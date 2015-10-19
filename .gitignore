@@ -1,0 +1,5 @@
+bin/
+out/
+node_modules/
+vscode-powershell.zip
+vscps-preview.zip

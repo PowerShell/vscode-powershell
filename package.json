@@ -1,0 +1,52 @@
+{
+	"name": "PowerShell",
+	"version": "0.1.0-preview",
+	"publisher": "daviwil",
+	"description": "Windows PowerShell for Visual Studio Code",	
+	"engines": { "vscode": "*" },
+	"main": "./out/powershellMain",
+	"activationEvents": ["onLanguage:PowerShell"],
+	"dependencies": {
+		"vscode": "0.9.6"
+	},
+    "scripts": {
+		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
+    },
+	"contributes": {
+		"languages": [{
+			"id": "PowerShell",
+			"extensions": [ ".ps1", ".psm1", ".psd1", ".pssc", ".psrc" ],
+			"aliases": [ "PowerShell", "powershell", "ps", "ps1" ]
+		}],
+		"configuration": {
+			"type": "object",
+			"title": "PowerShell Configuration",
+			"properties": {
+				"PowerShell.editorServicesHostPath": {
+					"type": "string",
+					"default": "bin/Microsoft.PowerShell.EditorServices.Host.exe",
+					"description": "Specifies the path to the PowerShell Editor Services host executable."
+				},
+				"PowerShell.waitForDebugger": {
+					"type": "boolean",
+					"default": false,
+					"description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
+				},
+				"PowerShell.enableLogging": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enables diagnostic logging for the extension."
+				}				
+			}
+		},
+		"debugAdapter": [
+			{
+				"type": "PowerShell",
+				"enableBreakpointsFor": { "languageIds": ["PowerShell"] },
+				"program": "bin/Microsoft.PowerShell.EditorServices.Host.exe"
+			}
+		]		
+	},
+	"private": true		
+}

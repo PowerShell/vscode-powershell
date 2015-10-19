@@ -1,0 +1,27 @@
+{
+	"version": "0.1.0",
+	"configurations": [
+		{
+			"request": "launch",
+			"name": "Launch Extension",
+			"type": "extensionHost",
+			//"runtimeExecutable": "${execPath}",
+			"runtimeExecutable": "c:/dev/Monaco/tools/code.bat",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"c:/Users/daviwil/Documents/DemoFiles"
+			],
+			"stopOnEntry": false,
+			"sourceMaps": true,
+			"outDir": "out",
+			"preLaunchTask": "npm"
+		},
+		{
+			"name": "Attach",
+			"type": "node",
+			"address": "localhost",
+			"port": 5858,
+			"sourceMaps": false
+		}
+	]
+}

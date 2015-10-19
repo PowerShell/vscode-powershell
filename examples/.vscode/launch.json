@@ -1,0 +1,10 @@
+{
+	"version": "0.1.0",
+	"configurations": [
+		{
+			"name": "PowerShell",
+			"type": "PowerShell",
+			"program": "DebugTest.ps1"
+		}
+	]
+}
