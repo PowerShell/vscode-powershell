@@ -5,7 +5,24 @@ More details forthcoming.
 
 ## Building the code
 
-`npm run compile`
+First, install the package dependencies:
+
+```
+npm install
+```
+
+The next two steps are required if you have Node.js 5 installed due to some change in npm:
+
+```
+cd node_modules\vscode
+npm install
+```
+
+Now you can compile the code:
+
+```
+npm run compile
+```
 
 After the initial compile, the source files will be watched and recompiled
 when changes are saved.
@@ -14,7 +31,9 @@ when changes are saved.
 
 From a PowerShell or cmd.exe prompt, run the following command:
 
-`code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .`
+```
+code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
+```
 		
 If you allow the compiler to continue watching for file changes, you can use
 the `Reload Window` command found in the command palette `(Ctrl+Shift+P)` 
