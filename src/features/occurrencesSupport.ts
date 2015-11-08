@@ -8,7 +8,7 @@ import vscode = require('vscode');
 import Proto = require('../protocol');
 import PowershellService = require('../powershellService');
 
-class OccurrencesSupport implements vscode.Modes.IOccurrencesSupport {
+class OccurrencesSupport implements vscode.DocumentHighlightProvider {
 	
 	private client: PowershellService.IPowershellServiceClient;
 	
@@ -16,25 +16,22 @@ class OccurrencesSupport implements vscode.Modes.IOccurrencesSupport {
 		this.client = client;
 	}
 
-	public findOccurrences(resource:vscode.TextDocument, position:vscode.Position, token: vscode.CancellationToken): Promise<vscode.Modes.IOccurrence[]> {
+	public provideDocumentHighlights(resource:vscode.TextDocument, position:vscode.Position, token: vscode.CancellationToken): Promise<vscode.DocumentHighlight[]> {
 		var args:Proto.FileLocationRequestArgs = {
-			file: this.client.asAbsolutePath(resource.getUri()),
-			//line: position.line + 1,
-			//offset: position.character + 1
-			line: position.line,
-			offset: position.character			
+			file: this.client.asAbsolutePath(resource.uri),
+			line: position.line + 1,
+			offset: position.character + 1
 		};
 		if (!args.file) {
-			return Promise.resolve<vscode.Modes.IOccurrence[]>([]);
+			return Promise.resolve<vscode.DocumentHighlight[]>([]);
 		}
-		return this.client.execute('occurrences', args, token).then((response):vscode.Modes.IOccurrence[] => {
+		return this.client.execute('occurrences', args, token).then((response):vscode.DocumentHighlight[] => {
 			var data = response.body;
 			if (data) {
 				return data.map((item) => {
-					return {
-						kind: item.isWriteAccess ? 'write' : null,
-						range: new vscode.Range(item.start.line, item.start.offset, item.end.line, item.end.offset)
-					};
+					return new vscode.DocumentHighlight(
+						new vscode.Range(item.start.line - 1, item.start.offset - 1, item.end.line - 1, item.end.offset - 1),
+						item.isWriteAccess ? vscode.DocumentHighlightKind.Write : vscode.DocumentHighlightKind.Read);
 				});
 			}
 		}, (err) => {

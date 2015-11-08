@@ -1,9 +1,10 @@
 .vscode/**
 typings/**
-node_modules/vscode/**
-node_modules/vscode-languageworker/**
+node_modules/**
 **/*.ts
 .gitignore
 tsconfig.json
+build/**
 bin/EditorServices.log
+bin/DebugService.log
 bin/*.vshost.*

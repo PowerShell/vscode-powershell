@@ -9,7 +9,7 @@ import Proto = require('../protocol');
 import PowershellService = require('../powershellService');
 import Previewer = require('./previewer');
 
-class ParameterHintsSupport implements vscode.Modes.IParameterHintsSupport {
+class ParameterHintsSupport implements vscode.SignatureHelpProvider {
 
 	public triggerCharacters:string[] = ['(', ',','"','-'];
 	public excludeTokens:string[] = ['string'];
@@ -20,41 +20,32 @@ class ParameterHintsSupport implements vscode.Modes.IParameterHintsSupport {
 		this.client = client;
 	}
 	
-	public getParameterHints(document:vscode.TextDocument, position:vscode.Position, token: vscode.CancellationToken): Promise<vscode.Modes.IParameterHints> {
+	public provideSignatureHelp(document:vscode.TextDocument, position:vscode.Position, token: vscode.CancellationToken):Promise<vscode.SignatureHelp> {
 		var args:Proto.SignatureHelpRequestArgs = {
-			file: this.client.asAbsolutePath(document.getUri()),
-			//line: position.line + 1,
-			//offset: position.character + 1
-			line: position.line,
-			offset: position.character						
+			file: this.client.asAbsolutePath(document.uri),
+			line: position.line + 1,
+			offset: position.character + 1						
 		};
 		if (!args.file) {
-			return Promise.resolve<vscode.Modes.IParameterHints>(null);
+			return Promise.resolve<vscode.SignatureHelp>(null);
 		}
 		return this.client.execute('signatureHelp', args).then((response) => {
 			var info = response.body;
 			if (!info) {
 				return null;
 			}
-			var result = <vscode.Modes.IParameterHints> {
-				currentSignature: 0,
-				currentParameter: 0,
-				signatures: []
-			};
+			
+			var result = new vscode.SignatureHelp();
+			result.activeSignature = info.selectedItemIndex;
+			result.activeParameter = info.argumentIndex;
+			
 			info.items.forEach(item => {
-				var signature = <vscode.Modes.ISignature> {
-					label: info.commandName += ' ',
-					documentation: null,
-					parameters: []
-				};
+				var signature = new vscode.SignatureInformation('');
+				signature.label += info.commandName + ' ';
 		
 				var paramlabel = item.signatureText;
-				var parameter = <vscode.Modes.IParameter> {
-					label: paramlabel,
-					documentation: null,
-					signatureLabelOffset: signature.label.length,
-					signatureLabelEnd: signature.label.length + paramlabel.length
-				};
+				var parameter = new vscode.ParameterInformation(item.signatureText, '');
+				
 				signature.label += paramlabel;
 				signature.parameters.push(parameter);
 

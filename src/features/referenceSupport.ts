@@ -8,7 +8,7 @@ import vscode = require('vscode');
 import Proto = require('../protocol');
 import PowershellService = require('../powershellService');
 
-class ReferenceSupport implements vscode.Modes.IReferenceSupport {
+class ReferenceSupport implements vscode.ReferenceProvider {
 
 	private client: PowershellService.IPowershellServiceClient;
 
@@ -18,27 +18,25 @@ class ReferenceSupport implements vscode.Modes.IReferenceSupport {
 		this.client = client;
 	}	
 
-	public findReferences(document: vscode.TextDocument, position: vscode.Position, includeDeclaration:boolean, token: vscode.CancellationToken): Promise<vscode.Modes.IReference[]> {
+	public provideReferences(document: vscode.TextDocument, position: vscode.Position, options: { includeDeclaration: boolean }, token: vscode.CancellationToken): Promise<vscode.Location[]> {	
 		var args: Proto.FileLocationRequestArgs = {
-			file: this.client.asAbsolutePath(document.getUri()),
-			//line: position.line + 1,
-			//offset: position.character + 1
-			line: position.line,
-			offset: position.character			
+			file: this.client.asAbsolutePath(document.uri),
+			line: position.line + 1,
+			offset: position.character + 1
 		};
 		if (!args.file) {
-			return Promise.resolve<vscode.Modes.IReference[]>([]);
+			return Promise.resolve<vscode.Location[]>([]);
 		}
 		return this.client.execute('references', args, token).then((msg) => {
-			var result: vscode.Modes.IReference[] = [];
+			var result: vscode.Location[] = [];
 			var refs = msg.body.refs;
 			for (var i = 0; i < refs.length; i++) {
 				var ref = refs[i];
 				var url = this.client.asUrl(ref.file);
-				result.push({
-					resource: url,
-					range: new vscode.Range(ref.start.line, ref.start.offset, ref.end.line, ref.end.offset)
-				});
+				result.push(
+					new vscode.Location(
+						url,
+						new vscode.Range(ref.start.line - 1, ref.start.offset - 1, ref.end.line - 1, ref.end.offset - 1)));
 			}
 			return result;
 		}, () => {

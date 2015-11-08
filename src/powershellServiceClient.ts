@@ -88,73 +88,74 @@ class PowershellServiceClient implements PowershellService.IPowershellServiceCli
 	private startService(): void {
 						
 		this.servicePromise = new Promise<cp.ChildProcess>((resolve, reject) => {
-			configuration.load('PowerShell').then(config => {
-			//vscode.extensions.getConfigurationMemento('PowerShell').getValue<string>('editorServicesHostPath').then(editorServicesHostPath => {
-				var editorServicesHostPath = config.editorServicesHostPath;
+			var config = configuration.load('PowerShell');
+			var editorServicesHostPath = config.editorServicesHostPath;
+			
+			PowershellServiceClient.Trace = config.enableLogging;
+			console.log("POWERSHELL> Logging enabled: " + PowershellServiceClient.Trace);
+			
+			if (config.editorServicesHostPath)
+			{	
+				this.log("Found Editor Services path from config: " + editorServicesHostPath);
+						
+				// Make the path absolute if it's not
+				editorServicesHostPath =
+					path.resolve(
+						__dirname,
+						config.editorServicesHostPath);
+						
+				this.log("    Resolved path to: " + editorServicesHostPath);
+			}
+			else
+			{
+				// Use the default path in the plugin's 'bin' folder
+				editorServicesHostPath =
+					path.join(
+						__dirname,
+						'..',
+						'bin',
+						'Microsoft.PowerShell.EditorServices.Host.exe');
+						
+				this.log("Using default Editor Services path: " + editorServicesHostPath);
+			}
+
+			var childProcess:cp.ChildProcess = null;
+			try {
+				var args: string[];
 				
-				PowershellServiceClient.Trace = true; //config.enableLogging;
-				console.log("-- PowerShell logging enabled? " + PowershellServiceClient.Trace);
+				if (config.waitForDebugger)
+				{
+					args = ['/waitForDebugger'];
+					this.log("Language service will wait for debugger after launching.");
+				}
 				
-				if (config.editorServicesHostPath)
-				{
-					// Make the path absolute if it's not
-					editorServicesHostPath =
-						path.resolve(
-							config.editorServicesHostPath);
-							
-					this.log("Found Editor Services path from config: " + editorServicesHostPath);
-				}
-				else
-				{
-					// Use the default path in the plugin's 'bin' folder
-					editorServicesHostPath =
-						path.join(
-							__dirname,
-							'..',
-							'bin',
-							'Microsoft.PowerShell.EditorServices.Host.exe');
-							
-					this.log("Using default Editor Services path: " + editorServicesHostPath);
-				}
+				if (isWin) {
+					childProcess = cp.spawn(editorServicesHostPath, args);
 
-				var childProcess:cp.ChildProcess = null;
-				try {
-					var args: string[];
-					
-					if (config.waitForDebugger)
-					{
-						args = ['/waitForDebugger'];
-						this.log("Language service will wait for debugger after launching.");
-					}
-					
-					if (isWin) {
-                       	childProcess = cp.spawn(editorServicesHostPath, args);
+				} /*else if (isDarwin) {
+					childProcess = cp.spawn(path.join(vscode.Paths.getAppRoot(), 'tools/bin/osx/node'), args);
+				} else if (isLinux && arch === 'x64') {
+					childProcess = cp.spawn(path.join(vscode.Paths.getAppRoot(), 'tools/bin/linux/x64/node'), args);
+				}*/
 
-					} /*else if (isDarwin) {
-						childProcess = cp.spawn(path.join(vscode.Paths.getAppRoot(), 'tools/bin/osx/node'), args);
-					} else if (isLinux && arch === 'x64') {
-						childProcess = cp.spawn(path.join(vscode.Paths.getAppRoot(), 'tools/bin/linux/x64/node'), args);
-					}*/
-
-					childProcess.on('error', (err:Error) => {
-						this.lastError = err;
-						this.serviceExited();
-					});
-					childProcess.on('exit', (err:Error) => {
-						this.serviceExited();
-					});
-					this.reader = new WireProtocol.Reader<Proto.Response>(childProcess.stdout, (msg) => {
-						this.dispatchMessage(msg);
-					});
-					
-					this.log("Finished spawning language service.");
-					
-					resolve(childProcess);
-				} catch (error) {
-					this.log("Failed to launch the language service! -> " + error);
-					reject(error);
-				}
-			});
+				childProcess.on('error', (err:Error) => {
+					this.lastError = err;
+					this.serviceExited();
+				});
+				childProcess.on('exit', (err:Error) => {
+					this.serviceExited();
+				});
+				this.reader = new WireProtocol.Reader<Proto.Response>(childProcess.stdout, (msg) => {
+					this.dispatchMessage(msg);
+				});
+				
+				this.log("Finished spawning language service.");
+				
+				resolve(childProcess);
+			} catch (error) {
+				this.log("Failed to launch the language service! -> " + error);
+				reject(error);
+			}
 		});
 	}
 

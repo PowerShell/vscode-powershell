@@ -42,7 +42,7 @@ class SyncedBuffer {
 	}
 
 	onContentChanged(events: vscode.TextDocumentContentChangeEvent[]): void {
-		var filePath = this.client.asAbsolutePath(this.document.getUri());
+		var filePath = this.client.asAbsolutePath(this.document.uri);
 		if (!filePath) {
 			return;
 		}
@@ -53,14 +53,10 @@ class SyncedBuffer {
 			var text = event.text;
 			var args:Proto.ChangeRequestArgs = {
 				file: filePath,
-				//line: range.start.line + 1,
-				//offset: range.start.character + 1,
-				//endLine: range.end.line + 1,
-				//endOffset: range.end.character + 1,
-				line: range.start.line,
-				offset: range.start.character,
-				endLine: range.end.line,
-				endOffset: range.end.character,
+				line: range.start.line + 1,
+				offset: range.start.character + 1,
+				endLine: range.end.line + 1,
+				endOffset: range.end.character + 1,
 				insertString: text
 			};
 			this.client.execute('change', args, false);
@@ -90,7 +86,7 @@ class BufferSyncSupport {
 		vscode.workspace.onDidOpenTextDocument(this.onDidAddDocument, this, this.disposables);
 		vscode.workspace.onDidCloseTextDocument(this.onDidRemoveDocument, this, this.disposables);
 		vscode.workspace.onDidChangeTextDocument(this.onDidChangeDocument, this, this.disposables);
-		vscode.workspace.getTextDocuments().forEach(this.onDidAddDocument, this);
+		vscode.workspace.textDocuments.forEach(this.onDidAddDocument, this);
 	}
 
 	public dispose(): void {
@@ -101,13 +97,13 @@ class BufferSyncSupport {
 
 	private onDidAddDocument(document: vscode.TextDocument): void {
 	
-		if (document.getLanguageId() !== this.modeId) {
+		if (document.languageId !== this.modeId) {
 			return;
 		}
-		if (document.isUntitled()) {
+		if (document.isUntitled) {
 			return;
 		}
-		var resource = document.getUri();
+		var resource = document.uri;
 		var filepath = this.client.asAbsolutePath(resource);
 		if (!filepath) {
 			return;
@@ -117,11 +113,11 @@ class BufferSyncSupport {
 		syncedBuffer.open();
 		this.requestDiagnostic(filepath);
 		
-		this.client.log("Added new document: " + document.getUri());		
+		this.client.log("Added new document: " + document.uri);		
 	}
 
 	private onDidRemoveDocument(document: vscode.TextDocument): void {
-		var filepath:string = this.client.asAbsolutePath(document.getUri());
+		var filepath:string = this.client.asAbsolutePath(document.uri);
 		if (!filepath) {
 			return;
 		}
@@ -134,7 +130,7 @@ class BufferSyncSupport {
 	}
 
 	private onDidChangeDocument(e: vscode.TextDocumentChangeEvent): void {
-		var filepath:string = this.client.asAbsolutePath(e.document.getUri());
+		var filepath:string = this.client.asAbsolutePath(e.document.uri);
 		if (!filepath) {
 			return;
 		}
