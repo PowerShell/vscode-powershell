@@ -17,7 +17,11 @@ export var defaultConfiguration: IConfiguration = {
 	enableLogging: false
 }
 
-export function load(myPluginId: string): Thenable<IConfiguration> {
-	let configuration = vscode.extensions.getConfigurationMemento(myPluginId);
-	return configuration.getValues<IConfiguration>(defaultConfiguration);
+export function load(myPluginId: string): IConfiguration {
+	let configuration = vscode.workspace.getConfiguration(myPluginId);
+	return {
+		editorServicesHostPath: configuration.get<string>("editorServicesHostPath", "../bin/Microsoft.PowerShell.EditorServices.Host.exe"),
+		waitForDebugger: configuration.get<boolean>("waitForDebugger", false),
+		enableLogging: configuration.get<boolean>("enableLogging", false)
+	}
 }

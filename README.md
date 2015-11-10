@@ -1,53 +1,36 @@
 # Windows PowerShell for Visual Studio Code
 
-Windows PowerShell language support for Visual Studio Code.
+This extension provides Windows PowerShell language support for Visual Studio Code.
 More details forthcoming.
 
-## Building the code
+## Features
 
-First, install the package dependencies:
-
-```
-npm install
-```
-
-The next two steps are required if you have Node.js 5 installed due to some change in npm:
-
-```
-cd node_modules\vscode
-npm install
-```
-
-Now you can compile the code:
-
-```
-npm run compile
-```
-
-After the initial compile, the source files will be watched and recompiled
-when changes are saved.
-
-## Running the compiled code
-
-From a PowerShell or cmd.exe prompt, run the following command:
-
-```
-code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
-```
-		
-If you allow the compiler to continue watching for file changes, you can use
-the `Reload Window` command found in the command palette `(Ctrl+Shift+P)` 
-so that the new source files are loaded.
+- IntelliSense for cmdlets and more
+- Rule-based analysis provided by [Windows PowerShell Script Analyzer](http://github.com/PowerShell/PSScriptAnalyzer)
+- Go to Definition for cmdlets and variables
+- Find References of cmdlets and variables
+- Local script debugging!
 
 ## Example Scripts
 
-There are some example scripts in the `examples` folder that you can
+There are some example scripts in the extension's `examples` folder that you can
 use to discover PowerShell editing and debugging functionality.  Please
-check out the [README.md](examples/README.md) file to learn more about
+check out the included [README.md](examples/README.md) file to learn more about
 how to use them.
+
+This folder can be found at the following path:
+
+```
+c:\Users\<yourusername>\.vscode\extensions\daviwil.PowerShell\examples
+```
+
+## Contributing to the Code
+
+Check out the [development documentation](docs/development.md) for more details
+on how to contribute to this extension!
 
 ## License
 
-This project is [licensed under the MIT License](LICENSE).  Please see the
+This extension is [licensed under the MIT License](LICENSE).  Please see the
 [third-party notices](Third Party Notices.txt) file for details on the third-party
 binaries that we include with releases of this project.
