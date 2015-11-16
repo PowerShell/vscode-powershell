@@ -24,10 +24,11 @@
 		"type": "git",
 		"url": "https://github.com/PowerShell/vscode-powershell.git"
 	},	
-	"main": "./out/powershellMain",
+	"main": "./out/main",
 	"activationEvents": ["onLanguage:PowerShell"],
 	"devDependencies": {
-		"vscode": "0.10.0"
+		"vscode": "0.10.0",
+		"vscode-languageclient": "0.10.4"
 	},
     "scripts": {
 		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
