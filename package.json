@@ -13,6 +13,7 @@
 	"categories": [
 		"Languages",
 		"Snippets",
+		"Debuggers",
 		"Linters"
 	],	
 	"icon": "images/PowerShell_icon.png",		
@@ -55,7 +56,7 @@
 			{
 				"type": "PowerShell",
 				"enableBreakpointsFor": { "languageIds": ["PowerShell"] },
-				"program": "bin/Microsoft.PowerShell.EditorServices.Host.exe"
+				"program": "bin/Microsoft.PowerShell.EditorServices.Host.DebugAdapter.cmd"
 			}
 		],		
 		"configuration": {
