@@ -57,9 +57,8 @@ when `F5` is pressed.
 
 ## Feedback
 
-We would love to hear your feedback!  Please send feature requests or issue 
-reports to [daviwil@microsoft.com](mailto:daviwil@microsoft.com) for now. 
- We'll provide a more appropriate issue tracker soon.
+We would love to hear your feedback!  Please post feature requests or issue 
+reports on our [GitHub issues page](http://github.com/PowerShell/vscode-powershell).
 
 If you are experiencing any errors or crashes, please include the 
 following two log files:

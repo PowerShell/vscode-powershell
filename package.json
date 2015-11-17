@@ -1,9 +1,9 @@
 {
 	"name": "PowerShell",
-	"displayName": "Windows PowerShell Language Support",
+	"displayName": "PowerShell",
 	"version": "0.1.0",
 	"publisher": "daviwil",
-	"description": "Develop Windows PowerShell scripts in Visual Studio Code!",	
+	"description": "Develop PowerShell scripts in Visual Studio Code!",	
 	"engines": { "vscode": "0.10.x" },
 	"author": {
 		"name": "Microsoft Corporation - Development Labs"

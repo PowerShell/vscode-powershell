@@ -1,15 +1,19 @@
-# Windows PowerShell for Visual Studio Code
+# PowerShell Language Support for Visual Studio Code
 
-This extension provides Windows PowerShell language support for Visual Studio Code.
-More details forthcoming.
+This extension provides rich PowerShell language support for Visual Studio Code.
+Now you write and debug PowerShell scripts using the excellent IDE-like interface
+that VS Code provides.
 
 ## Features
 
+- Syntax highlighting
+- Code snippets
 - IntelliSense for cmdlets and more
-- Rule-based analysis provided by [Windows PowerShell Script Analyzer](http://github.com/PowerShell/PSScriptAnalyzer)
-- Go to Definition for cmdlets and variables
+- Rule-based analysis provided by [PowerShell Script Analyzer](http://github.com/PowerShell/PSScriptAnalyzer)
+- Go to Definition of cmdlets and variables
 - Find References of cmdlets and variables
-- Local script debugging!
+- Document and workspace symbol discovery
+- Local script debugging and basic interactive console support!
 
 ## Example Scripts
 

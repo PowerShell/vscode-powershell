@@ -1,6 +1,5 @@
 .vscode/**
 typings/**
-node_modules/**
 **/*.ts
 .gitignore
 tsconfig.json
