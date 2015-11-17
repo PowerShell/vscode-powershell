@@ -27,9 +27,11 @@
 	},	
 	"main": "./out/main",
 	"activationEvents": ["onLanguage:PowerShell"],
+	"dependencies": {
+		"vscode-languageclient": "0.10.7"
+	},
 	"devDependencies": {
-		"vscode": "0.10.0",
-		"vscode-languageclient": "0.10.4"
+		"vscode": "0.10.0"
 	},
     "scripts": {
 		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
