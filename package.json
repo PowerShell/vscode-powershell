@@ -2,13 +2,10 @@
 	"name": "PowerShell",
 	"displayName": "PowerShell",
 	"version": "0.1.0",
-	"publisher": "daviwil",
+	"publisher": "ms-vscode",
 	"description": "Develop PowerShell scripts in Visual Studio Code!",	
 	"engines": { "vscode": "0.10.x" },
-	"author": {
-		"name": "Microsoft Corporation - Development Labs"
-	},
-	"license":"SEE LICENSE FILE",
+	"license":"SEE LICENSE IN LICENSE.txt",
 	"homepage": "https://github.com/PowerShell/vscode-powershell/README.md",
 	"categories": [
 		"Languages",
