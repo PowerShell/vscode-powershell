@@ -13,7 +13,7 @@
 		"Debuggers",
 		"Linters"
 	],	
-	"icon": "images/PowerShell_icon.png",		
+	"icon": "images/PowerShell_icon.png",
 	"galleryBanner": {
 		"color": "#ACD1EC",
 		"theme": "light"
@@ -63,7 +63,7 @@
 				"language": "powershell",
 				"path": "./snippets/PowerShell.json"
 			}
-		],
+		],		
 		"debuggers": [
 			{
 				"type": "PowerShell",
@@ -75,20 +75,20 @@
 			"type": "object",
 			"title": "PowerShell Configuration",
 			"properties": {
-				"PowerShell.editorServicesHostPath": {
+				"powershell.scriptAnalysis.enable": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enables real-time script analysis using PowerShell Script Analyzer."
+				},				
+				"powershell.developer.editorServicesHostPath": {
 					"type": "string",
 					"default": "../bin/Microsoft.PowerShell.EditorServices.Host.exe",
 					"description": "Specifies the path to the PowerShell Editor Services host executable."
 				},
-				"PowerShell.waitForDebugger": {
+				"powershell.developer.editorServicesWaitForDebugger": {
 					"type": "boolean",
 					"default": false,
 					"description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
-				},
-				"PowerShell.enableLogging": {
-					"type": "boolean",
-					"default": true,
-					"description": "Enables diagnostic logging for the extension."
 				}				
 			}
 		}

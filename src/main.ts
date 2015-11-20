@@ -6,7 +6,7 @@
 
 import path = require('path');
 import vscode = require('vscode');
-import configuration = require('./features/configuration');
+import settingsManager = require('./settings');
 import { LanguageClient, LanguageClientOptions, Executable } from 'vscode-languageclient';
 
 import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
@@ -14,7 +14,8 @@ import powerShellMessage = require('./features/ShowOnlineHelp');
 
 export function activate(context: vscode.ExtensionContext): void {
 	
-	var PowerShellLanguageId = 'PowerShell';
+	var PowerShellLanguageId = 'powershell';
+	var settings = settingsManager.load('powershell');
 
     vscode.languages.setLanguageConfiguration(PowerShellLanguageId, 
 	{
@@ -59,10 +60,17 @@ export function activate(context: vscode.ExtensionContext): void {
 		
 	});
 	
-	let serverPath = resolveLanguageServerPath();
+	let args = [];
+	if (settings.developer.editorServicesWaitForDebugger)
+	{
+		args.push('/waitForDebugger');
+	}
+	
+	let serverPath = resolveLanguageServerPath(settings);
 	let serverOptions = {
 		run: { 
-			command: serverPath, 
+			command: serverPath,
+			args: args 
 		},
 		debug: { 
 			command: serverPath,
@@ -99,11 +107,10 @@ export function activate(context: vscode.ExtensionContext): void {
     });
 }
 
-function resolveLanguageServerPath() : string {
-	var config = configuration.load('PowerShell');
-	var editorServicesHostPath = config.editorServicesHostPath;
+function resolveLanguageServerPath(settings: settingsManager.ISettings) : string {
+	var editorServicesHostPath = settings.developer.editorServicesHostPath;
 	
-	if (config.editorServicesHostPath)
+	if (editorServicesHostPath)
 	{	
 		console.log("Found Editor Services path from config: " + editorServicesHostPath);
 				
@@ -111,7 +118,7 @@ function resolveLanguageServerPath() : string {
 		editorServicesHostPath =
 			path.resolve(
 				__dirname,
-				config.editorServicesHostPath);
+				editorServicesHostPath);
 				
 		console.log("    Resolved path to: " + editorServicesHostPath);
 	}
