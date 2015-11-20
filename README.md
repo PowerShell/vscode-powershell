@@ -25,7 +25,7 @@ how to use them.
 This folder can be found at the following path:
 
 ```
-c:\Users\<yourusername>\.vscode\extensions\daviwil.PowerShell\examples
+c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell\examples
 ```
 
 ## Contributing to the Code
