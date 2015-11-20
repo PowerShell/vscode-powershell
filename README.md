@@ -13,6 +13,7 @@ that VS Code provides.
 - Go to Definition of cmdlets and variables
 - Find References of cmdlets and variables
 - Document and workspace symbol discovery
+- Launch online help for the symbol under the cursor using `Ctrl+F1`
 - Local script debugging and basic interactive console support!
 
 ## Example Scripts

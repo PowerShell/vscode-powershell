@@ -43,11 +43,11 @@
 			"key": "ctrl+f1",
 			"when": "editorTextFocus"
 		}],
-                "commands": [{
-                        "command": "PowerShell.OnlineHelp",
-                        "title": "Get online help for command",
-                        "category": "PowerShell"
-                }],        	
+		"commands": [{
+			"command": "PowerShell.OnlineHelp",
+			"title": "Get online help for command",
+			"category": "PowerShell"
+		}],
 		"languages": [{
 			"id": "PowerShell",
 			"extensions": [ ".ps1", ".psm1", ".psd1", ".pssc", ".psrc" ],

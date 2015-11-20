@@ -10,7 +10,7 @@ import settingsManager = require('./settings');
 import { LanguageClient, LanguageClientOptions, Executable } from 'vscode-languageclient';
 
 import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
-import powerShellMessage = require('./features/ShowOnlineHelp');
+import { registerShowHelpCommand } from './features/ShowOnlineHelp';
 
 export function activate(context: vscode.ExtensionContext): void {
 	
@@ -57,7 +57,6 @@ export function activate(context: vscode.ExtensionContext): void {
 				{ open: '\'', close: '\'', notIn: ['string', 'comment'] }
 			]			
 		}
-		
 	});
 	
 	let args = [];
@@ -94,17 +93,8 @@ export function activate(context: vscode.ExtensionContext): void {
 			
     client.start();
 
-    var disposable = vscode.commands.registerCommand('PowerShell.OnlineHelp', () => {
-		
-        const editor = vscode.window.activeTextEditor;
-
-        var selection = editor.selection;
-        var doc = editor.document;
-        var cwr = doc.getWordRangeAtPosition(selection.active)
-        var text = doc.getText(cwr);        
-        
-        client.sendRequest(powerShellMessage.ShowOnlineHelpRequest.type, text);
-    });
+	// Register other features
+	registerShowHelpCommand(client);
 }
 
 function resolveLanguageServerPath(settings: settingsManager.ISettings) : string {
