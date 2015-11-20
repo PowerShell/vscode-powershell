@@ -38,6 +38,26 @@
 		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
     },
 	"contributes": {
+		"keybindings": [{
+			"command": "PowerShell.OnlineHelp",
+			"key": "ctrl+f1",
+			"when": "editorTextFocus"
+		}],
+                "commands": [{
+                        "command": "PowerShell.OnlineHelp",
+                        "title": "Get online help for command",
+                        "category": "PowerShell"
+                }],        	
+		"languages": [{
+			"id": "PowerShell",
+			"extensions": [ ".ps1", ".psm1", ".psd1", ".pssc", ".psrc" ],
+			"aliases": [ "PowerShell", "powershell", "ps", "ps1" ]
+		}],
+		"grammars": [{
+			"language": "PowerShell",
+			"scopeName": "source.powershell",
+			"path": "./syntaxes/PowerShell.tmLanguage"
+		}],
 		"snippets": [
 			{
 				"language": "powershell",

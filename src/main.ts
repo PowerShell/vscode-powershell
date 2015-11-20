@@ -9,11 +9,14 @@ import vscode = require('vscode');
 import configuration = require('./features/configuration');
 import { LanguageClient, LanguageClientOptions, Executable } from 'vscode-languageclient';
 
+import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
+import powerShellMessage = require('./features/ShowOnlineHelp');
+
 export function activate(context: vscode.ExtensionContext): void {
 	
 	var PowerShellLanguageId = 'PowerShell';
 
-	vscode.languages.setLanguageConfiguration(PowerShellLanguageId, 
+    vscode.languages.setLanguageConfiguration(PowerShellLanguageId, 
 	{
 		wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)/g,
 		
@@ -81,7 +84,19 @@ export function activate(context: vscode.ExtensionContext): void {
 			serverOptions, 
 			clientOptions);
 			
-	client.start();
+    client.start();
+
+    var disposable = vscode.commands.registerCommand('PowerShell.OnlineHelp', () => {
+		
+        const editor = vscode.window.activeTextEditor;
+
+        var selection = editor.selection;
+        var doc = editor.document;
+        var cwr = doc.getWordRangeAtPosition(selection.active)
+        var text = doc.getText(cwr);        
+        
+        client.sendRequest(powerShellMessage.ShowOnlineHelpRequest.type, text);
+    });
 }
 
 function resolveLanguageServerPath() : string {
