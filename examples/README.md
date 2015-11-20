@@ -63,6 +63,6 @@ reports on our [GitHub issues page](http://github.com/PowerShell/vscode-powershe
 If you are experiencing any errors or crashes, please include the 
 following two log files:
 
-- The language service log file: `$env:USERPROFILE\.vscode\extensions\vscode-powershell\bin\EditorServices.log`
-- The debugging service log file: `$env:USERPROFILE\.vscode\extensions\vscode-powershell\bin\DebugService.log`
+- The language service log file: `$env:USERPROFILE\.vscode\extensions\ms-vscode.PowerShell\bin\EditorServices.log`
+- The debugging service log file: `$env:USERPROFILE\.vscode\extensions\ms-vscode.PowerShell\bin\DebugService.log`
   - NOTE: This file may not exist if you haven't use the debugger yet.
