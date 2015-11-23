@@ -11,6 +11,7 @@ import { LanguageClient, LanguageClientOptions, Executable } from 'vscode-langua
 
 import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
 import { registerShowHelpCommand } from './features/ShowOnlineHelp';
+import { registerConsoleCommands } from './features/Console';
 
 export function activate(context: vscode.ExtensionContext): void {
 	
@@ -95,6 +96,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
 	// Register other features
 	registerShowHelpCommand(client);
+	registerConsoleCommands(client);
 }
 
 function resolveLanguageServerPath(settings: settingsManager.ISettings) : string {

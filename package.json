@@ -38,16 +38,30 @@
 		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
     },
 	"contributes": {
-		"keybindings": [{
-			"command": "PowerShell.OnlineHelp",
-			"key": "ctrl+f1",
-			"when": "editorTextFocus"
-		}],
-		"commands": [{
-			"command": "PowerShell.OnlineHelp",
-			"title": "Get online help for command",
-			"category": "PowerShell"
-		}],
+		"keybindings": [
+			{
+				"command": "PowerShell.OnlineHelp",
+				"key": "ctrl+f1",
+				"when": "editorTextFocus && editorLangId == 'powershell'"
+			},
+			{
+				"command": "PowerShell.RunSelection",
+				"key": "f8",
+				"when": "editorTextFocus && editorLangId == 'powershell'"
+			}
+		],
+		"commands": [
+			{
+				"command": "PowerShell.OnlineHelp",
+				"title": "Get online help for command",
+				"category": "PowerShell"
+			},
+			{
+				"command": "PowerShell.RunSelection",
+				"title": "Run selection",
+				"category": "PowerShell"	
+			}
+		],
 		"snippets": [
 			{
 				"language": "powershell",
