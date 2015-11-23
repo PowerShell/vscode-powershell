@@ -5,5 +5,5 @@ typings/**
 tsconfig.json
 build/**
 bin/EditorServices.log
-bin/DebugService.log
+bin/DebugAdapter.log
 bin/*.vshost.*
