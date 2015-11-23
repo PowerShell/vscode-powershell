@@ -1,7 +1,7 @@
 # vscode-powershell Release History
 
 ## 0.2.0
-### Friday, November 20, 2015
+### Monday, November 23, 2015
 
 - (Experimental) Added a new "Run selection" (F8) command which executes the current code selection and displays the output
 - Added a new online help command!  Press Ctrl+F1 to get help for the symbol under the cursor.
