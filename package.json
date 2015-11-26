@@ -6,7 +6,7 @@
 	"description": "Develop PowerShell scripts in Visual Studio Code!",	
 	"engines": { "vscode": "0.10.x" },
 	"license":"SEE LICENSE IN LICENSE.txt",
-	"homepage": "https://github.com/PowerShell/vscode-powershell/README.md",
+	"homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
 	"categories": [
 		"Languages",
 		"Snippets",
