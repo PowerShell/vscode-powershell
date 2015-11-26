@@ -72,7 +72,18 @@
 			{
 				"type": "PowerShell",
 				"enableBreakpointsFor": { "languageIds": ["powershell"] },
-				"program": "bin/Microsoft.PowerShell.EditorServices.Host.DebugAdapter.cmd"
+				"program": "bin/Microsoft.PowerShell.EditorServices.Host.DebugAdapter.cmd",
+				"configurationAttributes": {
+					"launch": {
+						"required": [ "program" ],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "Workspace relative path to the PowerShell script."
+							}
+						}
+					}
+				},
 			}
 		],		
 		"configuration": {
