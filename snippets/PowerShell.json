@@ -1,4 +1,15 @@
 {
+	"Splatting": {
+		"prefix": "splat",
+		"body": [
+			"$Params = @{", 
+			"\tModule = '*'",
+			"\tVerb = 'Get'",
+			"}",
+			"Get-Command"
+			],
+		"description": "An example of how to use the PowerShell Splatting technique."
+	},
 	"Class": {
 		"prefix": "class",
 		"body": [
