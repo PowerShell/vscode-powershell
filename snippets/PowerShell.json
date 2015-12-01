@@ -6,7 +6,7 @@
 			"\tModule = '*'",
 			"\tVerb = 'Get'",
 			"}",
-			"Get-Command"
+			"Get-Command @Params"
 			],
 		"description": "An example of how to use the PowerShell Splatting technique."
 	},
