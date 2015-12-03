@@ -16,7 +16,7 @@ export function registerExpandAliasCommand(client: LanguageClient): void {
 		var text, range;
 		
 		var sls = selection.start;
-		var sle = selection.end;
+		var sle = selection.end; 
 		
 		if(
 			(sls.character === sle.character ) &&

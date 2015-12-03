@@ -10,9 +10,7 @@ import settingsManager = require('./settings');
 import { LanguageClient, LanguageClientOptions, Executable } from 'vscode-languageclient';
 
 import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
-import { registerFindModuleCommand } from './features/FindModule';
 import { registerExpandAliasCommand } from './features/ExpandAlias';
-import { registerGetInstalledModuleCommand } from './features/GetInstalledModule';
 import { registerShowHelpCommand } from './features/ShowOnlineHelp';
 import { registerConsoleCommands } from './features/Console';
 
@@ -98,9 +96,7 @@ export function activate(context: vscode.ExtensionContext): void {
     client.start();
 
 	// Register other features
-	registerFindModuleCommand(client);
 	registerExpandAliasCommand(client);
-	registerGetInstalledModuleCommand(client);
 	registerShowHelpCommand(client);
 	registerConsoleCommands(client);
 }
