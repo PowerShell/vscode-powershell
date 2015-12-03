@@ -62,16 +62,6 @@
 				"category": "PowerShell"
 			},		
 			{
-				"command": "PowerShell.GetInstalledModule",
-				"title": "Show Installed PowerShell Modules",
-				"category": "PowerShell"
-			},		
-			{
-				"command": "PowerShell.FindModule",
-				"title": "Install PowerShell Module",
-				"category": "PowerShell"
-			},
-			{
 				"command": "PowerShell.OnlineHelp",
 				"title": "Get online help for command",
 				"category": "PowerShell"
