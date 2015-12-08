@@ -25,9 +25,12 @@ check out the included [README.md](examples/README.md) file to learn more about
 how to use them.
 
 This folder can be found at the following path:
-
 ```
 c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell\examples
+```
+To open/view the extension's examples Visual Studio Code, run the following from your PowerShell command prompt:
+```
+code $env:USERPROFILE\.vscode\extensions\ms-vscode.PowerShell\examples
 ```
 
 ## Contributing to the Code
