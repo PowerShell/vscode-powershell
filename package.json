@@ -38,10 +38,15 @@
 		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
     },
 	"contributes": {
-		"keybindings": [
+		"keybindings": [			
 			{
 				"command": "PowerShell.OnlineHelp",
 				"key": "ctrl+f1",
+				"when": "editorTextFocus && editorLangId == 'powershell'"
+			},
+			{
+				"command": "PowerShell.ExpandAlias",
+				"key": "ctrl+f5",
 				"when": "editorTextFocus && editorLangId == 'powershell'"
 			},
 			{
@@ -50,7 +55,12 @@
 				"when": "editorTextFocus && editorLangId == 'powershell'"
 			}
 		],
-		"commands": [
+		"commands": [			
+			{
+				"command": "PowerShell.ExpandAlias",
+				"title": "Expand Alias",
+				"category": "PowerShell"
+			},		
 			{
 				"command": "PowerShell.OnlineHelp",
 				"title": "Get online help for command",
