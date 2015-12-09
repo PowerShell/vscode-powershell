@@ -25,13 +25,15 @@ export function registerConsoleCommands(client: LanguageClient): void {
 	
 	vscode.commands.registerCommand('PowerShell.RunSelection', () => {
 		var editor = vscode.window.activeTextEditor;
-		
-        client.sendRequest(EvaluateRequest.type, {
+		var start = editor.selection.start;
+        	var end = editor.selection.end;
+        	if(editor.selection.isEmpty){
+	            start = new vscode.Position(start.line, 0)
+	        }
+        	client.sendRequest(EvaluateRequest.type, {
 			expression: 
 				editor.document.getText(
-					new vscode.Range(
-						editor.selection.anchor, 
-						editor.selection.active))
+					new vscode.Range(start, end))
 		});		
 	});
 	
