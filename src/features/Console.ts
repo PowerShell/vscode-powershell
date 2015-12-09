@@ -37,7 +37,11 @@ export function registerConsoleCommands(client: LanguageClient): void {
 	
 	var consoleChannel = vscode.window.createOutputChannel("PowerShell Output");
 	client.onNotification(OutputNotification.type, (output) => {
-		consoleChannel.show(vscode.ViewColumn.Three);		
+		var outputEditorExist = vscode.window.visibleTextEditors.some((editor) => {
+	           return editor.document.languageId == 'Log'  
+	        });
+	        if(!outputEditorExist)
+			consoleChannel.show(vscode.ViewColumn.Three);		
 		consoleChannel.append(output.output);
 	});
 }
