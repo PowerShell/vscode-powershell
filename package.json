@@ -94,7 +94,15 @@
 							}
 						}
 					}
-				}
+				},
+				"initialConfigurations": [
+					{
+						"name": "PowerShell",
+						"type": "PowerShell",
+						"request": "launch",
+						"program": "SET_SCRIPT_FILE_PATH_HERE.ps1"
+					}
+				]
 			}
 		],		
 		"configuration": {
