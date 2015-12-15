@@ -1,5 +1,19 @@
 # vscode-powershell Release History
 
+## 0.3.0
+### Tuesday, December 15, 2015
+
+- Major improvements in variables retrieved from the debugging service:
+  - Global and script scope variables are now accessible
+  - New "Auto" scope which shows only the variables defined within the current scope
+  - Greatly improved representation of variable values, especially for dictionaries and
+    objects that implement the ToString() method
+- Added new "Expand Alias" command which resolves command aliases used in a file or 
+  selection and updates the source text with the resolved command names
+- Reduced default Script Analyzer rules to a minimal list    
+- Fixed a wide array of completion text replacement bugs
+- Improved extension upgrade experience
+
 ## 0.2.0
 ### Monday, November 23, 2015
 
