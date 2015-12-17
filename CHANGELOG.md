@@ -1,5 +1,10 @@
 # vscode-powershell Release History
 
+## 0.3.1
+### Thursday, December 17, 2015
+
+- Fix issue #49, Debug Console does not receive script output
+
 ## 0.3.0
 ### Tuesday, December 15, 2015
 
