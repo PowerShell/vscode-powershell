@@ -1,10 +1,11 @@
 {
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"configurations": [
 		{
 			"name": "PowerShell",
 			"type": "PowerShell",
-			"program": "DebugTest.ps1"
+			"request": "launch",
+			"program": "${workspaceRoot}/DebugTest.ps1"
 		}
 	]
 }
