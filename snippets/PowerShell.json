@@ -13,14 +13,14 @@
 	"Class": {
 		"prefix": "class",
 		"body": [
-			"class MyClass {",
+			"class ${classname:MyClass} {",
 		    	"\t# Property: Holds name",
 		   		"\t[String] $Name;",
 		
 				"",
 			    "\t# Constructor: Creates a new MyClass object, with the specified name",
-			    "\tMyClass([String] $NewName) {",
-			        "\t\t# Set name for MyClass",
+			    "\t${classname:MyClass}([String] $NewName) {",
+			        "\t\t# Set name for ${classname:MyClass}",
 			        "\t\t$this.Name = $NewName;",
 			    "\t}",
 				"",
@@ -46,7 +46,7 @@
 			".EXAMPLE",
 				"\tAnother example of how to use this cmdlet",
 			"#>",
-			"function Verb-Noun",
+			"function ${name:Verb-Noun}",
 			"{",
 			    "\t[CmdletBinding()]",
 			    "\t[Alias()]",
@@ -71,6 +71,7 @@
 			    "\t}",
 			    "\tProcess",
 			    "\t{",
+                "\t\t$1",
 			    "\t}",
 			    "\tEnd",
 			    "\t{",
@@ -104,7 +105,7 @@
 			".FUNCTIONALITY",
 			   	"\tThe functionality that best describes this cmdlet",
 			"#>",
-			"function Verb-Noun",
+			"function ${name:Verb-Noun}",
 			"{",
 			    "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
 			                  "\t\t\t\t   SupportsShouldProcess=$true,",
@@ -170,7 +171,7 @@
 		"prefix": "comment",
 		"body": [
 			"<#",
-			" #",
+			" # $1",
 			" #>"
 		],
 		"description": "Comment block"
@@ -304,9 +305,9 @@
 		"body": [
 			"do",
 			"{",
-    		"\t",
+    		"\t$1",
 			"}",
-			"until ($x -gt 0)"
+			"until (${condition:$x -gt 0})"
 		],
 		"description": "do-until loop"
 	},
@@ -315,18 +316,18 @@
 		"body": [
 			"do",
 			"{",
-    		"\t",
+    		"\t$1",
 			"}",
-			"while ($x -gt 0)"
+			"while (${condition:$x -gt 0})"
 		],
 		"description": "do-while loop"
 	},
 	"for": {
 		"prefix": "for",
 		"body": [
-			"for ($i = 1; $i -lt 99; $i++)",
+			"for ($${variable:i} = 1; $${variable:i} -lt 99; $${variable:i}++)",
 			"{",
-    		"\t",
+    		"\t$1",
 			"}"
 		],
 		"description": "for loop"
@@ -334,9 +335,9 @@
 	"foreach": {
 		"prefix": "foreach",
 		"body": [
-			"foreach ($item in $collection)",
+			"foreach ($${variable:item} in $${collection:collection})",
 			"{",
-    		"\t",
+    		"\t$1",
 			"}"
 		],
 		"description": "foreach loop"
@@ -344,19 +345,19 @@
 	"function": {
 		"prefix": "function",
 		"body": [
-			"function MyFunction ($param1, $param2)",
+			"function ${name:MyFunction} ($${param:param1})",
 			"{",
-    		"\t",
+    		"\t$1",
 			"}"
 		],
-		"description": "Simple function with two parameters"
+		"description": "Simple function"
 	},
 	"if": {
 		"prefix": "if",
 		"body": [
-			"if ($x -gt $y)",
+			"if (${condition:$x -gt $y})",
 			"{",
-    		"\t",
+    		"\t$1",
 			"}"
 		],
 		"description": "if statement"
@@ -364,13 +365,13 @@
 	"if-else": {
 		"prefix": "if-else",
 		"body": [
-			"if ($x -gt $y)",
+			"if (${condition:$x -gt $y})",
 			"{",
-    		"\t",
+    		"\t$1",
 			"}",
 			"else",
 			"{",
-    		"\t",
+    		"\t$2",
 			"}"
 		],
 		"description": "if-else statement"
@@ -378,9 +379,9 @@
 	"switch": {
 		"prefix": "switch",
 		"body": [
-			"switch ($x)",
+			"switch (${variable:$x})",
 			"{",
-			"\t'value1' {}",
+			"\t'${val:value1}' { $1 }",
     		"\t{$_ -in 'A','B','C'} {}",
     		"\t'value3' {}",
     		"\tDefault {}",
@@ -393,10 +394,10 @@
 		"body": [
 			"Param(",
     		"\t[Parameter(Mandatory=$true)]",
-    		"\t[string]$RequiredInput1,",
+    		"\t[string]$${param1:RequiredInput1},",
 			"",
 		    "\t[Parameter(Mandatory=$true)]",
-    		"\t[string]$RequiredInput2",
+    		"\t[string]$${param2:RequiredInput2}",
 			")"
 		],
 		"description": "Param declaration with mandatory parameters"
@@ -406,11 +407,11 @@
 		"body": [
 			"try",
 			"{",
-			    "\t1/0",
+			    "\t${1:1/0}",
 			"}",
-			"catch [DivideByZeroException]",
+			"catch [${2:DivideByZeroException}]",
 			"{",
-			    "\tWrite-Host \"Divide by zero exception\"",
+			    "\t${3:Write-Host \"Divide by zero exception\"}",
 			"}",
 			"catch [System.Net.WebException],[System.Exception]",
 			"{",
@@ -428,11 +429,11 @@
 		"body": [
 			"try",
 			"{",
-			    "\t",
+			    "\t$1",
 			"}",
 			"finally",
 			"{",
-			    "\t",
+			    "\t$2",
 			"}"
 		],
 		"description": "try-finally exception handling"
@@ -440,9 +441,9 @@
 	"while": {
 		"prefix": "while",
 		"body": [
-			"while ($x -gt 0)",
+			"while (${condition:$x -gt 0})",
 			"{",
-			    "\t",
+			    "\t$1",
 			"}"
 		],
 		"description": "while loop"
@@ -450,7 +451,7 @@
 	"Advanced Workflow": {
 		"prefix": "advanced workflow",
 		"body": [
-			"workflow Verb-Noun",
+			"workflow ${name:Verb-Noun}",
 			"{",
 			"<#",
 			".Synopsis",
@@ -549,19 +550,19 @@
 			".FUNCTIONALITY",
 			   "\tThe functionality that best describes this workflow",
 			"#>",
-			"workflow Verb-Noun",
+			"workflow ${name:Verb-Noun}",
 			"{",
 			    "\tParam",
 			    "\t(",
 			        "\t\t# Param1 help description",
 			        "\t\t[string]",
-			        "\t\t$Param1,",
+			        "\t\t$${param1:Param1},",
 			
 			        "\t\t# Param2 help description",
 			        "\t\t[int]",
-			        "\t\t$Param2",
+			        "\t\t$${param2:Param2}",
 			    "\t)",
-				"",
+				"\t$1",
 			"}"
 		],
 		"description": "Basic workflow"
@@ -569,9 +570,9 @@
 	"Workflow ForEachParallel": {
 		"prefix": "workflow ForEachParallel",
 		"body": [
-			"foreach -parallel ($item in $collection)",
+			"foreach -parallel ($${variable:item} in $${collection:collection})",
 			"{",
-			"",
+			"\t$1",
 			"}"
 		],
 		"description": "Runs contents of foreach block in parallel"
@@ -581,7 +582,7 @@
 		"body": [
 			"inlineScript",
 			"{",
-			"",
+			"\t$1",
 			"} # Optional workflow common parameters such as -PSComputerName and -PSCredentialw"
 		],
 		"description": "Runs isolated blocks of PowerShell script"
@@ -591,7 +592,7 @@
 		"body": [
 			"parallel",
 			"{",
-			"",
+			"\t$1",
 			"}"
 		],
 		"description": "Runs commands in parallel"
@@ -601,7 +602,7 @@
 		"body": [
 			"sequence",
 			"{",
-			"",
+			"\t$1",
 			"}"
 		],
 		"description": "Runs commands in sequential order"
