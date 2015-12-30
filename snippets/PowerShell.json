@@ -375,7 +375,16 @@
 			"}"
 		],
 		"description": "if-else statement"
-	},	
+	},
+    "method": {
+        "prefix": "method",
+        "body": [
+            "[${returnType:void}] ${name:MyMethod}(${Optional Parameters}) {",
+            "\t$1",
+            "}"
+        ],
+        "description": "Method of a class"
+    },
 	"switch": {
 		"prefix": "switch",
 		"body": [
