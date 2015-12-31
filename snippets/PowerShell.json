@@ -411,6 +411,20 @@
 		],
 		"description": "Param declaration with mandatory parameters"
 	},
+    "try-catch": {
+        "prefix": "try-catch",
+        "body": [
+            "try",
+            "{",
+            "\t$1",
+            "}",
+            "catch [${exception:System.Exception}]",
+            "{",
+            "\t$2",
+            "}"
+        ],
+        "description": "try-catch exception handling"
+    },
 	"try-catch-finally": {
 		"prefix": "try-catch-finally",
 		"body": [
