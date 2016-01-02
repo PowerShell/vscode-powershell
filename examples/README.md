@@ -3,19 +3,19 @@
 *NOTE: For a more comfortable reading experience, use the key combination `Ctrl+Shift+V`*
 
 This folder contains a few basic PowerShell script files that you can use
-to experiment with the new PowerShell editing and debugging capabilities. 
+to experiment with the new PowerShell editing and debugging capabilities.
 Here are some ideas for what you can try with these scripts:
 
 ## Language Features
 
-- **Integrated syntax checks** from the PowerShell engine and **integrated 
+- **Integrated syntax checks** from the PowerShell engine and **integrated
   rule-based analysis** using PowerShell Script Analyzer
   - Try opening `DebugTest.ps1` and `StopTest.ps1` by double-clicking on their
     file names.  You will see red and green squiggles for rule-based checks.
     You can introduce a syntax error somewhere to see the red squiggle for
-    that as well.  To see a list of all errors and warnings, try pressing 
+    that as well.  To see a list of all errors and warnings, try pressing
     `Ctrl+Shift+M`.
-- **Go to definition `(F12)`** and **Peek definition `(Alt+F12)`** 
+- **Go to definition `(F12)`** and **Peek definition `(Alt+F12)`**
   for cmdlet and variable names
   - Try this on the `Stop-Process2` cmdlet in `StopTest.ps1`
 - **Find all references `(Shift+F12)`** for cmdlet and variable names
@@ -28,7 +28,7 @@ Here are some ideas for what you can try with these scripts:
 You can run scripts under the debugger by going to the debug workspace
 `(Ctrl+Shift+D)` and clicking the `Start` button or just by pressing `F5`.
 By default the debugger will start the `DebugTest.ps1` script.  You can
-set breakpoints, pause execution, look at the call stack, inspect variables, 
+set breakpoints, pause execution, look at the call stack, inspect variables,
 and set specific variables to be watched.
 
 Try these steps:
@@ -38,7 +38,7 @@ Try these steps:
 3. Press the blue **Pause** button at the top of the screen.  The debugger
    will stop executing wherever it is at the moment and will bring you to the
    file and line where it stopped.
-4. Check out the **Variables** pane at the top left of the window.  Scroll 
+4. Check out the **Variables** pane at the top left of the window.  Scroll
    through the list and inspect some of the variables there.
 5. Find the variable `i` in the Variables list, right click it and select
    **Add to Watch**.  The variable should appear in the **Watch** pane now.
@@ -57,12 +57,12 @@ when `F5` is pressed.
 
 ## Feedback
 
-We would love to hear your feedback!  Please post feature requests or issue 
+We would love to hear your feedback!  Please post feature requests or issue
 reports on our [GitHub issues page](http://github.com/PowerShell/vscode-powershell).
 
-If you are experiencing any errors or crashes, please include the 
+If you are experiencing any errors or crashes, please include the
 following two log files:
 
-- The language service log file: `$env:USERPROFILE\.vscode\extensions\ms-vscode.PowerShell\bin\EditorServices.log`
-- The debugging service log file: `$env:USERPROFILE\.vscode\extensions\ms-vscode.PowerShell\bin\DebugService.log`
-  - NOTE: This file may not exist if you haven't use the debugger yet.
+- The language service log file: `$Home\.vscode\extensions\ms-vscode.PowerShell-<version>\bin\EditorServices.log`
+- The debugging service log file: `$Home\.vscode\extensions\ms-vscode.PowerShell-<version>\bin\DebugService.log`
+  - NOTE: This file may not exist if you haven't use the debugger yet.  Replace `<version>` in the paths above with the version number of the extension.
