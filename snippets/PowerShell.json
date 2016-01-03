@@ -626,6 +626,15 @@
         ],
         "description": "do-while loop"
     },
+    "while": {
+        "prefix": "while",
+        "body": [
+            "while (${condition}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "while loop"
+    },
     "for": {
         "prefix": "for",
         "body": [
@@ -660,7 +669,7 @@
             "\t$0",
             "}"
         ],
-        "description": "function"
+        "description": "function definition"
     },
     "if": {
         "prefix": "if",
@@ -670,18 +679,6 @@
             "}"
         ],
         "description": "if statement"
-    },
-    "if-else": {
-        "prefix": "if-else",
-        "body": [
-            "if (${condition}) {",
-            "\t$1",
-            "}",
-            "else {",
-            "\t$2",
-            "}"
-        ],
-        "description": "if-else statement"
     },
     "elseif": {
         "prefix": "elseif",
@@ -749,15 +746,6 @@
             "}"
         ],
         "description": "try-finally exception handling"
-    },
-    "while": {
-        "prefix": "while",
-        "body": [
-            "while (${condition}) {",
-            "\t$0",
-            "}"
-        ],
-        "description": "while loop"
     },
 
     "Workflow": {
