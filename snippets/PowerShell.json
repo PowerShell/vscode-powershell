@@ -1,633 +1,834 @@
 {
-	"Splatting": {
-		"prefix": "splat",
-		"body": [
-			"$Params = @{", 
-			"\tModule = '*'",
-			"\tVerb = 'Get'",
-			"}",
-			"Get-Command @Params"
-			],
-		"description": "An example of how to use the PowerShell Splatting technique."
-	},
-	"Class": {
-		"prefix": "class",
-		"body": [
-			"class ${classname:MyClass} {",
-		    	"\t# Property: Holds name",
-		   		"\t[String] $Name;",
-		
-				"",
-			    "\t# Constructor: Creates a new MyClass object, with the specified name",
-			    "\t${classname:MyClass}([String] $NewName) {",
-			        "\t\t# Set name for ${classname:MyClass}",
-			        "\t\t$this.Name = $NewName;",
-			    "\t}",
-				"",
-			
-			    "\t# Method: Method that changes $Name to the default name",
-			    "\t[void] ChangeNameToDefault() {",
-			        "\t\t$this.Name = \"DefaultName\";",
-			    "\t}",
-			"}"
-		],
-		"description": "Simple example class with a constructor and a method"
-	},	
-	"Cmdlet": {
-		"prefix": "cmdlet",
-		"body": [
-			"<#",
-			".Synopsis",
-				"\tShort description",
-			".DESCRIPTION",
-				"\tLong description",
-			".EXAMPLE",
-				"\tExample of how to use this cmdlet",
-			".EXAMPLE",
-				"\tAnother example of how to use this cmdlet",
-			"#>",
-			"function ${name:Verb-Noun}",
-			"{",
-			    "\t[CmdletBinding()]",
-			    "\t[Alias()]",
-			   	"\t[OutputType([int])]",
-			    "\tParam",
-			    "\t(",
-			        "\t\t# Param1 help description",
-			        "\t\t[Parameter(Mandatory=$true,",
-			        "\t\t\t\t   ValueFromPipelineByPropertyName=$true,",
-			        "\t\t\t\t   Position=0)]",
-			        "\t\t$Param1,",
-					"\t\t",
-					
-			        "\t\t# Param2 help description",
-			        "\t\t[int]",
-			        "\t\t$Param2",
-			    "\t)",
-				"\t",
-				
-			    "\tBegin",
-			    "\t{",
-			    "\t}",
-			    "\tProcess",
-			    "\t{",
-                "\t\t$1",
-			    "\t}",
-			    "\tEnd",
-			    "\t{",
-			    "\t}",
-			"}"
-		],
-		"description": "ScriptCmdlet with some attributes and inline help fields"
-	},
-	"Complete Cmdlet": {
-		"prefix": "complete cmdlet",
-		"body": [
-			"<#",
-			".Synopsis",
-				"\tShort description",
-			".DESCRIPTION",
-				"\tLong description",
-			".EXAMPLE",
-				"\tExample of how to use this cmdlet",
-			".EXAMPLE",
-				"\tAnother example of how to use this cmdlet",
-			".INPUTS",
-			  	"\tInputs to this cmdlet (if any)",
-			".OUTPUTS",
-			   	"\tOutput from this cmdlet (if any)",
-			".NOTES",
-			  	"\tGeneral notes",
-			".COMPONENT",
-			   	"\tThe component this cmdlet belongs to",
-			".ROLE",
-			  	"\tThe role this cmdlet belongs to",
-			".FUNCTIONALITY",
-			   	"\tThe functionality that best describes this cmdlet",
-			"#>",
-			"function ${name:Verb-Noun}",
-			"{",
-			    "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
-			                  "\t\t\t\t   SupportsShouldProcess=$true,",
-			                  "\t\t\t\t   PositionalBinding=$false,",
-			                  "\t\t\t\t   HelpUri = 'http://www.microsoft.com/',",
-			                  "\t\t\t\t   ConfirmImpact='Medium')]",
-			    "\t[Alias()]",
-			    "\t[OutputType([String])]",
-			    "\tParam",
-			    "\t(",
-			        "\t\t# Param1 help description",
-			        "\t\t[Parameter(Mandatory=$true,",
-			                   "\t\t\t\t   ValueFromPipeline=$true,",
-			                   "\t\t\t\t   ValueFromPipelineByPropertyName=$true,",
-			                   "\t\t\t\t   ValueFromRemainingArguments=$false, ",
-			                   "\t\t\t\t   Position=0,",
-			                   "\t\t\t\t   ParameterSetName='Parameter Set 1')]",
-			        "\t\t[ValidateNotNull()]",
-			        "\t\t[ValidateNotNullOrEmpty()]",
-			        "\t\t[ValidateCount(0,5)]",
-			        "\t\t[ValidateSet(\"sun\", \"moon\", \"earth\")]",
-			        "\t\t[Alias(\"p1\")] ",
-			        "\t\t$Param1,",
-					"\t\t",
-			        
-					"\t\t# Param2 help description",
-			        "\t\t[Parameter(ParameterSetName='Parameter Set 1')]",
-			        "\t\t[AllowNull()]",
-			        "\t\t[AllowEmptyCollection()]",
-			        "\t\t[AllowEmptyString()]",
-			        "\t\t[ValidateScript({$true})]",
-			        "\t\t[ValidateRange(0,5)]",
-			        "\t\t[int]",
-			        "\t\t$Param2,",
-					"\t\t",
-			        
-					"\t\t# Param3 help description",
-			        "\t\t[Parameter(ParameterSetName='Another Parameter Set')]",
-			        "\t\t[ValidatePattern(\"[a-z]*\")]",
-			        "\t\t[ValidateLength(0,15)]",
-			        "\t\t[String]",
-			        "\t\t$Param3",
-			    "\t)",
-				"\t",
-			    
-				"\tBegin",
-			    "\t{",
-			    "\t}",
-			    "\tProcess",
-			    "\t{",
-			        "\t\tif ($pscmdlet.ShouldProcess(\"Target\", \"Operation\"))",
-			        "\t\t{",
-			        "\t\t}",
-			    "\t}",
-			    "\tEnd",
-			    "\t{",
-			    "\t}",
-			"}"
-		],
-		"description": "ScriptCmdlet with all attributes and inline help fields"
-	},
-	"comment block": {
-		"prefix": "comment",
-		"body": [
-			"<#",
-			" # $1",
-			" #>"
-		],
-		"description": "Comment block"
-	},
-	"DSC Configuration": {
-		"prefix": "DSC config",
-		"body": [
-			"configuration Name",
-			"{",
-			    "\t# One can evaluate expressions to get the node list",
-			    "\t# E.g: $AllNodes.Where(\"Role -eq Web\").NodeName",
-			    "\tnode (\"Node1\",\"Node2\",\"Node3\")",
-			    "\t{",
-			        "\t\t# Call Resource Provider",
-			        "\t\t# E.g: WindowsFeature, File",
-			        "\t\tWindowsFeature FriendlyName",
-			        "\t\t{",
-			           "\t\t\tEnsure = \"Present\"",
-			           "\t\t\tName = \"Feature Name\"",
-			        "\t\t}",
-					"",
-			        "\t\tFile FriendlyName",
-			        "\t\t{",
-			            "\t\t\tEnsure = \"Present\"",
-			            "\t\t\tSourcePath = $SourcePath",
-			            "\t\t\tDestinationPath = $DestinationPath",
-			            "\t\t\tType = \"Directory\"",
-			            "\t\t\tDependsOn = \"[WindowsFeature]FriendlyName\"",
-			        "\t\t}",       
-			    "\t}",
-			"}"
-		],
-		"description": "DSC Configuration that uses built-in resource providers"
-	},
-	"DSC Resource Provider": {
-		"prefix": "DSC resource",
-		"body": [
-			"Function Get-TargetResource",
-			"{",
-			    "\t# TODO: Add parameters here",
-			    "\t# Make sure to use the same parameters for",
-			    "\t# Get-TargetResource, Set-TargetResource, and Test-TargetResource",
-			    "\tparam(",
-			    "\t)",
-			"}",
-			
-			"Function Set-TargetResource",
-			"{",
-			    "\t# TODO: Add parameters here",
-			    "\t# Make sure to use the same parameters for",
-			    "\t# Get-TargetResource, Set-TargetResource, and Test-TargetResource",
-			    "\tparam(",
-			    "\t)",
-			"}",
-			
-			"Function Test-TargetResource",
-			"{",
-			    "\t# TODO: Add parameters here",
-			    "\t# Make sure to use the same parameters for",
-			    "\t# Get-TargetResource, Set-TargetResource, and Test-TargetResource",
-			    "\tparam(",
-			    "\t)",
-			"}"
-		],
-		"description": "Simple DSC resource provider with functions"
-	},
-	"DSC Resource with class": {
-		"prefix": "DSC resource class",
-		"body": [
-			"# Defines the values for the resource's Ensure property.",
-			"enum Ensure",
-			"{",
-			    "\t# The resource must be absent.",    
-			    "\tAbsent",
-			    "\t# The resource must be present.",    
-			    "\tPresent",
-			"}",
-			"",
-			"# [DscResource()] indicates the class is a DSC resource.",
-			"[DscResource()]",
-			"class NameOfResource",
-			"{",
-			    "\t# A DSC resource must define at least one key property.",
-			    "\t[DscProperty(Key)]",
-			    "\t[string]$P1",
-				
-				"",
-			    "\t# Mandatory indicates the property is required and DSC will guarantee it is set.",
-			    "\t[DscProperty(Mandatory)]",
-			    "\t[Ensure] $P2",
-				
-				"",
-			    "\t# NotConfigurable properties return additional information about the state of the resource.",
-			    "\t# For example, a Get() method might return the date a resource was last modified.",
-			    "\t# NOTE: These properties are only used by the Get() method and cannot be set in configuration.",    
-			    "\t[DscProperty(NotConfigurable)]",
-			    "\t[Nullable[datetime]] $P3",
-				
-				"",
-			    "\t[DscProperty()]",
-			    "\t[ValidateSet(\"val1\", \"val2\")]",
-			    "\t[string] $P4",
-				
-			    "",
-			    "\t# Sets the desired state of the resource.",
-			    "\t[void] Set()",
-			    "\t{",       
-			    "\t}",        
-			    
-				"",
-			    "\t# Tests if the resource is in the desired state.",
-			    "\t[bool] Test()",
-			    "\t{",        
-			       "\t\t return $true",
-			    "\t}",    
-			    "\t# Gets the resource's current state.",
-			    "\t[NameOfResource] Get()",
-			    "\t{",        
-			        "\t\t# NotConfigurable properties are set in the Get method.",
-			        "\t\t$this.P3 = something",
-			        "\t\t# Return this instance or construct a new instance.",
-			        "\t\treturn $this",
-			    "\t}",    
-			"}"
-		],
-		"description": "DSC Resource using classes"
-	},
-
-	"do-until": {
-		"prefix": "do-until",
-		"body": [
-			"do",
-			"{",
-    		"\t$1",
-			"}",
-			"until (${condition:$x -gt 0})"
-		],
-		"description": "do-until loop"
-	},
-	"do-while": {
-		"prefix": "do-while",
-		"body": [
-			"do",
-			"{",
-    		"\t$1",
-			"}",
-			"while (${condition:$x -gt 0})"
-		],
-		"description": "do-while loop"
-	},
-	"for": {
-		"prefix": "for",
-		"body": [
-			"for ($${variable:i} = 1; $${variable:i} -lt 99; $${variable:i}++)",
-			"{",
-    		"\t$1",
-			"}"
-		],
-		"description": "for loop"
-	},
-	"foreach": {
-		"prefix": "foreach",
-		"body": [
-			"foreach ($${variable:item} in $${collection:collection})",
-			"{",
-    		"\t$1",
-			"}"
-		],
-		"description": "foreach loop"
-	},
-	"function": {
-		"prefix": "function",
-		"body": [
-			"function ${name:MyFunction} ($${param:param1})",
-			"{",
-    		"\t$1",
-			"}"
-		],
-		"description": "Simple function"
-	},
-	"if": {
-		"prefix": "if",
-		"body": [
-			"if (${condition:$x -gt $y})",
-			"{",
-    		"\t$1",
-			"}"
-		],
-		"description": "if statement"
-	},
-	"if-else": {
-		"prefix": "if-else",
-		"body": [
-			"if (${condition:$x -gt $y})",
-			"{",
-    		"\t$1",
-			"}",
-			"else",
-			"{",
-    		"\t$2",
-			"}"
-		],
-		"description": "if-else statement"
-	},
-    "method": {
-        "prefix": "method",
+    "Example-Class": {
+        "prefix": "ex-class",
         "body": [
-            "[${returnType:void}] ${name:MyMethod}(${Optional Parameters}) {",
-            "\t$1",
+            "class ${classname:MyClass} {",
+                "\t# Property: Holds name",
+                "\t[String] $Name",
+
+                "",
+                "\t# Constructor: Creates a new MyClass object, with the specified name",
+                "\t${classname:MyClass}([String] $NewName) {",
+                "\t\t# Set name for ${classname:MyClass}",
+                "\t\t$this.Name = $NewName",
+                "\t}",
+                "",
+
+                "\t# Method: Method that changes $Name to the default name",
+                "\t[void] ChangeNameToDefault() {",
+                "\t\t$this.Name = \"DefaultName\"",
+                "\t}",
             "}"
         ],
-        "description": "Method of a class"
+        "description": "Example class with a constructor, property and a method"
     },
-	"switch": {
-		"prefix": "switch",
-		"body": [
-			"switch (${variable:$x})",
-			"{",
-			"\t'${val:value1}' { $1 }",
-    		"\t{$_ -in 'A','B','C'} {}",
-    		"\t'value3' {}",
-    		"\tDefault {}",
-			"}"
-		],
-		"description": "switch statement"
-	},
-	"parameter": {
-		"prefix": "param",
-		"body": [
-			"Param(",
-    		"\t[Parameter(Mandatory=$true)]",
-    		"\t[string]$${param1:RequiredInput1},",
-			"",
-		    "\t[Parameter(Mandatory=$true)]",
-    		"\t[string]$${param2:RequiredInput2}",
-			")"
-		],
-		"description": "Param declaration with mandatory parameters"
-	},
-    "try-catch": {
-        "prefix": "try-catch",
+    "Example-Cmdlet": {
+        "prefix": "ex-cmdlet",
         "body": [
-            "try",
+            "<#",
+            ".SYNOPSIS",
+                "\tShort description",
+            ".DESCRIPTION",
+                "\tLong description",
+            ".EXAMPLE",
+                "\tExample of how to use this cmdlet",
+            ".EXAMPLE",
+                "\tAnother example of how to use this cmdlet",
+            ".INPUTS",
+                "\tInputs to this cmdlet (if any)",
+            ".OUTPUTS",
+                "\tOutput from this cmdlet (if any)",
+            ".NOTES",
+                "\tGeneral notes",
+            ".COMPONENT",
+                "\tThe component this cmdlet belongs to",
+            ".ROLE",
+                "\tThe role this cmdlet belongs to",
+            ".FUNCTIONALITY",
+                "\tThe functionality that best describes this cmdlet",
+            "#>",
+            "function ${name:Verb-Noun} {",
+                "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
+                "\t               SupportsShouldProcess=$true,",
+                "\t               PositionalBinding=$false,",
+                "\t               HelpUri = 'http://www.microsoft.com/',",
+                "\t               ConfirmImpact='Medium')]",
+                "\t[Alias()]",
+                "\t[OutputType([String])]",
+                "\tParam (",
+                "\t\t# Param1 help description",
+                "\t\t[Parameter(Mandatory=$true,",
+                "\t\t           Position=0,",
+                "\t\t           ValueFromPipeline=$true,",
+                "\t\t           ValueFromPipelineByPropertyName=$true,",
+                "\t\t           ValueFromRemainingArguments=$false, ",
+                "\t\t           ParameterSetName='Parameter Set 1')]",
+                "\t\t[ValidateNotNull()]",
+                "\t\t[ValidateNotNullOrEmpty()]",
+                "\t\t[ValidateCount(0,5)]",
+                "\t\t[ValidateSet(\"sun\", \"moon\", \"earth\")]",
+                "\t\t[Alias(\"p1\")] ",
+                "\t\t$Param1,",
+                "\t\t",
+
+                "\t\t# Param2 help description",
+                "\t\t[Parameter(ParameterSetName='Parameter Set 1')]",
+                "\t\t[AllowNull()]",
+                "\t\t[AllowEmptyCollection()]",
+                "\t\t[AllowEmptyString()]",
+                "\t\t[ValidateScript({$true})]",
+                "\t\t[ValidateRange(0,5)]",
+                "\t\t[int]",
+                "\t\t$Param2,",
+                "\t\t",
+
+                "\t\t# Param3 help description",
+                "\t\t[Parameter(ParameterSetName='Another Parameter Set')]",
+                "\t\t[ValidatePattern(\"[a-z]*\")]",
+                "\t\t[ValidateLength(0,15)]",
+                "\t\t[String]",
+                "\t\t$Param3",
+                "\t)",
+                "\t",
+
+                "\tbegin {",
+                "\t}",
+                "\t",
+
+                "\tprocess {",
+                "\t\tif ($pscmdlet.ShouldProcess(\"Target\", \"Operation\")) {",
+                "\t\t$0",
+                "\t\t}",
+                "\t}",
+                "\t",
+
+                "\tend {",
+                "\t}",
+            "}"
+        ],
+        "description": "Example script cmdlet with all attributes and inline help fields"
+    },
+    "Example-DSC Configuration": {
+        "prefix": "ex-DSC config",
+        "body": [
+            "configuration Name {",
+                "\t# One can evaluate expressions to get the node list",
+                "\t# E.g: $AllNodes.Where(\"Role -eq Web\").NodeName",
+                "\tnode (\"Node1\",\"Node2\",\"Node3\")",
+                "\t{",
+                    "\t\t# Call Resource Provider",
+                    "\t\t# E.g: WindowsFeature, File",
+                    "\t\tWindowsFeature FriendlyName",
+                    "\t\t{",
+                        "\t\t\tEnsure = \"Present\"",
+                        "\t\t\tName = \"Feature Name\"",
+                    "\t\t}",
+                    "",
+                    "\t\tFile FriendlyName",
+                    "\t\t{",
+                        "\t\t\tEnsure = \"Present\"",
+                        "\t\t\tSourcePath = $SourcePath",
+                        "\t\t\tDestinationPath = $DestinationPath",
+                        "\t\t\tType = \"Directory\"",
+                        "\t\t\tDependsOn = \"[WindowsFeature]FriendlyName\"",
+                    "\t\t}",
+                "\t}",
+            "}"
+        ],
+        "description": "Example DSC Configuration that uses built-in resource providers"
+    },
+    "Example-DSC Resource Provider (class-based)": {
+        "prefix": "ex-DSC resource provider (class-based)",
+        "body": [
+            "# Defines the values for the resource's Ensure property.",
+            "enum Ensure {",
+                "\t# The resource must be absent.",
+                "\tAbsent",
+                "\t# The resource must be present.",
+                "\tPresent",
+            "}",
+            "",
+
+            "# [DscResource()] indicates the class is a DSC resource.",
+            "[DscResource()]",
+            "class NameOfResource {",
+                "\t# A DSC resource must define at least one key property.",
+                "\t[DscProperty(Key)]",
+                "\t[string] $P1",
+                "\t",
+
+                "\t# Mandatory indicates the property is required and DSC will guarantee it is set.",
+                "\t[DscProperty(Mandatory)]",
+                "\t[Ensure] $P2",
+                "\t",
+
+                "\t# NotConfigurable properties return additional information about the state of the resource.",
+                "\t# For example, a Get() method might return the date a resource was last modified.",
+                "\t# NOTE: These properties are only used by the Get() method and cannot be set in configuration.",
+                "\t[DscProperty(NotConfigurable)]",
+                "\t[Nullable[datetime]] $P3",
+                "\t",
+
+                "\t[DscProperty()]",
+                "\t[ValidateSet(\"val1\", \"val2\")]",
+                "\t[string] $P4",
+                "\t",
+
+                "\t# Gets the resource's current state.",
+                "\t[NameOfResource] Get() {",
+                    "\t\t# NotConfigurable properties are set in the Get method.",
+                    "\t\t$this.P3 = something",
+                    "\t\t# Return this instance or construct a new instance.",
+                    "\t\treturn $this",
+                "\t}",
+                "\t",
+
+                "\t# Sets the desired state of the resource.",
+                "\t[void] Set() {",
+                "\t}",
+                "\t",
+
+                "\t# Tests if the resource is in the desired state.",
+                "\t[bool] Test() {",
+                   "\t\t return $true",
+                "\t}",
+            "}"
+        ],
+        "description": "Example class-based DSC Resource Provider"
+    },
+    "Example-DSC Resource Provider (function based)": {
+        "prefix": "ex-DSC resource provider (function based)",
+        "body": [
+            "function Get-TargetResource {",
+                "\t# TODO: Add parameters here",
+                "\t# Make sure to use the same parameters for",
+                "\t# Get-TargetResource, Set-TargetResource, and Test-TargetResource",
+                "\tparam(",
+                "\t)",
+            "}",
+
+            "function Set-TargetResource {",
+                "\t# TODO: Add parameters here",
+                "\t# Make sure to use the same parameters for",
+                "\t# Get-TargetResource, Set-TargetResource, and Test-TargetResource",
+                "\tparam(",
+                "\t)",
+            "}",
+
+            "function Test-TargetResource {",
+                "\t# TODO: Add parameters here",
+                "\t# Make sure to use the same parameters for",
+                "\t# Get-TargetResource, Set-TargetResource, and Test-TargetResource",
+                "\tparam(",
+                "\t)",
+            "}"
+        ],
+        "description": "Example function-based DSC Resource Provider"
+    },
+    "Example-Path Processing": {
+        "prefix": "ex-path processing",
+        "body": [
+            "$paths = @()",
+            "if ($psCmdlet.ParameterSetName -eq 'Path') {",
+            "\tforeach ($aPath in $Path) {",
+            "\t\tif (!(Test-Path -Path $aPath)) {",
+            "\t\t\t$ex = New-Object System.Management.Automation.ItemNotFoundException \"Cannot find path '$Path' because it does not exist.\"",
+            "\t\t\t$category = [System.Management.Automation.ErrorCategory]::ObjectNotFound",
+            "\t\t\t$errRecord = New-Object System.Management.Automation.ErrorRecord $ex,'PathNotFound',$category,$Path",
+            "\t\t\t$psCmdlet.WriteError($errRecord)",
+            "\t\t\tcontinue",
+            "\t\t}",
+            "\t",
+            "\t\t# In the -Path (non-literal) case, resolve any wildcards in path",
+            "\t\t$paths += $aPath | Resolve-Path | Foreach Path",
+            "\t}",
+            "}",
+            "else {",
+            "\tforeach ($aPath in $LiteralPath) {",
+            "\t\tif (!(Test-Path -LiteralPath $aPath)) {",
+            "\t\t\t$ex = New-Object System.Management.Automation.ItemNotFoundException \"Cannot find path '$LiteralPath' because it does not exist.\"",
+            "\t\t\t$category = [System.Management.Automation.ErrorCategory]::ObjectNotFound",
+            "\t\t\t$errRecord = New-Object System.Management.Automation.ErrorRecord $ex,'PathNotFound',$category,$LiteralPath",
+            "\t\t\t$psCmdlet.WriteError($errRecord)",
+            "\t\t\tcontinue",
+            "\t\t}",
+            "\t",
+            "\t\t$paths += $aPath",
+            "\t}",
+            "}",
+           "",
+            "foreach ($aPath in $paths) {",
+            "\tif ($pscmdlet.ShouldProcess($aPath, 'Operation')) {",
+            "\t\t# Process each path",
+            "\t\t$0",
+            "\t}",
+            "}"
+            ],
+        "description": "Example of how to process paths in process block. See parameter-path and parameter-literalpath snippets."
+    },
+    "Example-Splatting": {
+        "prefix": "ex-splat",
+        "body": [
+            "$Params = @{",
+            "\tModule = '*'",
+            "\tVerb = 'Get'",
+            "}",
+            "Get-Command @Params"
+            ],
+        "description": "Example of how to use the PowerShell splatting technique."
+    },
+    "Example-Switch": {
+        "prefix": "ex-switch",
+        "body": [
+            "switch (${variable:$x})",
             "{",
+            "\t'${val:value1}' { $1 }",
+            "\t{$_ -in 'A','B','C'} {}",
+            "\t'value3' {}",
+            "\tDefault {}",
+            "}"
+        ],
+        "description": "Example switch statement"
+    },
+    "Example-Advanced Workflow": {
+        "prefix": "ex-advanced workflow",
+        "body": [
+            "<#",
+            ".Synopsis",
+               "\tShort description",
+            ".DESCRIPTION",
+               "\tLong description",
+            ".EXAMPLE",
+               "\tExample of how to use this workflow",
+            ".EXAMPLE",
+               "\tAnother example of how to use this workflow",
+            ".INPUTS",
+               "\tInputs to this workflow (if any)",
+            ".OUTPUTS",
+               "\tOutput from this workflow (if any)",
+            ".NOTES",
+               "\tGeneral notes",
+            ".FUNCTIONALITY",
+               "\tThe functionality that best describes this workflow",
+            "#>",
+            "workflow ${name:Verb-Noun} {",
+                "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
+                "\t               HelpUri = 'http://www.microsoft.com/',",
+                "\t               ConfirmImpact='Medium')]",
+                "\t[Alias()]",
+                "\t[OutputType([String])]",
+                "\tparam(",
+                "\t\t# Param1 help description",
+                "\t\t[Parameter(Mandatory=$true, ",
+                "\t\t           Position=0,",
+                "\t\t           ParameterSetName='Parameter Set 1')]",
+                "\t\t[ValidateNotNull()]",
+                "\t\t[Alias(\"p1\")] ",
+                "\t\t$Param1,",
+                "",
+
+                "\t\t# Param2 help description",
+                "\t\t[int]",
+                "\t\t$Param2",
+                "\t)",
+                "",
+
+                "\t# Saves (persists) the current workflow state and output",
+                "\t# Checkpoint-Workflow",
+                "\t# Suspends the workflow",
+                "\t# Suspend-Workflow",
+                "",
+
+                "\t# Workflow common parameters are available as variables such as:",
+                "\t$PSPersist ",
+                "\t$PSComputerName",
+                "\t$PSCredential",
+                "\t$PSUseSsl",
+                "\t$PSAuthentication",
+                "",
+
+                "\t# Workflow runtime information can be accessed by using the following variables:",
+                "\t$Input",
+                "\t$PSSenderInfo",
+                "\t$PSWorkflowRoot",
+                "\t$JobCommandName",
+                "\t$ParentCommandName",
+                "\t$JobId",
+                "\t$ParentJobId",
+                "\t$WorkflowInstanceId",
+                "\t$JobInstanceId",
+                "\t$ParentJobInstanceId",
+                "\t$JobName",
+                "\t$ParentJobName",
+                "",
+
+                "\t# Set the progress message ParentActivityId",
+                "\t$PSParentActivityId",
+                "",
+
+                "\t# Preference variables that control runtime behavior",
+                "\t$PSRunInProcessPreference",
+                "\t$PSPersistPreference",
+            "}"
+        ],
+        "description": "Example advanced workflow that access common workflow parameters and other pre-defined variables"
+    },
+
+    "Class": {
+        "prefix": "class",
+        "body": [
+            "class ${ClassName} {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Class declaration"
+    },
+    "Constructor": {
+        "prefix": "ctor",
+        "body": [
+            "${ClassName}(${OptionalParameters}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Class constructor"
+    },
+    "Hidden Property": {
+        "prefix": "proph",
+        "body": [
+            "hidden [${string}] $${ProperyName}"
+        ],
+        "description": "Define hidden property within a class"
+    },
+    "Property": {
+        "prefix": "prop",
+        "body": [
+            "[${string}] $${PropertyName}"
+        ],
+        "description": "Define property within a class"
+    },
+    "Method": {
+        "prefix": "method",
+        "body": [
+            "[${void}] ${MethodName}(${OptionalParameters}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Define method within a class"
+    },
+    "Enum": {
+        "prefix": "enum",
+        "body": [
+            "enum ${EnumName} {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Enum declaration"
+    },
+
+    "Cmdlet": {
+        "prefix": "cmdlet",
+        "body": [
+            "function ${name:Verb-Noun} {",
+                "\t[CmdletBinding()]",
+                "\tparam(",
+                "\t\t$0",
+                "\t)",
+                "\t",
+
+                "\tbegin {",
+                "\t}",
+                "\t",
+
+                "\tprocess {",
+                "\t}",
+                "\t",
+
+                "\tend {",
+                "\t}",
+            "}"
+        ],
+        "description": "Script cmdlet a.k.a. advanced function"
+    },
+    "Cmdlet-Comment-Help": {
+        "prefix": "comment-help-cmdlet",
+        "body": [
+            "<#",
+            ".SYNOPSIS",
+                "\tShort description",
+            ".DESCRIPTION",
+                "\tLong description",
+            ".EXAMPLE",
+                "\tC:\\PS> cmdlet example",
+                "\tExplanation of what the example does",
+            ".INPUTS",
+                "\tInputs to this cmdlet (if any)",
+            ".OUTPUTS",
+                "\tOutput from this cmdlet (if any)",
+            ".NOTES",
+                "\tGeneral notes",
+            "#>"
+        ],
+        "description": "Comment-based help for a cmdlet"
+    },
+    "Parameter": {
+        "prefix": "parameter",
+        "body": [
+            "# ${Parameter help description}",
+            "[Parameter(${AttributeValues})]",
+            "[${ParameterType}]",
+            "$${ParameterName}"
+        ],
+        "description": "Cmdlet parameter declaration"
+    },
+    "Parameter-Path": {
+        "prefix": "parameter-path",
+        "body": [
+            "# Specifies a path to one or more locations. The default location is the current directory (.).",
+            "[Parameter(Mandatory=$true,",
+            "           Position=${Position:0},",
+            "           ParameterSetName=\"${ParameterSetName:Path}\",",
+            "           ValueFromPipeline=$true,",
+            "           ValueFromPipelineByPropertyName=$true,",
+            "           HelpMessage=\"Path to one or more locations.\")]",
+            "[ValidateNotNullOrEmpty()]",
+            "[string[]]",
+            "$${ParameterName:Path}$0"
+        ],
+        "description": "Parameter declaration for a Path parameter that does not accept wildcards"
+    },
+    "Parameter-Path-Wildcards": {
+        "prefix": "parameter-path-wildcards",
+        "body": [
+            "# Specifies a path to one or more locations. Wildcards are permitted. The default location is the current directory (.).",
+            "[Parameter(Mandatory=$true,",
+            "           Position=${Position:0},",
+            "           ParameterSetName=\"${ParameterSetName:Path}\",",
+            "           ValueFromPipeline=$true,",
+            "           ValueFromPipelineByPropertyName=$true,",
+            "           HelpMessage=\"Path to one or more locations.\")]",
+            "[ValidateNotNullOrEmpty()]",
+            "[SupportsWildcards()]",
+            "[string[]]",
+            "$${ParameterName:Path}$0"
+        ],
+        "description": "Parameter declaration for a Path parameter that accepts wildcards"
+    },
+    "Parameter-LiteralPath": {
+        "prefix": "parameter-literal-path",
+        "body": [
+            "# Specifies a path to one or more locations. Unlike the Path parameter, the value of the LiteralPath parameter is",
+            "# used exactly as it is typed. No characters are interpreted as wildcards. If the path includes escape characters,",
+            "# enclose it in single quotation marks. Single quotation marks tell Windows PowerShell not to interpret any",
+            "# characters as escape sequences.",
+            "[Parameter(Mandatory=$true,",
+            "           Position=${Position:0},",
+            "           ParameterSetName=\"${ParameterSetName:LiteralPath}\",",
+            "           ValueFromPipelineByPropertyName=$true,",
+            "           HelpMessage=\"Literal path to one or more locations.\")]",
+            "[Alias(\"PSPath\")]",
+            "[ValidateNotNullOrEmpty()]",
+            "[string[]]",
+            "$${ParameterName:LiteralPath}$0"
+        ],
+        "description": "Parameter declaration for a LiteralPath parameter"
+    },
+
+    "DSC Ensure Enum": {
+        "prefix": "DSC Ensure enum",
+        "body": [
+            "enum Ensure {",
+                "\tAbsent",
+                "\tPresent",
+            "}"
+        ],
+        "description": "DSC Ensure enum definition"
+    },
+    "DSC Resource Provider (class-based)": {
+        "prefix": "DSC resource provider (class-based)",
+        "body": [
+            "[DscResource()]",
+            "class ${ResourceName:NameOfResource} {",
+                "\t[DscProperty(Key)]",
+                "\t[string] $${PropertyName:KeyName}",
+                "\t",
+
+                "\t# Gets the resource's current state.",
+                "\t[${ResourceName:NameOfResource}] Get() {",
+                "\t\t$0",
+                "\t\treturn $this",
+                "\t}",
+                "\t",
+
+                "\t# Sets the desired state of the resource.",
+                "\t[void] Set() {",
+                "\t\t",
+                "\t}",
+                "\t",
+
+                "\t# Tests if the resource is in the desired state.",
+                "\t[bool] Test() {",
+                "\t\t",
+                "\t}",
+            "}"
+        ],
+        "description": "Class-based DSC Resource Provider"
+    },
+    "DSC Resource Provider (function-based)": {
+        "prefix": "DSC resource provier (function-based)",
+        "body": [
+            "function Get-TargetResource {",
+            "\tparam(",
+            "\t)",
+            "\t",
+            "\t$0",
+            "}",
+
+            "function Set-TargetResource {",
+            "\tparam(",
+            "\t)",
+            "\t",
+            "}",
+
+            "function Test-TargetResource {",
+            "\tparam(",
+            "\t)",
+            "\t",
+            "}"
+        ],
+        "description": "Function-based DSC Resource Provider"
+    },
+
+    "comment block": {
+        "prefix": "comment",
+        "body": [
+            "<#",
+            " # $0",
+            " #>"
+        ],
+        "description": "Comment block"
+    },
+    "do-until": {
+        "prefix": "do-until",
+        "body": [
+            "do {",
+            "\t$0",
+            "} until (${condition})"
+        ],
+        "description": "do-until loop"
+    },
+    "do-while": {
+        "prefix": "do-while",
+        "body": [
+            "do {",
+            "\t$0",
+            "} while (${condition})"
+        ],
+        "description": "do-while loop"
+    },
+    "for": {
+        "prefix": "for",
+        "body": [
+            "for ($${variable:i} = 1; $${variable:i} -lt $${array}.Count; $${variable:i}++) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "for loop"
+    },
+    "for-reversed": {
+        "prefix": "forr",
+        "body": [
+            "for ($${variable:i} = $${array}.Count - 1; $${variable:i} -ge 0 ; $${variable:i}--) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "reversed for loop"
+    },
+    "foreach": {
+        "prefix": "foreach",
+        "body": [
+            "foreach ($${variable:item} in $${collection:collection}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "foreach loop"
+    },
+    "function": {
+        "prefix": "function",
+        "body": [
+            "function ${FunctionName} (${OptionalParameters}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "function"
+    },
+    "if": {
+        "prefix": "if",
+        "body": [
+            "if (${condition}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "if statement"
+    },
+    "if-else": {
+        "prefix": "if-else",
+        "body": [
+            "if (${condition}) {",
             "\t$1",
             "}",
-            "catch [${exception:System.Exception}]",
-            "{",
+            "else {",
             "\t$2",
+            "}"
+        ],
+        "description": "if-else statement"
+    },
+    "elseif": {
+        "prefix": "elseif",
+        "body": [
+            "elseif (${condition}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "elseif statement"
+    },
+    "else": {
+        "prefix": "else",
+        "body": [
+            "else {",
+            "\t$0",
+            "}"
+        ],
+        "description": "else statement"
+    },
+    "switch": {
+        "prefix": "switch",
+        "body": [
+            "switch (${variable:$x}) {",
+            "\t${condition} { $0 }",
+            "\tDefault {}",
+            "}"
+        ],
+        "description": "switch statement"
+    },
+    "try-catch": {
+        "prefix": "try",
+        "body": [
+            "try {",
+            "\t$0",
+            "}",
+            "catch [${exception:System.Exception}] {",
+            "\t",
             "}"
         ],
         "description": "try-catch exception handling"
     },
-	"try-catch-finally": {
-		"prefix": "try-catch-finally",
-		"body": [
-			"try",
-			"{",
-			    "\t${1:1/0}",
-			"}",
-			"catch [${2:DivideByZeroException}]",
-			"{",
-			    "\t${3:Write-Host \"Divide by zero exception\"}",
-			"}",
-			"catch [System.Net.WebException],[System.Exception]",
-			"{",
-			    "\tWrite-Host \"Other exception\"",
-			"}",
-			"finally",
-			"{",
-			    "\tWrite-Host \"cleaning up ...\"",
-			"}"
-		],
-		"description": "try-catch-finally exception handling"
-	},
-	"try-finally": {
-		"prefix": "try-finally",
-		"body": [
-			"try",
-			"{",
-			    "\t$1",
-			"}",
-			"finally",
-			"{",
-			    "\t$2",
-			"}"
-		],
-		"description": "try-finally exception handling"
-	},
-	"while": {
-		"prefix": "while",
-		"body": [
-			"while (${condition:$x -gt 0})",
-			"{",
-			    "\t$1",
-			"}"
-		],
-		"description": "while loop"
-	},
-	"Advanced Workflow": {
-		"prefix": "advanced workflow",
-		"body": [
-			"workflow ${name:Verb-Noun}",
-			"{",
-			"<#",
-			".Synopsis",
-			   "\tShort description",
-			".DESCRIPTION",
-			   "\tLong description",
-			".EXAMPLE",
-			   "\tExample of how to use this workflow",
-			".EXAMPLE",
-			   "\tAnother example of how to use this workflow",
-			".INPUTS",
-			   "\tInputs to this workflow (if any)",
-			".OUTPUTS",
-			   "\tOutput from this workflow (if any)",
-			".NOTES",
-			   "\tGeneral notes",
-			".FUNCTIONALITY",
-			   "\tThe functionality that best describes this workflow",
-			"#>",
-			"",
-			    "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
-			                  "\t\t\t\t   HelpUri = 'http://www.microsoft.com/',",
-			                  "\t\t\t\t   ConfirmImpact='Medium')]",
-			    "\t[Alias()]",
-			    "\t[OutputType([String])]",
-			    "\tParam",
-			    "\t(",
-			        "\t\t# Param1 help description",
-			        "\t\t[Parameter(Mandatory=$true, ",
-			                   "\t\t\t\t   Position=0,",
-			                   "\t\t\t\t   ParameterSetName='Parameter Set 1')]",
-			        "\t\t[ValidateNotNull()]",
-			        "\t\t[Alias(\"p1\")] ",
-			        "\t\t$Param1,",
-					"",
-			        "\t\t# Param2 help description",
-			        "\t\t[int]",
-			        "\t\t$Param2",
-			    "\t)",
-			    "",
-			    "\t# Saves (persists) the current workflow state and output",
-			    "\t# Checkpoint-Workflow",
-			
-			    "\t# Suspends the workflow",
-			    "\t# Suspend-Workflow",
-				"",
-			    "\t# Workflow common parameters are available as variables such as:",
-			    "\t$PSPersist ",
-			    "\t$PSComputerName",
-			    "\t$PSCredential",
-			    "\t$PSUseSsl",
-			    "\t$PSAuthentication",
-				"",
-			    "\t# Workflow runtime information can be accessed by using the following variables:",
-			    "\t$Input",
-			    "\t$PSSenderInfo",
-			    "\t$PSWorkflowRoot",
-			    "\t$JobCommandName",
-			    "\t$ParentCommandName",
-			    "\t$JobId",
-			    "\t$ParentJobId",
-			    "\t$WorkflowInstanceId",
-			    "\t$JobInstanceId",
-			    "\t$ParentJobInstanceId",
-			    "\t$JobName",
-			    "\t$ParentJobName",
-			
-			    "\t# Set the progress message ParentActivityId",
-			    "\t$PSParentActivityId",
-			
-			    "\t# Preference variables that control runtime behavior",
-			    "\t$PSRunInProcessPreference",
-			    "\t$PSPersistPreference",
-			"}"
-		],
-		"description": "Advanced workflow that access common workflow parameters and other pre-defined variables"
-	},
-	"Workflow": {
-		"prefix": "workflow",
-		"body": [
-			"<#",
-			".Synopsis",
-			   "\tShort description",
-			".DESCRIPTION",
-			   "\tLong description",
-			".EXAMPLE",
-			   "\tExample of how to use this workflow",
-			".EXAMPLE",
-			   "\tAnother example of how to use this workflow",
-			".INPUTS",
-			   "\tInputs to this workflow (if any)",
-			".OUTPUTS",
-			   "\tOutput from this workflow (if any)",
-			".NOTES",
-			   "\tGeneral notes",
-			".FUNCTIONALITY",
-			   "\tThe functionality that best describes this workflow",
-			"#>",
-			"workflow ${name:Verb-Noun}",
-			"{",
-			    "\tParam",
-			    "\t(",
-			        "\t\t# Param1 help description",
-			        "\t\t[string]",
-			        "\t\t$${param1:Param1},",
-			
-			        "\t\t# Param2 help description",
-			        "\t\t[int]",
-			        "\t\t$${param2:Param2}",
-			    "\t)",
-				"\t$1",
-			"}"
-		],
-		"description": "Basic workflow"
-	},
-	"Workflow ForEachParallel": {
-		"prefix": "workflow ForEachParallel",
-		"body": [
-			"foreach -parallel ($${variable:item} in $${collection:collection})",
-			"{",
-			"\t$1",
-			"}"
-		],
-		"description": "Runs contents of foreach block in parallel"
-	},
-	"Workflow InlineScript": {
-		"prefix": "workflow InlineScript",
-		"body": [
-			"inlineScript",
-			"{",
-			"\t$1",
-			"} # Optional workflow common parameters such as -PSComputerName and -PSCredentialw"
-		],
-		"description": "Runs isolated blocks of PowerShell script"
-	},
-	"Workflow Parallel": {
-		"prefix": "workflow parallel",
-		"body": [
-			"parallel",
-			"{",
-			"\t$1",
-			"}"
-		],
-		"description": "Runs commands in parallel"
-	},
-	"Workflow Sequence": {
-		"prefix": "workflow sequence",
-		"body": [
-			"sequence",
-			"{",
-			"\t$1",
-			"}"
-		],
-		"description": "Runs commands in sequential order"
-	}
+    "try-catch-finally": {
+        "prefix": "trycf",
+        "body": [
+            "try {",
+            "\t$0",
+            "}",
+            "catch [${exception:System.Exception}] {",
+            "\t",
+            "}",
+            "finally {",
+            "\t",
+            "}"
+        ],
+        "description": "try-catch-finally exception handling"
+    },
+    "try-finally": {
+        "prefix": "tryf",
+        "body": [
+            "try {",
+            "\t$0",
+            "}",
+            "finally {",
+            "\t",
+            "}"
+        ],
+        "description": "try-finally exception handling"
+    },
+    "while": {
+        "prefix": "while",
+        "body": [
+            "while (${condition}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "while loop"
+    },
+
+    "Workflow": {
+        "prefix": "workflow",
+        "body": [
+
+            "workflow ${name:Verb-Noun} {",
+                "\tparam(",
+                "\t)",
+                "\t",
+
+                "\t$0",
+            "}"
+        ],
+        "description": "workflow"
+    },
+    "Workflow-Comment-Help": {
+        "prefix": "comment-help-workflow",
+        "body": [
+            "<#",
+            ".SYNOPSIS",
+                "\tShort description",
+            ".DESCRIPTION",
+                "\tLong description",
+            ".EXAMPLE",
+               "\tExample of how to use this workflow",
+            ".INPUTS",
+               "\tInputs to this workflow (if any)",
+            ".OUTPUTS",
+               "\tOutput from this workflow (if any)",
+            ".NOTES",
+               "\tGeneral notes",
+            ".FUNCTIONALITY",
+               "\tThe functionality that best describes this workflow",
+            "#>"
+        ],
+        "description": "Comment-based help for a workflow"
+    },
+    "Workflow ForEachParallel": {
+        "prefix": "workflow foreach-parallel",
+        "body": [
+            "foreach -parallel ($${variable:item} in $${collection:collection}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Runs contents of foreach block in parallel inside a workflow"
+    },
+    "Workflow InlineScript": {
+        "prefix": "workflow inlinescript",
+        "body": [
+            "inlineScript {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Runs isolated blocks of PowerShell script inside a workflow"
+    },
+    "Workflow Parallel": {
+        "prefix": "workflow parallel",
+        "body": [
+            "parallel {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Runs commands in parallel inside a workflow"
+    },
+    "Workflow Sequence": {
+        "prefix": "workflow sequence",
+        "body": [
+            "sequence {",
+            "\t$0",
+            "}"
+        ],
+        "description": "Runs commands in sequential order inside a workflow"
+    }
 }
