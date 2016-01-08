@@ -12,6 +12,7 @@ import { LanguageClient, LanguageClientOptions, Executable } from 'vscode-langua
 import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
 import { registerExpandAliasCommand } from './features/ExpandAlias';
 import { registerShowHelpCommand } from './features/ShowOnlineHelp';
+import { registerOpenInISECommand } from './features/OpenInISE';
 import { registerConsoleCommands } from './features/Console';
 
 var languageServerClient : LanguageClient = undefined;
@@ -100,6 +101,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	// Register other features
 	registerExpandAliasCommand(languageServerClient);
 	registerShowHelpCommand(languageServerClient);
+    registerOpenInISECommand(languageServerClient);
 	registerConsoleCommands(languageServerClient);
 }
 
