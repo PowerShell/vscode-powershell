@@ -23,7 +23,7 @@ export function registerOpenInISECommand(): void {
         //process = require('child_process');
         //var filePath = convertUriToPath(editor.document.uri);
         var filePath = 'C:\temp\Get-ProductKey.ps1'
-        require("child_process").exec("powershell_ise.exe -NoProfile -File " + filePath).unref();
+        require("child_process").exec("powershell_ise.exe -NoProfile -File C:\temp\Get-ProductKey.ps1").unref();
 
 			});
 }

@@ -102,6 +102,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	registerExpandAliasCommand(languageServerClient);
 	registerShowHelpCommand(languageServerClient);
 	registerConsoleCommands(languageServerClient);
+	registerOpenInISECommand();    
 }
 
 export function deactivate(): void {
