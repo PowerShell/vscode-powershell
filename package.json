@@ -55,6 +55,12 @@
 				"key": "f8",
 				"when": "editorTextFocus && editorLangId == 'powershell'"
 			}
+            ,
+			{
+				"command": "PowerShell.OpenInISE",
+				"key": "ctrl+alt+i",
+				"when": "editorTextFocus && editorLangId == 'powershell'"
+			}
 		],
 		"commands": [			
 			{
@@ -70,6 +76,11 @@
 			{
 				"command": "PowerShell.RunSelection",
 				"title": "Run selection",
+				"category": "PowerShell"	
+			},
+			{
+				"command": "PowerShell.OpenInISE",
+				"title": "Open current file in PowerShell ISE",
 				"category": "PowerShell"	
 			}
 		],
