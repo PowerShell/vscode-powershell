@@ -29,7 +29,7 @@
         "onLanguage:powershell"
     ],
     "dependencies": {
-        "vscode-languageclient": "0.10.7"
+        "vscode-languageclient": "1.1.2"
     },
     "devDependencies": {
         "vscode": "0.10.6",

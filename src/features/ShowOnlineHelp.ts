@@ -1,6 +1,5 @@
 import vscode = require('vscode');
-import { LanguageClient } from 'vscode-languageclient';
-import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
+import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace ShowOnlineHelpRequest {
     export const type: RequestType<string, void, void> = { get method() { return 'powerShell/showOnlineHelp'; } };

@@ -7,9 +7,8 @@
 import path = require('path');
 import vscode = require('vscode');
 import settingsManager = require('./settings');
-import { LanguageClient, LanguageClientOptions, Executable } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, Executable, RequestType, NotificationType } from 'vscode-languageclient';
 
-import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
 import { registerExpandAliasCommand } from './features/ExpandAlias';
 import { registerShowHelpCommand } from './features/ShowOnlineHelp';
 import { registerOpenInISECommand } from './features/OpenInISE';

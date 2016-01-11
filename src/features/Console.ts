@@ -1,6 +1,5 @@
 import vscode = require('vscode');
-import { LanguageClient } from 'vscode-languageclient';
-import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
+import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace EvaluateRequest {
     export const type: RequestType<EvaluateRequestArguments, void, void> =
@@ -19,6 +18,78 @@ export namespace OutputNotification {
 export interface OutputNotificationBody {
     category: string;
     output: string;
+}
+
+export namespace ShowChoicePromptNotification {
+    export const type: NotificationType<ShowChoicePromptNotificationBody> =
+        { get method() { return 'powerShell/showChoicePrompt'; } };
+}
+
+interface ChoiceDetails {
+    label: string;
+    helpMessage: string;
+}
+
+interface ShowChoicePromptNotificationBody {
+    caption: string;
+    message: string;
+    choices: ChoiceDetails[];
+    defaultChoice: number;
+}
+
+export namespace CompleteChoicePromptNotification {
+    export const type: NotificationType<CompleteChoicePromptNotificationBody> =
+        { get method() { return 'powerShell/completeChoicePrompt'; } };
+}
+
+interface CompleteChoicePromptNotificationBody {
+    chosenItem: string;
+    promptCancelled: boolean;
+}
+
+function showChoicePrompt(
+    promptDetails: ShowChoicePromptNotificationBody,
+    client: LanguageClient) {
+
+    var quickPickItems =
+        promptDetails.choices.map<vscode.QuickPickItem>(choice => {
+            return {
+                label: choice.label,
+                description: choice.helpMessage
+            }
+        });
+
+    // Shift the default item to the front of the
+    // array so that the user can select it easily
+    if (promptDetails.defaultChoice > -1 &&
+        promptDetails.defaultChoice < promptDetails.choices.length) {
+
+        var defaultChoiceItem = quickPickItems[promptDetails.defaultChoice];
+        quickPickItems.splice(promptDetails.defaultChoice, 1);
+
+        // Add the default choice to the head of the array
+        quickPickItems = [defaultChoiceItem].concat(quickPickItems);
+    }
+
+    vscode.window
+        .showQuickPick(
+        quickPickItems,
+        { placeHolder: promptDetails.caption + " - " + promptDetails.message })
+        .then(chosenItem => onItemSelected(chosenItem, client));
+}
+
+function onItemSelected(chosenItem: vscode.QuickPickItem, client: LanguageClient) {
+    if (chosenItem !== undefined) {
+        client.sendNotification(
+            CompleteChoicePromptNotification.type,
+            { chosenItem: chosenItem.label });
+    }
+    else {
+        // User cancelled the prompt, send the cancellation
+        client.sendNotification(
+            CompleteChoicePromptNotification.type,
+            { promptCancelled: true });
+    }
 }
 
 export function registerConsoleCommands(client: LanguageClient): void {
@@ -46,4 +117,8 @@ export function registerConsoleCommands(client: LanguageClient): void {
             consoleChannel.show(vscode.ViewColumn.Three);
         consoleChannel.append(output.output);
     });
+
+    client.onNotification(
+        ShowChoicePromptNotification.type,
+        promptDetails => showChoicePrompt(promptDetails, client));
 }

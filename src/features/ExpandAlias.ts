@@ -1,6 +1,5 @@
 import vscode = require('vscode');
-import { LanguageClient } from 'vscode-languageclient';
-import { RequestType, NotificationType, ResponseError } from 'vscode-jsonrpc';
+import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 import Window = vscode.window;
 
 export namespace ExpandAliasRequest {
