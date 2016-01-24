@@ -7,11 +7,26 @@ export namespace FindModuleRequest {
 	export const type: RequestType<any, any, void> = { get method() { return 'powerShell/findModule'; } };
 }
 
+function GetCurrentTime() {
+
+    var timeNow = new Date();
+    var hours   = timeNow.getHours();
+    var minutes = timeNow.getMinutes();
+    var seconds = timeNow.getSeconds();
+
+    var timeString = "" + ((hours > 12) ? hours - 12 : hours);
+    timeString  += ((minutes < 10) ? ":0" : ":") + minutes;
+    timeString  += ((seconds < 10) ? ":0" : ":") + seconds;
+    timeString  += (hours >= 12) ? " PM" : " AM";
+
+    return timeString;
+}
+
 export function registerPowerShellFindModuleCommand(client: LanguageClient): void {
     var disposable = vscode.commands.registerCommand('PowerShell.PowerShellFindModule', () => {
         var items: QuickPickItem[] = [];
 
-        vscode.window.setStatusBarMessage("Querying PowerShell Gallery", 1500);
+        vscode.window.setStatusBarMessage(GetCurrentTime() + " Querying PowerShell Gallery");
 
 		client.sendRequest(FindModuleRequest.type, null).then((modules) => {
 			for(var i=0 ; i < modules.moduleList.length; i++) {
@@ -19,10 +34,12 @@ export function registerPowerShellFindModuleCommand(client: LanguageClient): voi
 				items.push({ label: module.name, description: module.description });
 			}
 
+            vscode.window.setStatusBarMessage("");
 			Window.showQuickPick(items).then((selection) => {
 				switch (selection.label) {
 					default :
-						Window.showInformationMessage("Installing PowerShell Module " + selection.label);
+                        var message = "Installing PowerShell Module " + selection.label;
+                        vscode.window.setStatusBarMessage(message, 1500);
 				}
 			});
 		});
