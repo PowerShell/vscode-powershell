@@ -8,7 +8,7 @@ export namespace FindModuleRequest {
 }
 
 export namespace InstallModuleRequest {
-    export const type: RequestType<string, void, void> = { get method() { return 'powerShell/InstallModule'; } };
+    export const type: RequestType<string, void, void> = { get method() { return 'powerShell/installModule'; } };
 }
 
 function GetCurrentTime() {
@@ -43,9 +43,7 @@ export function registerPowerShellFindModuleCommand(client: LanguageClient): voi
             	switch (selection.label) {
             	    default :
             	        var moduleName = selection.label;
-
-            	        vscode.window.setStatusBarMessage("Installing PowerShell Module " + moduleName, 1500);
-            	        
+            	        //vscode.window.setStatusBarMessage("Installing PowerShell Module " + moduleName, 1500);
             	        client.sendRequest(InstallModuleRequest.type, moduleName);
             	    }
             	});
