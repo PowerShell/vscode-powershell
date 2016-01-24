@@ -4,7 +4,11 @@ import Window = vscode.window;
 import QuickPickItem = vscode.QuickPickItem;
 
 export namespace FindModuleRequest {
-	export const type: RequestType<any, any, void> = { get method() { return 'powerShell/findModule'; } };
+    export const type: RequestType<any, any, void> = { get method() { return 'powerShell/findModule'; } };
+}
+
+export namespace InstallModuleRequest {
+    export const type: RequestType<string, void, void> = { get method() { return 'powerShell/InstallModule'; } };
 }
 
 function GetCurrentTime() {
@@ -27,21 +31,24 @@ export function registerPowerShellFindModuleCommand(client: LanguageClient): voi
         var items: QuickPickItem[] = [];
 
         vscode.window.setStatusBarMessage(GetCurrentTime() + " Querying PowerShell Gallery");
-
-		client.sendRequest(FindModuleRequest.type, null).then((modules) => {
-			for(var i=0 ; i < modules.moduleList.length; i++) {
-				var module = modules.moduleList[i];
-				items.push({ label: module.name, description: module.description });
-			}
+        client.sendRequest(FindModuleRequest.type, null).then((modules) => {
+            for(var i=0 ; i < modules.moduleList.length; i++) {
+                var module = modules.moduleList[i];
+                items.push({ label: module.name, description: module.description });
+            }
 
             vscode.window.setStatusBarMessage("");
-			Window.showQuickPick(items).then((selection) => {
-				switch (selection.label) {
-					default :
-                        var message = "Installing PowerShell Module " + selection.label;
-                        vscode.window.setStatusBarMessage(message, 1500);
-				}
-			});
-		});
+            Window.showQuickPick(items).then((selection) => {
+            	if (!selection) { return; }
+            	switch (selection.label) {
+            	    default :
+            	        var moduleName = selection.label;
+
+            	        vscode.window.setStatusBarMessage("Installing PowerShell Module " + moduleName, 1500);
+            	        
+            	        client.sendRequest(InstallModuleRequest.type, moduleName);
+            	    }
+            	});
+            });
     });
 }
