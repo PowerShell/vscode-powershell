@@ -32,10 +32,9 @@ export function registerPowerShellFindModuleCommand(client: LanguageClient): voi
 
         vscode.window.setStatusBarMessage(GetCurrentTime() + " Querying PowerShell Gallery");
         client.sendRequest(FindModuleRequest.type, null).then((modules) => {
-            for(var i=0 ; i < modules.moduleList.length; i++) {
-                var module = modules.moduleList[i];
-                items.push({ label: module.name, description: module.description });
-            }
+            for(var item in modules) {
+                items.push({ label: modules[item].name, description: modules[item].description });
+            };
 
             vscode.window.setStatusBarMessage("");
             Window.showQuickPick(items).then((selection) => {
