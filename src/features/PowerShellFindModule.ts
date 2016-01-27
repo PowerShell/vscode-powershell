@@ -30,14 +30,14 @@ export function registerPowerShellFindModuleCommand(client: LanguageClient): voi
     var disposable = vscode.commands.registerCommand('PowerShell.PowerShellFindModule', () => {
         var items: QuickPickItem[] = [];
 
-        vscode.window.setStatusBarMessage(GetCurrentTime() + " Querying PowerShell Gallery");
+        vscode.window.setStatusBarMessage(GetCurrentTime() + " Initializing...");
         client.sendRequest(FindModuleRequest.type, null).then((modules) => {
             for(var item in modules) {
                 items.push({ label: modules[item].name, description: modules[item].description });
             };
 
             vscode.window.setStatusBarMessage("");
-            Window.showQuickPick(items).then((selection) => {
+            Window.showQuickPick(items,{placeHolder: "Results: (" + modules.length + ")"}).then((selection) => {
             	if (!selection) { return; }
             	switch (selection.label) {
             	    default :
