@@ -63,7 +63,13 @@
                 "command": "PowerShell.OpenInISE",
                 "key": "ctrl+alt+i",
                 "when": "editorTextFocus && editorLangId == 'powershell'"
+            },
+            {
+                "command": "PowerShell.PowerShellFindModule",
+                "key": "ctrl+K ctrl+f",
+                "when": "editorTextFocus && editorLangId == 'powershell'"
             }
+
         ],
         "commands": [
             {
@@ -84,6 +90,11 @@
             {
                 "command": "PowerShell.OpenInISE",
                 "title": "Open current file in PowerShell ISE",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.PowerShellFindModule",
+                "title": "Find/Install PowerShell modules from the gallery",
                 "category": "PowerShell"
             }
         ],

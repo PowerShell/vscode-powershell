@@ -12,6 +12,7 @@ import { LanguageClient, LanguageClientOptions, Executable, RequestType, Notific
 import { registerExpandAliasCommand } from './features/ExpandAlias';
 import { registerShowHelpCommand } from './features/ShowOnlineHelp';
 import { registerOpenInISECommand } from './features/OpenInISE';
+import { registerPowerShellFindModuleCommand } from './features/PowerShellFindModule';
 import { registerConsoleCommands } from './features/Console';
 
 var languageServerClient: LanguageClient = undefined;
@@ -101,6 +102,7 @@ export function activate(context: vscode.ExtensionContext): void {
     registerShowHelpCommand(languageServerClient);
     registerConsoleCommands(languageServerClient);
     registerOpenInISECommand();
+    registerPowerShellFindModuleCommand(languageServerClient);
 }
 
 export function deactivate(): void {
