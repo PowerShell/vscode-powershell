@@ -103,7 +103,7 @@
             },
             {
                 "command": "PowerShell.PowerShellPasteAsClass",
-                "title": "Pasted from clipboard as PowerShell class",
+                "title": "Paste from clipboard as PowerShell|C# class",
                 "category": "PowerShell"
             }
         ],
