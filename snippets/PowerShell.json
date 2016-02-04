@@ -429,7 +429,7 @@
     "Method": {
         "prefix": "method",
         "body": [
-            "[${void}] ${MethodName}(${OptionalParameters}) {",
+            "[${void}] ${MethodName}($${OptionalParameters}) {",
             "\t$0",
             "}"
         ],
