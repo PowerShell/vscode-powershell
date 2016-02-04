@@ -134,6 +134,36 @@
                         "program": "${file}"
                     }
                 ]
+            },
+            {
+                "type": "PowerShell x86",
+                "enableBreakpointsFor": {
+                    "languageIds": [
+                        "powershell"
+                    ]
+                },
+                "program": "bin/Microsoft.PowerShell.EditorServices.Host.DebugAdapter.x86.cmd",
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "program"
+                        ],
+                        "properties": {
+                            "program": {
+                                "type": "string",
+                                "description": "Workspace relative path to the PowerShell script."
+                            }
+                        }
+                    }
+                },
+                "initialConfigurations": [
+                    {
+                        "name": "PowerShell x86",
+                        "type": "PowerShell x86",
+                        "request": "launch",
+                        "program": "${file}"
+                    }
+                ]
             }
         ],
         "configuration": {
