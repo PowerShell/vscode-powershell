@@ -494,7 +494,7 @@
             "[${ParameterType}]",
             "$${ParameterName}"
         ],
-        "description": "Cmdlet parameter declaration snippet"
+        "description": "Parameter declaration snippet"
     },
     "Parameter-Path": {
         "prefix": "parameter-path",
