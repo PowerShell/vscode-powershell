@@ -18,7 +18,7 @@
             "\t}",
             "}"
         ],
-        "description": "Example class with a constructor, property and a method"
+        "description": "Example: class snippet with a constructor, property and a method"
     },
     "Example-Cmdlet": {
         "prefix": "ex-cmdlet",
@@ -91,7 +91,7 @@
             "\t",
             "\tprocess {",
             "\t\tif ($pscmdlet.ShouldProcess(\"Target\", \"Operation\")) {",
-            "\t\t$0",
+            "\t\t\t$0",
             "\t\t}",
             "\t}",
             "\t",
@@ -99,7 +99,7 @@
             "\t}",
             "}"
         ],
-        "description": "Example script cmdlet with all attributes and inline help fields"
+        "description": "Example: script cmdlet snippet with all attributes and inline help fields"
     },
     "Example-DSC Configuration": {
         "prefix": "ex-DSC config",
@@ -128,7 +128,7 @@
             "\t}",
             "}"
         ],
-        "description": "Example DSC Configuration that uses built-in resource providers"
+        "description": "Example: DSC configuration snippet that uses built-in resource providers"
     },
     "Example-DSC Resource Provider (class-based)": {
         "prefix": "ex-DSC resource provider (class-based)",
@@ -180,7 +180,7 @@
             "\t}",
             "}"
         ],
-        "description": "Example class-based DSC Resource Provider"
+        "description": "Example: class-based DSC resource provider snippet"
     },
     "Example-DSC Resource Provider (function based)": {
         "prefix": "ex-DSC resource provider (function based)",
@@ -207,10 +207,52 @@
             "\t)",
             "}"
         ],
-        "description": "Example function-based DSC Resource Provider"
+        "description": "Example: function-based DSC resource provider snippet"
     },
     "Example-Path Processing": {
         "prefix": "ex-path processing",
+        "body": [
+            "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=$true)]",
+            "foreach ($aPath in $Path) {",
+            "\tif ($pscmdlet.ShouldProcess($aPath, 'Operation')) {",
+            "\t\t# Process each path",
+            "\t\t$0",
+            "\t}",
+            "}"
+        ],
+        "description": "Example: processing paths allowing for non-existing paths (for use in process block). See parameter-path snippets."
+    },
+    "Example-Path Must Exist Processing": {
+        "prefix": "ex-path must exist processing",
+        "body": [
+            "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=$true)]",
+            "$paths = @()",
+            "if ($psCmdlet.ParameterSetName -eq 'Path') {",
+            "\tforeach ($aPath in $Path) {",
+            "\t\t# If Path doesn't have to exist, eg this command creates a file, remove the following if statement.",
+            "\t\tif (!(Test-Path -Path $aPath)) {",
+            "\t\t\t$ex = New-Object System.Management.Automation.ItemNotFoundException \"Cannot find path '$aPath' because it does not exist.\"",
+            "\t\t\t$category = [System.Management.Automation.ErrorCategory]::ObjectNotFound",
+            "\t\t\t$errRecord = New-Object System.Management.Automation.ErrorRecord $ex,'PathNotFound',$category,$aPath",
+            "\t\t\t$psCmdlet.WriteError($errRecord)",
+            "\t\t\tcontinue",
+            "\t\t}",
+            "\t",
+            "\t\t$paths += $aPath",
+            "\t}",
+            "}",
+            "",
+            "foreach ($aPath in $paths) {",
+            "\tif ($pscmdlet.ShouldProcess($aPath, 'Operation')) {",
+            "\t\t# Process each path",
+            "\t\t$0",
+            "\t}",
+            "}"
+        ],
+        "description": "Example: processing paths that must exist (for use in process block). See parameter-path snippets."
+    },
+    "Example-Path with Wildcards Processing": {
+        "prefix": "ex-path wildcard processing",
         "body": [
             "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=$true, DefaultParameterSetName='Path')]",
             "$paths = @()",
@@ -249,7 +291,7 @@
             "\t}",
             "}"
         ],
-        "description": "Example of how to process paths in process block. See parameter-path and parameter-literalpath snippets."
+        "description": "Example: processing paths with wildcards (for use in process block). See parameter-path-wildcards and parameter-literalpath snippets."
     },
     "Example-Splatting": {
         "prefix": "ex-splat",
@@ -260,7 +302,7 @@
             "}",
             "Get-Command @Params"
         ],
-        "description": "Example of how to use the PowerShell splatting technique."
+        "description": "Example: PowerShell splatting technique snippet"
     },
     "Example-Switch": {
         "prefix": "ex-switch",
@@ -273,7 +315,7 @@
             "\tDefault {}",
             "}"
         ],
-        "description": "Example switch statement"
+        "description": "Example: switch statement snippet"
     },
     "Example-Advanced Workflow": {
         "prefix": "ex-advanced workflow",
@@ -350,7 +392,7 @@
             "\t$PSPersistPreference",
             "}"
         ],
-        "description": "Example advanced workflow that access common workflow parameters and other pre-defined variables"
+        "description": "Example: advanced workflow snippet"
     },
     "Class": {
         "prefix": "class",
@@ -359,7 +401,7 @@
             "\t$0",
             "}"
         ],
-        "description": "Class declaration"
+        "description": "Class definition snippet"
     },
     "Constructor": {
         "prefix": "ctor",
@@ -368,30 +410,30 @@
             "\t$0",
             "}"
         ],
-        "description": "Class constructor"
+        "description": "Class constructor definition snippet"
     },
     "Hidden Property": {
         "prefix": "proph",
         "body": [
             "hidden [${string}] $${ProperyName}"
         ],
-        "description": "Define hidden property within a class"
+        "description": "Class hidden property definition snippet"
     },
     "Property": {
         "prefix": "prop",
         "body": [
             "[${string}] $${PropertyName}"
         ],
-        "description": "Define property within a class"
+        "description": "Class property definition snippet"
     },
     "Method": {
         "prefix": "method",
         "body": [
-            "[${void}] ${MethodName}(${OptionalParameters}) {",
+            "[${void}] ${MethodName}($${OptionalParameters}) {",
             "\t$0",
             "}"
         ],
-        "description": "Define method within a class"
+        "description": "Class method definition snippet"
     },
     "Enum": {
         "prefix": "enum",
@@ -400,7 +442,7 @@
             "\t$0",
             "}"
         ],
-        "description": "Enum declaration"
+        "description": "Enum definition snippet"
     },
     "Cmdlet": {
         "prefix": "cmdlet",
@@ -421,10 +463,10 @@
             "\t}",
             "}"
         ],
-        "description": "Script cmdlet a.k.a. advanced function"
+        "description": "Script cmdlet definition snippet"
     },
     "Cmdlet-Comment-Help": {
-        "prefix": "comment-help-cmdlet",
+        "prefix": "comment-help",
         "body": [
             "<#",
             ".SYNOPSIS",
@@ -432,17 +474,17 @@
             ".DESCRIPTION",
             "\tLong description",
             ".EXAMPLE",
-            "\tC:\\PS> cmdlet example",
+            "\tC:\\PS> <example usage>",
             "\tExplanation of what the example does",
             ".INPUTS",
-            "\tInputs to this cmdlet (if any)",
+            "\tInputs (if any)",
             ".OUTPUTS",
-            "\tOutput from this cmdlet (if any)",
+            "\tOutput (if any)",
             ".NOTES",
             "\tGeneral notes",
             "#>"
         ],
-        "description": "Comment-based help for a cmdlet"
+        "description": "Comment-based help snippet"
     },
     "Parameter": {
         "prefix": "parameter",
@@ -452,7 +494,7 @@
             "[${ParameterType}]",
             "$${ParameterName}"
         ],
-        "description": "Cmdlet parameter declaration"
+        "description": "Parameter declaration snippet"
     },
     "Parameter-Path": {
         "prefix": "parameter-path",
@@ -468,7 +510,7 @@
             "[string[]]",
             "$${ParameterName:Path}$0"
         ],
-        "description": "Parameter declaration for a Path parameter that does not accept wildcards"
+        "description": "Parameter declaration snippet for Path parameter that does not accept wildcards"
     },
     "Parameter-Path-Wildcards": {
         "prefix": "parameter-path-wildcards",
@@ -485,10 +527,10 @@
             "[string[]]",
             "$${ParameterName:Path}$0"
         ],
-        "description": "Parameter declaration for a Path parameter that accepts wildcards"
+        "description": "Parameter declaration snippet for Path parameter that accepts wildcards"
     },
     "Parameter-LiteralPath": {
-        "prefix": "parameter-literal-path",
+        "prefix": "parameter-literalpath",
         "body": [
             "# Specifies a path to one or more locations. Unlike the Path parameter, the value of the LiteralPath parameter is",
             "# used exactly as it is typed. No characters are interpreted as wildcards. If the path includes escape characters,",
@@ -504,7 +546,7 @@
             "[string[]]",
             "$${ParameterName:LiteralPath}$0"
         ],
-        "description": "Parameter declaration for a LiteralPath parameter"
+        "description": "Parameter declaration snippet for a LiteralPath parameter"
     },
     "DSC Ensure Enum": {
         "prefix": "DSC Ensure enum",
@@ -514,7 +556,7 @@
             "\tPresent",
             "}"
         ],
-        "description": "DSC Ensure enum definition"
+        "description": "DSC Ensure enum definition snippet"
     },
     "DSC Resource Provider (class-based)": {
         "prefix": "DSC resource provider (class-based)",
@@ -541,7 +583,7 @@
             "\t}",
             "}"
         ],
-        "description": "Class-based DSC Resource Provider"
+        "description": "Class-based DSC resource provider snippet"
     },
     "DSC Resource Provider (function-based)": {
         "prefix": "DSC resource provier (function-based)",
@@ -563,7 +605,7 @@
             "\t",
             "}"
         ],
-        "description": "Function-based DSC Resource Provider"
+        "description": "Function-based DSC resource provider snippet"
     },
     "comment block": {
         "prefix": "comment",
@@ -572,7 +614,7 @@
             " # $0",
             " #>"
         ],
-        "description": "Comment block"
+        "description": "Comment block snippet"
     },
     "do-until": {
         "prefix": "do-until",
@@ -581,7 +623,7 @@
             "\t$0",
             "} until (${condition})"
         ],
-        "description": "do-until loop"
+        "description": "do-until loop snippet"
     },
     "do-while": {
         "prefix": "do-while",
@@ -590,7 +632,7 @@
             "\t$0",
             "} while (${condition})"
         ],
-        "description": "do-while loop"
+        "description": "do-while loop snippet"
     },
     "while": {
         "prefix": "while",
@@ -599,7 +641,7 @@
             "\t$0",
             "}"
         ],
-        "description": "while loop"
+        "description": "while loop snippet"
     },
     "for": {
         "prefix": "for",
@@ -608,7 +650,7 @@
             "\t$0",
             "}"
         ],
-        "description": "for loop"
+        "description": "for loop snippet"
     },
     "for-reversed": {
         "prefix": "forr",
@@ -617,7 +659,7 @@
             "\t$0",
             "}"
         ],
-        "description": "reversed for loop"
+        "description": "reversed for loop snippet"
     },
     "foreach": {
         "prefix": "foreach",
@@ -626,7 +668,7 @@
             "\t$0",
             "}"
         ],
-        "description": "foreach loop"
+        "description": "foreach loop snippet"
     },
     "function": {
         "prefix": "function",
@@ -635,7 +677,7 @@
             "\t$0",
             "}"
         ],
-        "description": "function definition"
+        "description": "function definition snippet"
     },
     "if": {
         "prefix": "if",
@@ -644,7 +686,7 @@
             "\t$0",
             "}"
         ],
-        "description": "if statement"
+        "description": "if statement snippet"
     },
     "elseif": {
         "prefix": "elseif",
@@ -653,7 +695,7 @@
             "\t$0",
             "}"
         ],
-        "description": "elseif statement"
+        "description": "elseif statement snippet"
     },
     "else": {
         "prefix": "else",
@@ -662,7 +704,7 @@
             "\t$0",
             "}"
         ],
-        "description": "else statement"
+        "description": "else statement snippet"
     },
     "switch": {
         "prefix": "switch",
@@ -672,7 +714,7 @@
             "\tDefault {}",
             "}"
         ],
-        "description": "switch statement"
+        "description": "switch statement snippet"
     },
     "try-catch": {
         "prefix": "try",
@@ -684,7 +726,7 @@
             "\t",
             "}"
         ],
-        "description": "try-catch exception handling"
+        "description": "try-catch snippet"
     },
     "try-catch-finally": {
         "prefix": "trycf",
@@ -699,7 +741,7 @@
             "\t",
             "}"
         ],
-        "description": "try-catch-finally exception handling"
+        "description": "try-catch-finally snippet"
     },
     "try-finally": {
         "prefix": "tryf",
@@ -711,7 +753,7 @@
             "\t",
             "}"
         ],
-        "description": "try-finally exception handling"
+        "description": "try-finally snippet"
     },
     "Workflow": {
         "prefix": "workflow",
@@ -723,29 +765,7 @@
             "\t$0",
             "}"
         ],
-        "description": "workflow"
-    },
-    "Workflow-Comment-Help": {
-        "prefix": "comment-help-workflow",
-        "body": [
-            "<#",
-            ".SYNOPSIS",
-            "\tShort description",
-            ".DESCRIPTION",
-            "\tLong description",
-            ".EXAMPLE",
-            "\tExample of how to use this workflow",
-            ".INPUTS",
-            "\tInputs to this workflow (if any)",
-            ".OUTPUTS",
-            "\tOutput from this workflow (if any)",
-            ".NOTES",
-            "\tGeneral notes",
-            ".FUNCTIONALITY",
-            "\tThe functionality that best describes this workflow",
-            "#>"
-        ],
-        "description": "Comment-based help for a workflow"
+        "description": "workflow snippet"
     },
     "Workflow ForEachParallel": {
         "prefix": "workflow foreach-parallel",
@@ -754,7 +774,7 @@
             "\t$0",
             "}"
         ],
-        "description": "Runs contents of foreach block in parallel inside a workflow"
+        "description": "foreach-parallel snippet (for use inside a workflow)"
     },
     "Workflow InlineScript": {
         "prefix": "workflow inlinescript",
@@ -763,7 +783,7 @@
             "\t$0",
             "}"
         ],
-        "description": "Runs isolated blocks of PowerShell script inside a workflow"
+        "description": "inlinescript snippet (for use inside a workflow)"
     },
     "Workflow Parallel": {
         "prefix": "workflow parallel",
@@ -772,7 +792,7 @@
             "\t$0",
             "}"
         ],
-        "description": "Runs commands in parallel inside a workflow"
+        "description": "parallel snippet (for use inside a workflow)"
     },
     "Workflow Sequence": {
         "prefix": "workflow sequence",
@@ -781,6 +801,6 @@
             "\t$0",
             "}"
         ],
-        "description": "Runs commands in sequential order inside a workflow"
+        "description": "sequence snippet (for use inside a workflow)"
     }
 }
