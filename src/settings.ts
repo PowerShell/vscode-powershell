@@ -12,6 +12,7 @@ export interface IScriptAnalysisSettings {
 
 export interface IDeveloperSettings {
     editorServicesHostPath?: string;
+    editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
 }
 
@@ -29,6 +30,7 @@ export function load(myPluginId: string): ISettings {
 
     let defaultDeveloperSettings = {
         editorServicesHostPath: "../bin/Microsoft.PowerShell.EditorServices.Host.exe",
+        editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false
     }
 

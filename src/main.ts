@@ -68,6 +68,9 @@ export function activate(context: vscode.ExtensionContext): void {
     if (settings.developer.editorServicesWaitForDebugger) {
         args.push('/waitForDebugger');
     }
+    if (settings.developer.editorServicesLogLevel) {
+        args.push('/logLevel:' + settings.developer.editorServicesLogLevel)
+    }
 
     let serverPath = resolveLanguageServerPath(settings);
     let serverOptions = {
@@ -95,8 +98,14 @@ export function activate(context: vscode.ExtensionContext): void {
             serverOptions,
             clientOptions);
 
-    languageServerClient.start();
+    languageServerClient.onReady().then(
+        () => registerFeatures(),
+        (reason) => vscode.window.showErrorMessage("Could not start language service: " + reason));
 
+    languageServerClient.start();
+}
+
+function registerFeatures() {
     // Register other features
     registerExpandAliasCommand(languageServerClient);
     registerShowHelpCommand(languageServerClient);

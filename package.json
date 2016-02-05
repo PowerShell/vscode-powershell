@@ -187,6 +187,11 @@
                     "default": "../bin/Microsoft.PowerShell.EditorServices.Host.exe",
                     "description": "Specifies the path to the PowerShell Editor Services host executable."
                 },
+                "powershell.developer.editorServicesLogLevel": {
+                    "type": "string",
+                    "default": "Normal",
+                    "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable."
+                },
                 "powershell.developer.editorServicesWaitForDebugger": {
                     "type": "boolean",
                     "default": false,
