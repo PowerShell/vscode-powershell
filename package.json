@@ -190,7 +190,7 @@
                 "powershell.developer.editorServicesLogLevel": {
                     "type": "string",
                     "default": "Normal",
-                    "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable."
+                    "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Possible values are 'Verbose', 'Normal', 'Warning', and 'Error'"
                 },
                 "powershell.developer.editorServicesWaitForDebugger": {
                     "type": "boolean",
