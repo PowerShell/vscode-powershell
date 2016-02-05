@@ -20,9 +20,14 @@ export interface OutputNotificationBody {
     output: string;
 }
 
-export namespace ShowChoicePromptNotification {
-    export const type: NotificationType<ShowChoicePromptNotificationBody> =
+export namespace ShowChoicePromptRequest {
+    export const type: RequestType<ShowChoicePromptRequestArgs, ShowChoicePromptResponseBody, string> =
         { get method() { return 'powerShell/showChoicePrompt'; } };
+}
+
+export namespace ShowInputPromptRequest {
+    export const type: RequestType<ShowInputPromptRequestArgs, ShowInputPromptResponseBody, string> =
+        { get method() { return 'powerShell/showInputPrompt'; } };
 }
 
 interface ChoiceDetails {
@@ -30,26 +35,31 @@ interface ChoiceDetails {
     helpMessage: string;
 }
 
-interface ShowChoicePromptNotificationBody {
+interface ShowInputPromptRequestArgs {
+    name: string;
+    label: string;
+}
+
+interface ShowChoicePromptRequestArgs {
     caption: string;
     message: string;
     choices: ChoiceDetails[];
     defaultChoice: number;
 }
 
-export namespace CompleteChoicePromptNotification {
-    export const type: NotificationType<CompleteChoicePromptNotificationBody> =
-        { get method() { return 'powerShell/completeChoicePrompt'; } };
-}
-
-interface CompleteChoicePromptNotificationBody {
+interface ShowChoicePromptResponseBody {
     chosenItem: string;
     promptCancelled: boolean;
 }
 
+interface ShowInputPromptResponseBody {
+    responseText: string;
+    promptCancelled: boolean;
+}
+
 function showChoicePrompt(
-    promptDetails: ShowChoicePromptNotificationBody,
-    client: LanguageClient) {
+    promptDetails: ShowChoicePromptRequestArgs,
+    client: LanguageClient) : Thenable<ShowChoicePromptResponseBody> {
 
     var quickPickItems =
         promptDetails.choices.map<vscode.QuickPickItem>(choice => {
@@ -71,24 +81,60 @@ function showChoicePrompt(
         quickPickItems = [defaultChoiceItem].concat(quickPickItems);
     }
 
-    vscode.window
-        .showQuickPick(
-        quickPickItems,
-        { placeHolder: promptDetails.caption + " - " + promptDetails.message })
-        .then(chosenItem => onItemSelected(chosenItem, client));
+    // For some bizarre reason, the quick pick dialog does not
+    // work if I return the Thenable immediately at this point.
+    // It only works if I save the thenable to a variable and
+    // return the variable instead...
+    var resultThenable =
+        vscode.window
+            .showQuickPick(
+                quickPickItems,
+                { placeHolder: promptDetails.caption + " - " + promptDetails.message })
+            .then(onItemSelected);
+
+    return resultThenable;
 }
 
-function onItemSelected(chosenItem: vscode.QuickPickItem, client: LanguageClient) {
+function showInputPrompt(
+    promptDetails: ShowInputPromptRequestArgs,
+    client: LanguageClient) : Thenable<ShowInputPromptResponseBody> {
+
+    var resultThenable =
+        vscode.window.showInputBox({
+            placeHolder: promptDetails.name + ": "
+        }).then(onInputEntered)
+
+    return resultThenable;
+}
+
+function onItemSelected(chosenItem: vscode.QuickPickItem): ShowChoicePromptResponseBody {
     if (chosenItem !== undefined) {
-        client.sendNotification(
-            CompleteChoicePromptNotification.type,
-            { chosenItem: chosenItem.label });
+        return {
+            promptCancelled: false,
+            chosenItem: chosenItem.label
+        };
     }
     else {
         // User cancelled the prompt, send the cancellation
-        client.sendNotification(
-            CompleteChoicePromptNotification.type,
-            { promptCancelled: true });
+        return {
+            promptCancelled: true,
+            chosenItem: undefined
+        };
+    }
+}
+
+function onInputEntered(responseText: string): ShowInputPromptResponseBody {
+    if (responseText !== undefined) {
+        return {
+            promptCancelled: false,
+            responseText: responseText
+        }
+    }
+    else {
+        return {
+            promptCancelled: true,
+            responseText: undefined
+        }
     }
 }
 
@@ -118,7 +164,13 @@ export function registerConsoleCommands(client: LanguageClient): void {
         consoleChannel.append(output.output);
     });
 
-    client.onNotification(
-        ShowChoicePromptNotification.type,
+    var t: Thenable<ShowChoicePromptResponseBody>;
+
+    client.onRequest(
+        ShowChoicePromptRequest.type,
         promptDetails => showChoicePrompt(promptDetails, client));
+
+    client.onRequest(
+        ShowInputPromptRequest.type,
+        promptDetails => showInputPrompt(promptDetails, client));
 }
