@@ -5,7 +5,7 @@
 			"name": "PowerShell",
 			"type": "PowerShell",
 			"request": "launch",
-			"program": "${workspaceRoot}/DebugTest.ps1"
+			"program": "${file}"
 		}
 	]
 }
