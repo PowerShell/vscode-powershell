@@ -646,7 +646,7 @@
     "for": {
         "prefix": "for",
         "body": [
-            "for ($${variable:i} = 1; $${variable:i} -lt $${array}.Count; $${variable:i}++) {",
+            "for ($${variable:i} = 0; $${variable:i} -lt $${array}.Count; $${variable:i}++) {",
             "\t$0",
             "}"
         ],
