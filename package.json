@@ -70,7 +70,6 @@
                 "key": "ctrl+K ctrl+f",
                 "when": "editorTextFocus && editorLangId == 'powershell'"
             }
-
         ],
         "commands": [
             {
@@ -127,6 +126,14 @@
                                 "type": "string",
                                 "description": "Absolute path to the PowerShell script to launch under the debugger."
                             },
+                            "args": {
+                                "type": "array",
+                                "description": "Command line arguments to pass to the PowerShell script.",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
                             "cwd": {
                                 "type": "string",
                                 "description": "Absolute path to the working directory. Default is the current workspace.",
@@ -141,6 +148,7 @@
                         "type": "PowerShell",
                         "request": "launch",
                         "program": "${file}",
+                        "args": [],
                         "cwd": "${file}"
                     }
                 ]
@@ -166,6 +174,14 @@
                                 "type": "string",
                                 "description": "Absolute path to the PowerShell script to launch under the debugger."
                             },
+                            "args": {
+                                "type": "array",
+                                "description": "Command line arguments to pass to the PowerShell script.",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
                             "cwd": {
                                 "type": "string",
                                 "description": "Absolute path to the working directory. Default is the current workspace.",
@@ -180,6 +196,7 @@
                         "type": "PowerShell x86",
                         "request": "launch",
                         "program": "${file}",
+                        "args": [],
                         "cwd": "${file}"
                     }
                 ]
