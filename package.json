@@ -125,7 +125,12 @@
                         "properties": {
                             "program": {
                                 "type": "string",
-                                "description": "Workspace relative path to the PowerShell script."
+                                "description": "Absolute path to the PowerShell script to launch under the debugger."
+                            },
+                            "cwd": {
+                                "type": "string",
+                                "description": "Absolute path to the working directory. Default is the current workspace.",
+                                "default": "."
                             }
                         }
                     }
@@ -135,7 +140,8 @@
                         "name": "PowerShell",
                         "type": "PowerShell",
                         "request": "launch",
-                        "program": "${file}"
+                        "program": "${file}",
+                        "cwd": "${file}"
                     }
                 ]
             },
@@ -158,7 +164,12 @@
                         "properties": {
                             "program": {
                                 "type": "string",
-                                "description": "Workspace relative path to the PowerShell script."
+                                "description": "Absolute path to the PowerShell script to launch under the debugger."
+                            },
+                            "cwd": {
+                                "type": "string",
+                                "description": "Absolute path to the working directory. Default is the current workspace.",
+                                "default": "."
                             }
                         }
                     }
@@ -168,7 +179,8 @@
                         "name": "PowerShell x86",
                         "type": "PowerShell x86",
                         "request": "launch",
-                        "program": "${file}"
+                        "program": "${file}",
+                        "cwd": "${file}"
                     }
                 ]
             }
