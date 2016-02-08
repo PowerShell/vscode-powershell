@@ -209,37 +209,14 @@
         ],
         "description": "Example: function-based DSC resource provider snippet"
     },
-    "Example-Path Processing": {
-        "prefix": "ex-path processing",
-        "body": [
-            "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=$true)]",
-            "foreach ($aPath in $Path) {",
-            "\tif ($pscmdlet.ShouldProcess($aPath, 'Operation')) {",
-            "\t\t# Process each path",
-            "\t\t$0",
-            "\t}",
-            "}"
-        ],
-        "description": "Example: processing paths allowing for non-existing paths (for use in process block). See parameter-path snippets."
-    },
-    "Example-Path Must Exist Processing": {
-        "prefix": "ex-path must exist processing",
+    "Example-Path Processing for Non-Existing Paths": {
+        "prefix": "ex-path processing for non-existing paths",
         "body": [
             "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=$true)]",
             "$paths = @()",
-            "if ($psCmdlet.ParameterSetName -eq 'Path') {",
-            "\tforeach ($aPath in $Path) {",
-            "\t\t# If Path doesn't have to exist, eg this command creates a file, remove the following if statement.",
-            "\t\tif (!(Test-Path -Path $aPath)) {",
-            "\t\t\t$ex = New-Object System.Management.Automation.ItemNotFoundException \"Cannot find path '$aPath' because it does not exist.\"",
-            "\t\t\t$category = [System.Management.Automation.ErrorCategory]::ObjectNotFound",
-            "\t\t\t$errRecord = New-Object System.Management.Automation.ErrorRecord $ex,'PathNotFound',$category,$aPath",
-            "\t\t\t$psCmdlet.WriteError($errRecord)",
-            "\t\t\tcontinue",
-            "\t\t}",
-            "\t",
-            "\t\t$paths += $aPath",
-            "\t}",
+            "foreach ($aPath in $Path) {",
+            "\t# Resolve any relative paths",
+            "\t$paths += $psCmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath($aPath)",
             "}",
             "",
             "foreach ($aPath in $paths) {",
@@ -249,10 +226,37 @@
             "\t}",
             "}"
         ],
-        "description": "Example: processing paths that must exist (for use in process block). See parameter-path snippets."
+        "description": "Example: processing non-existing paths typically used in New-* commands (for use in process block). See parameter-path snippet."
     },
-    "Example-Path with Wildcards Processing": {
-        "prefix": "ex-path wildcard processing",
+    "Example-Path Processing for No Wildcards Allowed": {
+        "prefix": "ex-path processing for no wildcards allowed",
+        "body": [
+            "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=$true)]",
+            "$paths = @()",
+            "foreach ($aPath in $Path) {",
+            "\tif (!(Test-Path -LiteralPath $aPath)) {",
+            "\t\t$ex = New-Object System.Management.Automation.ItemNotFoundException \"Cannot find path '$aPath' because it does not exist.\"",
+            "\t\t$category = [System.Management.Automation.ErrorCategory]::ObjectNotFound",
+            "\t\t$errRecord = New-Object System.Management.Automation.ErrorRecord $ex,'PathNotFound',$category,$aPath",
+            "\t\t$psCmdlet.WriteError($errRecord)",
+            "\t\tcontinue",
+            "\t}",
+            "",
+            "\t# Resolve any relative paths",
+            "\t$paths += $psCmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath($aPath)",
+            "}",
+            "",
+            "foreach ($aPath in $paths) {",
+            "\tif ($pscmdlet.ShouldProcess($aPath, 'Operation')) {",
+            "\t\t# Process each path",
+            "\t\t$0",
+            "\t}",
+            "}"
+        ],
+        "description": "Example: processing non-wildcard paths that must exist (for use in process block). See parameter-path snippets."
+    },
+    "Example-Path Processing for Wildcards Allowed": {
+        "prefix": "ex-path processing for wildcards allowed",
         "body": [
             "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=$true, DefaultParameterSetName='Path')]",
             "$paths = @()",
@@ -266,8 +270,9 @@
             "\t\t\tcontinue",
             "\t\t}",
             "\t",
-            "\t\t# In the -Path (non-literal) case, resolve any wildcards in path",
-            "\t\t$paths += $aPath | Resolve-Path | Foreach Path",
+            "\t\t# Resolve any wildcards that might be in the path",
+            "\t\t$provider = $null",
+            "\t\t$paths += $psCmdlet.SessionState.Path.GetResolvedProviderPathFromPSPath($aPath, [ref]$provider)",
             "\t}",
             "}",
             "else {",
@@ -280,7 +285,8 @@
             "\t\t\tcontinue",
             "\t\t}",
             "\t",
-            "\t\t$paths += $aPath",
+            "\t\t# Resolve any relative paths",
+            "\t\t$paths += $psCmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath($aPath)",
             "\t}",
             "}",
             "",
@@ -291,7 +297,7 @@
             "\t}",
             "}"
         ],
-        "description": "Example: processing paths with wildcards (for use in process block). See parameter-path-wildcards and parameter-literalpath snippets."
+        "description": "Example: processing wildcard paths that must exist (for use in process block). See parameter-path-wildcards and parameter-literalpath snippets."
     },
     "Example-Splatting": {
         "prefix": "ex-splat",
@@ -499,23 +505,24 @@
     "Parameter-Path": {
         "prefix": "parameter-path",
         "body": [
-            "# Specifies a path to one or more locations. The default location is the current directory (.).",
+            "# Specifies a path to one or more locations.",
             "[Parameter(Mandatory=$true,",
             "           Position=${Position:0},",
             "           ParameterSetName=\"${ParameterSetName:Path}\",",
             "           ValueFromPipeline=$true,",
             "           ValueFromPipelineByPropertyName=$true,",
             "           HelpMessage=\"Path to one or more locations.\")]",
+            "[Alias(\"PSPath\")]",
             "[ValidateNotNullOrEmpty()]",
             "[string[]]",
             "$${ParameterName:Path}$0"
         ],
-        "description": "Parameter declaration snippet for Path parameter that does not accept wildcards"
+        "description": "Parameter declaration snippet for Path parameter that does not accept wildcards. Do not use with parameter-literalpath."
     },
     "Parameter-Path-Wildcards": {
         "prefix": "parameter-path-wildcards",
         "body": [
-            "# Specifies a path to one or more locations. Wildcards are permitted. The default location is the current directory (.).",
+            "# Specifies a path to one or more locations. Wildcards are permitted.",
             "[Parameter(Mandatory=$true,",
             "           Position=${Position:0},",
             "           ParameterSetName=\"${ParameterSetName:Path}\",",
@@ -527,7 +534,7 @@
             "[string[]]",
             "$${ParameterName:Path}$0"
         ],
-        "description": "Parameter declaration snippet for Path parameter that accepts wildcards"
+        "description": "Parameter declaration snippet for Path parameter that accepts wildcards. Add parameter-literalpath to handle paths with embedded wildcard chars."
     },
     "Parameter-LiteralPath": {
         "prefix": "parameter-literalpath",

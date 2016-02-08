@@ -49,11 +49,40 @@ Try these steps:
 9. Observe that every time the breakpoint is hit, the watch variables get updated.
 10. When you're done debugging, click the red **Stop** button or press `Shift+F5`
 
-If you would like to debug a different script, you will need to edit the
-`.vscode\launch.json` file and change the `program` parameter to point to
-the script file to be debugged.  In the future we hope to remove the
-necessity of this setting so that the current script file will be executed
-when `F5` is pressed.
+The debugger will attempt to execute the file in the active editor pane.
+If you would like to configure a single script to always be executed upon
+launch of the debugger, you will need to edit the `.vscode\launch.json`
+file and change the `program` parameter to point to the script file to be
+debugged.  The path must be absolute but you can use the ${workspaceRoot} variable
+to refer to the open folder in VSCode e.g.
+`"program": "${workspaceRoot}\\DebugTest.ps1"`
+
+### Passing Arguments to the Script
+
+If you would like to pass arguments to your script, open the `.vscode\launch.json`
+file in your workspace and modify the `args` parameter e.g.:
+
+`"args": [ "-Param1 foo -Recurse" ]`
+
+You can pass all your script arguments in a single string or break them up
+into individual strings e.g.:
+
+`"args": [ "-Param1", "foo" "-Recurse" ],`
+
+At runtime these arguments will be concatenated togehter using a space
+delimiter so it will result in the same string as the first `args` example.
+
+### Setting the Working Directory
+
+When the debugger starts it will set the working directory of the PowerShell
+environment depending on the value of the `cwd` parameter in the
+`.vscode\launch.json` file in your workspace.  If this parameter is missing or
+is set to an empty string, the working directory will be set to the workspace directory.
+By default it is set to `${file}` which will set the working directory to the parent
+directory of the file in the active editor pane when the debugger is launched.
+You can also set the parameter explicitly e.g.:
+
+`"cwd": "C:\\Users\\JSnover\\Documents\\MonadUberAlles"`
 
 ## Feedback
 
