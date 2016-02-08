@@ -10,7 +10,7 @@
 - You can now pass arguments to scripts in the debugger with the `args` parameter in launch.json
 - You can also run your script with the 32-bit debugger by changing the `type` parameter in launch.json to "PowerShell x86" (also thanks to [@adamdriscoll](https://github.com/adamdriscoll)!)
 - The new default PowerShell debugger configuration now launches the active file in the editor
-- You can also set the working directory where the script is run by setting the `cwd` parameter in launch.json to an absolute path
+- You can also set the working directory where the script is run by setting the `cwd` parameter in launch.json to an absolute path.  If you need a workspace relative path, use ${workspaceRoot} to create an absolute path e.g. `"${workspaceRoot}/modules/foo.psm1"`.
 
 We recommend deleting any existing `launch.json` file you're using so that a new one will
 be generated with the new defaults.
@@ -31,14 +31,18 @@ be generated with the new defaults.
 - "Find/Install PowerShell modules from the gallery" (`Ctrl+K Ctrl+F`): Enables you to find and install modules from the PowerShell Gallery (thanks [@dfinke](https://github.com/dfinke)!)
 - "Open current file in PowerShell ISE" (`Ctrl+Shift+i`): Opens the current file in the PowerShell ISE (thanks [@janegilring](https://github.com/janegilring)!)
 
+#### Editor improvements
+
+- Path auto-completion lists show just the current directory's contents instead of the full path (which had resulted in clipped text)
+- Parameter auto-completion lists are now sorted in the same order as they are in PowerShell ISE where command-specific parameters preceed the common parameters
+- Parameter auto-completion lists show the parameter type
+- Command auto-completion lists show the resolved command for aliases and the path for executables
+- Many improvements to the PowerShell snippets, more clearly separating functional and example snippets
+- Added some additional example script files in the `examples` folder
+
 #### New configuration settings
 
 - `powershell.developer.editorServicesLogLevel`: configures the logging verbosity for PowerShell Editor Services.  The default log level will now write less logs, improving overall performance
-
-#### Other improvements
-
-- Many improvements to the PowerShell snippets, more clearly separating functional and example snippets
-- Added some additional example script files in the `examples` folder
 
 ## 0.3.1
 ### Thursday, December 17, 2015
