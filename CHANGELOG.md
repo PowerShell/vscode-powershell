@@ -37,7 +37,7 @@ be generated with the new defaults.
 - Parameter auto-completion lists are now sorted in the same order as they are in PowerShell ISE where command-specific parameters preceed the common parameters
 - Parameter auto-completion lists show the parameter type
 - Command auto-completion lists show the resolved command for aliases and the path for executables
-- Many improvements to the PowerShell snippets, more clearly separating functional and example snippets
+- Many improvements to the PowerShell snippets, more clearly separating functional and example snippets (all of the latter are prefixed with `ex-`)
 - Added some additional example script files in the `examples` folder
 
 #### New configuration settings
