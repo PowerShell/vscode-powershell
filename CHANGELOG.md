@@ -1,5 +1,45 @@
 # vscode-powershell Release History
 
+## 0.4.0
+### Monday, February 8, 2016
+
+#### Debugging improvements
+
+[@rkeithhill](https://github.com/rkeithhill) spent a lot of time polishing the script debugging experience for this release:
+
+- You can now pass arguments to scripts in the debugger with the `args` parameter in launch.json
+- You can also run your script with the 32-bit debugger by changing the `type` parameter in launch.json to "PowerShell x86" (also thanks to [@adamdriscoll](https://github.com/adamdriscoll)!)
+- The new default PowerShell debugger configuration now launches the active file in the editor
+- You can also set the working directory where the script is run by setting the `cwd` parameter in launch.json to an absolute path
+
+We recommend deleting any existing `launch.json` file you're using so that a new one will
+be generated with the new defaults.
+
+#### Console improvements
+
+- Improved PowerShell console output formatting and performance
+  - The console prompt is now displayed after a command is executed
+  - Command execution errors are now displayed correctly in more cases
+  - Console output now wraps at 120 characters instead of 80 characters
+
+- Added choice and input prompt support
+  - When executing code using the 'Run Selection' command, choice and input prompts appear as VS Code UI popups
+  - When executing code in the debugger, choice and input prompts appear in the Debug Console
+
+#### New commands
+
+- "Find/Install PowerShell modules from the gallery" (`Ctrl+K Ctrl+F`): Enables you to find and install modules from the PowerShell Gallery (thanks [@dfinke](https://github.com/dfinke)!)
+- "Open current file in PowerShell ISE" (`Ctrl+Shift+i`): Opens the current file in the PowerShell ISE (thanks [@janegilring](https://github.com/janegilring)!)
+
+#### New configuration settings
+
+- `powershell.developer.editorServicesLogLevel`: configures the logging verbosity for PowerShell Editor Services.  The default log level will now write less logs, improving overall performance
+
+#### Other improvements
+
+- Many improvements to the PowerShell snippets, more clearly separating functional and example snippets
+- Added some additional example script files in the `examples` folder
+
 ## 0.3.1
 ### Thursday, December 17, 2015
 
@@ -13,9 +53,9 @@
   - New "Auto" scope which shows only the variables defined within the current scope
   - Greatly improved representation of variable values, especially for dictionaries and
     objects that implement the ToString() method
-- Added new "Expand Alias" command which resolves command aliases used in a file or 
+- Added new "Expand Alias" command which resolves command aliases used in a file or
   selection and updates the source text with the resolved command names
-- Reduced default Script Analyzer rules to a minimal list    
+- Reduced default Script Analyzer rules to a minimal list
 - Fixed a wide array of completion text replacement bugs
 - Improved extension upgrade experience
 
