@@ -38,6 +38,11 @@ code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1
 Check out the [development documentation](docs/development.md) for more details
 on how to contribute to this extension!
 
+## Maintainers
+
+- [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
+- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
+
 ## License
 
 This extension is [licensed under the MIT License](LICENSE.txt).  Please see the
