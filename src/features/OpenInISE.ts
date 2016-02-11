@@ -15,6 +15,6 @@ export function registerOpenInISECommand(): void {
             var ISEPath = process.env.windir + '\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe';
         }
 
-        ChildProcess.exec(ISEPath + ' -File ' + uri.fsPath).unref();
+        ChildProcess.exec(ISEPath + ' -File "' + uri.fsPath + '"').unref();
     });
 }
