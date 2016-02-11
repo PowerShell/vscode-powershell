@@ -1,0 +1,31 @@
+// This uses the 'taskRunnertest' tag to specify which tests to include.
+
+// A task runner that calls Pester for testing the current project
+{
+	"version": "0.1.0",
+
+	// Start PowerShell
+	"command": "c:\\windows\\sysnative\\windowspowershell\\v1.0\\PowerShell.exe",
+
+	// The command is a shell script
+	"isShellCommand": true,
+
+	// Show the output window always
+	"showOutput": "always",
+
+	// Allow Pester to invoke scripts and run Pester
+	"args": [
+        "-NoProfile",
+        "Set-ExecutionPolicy -ExecutionPolicy 'RemoteSigned' -Scope 'Process';",
+        "write-host 'invoking Pester...';invoke-pester;",
+        "invoke-command {write-host \"Completed all tasks in taskRunner: $args[0]\"} -args"
+        ],
+    
+    // Associate with test taskrunner
+    "tasks": [
+        {
+            "taskName": "Pester",
+            "isTestCommand": true
+        }
+    ]
+}
