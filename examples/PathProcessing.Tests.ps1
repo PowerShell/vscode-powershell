@@ -1,11 +1,11 @@
-# These tests for the for parameter-* and ex-path* snippets.
-# These tests also demonstrate how you can create a tasks.json
-# file in your workspace folder's .vscode directory to easily
-# run your Pester tests.  See the examples\.vscode\tasks.json file.
+# These Pester tests are for the for parameter-* and ex-path* snippets.
+# Take a look at the .vscode\tasks.json file to see how you can create
+# and configure a test task runner that will run all the Pester tests
+# in your workspace folder.
 
-# To run these Pester tests, press Ctrl+Shift+T which will run the
-# "test" task defined in .vscode\tasks.json. Or press Ctrl+Shift+P,
-# type "test" and select "Tasks: Run Test Task".
+# To run these Pester tests, press Ctrl+Shift+T or press Ctrl+Shift+P,
+# type "test" and select "Tasks: Run Test Task".  This will invoke the
+# test task runner defined in .vscode\tasks.json.
 
 # This (empty) file is required by some of the tests.
 $null = New-Item -Path 'foo[1].txt' -Force
