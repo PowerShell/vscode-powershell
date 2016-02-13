@@ -1,11 +1,19 @@
-// This uses the 'taskRunnertest' tag to specify which tests to include.
+// A task runner that invokes Pester which runs all Pester tests under the
+// current workspace folder.
 
-// A task runner that calls Pester for testing the current project
+// Available variables which can be used inside of strings.
+// ${workspaceRoot}: the root folder of the team
+// ${file}: the current opened file
+// ${fileBasename}: the current opened file's basename
+// ${fileDirname}: the current opened file's dirname
+// ${fileExtname}: the current opened file's extension
+// ${cwd}: the current working directory of the spawned process
+
 {
 	"version": "0.1.0",
 
 	// Start PowerShell
-	"command": "c:\\windows\\sysnative\\windowspowershell\\v1.0\\PowerShell.exe",
+	"command": "${env.windir}\\sysnative\\windowspowershell\\v1.0\\PowerShell.exe",
 
 	// The command is a shell script
 	"isShellCommand": true,
@@ -16,16 +24,116 @@
 	// Allow Pester to invoke scripts and run Pester
 	"args": [
         "-NoProfile",
-        "Set-ExecutionPolicy -ExecutionPolicy 'RemoteSigned' -Scope 'Process';",
-        "write-host 'invoking Pester...';invoke-pester;",
-        "invoke-command {write-host \"Completed all tasks in taskRunner: $args[0]\"} -args"
+        "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process;",
+        "Write-Host 'Invoking Pester...'; Invoke-Pester;",
+        "Invoke-Command { Write-Host \"Completed all tasks in task runner: $($args[0])\" } -args"
         ],
-    
-    // Associate with test taskrunner
+
+    // Associate with test task runner
     "tasks": [
         {
             "taskName": "Pester",
-            "isTestCommand": true
+            "isTestCommand": true,
+            "problemMatcher": [
+                {
+                    "owner": "powershell",
+                    "fileLocation": ["absolute"],
+                    "severity": "error",
+                    "pattern": [
+                        {
+                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
+                            "message": 1
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
+                            "line": 1,
+                            "file": 2,
+                            "message": 2
+                        }
+                    ]
+                },
+                {
+                    "owner": "powershell",
+                    "fileLocation": ["absolute"],
+                    "severity": "error",
+                    "pattern": [
+                        {
+                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
+                            "message": 1
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
+                            "line": 1,
+                            "file": 2,
+                            "message": 2
+                        }
+                    ]
+                },
+                {
+                    "owner": "powershell",
+                    "fileLocation": ["absolute"],
+                    "severity": "error",
+                    "pattern": [
+                        {
+                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
+                            "message": 1
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
+                            "line": 1,
+                            "file": 2,
+                            "message": 2
+                        }
+                    ]
+                },
+                {
+                    "owner": "powershell",
+                    "fileLocation": ["absolute"],
+                    "severity": "error",
+                    "pattern": [
+                        {
+                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
+                            "message": 1
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^.*$"
+                        },
+                        {
+                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
+                            "line": 1,
+                            "file": 2,
+                            "message": 2
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
