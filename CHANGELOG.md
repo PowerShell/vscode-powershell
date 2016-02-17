@@ -1,7 +1,14 @@
 # vscode-powershell Release History
 
+## 0.4.1
+### Wednesday, February 17, 2016
+
+- Updated PSScriptAnalyzer 1.4.0 for improved rule marker extents
+- Added example Pester task for running tests in the examples folder
+- Fixed #94: Scripts fail to launch in the debugger if the working directory path contains spaces
+
 ## 0.4.0
-### Monday, February 8, 2016
+### Tuesday, February 9, 2016
 
 #### Debugging improvements
 
