@@ -1,5 +1,18 @@
-// A task runner that invokes Pester which runs all Pester tests under the
+// A task runner that invokes Pester to run all Pester tests under the
 // current workspace folder.
+
+// NOTE: This Pester task runner requires an updated version of Pester (>=3.4.0)
+// in order for the problemMatcher to find failed test information (message, line, file).
+// If you don't have that version, you can update Pester from the PSGallery like so:
+//
+// PS C:\> Update-Module Pester
+//
+// If that gives an error like:
+// "Module 'Pester' was not installed by using Install-Module, so it cannot be updated."
+// then execute:
+//
+// PS C:\> Install-Module Pester -Scope CurrentUser -Force
+//
 
 // Available variables which can be used inside of strings.
 // ${workspaceRoot}: the root folder of the team
@@ -21,11 +34,9 @@
 	// Show the output window always
 	"showOutput": "always",
 
-	// Allow Pester to invoke scripts and run Pester
 	"args": [
-        "-NoProfile",
-        "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process;",
-        "Write-Host 'Invoking Pester...'; Invoke-Pester;",
+        "-NoProfile", "-ExecutionPolicy", "Bypass",
+        "Write-Host 'Invoking Pester...'; Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true};",
         "Invoke-Command { Write-Host \"Completed all tasks in task runner: $($args[0])\" } -args"
         ],
 
@@ -41,95 +52,13 @@
                     "severity": "error",
                     "pattern": [
                         {
-                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
+                            "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
                             "message": 1
                         },
                         {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
-                            "line": 1,
-                            "file": 2,
-                            "message": 2
-                        }
-                    ]
-                },
-                {
-                    "owner": "powershell",
-                    "fileLocation": ["absolute"],
-                    "severity": "error",
-                    "pattern": [
-                        {
-                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
-                            "message": 1
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
-                            "line": 1,
-                            "file": 2,
-                            "message": 2
-                        }
-                    ]
-                },
-                {
-                    "owner": "powershell",
-                    "fileLocation": ["absolute"],
-                    "severity": "error",
-                    "pattern": [
-                        {
-                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
-                            "message": 1
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
-                            "line": 1,
-                            "file": 2,
-                            "message": 2
-                        }
-                    ]
-                },
-                {
-                    "owner": "powershell",
-                    "fileLocation": ["absolute"],
-                    "severity": "error",
-                    "pattern": [
-                        {
-                            "regexp": "^\\s*\\[-\\](.*?)(\\d+)ms\\s*$",
-                            "message": 1
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^.*$"
-                        },
-                        {
-                            "regexp": "^\\s+at line: (\\d+) in (.*)$",
-                            "line": 1,
-                            "file": 2,
-                            "message": 2
+                            "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+                            "file": 1,
+                            "line": 2
                         }
                     ]
                 }
