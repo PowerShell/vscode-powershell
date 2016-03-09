@@ -4,6 +4,7 @@
 
 'use strict';
 
+import os = require('os');
 import path = require('path');
 import vscode = require('vscode');
 import settingsManager = require('./settings');
@@ -64,45 +65,49 @@ export function activate(context: vscode.ExtensionContext): void {
             }
         });
 
-    let args = [];
-    if (settings.developer.editorServicesWaitForDebugger) {
-        args.push('/waitForDebugger');
-    }
-    if (settings.developer.editorServicesLogLevel) {
-        args.push('/logLevel:' + settings.developer.editorServicesLogLevel)
-    }
-
-    let serverPath = resolveLanguageServerPath(settings);
-    let serverOptions = {
-        run: {
-            command: serverPath,
-            args: args
-        },
-        debug: {
-            command: serverPath,
-            args: ['/waitForDebugger']
+    // The language server is only available on Windows
+    if (os.platform() == "win32")
+    {
+        let args = [];
+        if (settings.developer.editorServicesWaitForDebugger) {
+            args.push('/waitForDebugger');
         }
-    };
-
-    let clientOptions: LanguageClientOptions = {
-        documentSelector: [PowerShellLanguageId],
-        synchronize: {
-            configurationSection: PowerShellLanguageId,
-            //fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
+        if (settings.developer.editorServicesLogLevel) {
+            args.push('/logLevel:' + settings.developer.editorServicesLogLevel)
         }
+
+        let serverPath = resolveLanguageServerPath(settings);
+        let serverOptions = {
+            run: {
+                command: serverPath,
+                args: args
+            },
+            debug: {
+                command: serverPath,
+                args: ['/waitForDebugger']
+            }
+        };
+
+        let clientOptions: LanguageClientOptions = {
+            documentSelector: [PowerShellLanguageId],
+            synchronize: {
+                configurationSection: PowerShellLanguageId,
+                //fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
+            }
+        }
+
+        languageServerClient =
+            new LanguageClient(
+                'PowerShell Editor Services',
+                serverOptions,
+                clientOptions);
+
+        languageServerClient.onReady().then(
+            () => registerFeatures(),
+            (reason) => vscode.window.showErrorMessage("Could not start language service: " + reason));
+
+        languageServerClient.start();
     }
-
-    languageServerClient =
-        new LanguageClient(
-            'PowerShell Editor Services',
-            serverOptions,
-            clientOptions);
-
-    languageServerClient.onReady().then(
-        () => registerFeatures(),
-        (reason) => vscode.window.showErrorMessage("Could not start language service: " + reason));
-
-    languageServerClient.start();
 }
 
 function registerFeatures() {
