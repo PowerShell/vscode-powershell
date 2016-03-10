@@ -112,7 +112,12 @@
                         "powershell"
                     ]
                 },
-                "program": "bin/Microsoft.PowerShell.EditorServices.Host.exe",
+                "windows": {
+                    "program": "bin/Microsoft.PowerShell.EditorServices.Host.exe"
+                },
+                "winx86": {
+                    "program": "bin/Microsoft.PowerShell.EditorServices.Host.x86.exe"
+                },
                 "args": [
                     "/debugAdapter"
                 ],
@@ -150,6 +155,14 @@
                         "program": "${file}",
                         "args": [],
                         "cwd": "${file}"
+                    },
+                    {
+                        "name": "PowerShell x86",
+                        "type": "PowerShell x86",
+                        "request": "launch",
+                        "program": "${file}",
+                        "args": [],
+                        "cwd": "${file}"
                     }
                 ]
             },
@@ -160,7 +173,9 @@
                         "powershell"
                     ]
                 },
-                "program": "bin/Microsoft.PowerShell.EditorServices.Host.x86.exe",
+                "windows": {
+                    "program": "bin/Microsoft.PowerShell.EditorServices.Host.x86.exe"
+                },
                 "args": [
                     "/debugAdapter"
                 ],
