@@ -76,37 +76,45 @@ export function activate(context: vscode.ExtensionContext): void {
             args.push('/logLevel:' + settings.developer.editorServicesLogLevel)
         }
 
-        let serverPath = resolveLanguageServerPath(settings);
-        let serverOptions = {
-            run: {
-                command: serverPath,
-                args: args
-            },
-            debug: {
-                command: serverPath,
-                args: ['/waitForDebugger']
-            }
-        };
+        try
+        {
+            let serverPath = resolveLanguageServerPath(settings);
+            let serverOptions = {
+                run: {
+                    command: serverPath,
+                    args: args
+                },
+                debug: {
+                    command: serverPath,
+                    args: ['/waitForDebugger']
+                }
+            };
 
-        let clientOptions: LanguageClientOptions = {
-            documentSelector: [PowerShellLanguageId],
-            synchronize: {
-                configurationSection: PowerShellLanguageId,
-                //fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
+            let clientOptions: LanguageClientOptions = {
+                documentSelector: [PowerShellLanguageId],
+                synchronize: {
+                    configurationSection: PowerShellLanguageId,
+                    //fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
+                }
             }
+
+            languageServerClient =
+                new LanguageClient(
+                    'PowerShell Editor Services',
+                    serverOptions,
+                    clientOptions);
+
+            languageServerClient.onReady().then(
+                () => registerFeatures(),
+                (reason) => vscode.window.showErrorMessage("Could not start language service: " + reason));
+
+            languageServerClient.start();
         }
-
-        languageServerClient =
-            new LanguageClient(
-                'PowerShell Editor Services',
-                serverOptions,
-                clientOptions);
-
-        languageServerClient.onReady().then(
-            () => registerFeatures(),
-            (reason) => vscode.window.showErrorMessage("Could not start language service: " + reason));
-
-        languageServerClient.start();
+        catch (e)
+        {
+            vscode.window.showErrorMessage(
+                "The language service could not be started: " + e);
+        }
     }
 }
 
@@ -133,11 +141,17 @@ function resolveLanguageServerPath(settings: settingsManager.ISettings): string 
     if (editorServicesHostPath) {
         console.log("Found Editor Services path from config: " + editorServicesHostPath);
 
+        // Does the path end in a .exe?  Alert the user if so.
+        if (path.extname(editorServicesHostPath) != '') {
+            throw "The editorServicesHostPath setting must point to a directory, not a file.";
+        }
+
         // Make the path absolute if it's not
         editorServicesHostPath =
             path.resolve(
                 __dirname,
-                editorServicesHostPath);
+                editorServicesHostPath,
+                getHostExeName(settings.useX86Host));
 
         console.log("    Resolved path to: " + editorServicesHostPath);
     }
@@ -148,10 +162,17 @@ function resolveLanguageServerPath(settings: settingsManager.ISettings): string 
                 __dirname,
                 '..',
                 'bin',
-                'Microsoft.PowerShell.EditorServices.Host.exe');
+                getHostExeName(settings.useX86Host));
 
         console.log("Using default Editor Services path: " + editorServicesHostPath);
     }
 
     return editorServicesHostPath;
+}
+
+function getHostExeName(useX86Host: boolean): string {
+    // The useX86Host setting is only relevant on 64-bit OS
+    var is64BitOS = process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
+    var archText = useX86Host && is64BitOS ? ".x86" : "";
+    return "Microsoft.PowerShell.EditorServices.Host" + archText + ".exe";
 }
