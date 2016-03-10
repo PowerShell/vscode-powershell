@@ -1,4 +1,5 @@
 bin/
+examples/Release/
 out/
 node_modules/
 vscode-powershell.zip
