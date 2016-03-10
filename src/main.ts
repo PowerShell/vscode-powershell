@@ -46,11 +46,6 @@ export function activate(context: vscode.ExtensionContext): void {
             ],
 
             __electricCharacterSupport: {
-                brackets: [
-                    { tokenType: 'delimiter.curly.ts', open: '{', close: '}', isElectric: true },
-                    { tokenType: 'delimiter.square.ts', open: '[', close: ']', isElectric: true },
-                    { tokenType: 'delimiter.paren.ts', open: '(', close: ')', isElectric: true }
-                ],
                 docComment: { scope: 'comment.documentation', open: '/**', lineStart: ' * ', close: ' */' }
             },
 
