@@ -1,5 +1,44 @@
 # vscode-powershell Release History
 
+## 0.5.0
+### Thursday, March 10, 2016
+
+#### Support for PowerShell v3 and v4
+
+- Support for PowerShell v3 and v4 is now complete!  Note that for this release,
+  Script Analyzer support has been disabled for PS v3 and v4 until we implement
+  a better strategy for integrating it as a module dependency
+
+#### Debugging improvements
+
+- Added support for command breakpoints.
+
+  Hover over the Debug workspace's 'Breakpoints' list header and click the 'Add'
+  button then type a command name (like `Write-Output`) in the new text box that
+  appears in the list.
+
+- Added support for conditional breakpoints.
+
+  Right click in the breakpoint margin to the left of the code editor and click
+  'Add conditional breakpoint' then enter a PowerShell expression in the text box
+  that appears in the editor.
+
+#### Other improvements
+
+- Added a preview of a possible project template for PowerShell Gallery modules in
+  the `examples` folder.  Includes a PSake build script with Pester test, clean,
+  build, and publish tasks.  See the `examples\README.md` file for instructions.
+  Check it out and give your feedback on GitHub!
+- `using 'module'` now resolves relative paths correctly, removing a syntax error that
+  previously appeared when relative paths were used
+- Calling `Read-Host -AsSecureString` or `Get-Credential` from the console now shows an
+  appropriate "not supported" error message instead of crashing the language service.
+  Support for these commands will be added in a later release.
+
+#### New configuration settings
+
+- `powershell.useX86Host`: If true, causes the 32-bit language service to be used on 64-bit Windows.  On 32-bit Windows this setting has no effect.
+
 ## 0.4.1
 ### Wednesday, February 17, 2016
 
