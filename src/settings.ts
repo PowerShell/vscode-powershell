@@ -17,6 +17,7 @@ export interface IDeveloperSettings {
 }
 
 export interface ISettings {
+    useX86Host?: boolean,
     scriptAnalysis?: IScriptAnalysisSettings,
     developer?: IDeveloperSettings,
 }
@@ -29,12 +30,13 @@ export function load(myPluginId: string): ISettings {
     };
 
     let defaultDeveloperSettings = {
-        editorServicesHostPath: "../bin/Microsoft.PowerShell.EditorServices.Host.exe",
+        editorServicesHostPath: "../bin/",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false
     }
 
     return {
+        useX86Host: configuration.get<boolean>("useX86Host", false),
         scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
         developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings)
     }

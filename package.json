@@ -221,6 +221,11 @@
             "type": "object",
             "title": "PowerShell Configuration",
             "properties": {
+                "powershell.useX86Host": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, causes the 32-bit language service to be used on 64-bit Windows.  On 32-bit Windows this setting has no effect.  This setting does not affect the debugger which has its own architecture configuration."
+                },
                 "powershell.scriptAnalysis.enable": {
                     "type": "boolean",
                     "default": true,
@@ -228,8 +233,8 @@
                 },
                 "powershell.developer.editorServicesHostPath": {
                     "type": "string",
-                    "default": "../bin/Microsoft.PowerShell.EditorServices.Host.exe",
-                    "description": "Specifies the path to the PowerShell Editor Services host executable."
+                    "default": "../bin/",
+                    "description": "Specifies the path to the folder containing the PowerShell Editor Services host executables."
                 },
                 "powershell.developer.editorServicesLogLevel": {
                     "type": "string",
