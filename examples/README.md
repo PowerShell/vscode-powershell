@@ -111,14 +111,14 @@ To execute the `Publish` task, press `Ctrl+P` then type `"task publish"` and pre
 
 NOTE: the `Publish` task does not actually publish to allow for experimentation.
 If you wish to publish, remove the `-WhatIf` parameter on the `Publish-Module` command
-in Build.ps1.
+in Build.ps1. But make sure you've modified the module manifest (psd1) file or supplied your own
+in order to give your module a unique name and guid.
 
 NOTE: the very first time you execute the publish task, you will be prompted for
 a NuGet API Key.  This would normally be the NuGet API Key you are assigned when you
-create an account of the [PowerShell Gallery](https://www.powershellgallery.com/).
+register for an account on the [PowerShell Gallery](https://www.powershellgallery.com/).
 However since this is just an example of how this feature could work in the future,
-you can supply any string you want.  You will need to enter the api key string at the
-bottom of the Debug Console window.
+you can supply any string you want.
 
 For more details on how this works, inspect the `.vscode\tasks.json` file and the
 `Build.ps1` file.
