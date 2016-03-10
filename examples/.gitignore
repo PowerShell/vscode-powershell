@@ -1,0 +1,5 @@
+# Don't checkin this output dir
+Release/
+
+# Auto-generated test file
+foo[1].ps1

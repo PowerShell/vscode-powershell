@@ -8,40 +8,30 @@
 .EXAMPLE
 	Another example of how to use this cmdlet
 #>
-function Stop-Process2
-{
+function Stop-Process2 {
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	[Alias()]
 	[OutputType([int])]
-	Param
-	(
+	param(
 		# Param1 help description
 		[Parameter(Mandatory=$true,
 				   ValueFromPipelineByPropertyName=$true,
 				   Position=0)]
 		$Name
 	)
-	
-	Begin
-	{
-	}
-	Process
-	{
+
+	process	{
 		if ($PSCmdlet.ShouldProcess("")) {
 			$processes = Get-Process -Name $Name
-			foreach ($process in $processes)
-			{
+			foreach ($process in $processes) {
 				$id = $process.Id
 				$name = $process.Name
 				Write-Output "Killing $name ($id)"
-				
+
 				$process.Kill();
-				
+
 				Start-Sleep -Seconds 1
 			}
 		}
-	}
-	End
-	{
 	}
 }

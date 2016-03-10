@@ -3,7 +3,10 @@
 *NOTE: For a more comfortable reading experience, use the key combination `Ctrl+Shift+V`*
 
 This folder contains a few basic PowerShell script files that you can use
-to experiment with the new PowerShell editing and debugging capabilities.
+to experiment with the new PowerShell editing debugging capabilities as well
+as an early preview of a workflow for publishing a module to the PowerShell
+Gallery.
+
 Here are some ideas for what you can try with these scripts:
 
 ## Language Features
@@ -83,6 +86,42 @@ directory of the file in the active editor pane when the debugger is launched.
 You can also set the parameter explicitly e.g.:
 
 `"cwd": "C:\\Users\\JSnover\\Documents\\MonadUberAlles"`
+
+## Module Publishing Preview
+
+### Requirements:
+* [PSake](https://github.com/psake/psake) - install PSake with the command:
+
+  PS C:\\> `Install-Module PSake -Scope CurrentUser`
+
+The are two files (Build.ps1 and tasks.json) that facilitate building a directory from which
+to publish a module from and then publishing from that directory.  The act of creating or
+building this "Release" directory can be executed with the key combination `Ctrl+Shift+B`
+which is the `Build` keyboard shortcut in Visual Studio Code.
+
+When you execute the `Build` command, the build task from the `.vscode\tasks.json` file
+is executed.  This task invokes PSake on the file `Build.ps1`.  This file
+contains items you might want to customize such as `$PublishRepository` or the
+`$ReleaseNotesPath`.  It also contains two PSake tasks which you might want to
+customize: `PrePublish` and `PostPublish`.  If you sign your scripts, you can
+use the `PrePublish` task and the script in it will get executed after the build
+but before the `Publish` task is executed.
+
+To execute the `Publish` task, press `Ctrl+P` then type `"task publish"` and press `Enter`.
+
+NOTE: the `Publish` task does not actually publish to allow for experimentation.
+If you wish to publish, remove the `-WhatIf` parameter on the `Publish-Module` command
+in Build.ps1.
+
+NOTE: the very first time you execute the publish task, you will be prompted for
+a NuGet API Key.  This would normally be the NuGet API Key you are assigned when you
+create an account of the [PowerShell Gallery](https://www.powershellgallery.com/).
+However since this is just an example of how this feature could work in the future,
+you can supply any string you want.  You will need to enter the api key string at the
+bottom of the Debug Console window.
+
+For more details on how this works, inspect the `.vscode\tasks.json` file and the
+`Build.ps1` file.
 
 ## Feedback
 
