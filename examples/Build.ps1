@@ -134,6 +134,7 @@ Task PublishImpl -depends Test -requiredVariables PublishDir, EncryptedApiKeyPat
         $publishParams['ReleaseNotes'] = @(Get-Content $ReleaseNotesPath)
     }
 
+    "Calling Publish-Module..."
     Publish-Module @publishParams -WhatIf
 }
 
@@ -201,7 +202,7 @@ function Get-NuGetApiKey($NuGetApiKey, $EncryptedApiKeyPath) {
             Write-Verbose "Retrieved encrypted NuGetApiKey from $EncryptedApiKeyPath"
         }
         else {
-            $cred = Get-Credential -Message "Enter your NuGet API Key in the password field" -UserName "user"
+            $cred = Get-Credential -Message "Enter your NuGet API Key in the password field (or nothing, this isn't used yet in the preview)" -UserName "user"
             $apiKeySS = $cred.Password
             $NuGetApiKey = $cred.GetNetworkCredential().Password
         }
