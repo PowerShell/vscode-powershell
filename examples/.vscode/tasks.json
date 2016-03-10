@@ -1,9 +1,10 @@
 // A task runner that invokes Pester to run all Pester tests under the
 // current workspace folder.
 
-// NOTE: This Pester task runner requires an updated version of Pester (>=3.4.0)
+// NOTE: This Test task runner requires an updated version of Pester (>=3.4.0)
 // in order for the problemMatcher to find failed test information (message, line, file).
-// If you don't have that version, you can update Pester from the PSGallery like so:
+// If you don't have that version, you can update Pester from the PowerShell Gallery
+// with this command:
 //
 // PS C:\> Update-Module Pester
 //
@@ -14,6 +15,12 @@
 // PS C:\> Install-Module Pester -Scope CurrentUser -Force
 //
 
+// NOTE: The Clean, Build and Publish tasks require PSake. PSake can be installed
+// from the PowerShell Gallery with this command:
+//
+// PS C:\> Install-Module PSake -Scope CurrentUser -Force
+//
+
 // Available variables which can be used inside of strings.
 // ${workspaceRoot}: the root folder of the team
 // ${file}: the current opened file
@@ -21,7 +28,6 @@
 // ${fileDirname}: the current opened file's dirname
 // ${fileExtname}: the current opened file's extension
 // ${cwd}: the current working directory of the spawned process
-
 {
 	"version": "0.1.0",
 
@@ -34,17 +40,49 @@
 	// Show the output window always
 	"showOutput": "always",
 
-	"args": [
-        "-NoProfile", "-ExecutionPolicy", "Bypass",
-        "Write-Host 'Invoking Pester...'; Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true};",
-        "Invoke-Command { Write-Host \"Completed all tasks in task runner: $($args[0])\" } -args"
-        ],
+    "args": [
+        "-NoProfile", "-ExecutionPolicy", "Bypass"
+    ],
 
     // Associate with test task runner
     "tasks": [
         {
-            "taskName": "Pester",
+            "taskName": "Clean",
+            "suppressTaskName": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Clean;",
+                "Invoke-Command { Write-Host 'Completed Clean task in task runner.' }"
+            ]
+        },
+        {
+            "taskName": "Build",
+            "suppressTaskName": true,
+            "isBuildCommand": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Build;",
+                "Invoke-Command { Write-Host 'Completed Build task in task runner.' }"
+            ]
+        },
+        {
+            "taskName": "Publish",
+            "suppressTaskName": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Publish;",
+                "Invoke-Command { Write-Host 'Completed Publish task in task runner.' }"
+            ]
+        },
+        {
+            "taskName": "Test",
+            "suppressTaskName": true,
             "isTestCommand": true,
+            "showOutput": "always",
+            "args": [
+                "Write-Host 'Invoking Pester...'; Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true};",
+                "Invoke-Command { Write-Host 'Completed Test task in task runner.' }"
+            ],
             "problemMatcher": [
                 {
                     "owner": "powershell",
