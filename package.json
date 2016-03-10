@@ -119,7 +119,8 @@
                     "program": "bin/Microsoft.PowerShell.EditorServices.Host.x86.exe"
                 },
                 "args": [
-                    "/debugAdapter"
+                    "/debugAdapter",
+                    "/logLevel:Verbose"
                 ],
                 "configurationAttributes": {
                     "launch": {
