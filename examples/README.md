@@ -13,11 +13,12 @@ Here are some ideas for what you can try with these scripts:
 
 - **Integrated syntax checks** from the PowerShell engine and **integrated
   rule-based analysis** using PowerShell Script Analyzer
-  - Try opening `DebugTest.ps1` and `StopTest.ps1` by double-clicking on their
-    file names.  You will see red and green squiggles for rule-based checks.
-    You can introduce a syntax error somewhere to see the red squiggle for
-    that as well.  To see a list of all errors and warnings, try pressing
-    `Ctrl+Shift+M`.
+  - Try opening `DebugTest.ps1` by double-clicking on its file name in the
+    Explorer view. You will see a green squiggle on the function name `Do-Work`
+    indicating that `Do` is not an approved verb.  These rule-based checks use
+    PSScriptAnalyzer to analyze/lint your scripts.  You can introduce a syntax
+    error somewhere to see a red squiggle for that as well.  To see a list of
+    all errors and warnings, try pressing `Ctrl+Shift+M`.
 - **Go to definition `(F12)`** and **Peek definition `(Alt+F12)`**
   for cmdlet and variable names
   - Try this on the `Stop-Process2` cmdlet in `StopTest.ps1`
