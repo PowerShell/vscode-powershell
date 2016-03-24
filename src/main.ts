@@ -5,7 +5,6 @@
 'use strict';
 
 import vscode = require('vscode');
-
 import { Logger, LogLevel } from './logging';
 import { IFeature } from './feature';
 import { SessionManager } from './session';
