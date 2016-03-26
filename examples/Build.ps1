@@ -117,8 +117,19 @@ Task default -depends Build
 Task Publish -depends Test, PrePublish, PublishImpl, PostPublish {
 }
 
-Task PublishImpl -depends Test -requiredVariables PublishDir, EncryptedApiKeyPath {
-    $NuGetApiKey = Get-NuGetApiKey $NuGetApiKey $EncryptedApiKeyPath
+Task PublishImpl -depends Test -requiredVariables EncryptedApiKeyPath, PublishDir {
+    if ($NuGetApiKey) {
+        "Using script embedded NuGetApiKey"
+    }
+    elseif (Test-Path -LiteralPath $EncryptedApiKeyPath) {
+        $NuGetApiKey = LoadAndUnencryptNuGetApiKey $EncryptedApiKeyPath
+        "Using stored NuGetApiKey"
+    }
+    else {
+        $cred = PromptUserForNuGetApiKeyCredential -DestinationPath $EncryptedApiKeyPath
+        $NuGetApiKey = $cred.GetNetworkCredential().Password
+        "The NuGetApiKey has been stored in $EncryptedApiKeyPath"
+    }
 
     $publishParams = @{
         Path        = $PublishDir
@@ -144,7 +155,7 @@ Task Test -depends Build {
 }
 
 Task Build -depends Clean -requiredVariables PublishDir, Exclude, ModuleName {
-    Copy-Item $PSScriptRoot\* -Destination $PublishDir -Recurse -Exclude $Exclude
+    Copy-Item -Path $PSScriptRoot\* -Destination $PublishDir -Recurse -Exclude $Exclude
 
     # Get contents of the ReleaseNotes file and update the copied module manifest file
     # with the release notes.
@@ -170,58 +181,109 @@ Task Init -requiredVariables PublishDir {
    }
 }
 
-Task StoreKey -requiredVariables EncryptedApiKeyPath {
-    if (Test-Path $EncryptedApiKeyPath) {
-        Remove-Item $EncryptedApiKeyPath
+Task RemoveKey -requiredVariables EncryptedApiKeyPath {
+    if (Test-Path -LiteralPath $EncryptedApiKeyPath) {
+        Remove-Item -LiteralPath $EncryptedApiKeyPath
     }
+}
 
-    $null = Get-NuGetApiKey $NuGetApiKey $EncryptedApiKeyPath
+Task StoreKey -requiredVariables EncryptedApiKeyPath {
+    $nuGetApiKeyCred = PromptUserForNuGetApiKeyCredential -DestinationPath $EncryptedApiKeyPath
     "The NuGetApiKey has been stored in $EncryptedApiKeyPath"
 }
 
 Task ShowKey -requiredVariables EncryptedApiKeyPath {
-    $NuGetApiKey = Get-NuGetApiKey $NuGetApiKey $EncryptedApiKeyPath
-    "The stored NuGetApiKey is: $NuGetApiKey"
+    $OFS = ''
+
+    if ($NuGetApiKey) {
+        "The embedded (partial) NuGetApiKey is: $($NuGetApiKey[0..7])"
+    }
+    else {
+        $NuGetApiKey = LoadAndUnencryptNuGetApiKey -Path $EncryptedApiKeyPath
+        "The stored (partial) NuGetApiKey is: $($NuGetApiKey[0..7])"
+    }
+
+    "To see the full key, use the task 'ShowFullKey'"
+}
+
+Task ShowFullKey -requiredVariables EncryptedApiKeyPath {
+    if ($NuGetApiKey) {
+        "The embedded NuGetApiKey is: $NuGetApiKey"
+    }
+    else {
+        $NuGetApiKey = LoadAndUnencryptNuGetApiKey -Path $EncryptedApiKeyPath
+        "The stored NuGetApiKey is: $NuGetApiKey"
+    }
 }
 
 Task ? -description 'Lists the available tasks' {
     "Available tasks:"
-    $psake.context.Peek().tasks.Keys | Sort
+    $PSake.Context.Peek().Tasks.Keys | Sort-Object
 }
 
 ###############################################################################
 # Helper functions
 ###############################################################################
-function Get-NuGetApiKey($NuGetApiKey, $EncryptedApiKeyPath) {
-    $storedKey = $null
-    if (!$NuGetApiKey) {
-        if (Test-Path $EncryptedApiKeyPath) {
-            $storedKey = Import-Clixml $EncryptedApiKeyPath | ConvertTo-SecureString
-            $cred = New-Object -TypeName PSCredential -ArgumentList 'kh',$storedKey
-            $NuGetApiKey = $cred.GetNetworkCredential().Password
-            Write-Verbose "Retrieved encrypted NuGetApiKey from $EncryptedApiKeyPath"
-        }
-        else {
-            $cred = Get-Credential -Message "Enter your NuGet API Key in the password field (or nothing, this isn't used yet in the preview)" -UserName "user"
-            $apiKeySS = $cred.Password
-            $NuGetApiKey = $cred.GetNetworkCredential().Password
-        }
+function PromptUserForNuGetApiKeyCredential {
+    param(
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $DestinationPath
+    )
+
+    $message = "Enter your NuGet API Key in the password field (or nothing, this isn't used yet in the preview)"
+    $nuGetApiKeyCred = Get-Credential -Message $message -UserName "ignored"
+
+    if ($DestinationPath) {
+        EncryptAndSaveNuGetApiKey -NuGetApiKeySecureString $nuGetApiKeyCred.Password -Path $DestinationPath
     }
 
-    if (!$storedKey) {
-        # Store encrypted NuGet API key to use for future invocations
-        if (!$apiKeySS) {
-            $apiKeySS = ConvertTo-SecureString -String $NuGetApiKey -AsPlainText -Force
-        }
+    $nuGetApiKeyCred
+}
 
-        $parentDir = Split-Path $EncryptedApiKeyPath -Parent
-        if (!(Test-Path -Path $parentDir)) {
-            $null = New-Item -Path $parentDir -ItemType Directory
-        }
+function EncryptAndSaveNuGetApiKey {
+    param(
+        [Parameter(Mandatory, ParameterSetName='SecureString')]
+        [ValidateNotNull()]
+        [SecureString]
+        $NuGetApiKeySecureString,
 
-        $apiKeySS | ConvertFrom-SecureString | Export-Clixml $EncryptedApiKeyPath
-        Write-Verbose "Stored encrypted NuGetApiKey to $EncryptedApiKeyPath"
+        [Parameter(Mandatory, ParameterSetName='PlainText')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $NuGetApiKey,
+
+        [Parameter(Mandatory)]
+        $Path
+    )
+
+    if ($PSCmdlet.ParameterSetName -eq 'PlainText') {
+        $NuGetApiKeySecureString = ConvertTo-SecureString -String $NuGetApiKey -AsPlainText -Force
     }
 
-    $NuGetApiKey
+    $parentDir = Split-Path $Path -Parent
+    if (!(Test-Path -LiteralPath $parentDir)) {
+        $null = New-Item -Path $parentDir -ItemType Directory
+    }
+    elseif (Test-Path -LiteralPath $Path) {
+        Remove-Item -LiteralPath $Path
+    }
+
+    $NuGetApiKeySecureString | ConvertFrom-SecureString | Export-Clixml $Path
+    Write-Verbose "The NuGetApiKey has been encrypted and saved to $Path"
+}
+
+function LoadAndUnencryptNuGetApiKey {
+    param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path
+    )
+
+    $storedKey = Import-Clixml $Path | ConvertTo-SecureString
+    $cred = New-Object -TypeName PSCredential -ArgumentList 'jpgr',$storedKey
+    $cred.GetNetworkCredential().Password
+    Write-Verbose "The NuGetApiKey has been loaded and unencrypted from $Path"
 }
