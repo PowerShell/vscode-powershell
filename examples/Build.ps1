@@ -193,8 +193,6 @@ Task StoreKey -requiredVariables EncryptedApiKeyPath {
 }
 
 Task ShowKey -requiredVariables EncryptedApiKeyPath {
-    $OFS = ''
-
     if ($NuGetApiKey) {
         "The embedded (partial) NuGetApiKey is: $($NuGetApiKey[0..7])"
     }
@@ -225,6 +223,7 @@ Task ? -description 'Lists the available tasks' {
 # Helper functions
 ###############################################################################
 function PromptUserForNuGetApiKeyCredential {
+    [Diagnostics.CodeAnalysis.SuppressMessage("PSProvideDefaultParameterValue", '')]
     param(
         [Parameter()]
         [ValidateNotNullOrEmpty()]
@@ -243,6 +242,8 @@ function PromptUserForNuGetApiKeyCredential {
 }
 
 function EncryptAndSaveNuGetApiKey {
+    [Diagnostics.CodeAnalysis.SuppressMessage("PSAvoidUsingConvertToSecureStringWithPlainText", '')]
+    [Diagnostics.CodeAnalysis.SuppressMessage("PSProvideDefaultParameterValue", '')]
     param(
         [Parameter(Mandatory, ParameterSetName='SecureString')]
         [ValidateNotNull()]
@@ -275,6 +276,7 @@ function EncryptAndSaveNuGetApiKey {
 }
 
 function LoadAndUnencryptNuGetApiKey {
+    [Diagnostics.CodeAnalysis.SuppressMessage("PSProvideDefaultParameterValue", '')]
     param(
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
