@@ -2,29 +2,51 @@
 
 ## Building the code
 
-First, install the package dependencies:
+1. Install [Node.js](https://nodejs.org/en/) 4.4.1 or higher.
 
-```
-npm install
-```
+2. Install the package dependencies by running one of the following commands:
 
-Now you can compile the code:
+   ```
+   # From a PowerShell prompt
+   npm install
 
-```
-npm run compile
-```
+   # Or from Visual Studio Code
+   Press Ctrl+P and type "task install"
+   ```
 
-After the initial compile, the source files will be watched and recompiled
-when changes are saved.
+3. Compile the code by running one of the following commands:
+
+   ```
+   # From a PowerShell prompt
+   npm run compile
+
+   # Or from Visual Studio Code
+   Press Ctrl+P and type "task compile"
+   ```
+   This will compile the TypeScript files in the project to JavaScript files.
+
+   OR
+
+   You can compile the files and then have the TypeScript compiler watch for changes to
+   the source files and automatically recompile those files when changes are saved.
+   To do this, run one of the following commands:
+
+   ```
+   # From a PowerShell prompt
+   npm run compile-watch
+
+   # Or from Visual Studio Code
+   Press Ctrl+P and type "task compile-watch"
+   ```
 
 ## Running the compiled code
 
-From a PowerShell or cmd.exe prompt, run the following command:
+1. From a PowerShell prompt, run the following command:
 
-```
-code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
-```
-		
-If you allow the compiler to continue watching for file changes, you can use
-the `Reload Window` command found in the command palette `(Ctrl+Shift+P)` 
-so that the new source files are loaded.
+   ```
+   code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
+   ```
+
+2. If you allow the compiler to continue watching for file changes, you can use
+   the `Reload Window` command found in the command palette `(Ctrl+Shift+P)`
+   so that the new source files are loaded.

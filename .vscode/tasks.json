@@ -16,15 +16,39 @@
 	// the command is a shell script
 	"isShellCommand": true,
 
-	// show the output window only if unrecognized errors occur.
-	"showOutput": "silent",
+    "tasks": [
+        {
+            "taskName": "install",
+            "showOutput": "always"
+        },
+        {
+            "taskName": "compile",
+            "suppressTaskName": true,
 
-	// we run the custom script "compile" as defined in package.json
-	"args": ["run", "compile"],
+            // show the output window only if unrecognized errors occur.
+            "showOutput": "silent",
 
-	// The tsc compiler is started in watching mode
-	"isWatching": true,
+            // we run the custom script "compile" as defined in package.json
+            "args": ["run", "compile"],
 
-	// use the standard tsc in watch mode problem matcher to find compile problems in the output.
-	"problemMatcher": "$tsc-watch"
+        	// use the standard tsc problem matcher to find compile problems in the output.
+            "problemMatcher": "$tsc"
+        },
+        {
+            "taskName": "compile-watch",
+            "suppressTaskName": true,
+
+            // show the output window only if unrecognized errors occur.
+            "showOutput": "silent",
+
+            // we run the custom script "compile-watch" as defined in package.json
+            "args": ["run", "compile-watch"],
+
+            // The tsc compiler is started in watching mode
+            "isWatching": true,
+
+        	// use the standard tsc in watch mode problem matcher to find compile problems in the output.
+            "problemMatcher": "$tsc-watch"
+        }
+    ]
 }
