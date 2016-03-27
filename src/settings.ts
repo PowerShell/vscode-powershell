@@ -8,6 +8,7 @@ import vscode = require('vscode');
 
 export interface IScriptAnalysisSettings {
     enable?: boolean
+    settingsPath: string
 }
 
 export interface IDeveloperSettings {
@@ -26,7 +27,8 @@ export function load(myPluginId: string): ISettings {
     let configuration = vscode.workspace.getConfiguration(myPluginId);
 
     let defaultScriptAnalysisSettings = {
-        enable: true
+        enable: true,
+        settingsPath: "./PSScriptAnalyzerSettings.psd1"
     };
 
     let defaultDeveloperSettings = {
