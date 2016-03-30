@@ -63,7 +63,20 @@ export function activate(context: vscode.ExtensionContext): void {
     // The language server is only available on Windows
     if (os.platform() == "win32")
     {
-        let args = [];
+        // Get the current version of this extension
+        var hostVersion =
+            vscode
+                .extensions
+                .getExtension("ms-vscode.PowerShell")
+                .packageJSON
+                .version;
+
+        let args = [
+            "/hostName:\"Visual Studio Code Host\"",
+            "/hostProfileId:\"Microsoft.VSCode\"",
+            "/hostVersion:" + hostVersion
+        ];
+
         if (settings.developer.editorServicesWaitForDebugger) {
             args.push('/waitForDebugger');
         }

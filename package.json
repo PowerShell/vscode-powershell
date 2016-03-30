@@ -121,7 +121,10 @@
                 },
                 "args": [
                     "/debugAdapter",
-                    "/logLevel:Verbose"
+                    "/logLevel:Verbose",
+                    "/hostName:\"Visual Studio Code Host\"",
+                    "/hostProfileId:Microsoft.VSCode",
+                    "/hostVersion:0.5.0"
                 ],
                 "configurationAttributes": {
                     "launch": {
@@ -179,7 +182,11 @@
                     "program": "bin/Microsoft.PowerShell.EditorServices.Host.x86.exe"
                 },
                 "args": [
-                    "/debugAdapter"
+                    "/debugAdapter",
+                    "/logLevel:Verbose",
+                    "/hostName:\"Visual Studio Code Host\"",
+                    "/hostProfileId:Microsoft.VSCode",
+                    "/hostVersion:0.5.0"
                 ],
                 "configurationAttributes": {
                     "launch": {
@@ -227,6 +234,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "If true, causes the 32-bit language service to be used on 64-bit Windows.  On 32-bit Windows this setting has no effect.  This setting does not affect the debugger which has its own architecture configuration."
+                },
+                "powershell.enableProfileLoading": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, causes user and system wide profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) to be loaded into the PowerShell session.  This affects IntelliSense and interactive script execution.  The debugger is not affected by this setting."
                 },
                 "powershell.scriptAnalysis.enable": {
                     "type": "boolean",
