@@ -19,6 +19,7 @@ export interface IDeveloperSettings {
 
 export interface ISettings {
     useX86Host?: boolean,
+    enableProfileLoading?: boolean,
     scriptAnalysis?: IScriptAnalysisSettings,
     developer?: IDeveloperSettings,
 }
@@ -39,6 +40,7 @@ export function load(myPluginId: string): ISettings {
 
     return {
         useX86Host: configuration.get<boolean>("useX86Host", false),
+        enableProfileLoading: configuration.get<boolean>("enableProfileLoading", false),
         scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
         developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings)
     }
