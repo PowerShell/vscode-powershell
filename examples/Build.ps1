@@ -65,27 +65,30 @@
 ###############################################################################
 Properties {
     # The name of your module should match the basename of the PSD1 file.
-    $ModuleName = (Get-Item $PSScriptRoot\*.psd1)[0].BaseName
+    $ModuleName = (Get-Item $PSScriptRoot\*.psd1 |
+                   Foreach-Object {$null = Test-ModuleManifest -Path $_ -ErrorAction SilentlyContinue; if ($?) {$_}})[0].BaseName
 
     # Path to the release notes file.  Set to $null if the release notes reside in the manifest file.
     $ReleaseNotesPath = "$PSScriptRoot\ReleaseNotes.md"
 
     # The directory used to publish the module from.  If you are using Git, the
-    # $PublishDir should be ignored if it is under the workspace directory.
-    $PublishDir = "$PSScriptRoot\Release\$ModuleName"
+    # $PublishRootDir should be ignored if it is under the workspace directory.
+    $PublishRootDir = "$PSScriptRoot\Release"
+    $PublishDir     = "$PublishRootDir\$ModuleName"
 
     # The following items will not be copied to the $PublishDir.
     # Add items that should not be published with the module.
     $Exclude = @(
+        (Split-Path $PSCommandPath -Leaf),
         'Release',
         'Tests',
         '.git*',
         '.vscode',
-        # The next three files are unique to this examples dir.
+        # These files are unique to this examples dir.
         'DebugTest.ps1',
-        'Stop*.ps1',
+        'PSScriptAnalyzerSettings.psd1',
         'Readme.md',
-        (Split-Path $PSCommandPath -Leaf)
+        'Stop*.ps1'
     )
 
     # Name of the repository you wish to publish to. Default repo is the PSGallery.
@@ -170,8 +173,8 @@ Task Clean -depends Init -requiredVariables PublishDir {
     # Sanity check the dir we are about to "clean".  If $PublishDir were to
     # inadvertently get set to $null, the Remove-Item commmand removes the
     # contents of \*.  That's a bad day.  Ask me how I know?  :-(
-    if ($PublishDir.Contains($PSScriptRoot)) {
-        Remove-Item $PublishDir\* -Recurse -Force
+    if ($PublishRootDir.Contains($PSScriptRoot)) {
+        Remove-Item $PublishRootDir\* -Recurse -Force
     }
 }
 

@@ -247,8 +247,8 @@
                 },
                 "powershell.scriptAnalysis.settingsPath": {
                     "type": "string",
-                    "default": "./PSScriptAnalyzerSettings.psd1",
-                    "description": "Specifies the path to the PowerShell Script Analyzer settings file. The settings file can be used to customize which rules to include or exclude as well as what severity levels to report."
+                    "default": "",
+                    "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
                 },
                 "powershell.developer.editorServicesHostPath": {
                     "type": "string",

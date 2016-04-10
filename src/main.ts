@@ -86,8 +86,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
         try
         {
-            settings.scriptAnalysis.settingsPath = resolveScriptAnalysisSettingsPath(settings);
-
             let serverPath = resolveLanguageServerPath(settings);
             let serverOptions = {
                 run: {
@@ -178,35 +176,6 @@ function resolveLanguageServerPath(settings: settingsManager.ISettings): string 
     }
 
     return editorServicesHostPath;
-}
-
-function resolveScriptAnalysisSettingsPath(settings: settingsManager.ISettings): string {
-    var scriptAnalysisSettingsPath = settings.scriptAnalysis.settingsPath;
-
-    if (scriptAnalysisSettingsPath) {
-        console.log("Found scriptAnalysis.settingsPath from config: " + scriptAnalysisSettingsPath);
-
-        // Make the path absolute if it's not
-        scriptAnalysisSettingsPath =
-            path.resolve(
-                __dirname,
-                '..',
-                scriptAnalysisSettingsPath);
-
-        console.log("    Resolved path to: " + scriptAnalysisSettingsPath);
-    }
-    else {
-        // Use the default path in the extension's 'root' folder
-        scriptAnalysisSettingsPath =
-            path.join(
-                __dirname,
-                '..',
-                'PSScriptAnalyzerSettings.psd1');
-
-        console.log("Using default scriptAnalysis.settingsPath: " + scriptAnalysisSettingsPath);
-    }
-
-    return scriptAnalysisSettingsPath;
 }
 
 function getHostExeName(useX86Host: boolean): string {
