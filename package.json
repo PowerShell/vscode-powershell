@@ -245,6 +245,11 @@
                     "default": true,
                     "description": "Enables real-time script analysis using PowerShell Script Analyzer."
                 },
+                "powershell.scriptAnalysis.settingsPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
+                },
                 "powershell.developer.editorServicesHostPath": {
                     "type": "string",
                     "default": "../bin/",

@@ -164,7 +164,7 @@ function resolveLanguageServerPath(settings: settingsManager.ISettings): string 
         console.log("    Resolved path to: " + editorServicesHostPath);
     }
     else {
-        // Use the default path in the plugin's 'bin' folder
+        // Use the default path in the extension's 'bin' folder
         editorServicesHostPath =
             path.join(
                 __dirname,
