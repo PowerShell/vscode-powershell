@@ -29,7 +29,7 @@ export function load(myPluginId: string): ISettings {
 
     let defaultScriptAnalysisSettings = {
         enable: true,
-        settingsPath: "./PSScriptAnalyzerSettings.psd1"
+        settingsPath: ""
     };
 
     let defaultDeveloperSettings = {
