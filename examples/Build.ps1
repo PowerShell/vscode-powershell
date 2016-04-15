@@ -162,26 +162,26 @@ Task Build -depends Clean, Init -requiredVariables PublishDir, Exclude, ModuleNa
 
     # Get contents of the ReleaseNotes file and update the copied module manifest file
     # with the release notes.
-    # DO NOT USE UNTIL UPDATE-MODULEMANIFEST IS FIXED - HORRIBLY BROKEN RIGHT NOW.
+    # DO NOT USE UNTIL UPDATE-MODULEMANIFEST IS FIXED - DOES NOT HANDLE SINGLE QUOTES CORRECTLY.
     # if ($ReleaseNotesPath) {
     #     $releaseNotes = @(Get-Content $ReleaseNotesPath)
     #     Update-ModuleManifest -Path $PublishDir\${ModuleName}.psd1 -ReleaseNotes $releaseNotes
     # }
 }
 
-Task Clean -requiredVariables PublishDir {
-    # Sanity check the dir we are about to "clean".  If $PublishDir were to
+Task Clean -requiredVariables PublishRootDir {
+    # Sanity check the dir we are about to "clean".  If $PublishRootDir were to
     # inadvertently get set to $null, the Remove-Item commmand removes the
     # contents of \*.  That's a bad day.  Ask me how I know?  :-(
-    if ($PublishRootDir.Contains($PSScriptRoot)) {
+    if ((Test-Path $PublishRootDir) -and $PublishRootDir.Contains($PSScriptRoot)) {
         Remove-Item $PublishRootDir\* -Recurse -Force
     }
 }
 
 Task Init -requiredVariables PublishDir {
-   if (!(Test-Path $PublishDir)) {
-       $null = New-Item $PublishDir -ItemType Directory
-   }
+    if (!(Test-Path $PublishDir)) {
+        $null = New-Item $PublishDir -ItemType Directory
+    }
 }
 
 Task RemoveKey -requiredVariables EncryptedApiKeyPath {
