@@ -157,7 +157,7 @@ Task Test -depends Build {
     Invoke-Pester $PSScriptRoot
 }
 
-Task Build -depends Clean -requiredVariables PublishDir, Exclude, ModuleName {
+Task Build -depends Clean, Init -requiredVariables PublishDir, Exclude, ModuleName {
     Copy-Item -Path $PSScriptRoot\* -Destination $PublishDir -Recurse -Exclude $Exclude
 
     # Get contents of the ReleaseNotes file and update the copied module manifest file
@@ -169,7 +169,7 @@ Task Build -depends Clean -requiredVariables PublishDir, Exclude, ModuleName {
     # }
 }
 
-Task Clean -depends Init -requiredVariables PublishDir {
+Task Clean -requiredVariables PublishDir {
     # Sanity check the dir we are about to "clean".  If $PublishDir were to
     # inadvertently get set to $null, the Remove-Item commmand removes the
     # contents of \*.  That's a bad day.  Ask me how I know?  :-(
