@@ -15,6 +15,7 @@ import { registerShowHelpCommand } from './features/ShowOnlineHelp';
 import { registerOpenInISECommand } from './features/OpenInISE';
 import { registerPowerShellFindModuleCommand } from './features/PowerShellFindModule';
 import { registerConsoleCommands } from './features/Console';
+import { registerPowerShellPasteAsClass } from './features/PowerShellPasteAsClass';
 
 var languageServerClient: LanguageClient = undefined;
 
@@ -133,6 +134,7 @@ function registerFeatures() {
     registerConsoleCommands(languageServerClient);
     registerOpenInISECommand();
     registerPowerShellFindModuleCommand(languageServerClient);
+    registerPowerShellPasteAsClass(languageServerClient);
 }
 
 export function deactivate(): void {

@@ -70,6 +70,11 @@
                 "command": "PowerShell.PowerShellFindModule",
                 "key": "ctrl+K ctrl+f",
                 "when": "editorTextFocus && editorLangId == 'powershell'"
+            },
+            {
+                "command": "PowerShell.PowerShellPasteAsClass",
+                "key": "ctrl+K ctrl+p",
+                "when": "editorTextFocus && editorLangId == 'powershell'"
             }
         ],
         "commands": [
@@ -96,6 +101,11 @@
             {
                 "command": "PowerShell.PowerShellFindModule",
                 "title": "Find/Install PowerShell modules from the gallery",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.PowerShellPasteAsClass",
+                "title": "Paste from clipboard as PowerShell|C# class",
                 "category": "PowerShell"
             }
         ],
