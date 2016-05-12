@@ -1,5 +1,44 @@
 # vscode-powershell Release History
 
+## 0.6.0
+### Thursday, May 12, 2016
+
+#### Added a new cross-editor extensibility model
+
+- We've added a new extensibility model which allows you to write PowerShell
+  code to add new functionality to Visual Studio Code and other editors with
+  a single API.  If you've used `$psISE` in the PowerShell ISE, you'll feel
+  right at home with `$psEditor`.  Check out the [documentation](https://powershell.github.io/PowerShellEditorServices/guide/extensions.html)
+  for more details!
+
+#### Support for user and system-wide profiles
+
+- We've now introduced the `$profile` variable which contains the expected
+  properties that you normally see in `powershell.exe` and `powershell_ise.exe`:
+  - `AllUsersAllHosts`
+  - `AllUsersCurrentHost`
+  - `CurrentUserAllHosts`
+  - `CurrentUserCurrentHost`
+- In Visual Studio Code the profile name is `Microsoft.VSCode_profile.ps1`.
+- `$host.Name` now returns "Visual Studio Code Host" and `$host.Version` returns
+  the version of the PowerShell extension that is being used.
+
+#### Other improvements
+
+- IntelliSense for static methods and properties now works correctly.  If you
+  type `::` after a type such as `[System.Guid]` you will now get the correct
+  completion results.  This also works if you press `Ctrl+Space` after the `::`
+  characters.
+- `$env` variables now have IntelliSense complete correctly.
+- The debug adapter now does not crash when you attempt to add breakpoints
+  for files that have been moved or don't exist.
+- Fixed an issue preventing output from being written in the debugger if you
+  don't set a breakpoint before running a script.
+
+#### New configuration settings
+
+- `powershell.scriptAnalysis.settingsPath`: Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace.
+
 ## 0.5.0
 ### Thursday, March 10, 2016
 
