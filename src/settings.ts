@@ -12,7 +12,8 @@ export interface IScriptAnalysisSettings {
 }
 
 export interface IDeveloperSettings {
-    editorServicesHostPath?: string;
+    powerShellExePath?: string;
+    bundledModulesPath?: string;
     editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
 }
@@ -33,7 +34,8 @@ export function load(myPluginId: string): ISettings {
     };
 
     let defaultDeveloperSettings = {
-        editorServicesHostPath: "../bin/",
+        powerShellExePath: undefined,
+        bundledModulesPath: "../modules/",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false
     }
