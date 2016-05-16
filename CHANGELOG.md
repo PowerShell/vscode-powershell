@@ -1,5 +1,13 @@
 # vscode-powershell Release History
 
+## 0.6.1
+### Monday, May 16, 2016
+
+- Fixed #180: Profile loading should be enabled by default
+- Fixed #183: Language server sometimes fails to initialize preventing IntelliSense, etc from working
+- Fixed #182: Using 'Run Selection' on a line without a selection only runs to the cursor position
+- Fixed #184: When running a script in the debugger, $host.Version reports wrong extension version
+
 ## 0.6.0
 ### Thursday, May 12, 2016
 
