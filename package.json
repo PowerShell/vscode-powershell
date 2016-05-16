@@ -1,7 +1,7 @@
 {
     "name": "PowerShell",
     "displayName": "PowerShell",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "publisher": "ms-vscode",
     "description": "Develop PowerShell scripts in Visual Studio Code!",
     "engines": {
@@ -129,7 +129,7 @@
                     "/logLevel:Verbose",
                     "/hostName:\"Visual Studio Code Host\"",
                     "/hostProfileId:Microsoft.VSCode",
-                    "/hostVersion:0.5.0"
+                    "/hostVersion:0.6.1"
                 ],
                 "configurationAttributes": {
                     "launch": {
@@ -191,7 +191,7 @@
                     "/logLevel:Verbose",
                     "/hostName:\"Visual Studio Code Host\"",
                     "/hostProfileId:Microsoft.VSCode",
-                    "/hostVersion:0.5.0"
+                    "/hostVersion:0.6.1"
                 ],
                 "configurationAttributes": {
                     "launch": {
@@ -242,7 +242,7 @@
                 },
                 "powershell.enableProfileLoading": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "description": "If true, causes user and system wide profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) to be loaded into the PowerShell session.  This affects IntelliSense and interactive script execution.  The debugger is not affected by this setting."
                 },
                 "powershell.scriptAnalysis.enable": {
