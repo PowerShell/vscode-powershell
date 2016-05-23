@@ -227,6 +227,36 @@ function openFile(filePath: string): Thenable<EditorOperationResponse> {
     return promise;
 }
 
+export namespace ShowErrorMessageRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/showErrorMessage'; } };
+}
+
+function showErrorMessage(message: string): Thenable<EditorOperationResponse> {
+     vscode.window.showErrorMessage(message);
+     return null;
+}
+
+export namespace ShowWarningMessageRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/showWarningMessage'; } };
+}
+
+function showWarningMessage(message: string): Thenable<EditorOperationResponse> {
+     vscode.window.showWarningMessage(message);
+     return null;
+}
+
+export namespace ShowInformationMessageRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/showInformationMessage'; } };
+}
+
+function showInformationMessage(message: string): Thenable<EditorOperationResponse> {
+     vscode.window.showInformationMessage(message);
+     return null;
+}
+
 export function registerExtensionCommands(client: LanguageClient): void {
 
     vscode.commands.registerCommand('PowerShell.ShowAdditionalCommands', () => {
@@ -259,4 +289,16 @@ export function registerExtensionCommands(client: LanguageClient): void {
     client.onRequest(
         OpenFileRequest.type,
         filePath => openFile(filePath));
+
+    client.onRequest(
+        ShowInformationMessageRequest.type,
+        message => showInformationMessage(message));
+
+    client.onRequest(
+        ShowErrorMessageRequest.type,
+        message => showErrorMessage(message));
+
+    client.onRequest(
+        ShowWarningMessageRequest.type,
+        message => showWarningMessage(message));
 }
