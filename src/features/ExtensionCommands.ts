@@ -257,6 +257,13 @@ function showInformationMessage(message: string): Thenable<EditorOperationRespon
      return null;
 }
 
+export namespace SetStatusBarMessageRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+}
+
+     vscode.window.setStatusBarMessage(message);
+}
+
 export function registerExtensionCommands(client: LanguageClient): void {
 
     vscode.commands.registerCommand('PowerShell.ShowAdditionalCommands', () => {
@@ -301,4 +308,8 @@ export function registerExtensionCommands(client: LanguageClient): void {
     client.onRequest(
         ShowWarningMessageRequest.type,
         message => showWarningMessage(message));
+
+    client.onRequest(
+        SetStatusBarMessageRequest.type,
+        message => setStatusBarMessage(message));
 }
