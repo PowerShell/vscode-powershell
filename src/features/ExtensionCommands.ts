@@ -259,9 +259,12 @@ function showInformationMessage(message: string): Thenable<EditorOperationRespon
 
 export namespace SetStatusBarMessageRequest {
     export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/setStatusBarMessage'; } };
 }
 
+function setStatusBarMessage(message: string) : Thenable<EditorOperationResponse> {
      vscode.window.setStatusBarMessage(message);
+          return null;
 }
 
 export function registerExtensionCommands(client: LanguageClient): void {
