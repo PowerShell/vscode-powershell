@@ -118,19 +118,8 @@
                         "powershell"
                     ]
                 },
-                "windows": {
-                    "program": "bin/Microsoft.PowerShell.EditorServices.Host.exe"
-                },
-                "winx86": {
-                    "program": "bin/Microsoft.PowerShell.EditorServices.Host.x86.exe"
-                },
-                "args": [
-                    "/debugAdapter",
-                    "/logLevel:Verbose",
-                    "/hostName:\"Visual Studio Code Host\"",
-                    "/hostProfileId:Microsoft.VSCode",
-                    "/hostVersion:0.6.1"
-                ],
+                "program": "./out/debugAdapter.js",
+                "runtime": "node",
                 "configurationAttributes": {
                     "launch": {
                         "required": [
@@ -165,68 +154,6 @@
                         "program": "${file}",
                         "args": [],
                         "cwd": "${file}"
-                    },
-                    {
-                        "name": "PowerShell x86",
-                        "type": "PowerShell x86",
-                        "request": "launch",
-                        "program": "${file}",
-                        "args": [],
-                        "cwd": "${file}"
-                    }
-                ]
-            },
-            {
-                "type": "PowerShell x86",
-                "enableBreakpointsFor": {
-                    "languageIds": [
-                        "powershell"
-                    ]
-                },
-                "windows": {
-                    "program": "bin/Microsoft.PowerShell.EditorServices.Host.x86.exe"
-                },
-                "args": [
-                    "/debugAdapter",
-                    "/logLevel:Verbose",
-                    "/hostName:\"Visual Studio Code Host\"",
-                    "/hostProfileId:Microsoft.VSCode",
-                    "/hostVersion:0.6.1"
-                ],
-                "configurationAttributes": {
-                    "launch": {
-                        "required": [
-                            "program"
-                        ],
-                        "properties": {
-                            "program": {
-                                "type": "string",
-                                "description": "Absolute path to the PowerShell script to launch under the debugger."
-                            },
-                            "args": {
-                                "type": "array",
-                                "description": "Command line arguments to pass to the PowerShell script.",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "default": []
-                            },
-                            "cwd": {
-                                "type": "string",
-                                "description": "Absolute path to the working directory. Default is the current workspace.",
-                                "default": "."
-                            }
-                        }
-                    }
-                },
-                "initialConfigurations": [
-                    {
-                        "name": "PowerShell x86",
-                        "type": "PowerShell x86",
-                        "request": "launch",
-                        "program": "${file}",
-                        "args": [],
-                        "cwd": "${file}"
                     }
                 ]
             }
@@ -255,10 +182,10 @@
                     "default": "",
                     "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
                 },
-                "powershell.developer.editorServicesHostPath": {
+                "powershell.developer.bundledModulesPath": {
                     "type": "string",
-                    "default": "../bin/",
-                    "description": "Specifies the path to the folder containing the PowerShell Editor Services host executables."
+                    "default": "../modules/",
+                    "description": "Specifies the path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PowerShell Script Analyzer, Plaster)"
                 },
                 "powershell.developer.editorServicesLogLevel": {
                     "type": "string",
