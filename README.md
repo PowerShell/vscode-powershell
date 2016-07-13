@@ -26,7 +26,7 @@ how to use them.
 
 This folder can be found at the following path:
 ```
-c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
+$env:USERPROFILE\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
 ```
 To open/view the extension's examples Visual Studio Code, run the following from your PowerShell command prompt:
 ```
