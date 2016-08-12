@@ -1,5 +1,12 @@
 # vscode-powershell Release History
 
+## 0.6.2
+### Friday, August 12, 2016
+
+- Fixed #231: In VS Code 1.4.0, IntelliSense has stopped working
+- Fixed #193: Typing "n" breaks intellisense
+- Fixed #187: Language server sometimes crashes then $ErrorActionPreference = "Stop"
+
 ## 0.6.1
 ### Monday, May 16, 2016
 
