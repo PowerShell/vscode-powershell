@@ -1,7 +1,7 @@
 {
     "name": "PowerShell",
     "displayName": "PowerShell",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "publisher": "ms-vscode",
     "description": "Develop PowerShell scripts in Visual Studio Code!",
     "engines": {
@@ -129,7 +129,7 @@
                     "/logLevel:Verbose",
                     "/hostName:\"Visual Studio Code Host\"",
                     "/hostProfileId:Microsoft.VSCode",
-                    "/hostVersion:0.6.1"
+                    "/hostVersion:0.6.2"
                 ],
                 "configurationAttributes": {
                     "launch": {
@@ -191,7 +191,7 @@
                     "/logLevel:Verbose",
                     "/hostName:\"Visual Studio Code Host\"",
                     "/hostProfileId:Microsoft.VSCode",
-                    "/hostVersion:0.6.1"
+                    "/hostVersion:0.6.2"
                 ],
                 "configurationAttributes": {
                     "launch": {
