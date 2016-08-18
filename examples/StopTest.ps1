@@ -1,4 +1,4 @@
-. .\Stop-Process2.ps1
+. ./Stop-Process2.ps1
 
 notepad.exe
 notepad.exe

@@ -1,5 +1,14 @@
 # vscode-powershell Release History
 
+## 0.7.0
+### Thursday, August 18, 2016
+
+#### Introducing support for Linux and macOS!
+
+This release marks the beginning of our support for Linux and macOS via
+the new [cross-platform release of PowerShell](https://github.com/PowerShell/PowerShell).
+You can find installation and usage instructions at the [PowerShell GitHub repository](https://github.com/PowerShell/PowerShell).
+
 ## 0.6.2
 ### Friday, August 12, 2016
 

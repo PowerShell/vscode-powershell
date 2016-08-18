@@ -1,6 +1,7 @@
 import fs = require('fs');
 import path = require('path');
 import net = require('net');
+import utils = require('./utils');
 import logging = require('./logging');
 
 // NOTE: The purpose of this file is to serve as a bridge between
@@ -10,7 +11,7 @@ import logging = require('./logging');
 // relay between the two transports.
 
 var logBasePath = path.resolve(__dirname, "../logs");
-logging.ensurePathExists(logBasePath);
+utils.ensurePathExists(logBasePath);
 
 var debugAdapterLogWriter =
     fs.createWriteStream(
@@ -22,15 +23,18 @@ var debugAdapterLogWriter =
 // debug server
 process.stdin.pause();
 
+// Read the details of the current session to learn
+// the connection details for the debug service
+let sessionDetails = utils.readSessionFile();
+
 // Establish connection before setting up the session
-let pipeName = "\\\\.\\pipe\\PSES-VSCode-DebugService-" + process.env.VSCODE_PID;
-debugAdapterLogWriter.write("Connecting to named pipe: " + pipeName + "\r\n");
-let debugServiceSocket = net.connect(pipeName);
+debugAdapterLogWriter.write("Connecting to port: " + sessionDetails.debugServicePort + "\r\n");
+let debugServiceSocket = net.connect(sessionDetails.debugServicePort);
 
 // Write any errors to the log file
 debugServiceSocket.on(
     'error',
-    (e) => debugAdapterLogWriter.write("Named pipe ERROR: " + e + "\r\n"));
+    (e) => debugAdapterLogWriter.write("Socket connect ERROR: " + e + "\r\n"));
 
 // Route any output from the socket through stdout
 debugServiceSocket.on(
@@ -41,7 +45,7 @@ debugServiceSocket.on(
 debugServiceSocket.on(
     'connect',
     () => {
-        debugAdapterLogWriter.write("Connected to named pipe: " + pipeName + "\r\n");
+        debugAdapterLogWriter.write("Connected to socket!\r\n\r\n");
 
         // When data comes on stdin, route it through the socket
         process.stdin.on(
@@ -51,3 +55,17 @@ debugServiceSocket.on(
         // Resume the stdin stream
         process.stdin.resume();
     });
+
+// When the socket closes, end the session
+debugServiceSocket.on(
+    'close',
+    () => {
+        debugAdapterLogWriter.write("Socket closed, shutting down.");
+
+        // Close after a short delay to give the client time
+        // to finish up
+        setTimeout(() => {
+            process.exit(0);
+        }, 1000);
+    }
+)
