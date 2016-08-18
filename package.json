@@ -182,6 +182,11 @@
                     "default": "",
                     "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
                 },
+                "powershell.developer.powerShellExePath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Specifies the full path to a PowerShell executable.  Used to change the installation of PowerShell used for language and debugging services."
+                },
                 "powershell.developer.bundledModulesPath": {
                     "type": "string",
                     "default": "../modules/",
