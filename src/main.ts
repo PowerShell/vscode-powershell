@@ -89,7 +89,7 @@ export function activate(context: vscode.ExtensionContext): void {
     var startArgs =
         '-EditorServicesVersion "' + requiredEditorServicesVersion + '" ' +
         '-HostName "Visual Studio Code Host" ' +
-        '-HostProfileId "Microsoft.VSCode" ' +
+        '-HostProfileId "' + settings.profileName + '" ' +
         '-HostVersion "' + hostVersion + '" ' +
         '-BundledModulesPath "' + bundledModulesPath + '" ';
 
