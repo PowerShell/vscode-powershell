@@ -177,7 +177,7 @@ function startPowerShell(powerShellExePath: string, bundledModulesPath: string, 
 
         // Add the Start-EditorServices.ps1 invocation arguments
         args.push('-Command')
-        args.push(startScriptPath + ' ' + startArgs)
+        args.push('& "' + startScriptPath + '" ' + startArgs)
 
         // Launch PowerShell as child process
         powerShellProcess = cp.spawn(powerShellExePath, args);
