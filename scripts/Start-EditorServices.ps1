@@ -54,6 +54,9 @@ param(
     $ConfirmInstall
 )
 
+# Are we running in PowerShell 5 or later?
+$isPS5orLater = $PSVersionTable.PSVersion.Major -ge 5
+
 # This variable will be assigned later to contain information about
 # what happened while attempting to launch the PowerShell Editor
 # Services host
@@ -81,8 +84,14 @@ function Test-PortAvailability($PortNumber) {
     $portAvailable = $true;
 
     try {
-        $ipAddress = [System.Net.Dns]::GetHostEntryAsync("localhost").Result.AddressList[0];
-        $tcpListener = [System.Net.Sockets.TcpListener]::new($ipAddress, $portNumber);
+        if ($isPS5orLater) {
+            $ipAddress = [System.Net.Dns]::GetHostEntryAsync("localhost").Result.AddressList[0];
+        }
+        else {
+            $ipAddress = [System.Net.Dns]::GetHostEntry("localhost").AddressList[0];
+        }
+
+        $tcpListener = New-Object System.Net.Sockets.TcpListener @($ipAddress, $portNumber)
         $tcpListener.Start();
         $tcpListener.Stop();
 
@@ -100,7 +109,7 @@ function Test-PortAvailability($PortNumber) {
     return $portAvailable;
 }
 
-$rand = [System.Random]::new()
+$rand = New-Object System.Random
 function Get-AvailablePort {
     $triesRemaining = 10;
 
@@ -128,9 +137,9 @@ if ((Test-ModuleAvailable "PowerShellGet") -eq $false) {
 
 # Check if the expected version of the PowerShell Editor Services
 # module is installed
-$parsedVersion = [System.Version]::new($EditorServicesVersion)
+$parsedVersion = New-Object System.Version @($EditorServicesVersion)
 if ((Test-ModuleAvailable "PowerShellEditorServices" -RequiredVersion $parsedVersion) -eq $false) {
-    if ($ConfirmInstall) {
+    if ($ConfirmInstall -and $isPS5orLater) {
         # TODO: Check for error and return failure if necessary
         Install-Module "PowerShellEditorServices" -RequiredVersion $parsedVersion -Confirm
     }
@@ -141,7 +150,12 @@ if ((Test-ModuleAvailable "PowerShellEditorServices" -RequiredVersion $parsedVer
     }
 }
 
-Import-Module PowerShellEditorServices -RequiredVersion $parsedVersion -ErrorAction Stop
+if ($isPS5orLater) {
+    Import-Module PowerShellEditorServices -RequiredVersion $parsedVersion -ErrorAction Stop
+}
+else {
+    Import-Module PowerShellEditorServices -Version $parsedVersion -ErrorAction Stop
+}
 
 # Locate available port numbers for services
 $languageServicePort = Get-AvailablePort
