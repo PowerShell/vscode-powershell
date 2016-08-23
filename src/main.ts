@@ -25,7 +25,7 @@ import net = require('net');
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-var requiredEditorServicesVersion = "0.7.0";
+var requiredEditorServicesVersion = "0.7.1";
 
 var powerShellProcess: cp.ChildProcess = undefined;
 var languageServerClient: LanguageClient = undefined;
