@@ -1,5 +1,13 @@
 # vscode-powershell Release History
 
+## 0.7.1
+### Tuesday, August 23, 2016
+
+- "Auto" variable scope in debugger UI now expands by default
+- Fixed #244: Extension fails to load if username contains spaces
+- Fixed #246: Restore default PSScriptAnalyzer ruleset
+- Fixed #248: Extension fails to load on Windows 7 with PowerShell v3
+
 ## 0.7.0
 ### Thursday, August 18, 2016
 
