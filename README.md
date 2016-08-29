@@ -1,6 +1,6 @@
 # PowerShell Language Support for Visual Studio Code
 
-This extension provides rich PowerShell language support for Visual Studio Code.
+This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
 that Visual Studio Code provides.
 
