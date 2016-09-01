@@ -42,6 +42,41 @@ To open/view the extension's examples Visual Studio Code, run the following from
 code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
 
+## Reporting Problems
+
+If you're having trouble with the PowerShell extension, please follow these instructions
+to file an issue on our GitHub repository:
+
+### 1. File an issue on our [Issues Page](https://github.com/PowerShell/vscode-powershell/issues)
+
+Make sure to fill in the information that is requested in the issue template as it
+will help us investigate the problem more quickly.
+
+### 2. Capture verbose logs and send them to us
+
+If you're having an issue with crashing or other erratic behavior, add the following
+line to your User Settings in Visual Studio Code:
+
+```json
+    "powershell.developer.editorServicesLogLevel": "Verbose"
+```
+
+Restart Visual Studio Code and try to reproduce the problem.  Once you are done with
+that, zip up the logs in the corresponding folder for your operating system:
+
+- **Windows**: `$HOME\.vscode\extensions\ms-vscode.PowerShell-<CURRENT VERSION>\logs`
+- **Linux and Mac OS X**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
+
+You have two options for sending us the logs:
+
+  1. If you are editing scripts that contain sensitive information (intellectual property,
+     deployment or administrative information, etc), e-mail the logs directly to
+     *daviwil [at] microsoft.com*
+
+  2. If you are editing scripts that don't contain sensitive information, you can drag and
+     drop your logs ZIP file into the GitHub issue that you are creating.
+
+
 ## Contributing to the Code
 
 Check out the [development documentation](docs/development.md) for more details
