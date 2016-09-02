@@ -80,3 +80,13 @@ export function readSessionFile(): EditorServicesSessionDetails {
 export function deleteSessionFile() {
     fs.unlinkSync(sessionFilePath);
 }
+
+export function checkIfFileExists(filePath: string): boolean {
+    try {
+        fs.accessSync(filePath, fs.R_OK)
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}

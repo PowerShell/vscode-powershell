@@ -112,6 +112,26 @@ export function activate(context: vscode.ExtensionContext): void {
     }
     else if (os.platform() == "darwin") {
         powerShellExePath = "/usr/local/bin/powershell";
+
+        // Check for OpenSSL dependency on OS X
+        if (!utils.checkIfFileExists("/usr/local/lib/libcrypto.1.0.0.dylib") ||
+            !utils.checkIfFileExists("/usr/local/lib/libssl.1.0.0.dylib")) {
+                var thenable =
+                    vscode.window.showWarningMessage(
+                        "The PowerShell extension will not work without OpenSSL on Mac OS X",
+                        "Show Documentation");
+
+                thenable.then(
+                    (s) => {
+                        if (s === "Show Documentation") {
+                            cp.exec("open https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md#1-powershell-intellisense-does-not-work-cant-debug-scripts");
+                        }
+                    });
+
+                // Don't continue initializing since Editor Services will not load successfully
+                console.log("Cannot start PowerShell Editor Services due to missing OpenSSL dependency.");
+                return;
+            }
     }
     else {
         powerShellExePath = "/usr/bin/powershell";
