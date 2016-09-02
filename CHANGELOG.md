@@ -1,5 +1,14 @@
 # vscode-powershell Release History
 
+## 0.7.2
+### Friday, September 2, 2016
+
+- Fixed #243: Debug adapter process has terminated unexpectedly
+- Fixed #264: Add check for OpenSSL on OS X before starting the language service
+- Fixed #271: PSScriptAnalyzer settings path isn't being passed along
+- Fixed #273: Debugger crashes after multiple runs
+- Fixed #274: Extension crashes on Ctrl+Hover
+
 ## 0.7.1
 ### Tuesday, August 23, 2016
 
