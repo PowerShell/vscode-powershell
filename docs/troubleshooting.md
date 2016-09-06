@@ -17,14 +17,21 @@ the following two files:
 ```
 
 The extension should check for these files and direct you to this documentation if you
-do not have OpenSSL isntalled.
+do not have OpenSSL installed.
 
 #### Installing OpenSSL via Homebrew
 
-You can use Homebrew to easily install OpenSSL.  First install Homebrew and then run the following command:
+You can use [Homebrew](http://brew.sh) to easily install OpenSSL.  First, install Homebrew and then run the following command:
 
 ```
 brew install openssl
+```
+
+After installation, the libraries of interest must be symlinked to `/usr/local/lib`; e.g. (adjust the version numbers as needed):
+
+```
+ln -s /usr/local/Cellar/openssl/1.0.2h_1/lib/libcrypto.1.0.0.dylib /usr/local/lib
+ln -s /usr/local/Cellar/openssl/1.0.2h_1/lib/libssl.1.0.0.dylib /usr/local/lib
 ```
 
 Restart VS Code after completing the installation and verify that the extension is working correctly.
