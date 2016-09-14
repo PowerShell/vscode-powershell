@@ -23,6 +23,7 @@
         },
         {
             "taskName": "compile",
+            "isBuildCommand": true,
             "suppressTaskName": true,
 
             // show the output window only if unrecognized errors occur.
