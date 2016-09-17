@@ -729,7 +729,7 @@
             "try {",
             "\t$0",
             "}",
-            "catch [${exception:System.Exception}] {",
+            "catch {",
             "\t",
             "}"
         ],
@@ -741,7 +741,7 @@
             "try {",
             "\t$0",
             "}",
-            "catch [${exception:System.Exception}] {",
+            "catch {",
             "\t",
             "}",
             "finally {",
