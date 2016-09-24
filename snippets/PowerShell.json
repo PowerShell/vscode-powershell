@@ -480,7 +480,7 @@
             ".DESCRIPTION",
             "\tLong description",
             ".EXAMPLE",
-            "\tC:\\PS> <example usage>",
+            "\tPS C:\\> <example usage>",
             "\tExplanation of what the example does",
             ".INPUTS",
             "\tInputs (if any)",
