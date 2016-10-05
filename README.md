@@ -1,5 +1,7 @@
 # PowerShell Language Support for Visual Studio Code
 
+[![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
 that Visual Studio Code provides.
