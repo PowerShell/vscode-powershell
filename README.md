@@ -39,7 +39,7 @@ This folder can be found at the following path:
 ```
 c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
 ```
-To open/view the extension's examples Visual Studio Code, run the following from your PowerShell command prompt:
+To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
 ```
 code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
