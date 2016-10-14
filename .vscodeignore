@@ -8,4 +8,4 @@ bin/EditorServices.log
 bin/DebugAdapter.log
 bin/*.vshost.*
 logs/**
-
+sessions/**

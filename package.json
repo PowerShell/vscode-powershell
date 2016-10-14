@@ -5,7 +5,7 @@
     "publisher": "ms-vscode",
     "description": "Develop PowerShell scripts in Visual Studio Code!",
     "engines": {
-        "vscode": "1.x.x"
+        "vscode": "^1.7.0"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
     "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -87,6 +87,21 @@
             {
                 "command": "PowerShell.RunSelection",
                 "title": "Run selection",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.RestartSession",
+                "title": "Restart PowerShell Session",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.ShowLogs",
+                "title": "Show PowerShell Extension Logs",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.OpenLogFolder",
+                "title": "Open PowerShell Extension Logs Folder",
                 "category": "PowerShell"
             },
             {

@@ -1,4 +1,9 @@
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ *--------------------------------------------------------*/
+
 import vscode = require('vscode');
+import { IFeature } from '../feature';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace EvaluateRequest {
@@ -138,44 +143,66 @@ function onInputEntered(responseText: string): ShowInputPromptResponseBody {
     }
 }
 
-export function registerConsoleCommands(client: LanguageClient): void {
+export class ConsoleFeature implements IFeature {
+    private command: vscode.Disposable;
+    private languageClient: LanguageClient;
+    private consoleChannel: vscode.OutputChannel;
 
-    vscode.commands.registerCommand('PowerShell.RunSelection', () => {
-        var editor = vscode.window.activeTextEditor;
-        var selectionRange: vscode.Range = undefined;
+    constructor() {
+        this.command =
+            vscode.commands.registerCommand('PowerShell.RunSelection', () => {
+                if (this.languageClient === undefined) {
+                    // TODO: Log error message
+                    return;
+                }
 
-        if (!editor.selection.isEmpty) {
-            selectionRange =
-                new vscode.Range(
-                    editor.selection.start,
-                    editor.selection.end);
-        }
-        else {
-            selectionRange = editor.document.lineAt(editor.selection.start.line).range;
-        }
+                var editor = vscode.window.activeTextEditor;
+                var selectionRange: vscode.Range = undefined;
 
-        client.sendRequest(EvaluateRequest.type, {
-            expression: editor.document.getText(selectionRange)
+                if (!editor.selection.isEmpty) {
+                    selectionRange =
+                        new vscode.Range(
+                            editor.selection.start,
+                            editor.selection.end);
+                }
+                else {
+                    selectionRange = editor.document.lineAt(editor.selection.start.line).range;
+                }
+
+                this.languageClient.sendRequest(EvaluateRequest.type, {
+                    expression: editor.document.getText(selectionRange)
+                });
+            });
+
+        this.consoleChannel = vscode.window.createOutputChannel("PowerShell Output");
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
+        this.languageClient = languageClient;
+
+        this.languageClient.onRequest(
+            ShowChoicePromptRequest.type,
+            promptDetails => showChoicePrompt(promptDetails, this.languageClient));
+
+        this.languageClient.onRequest(
+            ShowInputPromptRequest.type,
+            promptDetails => showInputPrompt(promptDetails, this.languageClient));
+
+        this.languageClient.onNotification(OutputNotification.type, (output) => {
+            var outputEditorExist = vscode.window.visibleTextEditors.some((editor) => {
+                return editor.document.languageId == 'Log'
+            });
+
+            if (!outputEditorExist) {
+                this.consoleChannel.show(vscode.ViewColumn.Three);
+            }
+
+            this.consoleChannel.append(output.output);
         });
-    });
+    }
 
-    var consoleChannel = vscode.window.createOutputChannel("PowerShell Output");
-    client.onNotification(OutputNotification.type, (output) => {
-        var outputEditorExist = vscode.window.visibleTextEditors.some((editor) => {
-	           return editor.document.languageId == 'Log'
-        });
-        if (!outputEditorExist)
-            consoleChannel.show(vscode.ViewColumn.Three);
-        consoleChannel.append(output.output);
-    });
-
-    var t: Thenable<ShowChoicePromptResponseBody>;
-
-    client.onRequest(
-        ShowChoicePromptRequest.type,
-        promptDetails => showChoicePrompt(promptDetails, client));
-
-    client.onRequest(
-        ShowInputPromptRequest.type,
-        promptDetails => showInputPrompt(promptDetails, client));
+    public dispose() {
+        this.command.dispose();
+        this.consoleChannel.dispose();
+    }
 }

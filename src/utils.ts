@@ -2,6 +2,8 @@ import fs = require('fs');
 import os = require('os');
 import path = require('path');
 
+export let PowerShellLanguageId = 'powershell';
+
 export function ensurePathExists(targetPath: string) {
     // Ensure that the path exists
     try {
@@ -57,12 +59,20 @@ export interface EditorServicesSessionDetails {
     languageServicePort: number;
     debugServicePort: number;
 }
+
 export interface ReadSessionFileCallback {
     (details: EditorServicesSessionDetails): void;
 }
 
-let sessionsFolder = path.resolve(__dirname, "sessions/");
+let sessionsFolder = path.resolve(__dirname, "..", "sessions/");
 let sessionFilePath = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
+
+// Create the sessions path if it doesn't exist already
+ensurePathExists(sessionsFolder);
+
+export function getSessionFilePath() {
+    return sessionFilePath;
+}
 
 export function writeSessionFile(sessionDetails: EditorServicesSessionDetails) {
     ensurePathExists(sessionsFolder);
@@ -78,12 +88,17 @@ export function readSessionFile(): EditorServicesSessionDetails {
 }
 
 export function deleteSessionFile() {
-    fs.unlinkSync(sessionFilePath);
+    try {
+        fs.unlinkSync(sessionFilePath);
+    }
+    catch (e) {
+        // TODO: Be more specific about what we're catching
+    }
 }
 
 export function checkIfFileExists(filePath: string): boolean {
     try {
-        fs.accessSync(filePath, fs.R_OK)
+        fs.accessSync(filePath, fs.constants.R_OK)
         return true;
     }
     catch (e) {

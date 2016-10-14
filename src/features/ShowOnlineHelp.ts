@@ -1,20 +1,43 @@
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ *--------------------------------------------------------*/
+
 import vscode = require('vscode');
+import { IFeature } from '../feature';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace ShowOnlineHelpRequest {
     export const type: RequestType<string, void, void> = { get method() { return 'powerShell/showOnlineHelp'; } };
 }
 
-export function registerShowHelpCommand(client: LanguageClient): void {
-    var disposable = vscode.commands.registerCommand('PowerShell.OnlineHelp', () => {
+export class ShowHelpFeature implements IFeature {
 
-        const editor = vscode.window.activeTextEditor;
+    private command: vscode.Disposable;
+    private languageClient: LanguageClient;
 
-        var selection = editor.selection;
-        var doc = editor.document;
-        var cwr = doc.getWordRangeAtPosition(selection.active)
-        var text = doc.getText(cwr);
+    constructor() {
+        this.command = vscode.commands.registerCommand('PowerShell.OnlineHelp', () => {
+            if (this.languageClient === undefined) {
+                // TODO: Log error message
+                return;
+            }
 
-        client.sendRequest(ShowOnlineHelpRequest.type, text);
-    });
+            const editor = vscode.window.activeTextEditor;
+
+            var selection = editor.selection;
+            var doc = editor.document;
+            var cwr = doc.getWordRangeAtPosition(selection.active)
+            var text = doc.getText(cwr);
+
+            this.languageClient.sendRequest(ShowOnlineHelpRequest.type, text);
+        });
+    }
+
+    public setLanguageClient(languageclient: LanguageClient) {
+        this.languageClient = languageclient;
+    }
+
+    public dispose() {
+        this.command.dispose();
+    }
 }
