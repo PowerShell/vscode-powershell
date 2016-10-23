@@ -123,10 +123,14 @@
                 "configurationAttributes": {
                     "launch": {
                         "required": [
-                            "program"
+                            "script"
                         ],
                         "properties": {
                             "program": {
+                                "type": "string",
+                                "description": "Deprecated. Please use the 'script' property instead to specify the absolute path to the PowerShell script to launch under the debugger."
+                            },
+                            "script": {
                                 "type": "string",
                                 "description": "Absolute path to the PowerShell script to launch under the debugger."
                             },
@@ -151,7 +155,7 @@
                         "name": "PowerShell",
                         "type": "PowerShell",
                         "request": "launch",
-                        "program": "${file}",
+                        "script": "${file}",
                         "args": [],
                         "cwd": "${file}"
                     }
