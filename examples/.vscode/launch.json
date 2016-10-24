@@ -5,7 +5,7 @@
             "name": "PowerShell",
             "type": "PowerShell",
             "request": "launch",
-            "program": "${file}",
+            "script": "${file}",
             "args": [],
             "cwd": "${file}"
         }
