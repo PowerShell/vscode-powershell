@@ -6,10 +6,11 @@ export function registerCodeActionCommands(client: LanguageClient): void {
     vscode.commands.registerCommand('PowerShell.ApplyCodeActionEdits', (edit: any) => {
         console.log("Applying edits");
         console.log(edit);
-
+        var editor = Window.activeTextEditor;
+        var filePath = editor.document.fileName;
         var workspaceEdit = new vscode.WorkspaceEdit();
         workspaceEdit.set(
-            vscode.Uri.file(edit.File),
+            vscode.Uri.file(filePath),
             [
                 new vscode.TextEdit(
                     new vscode.Range(
