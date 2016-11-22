@@ -23,6 +23,7 @@ export interface ISettings {
     enableProfileLoading?: boolean,
     scriptAnalysis?: IScriptAnalysisSettings,
     developer?: IDeveloperSettings,
+    profileName?: string
 }
 
 export function load(myPluginId: string): ISettings {
@@ -44,6 +45,7 @@ export function load(myPluginId: string): ISettings {
         useX86Host: configuration.get<boolean>("useX86Host", false),
         enableProfileLoading: configuration.get<boolean>("enableProfileLoading", false),
         scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
-        developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings)
+        developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
+        profileName: configuration.get<string>("profileName", "Microsoft.VSCode")
     }
 }
