@@ -47,7 +47,7 @@ Try these steps:
 5. Find the variable `i` in the Variables list, right click it and select
    **Add to Watch**.  The variable should appear in the **Watch** pane now.
 6. Hover over the title of the **Watch** pane and some buttons should appear.
-   Click the plus sign `+` button and type `str` then press enter.
+   Click the plus sign `+` button and type `$str` then press enter.
 7. Back in the editor, click to the left of line 10 to set a breakpoint there.
 8. Click the green **Play** button or press `F5` to continue execution.
 9. Observe that every time the breakpoint is hit, the watch variables get updated.
