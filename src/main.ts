@@ -66,8 +66,7 @@ export function activate(context: vscode.ExtensionContext): void {
         });
 
     // Create the logger
-    // TODO: Pull level from settings
-    logger = new Logger(LogLevel.Verbose);
+    logger = new Logger();
 
     // Create features
     extensionFeatures = [

@@ -40,7 +40,7 @@
         "vscode.powershell"
     ],
     "scripts": {
-        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+        "vscode:prepublish": "tsc -p ./",
         "compile": "tsc -p ./",
         "compile-watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install"
@@ -91,7 +91,7 @@
             },
             {
                 "command": "PowerShell.RestartSession",
-                "title": "Restart PowerShell Session",
+                "title": "Restart Current Session",
                 "category": "PowerShell"
             },
             {
@@ -117,6 +117,11 @@
             {
                 "command": "PowerShell.ShowAdditionalCommands",
                 "title": "Show additional commands from PowerShell modules",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.ShowSessionMenu",
+                "title": "Show Session Menu",
                 "category": "PowerShell"
             }
         ],

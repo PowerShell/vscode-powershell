@@ -9,15 +9,14 @@ import path = require('path');
 import utils = require('./utils');
 import vscode = require('vscode');
 import cp = require('child_process');
-import settingsManager = require('./settings');
+import Settings = require('./settings');
 
 import { Logger } from './logging';
 import { IFeature } from './feature';
 import { StringDecoder } from 'string_decoder';
 import { LanguageClient, LanguageClientOptions, Executable, RequestType, NotificationType, StreamInfo } from 'vscode-languageclient';
 
-export enum SessionStatus
-{
+export enum SessionStatus {
     NotStarted,
     Initializing,
     Running,
@@ -25,21 +24,59 @@ export enum SessionStatus
     Failed
 }
 
+enum SessionType {
+    UseDefault,
+    UseCurrent,
+    UsePath,
+    UseBuiltIn
+}
+
+interface DefaultSessionConfiguration {
+    type: SessionType.UseDefault
+}
+
+interface CurrentSessionConfiguration {
+    type: SessionType.UseCurrent,
+}
+
+interface PathSessionConfiguration {
+    type: SessionType.UsePath,
+    path: string;
+}
+
+interface BuiltInSessionConfiguration {
+    type: SessionType.UseBuiltIn;
+    path?: string;
+    is32Bit: boolean;
+}
+
+type SessionConfiguration =
+    DefaultSessionConfiguration |
+    CurrentSessionConfiguration |
+    PathSessionConfiguration |
+    BuiltInSessionConfiguration;
+
 export class SessionManager {
 
-    private ShowStatusBarMenuCommandName = "PowerShell.ShowStatusMenu";
+    private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
 
     private hostVersion: string;
+    private isWindowsOS: boolean;
     private sessionStatus: SessionStatus;
     private powerShellProcess: cp.ChildProcess;
     private statusBarItem: vscode.StatusBarItem;
+    private sessionConfiguration: SessionConfiguration;
+    private versionDetails: PowerShellVersionDetails;
     private registeredCommands: vscode.Disposable[] = [];
     private languageServerClient: LanguageClient = undefined;
+    private sessionSettings: Settings.ISettings = undefined;
 
     constructor(
         private requiredEditorServicesVersion: string,
         private log: Logger,
         private extensionFeatures: IFeature[] = []) {
+
+        this.isWindowsOS = os.platform() == "win32";
 
         // Get the current version of this extension
         this.hostVersion =
@@ -53,92 +90,41 @@ export class SessionManager {
         this.createStatusBarItem();
     }
 
-    public start() {
-        var settings = settingsManager.load(utils.PowerShellLanguageId);
+    public start(sessionConfig: SessionConfiguration = { type: SessionType.UseDefault }) {
+        this.sessionSettings = Settings.load(utils.PowerShellLanguageId);
+        this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
 
-        var bundledModulesPath = settings.developer.bundledModulesPath;
-        if (!path.isAbsolute(bundledModulesPath)) {
-            bundledModulesPath = path.resolve(__dirname, bundledModulesPath);
-        }
+        this.sessionConfiguration = this.resolveSessionConfiguration(sessionConfig);
 
-        var startArgs =
-            "-EditorServicesVersion '" + this.requiredEditorServicesVersion + "' " +
-            "-HostName 'Visual Studio Code Host' " +
-            "-HostProfileId 'Microsoft.VSCode' " +
-            "-HostVersion '" + this.hostVersion + "' " +
-            "-BundledModulesPath '" + bundledModulesPath + "' ";
+        if (this.sessionConfiguration.type === SessionType.UsePath ||
+            this.sessionConfiguration.type === SessionType.UseBuiltIn) {
 
-        if (settings.developer.editorServicesWaitForDebugger) {
-            startArgs += '-WaitForDebugger ';
-        }
-        if (settings.developer.editorServicesLogLevel) {
-            startArgs += "-LogLevel '" + settings.developer.editorServicesLogLevel + "' "
-        }
+            var bundledModulesPath = this.sessionSettings.developer.bundledModulesPath;
+            if (!path.isAbsolute(bundledModulesPath)) {
+                bundledModulesPath = path.resolve(__dirname, bundledModulesPath);
+            }
 
-        // Find the path to powershell.exe based on the current platform
-        // and the user's desire to run the x86 version of PowerShell
-        var powerShellExePath = undefined;
+            var startArgs =
+                "-EditorServicesVersion '" + this.requiredEditorServicesVersion + "' " +
+                "-HostName 'Visual Studio Code Host' " +
+                "-HostProfileId 'Microsoft.VSCode' " +
+                "-HostVersion '" + this.hostVersion + "' " +
+                "-BundledModulesPath '" + bundledModulesPath + "' ";
 
-        if (os.platform() == "win32") {
-            powerShellExePath =
-                settings.useX86Host || !process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432')
-                ? process.env.windir + '\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'
-                : process.env.windir + '\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe';
-        }
-        else if (os.platform() == "darwin") {
-            powerShellExePath = "/usr/local/bin/powershell";
+            if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
+                startArgs += '-WaitForDebugger ';
+            }
+            if (this.sessionSettings.developer.editorServicesLogLevel) {
+                startArgs += "-LogLevel '" + this.sessionSettings.developer.editorServicesLogLevel + "' "
+            }
 
-            // Check for OpenSSL dependency on OS X
-            if (!utils.checkIfFileExists("/usr/local/lib/libcrypto.1.0.0.dylib") ||
-                !utils.checkIfFileExists("/usr/local/lib/libssl.1.0.0.dylib")) {
-                    var thenable =
-                        vscode.window.showWarningMessage(
-                            "The PowerShell extension will not work without OpenSSL on Mac OS X",
-                            "Show Documentation");
-
-                    thenable.then(
-                        (s) => {
-                            if (s === "Show Documentation") {
-                                cp.exec("open https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md#1-powershell-intellisense-does-not-work-cant-debug-scripts");
-                            }
-                        });
-
-                    // Don't continue initializing since Editor Services will not load successfully
-                    this.setSessionFailure("Cannot start PowerShell Editor Services due to missing OpenSSL dependency.");
-                    return;
-                }
-        }
-        else {
-            powerShellExePath = "/usr/bin/powershell";
-        }
-
-        // Is there a setting override for the PowerShell path?
-        if (settings.developer.powerShellExePath &&
-            settings.developer.powerShellExePath.trim().length > 0) {
-
-            powerShellExePath = settings.developer.powerShellExePath;
-
-            // If the path does not exist, show an error
-            fs.access(
-                powerShellExePath, fs.constants.X_OK,
-                (err) => {
-                    if (err) {
-                        this.setSessionFailure(
-                            "powershell.exe cannot be found or is not accessible at path " + powerShellExePath);
-                    }
-                    else {
-                        this.startPowerShell(
-                            powerShellExePath,
-                            bundledModulesPath,
-                            startArgs);
-                    }
-                });
-        }
-        else {
             this.startPowerShell(
-                powerShellExePath,
+                this.sessionConfiguration.path,
                 bundledModulesPath,
                 startArgs);
+        }
+        else {
+            this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
         }
     }
 
@@ -183,10 +169,31 @@ export class SessionManager {
         this.registeredCommands.forEach(command => { command.dispose(); });
     }
 
+    private onConfigurationUpdated() {
+        var settings = Settings.load(utils.PowerShellLanguageId);
+
+        // Detect any setting changes that would affect the session
+        if (settings.useX86Host !== this.sessionSettings.useX86Host ||
+            settings.developer.powerShellExePath.toLowerCase() !== this.sessionSettings.developer.powerShellExePath.toLowerCase() ||
+            settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase() ||
+            settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()) {
+
+            vscode.window.showInformationMessage(
+                "The PowerShell runtime configuration has changed, would you like to start a new session?",
+                "Yes", "No")
+                .then((response) => {
+                    if (response === "Yes") {
+                        this.restartSession({ type: SessionType.UseDefault })
+                    }
+                });
+        }
+    }
+
     private registerCommands() : void {
         this.registeredCommands = [
             vscode.commands.registerCommand('PowerShell.RestartSession', () => { this.restartSession(); }),
-            vscode.commands.registerCommand(this.ShowStatusBarMenuCommandName, () => { this.showStatusMenu(); })
+            vscode.commands.registerCommand(this.ShowSessionMenuCommandName, () => { this.showSessionMenu(); }),
+            vscode.workspace.onDidChangeConfiguration(() => this.onConfigurationUpdated())
         ]
     }
 
@@ -212,7 +219,7 @@ export class SessionManager {
             ]
 
             // Only add ExecutionPolicy param on Windows
-            if (os.platform() == "win32") {
+            if (this.isWindowsOS) {
                 powerShellArgs.push("-ExecutionPolicy", "Unrestricted")
             }
 
@@ -328,11 +335,19 @@ export class SessionManager {
 
             this.languageServerClient.onReady().then(
                 () => {
-                    this.setSessionStatus(
-                        "Running",
-                        SessionStatus.Running);
+                    this.languageServerClient
+                        .sendRequest(PowerShellVersionRequest.type)
+                        .then(
+                            (versionDetails) => {
+                                this.versionDetails = versionDetails;
+                                this.setSessionStatus(
+                                    this.versionDetails.architecture === "x86"
+                                        ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
+                                        : this.versionDetails.displayVersion,
+                                    SessionStatus.Running);
 
-                    this.updateExtensionFeatures(this.languageServerClient)
+                                this.updateExtensionFeatures(this.languageServerClient)
+                            });
                 },
                 (reason) => {
                     this.setSessionFailure("Could not start language service: ", reason);
@@ -352,9 +367,9 @@ export class SessionManager {
         });
     }
 
-    private restartSession() {
+    private restartSession(sessionConfig?: SessionConfiguration) {
         this.stop();
-        this.start();
+        this.start(sessionConfig);
     }
 
     private createStatusBarItem() {
@@ -366,7 +381,7 @@ export class SessionManager {
                     vscode.StatusBarAlignment.Right,
                     1);
 
-            this.statusBarItem.command = this.ShowStatusBarMenuCommandName;
+            this.statusBarItem.command = this.ShowSessionMenuCommandName;
             this.statusBarItem.show();
         }
     }
@@ -398,10 +413,170 @@ export class SessionManager {
             SessionStatus.Failed);
     }
 
-    private showStatusMenu() {
-        // TODO: Generate the menu based on context
-        vscode.window.showQuickPick(
-            [ "Restart Current Session",
-              "Switch to PowerShell (x86)" ]);
+    private resolveSessionConfiguration(sessionConfig: SessionConfiguration): SessionConfiguration {
+
+        switch (sessionConfig.type) {
+            case SessionType.UseCurrent: return this.sessionConfiguration;
+            case SessionType.UseDefault:
+                // Is there a setting override for the PowerShell path?
+                var powerShellExePath = (this.sessionSettings.developer.powerShellExePath || "").trim();
+                if (powerShellExePath.length > 0) {
+                    return this.resolveSessionConfiguration(
+                        { type: SessionType.UsePath, path: this.sessionSettings.developer.powerShellExePath});
+                }
+                else {
+                    return this.resolveSessionConfiguration(
+                        { type: SessionType.UseBuiltIn, is32Bit: this.sessionSettings.useX86Host });
+                }
+
+            case SessionType.UsePath:
+                sessionConfig.path = this.resolvePowerShellPath(sessionConfig.path);
+                return sessionConfig;
+
+            case SessionType.UseBuiltIn:
+                sessionConfig.path = this.getBuiltInPowerShellPath(sessionConfig.is32Bit);
+                return sessionConfig;
+        }
     }
+
+    private getBuiltInPowerShellPath(use32Bit: boolean): string | null {
+
+        // Find the path to powershell.exe based on the current platform
+        // and the user's desire to run the x86 version of PowerShell
+        var powerShellExePath = undefined;
+
+        if (this.isWindowsOS) {
+            powerShellExePath =
+                use32Bit || !process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432')
+                ? process.env.windir + '\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'
+                : process.env.windir + '\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe';
+        }
+        else if (os.platform() == "darwin") {
+            powerShellExePath = "/usr/local/bin/powershell";
+
+            // Check for OpenSSL dependency on OS X
+            if (!utils.checkIfFileExists("/usr/local/lib/libcrypto.1.0.0.dylib") ||
+                !utils.checkIfFileExists("/usr/local/lib/libssl.1.0.0.dylib")) {
+                    var thenable =
+                        vscode.window.showWarningMessage(
+                            "The PowerShell extension will not work without OpenSSL on Mac OS X",
+                            "Show Documentation");
+
+                    thenable.then(
+                        (s) => {
+                            if (s === "Show Documentation") {
+                                cp.exec("open https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md#1-powershell-intellisense-does-not-work-cant-debug-scripts");
+                            }
+                        });
+
+                    // Don't continue initializing since Editor Services will not load successfully
+                    this.setSessionFailure("Cannot start PowerShell Editor Services due to missing OpenSSL dependency.");
+                    return null;
+                }
+        }
+        else {
+            powerShellExePath = "/usr/bin/powershell";
+        }
+
+        return this.resolvePowerShellPath(powerShellExePath);
+    }
+
+    private resolvePowerShellPath(powerShellExePath: string): string {
+        // If the path does not exist, show an error
+        if (!utils.checkIfFileExists(powerShellExePath)) {
+            this.setSessionFailure(
+                "powershell.exe cannot be found or is not accessible at path " + powerShellExePath);
+
+            return null;
+        }
+
+        return powerShellExePath;
+    }
+
+    private showSessionMenu() {
+        var menuItems: SessionMenuItem[] = [
+            new SessionMenuItem(
+                `Current session: PowerShell ${this.versionDetails.displayVersion} (${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition [${this.versionDetails.version}]`,
+                () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
+
+            new SessionMenuItem(
+                "Restart Current Session",
+                () => { this.restartSession(); }),
+        ];
+
+        if (this.isWindowsOS) {
+            var item32 =
+                new SessionMenuItem(
+                    "Switch to Windows PowerShell (x86)",
+                    () => { this.restartSession({ type: SessionType.UseBuiltIn, is32Bit: true}) });
+
+            var item64 =
+                new SessionMenuItem(
+                    "Switch to Windows PowerShell (x64)",
+                    () => { this.restartSession({ type: SessionType.UseBuiltIn, is32Bit: false }) });
+
+            // If the configured PowerShell path isn't being used, offer it as an option
+            if (this.sessionSettings.developer.powerShellExePath !== "" &&
+                (this.sessionConfiguration.type !== SessionType.UsePath ||
+                 this.sessionConfiguration.path !== this.sessionSettings.developer.powerShellExePath)) {
+
+                 menuItems.push(
+                     new SessionMenuItem(
+                         `Switch to PowerShell at path: ${this.sessionSettings.developer.powerShellExePath}`,
+                         () => {
+                             this.restartSession(
+                                 { type: SessionType.UsePath, path: this.sessionSettings.developer.powerShellExePath })
+                         }));
+            }
+
+            if (this.sessionConfiguration.type === SessionType.UseBuiltIn) {
+                menuItems.push(
+                    this.sessionConfiguration.is32Bit ? item64 : item32);
+            }
+            else {
+                menuItems.push(item32);
+                menuItems.push(item64);
+            }
+        }
+        else {
+            if (this.sessionConfiguration.type !== SessionType.UseBuiltIn) {
+                menuItems.push(
+                    new SessionMenuItem(
+                        "Use built-in PowerShell",
+                        () => { this.restartSession({ type: SessionType.UseBuiltIn, is32Bit: false }) }));
+            }
+        }
+
+        menuItems.push(
+            new SessionMenuItem(
+                "Open Session Logs Folder",
+                () => { vscode.commands.executeCommand("PowerShell.OpenLogFolder"); }));
+
+        vscode
+            .window
+            .showQuickPick<SessionMenuItem>(menuItems)
+            .then((selectedItem) => { selectedItem.callback(); });
+    }
+}
+
+class SessionMenuItem implements vscode.QuickPickItem {
+    public description: string;
+
+    constructor(
+        public readonly label: string,
+        public readonly callback: () => void = () => { })
+    {
+    }
+}
+
+export namespace PowerShellVersionRequest {
+    export const type: RequestType<void, PowerShellVersionDetails, void> =
+        { get method() { return 'powerShell/getVersion'; } };
+}
+
+export interface PowerShellVersionDetails {
+    version: string;
+    displayVersion: string;
+    edition: string;
+    architecture: string;
 }

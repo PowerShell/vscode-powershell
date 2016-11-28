@@ -22,17 +22,13 @@ export class Logger {
     private logFilePath: string;
 
     public logBasePath: string;
+    public logSessionPath: string;
+    public MinimumLogLevel: LogLevel = LogLevel.Normal;
 
-    constructor(readonly MinimumLogLevel: LogLevel = LogLevel.Normal) {
+    constructor() {
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
 
-        this.logBasePath =
-            path.resolve(
-                __dirname,
-                "../logs",
-                `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
-        this.logFilePath = this.getLogFilePath("vscode-powershell");
-
+        this.logBasePath = path.resolve(__dirname, "../logs");
         utils.ensurePathExists(this.logBasePath);
 
         this.commands = [
@@ -47,7 +43,7 @@ export class Logger {
     }
 
     public getLogFilePath(baseName: string): string {
-        return path.resolve(this.logBasePath, `${baseName}.log`);
+        return path.resolve(this.logSessionPath, `${baseName}.log`);
     }
 
     public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]) {
@@ -99,6 +95,29 @@ export class Logger {
         });
     }
 
+    public startNewLog(minimumLogLevel: string = "Normal") {
+        this.MinimumLogLevel = this.logLevelNameToValue(minimumLogLevel.trim());
+
+        this.logSessionPath =
+            path.resolve(
+                this.logBasePath,
+                `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
+
+        this.logFilePath = this.getLogFilePath("vscode-powershell");
+
+        utils.ensurePathExists(this.logSessionPath);
+    }
+
+    private logLevelNameToValue(logLevelName: string): LogLevel {
+        switch (logLevelName.toLowerCase()) {
+            case "normal": return LogLevel.Normal;
+            case "verbose": return LogLevel.Verbose;
+            case "warning": return LogLevel.Warning;
+            case "error": return LogLevel.Error;
+            default: return LogLevel.Normal;
+        }
+    }
+
     public dispose() {
         this.commands.forEach((command) => { command.dispose() });
         this.logChannel.dispose();
@@ -109,12 +128,14 @@ export class Logger {
     }
 
     private openLogFolder() {
-        // Open the folder in VS Code since there isn't an easy way to
-        // open the folder in the platform's file browser
-        vscode.commands.executeCommand(
-            'vscode.openFolder',
-            vscode.Uri.file(this.logBasePath),
-            true);
+        if (this.logSessionPath) {
+            // Open the folder in VS Code since there isn't an easy way to
+            // open the folder in the platform's file browser
+            vscode.commands.executeCommand(
+                'vscode.openFolder',
+                vscode.Uri.file(this.logSessionPath),
+                true);
+        }
     }
 }
 
