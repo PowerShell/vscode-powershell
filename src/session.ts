@@ -131,7 +131,7 @@ export class SessionManager {
     public stop() {
 
         // Shut down existing session if there is one
-        this.log.write("\r\n\r\nShutting down language client...");
+        this.log.write(os.EOL + os.EOL + "Shutting down language client...");
 
         if (this.sessionStatus === SessionStatus.Failed) {
             // Before moving further, clear out the client and process if
@@ -153,7 +153,7 @@ export class SessionManager {
 
         // Kill the PowerShell process we spawned via the console
         if (this.powerShellProcess !== undefined) {
-            this.log.write("\r\nTerminating PowerShell process...");
+            this.log.write(os.EOL + "Terminating PowerShell process...");
             this.powerShellProcess.kill();
             this.powerShellProcess = undefined;
         }
@@ -267,7 +267,7 @@ export class SessionManager {
             this.powerShellProcess.on(
                 'close',
                 (exitCode) => {
-                    this.log.write("\r\npowershell.exe terminated with exit code: " + exitCode + "\r\n");
+                    this.log.write(os.EOL + "powershell.exe terminated with exit code: " + exitCode + os.EOL);
 
                     if (this.languageServerClient != undefined) {
                         this.languageServerClient.stop();
@@ -285,7 +285,7 @@ export class SessionManager {
               "    pid: " + this.powerShellProcess.pid,
               "    exe: " + powerShellExePath,
               "    bundledModulesPath: " + bundledModulesPath,
-              "    args: " + startScriptPath + ' ' + startArgs + "\r\n\r\n");
+              "    args: " + startScriptPath + ' ' + startArgs + os.EOL + os.EOL);
         }
         catch (e)
         {
@@ -302,7 +302,7 @@ export class SessionManager {
 
     private startLanguageClient(port: number) {
 
-        this.log.write("Connecting to language service on port " + port + "...\r\n");
+        this.log.write("Connecting to language service on port " + port + "..." + os.EOL);
 
         try
         {

@@ -3,6 +3,7 @@
  *--------------------------------------------------------*/
 
 import fs = require('fs');
+import os = require('os');
 import path = require('path');
 import vscode = require('vscode');
 import utils = require('./utils');
@@ -50,11 +51,11 @@ export class Logger {
         if (logLevel >= this.MinimumLogLevel) {
             // TODO: Add timestamp
             this.logChannel.appendLine(message);
-            fs.appendFile(this.logFilePath, message + "\r\n");
+            fs.appendFile(this.logFilePath, message + os.EOL);
 
             additionalMessages.forEach((line) => {
                 this.logChannel.appendLine(line);
-                fs.appendFile(this.logFilePath, line + "\r\n");
+                fs.appendFile(this.logFilePath, line + os.EOL);
             });
         }
     }
