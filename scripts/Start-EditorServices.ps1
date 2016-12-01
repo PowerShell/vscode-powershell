@@ -57,6 +57,12 @@ param(
 # Are we running in PowerShell 5 or later?
 $isPS5orLater = $PSVersionTable.PSVersion.Major -ge 5
 
+# If PSReadline is present in the session, remove it so that runspace
+# management is easier
+if ((Get-Module PSReadline).Count -ne 0) {
+    Remove-Module PSReadline
+}
+
 # This variable will be assigned later to contain information about
 # what happened while attempting to launch the PowerShell Editor
 # Services host
@@ -161,6 +167,7 @@ else {
 $languageServicePort = Get-AvailablePort
 $debugServicePort = Get-AvailablePort
 
+# Create the Editor Services host
 $editorServicesHost =
     Start-EditorServicesHost `
         -HostName $HostName `

@@ -5,7 +5,7 @@
     "publisher": "ms-vscode",
     "description": "Develop PowerShell scripts in Visual Studio Code!",
     "engines": {
-        "vscode": "1.x.x"
+        "vscode": "^1.7.0"
     },
     "license": "SEE LICENSE IN LICENSE.txt",
     "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -32,16 +32,17 @@
         "vscode-languageclient": "1.3.1"
     },
     "devDependencies": {
-        "vscode": "^0.11.12",
-        "typescript": "^1.8.0"
+        "vscode": "^1.0.0",
+        "typescript": "^2.0.3",
+        "@types/node": "^6.0.40"
     },
     "extensionDependencies": [
         "vscode.powershell"
     ],
     "scripts": {
-        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-        "compile": "node ./node_modules/vscode/bin/compile -p ./",
-        "compile-watch": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -p ./",
+        "compile-watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "contributes": {
@@ -89,6 +90,21 @@
                 "category": "PowerShell"
             },
             {
+                "command": "PowerShell.RestartSession",
+                "title": "Restart Current Session",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.ShowLogs",
+                "title": "Show PowerShell Extension Logs",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.OpenLogFolder",
+                "title": "Open PowerShell Extension Logs Folder",
+                "category": "PowerShell"
+            },
+            {
                 "command": "PowerShell.OpenInISE",
                 "title": "Open current file in PowerShell ISE",
                 "category": "PowerShell"
@@ -101,6 +117,11 @@
             {
                 "command": "PowerShell.ShowAdditionalCommands",
                 "title": "Show additional commands from PowerShell modules",
+                "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.ShowSessionMenu",
+                "title": "Show Session Menu",
                 "category": "PowerShell"
             }
         ],
