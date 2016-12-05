@@ -16,6 +16,11 @@ interface LabelToCheckboxMap {
     [Label: string]: string;
 }
 
+interface RuleInfo {
+    Name: string;
+    IsEnabled: boolean;
+}
+
 export class SelectPSSARulesFeature implements IFeature {
 
     private command: vscode.Disposable;
@@ -35,19 +40,21 @@ export class SelectPSSARulesFeature implements IFeature {
             var cwr = doc.getWordRangeAtPosition(selection.active)
             var text = doc.getText(cwr);
 
-            let rules: string[] = [];
+            let rules: RuleInfo[] = [];
             this.languageClient.sendRequest(GetPSSARulesRequest.type, null).then((returnedRules) => {
-                    returnedRules.forEach(item => rules.push(item))
-                    let ruleSelectionMap = new Map<string,boolean>();
-                    rules.forEach(rule => ruleSelectionMap[rule] = false);
-                    ruleSelectionMap = this.GetSelections(rules, ruleSelectionMap);
+                    for (var index = 0; index < returnedRules.length; index++) {
+                        var element = returnedRules[index];
+                        rules.push({Name : element.name, IsEnabled : element.isEnabled})
+                    }
+
+                    this.GetSelections(rules);
                 });
         });
     }
 
-    private GetSelections(rules: string[], ruleSelectionMap: Map<string,boolean>): Map<string,boolean>
+    private GetSelections(rules: RuleInfo[])
     {
-            vscode.window.showQuickPick(this.GetQuickPickItems(rules, ruleSelectionMap))
+            vscode.window.showQuickPick(this.GetQuickPickItems(rules))
                 .then((selection) =>{
                     if (!selection)
                     {
@@ -56,24 +63,28 @@ export class SelectPSSARulesFeature implements IFeature {
 
                     if (selection.label == figures.tick)
                     {
-                        vscode.window.showInformationMessage("yes!");
                         return;
                     }
 
-                    ruleSelectionMap[selection.description] = this.ToggleState(ruleSelectionMap[selection.description]);
-                    this.GetSelections(rules, ruleSelectionMap);
+                    let index = this.GetRuleIndex(rules, selection.description);
+                    rules[index].IsEnabled = this.ToggleState(rules[index].IsEnabled);
+                    this.GetSelections(rules);
                 });
-            return ruleSelectionMap;
+    }
+
+    private GetRuleIndex(rules: RuleInfo[], ruleName: string) : number
+    {
+        return rules.findIndex(rule => rule.Name == ruleName);
     }
 
     private GetCheckBoxOn() : string
     {
-        return figures.checkboxOn;
+        return "[ x ]"; // this looks better than figure.checkboxOn
     }
 
     private GetCheckBoxOff() : string
     {
-        return figures.checkboxOff;
+        return "[   ]"; // this looks better than figure.checkboxOff
     }
 
     private ConvertToState(checkBox: string) : boolean
@@ -103,9 +114,12 @@ export class SelectPSSARulesFeature implements IFeature {
         }
     }
 
-    private GetQuickPickItems(items: string[], itemsMap: Map<string,boolean>): QuickPickItem[] {
+    private GetQuickPickItems(rules: RuleInfo[]): QuickPickItem[] {
         let qItems: QuickPickItem[] = [];
-        items.forEach(item => qItems.push({label: this.ConvertToCheckBox(itemsMap[item]), description: item }));
+        for (var index = 0; index < rules.length; index++) {
+            var element = rules[index];
+            qItems.push({label: this.ConvertToCheckBox(element.IsEnabled), description: element.Name })
+        }
         qItems.push({label: figures.tick, description: "confirm"});
         return qItems;
     }
@@ -117,6 +131,4 @@ export class SelectPSSARulesFeature implements IFeature {
     public dispose() {
         this.command.dispose();
     }
-
-
 }
