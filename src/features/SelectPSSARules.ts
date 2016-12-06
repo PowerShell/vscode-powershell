@@ -9,11 +9,11 @@ import { LanguageClient, RequestType, NotificationType } from 'vscode-languagecl
 const figures = require('figures');
 
 export namespace GetPSSARulesRequest {
-    export const type: RequestType<any, any, void> = { get method() { return 'powerShell/GetPSSARules'; } };
+    export const type: RequestType<any, any, void> = { get method() { return 'powerShell/getPSSARules'; } };
 }
 
-interface LabelToCheckboxMap {
-    [Label: string]: string;
+export namespace SetPSSARulesRequest {
+    export const type: RequestType<any, any, void> = { get method() {return 'powerShell/setPSSARules';}}
 }
 
 interface RuleInfo {
@@ -46,7 +46,6 @@ export class SelectPSSARulesFeature implements IFeature {
                         var element = returnedRules[index];
                         rules.push({Name : element.name, IsEnabled : element.isEnabled})
                     }
-
                     this.GetSelections(rules);
                 });
         });
@@ -63,6 +62,7 @@ export class SelectPSSARulesFeature implements IFeature {
 
                     if (selection.label == figures.tick)
                     {
+                        this.languageClient.sendRequest(SetPSSARulesRequest.type, rules); //TODO handle error
                         return;
                     }
 
