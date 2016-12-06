@@ -2,23 +2,23 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
+import vscode = require("vscode");
 import QuickPickItem = vscode.QuickPickItem;
-const figures = require('figures');
+const figures: any = require("figures");
 
-export interface Option {
+export interface ICheckboxOption {
     name: string;
     isSelected: boolean;
 }
 
 export class CheckboxQuickPick {
-    private options: Option[];
+    private options: ICheckboxOption[];
     private readonly confirm: string;
     private readonly checkboxOn: string;
     private readonly checkboxOff: string;
     private readonly confirmPlaceHolder: string;
 
-    constructor(options: Option[]) {
+    constructor(options: ICheckboxOption[]) {
         this.options = options;
         this.confirm = figures.tick;
         this.checkboxOn = "[ x ]";
@@ -26,12 +26,12 @@ export class CheckboxQuickPick {
         this.confirmPlaceHolder = "Select " + this.confirm + " to confirm";
     }
 
-    public show(callback: (options: Option[]) => void) {
-        let tempOptions = this.options.slice();
+    public show(callback: (options: ICheckboxOption[]) => void): void {
+        let tempOptions: ICheckboxOption[] = this.options.slice();
         this.showInner(tempOptions, callback);
     }
 
-    private showInner(tempOptions: Option[], callback: (options: Option[]) => void) {
+    private showInner(tempOptions: ICheckboxOption[], callback: (options: ICheckboxOption[]) => void): void {
         vscode.window.showQuickPick(
             this.getQuickPickItems(tempOptions),
             { ignoreFocusOut: true, placeHolder: this.confirmPlaceHolder }).then((selection) => {
@@ -45,18 +45,17 @@ export class CheckboxQuickPick {
                     return;
                 }
 
-                let index = this.getRuleIndex(tempOptions, selection.description);
-                // this.toggleOption(tempOptions[index]);
-                tempOptions[index].isSelected = this.toggleState(tempOptions[index].isSelected);
+                let index: number = this.getRuleIndex(tempOptions, selection.description);
+                this.toggleOption(tempOptions[index]);
                 this.showInner(tempOptions, callback);
             });
     }
 
-    private getRuleIndex(options: Option[], optionLabel: string) {
+    private getRuleIndex(options: ICheckboxOption[], optionLabel: string): number {
         return options.findIndex(opt => opt.name == optionLabel);
     }
 
-    private getQuickPickItems(tempOptions: Option[]): QuickPickItem[] {
+    private getQuickPickItems(tempOptions: ICheckboxOption[]): QuickPickItem[] {
         let quickPickItems: QuickPickItem[] = [];
         tempOptions.forEach(option =>
             quickPickItems.push({
@@ -70,12 +69,12 @@ export class CheckboxQuickPick {
         return checkBox == this.checkboxOn;
     }
 
-    private toggleOption(option: Option) {
-        option.isSelected = this.toggleState(option.isSelected);
-    }
-
     private toggleState(state: boolean): boolean {
         return !state;
+    }
+
+    private toggleOption(option: ICheckboxOption): void {
+        option.isSelected = this.toggleState(option.isSelected);
     }
 
     private toggleCheckBox(checkBox: string): string {
