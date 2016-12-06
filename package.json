@@ -124,6 +124,11 @@
                 "command": "PowerShell.ShowSessionMenu",
                 "title": "Show Session Menu",
                 "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.SelectPSSARules",
+                "title": "Select PSScriptAnalyzer Rules",
+                "category": "PowerShell"
             }
         ],
         "snippets": [
