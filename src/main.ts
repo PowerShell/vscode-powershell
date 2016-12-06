@@ -5,7 +5,6 @@
 'use strict';
 
 import vscode = require('vscode');
-
 import { Logger, LogLevel } from './logging';
 import { IFeature } from './feature';
 import { SessionManager } from './session';
@@ -17,6 +16,7 @@ import { ShowHelpFeature } from './features/ShowOnlineHelp';
 import { FindModuleFeature } from './features/PowerShellFindModule';
 import { ExtensionCommandsFeature } from './features/ExtensionCommands';
 import { SelectPSSARulesFeature } from './features/SelectPSSARules';
+import { CodeActionsFeature } from './features/CodeActions';
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
@@ -77,7 +77,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new ShowHelpFeature(),
         new FindModuleFeature(),
         new ExtensionCommandsFeature(),
-        new SelectPSSARulesFeature()
+        new SelectPSSARulesFeature(),
+        new CodeActionsFeature()
     ];
 
     sessionManager =
