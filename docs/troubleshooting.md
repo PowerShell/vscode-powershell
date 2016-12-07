@@ -30,8 +30,8 @@ brew install openssl
 After installation, the libraries of interest must be symlinked to `/usr/local/lib`; e.g. (adjust the version numbers as needed and also note that /usr/local/lib may not already exist and may need to be created before symlinking):
 
 ```
-ln -s /usr/local/Cellar/openssl/1.0.2h_1/lib/libcrypto.1.0.0.dylib /usr/local/lib/libcrypto.1.0.0.dylib
-ln -s /usr/local/Cellar/openssl/1.0.2h_1/lib/libssl.1.0.0.dylib /usr/local/lib/libssl.1.0.0.dylib
+ln -s /usr/local/Cellar/openssl/1.0.2j/lib/libcrypto.1.0.0.dylib /usr/local/lib/libcrypto.1.0.0.dylib
+ln -s /usr/local/Cellar/openssl/1.0.2j/lib/libssl.1.0.0.dylib /usr/local/lib/libssl.1.0.0.dylib
 ```
 
 Restart VS Code after completing the installation and verify that the extension is working correctly.
