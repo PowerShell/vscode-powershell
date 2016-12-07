@@ -4,7 +4,6 @@
 
 import vscode = require("vscode");
 import QuickPickItem = vscode.QuickPickItem;
-const figures: any = require("figures");
 
 export interface ICheckboxOption {
     name: string;
@@ -20,7 +19,7 @@ export class CheckboxQuickPick {
 
     constructor(options: ICheckboxOption[]) {
         this.options = options;
-        this.confirm = figures.tick;
+        this.confirm = "$(check)";
         this.checkboxOn = "[ x ]";
         this.checkboxOff = "[   ]";
         this.confirmPlaceHolder = "Select " + this.confirm + " to confirm";
