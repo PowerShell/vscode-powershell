@@ -138,8 +138,13 @@ export namespace ShowInformationMessageRequest {
 }
 
 export namespace SetStatusBarMessageRequest {
-    export const type: RequestType<string, EditorOperationResponse, void> =
+    export const type: RequestType<StatusBarMessageDetails, EditorOperationResponse, void> =
         { get method() { return 'editor/setStatusBarMessage'; } };
+}
+
+export interface StatusBarMessageDetails {
+    message: string;
+    timeout?: number;
 }
 
 export class ExtensionCommandsFeature implements IFeature {
@@ -207,7 +212,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
             this.languageClient.onRequest(
                 SetStatusBarMessageRequest.type,
-                message => this.setStatusBarMessage(message));
+                messageDetails => this.setStatusBarMessage(messageDetails));
         }
     }
 
@@ -340,8 +345,15 @@ export class ExtensionCommandsFeature implements IFeature {
                      .then(_ => EditorOperationResponse.Completed);
     }
 
-    private setStatusBarMessage(message: string): EditorOperationResponse {
-        vscode.window.setStatusBarMessage(message);
+    private setStatusBarMessage(messageDetails: StatusBarMessageDetails): EditorOperationResponse {
+
+        if (messageDetails.timeout) {
+            vscode.window.setStatusBarMessage(messageDetails.message, messageDetails.timeout);
+        }
+        else {
+            vscode.window.setStatusBarMessage(messageDetails.message);
+        }
+
         return EditorOperationResponse.Completed;
     }
 }
