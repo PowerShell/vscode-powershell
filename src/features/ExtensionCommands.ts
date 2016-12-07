@@ -122,6 +122,31 @@ export namespace OpenFileRequest {
         { get method() { return 'editor/openFile'; } };
 }
 
+export namespace ShowErrorMessageRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/showErrorMessage'; } };
+}
+
+export namespace ShowWarningMessageRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/showWarningMessage'; } };
+}
+
+export namespace ShowInformationMessageRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/showInformationMessage'; } };
+}
+
+export namespace SetStatusBarMessageRequest {
+    export const type: RequestType<StatusBarMessageDetails, EditorOperationResponse, void> =
+        { get method() { return 'editor/setStatusBarMessage'; } };
+}
+
+export interface StatusBarMessageDetails {
+    message: string;
+    timeout?: number;
+}
+
 export class ExtensionCommandsFeature implements IFeature {
 
     private command: vscode.Disposable;
@@ -172,6 +197,22 @@ export class ExtensionCommandsFeature implements IFeature {
             this.languageClient.onRequest(
                 OpenFileRequest.type,
                 filePath => this.openFile(filePath));
+
+            this.languageClient.onRequest(
+                ShowInformationMessageRequest.type,
+                message => this.showInformationMessage(message));
+
+            this.languageClient.onRequest(
+                ShowErrorMessageRequest.type,
+                message => this.showErrorMessage(message));
+
+            this.languageClient.onRequest(
+                ShowWarningMessageRequest.type,
+                message => this.showWarningMessage(message));
+
+            this.languageClient.onRequest(
+                SetStatusBarMessageRequest.type,
+                messageDetails => this.setStatusBarMessage(messageDetails));
         }
     }
 
@@ -282,6 +323,36 @@ export class ExtensionCommandsFeature implements IFeature {
                 asCodePosition(details.selectionRange.start),
                 asCodePosition(details.selectionRange.end))
         ]
+
+        return EditorOperationResponse.Completed;
+    }
+
+    private showInformationMessage(message: string): Thenable<EditorOperationResponse> {
+        return vscode.window
+                     .showInformationMessage(message)
+                     .then(_ => EditorOperationResponse.Completed);
+    }
+
+    private showErrorMessage(message: string): Thenable<EditorOperationResponse> {
+        return vscode.window
+                     .showErrorMessage(message)
+                     .then(_ => EditorOperationResponse.Completed);
+    }
+
+    private showWarningMessage(message: string): Thenable<EditorOperationResponse> {
+        return vscode.window
+                     .showWarningMessage(message)
+                     .then(_ => EditorOperationResponse.Completed);
+    }
+
+    private setStatusBarMessage(messageDetails: StatusBarMessageDetails): EditorOperationResponse {
+
+        if (messageDetails.timeout) {
+            vscode.window.setStatusBarMessage(messageDetails.message, messageDetails.timeout);
+        }
+        else {
+            vscode.window.setStatusBarMessage(messageDetails.message);
+        }
 
         return EditorOperationResponse.Completed;
     }
