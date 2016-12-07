@@ -50,19 +50,34 @@ export function activate(context: vscode.ExtensionContext): void {
                 ['(', ')'],
             ],
 
-            __electricCharacterSupport: {
-                docComment: { scope: 'comment.documentation', open: '/**', lineStart: ' * ', close: ' */' }
-            },
-
-            __characterPairSupport: {
-                autoClosingPairs: [
-                    { open: '{', close: '}' },
-                    { open: '[', close: ']' },
-                    { open: '(', close: ')' },
-                    { open: '"', close: '"', notIn: ['string'] },
-                    { open: '\'', close: '\'', notIn: ['string', 'comment'] }
-                ]
-            }
+			onEnterRules: [
+				{
+					// e.g. /** | */
+					beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+					afterText: /^\s*\*\/$/,
+					action: { indentAction: IndentAction.IndentOutdent, appendText: ' * ' }
+				},
+				{
+					// e.g. /** ...|
+					beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+					action: { indentAction: IndentAction.None, appendText: ' * ' }
+				},
+				{
+					// e.g.  * ...|
+					beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
+					action: { indentAction: IndentAction.None, appendText: '* ' }
+				},
+				{
+					// e.g.  */|
+					beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
+					action: { indentAction: IndentAction.None, removeText: 1 }
+				},
+				{
+					// e.g.  *-----*/|
+					beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
+					action: { indentAction: IndentAction.None, removeText: 1 }
+				}
+			]
         });
 
     // Create the logger
