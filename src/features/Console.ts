@@ -172,6 +172,9 @@ export class ConsoleFeature implements IFeature {
                 this.languageClient.sendRequest(EvaluateRequest.type, {
                     expression: editor.document.getText(selectionRange)
                 });
+
+                // Show the output window if it isn't already visible
+                this.consoleChannel.show(vscode.ViewColumn.Three);
             });
 
         this.consoleChannel = vscode.window.createOutputChannel("PowerShell Output");
@@ -189,14 +192,6 @@ export class ConsoleFeature implements IFeature {
             promptDetails => showInputPrompt(promptDetails, this.languageClient));
 
         this.languageClient.onNotification(OutputNotification.type, (output) => {
-            var outputEditorExist = vscode.window.visibleTextEditors.some((editor) => {
-                return editor.document.languageId == 'Log'
-            });
-
-            if (!outputEditorExist) {
-                this.consoleChannel.show(vscode.ViewColumn.Three);
-            }
-
             this.consoleChannel.append(output.output);
         });
     }
