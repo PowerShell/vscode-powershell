@@ -454,12 +454,15 @@ export class SessionManager {
         else if (os.platform() == "darwin") {
             powerShellExePath = "/usr/local/bin/powershell";
 
-            // Check for OpenSSL dependency on OS X
-            if (!utils.checkIfFileExists("/usr/local/lib/libcrypto.1.0.0.dylib") ||
-                !utils.checkIfFileExists("/usr/local/lib/libssl.1.0.0.dylib")) {
+            // Check for OpenSSL dependency on macOS.  Look for the default Homebrew installation
+            // path and if that fails check the system-wide library path.
+            if (!(utils.checkIfFileExists("/usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib") &&
+                  utils.checkIfFileExists("/usr/local/opt/openssl/lib/libssl.1.0.0.dylib")) &&
+                !(utils.checkIfFileExists("/usr/local/lib/libcrypto.1.0.0.dylib") &&
+                  utils.checkIfFileExists("/usr/local/lib/libssl.1.0.0.dylib"))) {
                     var thenable =
                         vscode.window.showWarningMessage(
-                            "The PowerShell extension will not work without OpenSSL on Mac OS X",
+                            "The PowerShell extension will not work without OpenSSL on macOS and OS X",
                             "Show Documentation");
 
                     thenable.then(
