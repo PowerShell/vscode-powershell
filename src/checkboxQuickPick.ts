@@ -22,7 +22,7 @@ export class CheckboxQuickPick {
         this.confirm = "$(check)";
         this.checkboxOn = "[ x ]";
         this.checkboxOff = "[   ]";
-        this.confirmPlaceHolder = "Select 'Confirm' to confirm";
+        this.confirmPlaceHolder = "Select 'Confirm' to confirm change; Press 'esc' key to cancel changes";
     }
 
     public show(callback: (options: CheckboxQuickPickItem[]) => void): void {
@@ -58,11 +58,11 @@ export class CheckboxQuickPick {
 
     private getQuickPickItems(tempOptions: CheckboxQuickPickItem[]): QuickPickItem[] {
         let quickPickItems: QuickPickItem[] = [];
+        quickPickItems.push({ label: this.confirm, description: "Confirm" });
         tempOptions.forEach(option =>
             quickPickItems.push({
                 label: this.convertToCheckBox(option.isSelected), description: option.name
             }));
-        quickPickItems.push({ label: this.confirm, description: "Confirm" });
         return quickPickItems;
     }
 
