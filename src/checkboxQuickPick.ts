@@ -25,22 +25,26 @@ export class CheckboxQuickPick {
     private static showInner(
         items: CheckboxQuickPickItem[],
         callback: (items: CheckboxQuickPickItem[]) => void): void {
-            vscode.window.showQuickPick(
-                CheckboxQuickPick.getQuickPickItems(items),
-                { ignoreFocusOut: true, placeHolder: CheckboxQuickPick.confirmPlaceHolder }).then((selection) => {
-                    if (!selection) {
-                        return;
-                    }
+        vscode.window.showQuickPick(
+            CheckboxQuickPick.getQuickPickItems(items),
+            {
+                ignoreFocusOut: true,
+                matchOnDescription: true,
+                placeHolder: CheckboxQuickPick.confirmPlaceHolder
+            }).then((selection) => {
+                if (!selection) {
+                    return;
+                }
 
-                    if (selection.label === CheckboxQuickPick.confirm) {
-                        callback(items);
-                        return;
-                    }
+                if (selection.label === CheckboxQuickPick.confirm) {
+                    callback(items);
+                    return;
+                }
 
-                    let index: number = CheckboxQuickPick.getRuleIndex(items, selection.description);
-                    CheckboxQuickPick.toggleSelection(items[index]);
-                    CheckboxQuickPick.showInner(items, callback);
-                });
+                let index: number = CheckboxQuickPick.getRuleIndex(items, selection.description);
+                CheckboxQuickPick.toggleSelection(items[index]);
+                CheckboxQuickPick.showInner(items, callback);
+            });
     }
 
     private static getRuleIndex(items: CheckboxQuickPickItem[], itemLabel: string): number {
