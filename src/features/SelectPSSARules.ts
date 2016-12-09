@@ -41,7 +41,7 @@ export class SelectPSSARulesFeature implements IFeature {
                 let options: CheckboxQuickPickItem[] = returnedRules.map(function (rule: IRuleInfo): CheckboxQuickPickItem {
                     return { name: rule.name, isSelected: rule.isEnabled };
                 });
-                (new CheckboxQuickPick(options)).show((updatedOptions) => {
+                CheckboxQuickPick.show(options, (updatedOptions) => {
                     this.languageClient.sendRequest(
                         SetPSSARulesRequest.type,
                         updatedOptions.map(function (option: CheckboxQuickPickItem): IRuleInfo {
