@@ -5,7 +5,7 @@
 import vscode = require("vscode");
 import { IFeature } from "../feature";
 import { LanguageClient, RequestType } from "vscode-languageclient";
-import { ICheckboxOption, CheckboxQuickPick } from "../checkboxQuickPick";
+import { CheckboxQuickPickItem, CheckboxQuickPick } from "../checkboxQuickPick";
 
 export namespace GetPSSARulesRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getPSSARules"; } };
@@ -33,13 +33,18 @@ export class SelectPSSARulesFeature implements IFeature {
             }
 
             this.languageClient.sendRequest(GetPSSARulesRequest.type, null).then((returnedRules) => {
-                let options: ICheckboxOption[] = returnedRules.map(function (rule: IRuleInfo): ICheckboxOption {
+                if (returnedRules == null) {
+                    vscode.window.showWarningMessage(
+                        "PowerShell extension uses PSScriptAnalyzer settings file - Cannot update rules.");
+                    return;
+                }
+                let options: CheckboxQuickPickItem[] = returnedRules.map(function (rule: IRuleInfo): CheckboxQuickPickItem {
                     return { name: rule.name, isSelected: rule.isEnabled };
                 });
                 (new CheckboxQuickPick(options)).show((updatedOptions) => {
                     this.languageClient.sendRequest(
                         SetPSSARulesRequest.type,
-                        updatedOptions.map(function (option: ICheckboxOption): IRuleInfo {
+                        updatedOptions.map(function (option: CheckboxQuickPickItem): IRuleInfo {
                             return { name: option.name, isEnabled: option.isSelected };
                         }));
                 });
