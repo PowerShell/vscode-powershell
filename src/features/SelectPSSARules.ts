@@ -15,9 +15,14 @@ export namespace SetPSSARulesRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/setPSSARules"; } };
 }
 
-interface IRuleInfo {
+class RuleInfo {
     name: string;
     isEnabled: boolean;
+}
+
+class SetPSSARulesRequestParams {
+    filepath: string;
+    ruleInfos: RuleInfo[];
 }
 
 export class SelectPSSARulesFeature implements IFeature {
@@ -28,7 +33,6 @@ export class SelectPSSARulesFeature implements IFeature {
     constructor() {
         this.command = vscode.commands.registerCommand("PowerShell.SelectPSSARules", () => {
             if (this.languageClient === undefined) {
-                // TODO: Log error message
                 return;
             }
 
@@ -38,15 +42,17 @@ export class SelectPSSARulesFeature implements IFeature {
                         "PowerShell extension uses PSScriptAnalyzer settings file - Cannot update rules.");
                     return;
                 }
-                let options: CheckboxQuickPickItem[] = returnedRules.map(function (rule: IRuleInfo): CheckboxQuickPickItem {
+                let options: CheckboxQuickPickItem[] = returnedRules.map(function (rule: RuleInfo): CheckboxQuickPickItem {
                     return { name: rule.name, isSelected: rule.isEnabled };
                 });
                 CheckboxQuickPick.show(options, (updatedOptions) => {
-                    this.languageClient.sendRequest(
-                        SetPSSARulesRequest.type,
-                        updatedOptions.map(function (option: CheckboxQuickPickItem): IRuleInfo {
+                    let filepath: string = vscode.window.activeTextEditor.document.uri.fsPath;
+                    let ruleInfos: RuleInfo[] = updatedOptions.map(
+                        function (option: CheckboxQuickPickItem): RuleInfo {
                             return { name: option.name, isEnabled: option.isSelected };
-                        }));
+                        });
+                    let requestParams: SetPSSARulesRequestParams = {filepath, ruleInfos};
+                    this.languageClient.sendRequest(SetPSSARulesRequest.type, requestParams);
                 });
             });
         });
