@@ -23,56 +23,42 @@ export class CheckboxQuickPick {
     }
 
     private static showInner(
-        tempOptions: CheckboxQuickPickItem[],
-        callback: (options: CheckboxQuickPickItem[]) => void): void {
+        items: CheckboxQuickPickItem[],
+        callback: (items: CheckboxQuickPickItem[]) => void): void {
             vscode.window.showQuickPick(
-                CheckboxQuickPick.getQuickPickItems(tempOptions),
+                CheckboxQuickPick.getQuickPickItems(items),
                 { ignoreFocusOut: true, placeHolder: CheckboxQuickPick.confirmPlaceHolder }).then((selection) => {
                     if (!selection) {
                         return;
                     }
 
                     if (selection.label === CheckboxQuickPick.confirm) {
-                        callback(tempOptions);
+                        callback(items);
                         return;
                     }
 
-                    let index: number = CheckboxQuickPick.getRuleIndex(tempOptions, selection.description);
-                    CheckboxQuickPick.toggleOption(tempOptions[index]);
-                    CheckboxQuickPick.showInner(tempOptions, callback);
+                    let index: number = CheckboxQuickPick.getRuleIndex(items, selection.description);
+                    CheckboxQuickPick.toggleSelection(items[index]);
+                    CheckboxQuickPick.showInner(items, callback);
                 });
     }
 
-    private static getRuleIndex(options: CheckboxQuickPickItem[], optionLabel: string): number {
-        return options.findIndex(opt => opt.name == optionLabel);
+    private static getRuleIndex(items: CheckboxQuickPickItem[], itemLabel: string): number {
+        return items.findIndex(item => item.name === itemLabel);
     }
 
-    private static getQuickPickItems(tempOptions: CheckboxQuickPickItem[]): QuickPickItem[] {
+    private static getQuickPickItems(items: CheckboxQuickPickItem[]): QuickPickItem[] {
         let quickPickItems: QuickPickItem[] = [];
         quickPickItems.push({ label: CheckboxQuickPick.confirm, description: "Confirm" });
-        tempOptions.forEach(option =>
+        items.forEach(item =>
             quickPickItems.push({
-                label: CheckboxQuickPick.convertToCheckBox(option.isSelected), description: option.name
+                label: CheckboxQuickPick.convertToCheckBox(item.isSelected), description: item.name
             }));
         return quickPickItems;
     }
 
-    private static convertToState(checkBox: string): boolean {
-        return checkBox === CheckboxQuickPick.checkboxOn;
-    }
-
-    private static toggleState(state: boolean): boolean {
-        return !state;
-    }
-
-    private static toggleOption(option: CheckboxQuickPickItem): void {
-        option.isSelected = CheckboxQuickPick.toggleState(option.isSelected);
-    }
-
-    private static toggleCheckBox(checkBox: string): string {
-        return CheckboxQuickPick.convertToCheckBox(
-            CheckboxQuickPick.toggleState(
-                CheckboxQuickPick.convertToState(checkBox)));
+    private static toggleSelection(item: CheckboxQuickPickItem): void {
+        item.isSelected = !item.isSelected;
     }
 
     private static convertToCheckBox(state: boolean): string {
