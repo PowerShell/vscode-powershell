@@ -3,6 +3,18 @@
 This document contains troubleshooting steps for commonly reported issues when using the
 PowerShell extension for Visual Studio Code.
 
+## Windows
+
+### 1. IntelliSense is extremely slow on PowerShell 5.0
+
+There is a known issue with PowerShell 5.0 which, for a small number of users, causes IntelliSense
+(code completions) to return after 5-15 seconds.  The following steps *might* resolve the issue for you:
+
+1. In a PowerShell console, run the following command: `Remove-Item -Force -Recurse $env:LOCALAPPDATA\Microsoft\Windows\PowerShell\CommandAnalysis`
+2. Restart Visual Studio Code and try getting IntelliSense again.
+
+This issue has been resolved in PowerShell 5.1.
+
 ## macOS (OS X)
 
 ### 1. PowerShell IntelliSense does not work, can't debug scripts
