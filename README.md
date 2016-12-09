@@ -10,7 +10,7 @@ that Visual Studio Code provides.
 
 - **Windows 7 through 10** with PowerShell v3 and higher
 - **Linux** with PowerShell v6 (all PowerShell-supported distribtions)
-- **Mac OS X** with PowerShell v6
+- **macOS and OS X** with PowerShell v6
 
 Read the [installation instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/learning-powershell/using-vscode.md)
 to get more details on how to use the extension on these platforms.
@@ -67,7 +67,7 @@ Restart Visual Studio Code and try to reproduce the problem.  Once you are done 
 that, zip up the logs in the corresponding folder for your operating system:
 
 - **Windows**: `$HOME\.vscode\extensions\ms-vscode.PowerShell-<CURRENT VERSION>\logs`
-- **Linux and Mac OS X**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
+- **Linux and macOS**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
 
 You have two options for sending us the logs:
 

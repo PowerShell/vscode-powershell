@@ -3,11 +3,11 @@
 This document contains troubleshooting steps for commonly reported issues when using the
 PowerShell extension for Visual Studio Code.
 
-## Mac OS X
+## macOS (OS X)
 
 ### 1. PowerShell IntelliSense does not work, can't debug scripts
 
-The most common problem when the PowerShell extension doesn't work on Mac OS X is that
+The most common problem when the PowerShell extension doesn't work on macOS is that
 OpenSSL is not installed.  You can check for the installation of OpenSSL by looking for
 the following files:
 
@@ -30,7 +30,7 @@ do not have OpenSSL installed.
 
 #### Installing OpenSSL via Homebrew
 
-We **highly recommend** that you use [Homebrew](http://brew.sh) to install OpenSSL.  The PowerShell distribution for OS X
+We **highly recommend** that you use [Homebrew](http://brew.sh) to install OpenSSL.  The PowerShell distribution for macOS
 has built-in support for Homebrew's OpenSSL library paths.  If you install with Homebrew, you will avoid
 [security concerns](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#openssl)
 around creating symbolic links in your `/usr/local/lib` path which are needed when using other means of installation.
