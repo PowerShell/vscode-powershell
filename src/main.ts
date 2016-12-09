@@ -15,6 +15,7 @@ import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
 import { FindModuleFeature } from './features/PowerShellFindModule';
 import { ExtensionCommandsFeature } from './features/ExtensionCommands';
+import { SelectPSSARulesFeature } from './features/SelectPSSARules';
 import { CodeActionsFeature } from './features/CodeActions';
 
 // NOTE: We will need to find a better way to deal with the required
@@ -91,6 +92,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new ShowHelpFeature(),
         new FindModuleFeature(),
         new ExtensionCommandsFeature(),
+        new SelectPSSARulesFeature(),
         new CodeActionsFeature()
     ];
 
