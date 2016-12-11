@@ -121,32 +121,32 @@
                 "program": "./out/debugAdapter.js",
                 "runtime": "node",
 
-				"configurationSnippets": [
-					{
-						"label": "PowerShell: Launch Current File Configuration",
-						"description": "A new configuration for launching the current opened PowerShell script",
-						"body": {
-							"type": "PowerShell",
-							"request": "launch",
-							"name": "PowerShell Launch (current file)",
-							"script": "^\"\\${file}\"",
+                "configurationSnippets": [
+                    {
+                        "label": "PowerShell: Launch Current File Configuration",
+                        "description": "A new configuration for launching the current opened PowerShell script",
+                        "body": {
+                            "type": "PowerShell",
+                            "request": "launch",
+                            "name": "PowerShell Launch (current file)",
+                            "script": "^\"\\${file}\"",
                             "args": [],
                             "cwd": "^\"\\${file}\""
-						}
-					},
-					{
-						"label": "PowerShell: Launch Configuration",
-						"description": "A new configuration for launching a PowerShell script",
-						"body": {
-							"type": "PowerShell",
-							"request": "launch",
-							"name": "PowerShell Launch (${Script})",
-							"script": "^\"\\${workspaceRoot}/${Script}\"",
+                        }
+                    },
+                    {
+                        "label": "PowerShell: Launch Configuration",
+                        "description": "A new configuration for launching a PowerShell script",
+                        "body": {
+                            "type": "PowerShell",
+                            "request": "launch",
+                            "name": "PowerShell Launch (${Script})",
+                            "script": "^\"\\${workspaceRoot}/${Script}\"",
                             "args": [],
                             "cwd": "^\"\\${workspaceRoot}\""
-						}
-					}
-				],
+                        }
+                    }
+                ],
 
                 "configurationAttributes": {
                     "launch": {
