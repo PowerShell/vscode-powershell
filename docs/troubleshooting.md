@@ -47,7 +47,13 @@ has built-in support for Homebrew's OpenSSL library paths.  If you install with 
 [security concerns](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#openssl)
 around creating symbolic links in your `/usr/local/lib` path which are needed when using other means of installation.
 
-First, install Homebrew and then run the following command:
+If you don't already have Homebrew installed, you can do so by downloading and installing Homebrew via this ruby script:
+
+````
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+````
+
+Once Homebrew is installed, run the following command:
 
 ```
 brew install openssl
