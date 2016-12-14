@@ -128,6 +128,11 @@
                 "command": "PowerShell.SelectPSSARules",
                 "title": "Select PSScriptAnalyzer Rules",
                 "category": "PowerShell"
+            },
+            {
+                "command": "PowerShell.ShowSessionOutput",
+                "title": "Show Session Output",
+                "category": "PowerShell"
             }
         ],
         "snippets": [

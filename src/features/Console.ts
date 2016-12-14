@@ -144,12 +144,12 @@ function onInputEntered(responseText: string): ShowInputPromptResponseBody {
 }
 
 export class ConsoleFeature implements IFeature {
-    private command: vscode.Disposable;
+    private commands: vscode.Disposable[];
     private languageClient: LanguageClient;
     private consoleChannel: vscode.OutputChannel;
 
     constructor() {
-        this.command =
+        this.commands = [
             vscode.commands.registerCommand('PowerShell.RunSelection', () => {
                 if (this.languageClient === undefined) {
                     // TODO: Log error message
@@ -175,7 +175,13 @@ export class ConsoleFeature implements IFeature {
 
                 // Show the output window if it isn't already visible
                 this.consoleChannel.show(vscode.ViewColumn.Three);
-            });
+            }),
+
+            vscode.commands.registerCommand('PowerShell.ShowSessionOutput', () => {
+                // Show the output window if it isn't already visible
+                this.consoleChannel.show(vscode.ViewColumn.Three);
+            })
+        ];
 
         this.consoleChannel = vscode.window.createOutputChannel("PowerShell Output");
     }
@@ -197,7 +203,7 @@ export class ConsoleFeature implements IFeature {
     }
 
     public dispose() {
-        this.command.dispose();
+        this.commands.forEach(command => command.dispose());
         this.consoleChannel.dispose();
     }
 }
