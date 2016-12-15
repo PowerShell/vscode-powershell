@@ -32,7 +32,7 @@ let sessionDetails = utils.readSessionFile();
 
 // Establish connection before setting up the session
 debugAdapterLogWriter.write("Connecting to port: " + sessionDetails.debugServicePort + "\r\n");
-let debugServiceSocket = net.connect(sessionDetails.debugServicePort);
+let debugServiceSocket = net.connect(sessionDetails.debugServicePort, '127.0.0.1');
 
 // Write any errors to the log file
 debugServiceSocket.on(
