@@ -383,6 +383,15 @@ export class SessionManager {
 
             this.statusBarItem.command = this.ShowSessionMenuCommandName;
             this.statusBarItem.show();
+            vscode.window.onDidChangeActiveTextEditor(textEditor => {
+                if (textEditor === undefined
+                    || textEditor.document.languageId !== "powershell") {
+                    this.statusBarItem.hide();
+                }
+                else {
+                    this.statusBarItem.show();
+                }
+            })
         }
     }
 
