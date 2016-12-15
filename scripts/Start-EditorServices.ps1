@@ -133,7 +133,7 @@ function Get-AvailablePort {
 
 # Add BundledModulesPath to $env:PSModulePath
 if ($BundledModulesPath) {
-    $env:PSMODULEPATH = $BundledModulesPath + [System.IO.Path]::PathSeparator + $env:PSMODULEPATH
+    $env:PSMODULEPATH = $env:PSMODULEPATH + [System.IO.Path]::PathSeparator + $BundledModulesPath
 }
 
 # Check if PowerShellGet module is available
