@@ -3,74 +3,97 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import QuickPickItem = vscode.QuickPickItem;
 
-export class CheckboxQuickPickItem {
-    name: string;
+var confirmItemLabel: string = "$(checklist) Confirm";
+var checkedPrefix: string = "[ $(check) ]";
+var uncheckedPrefix: string = "[     ]";
+var defaultPlaceHolder: string = "Select 'Confirm' to confirm or press 'Esc' key to cancel";
+
+export interface CheckboxQuickPickItem {
+    label: string;
+    description?: string;
     isSelected: boolean;
 }
 
-export class CheckboxQuickPick {
-    private static readonly confirm: string = "$(check)";
-    private static readonly checkboxOn: string = "[ x ]";
-    private static readonly checkboxOff: string = "[   ]";
-    private static readonly confirmPlaceHolder: string = "Select 'Confirm' to confirm change; Press 'esc' key to cancel changes";
+export interface CheckboxQuickPickOptions {
+    confirmPlaceHolder: string;
+}
 
-    public static show(
-        checkboxQuickPickItems: CheckboxQuickPickItem[],
-        callback: (items: CheckboxQuickPickItem[]) => void): void {
-        CheckboxQuickPick.showInner(checkboxQuickPickItems.slice(), callback);
-    }
+var defaultOptions:CheckboxQuickPickOptions = { confirmPlaceHolder: defaultPlaceHolder};
 
-    private static showInner(
-        items: CheckboxQuickPickItem[],
-        callback: (items: CheckboxQuickPickItem[]) => void): void {
+export function showCheckboxQuickPick(
+    items: CheckboxQuickPickItem[],
+    options: CheckboxQuickPickOptions = defaultOptions): Thenable<CheckboxQuickPickItem[]> {
+
+    return showInner(items, options).then(
+        (selectedItem) => {
+            // We're mutating the original item list so just return it for now.
+            // If 'selectedItem' is undefined it means the user cancelled the
+            // inner showQuickPick UI so pass the undefined along.
+            return selectedItem != undefined ? items : undefined;
+        })
+}
+
+function getQuickPickItems(items: CheckboxQuickPickItem[]): vscode.QuickPickItem[] {
+
+    let quickPickItems: vscode.QuickPickItem[] = [];
+    quickPickItems.push({ label: confirmItemLabel, description: "" });
+
+    items.forEach(item =>
+        quickPickItems.push({
+                label: convertToCheckBox(item),
+                description: item.description
+        }));
+
+    return quickPickItems;
+}
+
+function showInner(
+    items: CheckboxQuickPickItem[],
+    options: CheckboxQuickPickOptions): Thenable<vscode.QuickPickItem> {
+
+    var quickPickThenable: Thenable<vscode.QuickPickItem> =
         vscode.window.showQuickPick(
-            CheckboxQuickPick.getQuickPickItems(items),
+            getQuickPickItems(items),
             {
                 ignoreFocusOut: true,
                 matchOnDescription: true,
-                placeHolder: CheckboxQuickPick.confirmPlaceHolder
-            }).then((selection) => {
-                if (!selection) {
-                    return;
-                }
-
-                if (selection.label === CheckboxQuickPick.confirm) {
-                    callback(items);
-                    return;
-                }
-
-                let index: number = CheckboxQuickPick.getRuleIndex(items, selection.description);
-                CheckboxQuickPick.toggleSelection(items[index]);
-                CheckboxQuickPick.showInner(items, callback);
+                placeHolder: options.confirmPlaceHolder
             });
-    }
 
-    private static getRuleIndex(items: CheckboxQuickPickItem[], itemLabel: string): number {
-        return items.findIndex(item => item.name === itemLabel);
-    }
+    return quickPickThenable.then(
+        (selection) => {
+            if (!selection) {
+                //return Promise.reject<vscode.QuickPickItem>("showCheckBoxQuickPick cancelled")
+                return Promise.resolve<vscode.QuickPickItem>(undefined);
+            }
 
-    private static getQuickPickItems(items: CheckboxQuickPickItem[]): QuickPickItem[] {
-        let quickPickItems: QuickPickItem[] = [];
-        quickPickItems.push({ label: CheckboxQuickPick.confirm, description: "Confirm" });
-        items.forEach(item =>
-            quickPickItems.push({
-                label: CheckboxQuickPick.convertToCheckBox(item.isSelected), description: item.name
-            }));
-        return quickPickItems;
-    }
+            if (selection.label === confirmItemLabel) {
+                return selection;
+            }
 
-    private static toggleSelection(item: CheckboxQuickPickItem): void {
-        item.isSelected = !item.isSelected;
-    }
+            let index: number = getItemIndex(items, selection.label);
 
-    private static convertToCheckBox(state: boolean): string {
-        if (state) {
-            return CheckboxQuickPick.checkboxOn;
-        }
-        else {
-            return CheckboxQuickPick.checkboxOff;
-        }
-    }
+            if (index >= 0) {
+                toggleSelection(items[index]);
+            }
+            else {
+                console.log(`Couldn't find CheckboxQuickPickItem for label '${selection.label}'`);
+            }
+
+            return showInner(items, options);
+        });
+}
+
+function getItemIndex(items: CheckboxQuickPickItem[], itemLabel: string): number {
+    var trimmedLabel = itemLabel.substr(itemLabel.indexOf("]") + 2);
+    return items.findIndex(item => item.label === trimmedLabel);
+}
+
+function toggleSelection(item: CheckboxQuickPickItem): void {
+    item.isSelected = !item.isSelected;
+}
+
+function convertToCheckBox(item: CheckboxQuickPickItem): string {
+    return `${item.isSelected ? checkedPrefix : uncheckedPrefix} ${item.label}`;
 }

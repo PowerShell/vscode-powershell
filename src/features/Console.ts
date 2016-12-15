@@ -4,6 +4,7 @@
 
 import vscode = require('vscode');
 import { IFeature } from '../feature';
+import { showCheckboxQuickPick, CheckboxQuickPickItem } from '../checkboxQuickPick'
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace EvaluateRequest {
@@ -46,14 +47,15 @@ interface ShowInputPromptRequestArgs {
 }
 
 interface ShowChoicePromptRequestArgs {
+    isMultiChoice: boolean;
     caption: string;
     message: string;
     choices: ChoiceDetails[];
-    defaultChoice: number;
+    defaultChoices: number[];
 }
 
 interface ShowChoicePromptResponseBody {
-    chosenItem: string;
+    responseText: string;
     promptCancelled: boolean;
 }
 
@@ -66,36 +68,62 @@ function showChoicePrompt(
     promptDetails: ShowChoicePromptRequestArgs,
     client: LanguageClient) : Thenable<ShowChoicePromptResponseBody> {
 
-    var quickPickItems =
-        promptDetails.choices.map<vscode.QuickPickItem>(choice => {
-            return {
-                label: choice.label,
-                description: choice.helpMessage
+    var resultThenable: Thenable<ShowChoicePromptResponseBody> = undefined;
+
+    if (!promptDetails.isMultiChoice) {
+        var quickPickItems =
+            promptDetails.choices.map<vscode.QuickPickItem>(choice => {
+                return {
+                    label: choice.label,
+                    description: choice.helpMessage
+                }
+            });
+
+        if (promptDetails.defaultChoices &&
+            promptDetails.defaultChoices.length > 0) {
+
+            // Shift the default items to the front of the
+            // array so that the user can select it easily
+            var defaultChoice = promptDetails.defaultChoices[0];
+            if (defaultChoice > -1 &&
+                defaultChoice < promptDetails.choices.length) {
+
+                var defaultChoiceItem = quickPickItems[defaultChoice];
+                quickPickItems.splice(defaultChoice, 1);
+
+                // Add the default choice to the head of the array
+                quickPickItems = [defaultChoiceItem].concat(quickPickItems);
             }
+        }
+
+        resultThenable =
+            vscode.window
+                .showQuickPick(
+                    quickPickItems,
+                    { placeHolder: promptDetails.caption + " - " + promptDetails.message })
+                .then(onItemSelected);
+    }
+    else {
+        var checkboxQuickPickItems =
+            promptDetails.choices.map<CheckboxQuickPickItem>(choice => {
+                return {
+                    label: choice.label,
+                    description: choice.helpMessage,
+                    isSelected: false
+                }
+            });
+
+        // Select the defaults
+        promptDetails.defaultChoices.forEach(choiceIndex => {
+            checkboxQuickPickItems[choiceIndex].isSelected = true
         });
 
-    // Shift the default item to the front of the
-    // array so that the user can select it easily
-    if (promptDetails.defaultChoice > -1 &&
-        promptDetails.defaultChoice < promptDetails.choices.length) {
-
-        var defaultChoiceItem = quickPickItems[promptDetails.defaultChoice];
-        quickPickItems.splice(promptDetails.defaultChoice, 1);
-
-        // Add the default choice to the head of the array
-        quickPickItems = [defaultChoiceItem].concat(quickPickItems);
+        resultThenable =
+            showCheckboxQuickPick(
+                    checkboxQuickPickItems,
+                    { confirmPlaceHolder: `${promptDetails.caption} - ${promptDetails.message}`})
+                .then(onItemsSelected);
     }
-
-    // For some bizarre reason, the quick pick dialog does not
-    // work if I return the Thenable immediately at this point.
-    // It only works if I save the thenable to a variable and
-    // return the variable instead...
-    var resultThenable =
-        vscode.window
-            .showQuickPick(
-                quickPickItems,
-                { placeHolder: promptDetails.caption + " - " + promptDetails.message })
-            .then(onItemSelected);
 
     return resultThenable;
 }
@@ -112,18 +140,34 @@ function showInputPrompt(
     return resultThenable;
 }
 
-function onItemSelected(chosenItem: vscode.QuickPickItem): ShowChoicePromptResponseBody {
-    if (chosenItem !== undefined) {
+function onItemsSelected(chosenItems: CheckboxQuickPickItem[]): ShowChoicePromptResponseBody {
+    if (chosenItems !== undefined) {
         return {
             promptCancelled: false,
-            chosenItem: chosenItem.label
+            responseText: chosenItems.filter(item => item.isSelected).map(item => item.label).join(", ")
         };
     }
     else {
         // User cancelled the prompt, send the cancellation
         return {
             promptCancelled: true,
-            chosenItem: undefined
+            responseText: undefined
+        };
+    }
+}
+
+function onItemSelected(chosenItem: vscode.QuickPickItem): ShowChoicePromptResponseBody {
+    if (chosenItem !== undefined) {
+        return {
+            promptCancelled: false,
+            responseText: chosenItem.label
+        };
+    }
+    else {
+        // User cancelled the prompt, send the cancellation
+        return {
+            promptCancelled: true,
+            responseText: undefined
         };
     }
 }
@@ -144,12 +188,12 @@ function onInputEntered(responseText: string): ShowInputPromptResponseBody {
 }
 
 export class ConsoleFeature implements IFeature {
-    private command: vscode.Disposable;
+    private commands: vscode.Disposable[];
     private languageClient: LanguageClient;
     private consoleChannel: vscode.OutputChannel;
 
     constructor() {
-        this.command =
+        this.commands = [
             vscode.commands.registerCommand('PowerShell.RunSelection', () => {
                 if (this.languageClient === undefined) {
                     // TODO: Log error message
@@ -175,7 +219,13 @@ export class ConsoleFeature implements IFeature {
 
                 // Show the output window if it isn't already visible
                 this.consoleChannel.show(vscode.ViewColumn.Three);
-            });
+            }),
+
+            vscode.commands.registerCommand('PowerShell.ShowSessionOutput', () => {
+                // Show the output window if it isn't already visible
+                this.consoleChannel.show(vscode.ViewColumn.Three);
+            })
+        ];
 
         this.consoleChannel = vscode.window.createOutputChannel("PowerShell Output");
     }
@@ -197,7 +247,7 @@ export class ConsoleFeature implements IFeature {
     }
 
     public dispose() {
-        this.command.dispose();
+        this.commands.forEach(command => command.dispose());
         this.consoleChannel.dispose();
     }
 }

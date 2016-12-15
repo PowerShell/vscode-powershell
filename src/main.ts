@@ -11,6 +11,7 @@ import { SessionManager } from './session';
 import { PowerShellLanguageId } from './utils';
 import { ConsoleFeature } from './features/Console';
 import { OpenInISEFeature } from './features/OpenInISE';
+import { NewFileOrProjectFeature } from './features/NewFileOrProject';
 import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
 import { FindModuleFeature } from './features/PowerShellFindModule';
@@ -93,7 +94,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new FindModuleFeature(),
         new ExtensionCommandsFeature(),
         new SelectPSSARulesFeature(),
-        new CodeActionsFeature()
+        new CodeActionsFeature(),
+        new NewFileOrProjectFeature()
     ];
 
     sessionManager =
@@ -106,9 +108,6 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate(): void {
-    // Finish the logger
-    logger.dispose();
-
     // Clean up all extension features
     extensionFeatures.forEach(feature => {
        feature.dispose();
@@ -116,4 +115,7 @@ export function deactivate(): void {
 
     // Dispose of the current session
     sessionManager.dispose();
+
+    // Dispose of the logger
+    logger.dispose();
 }
