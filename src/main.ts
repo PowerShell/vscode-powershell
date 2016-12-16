@@ -21,7 +21,7 @@ import { CodeActionsFeature } from './features/CodeActions';
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-var requiredEditorServicesVersion = "0.7.2";
+var requiredEditorServicesVersion = "0.8.0";
 
 var logger: Logger = undefined;
 var sessionManager: SessionManager = undefined;
