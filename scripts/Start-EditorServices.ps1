@@ -54,13 +54,27 @@ param(
     $ConfirmInstall
 )
 
+# Are we running in PowerShell 2 or earlier?
+if ($PSVersionTable.PSVersion.Major -le 2) {
+    $resultDetails = @{
+        "status" = "failed"
+        "reason" = "unsupported"
+        "powerShellVersion" = $PSVersionTable.PSVersion.ToString()
+    };
+
+    # Notify the client that the services have started
+    Write-Output (ConvertTo-Json -InputObject $resultDetails -Compress)
+
+    exit 0;
+}
+
 # Are we running in PowerShell 5 or later?
 $isPS5orLater = $PSVersionTable.PSVersion.Major -ge 5
 
 # If PSReadline is present in the session, remove it so that runspace
 # management is easier
-if ((Get-Module PSReadline).Count -ne 0) {
-    Remove-Module PSReadline
+if ((Get-Module PSReadline).Count -gt 0) {
+    Remove-Module PSReadline -ErrorAction SilentlyContinue
 }
 
 # This variable will be assigned later to contain information about
