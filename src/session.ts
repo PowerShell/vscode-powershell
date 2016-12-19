@@ -246,6 +246,15 @@ export class SessionManager {
                         // Start the language service client
                         this.startLanguageClient(sessionDetails.languageServicePort);
                     }
+                    else if (response["status"] === "failed") {
+                        if (response["reason"] === "unsupported") {
+                            this.setSessionFailure(
+                                `PowerShell language features are only supported on PowerShell version 3 and above.  The current version is ${response["powerShellVersion"]}.`)
+                        }
+                        else {
+                            this.setSessionFailure(`PowerShell could not be started for an unknown reason '${response["reason"]}'`)
+                        }
+                    }
                     else {
                         // TODO: Handle other response cases
                     }
@@ -354,7 +363,6 @@ export class SessionManager {
                 },
                 (reason) => {
                     this.setSessionFailure("Could not start language service: ", reason);
-                    this.updateExtensionFeatures(undefined);
                 });
 
             this.languageServerClient.start();
@@ -362,7 +370,6 @@ export class SessionManager {
         catch (e)
         {
             this.setSessionFailure("The language service could not be started: ", e);
-            this.updateExtensionFeatures(undefined);
         }
     }
 
@@ -511,15 +518,34 @@ export class SessionManager {
     }
 
     private showSessionMenu() {
-        var menuItems: SessionMenuItem[] = [
-            new SessionMenuItem(
-                `Current session: PowerShell ${this.versionDetails.displayVersion} (${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition [${this.versionDetails.version}]`,
-                () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
+        var menuItems: SessionMenuItem[] = [];
 
-            new SessionMenuItem(
-                "Restart Current Session",
-                () => { this.restartSession(); }),
-        ];
+        if (this.sessionStatus === SessionStatus.Initializing ||
+            this.sessionStatus === SessionStatus.NotStarted ||
+            this.sessionStatus === SessionStatus.Stopping) {
+
+            // Don't show a menu for these states
+            return;
+        }
+
+        if (this.sessionStatus === SessionStatus.Running) {
+            menuItems = [
+                new SessionMenuItem(
+                    `Current session: PowerShell ${this.versionDetails.displayVersion} (${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition [${this.versionDetails.version}]`,
+                    () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
+
+                new SessionMenuItem(
+                    "Restart Current Session",
+                    () => { this.restartSession(); }),
+            ];
+        }
+        else if (this.sessionStatus === SessionStatus.Failed) {
+            menuItems = [
+                new SessionMenuItem(
+                    `Session initialization failed, click here to show PowerShell extension logs`,
+                    () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
+            ];
+        }
 
         if (this.isWindowsOS) {
             var item32 =
