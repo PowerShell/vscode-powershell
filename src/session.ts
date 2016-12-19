@@ -333,6 +333,11 @@ export class SessionManager {
                     connectFunc,
                     clientOptions);
 
+            // Send the new LanguageClient to extension features
+            // so that they can register their message handlers
+            // before the connection is established.
+            this.updateExtensionFeatures(this.languageServerClient);
+
             this.languageServerClient.onReady().then(
                 () => {
                     this.languageServerClient
@@ -345,12 +350,11 @@ export class SessionManager {
                                         ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
                                         : this.versionDetails.displayVersion,
                                     SessionStatus.Running);
-
-                                this.updateExtensionFeatures(this.languageServerClient)
                             });
                 },
                 (reason) => {
                     this.setSessionFailure("Could not start language service: ", reason);
+                    this.updateExtensionFeatures(undefined);
                 });
 
             this.languageServerClient.start();
@@ -358,6 +362,7 @@ export class SessionManager {
         catch (e)
         {
             this.setSessionFailure("The language service could not be started: ", e);
+            this.updateExtensionFeatures(undefined);
         }
     }
 
