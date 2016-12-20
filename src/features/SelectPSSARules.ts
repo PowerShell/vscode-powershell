@@ -47,7 +47,10 @@ export class SelectPSSARulesFeature implements IFeature {
                 });
 
                 showCheckboxQuickPick(options)
-                    .then(updatedOptions => {
+                    .then((updatedOptions: CheckboxQuickPickItem[]) => {
+                        if (updatedOptions === undefined) {
+                            return;
+                        }
                         let filepath: string = vscode.window.activeTextEditor.document.uri.fsPath;
                         let ruleInfos: RuleInfo[] = updatedOptions.map(
                             function (option: CheckboxQuickPickItem): RuleInfo {
