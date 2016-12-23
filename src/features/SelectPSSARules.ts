@@ -20,11 +20,6 @@ class RuleInfo {
     isEnabled: boolean;
 }
 
-class SetPSSARulesRequestParams {
-    filepath: string;
-    ruleInfos: RuleInfo[];
-}
-
 export class SelectPSSARulesFeature implements IFeature {
 
     private command: vscode.Disposable;
@@ -47,15 +42,20 @@ export class SelectPSSARulesFeature implements IFeature {
                 });
 
                 showCheckboxQuickPick(options)
-                    .then(updatedOptions => {
-                        let filepath: string = vscode.window.activeTextEditor.document.uri.fsPath;
-                        let ruleInfos: RuleInfo[] = updatedOptions.map(
-                            function (option: CheckboxQuickPickItem): RuleInfo {
-                                return { name: option.label, isEnabled: option.isSelected };
+                    .then((updatedOptions: CheckboxQuickPickItem[]) => {
+                        if (updatedOptions === undefined) {
+                            return;
+                        }
+                        this.languageClient.sendRequest(
+                            SetPSSARulesRequest.type,
+                            {
+                                filepath: vscode.window.activeTextEditor.document.uri.fsPath,
+                                ruleInfos: updatedOptions.map(
+                                    function (option: CheckboxQuickPickItem): RuleInfo {
+                                        return { name: option.label, isEnabled: option.isSelected };
+                                    })
                             });
-                        let requestParams: SetPSSARulesRequestParams = {filepath, ruleInfos};
-                        this.languageClient.sendRequest(SetPSSARulesRequest.type, requestParams);
-                });
+                    });
             });
         });
     }
