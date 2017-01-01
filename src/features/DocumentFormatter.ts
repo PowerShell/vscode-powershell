@@ -51,7 +51,8 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
     private languageClient: LanguageClient;
     private readonly ruleOrder: string[] = [
         "PSPlaceCloseBrace",
-        "PSPlaceOpenBrace"];
+        "PSPlaceOpenBrace",
+        "PSUseConsistentIndentation"];
 
     provideDocumentFormattingEdits(
         document: TextDocument,
@@ -62,10 +63,10 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         // the edits in edit j s.t i < j (seems like a hard problem)
         // or
         // peform edits ourself and return an empty textedit array
-        return this.applyEditsInOrder(document, options, 0);
+        return this.executeRulesInOrder(document, options, 0);
     }
 
-    applyEditsInOrder(
+    executeRulesInOrder(
         document: TextDocument,
         options: FormattingOptions,
         index: number): Thenable<TextEdit[]> | TextEdit[] {
@@ -80,26 +81,40 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
 
                     // TODO modify undo stops to make sure all the edits
                     // can be undone and redone in a single step
-                    this.applyEdits(result.markers, 0);
-                    this.applyEditsInOrder(document, options, ++index);
+
+                    // sort in decending order of the edits
+                    result.markers.sort(function(a: ScriptFileMarker, b: ScriptFileMarker): number {
+                        let leftOperand: number = a.correction.edits[0].startLineNumber,
+                            rightOperand: number = b.correction.edits[0].startLineNumber;
+                        if (leftOperand < rightOperand) {
+                            return 1;
+                        } else if (leftOperand > rightOperand) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    });
+                    return this.applyEdits(result.markers, 0);
 
                     // we do not return a valid array because our text edits
                     // need to be executed in a particular order and it is
                     // easier if we perform the edits ourselves
-                    return TextEdit[0];
+                })
+                .then(() => {
+                    return this.executeRulesInOrder(document, options, index + 1);
                 });
         } else {
             return TextEdit[0];
         }
     }
 
-    applyEdits(markers: ScriptFileMarker[], index: number): void {
+    applyEdits(markers: ScriptFileMarker[], index: number): Thenable<void> {
         if (index >= markers.length) {
             return;
         }
 
-        let edit: ScriptRegion = markers[index++].correction.edits[0];
-        Window.activeTextEditor.edit((editBuilder) => {
+        let edit: ScriptRegion = markers[index].correction.edits[0];
+        return Window.activeTextEditor.edit((editBuilder) => {
             editBuilder.replace(
                 new vscode.Range(
                     edit.startLineNumber - 1,
@@ -108,9 +123,8 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     edit.endColumnNumber - 1),
                 edit.text);
         }).then((isEditApplied) => {
-            this.applyEdits(markers, index);
+            return this.applyEdits(markers, index + 1);
         }); // TODO handle rejection
-
     }
 
     setLanguageClient(languageClient: LanguageClient): void {
