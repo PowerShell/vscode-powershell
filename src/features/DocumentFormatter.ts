@@ -86,7 +86,7 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     // can be undone and redone in a single step
 
                     // sort in decending order of the edits
-                    result.markers.sort(function(a: ScriptFileMarker, b: ScriptFileMarker): number {
+                    result.markers.sort(function (a: ScriptFileMarker, b: ScriptFileMarker): number {
                         let leftOperand: number = a.correction.edits[0].startLineNumber,
                             rightOperand: number = b.correction.edits[0].startLineNumber;
                         if (leftOperand < rightOperand) {
@@ -136,12 +136,29 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
 
     getSettings(rule: string): string {
         let settings: Settings.ISettings = Settings.load(Utils.PowerShellLanguageId);
+        let ruleProperty: string;
+        switch (rule) {
+            case "PSPlaceOpenBrace":
+                ruleProperty = `${rule} = @{
+                    OnSameLine = \$${settings.codeformatting.openBraceOnSameLine}
+                }`;
+                break;
+
+            case "PSUseConsistentIndentation":
+                ruleProperty = `${rule} = @{
+                    IndentationSize = ${settings.codeformatting.indentationSize}
+                }`;
+                break;
+
+            default:
+                ruleProperty = "";
+                break;
+        }
+
         return `@{
     IncludeRules = @('${rule}')
     Rules = @{
-                PSPlaceOpenBrace = @{
-                    OnSameLine = \$${settings.codeformatting.openBraceOnSameLine}
-        }
+                ${ruleProperty}
     }
 }`;
     }
