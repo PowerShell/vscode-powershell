@@ -3,6 +3,8 @@ import { languages, TextDocument, TextEdit, FormattingOptions, CancellationToken
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 import Window = vscode.window;
 import { IFeature } from '../feature';
+import * as Settings from '../settings';
+import * as Utils from '../utils';
 
 export namespace ScriptFileMarkersRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptFileMarkers"; } };
@@ -12,6 +14,7 @@ export namespace ScriptFileMarkersRequest {
 interface ScriptFileMarkersRequestParams {
     filePath: string;
     rules: string[];
+    settings: string;
 }
 
 interface ScriptFileMarkersRequestResultParams {
@@ -71,11 +74,13 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         options: FormattingOptions,
         index: number): Thenable<TextEdit[]> | TextEdit[] {
         if (this.languageClient !== null && index < this.ruleOrder.length) {
+            let rule = this.ruleOrder[index];
             return this.languageClient.sendRequest(
                 ScriptFileMarkersRequest.type,
                 {
                     filePath: document.fileName,
-                    rules: [this.ruleOrder[index]]
+                    rules: [rule],
+                    settings: this.getSettings(rule)
                 })
                 .then((result: ScriptFileMarkersRequestResultParams) => {
 
@@ -129,6 +134,18 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
 
     setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
+    }
+
+    getSettings(rule: string): string {
+        let settings: Settings.ISettings = Settings.load(Utils.PowerShellLanguageId);
+        return `@{
+    IncludeRules = @('${rule}')
+    Rules = @{
+                PSPlaceOpenBrace = @{
+                    OnSameLine = \$${settings.codeformatting.openBraceOnSameLine}
+        }
+    }
+}`;
     }
 }
 
