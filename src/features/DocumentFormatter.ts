@@ -13,7 +13,6 @@ export namespace ScriptFileMarkersRequest {
 // TODO move some of the common interface to a separate file?
 interface ScriptFileMarkersRequestParams {
     filePath: string;
-    rules: string[];
     settings: string;
 }
 
@@ -79,7 +78,6 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                 ScriptFileMarkersRequest.type,
                 {
                     filePath: document.fileName,
-                    rules: [rule],
                     settings: this.getSettings(rule)
                 })
                 .then((result: ScriptFileMarkersRequestResultParams) => {
