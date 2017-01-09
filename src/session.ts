@@ -189,6 +189,23 @@ export class SessionManager {
         }
     }
 
+    private setStatusBarVersionString(
+        runspaceDetails: RunspaceDetails) {
+
+        var versionString =
+            this.versionDetails.architecture === "x86"
+                ? `${runspaceDetails.powerShellVersion.displayVersion} (${runspaceDetails.powerShellVersion.architecture})`
+                : runspaceDetails.powerShellVersion.displayVersion;
+
+        if (runspaceDetails.runspaceType != RunspaceType.Local) {
+            versionString += ` [${runspaceDetails.connectionString}]`
+        }
+
+        this.setSessionStatus(
+            versionString,
+            SessionStatus.Running);
+    }
+
     private registerCommands() : void {
         this.registeredCommands = [
             vscode.commands.registerCommand('PowerShell.RestartSession', () => { this.restartSession(); }),
@@ -364,6 +381,10 @@ export class SessionManager {
                 (reason) => {
                     this.setSessionFailure("Could not start language service: ", reason);
                 });
+
+            this.languageServerClient.onNotification(
+                RunspaceChangedEvent.type,
+                (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); });
 
             this.languageServerClient.start();
         }
@@ -622,4 +643,21 @@ export interface PowerShellVersionDetails {
     displayVersion: string;
     edition: string;
     architecture: string;
+}
+
+export enum RunspaceType {
+    Local,
+    Process,
+    Remote
+}
+
+export interface RunspaceDetails {
+    powerShellVersion: PowerShellVersionDetails;
+    runspaceType: RunspaceType;
+    connectionString: string;
+}
+
+export namespace RunspaceChangedEvent {
+    export const type: NotificationType<RunspaceDetails> =
+        { get method() { return 'powerShell/runspaceChanged'; } };
 }
