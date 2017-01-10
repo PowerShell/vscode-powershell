@@ -49,6 +49,24 @@ interface MarkerCorrection {
     edits: ScriptRegion[]
 }
 
+function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): number {
+    if (leftOperand.startLineNumber < rightOperand.startLineNumber) {
+        return -1;
+    } else if (leftOperand.startLineNumber > rightOperand.startLineNumber) {
+        return 1;
+    } else {
+        if (leftOperand.startColumnNumber < rightOperand.startColumnNumber) {
+            return -1;
+        }
+        else if (leftOperand.startColumnNumber > rightOperand.startColumnNumber) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+}
+
 class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider {
     private languageClient: LanguageClient;
 
@@ -62,8 +80,7 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
     // Should we expose this through settings?
     private aggregateUndoStop: boolean;
 
-    constructor(aggregateUndoStop: boolean)
-    {
+    constructor(aggregateUndoStop: boolean) {
         this.aggregateUndoStop = aggregateUndoStop;
     }
 
@@ -94,28 +111,20 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     settings: this.getSettings(rule)
                 })
                 .then((result: ScriptFileMarkersRequestResultParams) => {
-                    edits = result.markers.map(m => { return m.correction.edits[0]; });
+                    edits = result.markers.map(marker => { return marker.correction.edits[0]; });
 
                     // sort in decending order of the edits
-                    edits.sort(function (a: ScriptRegion, b: ScriptRegion): number {
-                        let leftOperand: number = a.startLineNumber,
-                            rightOperand: number = b.startLineNumber;
-                        if (leftOperand < rightOperand) {
-                            return 1;
-                        } else if (leftOperand > rightOperand) {
-                            return -1;
-                        } else {
-                            return 0;
-                        }
+                    edits.sort((left: ScriptRegion, right: ScriptRegion) => {
+                        return -1 * editComparer(left, right);
                     });
 
-                    // We cannot handle multiple edits on the same line hence we
+                    // We cannot handle multiple edits at the same point hence we
                     // filter the markers so that there is only one edit per line
+                    // This ideally should not happen but it is good to have some additional safeguard
                     if (edits.length > 0) {
                         uniqueEdits.push(edits[0]);
                         for (let edit of edits.slice(1)) {
-                            if (edit.startLineNumber
-                                !== uniqueEdits[uniqueEdits.length - 1].startLineNumber) {
+                            if (editComparer(uniqueEdits[uniqueEdits.length - 1], edit) !== 0) {
                                 uniqueEdits.push(edit);
                             }
                         }
@@ -157,12 +166,12 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     edit.endColumnNumber - 1),
                 edit.text);
         },
-        {
-            undoStopAfter: undoStopAfter,
-            undoStopBefore: undoStopBefore
-        }).then((isEditApplied) => {
-            return this.applyEdit(edits, markerIndex + 1, ruleIndex);
-        }); // TODO handle rejection
+            {
+                undoStopAfter: undoStopAfter,
+                undoStopBefore: undoStopBefore
+            }).then((isEditApplied) => {
+                return this.applyEdit(edits, markerIndex + 1, ruleIndex);
+            }); // TODO handle rejection
     }
 
     setLanguageClient(languageClient: LanguageClient): void {
