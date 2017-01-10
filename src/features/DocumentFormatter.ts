@@ -85,8 +85,8 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         index: number): Thenable<TextEdit[]> | TextEdit[] {
         if (this.languageClient !== null && index < this.ruleOrder.length) {
             let rule = this.ruleOrder[index];
-            let uniqueMarkers: ScriptFileMarker[] = [];
-            let markers: ScriptFileMarker[];
+            let uniqueEdits: ScriptRegion[] = [];
+            let edits: ScriptRegion[];
             return this.languageClient.sendRequest(
                 ScriptFileMarkersRequest.type,
                 {
@@ -94,12 +94,12 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     settings: this.getSettings(rule)
                 })
                 .then((result: ScriptFileMarkersRequestResultParams) => {
-                    markers = result.markers;
+                    edits = result.markers.map(m => { return m.correction.edits[0]; });
 
                     // sort in decending order of the edits
-                    markers.sort(function (a: ScriptFileMarker, b: ScriptFileMarker): number {
-                        let leftOperand: number = a.correction.edits[0].startLineNumber,
-                            rightOperand: number = b.correction.edits[0].startLineNumber;
+                    edits.sort(function (a: ScriptRegion, b: ScriptRegion): number {
+                        let leftOperand: number = a.startLineNumber,
+                            rightOperand: number = b.startLineNumber;
                         if (leftOperand < rightOperand) {
                             return 1;
                         } else if (leftOperand > rightOperand) {
@@ -111,12 +111,12 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
 
                     // We cannot handle multiple edits on the same line hence we
                     // filter the markers so that there is only one edit per line
-                    if (markers.length > 0) {
-                        uniqueMarkers.push(markers[0]);
-                        for (let marker of markers.slice(1)) {
-                            if (marker.correction.edits[0].startLineNumber
-                                !== uniqueMarkers[uniqueMarkers.length - 1].correction.edits[0].startLineNumber) {
-                                uniqueMarkers.push(marker);
+                    if (edits.length > 0) {
+                        uniqueEdits.push(edits[0]);
+                        for (let edit of edits.slice(1)) {
+                            if (edit.startLineNumber
+                                !== uniqueEdits[uniqueEdits.length - 1].startLineNumber) {
+                                uniqueEdits.push(edit);
                             }
                         }
                     }
@@ -124,13 +124,13 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     // we do not return a valid array because our text edits
                     // need to be executed in a particular order and it is
                     // easier if we perform the edits ourselves
-                    return this.applyEdit(uniqueMarkers, 0, index);
+                    return this.applyEdit(uniqueEdits, 0, index);
                 })
                 .then(() => {
 
                     // execute the same rule again if we left out violations
                     // on the same line
-                    if (uniqueMarkers.length !== markers.length) {
+                    if (uniqueEdits.length !== edits.length) {
                         return this.executeRulesInOrder(document, options, index);
                     }
                     return this.executeRulesInOrder(document, options, index + 1);
@@ -140,14 +140,14 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         }
     }
 
-    applyEdit(markers: ScriptFileMarker[], markerIndex: number, ruleIndex: number): Thenable<void> {
-        if (markerIndex >= markers.length) {
+    applyEdit(edits: ScriptRegion[], markerIndex: number, ruleIndex: number): Thenable<void> {
+        if (markerIndex >= edits.length) {
             return;
         }
 
-        let undoStopAfter = !this.aggregateUndoStop || (ruleIndex === this.ruleOrder.length - 1 && markerIndex === markers.length - 1);
+        let undoStopAfter = !this.aggregateUndoStop || (ruleIndex === this.ruleOrder.length - 1 && markerIndex === edits.length - 1);
         let undoStopBefore = !this.aggregateUndoStop || (ruleIndex === 0 && markerIndex === 0);
-        let edit: ScriptRegion = markers[markerIndex].correction.edits[0];
+        let edit: ScriptRegion = edits[markerIndex];
         return Window.activeTextEditor.edit((editBuilder) => {
             editBuilder.replace(
                 new vscode.Range(
@@ -161,7 +161,7 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
             undoStopAfter: undoStopAfter,
             undoStopBefore: undoStopBefore
         }).then((isEditApplied) => {
-            return this.applyEdit(markers, markerIndex + 1, ruleIndex);
+            return this.applyEdit(edits, markerIndex + 1, ruleIndex);
         }); // TODO handle rejection
     }
 
