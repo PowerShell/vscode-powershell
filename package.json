@@ -160,7 +160,7 @@
 
                 "configurationSnippets": [
                     {
-                        "label": "PowerShell: Launch Current File Configuration",
+                        "label": "PowerShell: Launch Current Script Configuration",
                         "description": "A new configuration for launching the current opened PowerShell script",
                         "body": {
                             "type": "PowerShell",
@@ -172,7 +172,7 @@
                         }
                     },
                     {
-                        "label": "PowerShell: Launch Configuration",
+                        "label": "PowerShell: Launch Script Configuration",
                         "description": "A new configuration for launching a PowerShell script",
                         "body": {
                             "type": "PowerShell",
@@ -182,14 +182,31 @@
                             "args": [],
                             "cwd": "^\"\\${workspaceRoot}\""
                         }
+                    },
+                    {
+                        "label": "PowerShell: Attach to PowerShell Process Configuration",
+                        "description": "A new configuration for debugging a runspace in another process.",
+                        "body": {
+                            "type": "PowerShell",
+                            "request": "attach",
+                            "name": "PowerShell Attach to Process",
+                            "processId": "${ProcessId}",
+                            "runspaceId": "1"
+                        }
+                    },
+                    {
+                        "label": "PowerShell: Launch Interactive Session Configuration",
+                        "description": "A new configuration for debugging an interactive session.",
+                        "body": {
+                            "type": "PowerShell",
+                            "request": "launch",
+                            "name": "PowerShell Interactive Session"
+                        }
                     }
                 ],
 
                 "configurationAttributes": {
                     "launch": {
-                        "required": [
-                            "script"
-                        ],
                         "properties": {
                             "program": {
                                 "type": "string",
@@ -197,7 +214,7 @@
                             },
                             "script": {
                                 "type": "string",
-                                "description": "Absolute path to the PowerShell script to launch under the debugger."
+                                "description": "Optional: Absolute path to the PowerShell script to launch under the debugger."
                             },
                             "args": {
                                 "type": "array",
@@ -213,6 +230,23 @@
                                 "default": "${workspaceRoot}"
                             }
                         }
+                    },
+                    "attach": {
+                        "properties": {
+                            "computerName": {
+                                "type": "string",
+                                "description": "Optional: The computer name to which a remote session will be established.  Works only on PowerShell 4 and above."
+                            },
+                            "processId": {
+                                "type": "number",
+                                "description": "The ID of the process to be attached.  Works only on PowerShell 5 and above."
+                            },
+                            "runspaceId": {
+                                "type": "number",
+                                "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
+                                "default": 1
+                            }
+                        }
                     }
                 },
                 "initialConfigurations": [
@@ -223,6 +257,18 @@
                         "script": "${file}",
                         "args": [],
                         "cwd": "${file}"
+                    },
+                    {
+                        "type": "PowerShell",
+                        "request": "attach",
+                        "name": "PowerShell Attach",
+                        "processId": "12345"
+                    },
+                    {
+                        "type": "PowerShell",
+                        "request": "launch",
+                        "name": "PowerShell Interactive Session",
+                        "cwd": "${workspaceRoot}"
                     }
                 ]
             }
