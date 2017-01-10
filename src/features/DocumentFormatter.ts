@@ -51,10 +51,21 @@ interface MarkerCorrection {
 
 class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider {
     private languageClient: LanguageClient;
+
+    // The order in which the rules will be executed starting from the first element.
     private readonly ruleOrder: string[] = [
         "PSPlaceCloseBrace",
         "PSPlaceOpenBrace",
         "PSUseConsistentIndentation"];
+
+    // Allows edits to be undone and redone is a single step.
+    // Should we expose this through settings?
+    private aggregateUndoStop: boolean;
+
+    constructor(aggregateUndoStop: boolean)
+    {
+        this.aggregateUndoStop = aggregateUndoStop;
+    }
 
     provideDocumentFormattingEdits(
         document: TextDocument,
@@ -111,12 +122,14 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         }
     }
 
-    applyEdits(markers: ScriptFileMarker[], index: number): Thenable<void> {
-        if (index >= markers.length) {
+    applyEdit(markers: ScriptFileMarker[], markerIndex: number, ruleIndex: number): Thenable<void> {
+        if (markerIndex >= markers.length) {
             return;
         }
 
-        let edit: ScriptRegion = markers[index].correction.edits[0];
+        let undoStopAfter = !this.aggregateUndoStop || (ruleIndex === this.ruleOrder.length - 1 && markerIndex === markers.length - 1);
+        let undoStopBefore = !this.aggregateUndoStop || (ruleIndex === 0 && markerIndex === 0);
+        let edit: ScriptRegion = markers[markerIndex].correction.edits[0];
         return Window.activeTextEditor.edit((editBuilder) => {
             editBuilder.replace(
                 new vscode.Range(
@@ -125,8 +138,12 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     edit.endLineNumber - 1,
                     edit.endColumnNumber - 1),
                 edit.text);
+        },
+        {
+            undoStopAfter: undoStopAfter,
+            undoStopBefore: undoStopBefore
         }).then((isEditApplied) => {
-            return this.applyEdits(markers, index + 1);
+            return this.applyEdit(markers, markerIndex + 1, ruleIndex);
         }); // TODO handle rejection
     }
 
@@ -175,7 +192,7 @@ export class DocumentFormatterFeature implements IFeature {
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
     constructor() {
-        this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider();
+        this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider(true);
         this.disposable = vscode.languages.registerDocumentFormattingEditProvider(
             "powershell",
             this.documentFormattingEditProvider);
