@@ -85,6 +85,8 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         index: number): Thenable<TextEdit[]> | TextEdit[] {
         if (this.languageClient !== null && index < this.ruleOrder.length) {
             let rule = this.ruleOrder[index];
+            let uniqueMarkers: ScriptFileMarker[] = [];
+            let markers: ScriptFileMarker[];
             return this.languageClient.sendRequest(
                 ScriptFileMarkersRequest.type,
                 {
@@ -92,12 +94,10 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                     settings: this.getSettings(rule)
                 })
                 .then((result: ScriptFileMarkersRequestResultParams) => {
-
-                    // TODO modify undo stops to make sure all the edits
-                    // can be undone and redone in a single step
+                    markers = result.markers;
 
                     // sort in decending order of the edits
-                    result.markers.sort(function (a: ScriptFileMarker, b: ScriptFileMarker): number {
+                    markers.sort(function (a: ScriptFileMarker, b: ScriptFileMarker): number {
                         let leftOperand: number = a.correction.edits[0].startLineNumber,
                             rightOperand: number = b.correction.edits[0].startLineNumber;
                         if (leftOperand < rightOperand) {
@@ -108,13 +108,31 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                             return 0;
                         }
                     });
-                    return this.applyEdits(result.markers, 0);
+
+                    // We cannot handle multiple edits on the same line hence we
+                    // filter the markers so that there is only one edit per line
+                    if (markers.length > 0) {
+                        uniqueMarkers.push(markers[0]);
+                        for (let marker of markers.slice(1)) {
+                            if (marker.correction.edits[0].startLineNumber
+                                !== uniqueMarkers[uniqueMarkers.length - 1].correction.edits[0].startLineNumber) {
+                                uniqueMarkers.push(marker);
+                            }
+                        }
+                    }
 
                     // we do not return a valid array because our text edits
                     // need to be executed in a particular order and it is
                     // easier if we perform the edits ourselves
+                    return this.applyEdit(uniqueMarkers, 0, index);
                 })
                 .then(() => {
+
+                    // execute the same rule again if we left out violations
+                    // on the same line
+                    if (uniqueMarkers.length !== markers.length) {
+                        return this.executeRulesInOrder(document, options, index);
+                    }
                     return this.executeRulesInOrder(document, options, index + 1);
                 });
         } else {
