@@ -134,8 +134,8 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.ShowSessionOutput",
-        "title": "Show Session Output",
+        "command": "PowerShell.ShowSessionConsole",
+        "title": "Show Session Interactive Console",
         "category": "PowerShell"
       },
       {
