@@ -8,6 +8,7 @@ import vscode = require('vscode');
 
 export interface ICodeFormattingSettings {
     openBraceOnSameLine: boolean;
+    newLineAfterOpenBrace: boolean;
     indentationSize: number;
 }
 
@@ -48,6 +49,7 @@ export function load(myPluginId: string): ISettings {
 
     let defaultCodeFormattingSettings: ICodeFormattingSettings = {
         openBraceOnSameLine: true,
+        newLineAfterOpenBrace: true,
         indentationSize: 4
     };
 

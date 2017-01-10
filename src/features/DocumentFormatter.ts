@@ -139,11 +139,10 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         let ruleProperty: string;
         switch (rule) {
             case "PSPlaceOpenBrace":
-            // TODO Add newlineafter option to settings
                 ruleProperty = `${rule} = @{
                     Enable = \$true
                     OnSameLine = \$${settings.codeformatting.openBraceOnSameLine}
-                    NewLineAfter = \$true
+                    NewLineAfter = \$${settings.codeformatting.newLineAfterOpenBrace}
                 }`;
                 break;
 
