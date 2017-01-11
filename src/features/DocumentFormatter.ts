@@ -1,5 +1,14 @@
 import vscode = require('vscode');
-import { languages, TextDocument, TextEdit, FormattingOptions, CancellationToken } from 'vscode'
+import {
+    languages,
+    TextDocument,
+    TextEdit,
+    FormattingOptions,
+    CancellationToken,
+    DocumentFormattingEditProvider,
+    DocumentRangeFormattingEditProvider,
+    Range,
+} from 'vscode';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 import Window = vscode.window;
 import { IFeature } from '../feature';
@@ -67,7 +76,7 @@ function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): nu
     }
 }
 
-class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditProvider {
+class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider, DocumentRangeFormattingEditProvider {
     private languageClient: LanguageClient;
 
     // The order in which the rules will be executed starting from the first element.
@@ -88,16 +97,20 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         document: TextDocument,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
+        return this.provideDocumentRangeFormattingEdits(document, null, options, token);
+    }
 
-        // we need to order the edits such that edit i should not invalidate
-        // the edits in edit j s.t i < j (seems like a hard problem)
-        // or
-        // peform edits ourself and return an empty textedit array
-        return this.executeRulesInOrder(document, options, 0);
+    provideDocumentRangeFormattingEdits(
+        document: TextDocument,
+        range: Range,
+        options: FormattingOptions,
+        token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
+        return this.executeRulesInOrder(document, range, options, 0);
     }
 
     executeRulesInOrder(
         document: TextDocument,
+        range: Range,
         options: FormattingOptions,
         index: number): Thenable<TextEdit[]> | TextEdit[] {
         if (this.languageClient !== null && index < this.ruleOrder.length) {
@@ -130,26 +143,34 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
                         }
                     }
 
+                    // we need to update the range as the edits might
+                    // have changed the original layout
+                    if (range !== null) {
+                        let tempRange: Range = this.getSelectionRange(document);
+                        if (tempRange !== null) {
+                            range = tempRange;
+                        }
+                    }
+
                     // we do not return a valid array because our text edits
                     // need to be executed in a particular order and it is
                     // easier if we perform the edits ourselves
-                    return this.applyEdit(uniqueEdits, 0, index);
+                    return this.applyEdit(uniqueEdits, range, 0, index);
                 })
                 .then(() => {
-
                     // execute the same rule again if we left out violations
                     // on the same line
                     if (uniqueEdits.length !== edits.length) {
-                        return this.executeRulesInOrder(document, options, index);
+                        return this.executeRulesInOrder(document, range, options, index);
                     }
-                    return this.executeRulesInOrder(document, options, index + 1);
+                    return this.executeRulesInOrder(document, range, options, index + 1);
                 });
         } else {
             return TextEdit[0];
         }
     }
 
-    applyEdit(edits: ScriptRegion[], markerIndex: number, ruleIndex: number): Thenable<void> {
+    applyEdit(edits: ScriptRegion[], range: Range, markerIndex: number, ruleIndex: number): Thenable<void> {
         if (markerIndex >= edits.length) {
             return;
         }
@@ -157,21 +178,36 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
         let undoStopAfter = !this.aggregateUndoStop || (ruleIndex === this.ruleOrder.length - 1 && markerIndex === edits.length - 1);
         let undoStopBefore = !this.aggregateUndoStop || (ruleIndex === 0 && markerIndex === 0);
         let edit: ScriptRegion = edits[markerIndex];
-        return Window.activeTextEditor.edit((editBuilder) => {
-            editBuilder.replace(
-                new vscode.Range(
-                    edit.startLineNumber - 1,
-                    edit.startColumnNumber - 1,
-                    edit.endLineNumber - 1,
-                    edit.endColumnNumber - 1),
-                edit.text);
-        },
-            {
-                undoStopAfter: undoStopAfter,
-                undoStopBefore: undoStopBefore
-            }).then((isEditApplied) => {
-                return this.applyEdit(edits, markerIndex + 1, ruleIndex);
-            }); // TODO handle rejection
+        let editRange: Range = new vscode.Range(
+            edit.startLineNumber - 1,
+            edit.startColumnNumber - 1,
+            edit.endLineNumber - 1,
+            edit.endColumnNumber - 1);
+        if (range === null || range.contains(editRange)) {
+            return Window.activeTextEditor.edit((editBuilder) => {
+                editBuilder.replace(
+                    editRange,
+                    edit.text);
+            },
+                {
+                    undoStopAfter: undoStopAfter,
+                    undoStopBefore: undoStopBefore
+                }).then((isEditApplied) => {
+                    return this.applyEdit(edits, range, markerIndex + 1, ruleIndex);
+                }); // TODO handle rejection
+        }
+        else {
+            return this.applyEdit(edits, range, markerIndex + 1, ruleIndex);
+        }
+    }
+
+    getSelectionRange(document: TextDocument): Range {
+        let editor = vscode.window.visibleTextEditors.find(editor => editor.document === document);
+        if (editor !== undefined) {
+            return editor.selection as Range;
+        }
+
+        return null;
     }
 
     setLanguageClient(languageClient: LanguageClient): void {
@@ -214,13 +250,17 @@ class PSDocumentFormattingEditProvider implements vscode.DocumentFormattingEditP
 }
 
 export class DocumentFormatterFeature implements IFeature {
-    private disposable: vscode.Disposable;
+    private formattingEditProvider: vscode.Disposable;
+    private rangeFormattingEditProvider: vscode.Disposable;
     private languageClient: LanguageClient;
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
     constructor() {
         this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider(true);
-        this.disposable = vscode.languages.registerDocumentFormattingEditProvider(
+        this.formattingEditProvider = vscode.languages.registerDocumentFormattingEditProvider(
+            "powershell",
+            this.documentFormattingEditProvider);
+        this.rangeFormattingEditProvider = vscode.languages.registerDocumentRangeFormattingEditProvider(
             "powershell",
             this.documentFormattingEditProvider);
     }
@@ -231,6 +271,7 @@ export class DocumentFormatterFeature implements IFeature {
     }
 
     public dispose(): any {
-        this.disposable.dispose();
+        this.formattingEditProvider.dispose();
+        this.rangeFormattingEditProvider.dispose();
     }
 }
