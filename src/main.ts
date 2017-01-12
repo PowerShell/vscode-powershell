@@ -5,6 +5,7 @@
 'use strict';
 
 import vscode = require('vscode');
+import utils = require('./utils');
 import { Logger, LogLevel } from './logging';
 import { IFeature } from './feature';
 import { SessionManager } from './session';
@@ -27,6 +28,9 @@ var requiredEditorServicesVersion = "0.8.0";
 var logger: Logger = undefined;
 var sessionManager: SessionManager = undefined;
 var extensionFeatures: IFeature[] = [];
+
+// Clean up the session file just in case one lingers from a previous session
+utils.deleteSessionFile();
 
 export function activate(context: vscode.ExtensionContext): void {
 
