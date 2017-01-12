@@ -10,6 +10,7 @@ import { IFeature } from './feature';
 import { SessionManager } from './session';
 import { PowerShellLanguageId } from './utils';
 import { ConsoleFeature } from './features/Console';
+import { ExamplesFeature } from './features/Examples';
 import { OpenInISEFeature } from './features/OpenInISE';
 import { NewFileOrProjectFeature } from './features/NewFileOrProject';
 import { ExpandAliasFeature } from './features/ExpandAlias';
@@ -88,6 +89,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Create features
     extensionFeatures = [
         new ConsoleFeature(),
+        new ExamplesFeature(),
         new OpenInISEFeature(),
         new ExpandAliasFeature(),
         new ShowHelpFeature(),
