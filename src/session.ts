@@ -257,11 +257,8 @@ export class SessionManager {
                     if (response["status"] === "started") {
                         let sessionDetails: utils.EditorServicesSessionDetails = response;
 
-                        // Write out the session configuration file
-                        utils.writeSessionFile(sessionDetails);
-
                         // Start the language service client
-                        this.startLanguageClient(sessionDetails.languageServicePort);
+                        this.startLanguageClient(sessionDetails);
                     }
                     else if (response["status"] === "failed") {
                         if (response["reason"] === "unsupported") {
@@ -326,12 +323,14 @@ export class SessionManager {
             .then((answer) => { if (answer === "Yes") { this.restartSession(); }});
     }
 
-    private startLanguageClient(port: number) {
+    private startLanguageClient(sessionDetails: utils.EditorServicesSessionDetails) {
 
-        this.log.write("Connecting to language service on port " + port + "..." + os.EOL);
+        var port = sessionDetails.languageServicePort;
 
         try
         {
+            this.log.write("Connecting to language service on port " + port + "..." + os.EOL);
+
             let connectFunc = () => {
                 return new Promise<StreamInfo>(
                     (resolve, reject) => {
@@ -339,6 +338,9 @@ export class SessionManager {
                         socket.on(
                             'connect',
                             () => {
+                                // Write out the session configuration file
+                                utils.writeSessionFile(sessionDetails);
+
                                 this.log.write("Language service connected.");
                                 resolve({writer: socket, reader: socket})
                             });
