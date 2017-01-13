@@ -229,7 +229,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             case "PSUseConsistentIndentation":
                 ruleProperty = `${rule} = @{
                     Enable = \$true
-                    IndentationSize = ${settings.codeformatting.indentationSize}
+                    IndentationSize = ${vscode.workspace.getConfiguration("editor").get<number>("tabSize")}
                 }`;
                 break;
 
