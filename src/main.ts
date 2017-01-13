@@ -13,13 +13,14 @@ import { PowerShellLanguageId } from './utils';
 import { ConsoleFeature } from './features/Console';
 import { ExamplesFeature } from './features/Examples';
 import { OpenInISEFeature } from './features/OpenInISE';
-import { NewFileOrProjectFeature } from './features/NewFileOrProject';
 import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
-import { FindModuleFeature } from './features/PowerShellFindModule';
-import { ExtensionCommandsFeature } from './features/ExtensionCommands';
-import { SelectPSSARulesFeature } from './features/SelectPSSARules';
 import { CodeActionsFeature } from './features/CodeActions';
+import { DebugSessionFeature } from './features/DebugSession';
+import { SelectPSSARulesFeature } from './features/SelectPSSARules';
+import { FindModuleFeature } from './features/PowerShellFindModule';
+import { NewFileOrProjectFeature } from './features/NewFileOrProject';
+import { ExtensionCommandsFeature } from './features/ExtensionCommands';
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
@@ -101,7 +102,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new ExtensionCommandsFeature(),
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
-        new NewFileOrProjectFeature()
+        new NewFileOrProjectFeature(),
+        new DebugSessionFeature()
     ];
 
     sessionManager =
