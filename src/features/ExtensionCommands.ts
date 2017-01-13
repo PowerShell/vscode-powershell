@@ -122,6 +122,11 @@ export namespace OpenFileRequest {
         { get method() { return 'editor/openFile'; } };
 }
 
+export namespace CloseFileRequest {
+    export const type: RequestType<string, EditorOperationResponse, void> =
+        { get method() { return 'editor/closeFile'; } };
+}
+
 export namespace ShowErrorMessageRequest {
     export const type: RequestType<string, EditorOperationResponse, void> =
         { get method() { return 'editor/showErrorMessage'; } };
@@ -197,6 +202,10 @@ export class ExtensionCommandsFeature implements IFeature {
             this.languageClient.onRequest(
                 OpenFileRequest.type,
                 filePath => this.openFile(filePath));
+
+            this.languageClient.onRequest(
+                CloseFileRequest.type,
+                filePath => this.closeFile(filePath));
 
             this.languageClient.onRequest(
                 ShowInformationMessageRequest.type,
@@ -313,6 +322,37 @@ export class ExtensionCommandsFeature implements IFeature {
             vscode.workspace.openTextDocument(filePath)
                 .then(doc => vscode.window.showTextDocument(doc))
                 .then(_ => EditorOperationResponse.Completed);
+
+        return promise;
+    }
+
+    private closeFile(filePath: string): Thenable<EditorOperationResponse> {
+
+        var promise: Thenable<EditorOperationResponse>;
+
+        // Make sure the file path is absolute
+        if (!path.win32.isAbsolute(filePath))
+        {
+            filePath = path.win32.resolve(
+                vscode.workspace.rootPath,
+                filePath);
+        }
+
+        // Normalize file path case for comparison
+        var normalizedFilePath = filePath.toLowerCase();
+
+        if (vscode.workspace.textDocuments.find(doc => doc.fileName.toLowerCase() == normalizedFilePath))
+        {
+            promise =
+                vscode.workspace.openTextDocument(filePath)
+                    .then(doc => vscode.window.showTextDocument(doc))
+                    .then(editor => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+                    .then(_ => EditorOperationResponse.Completed);
+        }
+        else
+        {
+            promise = Promise.resolve(EditorOperationResponse.Completed);
+        }
 
         return promise;
     }

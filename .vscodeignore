@@ -7,5 +7,6 @@ build/**
 bin/EditorServices.log
 bin/DebugAdapter.log
 bin/*.vshost.*
+bin/PowerShell/**
 logs/**
 sessions/**

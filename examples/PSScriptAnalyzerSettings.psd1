@@ -16,6 +16,7 @@
                      'PSReservedParams',
                      'PSShouldProcess',
                      'PSUseApprovedVerbs',
+                     'PSAvoidUsingAliases',
                      'PSUseDeclaredVarsMoreThanAssigments')
 
     # Do not analyze the following rules. Use ExcludeRules when you have

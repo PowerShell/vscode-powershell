@@ -189,6 +189,23 @@ export class SessionManager {
         }
     }
 
+    private setStatusBarVersionString(
+        runspaceDetails: RunspaceDetails) {
+
+        var versionString =
+            this.versionDetails.architecture === "x86"
+                ? `${runspaceDetails.powerShellVersion.displayVersion} (${runspaceDetails.powerShellVersion.architecture})`
+                : runspaceDetails.powerShellVersion.displayVersion;
+
+        if (runspaceDetails.runspaceType != RunspaceType.Local) {
+            versionString += ` [${runspaceDetails.connectionString}]`
+        }
+
+        this.setSessionStatus(
+            versionString,
+            SessionStatus.Running);
+    }
+
     private registerCommands() : void {
         this.registeredCommands = [
             vscode.commands.registerCommand('PowerShell.RestartSession', () => { this.restartSession(); }),
@@ -240,11 +257,8 @@ export class SessionManager {
                     if (response["status"] === "started") {
                         let sessionDetails: utils.EditorServicesSessionDetails = response;
 
-                        // Write out the session configuration file
-                        utils.writeSessionFile(sessionDetails);
-
                         // Start the language service client
-                        this.startLanguageClient(sessionDetails.languageServicePort);
+                        this.startLanguageClient(sessionDetails);
                     }
                     else if (response["status"] === "failed") {
                         if (response["reason"] === "unsupported") {
@@ -309,12 +323,14 @@ export class SessionManager {
             .then((answer) => { if (answer === "Yes") { this.restartSession(); }});
     }
 
-    private startLanguageClient(port: number) {
+    private startLanguageClient(sessionDetails: utils.EditorServicesSessionDetails) {
 
-        this.log.write("Connecting to language service on port " + port + "..." + os.EOL);
+        var port = sessionDetails.languageServicePort;
 
         try
         {
+            this.log.write("Connecting to language service on port " + port + "..." + os.EOL);
+
             let connectFunc = () => {
                 return new Promise<StreamInfo>(
                     (resolve, reject) => {
@@ -322,6 +338,9 @@ export class SessionManager {
                         socket.on(
                             'connect',
                             () => {
+                                // Write out the session configuration file
+                                utils.writeSessionFile(sessionDetails);
+
                                 this.log.write("Language service connected.");
                                 resolve({writer: socket, reader: socket})
                             });
@@ -364,6 +383,10 @@ export class SessionManager {
                 (reason) => {
                     this.setSessionFailure("Could not start language service: ", reason);
                 });
+
+            this.languageServerClient.onNotification(
+                RunspaceChangedEvent.type,
+                (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); });
 
             this.languageServerClient.start();
         }
@@ -622,4 +645,21 @@ export interface PowerShellVersionDetails {
     displayVersion: string;
     edition: string;
     architecture: string;
+}
+
+export enum RunspaceType {
+    Local,
+    Process,
+    Remote
+}
+
+export interface RunspaceDetails {
+    powerShellVersion: PowerShellVersionDetails;
+    runspaceType: RunspaceType;
+    connectionString: string;
+}
+
+export namespace RunspaceChangedEvent {
+    export const type: NotificationType<RunspaceDetails> =
+        { get method() { return 'powerShell/runspaceChanged'; } };
 }

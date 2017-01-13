@@ -5,19 +5,22 @@
 'use strict';
 
 import vscode = require('vscode');
+import utils = require('./utils');
 import { Logger, LogLevel } from './logging';
 import { IFeature } from './feature';
 import { SessionManager } from './session';
 import { PowerShellLanguageId } from './utils';
 import { ConsoleFeature } from './features/Console';
+import { ExamplesFeature } from './features/Examples';
 import { OpenInISEFeature } from './features/OpenInISE';
-import { NewFileOrProjectFeature } from './features/NewFileOrProject';
 import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
-import { FindModuleFeature } from './features/PowerShellFindModule';
-import { ExtensionCommandsFeature } from './features/ExtensionCommands';
-import { SelectPSSARulesFeature } from './features/SelectPSSARules';
 import { CodeActionsFeature } from './features/CodeActions';
+import { DebugSessionFeature } from './features/DebugSession';
+import { SelectPSSARulesFeature } from './features/SelectPSSARules';
+import { FindModuleFeature } from './features/PowerShellFindModule';
+import { NewFileOrProjectFeature } from './features/NewFileOrProject';
+import { ExtensionCommandsFeature } from './features/ExtensionCommands';
 import { DocumentFormatterFeature } from './features/DocumentFormatter';
 
 // NOTE: We will need to find a better way to deal with the required
@@ -27,6 +30,9 @@ var requiredEditorServicesVersion = "0.8.0";
 var logger: Logger = undefined;
 var sessionManager: SessionManager = undefined;
 var extensionFeatures: IFeature[] = [];
+
+// Clean up the session file just in case one lingers from a previous session
+utils.deleteSessionFile();
 
 export function activate(context: vscode.ExtensionContext): void {
 
@@ -89,6 +95,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Create features
     extensionFeatures = [
         new ConsoleFeature(),
+        new ExamplesFeature(),
         new OpenInISEFeature(),
         new ExpandAliasFeature(),
         new ShowHelpFeature(),
@@ -98,6 +105,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
         new DocumentFormatterFeature(),
+        new DebugSessionFeature()
     ];
 
     sessionManager =
