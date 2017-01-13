@@ -280,11 +280,6 @@
                     "type":"boolean",
                     "default": true,
                     "description": "A new line must follow an open brace."
-                },
-                "powershell.codeformatting.indentationSize":{
-                    "type":"number",
-                    "default": 4,
-                    "description": "The indentation size in number of Space characters."
                 }
             }
         }
