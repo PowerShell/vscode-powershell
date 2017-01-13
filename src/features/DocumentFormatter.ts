@@ -90,10 +90,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         "PSUseConsistentIndentation"];
 
     // Allows edits to be undone and redone is a single step.
-    // Should we expose this through settings?
+    // It is usefuld to have undo stops after every edit while debugging
+    // hence we keep this as an option but set it true by default.
     private aggregateUndoStop: boolean;
 
-    constructor(aggregateUndoStop: boolean) {
+    constructor(aggregateUndoStop = true) {
         this.aggregateUndoStop = aggregateUndoStop;
     }
 
@@ -260,7 +261,7 @@ export class DocumentFormatterFeature implements IFeature {
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
     constructor() {
-        this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider(true);
+        this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider();
         this.formattingEditProvider = vscode.languages.registerDocumentFormattingEditProvider(
             "powershell",
             this.documentFormattingEditProvider);
