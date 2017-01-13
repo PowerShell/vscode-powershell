@@ -225,8 +225,8 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             case "PSPlaceOpenBrace":
                 ruleProperty = `${rule} = @{
                     Enable = \$true
-                    OnSameLine = \$${settings.codeformatting.openBraceOnSameLine}
-                    NewLineAfter = \$${settings.codeformatting.newLineAfterOpenBrace}
+                    OnSameLine = \$${settings.codeFormatting.openBraceOnSameLine}
+                    NewLineAfter = \$${settings.codeFormatting.newLineAfterOpenBrace}
                 }`;
                 break;
 

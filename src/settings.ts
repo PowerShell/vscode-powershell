@@ -28,7 +28,7 @@ export interface ISettings {
     enableProfileLoading?: boolean;
     scriptAnalysis?: IScriptAnalysisSettings;
     developer?: IDeveloperSettings;
-    codeformatting?: ICodeFormattingSettings;
+    codeFormatting?: ICodeFormattingSettings;
 }
 
 export function load(myPluginId: string): ISettings {
@@ -56,6 +56,6 @@ export function load(myPluginId: string): ISettings {
         enableProfileLoading: configuration.get<boolean>("enableProfileLoading", false),
         scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
         developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
-        codeformatting: configuration.get<ICodeFormattingSettings>("codeformatting", defaultCodeFormattingSettings)
+        codeFormatting: configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings)
     };
 }
