@@ -26,7 +26,7 @@ export namespace ScriptFileMarkersRequest {
 // TODO move some of the common interface to a separate file?
 interface ScriptFileMarkersRequestParams {
     filePath: string;
-    settings: string;
+    settings: any;
 }
 
 interface ScriptFileMarkersRequestResultParams {
@@ -219,38 +219,28 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         this.languageClient = languageClient;
     }
 
-    getSettings(rule: string): string {
-        let settings: Settings.ISettings = Settings.load(Utils.PowerShellLanguageId);
-        let ruleProperty: string;
+    getSettings(rule: string): any {
+        let psSettings: Settings.ISettings = Settings.load(Utils.PowerShellLanguageId);
+        let ruleSettings = new Object();
+        ruleSettings["Enable"] = true;
+
         switch (rule) {
             case "PSPlaceOpenBrace":
-                ruleProperty = `${rule} = @{
-                    Enable = \$true
-                    OnSameLine = \$${settings.codeFormatting.openBraceOnSameLine}
-                    NewLineAfter = \$${settings.codeFormatting.newLineAfterOpenBrace}
-                }`;
+                ruleSettings["OnSameLine"] = psSettings.codeFormatting.openBraceOnSameLine;
+                ruleSettings["NewLineAfter"] = psSettings.codeFormatting.newLineAfterOpenBrace;
                 break;
 
             case "PSUseConsistentIndentation":
-                ruleProperty = `${rule} = @{
-                    Enable = \$true
-                    IndentationSize = ${vscode.workspace.getConfiguration("editor").get<number>("tabSize")}
-                }`;
+                ruleSettings["IndentationSize"] = vscode.workspace.getConfiguration("editor").get<number>("tabSize");
                 break;
 
             default:
-                ruleProperty = `${rule} = @{
-                    Enable = \$true
-                }`;
                 break;
         }
 
-        return `@{
-    IncludeRules = @('${rule}')
-    Rules = @{
-                ${ruleProperty}
-    }
-}`;
+        let settings: Object = new Object();
+        settings[rule] = ruleSettings;
+        return settings;
     }
 }
 
