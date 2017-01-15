@@ -17,6 +17,7 @@ import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
 import { CodeActionsFeature } from './features/CodeActions';
 import { DebugSessionFeature } from './features/DebugSession';
+import { PickPSHostProcessFeature } from './features/DebugSession';
 import { SelectPSSARulesFeature } from './features/SelectPSSARules';
 import { FindModuleFeature } from './features/PowerShellFindModule';
 import { NewFileOrProjectFeature } from './features/NewFileOrProject';
@@ -103,7 +104,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
-        new DebugSessionFeature()
+        new DebugSessionFeature(),
+        new PickPSHostProcessFeature()
     ];
 
     sessionManager =
