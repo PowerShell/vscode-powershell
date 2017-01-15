@@ -127,15 +127,23 @@ export class PickPSHostProcessFeature implements IFeature {
 				 });
 			};
 
-			let options : vscode.QuickPickOptions = {
-				placeHolder: "Select a PowerShell Host process to attach to",
-				matchOnDescription: true,
-				matchOnDetail: true
-			};
+            if (items.length === 0) {
+                return vscode.window.showInformationMessage(
+                    "There are no other PowerShell host processes to attach to.").then(_ => {
+                        return null;
+                    });
+            }
+            else {
+                let options : vscode.QuickPickOptions = {
+                    placeHolder: "Select a PowerShell Host process to attach to",
+                    matchOnDescription: true,
+                    matchOnDetail: true
+                };
 
-			return vscode.window.showQuickPick(items, options).then(item => {
-				return item ? item.pid : null;
-			});
+                return vscode.window.showQuickPick(items, options).then(item => {
+                    return item ? item.pid : null;
+                });
+            }
 		});
 	}
 
