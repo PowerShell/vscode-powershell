@@ -76,13 +76,20 @@ export class PickPSHostProcessFeature implements IFeature {
 
                     // If PowerShell isn't finished loading yet, show a loading message
                     // until the LanguageClient is passed on to us
+                    var cancelled = false;
+                    var timedOut = false;
                     this.waitingForClientToken = new vscode.CancellationTokenSource();
+
                     vscode.window
                         .showQuickPick(
                             ["Cancel"],
-                            { placeHolder: "Select PowerShell Host Process to attach to: Please wait, starting PowerShell..." },
+                            { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
                             this.waitingForClientToken.token)
-                        .then(response => { if (response === "Cancel") { this.clearWaitingToken(); } });
+                        .then(response => {
+                            if (response === "Cancel") {
+                                this.clearWaitingToken();
+                            }
+                        });
 
                     // Cancel the loading prompt after 60 seconds
                     setTimeout(() => {
@@ -90,9 +97,11 @@ export class PickPSHostProcessFeature implements IFeature {
                                 this.clearWaitingToken();
 
                                 vscode.window.showErrorMessage(
-                                    "Select PowerShell Host Process to attach to: PowerShell session took too long to start.");
+                                    "Attach to PowerShell host process: PowerShell session took too long to start.");
                             }
                         }, 60000);
+
+                    // Wait w/timeout on language client to be initialized and then return this.pickPSHostProcess;
                 }
                 else {
                     return this.pickPSHostProcess();
@@ -105,7 +114,7 @@ export class PickPSHostProcessFeature implements IFeature {
 
         if (this.waitingForClientToken) {
             this.clearWaitingToken();
-            return this.pickPSHostProcess();
+            // Signal language client initialized
         }
     }
 
@@ -114,37 +123,36 @@ export class PickPSHostProcessFeature implements IFeature {
     }
 
     // In node, the function returned a Promise<string> not sure about "Thenable<string>"
-	private pickPSHostProcess(): Thenable<string> {
-		return this.languageClient.sendRequest(GetPSHostProcessesRequest.type, null).then(hostProcesses => {
-			var items: ProcessItem[] = [];
+	private pickPSHostProcess(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.languageClient.sendRequest(GetPSHostProcessesRequest.type, null).then(hostProcesses => {
+                var items: ProcessItem[] = [];
 
-			for(var p in hostProcesses) {
-				items.push({
-					label: hostProcesses[p].processName,
-                    description: hostProcesses[p].processId.toString(),
-					detail: hostProcesses[p].mainWindowTitle,
-					pid: hostProcesses[p].processId
-				 });
-			};
-
-            if (items.length === 0) {
-                return vscode.window.showInformationMessage(
-                    "There are no other PowerShell host processes to attach to.").then(_ => {
-                        return null;
+                for(var p in hostProcesses) {
+                    items.push({
+                        label: hostProcesses[p].processName,
+                        description: hostProcesses[p].processId.toString(),
+                        detail: hostProcesses[p].mainWindowTitle,
+                        pid: hostProcesses[p].processId
                     });
-            }
-            else {
-                let options : vscode.QuickPickOptions = {
-                    placeHolder: "Select a PowerShell Host process to attach to",
-                    matchOnDescription: true,
-                    matchOnDetail: true
                 };
 
-                return vscode.window.showQuickPick(items, options).then(item => {
-                    return item ? item.pid : null;
-                });
-            }
-		});
+                if (items.length === 0) {
+                    reject("There are no PowerShell host processes to attach to.");
+                }
+                else {
+                    let options : vscode.QuickPickOptions = {
+                        placeHolder: "Select a PowerShell host process to attach to",
+                        matchOnDescription: true,
+                        matchOnDetail: true
+                    };
+
+                    return vscode.window.showQuickPick(items, options).then(item => {
+                        resolve(item ? item.pid : "");
+                    });
+                }
+            });
+        });
 	}
 
     private clearWaitingToken() {

@@ -196,12 +196,12 @@
                         }
                     },
                     {
-                        "label": "PowerShell: Attach to PowerShell Process Configuration",
-                        "description": "A new configuration for debugging a runspace in another process.",
+                        "label": "PowerShell: Attach to PowerShell Host Process Configuration",
+                        "description": "A new configuration for debugging a runspace in another host process.",
                         "body": {
                             "type": "PowerShell",
                             "request": "attach",
-                            "name": "PowerShell Attach to Process",
+                            "name": "PowerShell Attach to Host Process",
                             "processId": "^\"\\${command.PickPSHostProcess}\"",
                             "runspaceId": 1
                         }
@@ -251,7 +251,7 @@
                             },
                             "processId": {
                                 "type": "string",
-                                "description": "Id of PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
+                                "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
                                 "default": "${command.PickPSHostProcess}"
                             },
                             "runspaceId": {
@@ -274,8 +274,9 @@
                     {
                         "type": "PowerShell",
                         "request": "attach",
-                        "name": "PowerShell Attach",
-                        "processId": "12345"
+                        "name": "PowerShell Attach to Host Process",
+                        "processId": "${command.PickPSHostProcess}",
+                        "runspaceId": 1
                     },
                     {
                         "type": "PowerShell",
