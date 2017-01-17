@@ -73,35 +73,38 @@ export class PickPSHostProcessFeature implements IFeature {
             vscode.commands.registerCommand('PowerShell.PickPSHostProcess', () => {
 
                 if (!this.languageClient && !this.waitingForClientToken) {
+                    return new Promise<string>((resolve, reject) => {
+                        reject("PowerShell has not fully initialized.  Try to attach again after PowerShell has been initialized.");
+                    });
 
-                    // If PowerShell isn't finished loading yet, show a loading message
-                    // until the LanguageClient is passed on to us
-                    var cancelled = false;
-                    var timedOut = false;
-                    this.waitingForClientToken = new vscode.CancellationTokenSource();
+                    // // If PowerShell isn't finished loading yet, show a loading message
+                    // // until the LanguageClient is passed on to us
+                    // var cancelled = false;
+                    // var timedOut = false;
+                    // this.waitingForClientToken = new vscode.CancellationTokenSource();
 
-                    vscode.window
-                        .showQuickPick(
-                            ["Cancel"],
-                            { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
-                            this.waitingForClientToken.token)
-                        .then(response => {
-                            if (response === "Cancel") {
-                                this.clearWaitingToken();
-                            }
-                        });
+                    // vscode.window
+                    //     .showQuickPick(
+                    //         ["Cancel"],
+                    //         { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
+                    //         this.waitingForClientToken.token)
+                    //     .then(response => {
+                    //         if (response === "Cancel") {
+                    //             this.clearWaitingToken();
+                    //         }
+                    //     });
 
-                    // Cancel the loading prompt after 60 seconds
-                    setTimeout(() => {
-                            if (this.waitingForClientToken) {
-                                this.clearWaitingToken();
+                    // // Cancel the loading prompt after 60 seconds
+                    // setTimeout(() => {
+                    //         if (this.waitingForClientToken) {
+                    //             this.clearWaitingToken();
 
-                                vscode.window.showErrorMessage(
-                                    "Attach to PowerShell host process: PowerShell session took too long to start.");
-                            }
-                        }, 60000);
+                    //             vscode.window.showErrorMessage(
+                    //                 "Attach to PowerShell host process: PowerShell session took too long to start.");
+                    //         }
+                    //     }, 60000);
 
-                    // Wait w/timeout on language client to be initialized and then return this.pickPSHostProcess;
+                    // // Wait w/timeout on language client to be initialized and then return this.pickPSHostProcess;
                 }
                 else {
                     return this.pickPSHostProcess();
