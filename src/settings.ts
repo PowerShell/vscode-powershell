@@ -21,6 +21,7 @@ export interface IDeveloperSettings {
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
+    powerShellExeIsWindowsDevBuild?: boolean;
 }
 
 export interface ISettings {
@@ -43,7 +44,8 @@ export function load(myPluginId: string): ISettings {
         powerShellExePath: undefined,
         bundledModulesPath: "../modules/",
         editorServicesLogLevel: "Normal",
-        editorServicesWaitForDebugger: false
+        editorServicesWaitForDebugger: false,
+        powerShellExeIsWindowsDevBuild: false
     };
 
     let defaultCodeFormattingSettings: ICodeFormattingSettings = {
