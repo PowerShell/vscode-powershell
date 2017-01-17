@@ -29,7 +29,8 @@
         "onLanguage:powershell",
         "onCommand:PowerShell.NewProjectFromTemplate",
         "onCommand:PowerShell.OpenExamplesFolder",
-        "onCommand:PowerShell.StartDebugSession"
+        "onCommand:PowerShell.StartDebugSession",
+        "onCommand:PowerShell.PickPSHostProcess"
     ],
     "dependencies": {
         "vscode-languageclient": "1.3.1"
@@ -164,6 +165,9 @@
                 },
                 "program": "./out/debugAdapter.js",
                 "runtime": "node",
+                "variables": {
+                    "PickPSHostProcess": "PowerShell.PickPSHostProcess"
+                },
                 "languages": ["powershell"],
                 "startSessionCommand": "PowerShell.StartDebugSession",
                 "configurationSnippets": [
@@ -198,8 +202,8 @@
                             "type": "PowerShell",
                             "request": "attach",
                             "name": "PowerShell Attach to Process",
-                            "processId": "${ProcessId}",
-                            "runspaceId": "1"
+                            "processId": "^\"\\${command.PickPSHostProcess}\"",
+                            "runspaceId": 1
                         }
                     },
                     {
@@ -246,8 +250,9 @@
                                 "description": "Optional: The computer name to which a remote session will be established.  Works only on PowerShell 4 and above."
                             },
                             "processId": {
-                                "type": "number",
-                                "description": "The ID of the process to be attached.  Works only on PowerShell 5 and above."
+                                "type": "string",
+                                "description": "Id of PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
+                                "default": "${command.PickPSHostProcess}"
                             },
                             "runspaceId": {
                                 "type": "number",
