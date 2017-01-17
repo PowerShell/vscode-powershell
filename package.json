@@ -329,6 +329,16 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
+                },
+                "powershell.codeFormatting.openBraceOnSameLine":{
+                    "type":"boolean",
+                    "default": true,
+                    "description": "Places open brace on the same line as its associated statement."
+                },
+                "powershell.codeFormatting.newLineAfterOpenBrace":{
+                    "type":"boolean",
+                    "default": true,
+                    "description": "A new line must follow an open brace."
                 }
             }
         }

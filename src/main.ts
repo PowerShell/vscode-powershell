@@ -22,6 +22,7 @@ import { SelectPSSARulesFeature } from './features/SelectPSSARules';
 import { FindModuleFeature } from './features/PowerShellFindModule';
 import { NewFileOrProjectFeature } from './features/NewFileOrProject';
 import { ExtensionCommandsFeature } from './features/ExtensionCommands';
+import { DocumentFormatterFeature } from './features/DocumentFormatter';
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
@@ -104,6 +105,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
+        new DocumentFormatterFeature(),
         new DebugSessionFeature(),
         new PickPSHostProcessFeature()
     ];
