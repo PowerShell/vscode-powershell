@@ -16,6 +16,7 @@ import { OpenInISEFeature } from './features/OpenInISE';
 import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
 import { CodeActionsFeature } from './features/CodeActions';
+import { RemoteFilesFeature } from './features/RemoteFiles';
 import { DebugSessionFeature } from './features/DebugSession';
 import { PickPSHostProcessFeature } from './features/DebugSession';
 import { SelectPSSARulesFeature } from './features/SelectPSSARules';
@@ -106,6 +107,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
         new DocumentFormatterFeature(),
+        new RemoteFilesFeature(),
         new DebugSessionFeature(),
         new PickPSHostProcessFeature()
     ];
