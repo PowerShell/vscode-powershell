@@ -316,6 +316,11 @@
                     "default": "",
                     "description": "Specifies the full path to a PowerShell executable.  Used to change the installation of PowerShell used for language and debugging services."
                 },
+                "powershell.developer.powerShellExeIsWindowsDevBuild": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, indicates that the powerShellExePath points to a developer build of Windows PowerShell and should be configured appropriately."
+                },
                 "powershell.developer.bundledModulesPath": {
                     "type": "string",
                     "default": "../modules/",

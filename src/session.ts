@@ -42,6 +42,7 @@ interface CurrentSessionConfiguration {
 interface PathSessionConfiguration {
     type: SessionType.UsePath,
     path: string;
+    isWindowsDevBuild: boolean;
 }
 
 interface BuiltInSessionConfiguration {
@@ -118,8 +119,13 @@ export class SessionManager {
                 startArgs += "-LogLevel '" + this.sessionSettings.developer.editorServicesLogLevel + "' "
             }
 
+            var isWindowsDevBuild =
+                this.sessionConfiguration.type == SessionType.UsePath
+                ? this.sessionConfiguration.isWindowsDevBuild : false;
+
             this.startPowerShell(
                 this.sessionConfiguration.path,
+                isWindowsDevBuild,
                 bundledModulesPath,
                 startArgs);
         }
@@ -214,7 +220,11 @@ export class SessionManager {
         ]
     }
 
-    private startPowerShell(powerShellExePath: string, bundledModulesPath: string, startArgs: string) {
+    private startPowerShell(
+        powerShellExePath: string,
+        isWindowsDevBuild: boolean,
+        bundledModulesPath: string,
+        startArgs: string) {
         try
         {
             this.setSessionStatus(
@@ -242,10 +252,14 @@ export class SessionManager {
 
             powerShellArgs.push(
                 "-Command",
-                "& '" + startScriptPath + "' " + startArgs)
+                "& '" + startScriptPath + "' " + startArgs);
 
             // Launch PowerShell as child process
-            this.powerShellProcess = cp.spawn(powerShellExePath, powerShellArgs);
+            this.powerShellProcess =
+                cp.spawn(
+                    powerShellExePath,
+                    powerShellArgs,
+                    { env: isWindowsDevBuild ? { "DEVPATH": path.dirname(powerShellExePath) } : {} });
 
             var decoder = new StringDecoder('utf8');
             this.powerShellProcess.stdout.on(
@@ -466,7 +480,9 @@ export class SessionManager {
                 var powerShellExePath = (this.sessionSettings.developer.powerShellExePath || "").trim();
                 if (powerShellExePath.length > 0) {
                     return this.resolveSessionConfiguration(
-                        { type: SessionType.UsePath, path: this.sessionSettings.developer.powerShellExePath});
+                        { type: SessionType.UsePath,
+                          path: this.sessionSettings.developer.powerShellExePath,
+                          isWindowsDevBuild: this.sessionSettings.developer.powerShellExeIsWindowsDevBuild});
                 }
                 else {
                     return this.resolveSessionConfiguration(
@@ -591,7 +607,9 @@ export class SessionManager {
                          `Switch to PowerShell at path: ${this.sessionSettings.developer.powerShellExePath}`,
                          () => {
                              this.restartSession(
-                                 { type: SessionType.UsePath, path: this.sessionSettings.developer.powerShellExePath })
+                                 { type: SessionType.UsePath,
+                                   path: this.sessionSettings.developer.powerShellExePath,
+                                   isWindowsDevBuild: this.sessionSettings.developer.powerShellExeIsWindowsDevBuild })
                          }));
             }
 
