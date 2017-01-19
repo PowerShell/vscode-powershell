@@ -254,12 +254,23 @@ export class SessionManager {
                 "-Command",
                 "& '" + startScriptPath + "' " + startArgs);
 
+            // Set DEVPATH environment variable if necessary
+            if (isWindowsDevBuild) {
+                // The development build looks for this environment variable to
+                // know where to find its assemblies
+                process.env.DEVPATH = path.dirname(powerShellExePath);
+            }
+            else {
+                // It's safe to delete this variable even if it doesn't exist
+                delete process.env.DEVPATH;
+            }
+
             // Launch PowerShell as child process
             this.powerShellProcess =
                 cp.spawn(
                     powerShellExePath,
                     powerShellArgs,
-                    { env: isWindowsDevBuild ? { "DEVPATH": path.dirname(powerShellExePath) } : {} });
+                    { env: process.env });
 
             var decoder = new StringDecoder('utf8');
             this.powerShellProcess.stdout.on(
@@ -545,15 +556,17 @@ export class SessionManager {
     }
 
     private resolvePowerShellPath(powerShellExePath: string): string {
+        var resolvedPath = path.resolve(__dirname, powerShellExePath);
+
         // If the path does not exist, show an error
-        if (!utils.checkIfFileExists(powerShellExePath)) {
+        if (!utils.checkIfFileExists(resolvedPath)) {
             this.setSessionFailure(
-                "powershell.exe cannot be found or is not accessible at path " + powerShellExePath);
+                "powershell.exe cannot be found or is not accessible at path " + resolvedPath);
 
             return null;
         }
 
-        return powerShellExePath;
+        return resolvedPath;
     }
 
     private showSessionMenu() {
