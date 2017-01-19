@@ -14,7 +14,7 @@
           "",
           "\tGUID = '<pasteNewGUIDhere>'",
           "",
-          "\tCopyright = '2017 ${company:Copyright Holder}",
+          "\tCopyright = '2017 ${company:Copyright Holder}'",
           "",
           "\tDescription = '${Description:What does this module do?}'",
           "",
