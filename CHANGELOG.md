@@ -1,5 +1,150 @@
 # vscode-powershell Release History
 
+## 0.9.0
+### Thursday, January 19, 2017
+
+#### New PowerShell code formatter
+
+We've added a formatter for PowerShell code which allows you to format an
+entire file or a selection within a file.  You can access this formatter by
+running VS Code's `Format Document` and `Format Selection` commands inside
+of a PowerShell file.
+
+You can configure code formatting with the following settings:
+
+- `powershell.codeFormatting.openBraceOnSameLine` - Places open brace on the
+  same line as its associated statement.  Default is `true`.
+- `powershell.codeFormatting.newLineAfterOpenBrace` - Ensures that a new line
+  occurs after an open brace (unless in a pipeline statement on the same line).
+  Default is `true`
+- `editor.tabSize` - Specifies the indentation width for code blocks.  This
+  is a VS Code setting but it is respected by the code formatter.
+- `editor.formatOnSave` - If true, automatically formats when they are saved.
+  This is a VS Code setting and may also affect non-PowerShell files.
+
+Please note that this is only a first pass at PowerShell code formatting, it
+may not format your code perfectly in all cases.  If you run into any issues,
+please [file an issue](https://github.com/PowerShell/vscode-powershell/issues/new)
+and give us your feedback!
+
+#### Streamlined debugging experience - launch.json is now optional!
+
+**NOTE: This improvement depends on VS Code 1.9.0 which is due for release
+early February!** However, you can try it out right now with the [VS Code Insiders](https://code.visualstudio.com/insiders)
+release.
+
+Thanks to a new improvement in VS Code's debugging APIs, we are now able to
+launch the PowerShell debugger on a script file without the need for a `launch.json`
+file.  You can even debug individual PowerShell scripts without opening a
+workspace folder!  Don't worry, you can still use a `launch.json` file to configure
+specific debugging scenarios.
+
+We've also made debugger startup much more reliable.  You will no longer see the
+dreaded "Debug adapter terminated unexpectedly" message when you try to launch
+the debugger while the language server is still starting up.
+
+#### Support for debugging remote and attached runspaces
+
+We now support remote PowerShell sessions via the [`Enter-PSSession`](https://msdn.microsoft.com/en-us/powershell/reference/5.0/microsoft.powershell.core/enter-pssession)
+cmdlet.  This cmdlet allows you to create a PowerShell session on another machine
+so that you can run commands or debug scripts there.  The full debugging
+experience works with these remote sessions on PowerShell 4 and above, allowing
+you to set breakpoints and see remote files be opened locally when those breakpoints
+are hit.
+
+For PowerShell 5 and above, we also support attaching to local and remote PowerShell
+host processes using the [`Enter-PSHostProcess`](https://msdn.microsoft.com/en-us/powershell/reference/5.0/microsoft.powershell.core/enter-pshostprocess)
+and [`Debug-Runspace`](https://msdn.microsoft.com/en-us/powershell/reference/5.0/microsoft.powershell.utility/debug-runspace)
+cmdlets.  This allows you to jump into another process and then debug a script that
+is already running in one of the runspaces in that process.  The debugger will break
+execution of the running script and then the associated script file will be opened
+in the editor so that you can set breakpoints and step through its execution.
+
+We've also added a new `launch.json` configuration for debugging PowerShell host processes:
+
+![Process launch configuration screenshot](https://cloud.githubusercontent.com/assets/79405/22089468/391e8120-dda0-11e6-950c-64f81b364c35.png)
+
+When launched, the default "attach" configuration will prompt you with a list of
+PowerShell host processes on the local machine so that you can easily select one
+to be debugged:
+
+![Process selection UI screenshot](https://cloud.githubusercontent.com/assets/79405/22081037/c205e516-dd76-11e6-834a-66f4c38e181d.png)
+
+You can also edit the launch configuration to hardcode the launch parameters, even
+setting a remote machine to connect to before attaching to the remote process:
+
+```json
+        {
+            "type": "PowerShell",
+            "request": "attach",
+            "name": "PowerShell Attach to Host Process",
+            "computerName": "my-remote-machine",
+            "processId": "12345",
+            "runspaceId": 1
+        }
+```
+
+Please note that we currently do not yet support initiating remote sessions from Linux
+or macOS.  This will be supported in an upcoming release.
+
+#### Initial support for remote file opening using `psedit`
+
+Another nice improvement is that we now support the `psedit` command in remote and
+attached sessions.  This command allows you to open a file in a local or remote session
+so that you can set breakpoints in it using the UI before launching it.  For now these
+remotely-opened files will not be saved back to the remote session when you edit and
+save them.  We plan to add this capability in the next feature update.
+
+#### New "interactive session" debugging mode
+
+You can now create a new launch configuration which drops you directly into the
+debug console so that you can debug your scripts and modules however you wish.
+You can call Set-PSBreakpoint to set any type of breakpoint and then invoke your
+code through the console to see those breakpoints get hit.  This mode can also be
+useful for debugging remote sessions.
+
+![Interactive session config screenshot](https://cloud.githubusercontent.com/assets/79405/22089502/5e56b4c6-dda0-11e6-8a51-f24e29ce7988.png)
+
+Please note that this is NOT a replacement for a true interactive console experience.
+We've added this debugging configuration to enable a few other debugging scenarios, like
+debugging PowerShell modules, while we work on a true interactive console experience using
+VS Code's Terminal interface.
+
+#### New document symbol support for PSD1 files
+
+We've extended our document symbol support to `.psd1` files to make it really easy to
+navigate through them.  When you have a `.psd1` file open, run the `Go to Symbol in File...`
+command (<kbd>Ctrl + Shift + O</kbd>) and you'll see this popup:
+
+![psd1 symbol screenshot](https://cloud.githubusercontent.com/assets/79405/22094872/85c7d9a2-ddc5-11e6-9bee-5fc8c3dae097.png)
+
+You can type a symbol name or navigate using your arrow keys.  Once you select one of the
+symbol names, the editor pane will jump directly to that line.
+
+#### Other fixes and improvements
+
+- Added a new `Open Examples Folder` command to easily open the extension's
+  example script folder.
+- Added a new setting `powershell.developer.powerShellExeIsWindowsDevBuild`
+  which, when true, indicates that the `powerShellExePath` points to a Windows
+  PowerShell development build.
+- Fixed [#395](https://github.com/PowerShell/vscode-powershell/issues/395):
+  Quick Fix for PSAvoidUsingAliases rule replaces the entire command
+- Fixed [#396](https://github.com/PowerShell/vscode-powershell/issues/396):
+  Extension commands loaded in PowerShell profile are not being registered
+- Fixed [#391](https://github.com/PowerShell/vscode-powershell/issues/391):
+  DSC IntelliSense can cause the language server to crash
+- Fixed [#400](https://github.com/PowerShell/vscode-powershell/issues/400):
+  Language server can crash when selecting PSScriptAnalyzer rules
+- Fixed [#408](https://github.com/PowerShell/vscode-powershell/issues/408):
+  Quick fix requests meant for other extensions crash the language server
+- Fixed [#401](https://github.com/PowerShell/vscode-powershell/issues/401):
+  Extension startup should indicate if the current PowerShell version is unsupported
+- Fixed [#314](https://github.com/PowerShell/vscode-powershell/issues/314):
+  Errors/Warnings still show up in Problems window when file is closed
+- Fixed [#388](https://github.com/PowerShell/vscode-powershell/issues/388):
+  Syntax errors are not reported when powershell.scriptAnalysis.enable is set to false
+
 ## 0.8.0
 ### Friday, December 16, 2016
 
