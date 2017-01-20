@@ -25,7 +25,7 @@ export namespace ScriptFileMarkersRequest {
 
 // TODO move some of the common interface to a separate file?
 interface ScriptFileMarkersRequestParams {
-    filePath: string;
+    fileUri: string;
     settings: any;
 }
 
@@ -122,10 +122,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             let rule = this.ruleOrder[index];
             let uniqueEdits: ScriptRegion[] = [];
             let edits: ScriptRegion[];
+
             return this.languageClient.sendRequest(
                 ScriptFileMarkersRequest.type,
                 {
-                    filePath: document.fileName,
+                    fileUri: document.uri.toString(),
                     settings: this.getSettings(rule)
                 })
                 .then((result: ScriptFileMarkersRequestResultParams) => {
