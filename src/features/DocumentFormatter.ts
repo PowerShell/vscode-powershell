@@ -110,14 +110,16 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         range: Range,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
-        return this.executeRulesInOrder(document, range, options, 0);
+        let textEdits = this.executeRulesInOrder(document, range, options, 0);
+        Window.setStatusBarMessage("formatting...", textEdits);
+        return textEdits;
     }
 
     executeRulesInOrder(
         document: TextDocument,
         range: Range,
         options: FormattingOptions,
-        index: number): Thenable<TextEdit[]> | TextEdit[] {
+        index: number): Thenable<TextEdit[]> {
         if (this.languageClient !== null && index < this.ruleOrder.length) {
             let rule = this.ruleOrder[index];
             let uniqueEdits: ScriptRegion[] = [];
@@ -172,7 +174,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                     return this.executeRulesInOrder(document, range, options, index + 1);
                 });
         } else {
-            return TextEdit[0];
+            return Promise.resolve(new TextEdit[0]);
         }
     }
 
