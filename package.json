@@ -323,7 +323,6 @@
                 },
                 "powershell.developer.bundledModulesPath": {
                     "type": "string",
-                    "default": "../modules/",
                     "description": "Specifies the path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PowerShell Script Analyzer, Plaster)"
                 },
                 "powershell.developer.editorServicesLogLevel": {

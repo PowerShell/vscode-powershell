@@ -42,7 +42,7 @@ export function load(myPluginId: string): ISettings {
 
     let defaultDeveloperSettings: IDeveloperSettings = {
         powerShellExePath: undefined,
-        bundledModulesPath: "../modules/",
+        bundledModulesPath: undefined,
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
         powerShellExeIsWindowsDevBuild: false
