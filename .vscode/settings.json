@@ -1,12 +1,7 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-	// Controls the rendering size of tabs in characters. Accepted values: "auto", 2, 4, 6, etc. If set to "auto", the value will be guessed when a file is opened.
-	"editor.tabSize": 4,
-
-	// Controls if the editor will insert spaces for tabs. Accepted values:  "auto", true, false. If set to "auto", the value will be guessed when a file is opened.
-	"editor.insertSpaces": true,
-
-	// When enabled, will trim trailing whitespace when you save a file.
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
     "files.trimTrailingWhitespace": true,
 
     // Lock the TypeScript SDK path to the version we use
