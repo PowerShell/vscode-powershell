@@ -7,7 +7,26 @@ param(
     [string]$EditorServicesRepoPath = $null
 )
 
-#Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.2.1"}
+#Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
+
+task GetExtensionVersion {
+    $updateVersion = $false
+
+    $script:ExtensionVersion = `
+        if ($env:AppVeyor) {
+            $updateVersion = $true
+            $env:APPVEYOR_BUILD_VERSION
+        }
+        else {
+            exec { & npm version | ConvertFrom-Json | ForEach-Object { $_.PowerShell } }
+        }
+
+    Write-Host "`n### Extension Version: $script:ExtensionVersion`n" -ForegroundColor Green
+
+    if ($updateVersion) {
+        exec { & npm version $script:ExtensionVersion --no-git-tag-version }
+    }
+}
 
 task ResolveEditorServicesPath -Before Clean, Build {
     $script:psesRepoPath = `
@@ -60,4 +79,20 @@ task Build {
     exec { & npm run compile }
 }
 
-task . Clean, Build
+task Package {
+
+    if ($script:psesBuildScriptPath) {
+        Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
+        Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\PowerShellEditorServices .\modules
+    }
+
+    Write-Host "`n### Packaging PowerShell-$($script:ExtensionVersion).vsix`n" -ForegroundColor Green
+    exec { & vsce package }
+}
+
+task UploadArtifacts -If { $env:AppVeyor } {
+    Push-AppveyorArtifact .\PowerShell-$($script:ExtensionVersion).vsix
+}
+
+# The default task is to run the entire CI build
+task . GetExtensionVersion, Clean, Build, Package, UploadArtifacts
