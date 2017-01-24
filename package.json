@@ -1,352 +1,353 @@
 {
-    "name": "PowerShell",
-    "displayName": "PowerShell",
-    "version": "0.9.0",
-    "publisher": "ms-vscode",
-    "description": "Develop PowerShell scripts in Visual Studio Code!",
-    "engines": {
-        "vscode": "^1.7.0"
-    },
-    "license": "SEE LICENSE IN LICENSE.txt",
-    "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
-    "categories": [
-        "Languages",
-        "Snippets",
-        "Debuggers",
-        "Linters"
+  "name": "PowerShell",
+  "displayName": "PowerShell",
+  "version": "0.9.0",
+  "publisher": "ms-vscode",
+  "description": "Develop PowerShell scripts in Visual Studio Code!",
+  "engines": {
+    "vscode": "^1.7.0"
+  },
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
+  "categories": [
+    "Languages",
+    "Snippets",
+    "Debuggers",
+    "Linters"
+  ],
+  "icon": "images/PowerShell_icon.png",
+  "galleryBanner": {
+    "color": "#ACD1EC",
+    "theme": "light"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PowerShell/vscode-powershell.git"
+  },
+  "main": "./out/main",
+  "activationEvents": [
+    "onLanguage:powershell",
+    "onCommand:PowerShell.NewProjectFromTemplate",
+    "onCommand:PowerShell.OpenExamplesFolder",
+    "onCommand:PowerShell.StartDebugSession",
+    "onCommand:PowerShell.PickPSHostProcess"
+  ],
+  "dependencies": {
+    "vscode-languageclient": "1.3.1"
+  },
+  "devDependencies": {
+    "vscode": "^1.0.0",
+    "typescript": "^2.0.3",
+    "@types/node": "^6.0.40"
+  },
+  "extensionDependencies": [
+    "vscode.powershell"
+  ],
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./",
+    "compile-watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "contributes": {
+    "keybindings": [
+      {
+        "command": "PowerShell.OnlineHelp",
+        "key": "ctrl+f1",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+      },
+      {
+        "command": "PowerShell.ExpandAlias",
+        "key": "ctrl+alt+e",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+      },
+      {
+        "command": "PowerShell.RunSelection",
+        "key": "f8",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+      },
+      {
+        "command": "PowerShell.OpenInISE",
+        "key": "ctrl+shift+i",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+      },
+      {
+        "command": "PowerShell.PowerShellFindModule",
+        "key": "ctrl+K ctrl+f",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+      }
     ],
-    "icon": "images/PowerShell_icon.png",
-    "galleryBanner": {
-        "color": "#ACD1EC",
-        "theme": "light"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/PowerShell/vscode-powershell.git"
-    },
-    "main": "./out/main",
-    "activationEvents": [
-        "onLanguage:powershell",
-        "onCommand:PowerShell.NewProjectFromTemplate",
-        "onCommand:PowerShell.OpenExamplesFolder",
-        "onCommand:PowerShell.StartDebugSession",
-        "onCommand:PowerShell.PickPSHostProcess"
+    "commands": [
+      {
+        "command": "PowerShell.ExpandAlias",
+        "title": "Expand Alias",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.OnlineHelp",
+        "title": "Get online help for command",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.RunSelection",
+        "title": "Run selection",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.RestartSession",
+        "title": "Restart Current Session",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.ShowLogs",
+        "title": "Show PowerShell Extension Logs",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.OpenLogFolder",
+        "title": "Open PowerShell Extension Logs Folder",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.OpenInISE",
+        "title": "Open current file in PowerShell ISE",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.PowerShellFindModule",
+        "title": "Find/Install PowerShell modules from the gallery",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.ShowAdditionalCommands",
+        "title": "Show additional commands from PowerShell modules",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.ShowSessionMenu",
+        "title": "Show Session Menu",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.SelectPSSARules",
+        "title": "Select PSScriptAnalyzer Rules",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.ShowSessionOutput",
+        "title": "Show Session Output",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.NewProjectFromTemplate",
+        "title": "Create New Project from Plaster Template",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.OpenExamplesFolder",
+        "title": "Open Examples Folder",
+        "category": "PowerShell"
+      }
     ],
-    "dependencies": {
-        "vscode-languageclient": "1.3.1"
-    },
-    "devDependencies": {
-        "vscode": "^1.0.0",
-        "typescript": "^2.0.3",
-        "@types/node": "^6.0.40"
-    },
-    "extensionDependencies": [
-        "vscode.powershell"
+    "snippets": [
+      {
+        "language": "powershell",
+        "path": "./snippets/PowerShell.json"
+      }
     ],
-    "scripts": {
-        "vscode:prepublish": "tsc -p ./",
-        "compile": "tsc -p ./",
-        "compile-watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install"
-    },
-    "contributes": {
-        "keybindings": [
-            {
-                "command": "PowerShell.OnlineHelp",
-                "key": "ctrl+f1",
-                "when": "editorTextFocus && editorLangId == 'powershell'"
-            },
-            {
-                "command": "PowerShell.ExpandAlias",
-                "key": "ctrl+alt+e",
-                "when": "editorTextFocus && editorLangId == 'powershell'"
-            },
-            {
-                "command": "PowerShell.RunSelection",
-                "key": "f8",
-                "when": "editorTextFocus && editorLangId == 'powershell'"
-            },
-            {
-                "command": "PowerShell.OpenInISE",
-                "key": "ctrl+shift+i",
-                "when": "editorTextFocus && editorLangId == 'powershell'"
-            },
-            {
-                "command": "PowerShell.PowerShellFindModule",
-                "key": "ctrl+K ctrl+f",
-                "when": "editorTextFocus && editorLangId == 'powershell'"
-            }
+    "debuggers": [
+      {
+        "type": "PowerShell",
+        "enableBreakpointsFor": {
+          "languageIds": [
+            "powershell"
+          ]
+        },
+        "program": "./out/debugAdapter.js",
+        "runtime": "node",
+        "variables": {
+          "PickPSHostProcess": "PowerShell.PickPSHostProcess"
+        },
+        "languages": [
+          "powershell"
         ],
-        "commands": [
-            {
-                "command": "PowerShell.ExpandAlias",
-                "title": "Expand Alias",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.OnlineHelp",
-                "title": "Get online help for command",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.RunSelection",
-                "title": "Run selection",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.RestartSession",
-                "title": "Restart Current Session",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.ShowLogs",
-                "title": "Show PowerShell Extension Logs",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.OpenLogFolder",
-                "title": "Open PowerShell Extension Logs Folder",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.OpenInISE",
-                "title": "Open current file in PowerShell ISE",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.PowerShellFindModule",
-                "title": "Find/Install PowerShell modules from the gallery",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.ShowAdditionalCommands",
-                "title": "Show additional commands from PowerShell modules",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.ShowSessionMenu",
-                "title": "Show Session Menu",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.SelectPSSARules",
-                "title": "Select PSScriptAnalyzer Rules",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.ShowSessionOutput",
-                "title": "Show Session Output",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.NewProjectFromTemplate",
-                "title": "Create New Project from Plaster Template",
-                "category": "PowerShell"
-            },
-            {
-                "command": "PowerShell.OpenExamplesFolder",
-                "title": "Open Examples Folder",
-                "category": "PowerShell"
+        "startSessionCommand": "PowerShell.StartDebugSession",
+        "configurationSnippets": [
+          {
+            "label": "PowerShell: Launch Current Script Configuration",
+            "description": "A new configuration for launching the current opened PowerShell script",
+            "body": {
+              "type": "PowerShell",
+              "request": "launch",
+              "name": "PowerShell Launch (current file)",
+              "script": "^\"\\${file}\"",
+              "args": [],
+              "cwd": "^\"\\${file}\""
             }
-        ],
-        "snippets": [
-            {
-                "language": "powershell",
-                "path": "./snippets/PowerShell.json"
+          },
+          {
+            "label": "PowerShell: Launch Script Configuration",
+            "description": "A new configuration for launching a PowerShell script",
+            "body": {
+              "type": "PowerShell",
+              "request": "launch",
+              "name": "PowerShell Launch (${Script})",
+              "script": "^\"\\${workspaceRoot}/${Script}\"",
+              "args": [],
+              "cwd": "^\"\\${workspaceRoot}\""
             }
-        ],
-        "debuggers": [
-            {
-                "type": "PowerShell",
-                "enableBreakpointsFor": {
-                    "languageIds": [
-                        "powershell"
-                    ]
-                },
-                "program": "./out/debugAdapter.js",
-                "runtime": "node",
-                "variables": {
-                    "PickPSHostProcess": "PowerShell.PickPSHostProcess"
-                },
-                "languages": ["powershell"],
-                "startSessionCommand": "PowerShell.StartDebugSession",
-                "configurationSnippets": [
-                    {
-                        "label": "PowerShell: Launch Current Script Configuration",
-                        "description": "A new configuration for launching the current opened PowerShell script",
-                        "body": {
-                            "type": "PowerShell",
-                            "request": "launch",
-                            "name": "PowerShell Launch (current file)",
-                            "script": "^\"\\${file}\"",
-                            "args": [],
-                            "cwd": "^\"\\${file}\""
-                        }
-                    },
-                    {
-                        "label": "PowerShell: Launch Script Configuration",
-                        "description": "A new configuration for launching a PowerShell script",
-                        "body": {
-                            "type": "PowerShell",
-                            "request": "launch",
-                            "name": "PowerShell Launch (${Script})",
-                            "script": "^\"\\${workspaceRoot}/${Script}\"",
-                            "args": [],
-                            "cwd": "^\"\\${workspaceRoot}\""
-                        }
-                    },
-                    {
-                        "label": "PowerShell: Attach to PowerShell Host Process Configuration",
-                        "description": "A new configuration for debugging a runspace in another host process.",
-                        "body": {
-                            "type": "PowerShell",
-                            "request": "attach",
-                            "name": "PowerShell Attach to Host Process",
-                            "processId": "^\"\\${command.PickPSHostProcess}\"",
-                            "runspaceId": 1
-                        }
-                    },
-                    {
-                        "label": "PowerShell: Launch Interactive Session Configuration",
-                        "description": "A new configuration for debugging an interactive session.",
-                        "body": {
-                            "type": "PowerShell",
-                            "request": "launch",
-                            "name": "PowerShell Interactive Session"
-                        }
-                    }
-                ],
-
-                "configurationAttributes": {
-                    "launch": {
-                        "properties": {
-                            "program": {
-                                "type": "string",
-                                "description": "Deprecated. Please use the 'script' property instead to specify the absolute path to the PowerShell script to launch under the debugger."
-                            },
-                            "script": {
-                                "type": "string",
-                                "description": "Optional: Absolute path to the PowerShell script to launch under the debugger."
-                            },
-                            "args": {
-                                "type": "array",
-                                "description": "Command line arguments to pass to the PowerShell script.",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "default": []
-                            },
-                            "cwd": {
-                                "type": "string",
-                                "description": "Absolute path to the working directory. Default is the current workspace.",
-                                "default": "${workspaceRoot}"
-                            }
-                        }
-                    },
-                    "attach": {
-                        "properties": {
-                            "computerName": {
-                                "type": "string",
-                                "description": "Optional: The computer name to which a remote session will be established.  Works only on PowerShell 4 and above."
-                            },
-                            "processId": {
-                                "type": "string",
-                                "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
-                                "default": "${command.PickPSHostProcess}"
-                            },
-                            "runspaceId": {
-                                "type": "number",
-                                "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
-                                "default": 1
-                            }
-                        }
-                    }
-                },
-                "initialConfigurations": [
-                    {
-                        "type": "PowerShell",
-                        "request": "launch",
-                        "name": "PowerShell Launch (current file)",
-                        "script": "${file}",
-                        "args": [],
-                        "cwd": "${file}"
-                    },
-                    {
-                        "type": "PowerShell",
-                        "request": "attach",
-                        "name": "PowerShell Attach to Host Process",
-                        "processId": "${command.PickPSHostProcess}",
-                        "runspaceId": 1
-                    },
-                    {
-                        "type": "PowerShell",
-                        "request": "launch",
-                        "name": "PowerShell Interactive Session",
-                        "cwd": "${workspaceRoot}"
-                    }
-                ]
+          },
+          {
+            "label": "PowerShell: Attach to PowerShell Host Process Configuration",
+            "description": "A new configuration for debugging a runspace in another host process.",
+            "body": {
+              "type": "PowerShell",
+              "request": "attach",
+              "name": "PowerShell Attach to Host Process",
+              "processId": "^\"\\${command.PickPSHostProcess}\"",
+              "runspaceId": 1
             }
+          },
+          {
+            "label": "PowerShell: Launch Interactive Session Configuration",
+            "description": "A new configuration for debugging an interactive session.",
+            "body": {
+              "type": "PowerShell",
+              "request": "launch",
+              "name": "PowerShell Interactive Session"
+            }
+          }
         ],
-        "configuration": {
-            "type": "object",
-            "title": "PowerShell Configuration",
+        "configurationAttributes": {
+          "launch": {
             "properties": {
-                "powershell.useX86Host": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "If true, causes the 32-bit language service to be used on 64-bit Windows.  On 32-bit Windows this setting has no effect.  This setting does not affect the debugger which has its own architecture configuration."
+              "program": {
+                "type": "string",
+                "description": "Deprecated. Please use the 'script' property instead to specify the absolute path to the PowerShell script to launch under the debugger."
+              },
+              "script": {
+                "type": "string",
+                "description": "Optional: Absolute path to the PowerShell script to launch under the debugger."
+              },
+              "args": {
+                "type": "array",
+                "description": "Command line arguments to pass to the PowerShell script.",
+                "items": {
+                  "type": "string"
                 },
-                "powershell.enableProfileLoading": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "If true, causes user and system wide profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) to be loaded into the PowerShell session.  This affects IntelliSense and interactive script execution.  The debugger is not affected by this setting."
-                },
-                "powershell.scriptAnalysis.enable": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Enables real-time script analysis using PowerShell Script Analyzer."
-                },
-                "powershell.scriptAnalysis.settingsPath": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
-                },
-                "powershell.developer.powerShellExePath": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Specifies the full path to a PowerShell executable.  Used to change the installation of PowerShell used for language and debugging services."
-                },
-                "powershell.developer.powerShellExeIsWindowsDevBuild": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "If true, indicates that the powerShellExePath points to a developer build of Windows PowerShell and should be configured appropriately."
-                },
-                "powershell.developer.bundledModulesPath": {
-                    "type": "string",
-                    "description": "Specifies the path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PowerShell Script Analyzer, Plaster)"
-                },
-                "powershell.developer.editorServicesLogLevel": {
-                    "type": "string",
-                    "default": "Normal",
-                    "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Possible values are 'Verbose', 'Normal', 'Warning', and 'Error'"
-                },
-                "powershell.developer.editorServicesWaitForDebugger": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
-                },
-                "powershell.codeFormatting.openBraceOnSameLine":{
-                    "type":"boolean",
-                    "default": true,
-                    "description": "Places open brace on the same line as its associated statement."
-                },
-                "powershell.codeFormatting.newLineAfterOpenBrace":{
-                    "type":"boolean",
-                    "default": true,
-                    "description": "A new line must follow an open brace."
-                }
+                "default": []
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Absolute path to the working directory. Default is the current workspace.",
+                "default": "${workspaceRoot}"
+              }
             }
+          },
+          "attach": {
+            "properties": {
+              "computerName": {
+                "type": "string",
+                "description": "Optional: The computer name to which a remote session will be established.  Works only on PowerShell 4 and above."
+              },
+              "processId": {
+                "type": "string",
+                "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
+                "default": "${command.PickPSHostProcess}"
+              },
+              "runspaceId": {
+                "type": "number",
+                "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
+                "default": 1
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Launch (current file)",
+            "script": "${file}",
+            "args": [],
+            "cwd": "${file}"
+          },
+          {
+            "type": "PowerShell",
+            "request": "attach",
+            "name": "PowerShell Attach to Host Process",
+            "processId": "${command.PickPSHostProcess}",
+            "runspaceId": 1
+          },
+          {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Interactive Session",
+            "cwd": "${workspaceRoot}"
+          }
+        ]
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "PowerShell Configuration",
+      "properties": {
+        "powershell.useX86Host": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, causes the 32-bit language service to be used on 64-bit Windows.  On 32-bit Windows this setting has no effect.  This setting does not affect the debugger which has its own architecture configuration."
+        },
+        "powershell.enableProfileLoading": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, causes user and system wide profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) to be loaded into the PowerShell session.  This affects IntelliSense and interactive script execution.  The debugger is not affected by this setting."
+        },
+        "powershell.scriptAnalysis.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables real-time script analysis using PowerShell Script Analyzer."
+        },
+        "powershell.scriptAnalysis.settingsPath": {
+          "type": "string",
+          "default": "",
+          "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
+        },
+        "powershell.developer.powerShellExePath": {
+          "type": "string",
+          "default": "",
+          "description": "Specifies the full path to a PowerShell executable.  Used to change the installation of PowerShell used for language and debugging services."
+        },
+        "powershell.developer.powerShellExeIsWindowsDevBuild": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, indicates that the powerShellExePath points to a developer build of Windows PowerShell and should be configured appropriately."
+        },
+        "powershell.developer.bundledModulesPath": {
+          "type": "string",
+          "description": "Specifies the path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PowerShell Script Analyzer, Plaster)"
+        },
+        "powershell.developer.editorServicesLogLevel": {
+          "type": "string",
+          "default": "Normal",
+          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Possible values are 'Verbose', 'Normal', 'Warning', and 'Error'"
+        },
+        "powershell.developer.editorServicesWaitForDebugger": {
+          "type": "boolean",
+          "default": false,
+          "description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
+        },
+        "powershell.codeFormatting.openBraceOnSameLine": {
+          "type": "boolean",
+          "default": true,
+          "description": "Places open brace on the same line as its associated statement."
+        },
+        "powershell.codeFormatting.newLineAfterOpenBrace": {
+          "type": "boolean",
+          "default": true,
+          "description": "A new line must follow an open brace."
         }
-    },
-    "private": true
+      }
+    }
+  },
+  "private": true
 }
