@@ -44,6 +44,23 @@ To open/view the extension's examples in Visual Studio Code, run the following f
 code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
 
+## Installing the Extension
+
+You can install the official release of the PowerShell extension by following the steps
+in the [Visual Studio Code documentation](https://code.visualstudio.com/docs/editor/extension-gallery).
+In the Extensions pane, search for "PowerShell" extension and install it there.  You will
+get notified automatically about any future extension updates!
+
+You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
+[Install from a VSIX](https://code.visualstudio.com/docs/extensions/install-extension#_install-from-a-vsix)
+instructions.  The easiest way is through the command line:
+
+```
+code --install-extension PowerShell-<version>.vsix
+```
+
+> NOTE: If you are using VS Code Insiders, the command will be `code-insiders`.
+
 ## Reporting Problems
 
 If you're having trouble with the PowerShell extension, please follow these instructions
