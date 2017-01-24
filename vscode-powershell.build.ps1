@@ -29,9 +29,13 @@ task ResolveEditorServicesPath -Before Clean, Build {
     }
 }
 
-task Restore -If { "Restore" -in $BuildTasks -or !(Test-Path "./node_modules") } -Before Build {
-    Write-Host "`n### Restoring vscode-powershell dependencies, this could take a while`n" -ForegroundColor Green
-    exec { & npm install }
+task Restore -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } -Before Build {
+    Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
+
+    # When in a CI build use the --loglevel=error parameter so that
+    # package install warnings don't cause PowerShell to throw up
+    $logLevelParam = if ($env:AppVeyor) { "--loglevel=error" } else { "" }
+    exec { & npm install $logLevelParam }
 }
 
 task Clean {
