@@ -72,6 +72,12 @@ export class SessionManager {
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
 
+    // When in development mode, VS Code's session ID is a fake
+    // value of "someValue.machineId".  Use that to detect dev
+    // mode for now until Microsoft/vscode#10272 gets implemented.
+    private readonly inDevelopmentMode =
+        vscode.env.sessionId === "someValue.sessionId";
+
     constructor(
         private requiredEditorServicesVersion: string,
         private log: Logger,
@@ -100,9 +106,24 @@ export class SessionManager {
         if (this.sessionConfiguration.type === SessionType.UsePath ||
             this.sessionConfiguration.type === SessionType.UseBuiltIn) {
 
-            var bundledModulesPath = this.sessionSettings.developer.bundledModulesPath;
-            if (!path.isAbsolute(bundledModulesPath)) {
-                bundledModulesPath = path.resolve(__dirname, bundledModulesPath);
+            var bundledModulesPath = path.resolve(__dirname, "../modules");
+
+            if (this.inDevelopmentMode) {
+                var devBundledModulesPath =
+                    // this.sessionSettings.developer.bundledModulesPath ||
+                    path.resolve(
+                        __dirname,
+                        this.sessionSettings.developer.bundledModulesPath ||
+                        "../../PowerShellEditorServices/module");
+
+                // Make sure the module's bin path exists
+                if (fs.existsSync(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
+                    bundledModulesPath = devBundledModulesPath;
+                }
+                else {
+                    this.log.write(
+                        `\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be found (or has not been built yet): ${devBundledModulesPath}\n`);
+                }
             }
 
             var startArgs =

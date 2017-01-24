@@ -10,7 +10,7 @@
 			"stopOnEntry": false,
 			"sourceMaps": true,
 			"outDir": "${workspaceRoot}/out",
-			"preLaunchTask": "compile"
+			"preLaunchTask": "Build"
 		},
 		{
 			"name": "Attach",
