@@ -13,7 +13,7 @@ to before you can proceed.
 
 ### 4. Install [Visual Studio Code Insiders Release](https://code.visualstudio.com/insiders)
 
-### 5. Install [Node.js](https://nodejs.org/en/) 4.4.1 or higher.
+### 5. Install [Node.js](https://nodejs.org/en/) 6.0.0 or higher.
 
 ## Building the Code
 
