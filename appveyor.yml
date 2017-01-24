@@ -1,0 +1,21 @@
+version: '0.9.0.{build}'
+image: Visual Studio 2017 RC
+clone_depth: 10
+skip_tags: true
+
+branches:
+  only:
+  - master
+  - develop
+
+install:
+  - git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
+  - ps: |
+      Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
+      Install-Module InvokeBuild -RequiredVersion 3.2.1 -Scope CurrentUser -Force | Out-Null
+
+build_script:
+  - ps: Invoke-Build Build
+
+# The build script takes care of the tests
+test: off
