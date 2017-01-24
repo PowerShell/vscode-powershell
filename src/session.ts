@@ -93,6 +93,11 @@ export class SessionManager {
                 .packageJSON
                 .version;
 
+        // Fix the host version so that PowerShell can consume it.
+        // This is needed when the extension uses a prerelease
+        // version string like 0.9.1-insiders-1234.
+        this.hostVersion = this.hostVersion.split('-')[0];
+
         this.registerCommands();
         this.createStatusBarItem();
     }
