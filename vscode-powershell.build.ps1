@@ -9,9 +9,8 @@ param(
 
 #Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
 
-task GetExtensionVersion {
+task GetExtensionVersion -Before Package {
     $updateVersion = $false
-
     $script:ExtensionVersion = `
         if ($env:AppVeyor) {
             $updateVersion = $true
@@ -67,7 +66,7 @@ task Clean {
     Remove-Item .\out -Recurse -Force -ErrorAction Ignore
 }
 
-task Build {
+task Build -Before Package {
 
     # If the PSES codebase is co-located, build it first
     if ($script:psesBuildScriptPath) {
@@ -87,7 +86,7 @@ task Package {
     }
 
     Write-Host "`n### Packaging PowerShell-$($script:ExtensionVersion).vsix`n" -ForegroundColor Green
-    exec { & vsce package }
+    exec { & node ./node_modules/vsce/out/vsce package }
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
