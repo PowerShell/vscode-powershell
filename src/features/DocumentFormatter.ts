@@ -18,6 +18,7 @@ import Window = vscode.window;
 import { IFeature } from '../feature';
 import * as Settings from '../settings';
 import * as Utils from '../utils';
+import * as AnimatedStatusBar from '../animatedStatusBar';
 
 export namespace ScriptFileMarkersRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptFileMarkers"; } };
@@ -80,66 +81,6 @@ function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): nu
     }
 }
 
-class AnimatedStatuBarItem {
-    private statusBarItem: vscode.StatusBarItem;
-    private maxCount: number;
-    private counter: number;
-    private baseText: string;
-    private text: string;
-    private timerInterval: number;
-    private ticks: number;
-    private intervalId: NodeJS.Timer;
-
-    constructor() {
-        this.statusBarItem = Window.createStatusBarItem();
-        this.baseText = "formatting";
-        this.maxCount = 4;
-        this.counter = 0;
-        this.timerInterval = 300;
-        this.ticks = 0;
-    }
-
-    updateCounter() {
-        this.counter = (this.counter + 1) % this.maxCount;
-        this.ticks = this.ticks + 1;
-    }
-
-    updateText() {
-        this.text = this.baseText + ".".repeat(this.counter) + " ".repeat(this.maxCount - this.counter - 1);
-    }
-
-    update() {
-        this.updateCounter();
-        this.updateText();
-        this.statusBarItem.text = this.text;
-    }
-
-    reset() {
-        this.counter = 0;
-    }
-
-    start(hideWhenDone?: Thenable<any>) {
-        this.intervalId = setInterval(() => this.update(), this.timerInterval);
-        this.show();
-        if (hideWhenDone !== undefined) {
-            hideWhenDone.then(() => this.stop());
-        }
-    }
-
-    stop() {
-        clearInterval(this.intervalId);
-        this.hide();
-    }
-
-    show() {
-        this.statusBarItem.show();
-    }
-
-    hide() {
-        this.statusBarItem.hide();
-    }
-}
-
 class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider, DocumentRangeFormattingEditProvider {
     private languageClient: LanguageClient;
 
@@ -171,9 +112,8 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
-        let status: AnimatedStatuBarItem = new AnimatedStatuBarItem();
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(document, range, options, 0);
-        status.start(textEdits);
+        AnimatedStatusBar.setAnimatedStatusBarMessage("formatting", textEdits);
         return textEdits;
     }
 
