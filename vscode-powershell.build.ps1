@@ -9,7 +9,12 @@ param(
 
 #Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
 
+$script:IsPullRequestBuild =
+    $env:APPVEYOR_PULL_REQUEST_NUMBER -and
+    $env:APPVEYOR_REPO_BRANCH -eq "develop"
+
 task GetExtensionVersion -Before Package {
+
     $updateVersion = $false
     $script:ExtensionVersion = `
         if ($env:AppVeyor) {
@@ -28,6 +33,7 @@ task GetExtensionVersion -Before Package {
 }
 
 task ResolveEditorServicesPath -Before Clean, Build {
+
     $script:psesRepoPath = `
         if ($EditorServicesRepoPath) {
             $EditorServicesRepoPath
@@ -48,6 +54,7 @@ task ResolveEditorServicesPath -Before Clean, Build {
 }
 
 task Restore -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } -Before Build {
+
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
 
     # When in a CI build use the --loglevel=error parameter so that
@@ -57,6 +64,7 @@ task Restore -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } 
 }
 
 task Clean {
+
     if ($script:psesBuildScriptPath) {
         Write-Host "`n### Cleaning PowerShellEditorServices`n" -ForegroundColor Green
         Invoke-Build Clean $script:psesBuildScriptPath
@@ -90,6 +98,7 @@ task Package {
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
+
     Push-AppveyorArtifact .\PowerShell-$($script:ExtensionVersion).vsix
 }
 
