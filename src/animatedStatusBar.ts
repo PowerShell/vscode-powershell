@@ -9,12 +9,12 @@ import {
     window} from "vscode";
 
 export function setAnimatedStatusBarMessage(text: string, hideWhenDone: Thenable<any>): Disposable {
-    let animatedStatusBarItem: AnimatedStatuBarItem = new AnimatedStatuBarItem(text);
+    let animatedStatusBarItem: AnimatedStatusBarItem = new AnimatedStatusBarItem(text);
     animatedStatusBarItem.show(hideWhenDone);
     return animatedStatusBarItem;
 }
 
-class AnimatedStatuBarItem implements StatusBarItem {
+class AnimatedStatusBarItem implements StatusBarItem {
     private readonly animationRate: number;
     private statusBarItem: StatusBarItem;
     private maxCount: number;
