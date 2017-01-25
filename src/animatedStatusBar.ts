@@ -25,43 +25,43 @@ class AnimatedStatuBarItem implements StatusBarItem {
     private intervalId: NodeJS.Timer;
     private suffixStates: string[];
 
-    get alignment(): StatusBarAlignment {
+    public get alignment(): StatusBarAlignment {
         return this.statusBarItem.alignment;
     }
 
-    get priority(): number {
+    public get priority(): number {
         return this.statusBarItem.priority;
     }
 
-    get text(): string {
+    public get text(): string {
         return this.statusBarItem.text;
     }
 
-    set text(value: string) {
+    public set text(value: string) {
         this.statusBarItem.text = value;
     }
 
-    get tooltip(): string {
+    public get tooltip(): string {
         return this.statusBarItem.tooltip;
     }
 
-    set tooltip(value: string) {
+    public set tooltip(value: string) {
         this.statusBarItem.tooltip = value;
     }
 
-    get color(): string {
+    public get color(): string {
         return this.statusBarItem.color;
     }
 
-    set color(value: string) {
+    public set color(value: string) {
         this.statusBarItem.color = value;
     }
 
-    get command(): string {
+    public get command(): string {
         return this.statusBarItem.command;
     }
 
-    set command(value: string) {
+    public set command(value: string) {
         this.statusBarItem.command = value;
     }
 
@@ -76,48 +76,48 @@ class AnimatedStatuBarItem implements StatusBarItem {
         this.elapsedTime = 0;
     }
 
-    show(hideWhenDone?: Thenable<any>): void {
+    public show(hideWhenDone?: Thenable<any>): void {
         this.statusBarItem.show();
-        this._start();
+        this.start();
         if (hideWhenDone !== undefined) {
             hideWhenDone.then(() => this.hide());
         }
     }
 
-    hide(): void {
-        this._stop();
+    public hide(): void {
+        this.stop();
         this.statusBarItem.hide();
     }
 
-    dispose(): void {
+    public dispose(): void {
         this.statusBarItem.dispose();
     }
 
-    _updateCounter(): void {
+    private updateCounter(): void {
         this.counter = (this.counter + 1) % this.maxCount;
         this.elapsedTime = this.elapsedTime + this.timerInterval;
     }
 
-    _updateText(): void {
+    private updateText(): void {
         this.text = this.baseText + this.suffixStates[this.counter];
     }
 
-    _update(): void {
-        this._updateCounter();
-        this._updateText();
+    private update(): void {
+        this.updateCounter();
+        this.updateText();
     }
 
-    _reset(): void {
+    private reset(): void {
         this.counter = 0;
-        this._updateText();
+        this.updateText();
     }
 
-    _start(): void {
-        this._reset();
-        this.intervalId = setInterval(() => this._update(), this.timerInterval);
+    private  start(): void {
+        this.reset();
+        this.intervalId = setInterval(() => this.update(), this.timerInterval);
     }
 
-    _stop(): void {
+    private stop(): void {
         clearInterval(this.intervalId);
     }
 }
