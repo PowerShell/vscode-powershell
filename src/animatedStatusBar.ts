@@ -11,13 +11,15 @@ export function setAnimatedStatusBarMessage(text: string, hideWhenDone: Thenable
 }
 
 class AnimatedStatuBarItem implements StatusBarItem {
+    private readonly animationRate: number;
     private statusBarItem: StatusBarItem;
     private maxCount: number;
     private counter: number;
     private baseText: string;
     private timerInterval: number;
-    private ticks: number;
+    private elapsedTime: number;
     private intervalId: NodeJS.Timer;
+    private suffixStates: string[];
 
     get alignment(): StatusBarAlignment {
         return this.statusBarItem.alignment;
@@ -60,12 +62,14 @@ class AnimatedStatuBarItem implements StatusBarItem {
     }
 
     constructor(baseText: string, alignment?: StatusBarAlignment, priority?: number) {
+        this.animationRate = 1;
         this.statusBarItem = window.createStatusBarItem(alignment, priority);
         this.baseText = baseText;
-        this.maxCount = 4;
         this.counter = 0;
-        this.timerInterval = 300;
-        this.ticks = 0;
+        this.suffixStates = ["  ", ".  ", ".. ", "..."];
+        this.maxCount = this.suffixStates.length;
+        this.timerInterval = ((1/this.maxCount) * 1000) / this.animationRate;
+        this.elapsedTime = 0;
     }
 
     show(hideWhenDone?: Thenable<any>): void {
@@ -87,11 +91,11 @@ class AnimatedStatuBarItem implements StatusBarItem {
 
     _updateCounter(): void {
         this.counter = (this.counter + 1) % this.maxCount;
-        this.ticks = this.ticks + 1;
+        this.elapsedTime = this.elapsedTime + this.timerInterval;
     }
 
     _updateText(): void {
-        this.text = this.baseText + ".".repeat(this.counter) + " ".repeat(this.maxCount - this.counter - 1);
+        this.text = this.baseText + this.suffixStates[this.counter];
     }
 
     _update(): void {
