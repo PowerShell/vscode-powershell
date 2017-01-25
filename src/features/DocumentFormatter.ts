@@ -18,6 +18,7 @@ import Window = vscode.window;
 import { IFeature } from '../feature';
 import * as Settings from '../settings';
 import * as Utils from '../utils';
+import * as AnimatedStatusBar from '../animatedStatusBar';
 
 export namespace ScriptFileMarkersRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptFileMarkers"; } };
@@ -110,14 +111,17 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         range: Range,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
-        return this.executeRulesInOrder(document, range, options, 0);
+
+        let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(document, range, options, 0);
+        AnimatedStatusBar.setAnimatedStatusBarMessage("formatting", textEdits);
+        return textEdits;
     }
 
     executeRulesInOrder(
         document: TextDocument,
         range: Range,
         options: FormattingOptions,
-        index: number): Thenable<TextEdit[]> | TextEdit[] {
+        index: number): Thenable<TextEdit[]> {
         if (this.languageClient !== null && index < this.ruleOrder.length) {
             let rule = this.ruleOrder[index];
             let uniqueEdits: ScriptRegion[] = [];
@@ -172,7 +176,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                     return this.executeRulesInOrder(document, range, options, index + 1);
                 });
         } else {
-            return TextEdit[0];
+            return Promise.resolve(TextEdit[0]);
         }
     }
 
