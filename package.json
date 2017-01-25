@@ -58,7 +58,7 @@
       },
       {
         "command": "PowerShell.ExpandAlias",
-        "key": "ctrl+alt+e",
+        "key": "shift+alt+e",
         "when": "editorTextFocus && editorLangId == 'powershell'"
       },
       {
