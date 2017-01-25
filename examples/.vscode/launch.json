@@ -4,6 +4,11 @@
         {
             "type": "PowerShell",
             "request": "launch",
+            "name": "PowerShell Interactive Session"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
             "name": "PowerShell Launch (current file)",
             "script": "${file}",
             "args": [],

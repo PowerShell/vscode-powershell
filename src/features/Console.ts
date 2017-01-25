@@ -4,7 +4,7 @@
 
 import vscode = require('vscode');
 import { IFeature } from '../feature';
-import { showCheckboxQuickPick, CheckboxQuickPickItem } from '../checkboxQuickPick'
+import { showCheckboxQuickPick, CheckboxQuickPickItem } from '../controls/checkboxQuickPick'
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace EvaluateRequest {
