@@ -8,7 +8,7 @@ import {
     Disposable,
     window} from "vscode";
 
-export function setAnimatedStatusBarMessage(text: string, hideWhenDone: Thenable<any>): Disposable {
+export function showAnimatedStatusBarMessage(text: string, hideWhenDone: Thenable<any>): Disposable {
     let animatedStatusBarItem: AnimatedStatusBarItem = new AnimatedStatusBarItem(text);
     animatedStatusBarItem.show(hideWhenDone);
     return animatedStatusBarItem;

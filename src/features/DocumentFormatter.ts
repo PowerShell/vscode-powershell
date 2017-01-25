@@ -18,7 +18,7 @@ import Window = vscode.window;
 import { IFeature } from '../feature';
 import * as Settings from '../settings';
 import * as Utils from '../utils';
-import * as AnimatedStatusBar from '../animatedStatusBar';
+import * as AnimatedStatusBar from '../controls/animatedStatusBar';
 
 export namespace ScriptFileMarkersRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptFileMarkers"; } };
@@ -113,7 +113,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(document, range, options, 0);
-        AnimatedStatusBar.setAnimatedStatusBarMessage("formatting", textEdits);
+        AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
         return textEdits;
     }
 

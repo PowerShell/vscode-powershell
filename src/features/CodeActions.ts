@@ -1,3 +1,7 @@
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ *--------------------------------------------------------*/
+
 import vscode = require('vscode');
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 import Window = vscode.window;

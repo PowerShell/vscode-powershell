@@ -5,7 +5,7 @@
 import vscode = require("vscode");
 import { IFeature } from "../feature";
 import { LanguageClient, RequestType } from "vscode-languageclient";
-import { CheckboxQuickPickItem, showCheckboxQuickPick } from "../checkboxQuickPick";
+import { CheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
 
 export namespace GetPSSARulesRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getPSSARules"; } };
