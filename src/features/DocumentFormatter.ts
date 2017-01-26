@@ -2,6 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
+import * as path from "path";
 import vscode = require('vscode');
 import {
     TextDocument,
@@ -11,6 +12,7 @@ import {
     DocumentFormattingEditProvider,
     DocumentRangeFormattingEditProvider,
     Range,
+    TextEditor
 } from 'vscode';
 import { LanguageClient, RequestType } from 'vscode-languageclient';
 import Window = vscode.window;
@@ -95,6 +97,10 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     // hence we keep this as an option but set it true by default.
     private aggregateUndoStop: boolean;
 
+    private get emptyPromise(): Promise<TextEdit[]> {
+        return Promise.resolve(TextEdit[0]);
+    }
+
     constructor(aggregateUndoStop = true) {
         this.aggregateUndoStop = aggregateUndoStop;
     }
@@ -112,15 +118,26 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
+        let editor: TextEditor = this.getEditor(document);
+        if (editor === undefined) {
+            Window.showWarningMessage(`Something went wrong. Cannot format ${path.basename(document.fileName)}`);
+            return this.emptyPromise;
+        }
+
         if (this.isDocumentLocked(document)) {
-            return;
+            Window.showWarningMessage(`Formatting ${path.basename(document.fileName)}. Please wait.`);
+            return this.emptyPromise;
         }
 
         this.lockDocument(document);
-        let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(document, range, options, 0);
+        let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
         this.releaseDocument(document, textEdits);
         AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
         return textEdits;
+    }
+
+    getEditor(document: TextDocument): TextEditor {
+        return Window.visibleTextEditors.find((e, n, obj) => { return e.document === document; });
     }
 
     isDocumentLocked(document: TextDocument): boolean {
@@ -150,13 +167,14 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     }
 
     executeRulesInOrder(
-        document: TextDocument,
+        editor: TextEditor,
         range: Range,
         options: FormattingOptions,
         index: number): Thenable<TextEdit[]> {
         if (this.languageClient !== null && index < this.ruleOrder.length) {
-            let rule = this.ruleOrder[index];
+            let rule: string = this.ruleOrder[index];
             let uniqueEdits: ScriptRegion[] = [];
+            let document: TextDocument = editor.document;
             let edits: ScriptRegion[];
 
             return this.languageClient.sendRequest(
@@ -197,22 +215,29 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                     // we do not return a valid array because our text edits
                     // need to be executed in a particular order and it is
                     // easier if we perform the edits ourselves
-                    return this.applyEdit(uniqueEdits, range, 0, index);
+                    return this.applyEdit(editor, uniqueEdits, range, 0, index);
                 })
                 .then(() => {
                     // execute the same rule again if we left out violations
                     // on the same line
+                    let newIndex: number = index + 1;
                     if (uniqueEdits.length !== edits.length) {
-                        return this.executeRulesInOrder(document, range, options, index);
+                        newIndex = index;
                     }
-                    return this.executeRulesInOrder(document, range, options, index + 1);
+
+                    return this.executeRulesInOrder(editor, range, options, newIndex);
                 });
         } else {
-            return Promise.resolve(TextEdit[0]);
+            return this.emptyPromise;
         }
     }
 
-    applyEdit(edits: ScriptRegion[], range: Range, markerIndex: number, ruleIndex: number): Thenable<void> {
+    applyEdit(
+        editor: TextEditor,
+        edits: ScriptRegion[],
+        range: Range,
+        markerIndex: number,
+        ruleIndex: number): Thenable<void> {
         if (markerIndex >= edits.length) {
             return;
         }
@@ -226,7 +251,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             edit.endLineNumber - 1,
             edit.endColumnNumber - 1);
         if (range === null || range.contains(editRange)) {
-            return Window.activeTextEditor.edit((editBuilder) => {
+            return editor.edit((editBuilder) => {
                 editBuilder.replace(
                     editRange,
                     edit.text);
@@ -235,11 +260,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                     undoStopAfter: undoStopAfter,
                     undoStopBefore: undoStopBefore
                 }).then((isEditApplied) => {
-                    return this.applyEdit(edits, range, markerIndex + 1, ruleIndex);
+                    return this.applyEdit(editor, edits, range, markerIndex + 1, ruleIndex);
                 }); // TODO handle rejection
         }
         else {
-            return this.applyEdit(edits, range, markerIndex + 1, ruleIndex);
+            return this.applyEdit(editor, edits, range, markerIndex + 1, ruleIndex);
         }
     }
 
