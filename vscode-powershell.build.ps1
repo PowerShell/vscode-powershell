@@ -93,13 +93,16 @@ task Package {
         Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\PowerShellEditorServices .\modules
     }
 
-    Write-Host "`n### Packaging PowerShell-$($script:ExtensionVersion).vsix`n" -ForegroundColor Green
+    Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
     exec { & node ./node_modules/vsce/out/vsce package }
+
+    # Change the package to have a static name for automation purposes
+    Move-Item .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
 
-    Push-AppveyorArtifact .\PowerShell-$($script:ExtensionVersion).vsix
+    Push-AppveyorArtifact .\PowerShell-insiders.vsix
 }
 
 # The default task is to run the entire CI build
