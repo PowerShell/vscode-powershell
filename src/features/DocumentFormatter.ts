@@ -120,17 +120,23 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
 
         let editor: TextEditor = this.getEditor(document);
         if (editor === undefined) {
-            Window.showWarningMessage(`Something went wrong. Cannot format ${path.basename(document.fileName)}`);
             return this.emptyPromise;
         }
 
+        // Check if the document is already being formatted.
+        // If so, then ignore the formatting request.
         if (this.isDocumentLocked(document)) {
-            Window.showWarningMessage(`Formatting ${path.basename(document.fileName)}. Please wait.`);
             return this.emptyPromise;
         }
 
         this.lockDocument(document);
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
+
+        // If the session crashes for any reason during formatting
+        // then the document won't be released and hence we won't
+        // be able to format it after restarting the session.
+        // Similar issue with the status - the bar will keep displaying
+        // the previous status even after restarting the session.
         this.releaseDocument(document, textEdits);
         AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
         return textEdits;
