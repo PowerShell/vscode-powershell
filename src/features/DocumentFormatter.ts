@@ -4,7 +4,6 @@
 
 import vscode = require('vscode');
 import {
-    languages,
     TextDocument,
     TextEdit,
     FormattingOptions,
@@ -13,7 +12,7 @@ import {
     DocumentRangeFormattingEditProvider,
     Range,
 } from 'vscode';
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import { LanguageClient, RequestType } from 'vscode-languageclient';
 import Window = vscode.window;
 import { IFeature } from '../feature';
 import * as Settings from '../settings';
