@@ -59,7 +59,7 @@ interface ScriptRegion {
 
 interface MarkerCorrection {
     name: string;
-    edits: ScriptRegion[]
+    edits: ScriptRegion[];
 }
 
 function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): number {
@@ -81,6 +81,7 @@ function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): nu
 }
 
 class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider, DocumentRangeFormattingEditProvider {
+    private static filesBeingFormatted: Object = new Object;
     private languageClient: LanguageClient;
 
     // The order in which the rules will be executed starting from the first element.
@@ -111,9 +112,41 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
+        if (this.isDocumentLocked(document)) {
+            return;
+        }
+
+        this.lockDocument(document);
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(document, range, options, 0);
+        this.releaseDocument(document, textEdits);
         AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
         return textEdits;
+    }
+
+    isDocumentLocked(document: TextDocument): boolean {
+        if (PSDocumentFormattingEditProvider.filesBeingFormatted.hasOwnProperty(this.getDocumentKey(document))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    lockDocument(document: TextDocument): void {
+        if (!this.isDocumentLocked(document)) {
+            PSDocumentFormattingEditProvider.filesBeingFormatted[this.getDocumentKey(document)] = true;
+        }
+    }
+
+    releaseDocument(document: TextDocument, releaseWhenDone: Thenable<any>): void {
+        if (this.isDocumentLocked(document)) {
+            releaseWhenDone.then(() => {
+                delete PSDocumentFormattingEditProvider.filesBeingFormatted[this.getDocumentKey(document)];
+            });
+        }
+    }
+
+    getDocumentKey(document: TextDocument): string {
+        return document.uri.toString();
     }
 
     executeRulesInOrder(
