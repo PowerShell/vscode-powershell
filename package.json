@@ -214,7 +214,8 @@
             "body": {
               "type": "PowerShell",
               "request": "launch",
-              "name": "PowerShell Interactive Session"
+              "name": "PowerShell Interactive Session",
+              "cwd": "^\"\\${workspaceRoot}\""
             }
           }
         ],
