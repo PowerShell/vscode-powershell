@@ -1,4 +1,13 @@
-**Please fill in these details so that we can help you!**
+<!--
+
+Please fill in these details so that we can help you!
+
+If you are filing an issue related the PowerShell syntax coloring/highlighting,
+please file it at the EditorSyntax repo:
+
+https://github.com/PowerShell/EditorSyntax/issues
+
+-->
 
 ### System Details
 
