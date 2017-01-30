@@ -132,6 +132,7 @@ class DocumentLocker {
 
 class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider, DocumentRangeFormattingEditProvider {
     private static documentLocker = new DocumentLocker();
+    private static statusBarTracker = new Object();
     private languageClient: LanguageClient;
 
     // The order in which the rules will be executed starting from the first element.
@@ -180,13 +181,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
         this.lockDocument(document, textEdits);
 
-        // If the session crashes for any reason during formatting
-        // then the document won't be released and hence we won't
-        // be able to format it after restarting the session.
-        // Similar issue with the status - the bar will keep displaying
-        // the previous status even after restarting the session.
-        // this.releaseDocument(document, textEdits);
-        AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
+        // FIXME If the session crashes for any reason during formatting
+        // then the bar will keep displaying the previous status even after restarting the session.
+        // A fix is to restart the window
+        // AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
+        PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
         return textEdits;
     }
 
@@ -315,7 +314,12 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
 
     setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
+
+        // setLanguageClient is called while restarting a session,
+        // so this makes sure we clean up the document locker and
+        // any residual status bars
         PSDocumentFormattingEditProvider.documentLocker.unlockAll();
+        PSDocumentFormattingEditProvider.disposeAllStatusBars();
     }
 
     getSettings(rule: string): any {
@@ -341,6 +345,27 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         settings[rule] = ruleSettings;
         return settings;
     }
+
+    private static showStatusBar(document: TextDocument, hideWhenDone: Thenable<any>): void {
+        let statusBar = AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", hideWhenDone);
+        this.statusBarTracker[document.uri.toString()] = statusBar;
+        hideWhenDone.then(() => {
+            this.disposeStatusBar(document.uri.toString());
+        });
+    }
+
+    private static disposeStatusBar(documentUri: string) {
+        if (this.statusBarTracker.hasOwnProperty(documentUri)) {
+            this.statusBarTracker[documentUri].dispose();
+            delete this.statusBarTracker[documentUri];
+        }
+    }
+
+    private static disposeAllStatusBars() {
+        Object.keys(this.statusBarTracker).slice().forEach((key) => this.disposeStatusBar(key));
+    }
+
+
 }
 
 export class DocumentFormatterFeature implements IFeature {
