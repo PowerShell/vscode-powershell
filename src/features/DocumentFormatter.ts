@@ -180,28 +180,33 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
 
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
         this.lockDocument(document, textEdits);
-
-        // FIXME If the session crashes for any reason during formatting
-        // then the bar will keep displaying the previous status even after restarting the session.
-        // A fix is to restart the window
-        // AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
         return textEdits;
     }
 
-    getEditor(document: TextDocument): TextEditor {
+    setLanguageClient(languageClient: LanguageClient): void {
+        this.languageClient = languageClient;
+
+        // setLanguageClient is called while restarting a session,
+        // so this makes sure we clean up the document locker and
+        // any residual status bars
+        PSDocumentFormattingEditProvider.documentLocker.unlockAll();
+        PSDocumentFormattingEditProvider.disposeAllStatusBars();
+    }
+
+    private getEditor(document: TextDocument): TextEditor {
         return Window.visibleTextEditors.find((e, n, obj) => { return e.document === document; });
     }
 
-    isDocumentLocked(document: TextDocument): boolean {
+    private isDocumentLocked(document: TextDocument): boolean {
         return PSDocumentFormattingEditProvider.documentLocker.isLocked(document);
     }
 
-    lockDocument(document: TextDocument, unlockWhenDone: Thenable<any>): void {
+    private lockDocument(document: TextDocument, unlockWhenDone: Thenable<any>): void {
         PSDocumentFormattingEditProvider.documentLocker.lock(document, unlockWhenDone);
     }
 
-    executeRulesInOrder(
+    private executeRulesInOrder(
         editor: TextEditor,
         range: Range,
         options: FormattingOptions,
@@ -267,7 +272,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         }
     }
 
-    applyEdit(
+    private applyEdit(
         editor: TextEditor,
         edits: ScriptRegion[],
         range: Range,
@@ -303,7 +308,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         }
     }
 
-    getSelectionRange(document: TextDocument): Range {
+    private getSelectionRange(document: TextDocument): Range {
         let editor = vscode.window.visibleTextEditors.find(editor => editor.document === document);
         if (editor !== undefined) {
             return editor.selection as Range;
@@ -312,17 +317,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         return null;
     }
 
-    setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
-
-        // setLanguageClient is called while restarting a session,
-        // so this makes sure we clean up the document locker and
-        // any residual status bars
-        PSDocumentFormattingEditProvider.documentLocker.unlockAll();
-        PSDocumentFormattingEditProvider.disposeAllStatusBars();
-    }
-
-    getSettings(rule: string): any {
+    private getSettings(rule: string): any {
         let psSettings: Settings.ISettings = Settings.load(Utils.PowerShellLanguageId);
         let ruleSettings = new Object();
         ruleSettings["Enable"] = true;
@@ -364,8 +359,6 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     private static disposeAllStatusBars() {
         Object.keys(this.statusBarTracker).slice().forEach((key) => this.disposeStatusBar(key));
     }
-
-
 }
 
 export class DocumentFormatterFeature implements IFeature {
