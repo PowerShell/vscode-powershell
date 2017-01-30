@@ -82,8 +82,56 @@ function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): nu
     }
 }
 
+class DocumentLocker {
+    private lockedDocuments: Object;
+
+    constructor() {
+        this.lockedDocuments = new Object();
+    }
+
+    isLocked(document: TextDocument): boolean {
+        return this.isLockedInternal(this.getKey(document));
+    }
+
+    lock(document: TextDocument, unlockWhenDone?: Thenable<any>): void {
+        this.lockInternal(this.getKey(document), unlockWhenDone);
+    }
+
+    unlock(document: TextDocument): void {
+        this.unlockInternal(this.getKey(document));
+    }
+
+    unlockAll(): void {
+        Object.keys(this.lockedDocuments).slice().forEach(documentKey => this.unlockInternal(documentKey));
+    }
+
+    private getKey(document: TextDocument): string {
+        return document.uri.toString();
+    }
+
+    private lockInternal(documentKey: string, unlockWhenDone?: Thenable<any>): void {
+        if (!this.isLockedInternal(documentKey)) {
+            this.lockedDocuments[documentKey] = true;
+        }
+
+        if (unlockWhenDone !== undefined) {
+            unlockWhenDone.then(() => this.unlockInternal(documentKey));
+        }
+    }
+
+    private unlockInternal(documentKey: string): void {
+        if (this.isLockedInternal(documentKey)) {
+            delete this.lockedDocuments[documentKey];
+        }
+    }
+
+    private isLockedInternal(documentKey: string): boolean {
+        return this.lockedDocuments.hasOwnProperty(documentKey);
+    }
+}
+
 class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider, DocumentRangeFormattingEditProvider {
-    private static filesBeingFormatted: Object = new Object;
+    private static documentLocker = new DocumentLocker();
     private languageClient: LanguageClient;
 
     // The order in which the rules will be executed starting from the first element.
@@ -129,15 +177,15 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             return this.emptyPromise;
         }
 
-        this.lockDocument(document);
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
+        this.lockDocument(document, textEdits);
 
         // If the session crashes for any reason during formatting
         // then the document won't be released and hence we won't
         // be able to format it after restarting the session.
         // Similar issue with the status - the bar will keep displaying
         // the previous status even after restarting the session.
-        this.releaseDocument(document, textEdits);
+        // this.releaseDocument(document, textEdits);
         AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", textEdits);
         return textEdits;
     }
@@ -147,29 +195,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     }
 
     isDocumentLocked(document: TextDocument): boolean {
-        if (PSDocumentFormattingEditProvider.filesBeingFormatted.hasOwnProperty(this.getDocumentKey(document))) {
-            return true;
-        }
-
-        return false;
+        return PSDocumentFormattingEditProvider.documentLocker.isLocked(document);
     }
 
-    lockDocument(document: TextDocument): void {
-        if (!this.isDocumentLocked(document)) {
-            PSDocumentFormattingEditProvider.filesBeingFormatted[this.getDocumentKey(document)] = true;
-        }
-    }
-
-    releaseDocument(document: TextDocument, releaseWhenDone: Thenable<any>): void {
-        if (this.isDocumentLocked(document)) {
-            releaseWhenDone.then(() => {
-                delete PSDocumentFormattingEditProvider.filesBeingFormatted[this.getDocumentKey(document)];
-            });
-        }
-    }
-
-    getDocumentKey(document: TextDocument): string {
-        return document.uri.toString();
+    lockDocument(document: TextDocument, unlockWhenDone: Thenable<any>): void {
+        PSDocumentFormattingEditProvider.documentLocker.lock(document, unlockWhenDone);
     }
 
     executeRulesInOrder(
@@ -285,6 +315,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
 
     setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
+        PSDocumentFormattingEditProvider.documentLocker.unlockAll();
     }
 
     getSettings(rule: string): any {
