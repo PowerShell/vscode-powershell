@@ -139,6 +139,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     private readonly ruleOrder: string[] = [
         "PSPlaceCloseBrace",
         "PSPlaceOpenBrace",
+        "PSUseWhitespace",
         "PSUseConsistentIndentation"];
 
     // Allows edits to be undone and redone is a single step.
@@ -232,12 +233,13 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                     });
 
                     // We cannot handle multiple edits at the same point hence we
-                    // filter the markers so that there is only one edit per line
-                    // This ideally should not happen but it is good to have some additional safeguard
+                    // filter the markers so that there is only one edit per region
                     if (edits.length > 0) {
                         uniqueEdits.push(edits[0]);
                         for (let edit of edits.slice(1)) {
-                            if (editComparer(uniqueEdits[uniqueEdits.length - 1], edit) !== 0) {
+                            let lastEdit: ScriptRegion = uniqueEdits[uniqueEdits.length - 1];
+                            if (lastEdit.startLineNumber !== edit.startLineNumber
+                                || (edit.startColumnNumber + edit.text.length) < lastEdit.startColumnNumber) {
                                 uniqueEdits.push(edit);
                             }
                         }
@@ -331,6 +333,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             case "PSUseConsistentIndentation":
                 ruleSettings["IndentationSize"] = vscode.workspace.getConfiguration("editor").get<number>("tabSize");
                 break;
+
+            case "PSUseWhitespace":
+                ruleSettings["CheckOpenBrace"] = true;
+                ruleSettings["CheckOpenParen"] = true;
+                ruleSettings["CheckOperator"] = true;
 
             default:
                 break;
