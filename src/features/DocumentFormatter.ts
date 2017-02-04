@@ -335,9 +335,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                 break;
 
             case "PSUseWhitespace":
-                ruleSettings["CheckOpenBrace"] = true;
-                ruleSettings["CheckOpenParen"] = true;
-                ruleSettings["CheckOperator"] = true;
+                ruleSettings["CheckOpenBrace"] = psSettings.codeFormatting.whitespaceBeforeOpenBrace;
+                ruleSettings["CheckOpenParen"] = psSettings.codeFormatting.whitespaceBeforeOpenParen;
+                ruleSettings["CheckOperator"] = psSettings.codeFormatting.whitespaceAroundOperator;
+                ruleSettings["CheckSeparator"] = psSettings.codeFormatting.whitespaceAfterSeparator;
+                break;
 
             default:
                 break;
