@@ -139,7 +139,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     private readonly ruleOrder: string[] = [
         "PSPlaceCloseBrace",
         "PSPlaceOpenBrace",
-        "PSUseWhitespace",
+        "PSUseConsistentWhitespace",
         "PSUseConsistentIndentation"];
 
     // Allows edits to be undone and redone is a single step.
@@ -334,7 +334,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                 ruleSettings["IndentationSize"] = vscode.workspace.getConfiguration("editor").get<number>("tabSize");
                 break;
 
-            case "PSUseWhitespace":
+            case "PSUseConsistentWhitespace":
                 ruleSettings["CheckOpenBrace"] = psSettings.codeFormatting.whitespaceBeforeOpenBrace;
                 ruleSettings["CheckOpenParen"] = psSettings.codeFormatting.whitespaceBeforeOpenParen;
                 ruleSettings["CheckOperator"] = psSettings.codeFormatting.whitespaceAroundOperator;
