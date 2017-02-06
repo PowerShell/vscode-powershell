@@ -1,3 +1,5 @@
+param([int]$Count=50, [int]$DelayMilliseconds=200)
+
 function Write-Item($itemCount) {
     $i = 1
 
@@ -10,7 +12,7 @@ function Write-Item($itemCount) {
         $i = $i + 1
 
         # Slow down execution a bit so user can test the "Pause debugger" feature.
-        Start-Sleep -Milliseconds 200
+        Start-Sleep -Milliseconds $DelayMilliseconds
     }
 }
 
@@ -23,4 +25,6 @@ function Do-Work($workCount) {
     Write-Host "Done!"
 }
 
-Do-Work 50
+$process = Get-Process -Id $pid
+
+Do-Work $Count
