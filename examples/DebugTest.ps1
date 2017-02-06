@@ -25,6 +25,4 @@ function Do-Work($workCount) {
     Write-Host "Done!"
 }
 
-$process = Get-Process -Id $pid
-
 Do-Work $Count
