@@ -174,8 +174,8 @@
         "startSessionCommand": "PowerShell.StartDebugSession",
         "configurationSnippets": [
           {
-            "label": "PowerShell: Launch Current Script Configuration",
-            "description": "A new configuration for launching the current opened PowerShell script",
+            "label": "PowerShell: Launch (current file)",
+            "description": "Launch current file (in active editor window) under debugger",
             "body": {
               "type": "PowerShell",
               "request": "launch",
@@ -186,8 +186,8 @@
             }
           },
           {
-            "label": "PowerShell: Launch Script Configuration",
-            "description": "A new configuration for launching a PowerShell script",
+            "label": "PowerShell: Launch Script",
+            "description": "Launch specified script under debugger",
             "body": {
               "type": "PowerShell",
               "request": "launch",
@@ -198,8 +198,8 @@
             }
           },
           {
-            "label": "PowerShell: Attach to PowerShell Host Process Configuration",
-            "description": "A new configuration for debugging a runspace in another host process.",
+            "label": "PowerShell: Attach to PowerShell Host Process",
+            "description": "Open host process picker to select process to attach debugger to",
             "body": {
               "type": "PowerShell",
               "request": "attach",
@@ -209,8 +209,8 @@
             }
           },
           {
-            "label": "PowerShell: Launch Interactive Session Configuration",
-            "description": "A new configuration for debugging an interactive session.",
+            "label": "PowerShell: Interactive Session",
+            "description": "Start interactive session (Debug Console) under debugger",
             "body": {
               "type": "PowerShell",
               "request": "launch",
