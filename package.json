@@ -366,6 +366,11 @@
           "type": "boolean",
           "default": true,
           "description": "There must be a whitespaces after a separator (',' and ';')."
+        },
+        "powershell.codeFormatting.ignoreOneLineBlock": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ignore blocks of code on one line. For example, if true, the braces in \"if (...) {...} else {...}\", will not be formatted."
         }
       }
     }
