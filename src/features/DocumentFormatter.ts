@@ -328,11 +328,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             case "PSPlaceOpenBrace":
                 ruleSettings["OnSameLine"] = psSettings.codeFormatting.openBraceOnSameLine;
                 ruleSettings["NewLineAfter"] = psSettings.codeFormatting.newLineAfterOpenBrace;
-                ruleSettings["ignoreOneLineBlock"] = psSettings.codeFormatting.ignoreOneLineBlock;
+                ruleSettings["IgnoreOneLineBlock"] = psSettings.codeFormatting.ignoreOneLineBlock;
                 break;
 
             case "PSPlaceCloseBrace":
-                ruleSettings["ignoreOneLineBlock"] = psSettings.codeFormatting.ignoreOneLineBlock;
+                ruleSettings["IgnoreOneLineBlock"] = psSettings.codeFormatting.ignoreOneLineBlock;
                 break;
 
             case "PSUseConsistentIndentation":
