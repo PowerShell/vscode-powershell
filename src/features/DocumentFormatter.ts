@@ -134,6 +134,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     private static documentLocker = new DocumentLocker();
     private static statusBarTracker = new Object();
     private languageClient: LanguageClient;
+    private lineDiff: number;
 
     // The order in which the rules will be executed starting from the first element.
     private readonly ruleOrder: string[] = [
@@ -153,6 +154,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
 
     constructor(aggregateUndoStop = true) {
         this.aggregateUndoStop = aggregateUndoStop;
+        this.lineDiff = 0;
     }
 
     provideDocumentFormattingEdits(
@@ -179,6 +181,12 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             return this.emptyPromise;
         }
 
+        // Extend the range such that it starts at the first character of the
+        // start line of the range.
+        if (range !== null) {
+            range = this.snapRangeToLineStart(range);
+        }
+
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
         this.lockDocument(document, textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
@@ -193,6 +201,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         // any residual status bars
         PSDocumentFormattingEditProvider.documentLocker.unlockAll();
         PSDocumentFormattingEditProvider.disposeAllStatusBars();
+    }
+
+    private snapRangeToLineStart(range: Range): Range {
+        // TODO snap to the last character of the end line too!
+        return range.with({start: range.start.with({character: 0})});
     }
 
     private getEditor(document: TextDocument): TextEditor {
@@ -248,11 +261,13 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                     // we need to update the range as the edits might
                     // have changed the original layout
                     if (range !== null) {
-                        let tempRange: Range = this.getSelectionRange(document);
-                        if (tempRange !== null) {
-                            range = tempRange;
+                        if (this.lineDiff !== 0) {
+                            range = range.with({end: range.end.translate({lineDelta: this.lineDiff})});
                         }
                     }
+
+                    // reset line difference to 0
+                    this.lineDiff = 0;
 
                     // we do not return a valid array because our text edits
                     // need to be executed in a particular order and it is
@@ -292,7 +307,13 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             edit.startColumnNumber - 1,
             edit.endLineNumber - 1,
             edit.endColumnNumber - 1);
+
         if (range === null || range.contains(editRange)) {
+
+            // accumulate the changes in number of lines
+            // get the difference between the number of lines in the replacement text and
+            // that of the original text
+            this.lineDiff += this.getNumLines(edit.text) - (editRange.end.line - editRange.start.line + 1);
             return editor.edit((editBuilder) => {
                 editBuilder.replace(
                     editRange,
@@ -310,6 +331,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         }
     }
 
+    private getNumLines(text: string): number {
+        return text.split("\r?\n").length;
+    }
+
+    // TODO Remove method as it is not used anymore
     private getSelectionRange(document: TextDocument): Range {
         let editor = vscode.window.visibleTextEditors.find(editor => editor.document === document);
         if (editor !== undefined) {
