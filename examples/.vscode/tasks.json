@@ -30,9 +30,14 @@
 // ${cwd}: the current working directory of the spawned process
 {
 	"version": "0.1.0",
-
+	
 	// Start PowerShell
-	"command": "${env.windir}\\sysnative\\windowspowershell\\v1.0\\PowerShell.exe",
+	"windows": {
+        	"command": "${env.windir}\\sysnative\\windowspowershell\\v1.0\\PowerShell.exe"
+    	},
+    	"osx": {
+        	"command": "/usr/local/microsoft/powershell/6.0.0-alpha.12/powershell"
+    	},
 
 	// The command is a shell script
 	"isShellCommand": true,
