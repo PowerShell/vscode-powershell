@@ -12,7 +12,8 @@ import {
     DocumentFormattingEditProvider,
     DocumentRangeFormattingEditProvider,
     Range,
-    TextEditor
+    TextEditor,
+    TextLine
 } from 'vscode';
 import { LanguageClient, RequestType } from 'vscode-languageclient';
 import Window = vscode.window;
@@ -181,12 +182,6 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             return this.emptyPromise;
         }
 
-        // Extend the range such that it starts at the first character of the
-        // start line of the range.
-        if (range !== null) {
-            range = this.snapRangeToLineStart(range);
-        }
-
         let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
         this.lockDocument(document, textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
@@ -203,9 +198,10 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         PSDocumentFormattingEditProvider.disposeAllStatusBars();
     }
 
-    private snapRangeToLineStart(range: Range): Range {
-        // TODO snap to the last character of the end line too!
-        return range.with({start: range.start.with({character: 0})});
+    private snapRangeToEdges(range: Range, document: TextDocument): Range {
+        return range.with({
+            start: range.start.with({ character: 0 }),
+            end: document.lineAt(range.end.line).range.end });
     }
 
     private getEditor(document: TextDocument): TextEditor {
@@ -262,8 +258,12 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
                     // have changed the original layout
                     if (range !== null) {
                         if (this.lineDiff !== 0) {
-                            range = range.with({end: range.end.translate({lineDelta: this.lineDiff})});
+                            range = range.with({ end: range.end.translate({ lineDelta: this.lineDiff }) });
                         }
+
+                        // extend the range such that it starts at the first character of the
+                        // start line of the range.
+                        range = this.snapRangeToEdges(range, document);
                     }
 
                     // reset line difference to 0
