@@ -13,6 +13,7 @@ export interface ICodeFormattingSettings {
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
+    ignoreOneLineBlock: boolean;
 }
 
 export interface IScriptAnalysisSettings {
@@ -58,7 +59,8 @@ export function load(myPluginId: string): ISettings {
         whitespaceBeforeOpenBrace: true,
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
-        whitespaceAfterSeparator: true
+        whitespaceAfterSeparator: true,
+        ignoreOneLineBlock: true
     };
 
     return {
