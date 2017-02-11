@@ -3,15 +3,16 @@
         "prefix": "manifest",
         "body": [
           "@{",
-          "\t# If authoring a script module, the RootModule is your .psm1 file",
+          "\t# If authoring a script module, the RootModule is the name of your .psm1 file",
           "\tRootModule = '${module:MyModule}.psm1'",
           "",
-          "\tAuthor = '${author:Cool Person <coolperson@email.local>}",
+          "\tAuthor = '${author:Cool Person <coolperson@email.local>}'",
           "",
           "\tCompanyName = '${company:Contoso Inc.}'",
           "",
           "\tModuleVersion = '${ModuleVersion:0.1}'",
           "",
+          "\t# Use the New-Guid command to generate a GUID, and copy/paste into the next line"
           "\tGUID = '<pasteNewGUIDhere>'",
           "",
           "\tCopyright = '2017 ${company:Copyright Holder}'",
