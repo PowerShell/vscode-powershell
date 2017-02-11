@@ -308,7 +308,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
             edit.endLineNumber - 1,
             edit.endColumnNumber - 1);
 
-        if (range === null || range.contains(editRange)) {
+        if (range === null || range.contains(editRange.start)) {
 
             // accumulate the changes in number of lines
             // get the difference between the number of lines in the replacement text and
