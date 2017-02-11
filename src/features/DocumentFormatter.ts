@@ -332,7 +332,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
     }
 
     private getNumLines(text: string): number {
-        return text.split("\r?\n").length;
+        return text.split(/\r?\n/).length;
     }
 
     // TODO Remove method as it is not used anymore
