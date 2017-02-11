@@ -335,16 +335,6 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         return text.split(/\r?\n/).length;
     }
 
-    // TODO Remove method as it is not used anymore
-    private getSelectionRange(document: TextDocument): Range {
-        let editor = vscode.window.visibleTextEditors.find(editor => editor.document === document);
-        if (editor !== undefined) {
-            return editor.selection as Range;
-        }
-
-        return null;
-    }
-
     private getSettings(rule: string): any {
         let psSettings: Settings.ISettings = Settings.load(Utils.PowerShellLanguageId);
         let ruleSettings = new Object();
