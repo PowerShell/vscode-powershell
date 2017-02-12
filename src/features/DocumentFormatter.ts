@@ -11,6 +11,8 @@ import {
     CancellationToken,
     DocumentFormattingEditProvider,
     DocumentRangeFormattingEditProvider,
+    OnTypeFormattingEditProvider,
+    Position,
     Range,
     TextEditor,
     TextLine
@@ -131,7 +133,10 @@ class DocumentLocker {
     }
 }
 
-class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider, DocumentRangeFormattingEditProvider {
+class PSDocumentFormattingEditProvider implements
+        DocumentFormattingEditProvider,
+        DocumentRangeFormattingEditProvider,
+        OnTypeFormattingEditProvider {
     private static documentLocker = new DocumentLocker();
     private static statusBarTracker = new Object();
     private languageClient: LanguageClient;
@@ -186,6 +191,24 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         this.lockDocument(document, textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
         return textEdits;
+    }
+
+    provideOnTypeFormattingEdits(
+        document: TextDocument,
+        position: Position,
+        ch: string,
+        options: FormattingOptions,
+        token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
+        if (ch === "}")
+        {
+            // find corresponding '{' character create a range between '{' and '}'
+        }
+        else if (ch === "\n")
+        {
+            // find the range that covers the entire line
+        }
+
+        return this.provideDocumentRangeFormattingEdits(document, null, options, token);
     }
 
     setLanguageClient(languageClient: LanguageClient): void {
@@ -392,8 +415,10 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
 }
 
 export class DocumentFormatterFeature implements IFeature {
+    private firstTriggerCharacter: string = "}";
     private formattingEditProvider: vscode.Disposable;
     private rangeFormattingEditProvider: vscode.Disposable;
+    private onTypeFormattingEditProvider: vscode.Disposable;
     private languageClient: LanguageClient;
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
@@ -405,6 +430,10 @@ export class DocumentFormatterFeature implements IFeature {
         this.rangeFormattingEditProvider = vscode.languages.registerDocumentRangeFormattingEditProvider(
             "powershell",
             this.documentFormattingEditProvider);
+        this.onTypeFormattingEditProvider = vscode.languages.registerOnTypeFormattingEditProvider(
+            "powershell",
+            this.documentFormattingEditProvider,
+            this.firstTriggerCharacter);
     }
 
     public setLanguageClient(languageclient: LanguageClient): void {
@@ -415,5 +444,6 @@ export class DocumentFormatterFeature implements IFeature {
     public dispose(): any {
         this.formattingEditProvider.dispose();
         this.rangeFormattingEditProvider.dispose();
+        this.onTypeFormattingEditProvider.dispose();
     }
 }
