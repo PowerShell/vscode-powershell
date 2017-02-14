@@ -90,6 +90,10 @@ function toRange(scriptRegion: ScriptRegion): vscode.Range {
         scriptRegion.endColumnNumber - 1);
 }
 
+function toOneBasedPosition(position: Position): Position {
+    return position.translate({ lineDelta: 1, characterDelta: 1 });
+}
+
 function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): number {
     if (leftOperand.startLineNumber < rightOperand.startLineNumber) {
         return -1;
@@ -246,13 +250,14 @@ class PSDocumentFormattingEditProvider implements
     }
 
     private getScriptRegion(document: TextDocument, position: Position, ch: string): Thenable<ScriptRegion> {
+        let oneBasedPosition = toOneBasedPosition(position);
         return this.languageClient.sendRequest(
             ScriptRegionRequest.type,
             {
                 fileUri: document.uri.toString(),
                 character: ch,
-                line: position.line + 1,
-                column: position.character + 1
+                line: oneBasedPosition.line,
+                column: oneBasedPosition.character
             }).then((result: ScriptRegionRequestResult) => {
                 if (result === null) {
                     return null;
