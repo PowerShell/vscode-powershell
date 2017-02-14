@@ -28,6 +28,21 @@ export namespace ScriptFileMarkersRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptFileMarkers"; } };
 }
 
+export namespace ScriptRegionRequest {
+    export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptRegion"; } };
+}
+
+interface ScriptRegionRequestParams {
+    fileUri: string;
+    character: string;
+    line: number;
+    column: number;
+}
+
+interface ScriptRegionRequestResult {
+    scriptRegion: ScriptRegion;
+}
+
 // TODO move some of the common interface to a separate file?
 interface ScriptFileMarkersRequestParams {
     fileUri: string;
