@@ -371,11 +371,7 @@ class PSDocumentFormattingEditProvider implements
         let undoStopAfter = !this.aggregateUndoStop || (ruleIndex === this.ruleOrder.length - 1 && markerIndex === edits.length - 1);
         let undoStopBefore = !this.aggregateUndoStop || (ruleIndex === 0 && markerIndex === 0);
         let edit: ScriptRegion = edits[markerIndex];
-        let editRange: Range = new vscode.Range(
-            edit.startLineNumber - 1,
-            edit.startColumnNumber - 1,
-            edit.endLineNumber - 1,
-            edit.endColumnNumber - 1);
+        let editRange: Range = toRange(edit);
 
         if (range === null || range.contains(editRange.start)) {
 
