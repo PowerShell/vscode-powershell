@@ -457,6 +457,7 @@ class PSDocumentFormattingEditProvider implements
 
 export class DocumentFormatterFeature implements IFeature {
     private firstTriggerCharacter: string = "}";
+    private moreTriggerCharacters: string[] = ["\n"];
     private formattingEditProvider: vscode.Disposable;
     private rangeFormattingEditProvider: vscode.Disposable;
     private onTypeFormattingEditProvider: vscode.Disposable;
@@ -474,7 +475,8 @@ export class DocumentFormatterFeature implements IFeature {
         this.onTypeFormattingEditProvider = vscode.languages.registerOnTypeFormattingEditProvider(
             "powershell",
             this.documentFormattingEditProvider,
-            this.firstTriggerCharacter);
+            this.firstTriggerCharacter,
+            ...this.moreTriggerCharacters);
     }
 
     public setLanguageClient(languageclient: LanguageClient): void {
