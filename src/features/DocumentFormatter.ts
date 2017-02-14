@@ -222,16 +222,17 @@ class PSDocumentFormattingEditProvider implements
         ch: string,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
-        if (ch === "}")
-        {
-            // find corresponding '{' character create a range between '{' and '}'
-        }
-        else if (ch === "\n")
-        {
-            // find the range that covers the entire line
-        }
+        return this.getScriptRegion(document, position, ch).then(scriptRegion => {
+            if (scriptRegion === null) {
+                return this.emptyPromise;
+            }
 
-        return this.provideDocumentRangeFormattingEdits(document, null, options, token);
+            return this.provideDocumentRangeFormattingEdits(
+                document,
+                toRange(scriptRegion),
+                options,
+                token);
+        });
     }
 
     setLanguageClient(languageClient: LanguageClient): void {
@@ -242,6 +243,23 @@ class PSDocumentFormattingEditProvider implements
         // any residual status bars
         PSDocumentFormattingEditProvider.documentLocker.unlockAll();
         PSDocumentFormattingEditProvider.disposeAllStatusBars();
+    }
+
+    private getScriptRegion(document: TextDocument, position: Position, ch: string): Thenable<ScriptRegion> {
+        return this.languageClient.sendRequest(
+            ScriptRegionRequest.type,
+            {
+                fileUri: document.uri.toString(),
+                character: ch,
+                line: position.line + 1,
+                column: position.character + 1
+            }).then((result: ScriptRegionRequestResult) => {
+                if (result === null) {
+                    return null;
+                }
+
+                return result.scriptRegion;
+            });
     }
 
     private snapRangeToEdges(range: Range, document: TextDocument): Range {
