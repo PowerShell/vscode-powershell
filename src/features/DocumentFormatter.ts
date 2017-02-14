@@ -82,6 +82,14 @@ interface MarkerCorrection {
     edits: ScriptRegion[];
 }
 
+function toRange(scriptRegion: ScriptRegion): vscode.Range {
+    return new vscode.Range(
+        scriptRegion.startLineNumber - 1,
+        scriptRegion.startColumnNumber - 1,
+        scriptRegion.endLineNumber - 1,
+        scriptRegion.endColumnNumber - 1);
+}
+
 function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): number {
     if (leftOperand.startLineNumber < rightOperand.startLineNumber) {
         return -1;
