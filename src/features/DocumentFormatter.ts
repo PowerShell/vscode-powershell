@@ -11,6 +11,8 @@ import {
     CancellationToken,
     DocumentFormattingEditProvider,
     DocumentRangeFormattingEditProvider,
+    OnTypeFormattingEditProvider,
+    Position,
     Range,
     TextEditor,
     TextLine
@@ -24,6 +26,21 @@ import * as AnimatedStatusBar from '../controls/animatedStatusBar';
 
 export namespace ScriptFileMarkersRequest {
     export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptFileMarkers"; } };
+}
+
+export namespace ScriptRegionRequest {
+    export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptRegion"; } };
+}
+
+interface ScriptRegionRequestParams {
+    fileUri: string;
+    character: string;
+    line: number;
+    column: number;
+}
+
+interface ScriptRegionRequestResult {
+    scriptRegion: ScriptRegion;
 }
 
 // TODO move some of the common interface to a separate file?
@@ -63,6 +80,18 @@ interface ScriptRegion {
 interface MarkerCorrection {
     name: string;
     edits: ScriptRegion[];
+}
+
+function toRange(scriptRegion: ScriptRegion): vscode.Range {
+    return new vscode.Range(
+        scriptRegion.startLineNumber - 1,
+        scriptRegion.startColumnNumber - 1,
+        scriptRegion.endLineNumber - 1,
+        scriptRegion.endColumnNumber - 1);
+}
+
+function toOneBasedPosition(position: Position): Position {
+    return position.translate({ lineDelta: 1, characterDelta: 1 });
 }
 
 function editComparer(leftOperand: ScriptRegion, rightOperand: ScriptRegion): number {
@@ -131,7 +160,10 @@ class DocumentLocker {
     }
 }
 
-class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider, DocumentRangeFormattingEditProvider {
+class PSDocumentFormattingEditProvider implements
+        DocumentFormattingEditProvider,
+        DocumentRangeFormattingEditProvider,
+        OnTypeFormattingEditProvider {
     private static documentLocker = new DocumentLocker();
     private static statusBarTracker = new Object();
     private languageClient: LanguageClient;
@@ -188,6 +220,25 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         return textEdits;
     }
 
+    provideOnTypeFormattingEdits(
+        document: TextDocument,
+        position: Position,
+        ch: string,
+        options: FormattingOptions,
+        token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
+        return this.getScriptRegion(document, position, ch).then(scriptRegion => {
+            if (scriptRegion === null) {
+                return this.emptyPromise;
+            }
+
+            return this.provideDocumentRangeFormattingEdits(
+                document,
+                toRange(scriptRegion),
+                options,
+                token);
+        });
+    }
+
     setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
 
@@ -196,6 +247,24 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         // any residual status bars
         PSDocumentFormattingEditProvider.documentLocker.unlockAll();
         PSDocumentFormattingEditProvider.disposeAllStatusBars();
+    }
+
+    private getScriptRegion(document: TextDocument, position: Position, ch: string): Thenable<ScriptRegion> {
+        let oneBasedPosition = toOneBasedPosition(position);
+        return this.languageClient.sendRequest(
+            ScriptRegionRequest.type,
+            {
+                fileUri: document.uri.toString(),
+                character: ch,
+                line: oneBasedPosition.line,
+                column: oneBasedPosition.character
+            }).then((result: ScriptRegionRequestResult) => {
+                if (result === null) {
+                    return null;
+                }
+
+                return result.scriptRegion;
+            });
     }
 
     private snapRangeToEdges(range: Range, document: TextDocument): Range {
@@ -302,11 +371,7 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
         let undoStopAfter = !this.aggregateUndoStop || (ruleIndex === this.ruleOrder.length - 1 && markerIndex === edits.length - 1);
         let undoStopBefore = !this.aggregateUndoStop || (ruleIndex === 0 && markerIndex === 0);
         let edit: ScriptRegion = edits[markerIndex];
-        let editRange: Range = new vscode.Range(
-            edit.startLineNumber - 1,
-            edit.startColumnNumber - 1,
-            edit.endLineNumber - 1,
-            edit.endColumnNumber - 1);
+        let editRange: Range = toRange(edit);
 
         if (range === null || range.contains(editRange.start)) {
 
@@ -392,8 +457,11 @@ class PSDocumentFormattingEditProvider implements DocumentFormattingEditProvider
 }
 
 export class DocumentFormatterFeature implements IFeature {
+    private firstTriggerCharacter: string = "}";
+    private moreTriggerCharacters: string[] = ["\n"];
     private formattingEditProvider: vscode.Disposable;
     private rangeFormattingEditProvider: vscode.Disposable;
+    private onTypeFormattingEditProvider: vscode.Disposable;
     private languageClient: LanguageClient;
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
@@ -405,6 +473,11 @@ export class DocumentFormatterFeature implements IFeature {
         this.rangeFormattingEditProvider = vscode.languages.registerDocumentRangeFormattingEditProvider(
             "powershell",
             this.documentFormattingEditProvider);
+        this.onTypeFormattingEditProvider = vscode.languages.registerOnTypeFormattingEditProvider(
+            "powershell",
+            this.documentFormattingEditProvider,
+            this.firstTriggerCharacter,
+            ...this.moreTriggerCharacters);
     }
 
     public setLanguageClient(languageclient: LanguageClient): void {
@@ -415,5 +488,6 @@ export class DocumentFormatterFeature implements IFeature {
     public dispose(): any {
         this.formattingEditProvider.dispose();
         this.rangeFormattingEditProvider.dispose();
+        this.onTypeFormattingEditProvider.dispose();
     }
 }
