@@ -198,6 +198,18 @@
             }
           },
           {
+            "label": "PowerShell: Pester Tests",
+            "description": "Invokes Pester tests under debugger",
+            "body": {
+              "type": "PowerShell",
+              "request": "launch",
+              "name": "PowerShell Pester Tests",
+              "script": "Invoke-Pester",
+              "args": [],
+              "cwd": "^\"\\${workspaceRoot}\""
+            }
+          },
+          {
             "label": "PowerShell: Attach to PowerShell Host Process",
             "description": "Open host process picker to select process to attach debugger to",
             "body": {

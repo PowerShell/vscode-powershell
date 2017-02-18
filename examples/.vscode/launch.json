@@ -25,6 +25,14 @@
         },
         {
             "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Pester Tests",
+            "script": "Invoke-Pester",
+            "args": [],
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "PowerShell",
             "request": "attach",
             "name": "PowerShell Attach to Host Process",
             "processId": "${command.PickPSHostProcess}",
