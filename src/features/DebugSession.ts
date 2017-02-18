@@ -36,6 +36,25 @@ export class DebugSessionFeature implements IFeature {
         if (config.request === 'launch') {
             // Make sure there's a usable working directory if possible
             config.cwd = config.cwd || vscode.workspace.rootPath || config.script;
+
+            // For launch of "current script", don't start the debugger if the current file
+            // is not a file that can be debugged by PowerShell
+            if (config.script === "${file}") {
+                let filename = vscode.window.activeTextEditor.document.fileName;
+                let ext = filename.substr(filename.lastIndexOf('.') + 1);
+                let langId = vscode.window.activeTextEditor.document.languageId;
+                if ((langId !== 'powershell') || (ext !== "ps1" && ext !== "psm1")) {
+                    let path = filename;
+                    let workspaceRootPath = vscode.workspace.rootPath;
+                    if (filename.startsWith(workspaceRootPath)) {
+                        path = filename.substring(vscode.workspace.rootPath.length + 1);
+                    }
+
+                    let msg = "'" + path + "' is a file type that cannot be debugged by the PowerShell debugger.";
+                    vscode.window.showErrorMessage(msg);
+                    return;
+                }
+            }
         }
 
         vscode.commands.executeCommand('vscode.startDebug', config);
