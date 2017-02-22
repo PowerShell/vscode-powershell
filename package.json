@@ -359,6 +359,11 @@
           "default": true,
           "description": "A new line must follow an open brace."
         },
+        "powershell.codeFormatting.newLineAfterCloseBrace": {
+          "type": "boolean",
+          "default": true,
+          "description": "A new line must follow a close brace."
+        },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
           "default": true,

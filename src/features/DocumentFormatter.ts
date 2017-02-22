@@ -414,6 +414,7 @@ class PSDocumentFormattingEditProvider implements
 
             case "PSPlaceCloseBrace":
                 ruleSettings["IgnoreOneLineBlock"] = psSettings.codeFormatting.ignoreOneLineBlock;
+                ruleSettings["NewLineAfter"] = psSettings.codeFormatting.newLineAfterCloseBrace;
                 break;
 
             case "PSUseConsistentIndentation":

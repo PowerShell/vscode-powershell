@@ -9,6 +9,7 @@ import vscode = require('vscode');
 export interface ICodeFormattingSettings {
     openBraceOnSameLine: boolean;
     newLineAfterOpenBrace: boolean;
+    newLineAfterCloseBrace: boolean;
     whitespaceBeforeOpenBrace: boolean;
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
@@ -56,6 +57,7 @@ export function load(myPluginId: string): ISettings {
     let defaultCodeFormattingSettings: ICodeFormattingSettings = {
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
+        newLineAfterCloseBrace: true,
         whitespaceBeforeOpenBrace: true,
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
