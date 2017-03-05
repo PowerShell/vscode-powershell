@@ -5,7 +5,7 @@
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.7.0"
+    "vscode": "^1.10.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -216,7 +216,7 @@
               "type": "PowerShell",
               "request": "attach",
               "name": "PowerShell Attach to Host Process",
-              "processId": "^\"\\${command.PickPSHostProcess}\"",
+              "processId": "^\"\\${command:PickPSHostProcess}\"",
               "runspaceId": 1
             }
           },
@@ -266,7 +266,7 @@
               "processId": {
                 "type": "string",
                 "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
-                "default": "${command.PickPSHostProcess}"
+                "default": "${command:PickPSHostProcess}"
               },
               "runspaceId": {
                 "type": "number",
@@ -289,7 +289,7 @@
             "type": "PowerShell",
             "request": "attach",
             "name": "PowerShell Attach to Host Process",
-            "processId": "${command.PickPSHostProcess}",
+            "processId": "${command:PickPSHostProcess}",
             "runspaceId": 1
           },
           {
