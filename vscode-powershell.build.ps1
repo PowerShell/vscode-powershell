@@ -79,7 +79,7 @@ task Build -Before Package {
     # If the PSES codebase is co-located, build it first
     if ($script:psesBuildScriptPath) {
         Write-Host "`n### Building PowerShellEditorServices`n" -ForegroundColor Green
-        Invoke-Build BuildHost $script:psesBuildScriptPath
+        Invoke-Build Build $script:psesBuildScriptPath
     }
 
     Write-Host "`n### Building vscode-powershell" -ForegroundColor Green

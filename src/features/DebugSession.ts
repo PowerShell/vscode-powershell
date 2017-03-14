@@ -24,6 +24,7 @@ export class DebugSessionFeature implements IFeature {
     }
 
     private startDebugSession(config: any) {
+
         if (!config.request) {
             // No launch.json, create the default configuration
             config.type = 'PowerShell';
@@ -56,6 +57,13 @@ export class DebugSessionFeature implements IFeature {
                 }
             }
         }
+
+        // Prevent the Debug Console from opening
+        config.internalConsoleOptions = "neverOpen";
+
+        // Create or show the interactive console
+        // TODO #367: Check if "newSession" mode is configured
+        vscode.commands.executeCommand('PowerShell.ShowSessionConsole');
 
         vscode.commands.executeCommand('vscode.startDebug', config);
     }

@@ -55,6 +55,9 @@ export function getPipePath(pipeName: string) {
 }
 
 export interface EditorServicesSessionDetails {
+    status: string;
+    reason: string;
+    powerShellVersion: string;
     channel: string;
     languageServicePort: number;
     debugServicePort: number;
@@ -62,6 +65,10 @@ export interface EditorServicesSessionDetails {
 
 export interface ReadSessionFileCallback {
     (details: EditorServicesSessionDetails): void;
+}
+
+export interface WaitForSessionFileCallback {
+    (details: EditorServicesSessionDetails, error: string): void;
 }
 
 let sessionsFolder = path.resolve(__dirname, "..", "sessions/");
@@ -80,6 +87,27 @@ export function writeSessionFile(sessionDetails: EditorServicesSessionDetails) {
     var writeStream = fs.createWriteStream(sessionFilePath);
     writeStream.write(JSON.stringify(sessionDetails));
     writeStream.close();
+}
+
+export function waitForSessionFile(callback: WaitForSessionFileCallback) {
+
+    function innerTryFunc(remainingTries: number) {
+        if (remainingTries == 0) {
+            callback(undefined, "Timed out waiting for session file to appear.");
+        }
+        else if(!checkIfFileExists(sessionFilePath)) {
+            // Wait a bit and try again
+            setTimeout(function() { innerTryFunc(remainingTries - 1); }, 500);
+        }
+        else {
+            // Session file was found, load and return it
+            callback(readSessionFile(), undefined);
+        }
+    }
+
+    // Since the delay is 500ms, 50 tries gives 25 seconds of time
+    // for the session file to appear
+    innerTryFunc(50);
 }
 
 export function readSessionFile(): EditorServicesSessionDetails {
