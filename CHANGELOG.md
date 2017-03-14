@@ -1,5 +1,134 @@
 # vscode-powershell Release History
 
+## 0.10.0
+### Tuesday, March 14, 2017
+
+#### New interactive console experience
+
+We are excited to provide you with the first release of our new interactive
+console experience!  When you open up a PowerShell script file, you will
+be greeted with a new VS Code integrated terminal window called
+"PowerShell Integrated Console"
+
+![integrated console screenshot](https://cloud.githubusercontent.com/assets/79405/23910661/b599f2ee-0897-11e7-9426-00af794c10b5.png)
+
+In this console you will have an experience that falls somewhere between
+the PowerShell ISE and the PowerShell console host:
+
+- Tab completion of commands and their parameters
+- Basic command history, accessed using the up/down arrow keys
+- The `psedit` command opens existing files in an editor pane
+- Pressing <kbd>F8</kbd> in an editor pane runs the current line or selection in the console
+- Native applications like `git` are fully supported
+- Script debugging shares the same console session with the editor for
+  a true ISE-like debugging experience
+
+It even works with your fancy prompt function if configured in your
+VS Code profile (`$HOME\Documents\WindowsPowerShell\Microsoft.VSCode_profile.ps1`):
+
+![custom prompt screenshot](https://cloud.githubusercontent.com/assets/79405/23910654/b1bca66c-0897-11e7-81b1-70eff5b97c21.png)
+
+The integrated console is supported on PowerShell v3 through v6 and works
+on Linux and macOS with PowerShell Core.  By default you don't have to
+configure which PowerShell to run, we will pick an appropriate default
+based on your platform.  If you'd like to choose a different install
+of PowerShell you can always change the `powershell.developer.powerShellExePath`
+setting.
+
+Keep in mind that this is the first release for this feature and there are
+bound to be issues and missing functionality.  Please feel free to file
+GitHub issues for any bugs or feature requests!
+
+##### Known Issues and Limitations
+
+- [#535](https://github.com/PowerShell/vscode-powershell/issues/535) PSReadline
+  is currently **not** supported in the integrated console.  We will enable this
+  in a future release.
+- [#534](https://github.com/PowerShell/vscode-powershell/issues/534) Integrated console
+  prompt is not restarted when you stop the debugging of a local runspace in another
+  process.  This will be addressed soon in a patch update.
+- [#533](https://github.com/PowerShell/vscode-powershell/issues/533) Backspace key
+  does not work in the integrated console on Linux and macOS.  The workaround for now
+  is to use <kbd>Ctrl+H</kbd> instead of the Backspace key.  This will be addressed
+  soon in a patch update.
+- [#536](https://github.com/PowerShell/vscode-powershell/issues/536) Integrated console
+  sometimes does not have a scrollbar at startup.  The workaround is to resize the width
+  of the VS Code window slightly and the scrollbar will appear.  This will be addressed
+  soon in a patch update.
+
+#### Get-Credential and PSCredential support
+
+Now that we have the integrated console, we have added support for the `Get-Credential`
+cmdlet, `Read-Host -AsSecureString`, and any input prompt of type `SecureString` or `PSCredential`.
+When you run any of these cmdlets you will be prompted inside the integrated console:
+
+![credential screenshot](https://cloud.githubusercontent.com/assets/79405/23910668/bac9019c-0897-11e7-80e2-eaf1b9e507f8.png)
+
+#### Code formatting improvements
+
+We now support VS Code's `editor.formatOnType` setting so that your code gets formatted
+as you type!  Formatting will be triggered when you press Enter or the closing curly
+brace character `}`.
+
+Based on your feedback, we've also added new code formatting options, all of which
+are turned on by default:
+
+- `powershell.codeFormatting.newLineAfterCloseBrace` - Causes a newline to be inserted
+  after a closing brace in multi-line expressions like if/else
+- `powershell.codeFormatting.whitespaceBeforeOpenBrace` - Causes whitespace to be
+  inserted before an open brace like `Foreach-Object {`
+- `powershell.codeFormatting.whitespaceBeforeOpenParen` - Causes whitespace to be
+  inserted before an open parentheses like `if (`
+- `powershell.codeFormatting.whitespaceAroundOperator` - Causes whitespace to be
+  inserted around operators like `=` or `+`
+- `powershell.codeFormatting.whitespaceAfterSeparator` - Causes whitespace to be
+  inserted around separator characters like `;` and `,`
+- `powershell.codeFormatting.ignoreOneLineBlock` - Single-line expressions, like
+  small if/else statements, will not be expanded to multiple lines.
+
+We've also made many improvements to the performance and stability of the formatter.
+
+#### Debugging improvements
+
+We've added a new configuration for debugging your Pester tests.  By default it
+merely runs `Invoke-Pester` at the workspace path, but you can also edit the
+configuation to add additional arguments to be passed through.
+
+We've also added support for column breakpoints.  Now you can set a breakpoint
+directly within a pipeline by placing your cursor at any column on a line and
+running the `Debug: Column Breakpoint` command:
+
+![column breakpoint screenshot](https://cloud.githubusercontent.com/assets/79405/23910649/aaef70e4-0897-11e7-93b7-0d729969a1e2.png)
+
+For the latest PowerShell Core release ([6.0.0-alpha.17](https://github.com/PowerShell/PowerShell/releases/tag/v6.0.0-alpha.17)),
+we have also added the ability to step into ScriptBlocks that are executed on another
+machine using `Invoke-Command -Computer`.
+
+Set a breakpoint on an `Invoke-Command` line and then once it's hit:
+
+![Invoke-Command screenshot](https://cloud.githubusercontent.com/assets/79405/23911032/c01b8ff6-0898-11e7-89e3-02a31d419fc5.png)
+
+Press `F11` and you will step into the ScriptBlock.  You can now continue to use
+"step in" and trace the ScriptBlock's execution on the remote machine:
+
+![remote script listing screenshot](https://cloud.githubusercontent.com/assets/79405/23918844/ca86cf28-08b1-11e7-8014-c689cdcccf87.png)
+
+Note that you cannot currently set breakpoints in the script listing file as
+this code is being executed without an actual script file on the remote machine.
+
+#### Other fixes and improvements
+
+- Fixed [#427](https://github.com/PowerShell/vscode-powershell/issues/427) -
+  The keybinding for "Expand Alias" command has been changed to <kbd>Shift+Alt+E</kbd>
+- Fixed [#519](https://github.com/PowerShell/vscode-powershell/issues/519) -
+  Debugger hangs after continuing when watch expressions are set
+- Fixed [#448](https://github.com/PowerShell/vscode-powershell/issues/448) -
+  Code formatter should keep indentation for multi-line pipelines
+- Fixed [#518](https://github.com/PowerShell/vscode-powershell/issues/518) -
+  Code formatter fails when dollar-paren `$()` expressions are used
+- Fixed [#447](https://github.com/PowerShell/vscode-powershell/issues/447) -
+  Code formatter crashes when run on untitled documents
+
 ## 0.9.0
 ### Thursday, January 19, 2017
 
