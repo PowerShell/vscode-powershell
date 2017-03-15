@@ -609,7 +609,7 @@ export class SessionManager {
 
     private showSessionConsole() {
         if (this.consoleTerminal) {
-            this.consoleTerminal.show();
+            this.consoleTerminal.show(true);
         }
     }
 
