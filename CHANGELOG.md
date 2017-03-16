@@ -1,5 +1,29 @@
 # vscode-powershell Release History
 
+## 0.10.1
+### Thursday, March 16, 2017
+
+#### Fixes and improvements
+
+- Fixed [#566](https://github.com/PowerShell/vscode-powershell/issues/566) -
+  Enable editor IntelliSense while stopped at a breakpoint
+- Fixed [#556](https://github.com/PowerShell/vscode-powershell/issues/556) -
+  Running and debugging scripts in the integrated console should not steal focus from the editor
+- Fixed [#543](https://github.com/PowerShell/vscode-powershell/issues/543) -
+  Keyboard input using <kbd>AltGr</kbd> <kbd>Ctrl+Alt</kbd> modifiers does not work
+- Fixed [#421](https://github.com/PowerShell/vscode-powershell/issues/421) -
+  Session startup should give a helpful error message if ConstrainedLanguage mode is turned on
+- Fixed [#401](https://github.com/PowerShell/vscode-powershell/issues/401) -
+  Session startup should indicate if current PowerShell version is unsupported (PSv1 and v2)
+- Fixed [#454](https://github.com/PowerShell/vscode-powershell/issues/454) -
+  ExecutionPolicy set via group policy or registry key should not cause language server to crash
+- Fixed [#532](https://github.com/PowerShell/vscode-powershell/issues/532) -
+  DEVPATH environment variable not being set for interactive console session
+- Fixed [PowerShellEditorServices #387](https://github.com/PowerShell/PowerShellEditorServices/issues/387) -
+  Write-(Warning, Verbose, Debug) are missing message prefixes and foreground colors
+- Fixed [PowerShellEditorServices #382](https://github.com/PowerShell/PowerShellEditorServices/issues/382) -
+  PSHostUserInterface implementation should set SupportsVirtualTerminal to true
+
 ## 0.10.0
 ### Tuesday, March 14, 2017
 
