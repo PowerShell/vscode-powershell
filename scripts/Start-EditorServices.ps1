@@ -65,24 +65,28 @@ param(
     $ConfirmInstall
 )
 
-function WriteSessionFile($sessionInfo) {
-    ConvertTo-Json -InputObject $sessionInfo -Compress | Set-Content -Force -Path "$SessionDetailsPath" -ErrorAction Stop
+function ExitWithError($errorString) {
+
+    Write-Host -ForegroundColor Red "`n`n$errorString"
+
+    # Sleep for a while to make sure the user has time to see and copy the
+    # error message
+    Start-Sleep -Seconds 300
+
+    exit 1;
 }
 
 # Are we running in PowerShell 2 or earlier?
 if ($PSVersionTable.PSVersion.Major -le 2) {
-    $resultDetails = @{
-        "status" = "failed"
-        "reason" = "unsupported"
-        "powerShellVersion" = $PSVersionTable.PSVersion.ToString()
-    };
+    # No ConvertTo-Json on PSv2 and below, so write out the JSON manually
+    "{`"status`": `"failed`", `"reason`": `"unsupported`", `"powerShellVersion`": `"$($PSVersionTable.PSVersion.ToString())`"}" |
+        Set-Content -Force -Path "$SessionDetailsPath" -ErrorAction Stop
 
-    # Notify the client that the services have started
-    WriteSessionFile $resultDetails
+    ExitWithError "Unsupported PowerShell version $($PSVersionTable.PSVersion), language features are disabled."
+}
 
-    Write-Host "Unsupported PowerShell version $($PSVersionTable.PSVersion), language features are disabled.`n"
-
-    exit 0;
+function WriteSessionFile($sessionInfo) {
+    ConvertTo-Json -InputObject $sessionInfo -Compress | Set-Content -Force -Path "$SessionDetailsPath" -ErrorAction Stop
 }
 
 # Are we running in PowerShell 5 or later?
@@ -240,5 +244,5 @@ catch [System.Exception] {
         $e = $e.InnerException;
     }
 
-    Write-Error ("`r`nCaught error while waiting for EditorServicesHost to complete:`r`n" + $errorString)
+    ExitWithError ("Caught error while waiting for EditorServicesHost to complete:`r`n" + $errorString)
 }
