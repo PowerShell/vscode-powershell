@@ -284,15 +284,19 @@ export class SessionManager {
                 "-Command",
                 "& '" + startScriptPath + "' " + startArgs);
 
-            // Set DEVPATH environment variable if necessary
             if (isWindowsDevBuild) {
-                // The development build looks for this environment variable to
-                // know where to find its assemblies
-                process.env.DEVPATH = path.dirname(powerShellExePath);
-            }
-            else {
-                // It's safe to delete this variable even if it doesn't exist
-                delete process.env.DEVPATH;
+                // Windows PowerShell development builds need the DEVPATH environment
+                // variable set to the folder where development binaries are held
+
+                // NOTE: This batch file approach is needed temporarily until VS Code's
+                // createTerminal API gets an argument for setting environment variables
+                // on the launched process.
+                var batScriptPath = path.resolve(__dirname, '../sessions/powershell.bat');
+                fs.writeFileSync(
+                    batScriptPath,
+                    `@set DEVPATH=${path.dirname(powerShellExePath)}\r\n@${powerShellExePath} %*`);
+
+                powerShellExePath = batScriptPath;
             }
 
             // Make sure no old session file exists
