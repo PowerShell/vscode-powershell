@@ -89,6 +89,16 @@ function WriteSessionFile($sessionInfo) {
     ConvertTo-Json -InputObject $sessionInfo -Compress | Set-Content -Force -Path "$SessionDetailsPath" -ErrorAction Stop
 }
 
+if ($host.Runspace.LanguageMode -eq 'ConstrainedLanguage') {
+    WriteSessionFile @{
+        "status" = "failed"
+        "reason" = "languageMode"
+        "detail" = $host.Runspace.LanguageMode.ToString()
+    }
+
+    ExitWithError "PowerShell is configured with an unsupported LanguageMode (ConstrainedLanguage), language features are disabled."
+}
+
 # Are we running in PowerShell 5 or later?
 $isPS5orLater = $PSVersionTable.PSVersion.Major -ge 5
 
