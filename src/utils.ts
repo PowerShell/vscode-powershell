@@ -91,13 +91,15 @@ export function writeSessionFile(sessionDetails: EditorServicesSessionDetails) {
 
 export function waitForSessionFile(callback: WaitForSessionFileCallback) {
 
-    function innerTryFunc(remainingTries: number) {
+    function innerTryFunc(remainingTries: number, delayMilliseconds: number) {
         if (remainingTries == 0) {
             callback(undefined, "Timed out waiting for session file to appear.");
         }
         else if(!checkIfFileExists(sessionFilePath)) {
             // Wait a bit and try again
-            setTimeout(function() { innerTryFunc(remainingTries - 1); }, 500);
+            setTimeout(
+                function() { innerTryFunc(remainingTries - 1, delayMilliseconds); },
+                delayMilliseconds);
         }
         else {
             // Session file was found, load and return it
@@ -105,9 +107,8 @@ export function waitForSessionFile(callback: WaitForSessionFileCallback) {
         }
     }
 
-    // Since the delay is 500ms, 50 tries gives 25 seconds of time
-    // for the session file to appear
-    innerTryFunc(50);
+    // Try once per second for 60 seconds, one full minute
+    innerTryFunc(60, 1000);
 }
 
 export function readSessionFile(): EditorServicesSessionDetails {
@@ -132,4 +133,9 @@ export function checkIfFileExists(filePath: string): boolean {
     catch (e) {
         return false;
     }
+}
+
+export function getTimestampString() {
+    var time = new Date();
+    return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`
 }
