@@ -57,6 +57,7 @@ export function getPipePath(pipeName: string) {
 export interface EditorServicesSessionDetails {
     status: string;
     reason: string;
+    detail: string;
     powerShellVersion: string;
     channel: string;
     languageServicePort: number;

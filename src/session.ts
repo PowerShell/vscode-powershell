@@ -327,6 +327,10 @@ export class SessionManager {
                                 this.setSessionFailure(
                                     `PowerShell language features are only supported on PowerShell version 3 and above.  The current version is ${sessionDetails.powerShellVersion}.`)
                             }
+                            else if (sessionDetails.reason === "languageMode") {
+                                this.setSessionFailure(
+                                    `PowerShell language features are disabled due to an unsupported LanguageMode: ${sessionDetails.detail}`);
+                            }
                             else {
                                 this.setSessionFailure(`PowerShell could not be started for an unknown reason '${sessionDetails.reason}'`)
                             }
