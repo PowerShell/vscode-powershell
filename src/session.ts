@@ -298,6 +298,8 @@ export class SessionManager {
             // Make sure no old session file exists
             utils.deleteSessionFile();
 
+            this.log.write(`${utils.getTimestampString()} Language server starting...`);
+
             // Launch PowerShell in the integrated terminal
             this.consoleTerminal =
                 vscode.window.createTerminal(
@@ -312,6 +314,8 @@ export class SessionManager {
                 (sessionDetails, error) => {
                     if (sessionDetails) {
                         if (sessionDetails.status === "started") {
+                            this.log.write(`${utils.getTimestampString()} Language server started.`);
+
                             // Write out the session configuration file
                             utils.writeSessionFile(sessionDetails);
 
@@ -332,6 +336,7 @@ export class SessionManager {
                         }
                     }
                     else {
+                        this.log.write(`${utils.getTimestampString()} Language server startup failed.`);
                         this.setSessionFailure("Could not start language service: ", error);
                     }
                 });
