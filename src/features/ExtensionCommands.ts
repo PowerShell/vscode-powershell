@@ -156,7 +156,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
-    private extensionCommands = [];
+    private extensionCommands: ExtensionCommand[] = [];
 
     constructor() {
         this.command = vscode.commands.registerCommand('PowerShell.ShowAdditionalCommands', () => {
@@ -235,6 +235,10 @@ export class ExtensionCommandsFeature implements IFeature {
             name: command.name,
             displayName: command.displayName
         });
+
+        this.extensionCommands.sort(
+            (a: ExtensionCommand, b: ExtensionCommand) =>
+                a.name.localeCompare(b.name));
     }
 
     private showExtensionCommands(client: LanguageClient) : Thenable<InvokeExtensionCommandRequestArguments> {
@@ -251,7 +255,7 @@ export class ExtensionCommandsFeature implements IFeature {
             this.extensionCommands.map<ExtensionCommandQuickPickItem>(command => {
                 return {
                     label: command.displayName,
-                    description: "",
+                    description: command.name,
                     command: command
                 }
             });
