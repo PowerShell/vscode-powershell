@@ -135,7 +135,7 @@
       },
       {
         "command": "PowerShell.ShowSessionConsole",
-        "title": "Show Session Interactive Console",
+        "title": "Show Integrated Console",
         "category": "PowerShell"
       },
       {
