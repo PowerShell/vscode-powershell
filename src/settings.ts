@@ -32,11 +32,18 @@ export interface IDeveloperSettings {
 }
 
 export interface ISettings {
+    startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
     scriptAnalysis?: IScriptAnalysisSettings;
     developer?: IDeveloperSettings;
     codeFormatting?: ICodeFormattingSettings;
+    integratedConsole?: IIntegratedConsoleSettings;
+}
+
+export interface IIntegratedConsoleSettings {
+    showOnStartup?: boolean;
+    focusConsoleOnExecute?: boolean;
 }
 
 export function load(myPluginId: string): ISettings {
@@ -67,11 +74,18 @@ export function load(myPluginId: string): ISettings {
         ignoreOneLineBlock: true
     };
 
+    let defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
+        showOnStartup: true,
+        focusConsoleOnExecute: true
+    };
+
     return {
+        startAutomatically: configuration.get<boolean>("startAutomatically", true),
         useX86Host: configuration.get<boolean>("useX86Host", false),
         enableProfileLoading: configuration.get<boolean>("enableProfileLoading", false),
         scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
         developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
-        codeFormatting: configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings)
+        codeFormatting: configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
+        integratedConsole: configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings)
     };
 }

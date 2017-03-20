@@ -6,6 +6,7 @@
 
 import vscode = require('vscode');
 import utils = require('./utils');
+import Settings = require('./settings');
 import { Logger, LogLevel } from './logging';
 import { IFeature } from './feature';
 import { SessionManager } from './session';
@@ -118,7 +119,10 @@ export function activate(context: vscode.ExtensionContext): void {
             logger,
             extensionFeatures);
 
-    sessionManager.start();
+    var extensionSettings = Settings.load(utils.PowerShellLanguageId);
+    if (extensionSettings.startAutomatically) {
+        sessionManager.start();
+    }
 }
 
 export function deactivate(): void {

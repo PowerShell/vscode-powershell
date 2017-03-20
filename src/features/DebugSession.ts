@@ -63,7 +63,7 @@ export class DebugSessionFeature implements IFeature {
 
         // Create or show the interactive console
         // TODO #367: Check if "newSession" mode is configured
-        vscode.commands.executeCommand('PowerShell.ShowSessionConsole');
+        vscode.commands.executeCommand('PowerShell.ShowSessionConsole', true);
 
         vscode.commands.executeCommand('vscode.startDebug', config);
     }
