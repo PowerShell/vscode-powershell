@@ -266,9 +266,15 @@ export class SessionManager {
 
             var editorServicesLogPath = this.log.getLogFilePath("EditorServices");
 
+            var featureFlags =
+                this.sessionSettings.developer.featureFlags !== undefined
+                ? this.sessionSettings.developer.featureFlags.map(f => `'${f}'`).join(', ')
+                : "";
+
             startArgs +=
-                "-LogPath '" + editorServicesLogPath + "' " +
-                "-SessionDetailsPath '" + utils.getSessionFilePath() + "' ";
+                `-LogPath '${editorServicesLogPath}' ` +
+                `-SessionDetailsPath '${utils.getSessionFilePath()}' ` +
+                `-FeatureFlags @(${featureFlags})`
 
             var powerShellArgs = [
                 "-NoProfile",

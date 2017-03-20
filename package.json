@@ -325,6 +325,11 @@
           "default": "",
           "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
         },
+        "powershell.developer.featureFlags": {
+          "type": "array",
+          "default": [],
+          "description": "An array of strings used to enable experimental features in the PowerShell extension."
+        },
         "powershell.developer.powerShellExePath": {
           "type": "string",
           "default": "",

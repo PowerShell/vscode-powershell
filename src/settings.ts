@@ -23,6 +23,7 @@ export interface IScriptAnalysisSettings {
 }
 
 export interface IDeveloperSettings {
+    featureFlags?: string[];
     powerShellExePath?: string;
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
@@ -47,6 +48,7 @@ export function load(myPluginId: string): ISettings {
     };
 
     let defaultDeveloperSettings: IDeveloperSettings = {
+        featureFlags: [],
         powerShellExePath: undefined,
         bundledModulesPath: undefined,
         editorServicesLogLevel: "Normal",

@@ -58,6 +58,9 @@ param(
     [string]
     $DebugServiceOnly,
 
+    [string[]]
+    $FeatureFlags,
+
     [switch]
     $WaitForDebugger,
 
