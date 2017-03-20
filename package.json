@@ -305,6 +305,11 @@
       "type": "object",
       "title": "PowerShell Configuration",
       "properties": {
+        "powershell.startAutomatically": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, causes PowerShell extension features to start automatically when a PowerShell file is opened.  If false, the user must initiate startup using the 'PowerShell: Restart Current Session' command.  IntelliSense, code navigation, integrated console, code formatting, and other features will not be enabled until the extension has been started."
+        },
         "powershell.useX86Host": {
           "type": "boolean",
           "default": false,
@@ -393,6 +398,11 @@
           "type": "boolean",
           "default": true,
           "description": "Ignore blocks of code on one line. For example, if true, the braces in \"if (...) {...} else {...}\", will not be formatted."
+        },
+        "powershell.integratedConsole.showOnStartup": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, causes the integrated console to be shown automatically when the PowerShell extension is initialized."
         }
       }
     }

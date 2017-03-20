@@ -99,12 +99,13 @@ export class SessionManager {
         this.hostVersion = this.hostVersion.split('-')[0];
 
         this.registerCommands();
-        this.createStatusBarItem();
     }
 
     public start(sessionConfig: SessionConfiguration = { type: SessionType.UseDefault }) {
         this.sessionSettings = Settings.load(utils.PowerShellLanguageId);
         this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
+
+        this.createStatusBarItem();
 
         this.sessionConfiguration = this.resolveSessionConfiguration(sessionConfig);
 
@@ -317,7 +318,9 @@ export class SessionManager {
                     powerShellExePath,
                     powerShellArgs);
 
-            this.consoleTerminal.show();
+            if (this.sessionSettings.integratedConsole.showOnStartup) {
+                this.consoleTerminal.show(true);
+            }
 
             // Start the language client
             utils.waitForSessionFile(
@@ -490,7 +493,7 @@ export class SessionManager {
     }
 
     private createStatusBarItem() {
-        if (this.statusBarItem == undefined) {
+        if (this.statusBarItem === undefined) {
             // Create the status bar item and place it right next
             // to the language indicator
             this.statusBarItem =

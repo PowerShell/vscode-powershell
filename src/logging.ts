@@ -49,13 +49,10 @@ export class Logger {
 
     public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]) {
         if (logLevel >= this.MinimumLogLevel) {
-            // TODO: Add timestamp
-            this.logChannel.appendLine(message);
-            fs.appendFile(this.logFilePath, message + os.EOL);
+            this.writeLine(message)
 
             additionalMessages.forEach((line) => {
-                this.logChannel.appendLine(line);
-                fs.appendFile(this.logFilePath, line + os.EOL);
+                this.writeLine(message);
             });
         }
     }
@@ -136,6 +133,14 @@ export class Logger {
                 'vscode.openFolder',
                 vscode.Uri.file(this.logSessionPath),
                 true);
+        }
+    }
+
+    private writeLine(message: string) {
+        // TODO: Add timestamp
+        this.logChannel.appendLine(message);
+        if (this.logFilePath) {
+            fs.appendFile(this.logFilePath, message + os.EOL);
         }
     }
 }
