@@ -1,5 +1,5 @@
 version: '0.10.1-insiders-{build}'
-image: Visual Studio 2017 RC
+image: Visual Studio 2017
 clone_depth: 10
 skip_tags: true
 
