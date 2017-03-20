@@ -64,6 +64,7 @@ export class SessionManager {
     private hostVersion: string;
     private isWindowsOS: boolean;
     private sessionStatus: SessionStatus;
+    private focusConsoleOnExecute: boolean;
     private statusBarItem: vscode.StatusBarItem;
     private sessionConfiguration: SessionConfiguration;
     private versionDetails: PowerShellVersionDetails;
@@ -104,6 +105,8 @@ export class SessionManager {
     public start(sessionConfig: SessionConfiguration = { type: SessionType.UseDefault }) {
         this.sessionSettings = Settings.load(utils.PowerShellLanguageId);
         this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
+
+        this.focusConsoleOnExecute = this.sessionSettings.integratedConsole.focusConsoleOnExecute;
 
         this.createStatusBarItem();
 
@@ -206,6 +209,8 @@ export class SessionManager {
     private onConfigurationUpdated() {
         var settings = Settings.load(utils.PowerShellLanguageId);
 
+        this.focusConsoleOnExecute = settings.integratedConsole.focusConsoleOnExecute;
+
         // Detect any setting changes that would affect the session
         if (settings.useX86Host !== this.sessionSettings.useX86Host ||
             settings.developer.powerShellExePath.toLowerCase() !== this.sessionSettings.developer.powerShellExePath.toLowerCase() ||
@@ -245,7 +250,7 @@ export class SessionManager {
             vscode.commands.registerCommand('PowerShell.RestartSession', () => { this.restartSession(); }),
             vscode.commands.registerCommand(this.ShowSessionMenuCommandName, () => { this.showSessionMenu(); }),
             vscode.workspace.onDidChangeConfiguration(() => this.onConfigurationUpdated()),
-            vscode.commands.registerCommand('PowerShell.ShowSessionConsole', () => { this.showSessionConsole(); })
+            vscode.commands.registerCommand('PowerShell.ShowSessionConsole', (isExecute?: boolean) => { this.showSessionConsole(isExecute); })
         ]
     }
 
@@ -629,9 +634,10 @@ export class SessionManager {
         return resolvedPath;
     }
 
-    private showSessionConsole() {
+    private showSessionConsole(isExecute?: boolean) {
         if (this.consoleTerminal) {
-            this.consoleTerminal.show(true);
+            this.consoleTerminal.show(
+                isExecute && !this.focusConsoleOnExecute);
         }
     }
 

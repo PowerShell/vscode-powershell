@@ -43,6 +43,7 @@ export interface ISettings {
 
 export interface IIntegratedConsoleSettings {
     showOnStartup?: boolean;
+    focusConsoleOnExecute?: boolean;
 }
 
 export function load(myPluginId: string): ISettings {
@@ -75,6 +76,7 @@ export function load(myPluginId: string): ISettings {
 
     let defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
         showOnStartup: true,
+        focusConsoleOnExecute: true
     };
 
     return {

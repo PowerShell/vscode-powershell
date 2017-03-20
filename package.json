@@ -403,6 +403,11 @@
           "type": "boolean",
           "default": true,
           "description": "If true, causes the integrated console to be shown automatically when the PowerShell extension is initialized."
+        },
+        "powershell.integratedConsole.focusConsoleOnExecute": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, causes the integrated console to be focused when a script selection is run or a script file is debugged."
         }
       }
     }

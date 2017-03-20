@@ -217,7 +217,7 @@ export class ConsoleFeature implements IFeature {
                 });
 
                 // Show the integrated console if it isn't already visible
-                vscode.commands.executeCommand("PowerShell.ShowSessionConsole");
+                vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
             })
         ];
     }
