@@ -6,11 +6,27 @@ import os = require('os');
 import path = require('path');
 import vscode = require('vscode');
 import { IFeature } from '../feature';
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import { LanguageClient, RequestType, NotificationType, TextDocumentIdentifier } from 'vscode-languageclient';
+
+// NOTE: The following two DidSaveTextDocument* types will
+// be removed when #593 gets fixed.
+
+export interface DidSaveTextDocumentParams {
+	/**
+	 * The document that was closed.
+	 */
+	textDocument: TextDocumentIdentifier;
+}
+
+export namespace DidSaveTextDocumentNotification {
+    export const type: NotificationType<DidSaveTextDocumentParams> =
+        { get method() { return 'textDocument/didSave'; } }
+}
 
 export class RemoteFilesFeature implements IFeature {
 
     private tempSessionPathPrefix: string;
+    private languageClient: LanguageClient;
 
     constructor() {
         // Get the common PowerShell Editor Services temporary file path
@@ -22,18 +38,19 @@ export class RemoteFilesFeature implements IFeature {
         // At startup, close any lingering temporary remote files
         this.closeRemoteFiles();
 
-        // TEMPORARY: Register for the onDidSave event so that we can alert
-        // the user when they attempt to save a remote file.  We don't
-        // currently propagate saved content back to the remote session.
         vscode.workspace.onDidSaveTextDocument(doc => {
-            if (this.isDocumentRemote(doc)) {
-                vscode.window.showWarningMessage(
-                    "Changes to remote files are not yet saved back in the remote session, coming in 0.10.0.");
+            if (this.languageClient && this.isDocumentRemote(doc)) {
+                this.languageClient.sendNotification(
+                    DidSaveTextDocumentNotification.type,
+                    {
+                        textDocument: TextDocumentIdentifier.create(doc.uri.toString())
+                    });
             }
         })
     }
 
     public setLanguageClient(languageclient: LanguageClient) {
+        this.languageClient = languageclient;
     }
 
     public dispose() {
