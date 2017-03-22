@@ -28,7 +28,7 @@ import { DocumentFormatterFeature } from './features/DocumentFormatter';
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-var requiredEditorServicesVersion = "0.10.1";
+var requiredEditorServicesVersion = "0.11.0";
 
 var logger: Logger = undefined;
 var sessionManager: SessionManager = undefined;

@@ -1,5 +1,74 @@
 # vscode-powershell Release History
 
+## 0.11.0
+### Wednesday, March 22, 2017
+
+#### Remotely edited files can now be saved
+
+- Added [#583](https://github.com/PowerShell/vscode-powershell/issues/583) -
+  When you open files in a remote PowerShell session with the `psedit` command,
+  their updated contents are now saved back to the remote machine when you save
+  them in the editor.
+
+#### Integrated console improvements
+
+- Fixed [#533](https://github.com/PowerShell/vscode-powershell/issues/533) -
+  The backspace key now works in the integrated console on Linux and macOS.  This
+  fix also resolves a few usability problems with the integrated console on all
+  supported OSes.
+
+- Fixed [542](https://github.com/PowerShell/vscode-powershell/issues/542) -
+  Get-Credential now hides keystrokes correctly on Linux and macOS.
+
+We also added some new settings ([#580](https://github.com/PowerShell/vscode-powershell/issues/580),
+[#588](https://github.com/PowerShell/vscode-powershell/issues/588)) to allow fine-tuning
+of the integrated console experience:
+
+- `powershell.startAutomatically` (default: `true`) - If true, causes PowerShell extension
+  features to start automatically when a PowerShell file is opened.  If false, the user must
+  initiate startup using the 'PowerShell: Restart Current Session' command.  IntelliSense,
+  code navigation, integrated console, code formatting, and other features will not be
+  enabled until the extension has been started.  Most users will want to leave this
+  setting to `true`, though it was added to save CPU cycles if you often use new VS Code
+  instances to quickly view PowerShell files.
+
+- `powershell.integratedConsole.showOnStartup` (default: `true`) - If true, causes the
+  integrated console to be shown automatically when the PowerShell extension is initialized.
+
+- `powershell.integratedConsole.focusConsoleOnExecute` (default: `true`) - If `true`,
+  causes the integrated console to be focused when a script selection is run or a
+  script file is debugged.
+
+#### Interactive debugging improvements
+
+- Added [#540](https://github.com/PowerShell/vscode-powershell/issues/540) -
+  The scripts that you debug are now dot-sourced into the integrated console's
+  session, allowing you to experiment with the results of your last execution.
+
+- Added [#600](https://github.com/PowerShell/vscode-powershell/issues/600) -
+  Debugger commands like `stepInto`, `continue`, and `quit` are now available
+  in the integrated console while debugging a script.
+
+- Fixed [#596](https://github.com/PowerShell/vscode-powershell/issues/596) -
+  VS Code's Debug Console now warns the user when it is used while debugging
+  a script.  All command evaluation now happens through the integrated console
+  so this message should help alleviate confusion.
+
+#### Other fixes and improvements
+
+- Fixed [#579](https://github.com/PowerShell/vscode-powershell/issues/579) -
+  Sorting of IntelliSense results is now consistent with the PowerShell ISE
+- Fixed [#591](https://github.com/PowerShell/vscode-powershell/issues/591) -
+  "Editor commands" registered with the `Register-EditorCommand` function are
+  now sorted alphabetically by their `Name` field, causing commands to be grouped
+  based on their source module.
+- Fixed [#575](https://github.com/PowerShell/vscode-powershell/issues/575) -
+  The interactive console no longer starts up with errors in the `$Error` variable.
+- Fixed [#599](https://github.com/PowerShell/vscode-powershell/issues/599) -
+  The [SSASCMDLETS module](https://msdn.microsoft.com/en-us/library/hh213141.aspx?f=255&MSPPError=-2147217396)
+  from SQL Server Analytics Service should now load correctly in the integrated
+  console.
+
 ## 0.10.1
 ### Thursday, March 16, 2017
 
