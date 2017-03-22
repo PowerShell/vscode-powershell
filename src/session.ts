@@ -87,12 +87,17 @@ export class SessionManager {
         this.isWindowsOS = os.platform() == "win32";
 
         // Get the current version of this extension
-        this.hostVersion =
-            vscode
-                .extensions
-                .getExtension("ms-vscode.PowerShell")
-                .packageJSON
-                .version;
+        // NOTE: Report the host version as 1.0.0 for now to avoid
+        //       issues loading the SSASCMDLETS module from SQL Server
+        //       Analytics Service.  Once we ship 1.0 of the extension,
+        //       this will be changed back to the actual ext version.
+        //       (part of a fix for PowerShell/vscode-powershell#599).
+        this.hostVersion = "1.0.0";
+            // vscode
+            //     .extensions
+            //     .getExtension("ms-vscode.PowerShell")
+            //     .packageJSON
+            //     .version;
 
         // Fix the host version so that PowerShell can consume it.
         // This is needed when the extension uses a prerelease
