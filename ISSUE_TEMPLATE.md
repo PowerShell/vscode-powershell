@@ -17,9 +17,10 @@ https://github.com/PowerShell/EditorSyntax/issues
 - Output from `$PSVersionTable`:
 
 ```
-Copy / paste the below commands into PowerShell, and paste the output here
+Copy / paste the below commands into the PowerShell Integrated Terminal, and paste the output here
 
 code -v
+$pseditor.EditorServicesVersion
 code --list-extensions --show-versions
 $PSVersionTable
 ```
