@@ -12,7 +12,7 @@
           "",
           "\tModuleVersion = '${ModuleVersion:0.1}'",
           "",
-          "\t# Use the New-Guid command to generate a GUID, and copy/paste into the next line"
+          "\t# Use the New-Guid command to generate a GUID, and copy/paste into the next line",
           "\tGUID = '<pasteNewGUIDhere>'",
           "",
           "\tCopyright = '2017 ${company:Copyright Holder}'",
