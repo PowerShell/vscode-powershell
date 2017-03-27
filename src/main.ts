@@ -6,6 +6,7 @@
 
 import vscode = require('vscode');
 import utils = require('./utils');
+import path = require('path');
 import Settings = require('./settings');
 import { Logger, LogLevel } from './logging';
 import { IFeature } from './feature';
@@ -38,6 +39,8 @@ var extensionFeatures: IFeature[] = [];
 utils.deleteSessionFile();
 
 export function activate(context: vscode.ExtensionContext): void {
+
+    checkForUpdatedVersion(context);
 
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -123,6 +126,43 @@ export function activate(context: vscode.ExtensionContext): void {
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }
+}
+
+function checkForUpdatedVersion(context: vscode.ExtensionContext) {
+
+    const showReleaseNotes = "Show Release Notes";
+    const powerShellExtensionVersionKey = 'powerShellExtensionVersion';
+
+    var extensionVersion: string =
+        vscode
+            .extensions
+            .getExtension("ms-vscode.PowerShell")
+            .packageJSON
+            .version;
+
+    var storedVersion = context.globalState.get(powerShellExtensionVersionKey);
+
+    if (!storedVersion) {
+        // TODO: Prompt to show User Guide for first-time install
+    }
+    else if (extensionVersion !== storedVersion) {
+        vscode
+            .window
+            .showInformationMessage(
+                `The PowerShell extension has been updated to version ${extensionVersion}!`,
+                showReleaseNotes)
+            .then(choice => {
+                if (choice === showReleaseNotes) {
+                    vscode.commands.executeCommand(
+                        'markdown.showPreview',
+                        vscode.Uri.file(path.resolve(__dirname, "../CHANGELOG.md")));
+                }
+            });
+    }
+
+    context.globalState.update(
+        powerShellExtensionVersionKey,
+        extensionVersion);
 }
 
 export function deactivate(): void {
