@@ -149,6 +149,15 @@
         "category": "PowerShell"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceLangId == powershell",
+          "command": "PowerShell.RunSelection",
+          "group": "2_powershell"
+        }
+      ]
+    },
     "snippets": [
       {
         "language": "powershell",
