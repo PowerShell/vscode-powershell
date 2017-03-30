@@ -310,18 +310,6 @@ class PSDocumentFormattingEditProvider implements
                         return -1 * editComparer(left, right);
                     });
 
-                    // We cannot handle multiple edits at the same point hence we
-                    // filter the markers so that there is only one edit per region
-                    if (edits.length > 0) {
-                        uniqueEdits.push(edits[0]);
-                        for (let edit of edits.slice(1)) {
-                            let lastEdit: ScriptRegion = uniqueEdits[uniqueEdits.length - 1];
-                            if (lastEdit.startLineNumber !== edit.startLineNumber
-                                || (edit.startColumnNumber + edit.text.length) < lastEdit.startColumnNumber) {
-                                uniqueEdits.push(edit);
-                            }
-                        }
-                    }
 
                     // we need to update the range as the edits might
                     // have changed the original layout
@@ -333,6 +321,22 @@ class PSDocumentFormattingEditProvider implements
                         // extend the range such that it starts at the first character of the
                         // start line of the range.
                         range = this.snapRangeToEdges(range, document);
+
+                        // filter edits that are contained in the input range
+                        edits = edits.filter(edit => range.contains(toRange(edit).start));
+                    }
+
+                    // We cannot handle multiple edits at the same point hence we
+                    // filter the markers so that there is only one edit per region
+                    if (edits.length > 0) {
+                        uniqueEdits.push(edits[0]);
+                        for (let edit of edits.slice(1)) {
+                            let lastEdit: ScriptRegion = uniqueEdits[uniqueEdits.length - 1];
+                            if (lastEdit.startLineNumber !== edit.startLineNumber
+                                || (edit.startColumnNumber + edit.text.length) < lastEdit.startColumnNumber) {
+                                uniqueEdits.push(edit);
+                            }
+                        }
                     }
 
                     // reset line difference to 0
