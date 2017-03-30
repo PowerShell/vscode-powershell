@@ -345,7 +345,7 @@ class PSDocumentFormattingEditProvider implements
                     // we do not return a valid array because our text edits
                     // need to be executed in a particular order and it is
                     // easier if we perform the edits ourselves
-                    return this.applyEdit(editor, uniqueEdits, range, 0, index);
+                    return this.applyEdit(editor, uniqueEdits, 0, index);
                 })
                 .then(() => {
                     // execute the same rule again if we left out violations
@@ -365,7 +365,6 @@ class PSDocumentFormattingEditProvider implements
     private applyEdit(
         editor: TextEditor,
         edits: ScriptRegion[],
-        range: Range,
         markerIndex: number,
         ruleIndex: number): Thenable<void> {
         if (markerIndex >= edits.length) {
@@ -377,27 +376,22 @@ class PSDocumentFormattingEditProvider implements
         let edit: ScriptRegion = edits[markerIndex];
         let editRange: Range = toRange(edit);
 
-        if (range === null || range.contains(editRange.start)) {
 
-            // accumulate the changes in number of lines
-            // get the difference between the number of lines in the replacement text and
-            // that of the original text
-            this.lineDiff += this.getNumLines(edit.text) - (editRange.end.line - editRange.start.line + 1);
-            return editor.edit((editBuilder) => {
-                editBuilder.replace(
-                    editRange,
-                    edit.text);
-            },
-                {
-                    undoStopAfter: undoStopAfter,
-                    undoStopBefore: undoStopBefore
-                }).then((isEditApplied) => {
-                    return this.applyEdit(editor, edits, range, markerIndex + 1, ruleIndex);
-                }); // TODO handle rejection
-        }
-        else {
-            return this.applyEdit(editor, edits, range, markerIndex + 1, ruleIndex);
-        }
+        // accumulate the changes in number of lines
+        // get the difference between the number of lines in the replacement text and
+        // that of the original text
+        this.lineDiff += this.getNumLines(edit.text) - (editRange.end.line - editRange.start.line + 1);
+        return editor.edit((editBuilder) => {
+            editBuilder.replace(
+                editRange,
+                edit.text);
+        },
+            {
+                undoStopAfter: undoStopAfter,
+                undoStopBefore: undoStopBefore
+            }).then((isEditApplied) => {
+                return this.applyEdit(editor, edits, markerIndex + 1, ruleIndex);
+            }); // TODO handle rejection
     }
 
     private getNumLines(text: string): number {
