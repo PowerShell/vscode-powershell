@@ -332,7 +332,7 @@
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
           "default": true,
-          "description": "Enables real-time script analysis from PowerShell Script Analyzer. This extension uses the PSScriptAnalyzer module in $home/.vscode/extensions/ms-vscode.PowerShell-<version>/modules/PSScriptAnalyzer"
+          "description": "Enables real-time script analysis from PowerShell Script Analyzer. Uses the newest installed version of the PSScriptAnalyzer module or the version bundled with this extension, if it is newer."
         },
         "powershell.scriptAnalysis.settingsPath": {
           "type": "string",
@@ -376,37 +376,37 @@
         "powershell.codeFormatting.newLineAfterOpenBrace": {
           "type": "boolean",
           "default": true,
-          "description": "A new line must follow an open brace."
+          "description": "Adds a newline (line break) after an open brace."
         },
         "powershell.codeFormatting.newLineAfterCloseBrace": {
           "type": "boolean",
           "default": true,
-          "description": "A new line must follow a close brace."
+          "description": "Adds a newline (line break) after a closing brace."
         },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
           "default": true,
-          "description": "There must be a whitespace between a keyword and its associated scriptblock expression."
+          "description": "Adds a space between a keyword and its associated scriptblock expression."
         },
         "powershell.codeFormatting.whitespaceBeforeOpenParen": {
           "type": "boolean",
           "default": true,
-          "description": "There must be whitespace between an keyword (if, elseif, while, switch, etc) and its associated conditional expression."
+          "description": "Adds a space between a keyword (if, elseif, while, switch, etc) and its associated conditional expression."
         },
         "powershell.codeFormatting.whitespaceAroundOperator": {
           "type": "boolean",
           "default": true,
-          "description": "There must be whitespaces around both sides of a binary or assignment operator ('=', '+', '-', etc.)."
+          "description": "Adds spaces before and after an operator ('=', '+', '-', etc.)."
         },
         "powershell.codeFormatting.whitespaceAfterSeparator": {
           "type": "boolean",
           "default": true,
-          "description": "There must be a whitespaces after a separator (',' and ';')."
+          "description": "Adds a space after a separator (',' and ';')."
         },
         "powershell.codeFormatting.ignoreOneLineBlock": {
           "type": "boolean",
           "default": true,
-          "description": "Ignore blocks of code on one line. For example, if true, the braces in \"if (...) {...} else {...}\", will not be formatted."
+          "description": "Does not reformat one-line code blocks, such as \"if (...) {...} else {...}\"."
         },
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
