@@ -317,51 +317,51 @@
         "powershell.startAutomatically": {
           "type": "boolean",
           "default": true,
-          "description": "If true, causes PowerShell extension features to start automatically when a PowerShell file is opened.  If false, the user must initiate startup using the 'PowerShell: Restart Current Session' command.  IntelliSense, code navigation, integrated console, code formatting, and other features will not be enabled until the extension has been started."
+          "description": "Starts PowerShell extension features automatically when a PowerShell file opens. If false, to start the extension, use the 'PowerShell: Restart Current Session' command. IntelliSense, code navigation, integrated console, code formatting, and other features are not enabled until the extension starts."
         },
         "powershell.useX86Host": {
           "type": "boolean",
           "default": false,
-          "description": "If true, causes the 32-bit language service to be used on 64-bit Windows.  On 32-bit Windows this setting has no effect.  This setting does not affect the debugger which has its own architecture configuration."
+          "description": "Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration."
         },
         "powershell.enableProfileLoading": {
           "type": "boolean",
           "default": true,
-          "description": "If true, causes user and system wide profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) to be loaded into the PowerShell session.  This affects IntelliSense and interactive script execution.  The debugger is not affected by this setting."
+          "description": "Loads user and system-wide PowerShell profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) into the PowerShell session. This affects IntelliSense and interactive script execution, but it does not affect the debugger."
         },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
           "default": true,
-          "description": "Enables real-time script analysis using PowerShell Script Analyzer."
+          "description": "Enables real-time script analysis from PowerShell Script Analyzer. This extension uses the PSScriptAnalyzer module in $home/.vscode/extensions/ms-vscode.PowerShell-<version>/modules/PSScriptAnalyzer"
         },
         "powershell.scriptAnalysis.settingsPath": {
           "type": "string",
           "default": "",
-          "description": "Specifies the path to a PowerShell Script Analyzer settings file. Use either an absolute path (to override the default settings for all projects) or use a path relative to your workspace."
+          "description": "Specifies the path to a PowerShell Script Analyzer settings file. To override the default settings for all projects, enter an absolute path, or enter a path relative to your workspace."
         },
         "powershell.developer.featureFlags": {
           "type": "array",
           "default": [],
-          "description": "An array of strings used to enable experimental features in the PowerShell extension."
+          "description": "An array of strings that enable experimental features in the PowerShell extension."
         },
         "powershell.developer.powerShellExePath": {
           "type": "string",
           "default": "",
-          "description": "Specifies the full path to a PowerShell executable.  Used to change the installation of PowerShell used for language and debugging services."
+          "description": "Specifies the full path to a PowerShell executable. Changes the installation of PowerShell used for language and debugging services."
         },
         "powershell.developer.powerShellExeIsWindowsDevBuild": {
           "type": "boolean",
           "default": false,
-          "description": "If true, indicates that the powerShellExePath points to a developer build of Windows PowerShell and should be configured appropriately."
+          "description": "Indicates that the powerShellExePath points to a developer build of Windows PowerShell and configures it for development."
         },
         "powershell.developer.bundledModulesPath": {
           "type": "string",
-          "description": "Specifies the path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PowerShell Script Analyzer, Plaster)"
+          "description": "Specifies an alternate path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PSScriptAnalyzer, Plaster)"
         },
         "powershell.developer.editorServicesLogLevel": {
           "type": "string",
           "default": "Normal",
-          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Possible values are 'Verbose', 'Normal', 'Warning', and 'Error'"
+          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Verbose', 'Normal', 'Warning', and 'Error'"
         },
         "powershell.developer.editorServicesWaitForDebugger": {
           "type": "boolean",
@@ -411,12 +411,12 @@
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
           "default": true,
-          "description": "If true, causes the integrated console to be shown automatically when the PowerShell extension is initialized."
+          "description": "Shows the integrated console when the PowerShell extension is initialized."
         },
         "powershell.integratedConsole.focusConsoleOnExecute": {
           "type": "boolean",
           "default": true,
-          "description": "If true, causes the integrated console to be focused when a script selection is run or a script file is debugged."
+          "description": "Switches focus to the console when a script selection is run or a script file is debugged. This is an accessibility feature. To disable it, set to false."
         }
       }
     }
