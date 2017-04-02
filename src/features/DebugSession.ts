@@ -48,7 +48,7 @@ export class DebugSessionFeature implements IFeature {
                         config.script = currentDocument.uri.toString();
                     }
                     else {
-                        let msg = "In order to debug '" + currentDocument.fileName +
+                        let msg = "To debug '" + currentDocument.fileName +
                                   "', change the document's language mode to PowerShell or save the file with a PowerShell extension.";
                         vscode.window.showErrorMessage(msg);
                         return;
