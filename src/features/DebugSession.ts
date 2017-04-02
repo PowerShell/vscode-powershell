@@ -44,7 +44,15 @@ export class DebugSessionFeature implements IFeature {
                 let currentDocument = vscode.window.activeTextEditor.document;
 
                 if (currentDocument.isUntitled) {
-                    config.script = currentDocument.uri.toString();
+                    if (currentDocument.languageId === 'powershell') {
+                        config.script = currentDocument.uri.toString();
+                    }
+                    else {
+                        let msg = "In order to debug '" + currentDocument.fileName +
+                                  "', set the document's language mode to PowerShell or save the file with a PowerShell extension.";
+                        vscode.window.showErrorMessage(msg);
+                        return;
+                    }
                 }
                 else {
                     let isValidExtension = false;
