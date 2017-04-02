@@ -42,24 +42,37 @@ export class DebugSessionFeature implements IFeature {
             // is not a file that can be debugged by PowerShell
             if (config.script === "${file}") {
                 let currentDocument = vscode.window.activeTextEditor.document;
-                let ext =
-                    currentDocument.fileName.substr(
-                        currentDocument.fileName.lastIndexOf('.') + 1);
 
-                if ((currentDocument.languageId !== 'powershell') ||
-                    (!currentDocument.isUntitled) && (ext !== "ps1" && ext !== "psm1")) {
-                    let path = currentDocument.fileName;
-                    let workspaceRootPath = vscode.workspace.rootPath;
-                    if (currentDocument.fileName.startsWith(workspaceRootPath)) {
-                        path = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
+                if (currentDocument.isUntitled) {
+                    if (currentDocument.languageId === 'powershell') {
+                        config.script = currentDocument.uri.toString();
+                    }
+                    else {
+                        let msg = "To debug '" + currentDocument.fileName +
+                                  "', change the document's language mode to PowerShell or save the file with a PowerShell extension.";
+                        vscode.window.showErrorMessage(msg);
+                        return;
+                    }
+                }
+                else {
+                    let isValidExtension = false;
+                    let extIndex = currentDocument.fileName.lastIndexOf('.');
+                    if (extIndex !== -1) {
+                        let ext = currentDocument.fileName.substr(extIndex + 1).toUpperCase();
+                        isValidExtension = (ext === "PS1" || ext === "PSM1");
                     }
 
-                    let msg = "'" + path + "' is a file type that cannot be debugged by the PowerShell debugger.";
-                    vscode.window.showErrorMessage(msg);
-                    return;
-                }
-                else if (currentDocument.isUntitled) {
-                    config.script = currentDocument.uri.toString();
+                    if ((currentDocument.languageId !== 'powershell') || !isValidExtension) {
+                        let path = currentDocument.fileName;
+                        let workspaceRootPath = vscode.workspace.rootPath;
+                        if (currentDocument.fileName.startsWith(workspaceRootPath)) {
+                            path = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
+                        }
+
+                        let msg = "'" + path + "' is a file type that cannot be debugged by the PowerShell debugger.";
+                        vscode.window.showErrorMessage(msg);
+                        return;
+                    }
                 }
             }
         }
