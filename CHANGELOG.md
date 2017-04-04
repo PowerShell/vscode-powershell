@@ -1,5 +1,12 @@
 # vscode-powershell Release History
 
+## 0.12.1
+### Tuesday, April 4, 2017
+
+- Fixed [#648](https://github.com/PowerShell/vscode-powershell/issues/648) -
+  Resolved an error when launching an untitled script file in a workspace
+  with no launch.json or in a window without a workspace path
+
 ## 0.12.0
 ### Tuesday, April 4, 2017
 
