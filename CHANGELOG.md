@@ -1,5 +1,100 @@
 # vscode-powershell Release History
 
+## 0.12.0
+### Tuesday, April 4, 2017
+
+#### Debugging untitled files ([#555](https://github.com/PowerShell/vscode-powershell/issues/555))
+
+You can now debug untitled files that are set to the PowerShell language mode.  When you
+create a new untitled file, use the "Change Language Mode" command (<kbd>Ctrl+K M</kbd>)
+and choose "PowerShell" from the menu that appears.  You can now press F5 to start
+debugging the script file without saving it.
+
+In the upcoming 1.11.0 release of Visual Studio Code (or in the current VS Code Insiders
+release), you can configure the new `files.defaultLanguage` setting to `powershell` in either
+your User or Workspace settings to cause all untitled files to be created with the PowerShell
+mode by default.  This will allow you to create new PowerShell scripts and debug them
+immediately without saving first!
+
+#### New right-click context menu for Run Selection ([#581](https://github.com/PowerShell/vscode-powershell/issues/581))
+
+By user request, we've also added a new "Run Selection" item in the right-click context menu
+for PowerShell script files:
+
+![image](https://cloud.githubusercontent.com/assets/79405/24670885/a18513fe-1924-11e7-91d3-dc14c6cbfad9.png)
+
+#### Debugging improvements
+
+- Fixed [#620](https://github.com/PowerShell/vscode-powershell/issues/620) -
+  PowerShell session now does not crash when a breakpoint is hit outside of
+  debug mode
+
+- Fixed [#614](https://github.com/PowerShell/vscode-powershell/issues/614) -
+  Auto variables are now populating correctly in the debugger.  **NOTE**: There is
+  a known issue where all of a script's variables begin to show up in the
+  Auto list after running a script for the first time.  This is caused by
+  a change in 0.11.0 where we now dot-source all debugged scripts.  We will
+  provide an option for this behavior in the future.
+
+- Fixed [#641](https://github.com/PowerShell/vscode-powershell/issues/641) -
+  PowerShell script files with capitalized extensions (.PS1, .PSM1) can now
+  be launched in the debugger
+
+- Fixed [#616](https://github.com/PowerShell/vscode-powershell/issues/616) -
+  Debugger now shows column position indicators when debugging pipelines or
+  nested expressions:
+
+  ![image](https://cloud.githubusercontent.com/assets/79405/24316990/2157480e-10b0-11e7-8a61-19fde63edfb7.png)
+
+#### Integrated console improvements
+
+- Fixed [PowerShell/PowerShellEditorServices#411](https://github.com/PowerShell/PowerShellEditorServices/issues/411) -
+  Commands run outside of the integrated console prompt now interrupt the prompt
+  correctly.  This resolves a class of issues that appear when running commands
+  in the extension like "New Project from Plaster Template" or any `$psEditor`
+  commands added with the "Register-EditorCommand" function.  Running any of
+  these commands will now cause the current input prompt to be cancelled so that
+  the command's output will be written correctly.
+
+#### Code formatting improvements
+
+- Fixed [#595](https://github.com/PowerShell/vscode-powershell/issues/595) -
+  High CPU usage when using formatOnType has now been resolve
+
+- Fixed [#559](https://github.com/PowerShell/vscode-powershell/issues/559) -
+  The `newLineAfterCloseBrace` behavior has been improved to respect common syntax
+  usages
+
+- Fixed[PowerShell/PowerShellEditorServices#380](https://github.com/PowerShell/PowerShellEditorServices/issues/380) -
+  The `whitespaceBeforeOpenBrace` behavior now leaves "magic" functions with the
+  correct formatting.  For example: `(0 .. 10).foreach{$_}` now does not have a
+  whitespace inserted before the `{`.
+
+#### New Project with Plaster improvements
+
+- Fixed [#643](https://github.com/PowerShell/vscode-powershell/issues/643) -
+  Running Plaster using the New Project command now interrupts the command prompt
+  correctly
+
+- Fixed [#504](https://github.com/PowerShell/vscode-powershell/issues/504) -
+  Confirming default values in Plaster input prompts by pressing Enter now works
+  correctly
+
+#### Other fixes and improvements
+
+- Added [#639](https://github.com/PowerShell/vscode-powershell/pull/639) and
+        [#640](https://github.com/PowerShell/vscode-powershell/pull/640) -
+  Our configuration setting descriptions have been edited for superior clarity
+  thanks to [June Blender](https://github.com/juneb)!
+
+- Fixed [#611](https://github.com/PowerShell/vscode-powershell/pull/640) -
+  Example-* snippets are now displaying correctly in IntelliSense results
+
+- Added [#624](https://github.com/PowerShell/vscode-powershell/pull/624) -
+  When you update the PowerShell extension after this release, you will now see
+  version update indicators which offer to display the changelog in a preview
+  tab
+
 ## 0.11.0
 ### Wednesday, March 22, 2017
 
