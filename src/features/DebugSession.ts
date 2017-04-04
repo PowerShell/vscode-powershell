@@ -25,13 +25,19 @@ export class DebugSessionFeature implements IFeature {
 
     private startDebugSession(config: any) {
 
+        let currentDocument = vscode.window.activeTextEditor.document;
+
         if (!config.request) {
             // No launch.json, create the default configuration
             config.type = 'PowerShell';
             config.name = 'PowerShell Launch Current File';
             config.request = 'launch';
             config.args = [];
-            config.script = vscode.window.activeTextEditor.document.fileName;
+
+            config.script =
+                currentDocument.isUntitled
+                    ? currentDocument.uri.toString()
+                    : currentDocument.fileName;
         }
 
         if (config.request === 'launch') {
@@ -41,7 +47,6 @@ export class DebugSessionFeature implements IFeature {
             // For launch of "current script", don't start the debugger if the current file
             // is not a file that can be debugged by PowerShell
             if (config.script === "${file}") {
-                let currentDocument = vscode.window.activeTextEditor.document;
 
                 if (currentDocument.isUntitled) {
                     if (currentDocument.languageId === 'powershell') {
