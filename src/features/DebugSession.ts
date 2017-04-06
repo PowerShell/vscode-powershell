@@ -42,7 +42,7 @@ export class DebugSessionFeature implements IFeature {
 
         if (config.request === 'launch') {
             // Make sure there's a usable working directory if possible
-            config.cwd = config.cwd || vscode.workspace.rootPath || config.script;
+            config.cwd = config.cwd || vscode.workspace.rootPath;
 
             // For launch of "current script", don't start the debugger if the current file
             // is not a file that can be debugged by PowerShell
@@ -79,6 +79,12 @@ export class DebugSessionFeature implements IFeature {
                         return;
                     }
                 }
+            }
+            else if (config.script) {
+                // In this case, the user has explicitly defined a script path
+                // so make sure to set the cwd to that path if the cwd wasn't
+                // explicitly set
+                config.cwd = config.cwd || config.script;
             }
         }
 
