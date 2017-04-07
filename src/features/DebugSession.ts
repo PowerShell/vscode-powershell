@@ -26,9 +26,11 @@ export class DebugSessionFeature implements IFeature {
     private startDebugSession(config: any) {
 
         let currentDocument = vscode.window.activeTextEditor.document;
+        let debugCurrentScript = (config.script === "${file}") || !config.request;
+        let generateLaunchConfig = !config.request;
 
-        if (!config.request) {
-            // No launch.json, create the default configuration
+        if (generateLaunchConfig) {
+            // No launch.json, create the default configuration for both unsaved (Untitled) and saved documents.
             config.type = 'PowerShell';
             config.name = 'PowerShell Launch Current File';
             config.request = 'launch';
@@ -38,19 +40,30 @@ export class DebugSessionFeature implements IFeature {
                 currentDocument.isUntitled
                     ? currentDocument.uri.toString()
                     : currentDocument.fileName;
+
+            // For a folder-less workspace, vscode.workspace.rootPath will be undefined.
+            // PSES will convert that undefined to a reasonable working dir.
+            config.cwd =
+                currentDocument.isUntitled
+                    ? vscode.workspace.rootPath
+                    : currentDocument.fileName;
         }
 
         if (config.request === 'launch') {
-            // Make sure there's a usable working directory if possible
-            config.cwd = config.cwd || vscode.workspace.rootPath;
 
-            // For launch of "current script", don't start the debugger if the current file
-            // is not a file that can be debugged by PowerShell
-            if (config.script === "${file}") {
+            // For debug launch of "current script" (saved or unsaved), warn before starting the debugger if either
+            // A) the unsaved document's language type is not PowerShell or
+            // B) the saved document's extension is a type that PowerShell can't debug.
+            if (debugCurrentScript) {
 
                 if (currentDocument.isUntitled) {
                     if (currentDocument.languageId === 'powershell') {
-                        config.script = currentDocument.uri.toString();
+                        if (!generateLaunchConfig) {
+                            // Cover the case of existing launch.json but unsaved (Untitled) document.
+                            // In this case, vscode.workspace.rootPath will not be undefined.
+                            config.script = currentDocument.uri.toString();
+                            config.cwd = vscode.workspace.rootPath
+                        }
                     }
                     else {
                         let msg = "To debug '" + currentDocument.fileName +
@@ -79,12 +92,6 @@ export class DebugSessionFeature implements IFeature {
                         return;
                     }
                 }
-            }
-            else if (config.script) {
-                // In this case, the user has explicitly defined a script path
-                // so make sure to set the cwd to that path if the cwd wasn't
-                // explicitly set
-                config.cwd = config.cwd || config.script;
             }
         }
 
