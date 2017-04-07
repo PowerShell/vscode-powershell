@@ -1,5 +1,39 @@
 # vscode-powershell Release History
 
+## 0.12.2
+### Friday, April 7, 2017
+
+- Fixed [#645](https://github.com/PowerShell/vscode-powershell/issues/645) -
+  Changed usage of `$env:PSMODULEPATH` to `$env:PSModulePath` to conform to
+  a recent change in PowerShell 6 ([PowerShell/PowerShell#3255](https://github.com/PowerShell/PowerShell/pull/3255))
+  which makes the casing of `PSModulePath` consistent between Windows and
+  the *NIX platforms.
+
+  **NOTE: This is a breaking change for PowerShell extension users on Linux and macOS**
+
+  If you are using PowerShell 6.0.0-alpha.17 or lower you **will** need to upgrade
+  to 6.0.0-alpha.18.
+
+- Fixed [#645](https://github.com/PowerShell/vscode-powershell/issues/645) -
+  "Go to Definition" or "Find References" now work in untitled scripts without
+  crashing the session
+- Fixed [#632](https://github.com/PowerShell/vscode-powershell/issues/632) -
+  Debugger no longer hangs when launched while PowerShell session is still
+  initializing
+- Fixed [#655](https://github.com/PowerShell/vscode-powershell/issues/655) -
+  Fixed an issue with current working directory being set incorrectly when
+  debugging untitled script files
+- Fixed [PowerShellEditorServices #430](https://github.com/PowerShell/PowerShellEditorServices/issues/430) -
+  Resolved occasional IntelliSense slowness by preventing the implicit loading
+  of the PowerShellGet and PackageManagement modules.  This change will be reverted
+  once a bug in PackageManagement is fixed.
+- Fixed [PowerShellEditorServices #427](https://github.com/PowerShell/PowerShellEditorServices/issues/427) -
+  Fixed an occasional crash when requesting editor IntelliSense while running
+  a script in the debugger
+- Fixed [PowerShellEditorServices #416](https://github.com/PowerShell/PowerShellEditorServices/issues/416) -
+  Cleaned up errors that would appear in the `$Errors` variable from the use
+  of `Get-Command` and `Get-Help` in IntelliSense results
+
 ## 0.12.1
 ### Tuesday, April 4, 2017
 
