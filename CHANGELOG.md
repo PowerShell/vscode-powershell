@@ -3,7 +3,7 @@
 ## 0.12.2
 ### Friday, April 7, 2017
 
-- Fixed [#645](https://github.com/PowerShell/vscode-powershell/issues/645) -
+- Fixed [#662](https://github.com/PowerShell/vscode-powershell/issues/662) -
   Changed usage of `$env:PSMODULEPATH` to `$env:PSModulePath` to conform to
   a recent change in PowerShell 6 ([PowerShell/PowerShell#3255](https://github.com/PowerShell/PowerShell/pull/3255))
   which makes the casing of `PSModulePath` consistent between Windows and
