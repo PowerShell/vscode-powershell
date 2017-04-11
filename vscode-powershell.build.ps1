@@ -32,7 +32,7 @@ task GetExtensionVersion -Before Package {
     }
 }
 
-task ResolveEditorServicesPath -Before Clean, BuildEditorServices {
+task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices {
 
     $script:psesRepoPath = `
         if ($EditorServicesRepoPath) {
@@ -64,30 +64,33 @@ task Restore -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } 
 }
 
 task Clean {
-
-    if ($script:psesBuildScriptPath) {
-        Write-Host "`n### Cleaning PowerShellEditorServices`n" -ForegroundColor Green
-        Invoke-Build Clean $script:psesBuildScriptPath
-    }
-
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
     Remove-Item .\out -Recurse -Force -ErrorAction Ignore
 }
 
-task Build BuildEditorServices, BuildClient -Before Package
+task CleanEditorServices {
+    if ($script:psesBuildScriptPath) {
+        Write-Host "`n### Cleaning PowerShellEditorServices`n" -ForegroundColor Green
+        Invoke-Build Clean $script:psesBuildScriptPath
+    }
+}
 
-task BuildClient {
+task CleanAll CleanEditorServices, Clean
+
+task Build {
     Write-Host "`n### Building vscode-powershell" -ForegroundColor Green
     exec { & npm run compile }
 }
 
 task BuildEditorServices {
-       # If the PSES codebase is co-located, build it first
+    # If the PSES codebase is co-located, build it first
     if ($script:psesBuildScriptPath) {
         Write-Host "`n### Building PowerShellEditorServices`n" -ForegroundColor Green
         Invoke-Build Build $script:psesBuildScriptPath
     }
 }
+
+task BuildAll BuildEditorServices, Build -Before Package
 
 task Package {
 
@@ -109,4 +112,4 @@ task UploadArtifacts -If { $env:AppVeyor } {
 }
 
 # The default task is to run the entire CI build
-task . GetExtensionVersion, Clean, Build, Package, UploadArtifacts
+task . GetExtensionVersion, CleanAll, BuildAll, Package, UploadArtifacts
