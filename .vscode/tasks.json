@@ -23,14 +23,24 @@
             "args": [ "Invoke-Build Restore" ]
         },
         {
+            "taskName": "CleanAll",
+            "suppressTaskName": true,
+            "args": [ "Invoke-Build CleanAll" ]
+        },
+        {
             "taskName": "Clean",
             "suppressTaskName": true,
             "args": [ "Invoke-Build Clean" ]
         },
         {
-            "taskName": "Build",
+            "taskName": "BuildAll",
             "suppressTaskName": true,
             "isBuildCommand": true,
+            "args": [ "Invoke-Build BuildAll" ]
+        },
+        {
+            "taskName": "Build",
+            "suppressTaskName": true,
             "args": [ "Invoke-Build Build" ]
         }
     ]
