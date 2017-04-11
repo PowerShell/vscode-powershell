@@ -32,7 +32,7 @@ task GetExtensionVersion -Before Package {
     }
 }
 
-task ResolveEditorServicesPath -Before Clean, Build {
+task ResolveEditorServicesPath -Before Clean, BuildEditorServices {
 
     $script:psesRepoPath = `
         if ($EditorServicesRepoPath) {
@@ -74,16 +74,19 @@ task Clean {
     Remove-Item .\out -Recurse -Force -ErrorAction Ignore
 }
 
-task Build -Before Package {
+task Build BuildEditorServices, BuildClient -Before Package
 
-    # If the PSES codebase is co-located, build it first
+task BuildClient {
+    Write-Host "`n### Building vscode-powershell" -ForegroundColor Green
+    exec { & npm run compile }
+}
+
+task BuildEditorServices {
+       # If the PSES codebase is co-located, build it first
     if ($script:psesBuildScriptPath) {
         Write-Host "`n### Building PowerShellEditorServices`n" -ForegroundColor Green
         Invoke-Build Build $script:psesBuildScriptPath
     }
-
-    Write-Host "`n### Building vscode-powershell" -ForegroundColor Green
-    exec { & npm run compile }
 }
 
 task Package {
