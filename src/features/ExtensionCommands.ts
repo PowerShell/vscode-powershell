@@ -17,8 +17,9 @@ export interface ExtensionCommandQuickPickItem extends vscode.QuickPickItem {
 }
 
 export namespace InvokeExtensionCommandRequest {
-    export const type: RequestType<InvokeExtensionCommandRequestArguments, void, void> =
-        { get method() { return 'powerShell/invokeExtensionCommand'; } };
+    export const type =
+        new RequestType<InvokeExtensionCommandRequestArguments, void, void, void>(
+            'powerShell/invokeExtensionCommand');
 }
 
 export interface EditorContext {
@@ -33,8 +34,9 @@ export interface InvokeExtensionCommandRequestArguments {
 }
 
 export namespace ExtensionCommandAddedNotification {
-    export const type: NotificationType<ExtensionCommandAddedNotificationBody> =
-        { get method() { return 'powerShell/extensionCommandAdded'; } };
+    export const type =
+        new NotificationType<ExtensionCommandAddedNotificationBody, void>(
+            'powerShell/extensionCommandAdded');
 }
 
 export interface ExtensionCommandAddedNotificationBody {
@@ -85,8 +87,9 @@ function asCodePosition(value: Position): vscode.Position {
 }
 
 export namespace GetEditorContextRequest {
-    export const type: RequestType<GetEditorContextRequestArguments, EditorContext, void> =
-        { get method() { return 'editor/getEditorContext'; } };
+    export const type =
+        new RequestType<GetEditorContextRequestArguments, EditorContext, void, void>(
+            'editor/getEditorContext');
 }
 
 export interface GetEditorContextRequestArguments {
@@ -98,8 +101,9 @@ enum EditorOperationResponse {
 }
 
 export namespace InsertTextRequest {
-    export const type: RequestType<InsertTextRequestArguments, EditorOperationResponse, void> =
-        { get method() { return 'editor/insertText'; } };
+    export const type =
+        new RequestType<InsertTextRequestArguments, EditorOperationResponse, void, void>(
+            'editor/insertText');
 }
 
 export interface InsertTextRequestArguments {
@@ -109,8 +113,9 @@ export interface InsertTextRequestArguments {
 }
 
 export namespace SetSelectionRequest {
-    export const type: RequestType<SetSelectionRequestArguments, EditorOperationResponse, void> =
-        { get method() { return 'editor/setSelection'; } };
+    export const type =
+        new RequestType<SetSelectionRequestArguments, EditorOperationResponse, void, void>(
+            'editor/setSelection');
 }
 
 export interface SetSelectionRequestArguments {
@@ -118,33 +123,39 @@ export interface SetSelectionRequestArguments {
 }
 
 export namespace OpenFileRequest {
-    export const type: RequestType<string, EditorOperationResponse, void> =
-        { get method() { return 'editor/openFile'; } };
+    export const type =
+        new RequestType<string, EditorOperationResponse, void, void>(
+            'editor/openFile');
 }
 
 export namespace CloseFileRequest {
-    export const type: RequestType<string, EditorOperationResponse, void> =
-        { get method() { return 'editor/closeFile'; } };
+    export const type =
+        new RequestType<string, EditorOperationResponse, void, void>(
+            'editor/closeFile');
 }
 
 export namespace ShowErrorMessageRequest {
-    export const type: RequestType<string, EditorOperationResponse, void> =
-        { get method() { return 'editor/showErrorMessage'; } };
+    export const type =
+        new RequestType<string, EditorOperationResponse, void, void>(
+            'editor/showErrorMessage');
 }
 
 export namespace ShowWarningMessageRequest {
-    export const type: RequestType<string, EditorOperationResponse, void> =
-        { get method() { return 'editor/showWarningMessage'; } };
+    export const type =
+        new RequestType<string, EditorOperationResponse, void, void>(
+            'editor/showWarningMessage');
 }
 
 export namespace ShowInformationMessageRequest {
-    export const type: RequestType<string, EditorOperationResponse, void> =
-        { get method() { return 'editor/showInformationMessage'; } };
+    export const type =
+        new RequestType<string, EditorOperationResponse, void, void>(
+            'editor/showInformationMessage');
 }
 
 export namespace SetStatusBarMessageRequest {
-    export const type: RequestType<StatusBarMessageDetails, EditorOperationResponse, void> =
-        { get method() { return 'editor/setStatusBarMessage'; } };
+    export const type =
+        new RequestType<StatusBarMessageDetails, EditorOperationResponse, void, void>(
+            'editor/setStatusBarMessage');
 }
 
 export interface StatusBarMessageDetails {

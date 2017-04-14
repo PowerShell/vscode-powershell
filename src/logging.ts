@@ -7,7 +7,7 @@ import os = require('os');
 import path = require('path');
 import vscode = require('vscode');
 import utils = require('./utils');
-import { ILogger } from 'vscode-jsonrpc';
+import jsonrpc = require('vscode-jsonrpc');
 
 export enum LogLevel {
     Verbose,
@@ -145,7 +145,7 @@ export class Logger {
     }
 }
 
-export class LanguageClientLogger implements ILogger {
+export class LanguageClientLogger implements jsonrpc.Logger {
 
     constructor(private logger: Logger) { }
 

@@ -8,8 +8,7 @@ import { showCheckboxQuickPick, CheckboxQuickPickItem } from '../controls/checkb
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace EvaluateRequest {
-    export const type: RequestType<EvaluateRequestArguments, void, void> =
-        { get method() { return 'evaluate'; } };
+    export const type = new RequestType<EvaluateRequestArguments, void, void, void>('evaluate');
 }
 
 export interface EvaluateRequestArguments {
@@ -17,8 +16,7 @@ export interface EvaluateRequestArguments {
 }
 
 export namespace OutputNotification {
-    export const type: NotificationType<OutputNotificationBody> =
-        { get method() { return 'output'; } };
+    export const type = new NotificationType<OutputNotificationBody, void>('output');
 }
 
 export interface OutputNotificationBody {
@@ -27,13 +25,13 @@ export interface OutputNotificationBody {
 }
 
 export namespace ShowChoicePromptRequest {
-    export const type: RequestType<ShowChoicePromptRequestArgs, ShowChoicePromptResponseBody, string> =
-        { get method() { return 'powerShell/showChoicePrompt'; } };
+    export const type =
+        new RequestType<ShowChoicePromptRequestArgs, ShowChoicePromptResponseBody, string, void>('powerShell/showChoicePrompt');
 }
 
 export namespace ShowInputPromptRequest {
-    export const type: RequestType<ShowInputPromptRequestArgs, ShowInputPromptResponseBody, string> =
-        { get method() { return 'powerShell/showInputPrompt'; } };
+    export const type =
+        new RequestType<ShowInputPromptRequestArgs, ShowInputPromptResponseBody, string, void>('powerShell/showInputPrompt');
 }
 
 interface ChoiceDetails {

@@ -118,8 +118,8 @@ interface PSHostProcessInfo {
 }
 
 namespace GetPSHostProcessesRequest {
-    export const type: RequestType<any, GetPSHostProcessesResponseBody, string> =
-        { get method() { return 'powerShell/getPSHostProcesses'; } };
+    export const type =
+        new RequestType<any, GetPSHostProcessesResponseBody, string, void>('powerShell/getPSHostProcesses');
 }
 
 interface GetPSHostProcessesResponseBody {

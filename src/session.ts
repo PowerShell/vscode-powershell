@@ -14,7 +14,7 @@ import Settings = require('./settings');
 import { Logger } from './logging';
 import { IFeature } from './feature';
 import { StringDecoder } from 'string_decoder';
-import { LanguageClient, LanguageClientOptions, Executable, RequestType, NotificationType, StreamInfo } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, Executable, RequestType, RequestType0, NotificationType, StreamInfo } from 'vscode-languageclient';
 
 export enum SessionStatus {
     NotStarted,
@@ -744,8 +744,7 @@ class SessionMenuItem implements vscode.QuickPickItem {
 }
 
 export namespace PowerShellVersionRequest {
-    export const type: RequestType<void, PowerShellVersionDetails, void> =
-        { get method() { return 'powerShell/getVersion'; } };
+    export const type = new RequestType0<PowerShellVersionDetails, void, void>('powerShell/getVersion');
 }
 
 export interface PowerShellVersionDetails {
@@ -768,6 +767,5 @@ export interface RunspaceDetails {
 }
 
 export namespace RunspaceChangedEvent {
-    export const type: NotificationType<RunspaceDetails> =
-        { get method() { return 'powerShell/runspaceChanged'; } };
+    export const type = new NotificationType<RunspaceDetails, void>('powerShell/runspaceChanged');
 }
