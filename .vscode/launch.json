@@ -2,15 +2,26 @@
 	"version": "0.1.0",
 	"configurations": [
 		{
-            "name": "Launch Extension",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
+			"name": "Launch Extension",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
 			"args": [ "--extensionDevelopmentPath=${workspaceRoot}" ],
 			"stopOnEntry": false,
 			"sourceMaps": true,
 			"outFiles": ["${workspaceRoot}/out"],
 			"preLaunchTask": "BuildAll"
+		},
+		{
+			"name": "Launch Extension (Build client only)",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [ "--extensionDevelopmentPath=${workspaceRoot}" ],
+			"stopOnEntry": false,
+			"sourceMaps": true,
+			"outFiles": ["${workspaceRoot}/out"],
+			"preLaunchTask": "Build"
 		},
 		{
 			"name": "Attach",
