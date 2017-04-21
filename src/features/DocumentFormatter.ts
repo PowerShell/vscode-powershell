@@ -174,7 +174,8 @@ class PSDocumentFormattingEditProvider implements
         "PSPlaceCloseBrace",
         "PSPlaceOpenBrace",
         "PSUseConsistentWhitespace",
-        "PSUseConsistentIndentation"];
+        "PSUseConsistentIndentation",
+        "PSAlignAssignmentStatement"]
 
     // Allows edits to be undone and redone is a single step.
     // It is usefuld to have undo stops after every edit while debugging
@@ -424,6 +425,10 @@ class PSDocumentFormattingEditProvider implements
                 ruleSettings["CheckOpenParen"] = psSettings.codeFormatting.whitespaceBeforeOpenParen;
                 ruleSettings["CheckOperator"] = psSettings.codeFormatting.whitespaceAroundOperator;
                 ruleSettings["CheckSeparator"] = psSettings.codeFormatting.whitespaceAfterSeparator;
+                break;
+
+            case "PSAlignAssignmentStatement":
+                ruleSettings["CheckHashtable"] = psSettings.codeFormatting.alignAssignmentsInHashtable;
                 break;
 
             default:
