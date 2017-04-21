@@ -428,7 +428,7 @@ class PSDocumentFormattingEditProvider implements
                 break;
 
             case "PSAlignAssignmentStatement":
-                ruleSettings["CheckHashtable"] = psSettings.codeFormatting.alignAssignmentsInHashtable;
+                ruleSettings["CheckHashtable"] = psSettings.codeFormatting.alignPropertyValuePairs;
                 break;
 
             default:

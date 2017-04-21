@@ -15,7 +15,7 @@ export interface ICodeFormattingSettings {
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
     ignoreOneLineBlock: boolean;
-    alignAssignmentsInHashtable: boolean;
+    alignPropertyValuePairs: boolean;
 }
 
 export interface IScriptAnalysisSettings {
@@ -73,7 +73,7 @@ export function load(myPluginId: string): ISettings {
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
         ignoreOneLineBlock: true,
-        alignAssignmentsInHashtable: true
+        alignPropertyValuePairs: true
     };
 
     let defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {

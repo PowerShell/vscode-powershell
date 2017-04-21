@@ -408,7 +408,7 @@
           "default": true,
           "description": "Does not reformat one-line code blocks, such as \"if (...) {...} else {...}\"."
         },
-        "powershell.codeFormatting.alignAssignmentsInHashtable": {
+        "powershell.codeFormatting.alignPropertyValuePairs": {
           "type": "boolean",
           "default": true,
           "description": "Align assignment statements in a hashtable."
