@@ -15,6 +15,7 @@ export interface ICodeFormattingSettings {
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
     ignoreOneLineBlock: boolean;
+    alignPropertyValuePairs: boolean;
 }
 
 export interface IScriptAnalysisSettings {
@@ -71,7 +72,8 @@ export function load(myPluginId: string): ISettings {
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
-        ignoreOneLineBlock: true
+        ignoreOneLineBlock: true,
+        alignPropertyValuePairs: true
     };
 
     let defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {

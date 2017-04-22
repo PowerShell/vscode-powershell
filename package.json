@@ -408,6 +408,11 @@
           "default": true,
           "description": "Does not reformat one-line code blocks, such as \"if (...) {...} else {...}\"."
         },
+        "powershell.codeFormatting.alignPropertyValuePairs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Align assignment statements in a hashtable or a DSC Configuration."
+        },
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
           "default": true,
