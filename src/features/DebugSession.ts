@@ -106,6 +106,39 @@ export class DebugSessionFeature implements IFeature {
     }
 }
 
+export class SpecifyScriptArgsFeature implements IFeature {
+
+    private command: vscode.Disposable;
+    private languageClient: LanguageClient;
+
+    constructor() {
+
+        this.command =
+            vscode.commands.registerCommand('PowerShell.SpecifyScriptArgs', () => {
+                return this.specifyScriptArguments();
+            });
+    }
+
+    public setLanguageClient(languageclient: LanguageClient) {
+        this.languageClient = languageclient;
+    }
+
+    public dispose() {
+        this.command.dispose();
+    }
+
+    private specifyScriptArguments(): Thenable<string[]> {
+        let options: vscode.InputBoxOptions = {
+            ignoreFocusOut: true,
+            placeHolder: "Enter script arguments"
+        }
+
+        return vscode.window.showInputBox(options).then(text => {
+            return text !== undefined ? new Array(text) : text;
+        });
+    }
+}
+
 interface ProcessItem extends vscode.QuickPickItem {
 	pid: string;	// payload for the QuickPick UI
 }

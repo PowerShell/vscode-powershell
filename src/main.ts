@@ -21,6 +21,7 @@ import { CodeActionsFeature } from './features/CodeActions';
 import { RemoteFilesFeature } from './features/RemoteFiles';
 import { DebugSessionFeature } from './features/DebugSession';
 import { PickPSHostProcessFeature } from './features/DebugSession';
+import { SpecifyScriptArgsFeature } from './features/DebugSession';
 import { SelectPSSARulesFeature } from './features/SelectPSSARules';
 import { FindModuleFeature } from './features/PowerShellFindModule';
 import { NewFileOrProjectFeature } from './features/NewFileOrProject';
@@ -113,7 +114,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new DocumentFormatterFeature(),
         new RemoteFilesFeature(),
         new DebugSessionFeature(),
-        new PickPSHostProcessFeature()
+        new PickPSHostProcessFeature(),
+        new SpecifyScriptArgsFeature()
     ];
 
     sessionManager =

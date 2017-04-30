@@ -30,7 +30,8 @@
     "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.StartDebugSession",
-    "onCommand:PowerShell.PickPSHostProcess"
+    "onCommand:PowerShell.PickPSHostProcess",
+    "onCommand:PowerShell.SpecifyScriptArgs"
   ],
   "dependencies": {
     "vscode-languageclient": "3.2.0"
@@ -175,7 +176,8 @@
         "program": "./out/debugAdapter.js",
         "runtime": "node",
         "variables": {
-          "PickPSHostProcess": "PowerShell.PickPSHostProcess"
+          "PickPSHostProcess": "PowerShell.PickPSHostProcess",
+          "SpecifyScriptArgs": "PowerShell.SpecifyScriptArgs"
         },
         "languages": [
           "powershell"
