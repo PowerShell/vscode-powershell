@@ -25,11 +25,11 @@ import * as Utils from '../utils';
 import * as AnimatedStatusBar from '../controls/animatedStatusBar';
 
 export namespace ScriptFileMarkersRequest {
-    export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptFileMarkers"; } };
+    export const type = new RequestType<any, any, void, void>("powerShell/getScriptFileMarkers");
 }
 
 export namespace ScriptRegionRequest {
-    export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getScriptRegion"; } };
+    export const type = new RequestType<any, any, void, void>("powerShell/getScriptRegion");
 }
 
 interface ScriptRegionRequestParams {

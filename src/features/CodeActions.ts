@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import vscode = require('vscode');
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import { LanguageClient } from 'vscode-languageclient';
 import Window = vscode.window;
 import { IFeature } from '../feature';
 

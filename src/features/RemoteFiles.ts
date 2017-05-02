@@ -19,8 +19,7 @@ export interface DidSaveTextDocumentParams {
 }
 
 export namespace DidSaveTextDocumentNotification {
-    export const type: NotificationType<DidSaveTextDocumentParams> =
-        { get method() { return 'textDocument/didSave'; } }
+    export const type = new NotificationType<DidSaveTextDocumentParams, void>('textDocument/didSave');
 }
 
 export class RemoteFilesFeature implements IFeature {

@@ -9,11 +9,11 @@ import QuickPickItem = vscode.QuickPickItem;
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace FindModuleRequest {
-    export const type: RequestType<any, any, void> = { get method() { return 'powerShell/findModule'; } };
+    export const type = new RequestType<any, any, void, void>('powerShell/findModule');
 }
 
 export namespace InstallModuleRequest {
-    export const type: RequestType<string, void, void> = { get method() { return 'powerShell/installModule'; } };
+    export const type = new RequestType<string, void, void, void>('powerShell/installModule');
 }
 
 export class FindModuleFeature implements IFeature {

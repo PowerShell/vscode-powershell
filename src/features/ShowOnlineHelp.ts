@@ -7,7 +7,7 @@ import { IFeature } from '../feature';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace ShowOnlineHelpRequest {
-    export const type: RequestType<string, void, void> = { get method() { return 'powerShell/showOnlineHelp'; } };
+    export const type = new RequestType<string, void, void, void>('powerShell/showOnlineHelp');
 }
 
 export class ShowHelpFeature implements IFeature {

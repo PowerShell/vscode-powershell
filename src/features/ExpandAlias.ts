@@ -8,7 +8,7 @@ import { IFeature } from '../feature';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace ExpandAliasRequest {
-    export const type: RequestType<string, any, void> = { get method() { return 'powerShell/expandAlias'; } };
+    export const type = new RequestType<string, any, void, void>('powerShell/expandAlias');
 }
 
 export class ExpandAliasFeature implements IFeature {

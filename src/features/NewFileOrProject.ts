@@ -182,8 +182,9 @@ interface TemplateDetails {
 }
 
 namespace GetProjectTemplatesRequest {
-    export const type: RequestType<GetProjectTemplatesRequestArgs, GetProjectTemplatesResponseBody, string> =
-        { get method() { return 'powerShell/getProjectTemplates'; } };
+    export const type =
+        new RequestType<GetProjectTemplatesRequestArgs, GetProjectTemplatesResponseBody, string, void>(
+            'powerShell/getProjectTemplates');
 }
 
 interface GetProjectTemplatesRequestArgs {
@@ -196,8 +197,9 @@ interface GetProjectTemplatesResponseBody {
 }
 
 namespace NewProjectFromTemplateRequest {
-    export const type: RequestType<any, NewProjectFromTemplateResponseBody, string> =
-        { get method() { return 'powerShell/newProjectFromTemplate'; } };
+    export const type =
+        new RequestType<any, NewProjectFromTemplateResponseBody, string, void>(
+            'powerShell/newProjectFromTemplate');
 }
 
 interface NewProjectFromTemplateRequestArgs {

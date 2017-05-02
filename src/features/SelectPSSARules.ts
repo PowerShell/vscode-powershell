@@ -8,11 +8,11 @@ import { LanguageClient, RequestType } from "vscode-languageclient";
 import { CheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
 
 export namespace GetPSSARulesRequest {
-    export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/getPSSARules"; } };
+    export const type = new RequestType<any, any, void, void>("powerShell/getPSSARules");
 }
 
 export namespace SetPSSARulesRequest {
-    export const type: RequestType<any, any, void> = { get method(): string { return "powerShell/setPSSARules"; } };
+    export const type = new RequestType<any, any, void, void>("powerShell/setPSSARules");
 }
 
 class RuleInfo {
