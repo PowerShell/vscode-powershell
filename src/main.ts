@@ -115,7 +115,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new RemoteFilesFeature(),
         new DebugSessionFeature(),
         new PickPSHostProcessFeature(),
-        new SpecifyScriptArgsFeature()
+        new SpecifyScriptArgsFeature(context)
     ];
 
     sessionManager =
