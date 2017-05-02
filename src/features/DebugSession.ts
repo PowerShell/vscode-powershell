@@ -110,8 +110,10 @@ export class SpecifyScriptArgsFeature implements IFeature {
 
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
+    private context: vscode.ExtensionContext;
 
-    constructor() {
+    constructor(context: vscode.ExtensionContext) {
+        this.context = context;
 
         this.command =
             vscode.commands.registerCommand('PowerShell.SpecifyScriptArgs', () => {
@@ -128,13 +130,25 @@ export class SpecifyScriptArgsFeature implements IFeature {
     }
 
     private specifyScriptArguments(): Thenable<string[]> {
+        const powerShellDbgScriptArgsKey = 'powerShellDebugScriptArgs';
+
         let options: vscode.InputBoxOptions = {
             ignoreFocusOut: true,
-            placeHolder: "Enter script arguments"
+            placeHolder: "Enter script arguments or leave empty to pass no args"
+        }
+
+        let prevArgs = this.context.globalState.get(powerShellDbgScriptArgsKey, '');
+        if (prevArgs.length > 0) {
+            options.value = prevArgs;
         }
 
         return vscode.window.showInputBox(options).then(text => {
-            return text !== undefined ? new Array(text) : text;
+            if (text !== undefined) {
+                this.context.globalState.update(powerShellDbgScriptArgsKey, text);
+                return new Array(text);
+            }
+
+            return text;
         });
     }
 }
