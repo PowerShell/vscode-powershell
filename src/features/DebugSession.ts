@@ -143,6 +143,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
         }
 
         return vscode.window.showInputBox(options).then(text => {
+            // When user cancel's the input box (by pressing Esc), the text value is undefined.
             if (text !== undefined) {
                 this.context.globalState.update(powerShellDbgScriptArgsKey, text);
                 return new Array(text);
