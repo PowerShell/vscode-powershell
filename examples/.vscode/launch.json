@@ -4,7 +4,7 @@
         {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PowerShell Launch (current file)",
+            "name": "PS Launch - Current File",
             "script": "${file}",
             "args": [],
             "cwd": "${file}"
@@ -12,7 +12,15 @@
         {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PowerShell Launch (DebugTest.ps1)",
+            "name": "PS Launch - Current File w/Args Prompt",
+            "script": "${file}",
+            "args": [ "${command:SpecifyScriptArgs}" ],
+            "cwd": "${file}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PS Launch - DebugTest.ps1",
             "script": "${workspaceRoot}/DebugTest.ps1",
             "args": ["-Count 55 -DelayMilliseconds 250"],
             "cwd": "${workspaceRoot}"
@@ -20,13 +28,13 @@
         {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PowerShell Interactive Session",
+            "name": "PS Interactive Session",
             "cwd": "${workspaceRoot}"
         },
         {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PowerShell Pester Tests",
+            "name": "PS Pester Tests",
             "script": "Invoke-Pester",
             "args": [],
             "cwd": "${workspaceRoot}"
@@ -34,7 +42,7 @@
         {
             "type": "PowerShell",
             "request": "attach",
-            "name": "PowerShell Attach to Host Process",
+            "name": "PS Attach to Host Process",
             "processId": "${command:PickPSHostProcess}",
             "runspaceId": 1
         }
