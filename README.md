@@ -28,20 +28,26 @@ to get more details on how to use the extension on these platforms.
 - Launch online help for the symbol under the cursor using `Ctrl+F1`
 - Local script debugging and basic interactive console support!
 
-## Example Scripts
+## Quick Installation
 
-There are some example scripts in the extension's `examples` folder that you can
-use to discover PowerShell editing and debugging functionality.  Please
-check out the included [README.md](examples/README.md) file to learn more about
-how to use them.
+If you're on Windows 7 or greater with the [PowerShellGet](https://msdn.microsoft.com/powershell/gallery/readme)
+module installed, you can easily install both Visual Studio Code and the PowerShell
+extension by running the following command:
 
-This folder can be found at the following path:
+```powershell
+Install-Script Install-VSCode -Scope CurrentUser; Install-VSCode.ps1
 ```
-c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
-```
-To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
-```
-code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
+
+You will need to accept the prompts that appear if this is your first time running
+the `Install-Script` command.
+
+**Alternatively** you can download and execute the script directly from the web
+without the use of `Install-Script`.  However we **highly recommend** that you
+[read the script](https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1)
+first before running it in this way!
+
+```powershell
+iex (iwr https://git.io/v9rJg)
 ```
 
 ## Installing the Extension
@@ -60,6 +66,22 @@ code --install-extension PowerShell-<version>.vsix
 ```
 
 > NOTE: If you are using VS Code Insiders, the command will be `code-insiders`.
+
+## Example Scripts
+
+There are some example scripts in the extension's `examples` folder that you can
+use to discover PowerShell editing and debugging functionality.  Please
+check out the included [README.md](examples/README.md) file to learn more about
+how to use them.
+
+This folder can be found at the following path:
+```
+c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
+```
+To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
+```
+code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
+```
 
 ## Reporting Problems
 
