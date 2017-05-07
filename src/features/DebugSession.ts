@@ -111,9 +111,20 @@ export class SpecifyScriptArgsFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
     private context: vscode.ExtensionContext;
+    private emptyInputBoxBugFixed: boolean;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
+
+        let vscodeVersionArray = vscode.version.split('.');
+        let editorVersion = {
+            major: Number(vscodeVersionArray[0]),
+            minor: Number(vscodeVersionArray[1]),
+        }
+
+        this.emptyInputBoxBugFixed =
+            ((editorVersion.major > 1) ||
+            ((editorVersion.major == 1) && (editorVersion.minor > 12)));
 
         this.command =
             vscode.commands.registerCommand('PowerShell.SpecifyScriptArgs', () => {
@@ -137,15 +148,19 @@ export class SpecifyScriptArgsFeature implements IFeature {
             placeHolder: "Enter script arguments or leave empty to pass no args"
         }
 
-        let prevArgs = this.context.globalState.get(powerShellDbgScriptArgsKey, '');
-        if (prevArgs.length > 0) {
-            options.value = prevArgs;
+        if (this.emptyInputBoxBugFixed) {
+            let prevArgs = this.context.globalState.get(powerShellDbgScriptArgsKey, '');
+            if (prevArgs.length > 0) {
+                options.value = prevArgs;
+            }
         }
 
         return vscode.window.showInputBox(options).then(text => {
             // When user cancel's the input box (by pressing Esc), the text value is undefined.
             if (text !== undefined) {
-                this.context.globalState.update(powerShellDbgScriptArgsKey, text);
+                if (this.emptyInputBoxBugFixed) {
+                   this.context.globalState.update(powerShellDbgScriptArgsKey, text);
+                }
                 return new Array(text);
             }
 
