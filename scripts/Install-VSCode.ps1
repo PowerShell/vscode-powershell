@@ -1,3 +1,33 @@
+<#PSScriptInfo
+
+.VERSION 1.0
+
+.GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
+
+.AUTHOR Microsoft
+
+.COMPANYNAME Microsoft Corporation
+
+.COPYRIGHT (c) Microsoft Corporation
+
+.TAGS install vscode installer
+
+.LICENSEURI https://github.com/PowerShell/vscode-powershell/blob/develop/LICENSE.txt
+
+.PROJECTURI https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
+
+.ICONURI
+
+.EXTERNALMODULEDEPENDENCIES
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.RELEASENOTES
+    Initial release.
+#>
+
 <#
 .SYNOPSIS
     Installs Visual Studio Code, the PowerShell extension, and optionally
