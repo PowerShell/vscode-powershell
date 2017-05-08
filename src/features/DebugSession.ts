@@ -149,7 +149,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
         }
 
         if (this.emptyInputBoxBugFixed) {
-            let prevArgs = this.context.globalState.get(powerShellDbgScriptArgsKey, '');
+            let prevArgs = this.context.workspaceState.get(powerShellDbgScriptArgsKey, '');
             if (prevArgs.length > 0) {
                 options.value = prevArgs;
             }
@@ -159,7 +159,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
             // When user cancel's the input box (by pressing Esc), the text value is undefined.
             if (text !== undefined) {
                 if (this.emptyInputBoxBugFixed) {
-                   this.context.globalState.update(powerShellDbgScriptArgsKey, text);
+                   this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
                 }
                 return new Array(text);
             }
