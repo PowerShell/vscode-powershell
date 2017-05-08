@@ -29,20 +29,24 @@
 // ${fileExtname}: the current opened file's extension
 // ${cwd}: the current working directory of the spawned process
 {
-	"version": "0.1.0",
+	"version": "2.0.0",
 
-	// Start PowerShell
-	"command": "${env.windir}\\sysnative\\windowspowershell\\v1.0\\PowerShell.exe",
+    // Start PowerShell
+    "windows": {
+        "command": "${env.windir}\\sysnative\\windowspowershell\\v1.0\\PowerShell.exe",
+        "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
+    },
+    "linux": {
+        "command": "/usr/bin/powershell",
+        "args": [ "-NoProfile" ]
+    },
+    "osx": {
+        "command": "/usr/local/bin/powershell",
+        "args": [ "-NoProfile" ]
+    },
 
-	// The command is a shell script
-	"isShellCommand": true,
-
-	// Show the output window always
-	"showOutput": "always",
-
-    "args": [
-        "-NoProfile", "-ExecutionPolicy", "Bypass"
-    ],
+    // Show the output window always
+    "showOutput": "always",
 
     // Associate with test task runner
     "tasks": [
