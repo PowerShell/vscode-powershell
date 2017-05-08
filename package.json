@@ -185,12 +185,12 @@
         "startSessionCommand": "PowerShell.StartDebugSession",
         "configurationSnippets": [
           {
-            "label": "PowerShell: Launch - Current File",
+            "label": "PowerShell: Launch Current File",
             "description": "Launch current file (in active editor window) under debugger",
             "body": {
               "type": "PowerShell",
               "request": "launch",
-              "name": "PS Launch - Current File",
+              "name": "PowerShell Launch Current File",
               "script": "^\"\\${file}\"",
               "args": [],
               "cwd": "^\"\\${file}\""
@@ -202,7 +202,7 @@
             "body": {
               "type": "PowerShell",
               "request": "launch",
-              "name": "PS Launch - Current File w/Args Prompt",
+              "name": "PowerShell Launch Current File w/Args Prompt",
               "script": "^\"\\${file}\"",
               "args": [],
               "cwd": "^\"\\${file}\""
@@ -214,7 +214,7 @@
             "body": {
               "type": "PowerShell",
               "request": "launch",
-              "name": "PS Launch - ${Script}",
+              "name": "PowerShell Launch ${Script}",
               "script": "^\"\\${workspaceRoot}/${Script}\"",
               "args": [],
               "cwd": "^\"\\${workspaceRoot}\""
@@ -226,7 +226,7 @@
             "body": {
               "type": "PowerShell",
               "request": "launch",
-              "name": "PS Pester Tests",
+              "name": "PowerShell Pester Tests",
               "script": "Invoke-Pester",
               "args": [],
               "cwd": "^\"\\${workspaceRoot}\""
@@ -238,7 +238,7 @@
             "body": {
               "type": "PowerShell",
               "request": "attach",
-              "name": "PS Attach to Host Process",
+              "name": "PowerShell Attach to Host Process",
               "processId": "^\"\\${command:PickPSHostProcess}\"",
               "runspaceId": 1
             }
@@ -249,7 +249,7 @@
             "body": {
               "type": "PowerShell",
               "request": "launch",
-              "name": "PS Interactive Session",
+              "name": "PowerShell Interactive Session",
               "cwd": "^\"\\${workspaceRoot}\""
             }
           }
@@ -303,7 +303,7 @@
           {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PS Launch - Current File",
+            "name": "PowerShell Launch Current File",
             "script": "${file}",
             "args": [],
             "cwd": "${file}"
@@ -311,7 +311,7 @@
           {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PS Launch - Current File w/Args Prompt",
+            "name": "PowerShell Launch Current File w/Args Prompt",
             "script": "${file}",
             "args": [ "${command:SpecifyScriptArgs}" ],
             "cwd": "${file}"
@@ -319,14 +319,14 @@
           {
             "type": "PowerShell",
             "request": "attach",
-            "name": "PS Attach to Host Process",
+            "name": "PowerShell Attach to Host Process",
             "processId": "${command:PickPSHostProcess}",
             "runspaceId": 1
           },
           {
             "type": "PowerShell",
             "request": "launch",
-            "name": "PS Interactive Session",
+            "name": "PowerShell Interactive Session",
             "cwd": "${workspaceRoot}"
           }
         ]
