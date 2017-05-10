@@ -9,7 +9,7 @@ that Visual Studio Code provides.
 ## Platform support
 
 - **Windows 7 through 10** with PowerShell v3 and higher
-- **Linux** with PowerShell v6 (all PowerShell-supported distribtions)
+- **Linux** with PowerShell v6 (all PowerShell-supported distributions)
 - **macOS and OS X** with PowerShell v6
 
 Read the [installation instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/learning-powershell/using-vscode.md)
