@@ -26,10 +26,17 @@ var debugAdapterLogWriter =
 // debug server
 process.stdin.pause();
 
+var debugSessionFilePath = utils.getDebugSessionFilePath();
+debugAdapterLogWriter.write("Session file path: " + debugSessionFilePath + ", pid: " + process.pid + " \r\n");
+
 function startDebugging() {
     // Read the details of the current session to learn
     // the connection details for the debug service
-    let sessionDetails = utils.readSessionFile();
+    let sessionDetails = utils.readSessionFile(debugSessionFilePath);
+
+    // Delete the session file after it has been read so that
+    // it isn't used mistakenly by another debug session
+    utils.deleteSessionFile(debugSessionFilePath);
 
     // Establish connection before setting up the session
     debugAdapterLogWriter.write("Connecting to port: " + sessionDetails.debugServicePort + "\r\n");
@@ -94,13 +101,12 @@ function startDebugging() {
     )
 }
 
-var sessionFilePath = utils.getSessionFilePath();
 function waitForSessionFile(triesRemaining: number) {
 
     debugAdapterLogWriter.write(`Waiting for session file, tries remaining: ${triesRemaining}...\r\n`);
 
     if (triesRemaining > 0) {
-        if (utils.checkIfFileExists(sessionFilePath)) {
+        if (utils.checkIfFileExists(debugSessionFilePath)) {
             debugAdapterLogWriter.write(`Session file present, connecting to debug adapter...\r\n\r\n`);
             startDebugging();
         }

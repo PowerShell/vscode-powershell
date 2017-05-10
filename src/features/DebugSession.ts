@@ -3,14 +3,16 @@
  *--------------------------------------------------------*/
 
 import vscode = require('vscode');
+import utils = require('../utils');
 import { IFeature } from '../feature';
+import { SessionManager } from '../session';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export class DebugSessionFeature implements IFeature {
     private command: vscode.Disposable;
     private examplesPath: string;
 
-    constructor() {
+    constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand(
             'PowerShell.StartDebugSession',
             config => { this.startDebugSession(config); });
@@ -101,6 +103,11 @@ export class DebugSessionFeature implements IFeature {
         // Create or show the interactive console
         // TODO #367: Check if "newSession" mode is configured
         vscode.commands.executeCommand('PowerShell.ShowSessionConsole', true);
+
+        // Write out temporary debug session file
+        utils.writeSessionFile(
+            utils.getDebugSessionFilePath(),
+            this.sessionManager.getSessionDetails());
 
         vscode.commands.executeCommand('vscode.startDebug', config);
     }
