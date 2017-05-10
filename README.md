@@ -131,5 +131,5 @@ on how to contribute to this extension!
 ## License
 
 This extension is [licensed under the MIT License](LICENSE.txt).  Please see the
-[third-party notices](Third Party Notices.txt) file for details on the third-party
+[third-party notices](Third%20Party%20Notices.txt) file for details on the third-party
 binaries that we include with releases of this project.
