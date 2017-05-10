@@ -36,9 +36,6 @@ var logger: Logger = undefined;
 var sessionManager: SessionManager = undefined;
 var extensionFeatures: IFeature[] = [];
 
-// Clean up the session file just in case one lingers from a previous session
-utils.deleteSessionFile();
-
 export function activate(context: vscode.ExtensionContext): void {
 
     checkForUpdatedVersion(context);
@@ -99,6 +96,11 @@ export function activate(context: vscode.ExtensionContext): void {
     // Create the logger
     logger = new Logger();
 
+    sessionManager =
+        new SessionManager(
+            requiredEditorServicesVersion,
+            logger);
+
     // Create features
     extensionFeatures = [
         new ConsoleFeature(),
@@ -113,16 +115,12 @@ export function activate(context: vscode.ExtensionContext): void {
         new NewFileOrProjectFeature(),
         new DocumentFormatterFeature(),
         new RemoteFilesFeature(),
-        new DebugSessionFeature(),
+        new DebugSessionFeature(sessionManager),
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context)
     ];
 
-    sessionManager =
-        new SessionManager(
-            requiredEditorServicesVersion,
-            logger,
-            extensionFeatures);
+    sessionManager.setExtensionFeatures(extensionFeatures);
 
     var extensionSettings = Settings.load(utils.PowerShellLanguageId);
     if (extensionSettings.startAutomatically) {

@@ -52,7 +52,7 @@ export class Logger {
             this.writeLine(message)
 
             additionalMessages.forEach((line) => {
-                this.writeLine(message);
+                this.writeLine(line);
             });
         }
     }

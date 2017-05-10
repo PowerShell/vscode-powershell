@@ -63,8 +63,10 @@ export class SessionManager {
 
     private hostVersion: string;
     private isWindowsOS: boolean;
+    private sessionFilePath: string;
     private sessionStatus: SessionStatus;
     private focusConsoleOnExecute: boolean;
+    private extensionFeatures: IFeature[] = [];
     private statusBarItem: vscode.StatusBarItem;
     private sessionConfiguration: SessionConfiguration;
     private versionDetails: PowerShellVersionDetails;
@@ -72,6 +74,7 @@ export class SessionManager {
     private consoleTerminal: vscode.Terminal = undefined;
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
+    private sessionDetails: utils.EditorServicesSessionDetails;
 
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
@@ -81,8 +84,7 @@ export class SessionManager {
 
     constructor(
         private requiredEditorServicesVersion: string,
-        private log: Logger,
-        private extensionFeatures: IFeature[] = []) {
+        private log: Logger) {
 
         this.isWindowsOS = os.platform() == "win32";
 
@@ -107,6 +109,10 @@ export class SessionManager {
         this.registerCommands();
     }
 
+    public setExtensionFeatures(extensionFeatures: IFeature[]) {
+        this.extensionFeatures = extensionFeatures;
+    }
+
     public start(sessionConfig: SessionConfiguration = { type: SessionType.UseDefault }) {
         this.sessionSettings = Settings.load(utils.PowerShellLanguageId);
         this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
@@ -114,6 +120,10 @@ export class SessionManager {
         this.focusConsoleOnExecute = this.sessionSettings.integratedConsole.focusConsoleOnExecute;
 
         this.createStatusBarItem();
+
+        this.sessionFilePath =
+            utils.getSessionFilePath(
+                Math.floor(100000 + Math.random() * 900000));
 
         this.sessionConfiguration = this.resolveSessionConfiguration(sessionConfig);
 
@@ -191,7 +201,7 @@ export class SessionManager {
         }
 
         // Clean up the session file
-        utils.deleteSessionFile();
+        utils.deleteSessionFile(this.sessionFilePath);
 
         // Kill the PowerShell process we spawned via the console
         if (this.consoleTerminal !== undefined) {
@@ -201,6 +211,10 @@ export class SessionManager {
         }
 
         this.sessionStatus = SessionStatus.NotStarted;
+    }
+
+    public getSessionDetails(): utils.EditorServicesSessionDetails {
+        return this.sessionDetails;
     }
 
     public dispose() : void {
@@ -284,7 +298,7 @@ export class SessionManager {
 
             startArgs +=
                 `-LogPath '${editorServicesLogPath}' ` +
-                `-SessionDetailsPath '${utils.getSessionFilePath()}' ` +
+                `-SessionDetailsPath '${this.sessionFilePath}' ` +
                 `-FeatureFlags @(${featureFlags})`
 
             var powerShellArgs = [
@@ -316,10 +330,10 @@ export class SessionManager {
                 powerShellExePath = batScriptPath;
             }
 
-            // Make sure no old session file exists
-            utils.deleteSessionFile();
-
             this.log.write(`${utils.getTimestampString()} Language server starting...`);
+
+            // Make sure no old session file exists
+            utils.deleteSessionFile(this.sessionFilePath);
 
             // Launch PowerShell in the integrated terminal
             this.consoleTerminal =
@@ -334,13 +348,16 @@ export class SessionManager {
 
             // Start the language client
             utils.waitForSessionFile(
+                this.sessionFilePath,
                 (sessionDetails, error) => {
+                    this.sessionDetails = sessionDetails;
+
                     if (sessionDetails) {
                         if (sessionDetails.status === "started") {
                             this.log.write(`${utils.getTimestampString()} Language server started.`);
 
-                            // Write out the session configuration file
-                            utils.writeSessionFile(sessionDetails);
+                            // The session file is no longer needed
+                            utils.deleteSessionFile(this.sessionFilePath);
 
                             // Start the language service client
                             this.startLanguageClient(sessionDetails);
@@ -422,6 +439,9 @@ export class SessionManager {
 
         var port = sessionDetails.languageServicePort;
 
+        // Log the session details object
+        this.log.write(JSON.stringify(sessionDetails));
+
         try
         {
             this.log.write("Connecting to language service on port " + port + "..." + os.EOL);
@@ -433,9 +453,6 @@ export class SessionManager {
                         socket.on(
                             'connect',
                             () => {
-                                // Write out the session configuration file
-                                utils.writeSessionFile(sessionDetails);
-
                                 this.log.write("Language service connected.");
                                 resolve({writer: socket, reader: socket})
                             });
