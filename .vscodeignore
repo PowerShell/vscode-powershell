@@ -11,3 +11,4 @@ bin/*.vshost.*
 bin/PowerShell/**
 logs/**
 sessions/**
+scripts/Install-VSCode.ps1
