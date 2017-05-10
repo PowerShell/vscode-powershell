@@ -1,5 +1,119 @@
 # vscode-powershell Release History
 
+## 1.0.0
+### Wednesday, May 10, 2017
+
+We are excited to announce that we've reached version 1.0!  For more information,
+please see the [official announcement](https://blogs.msdn.microsoft.com/powershell/2017/05/10/announcing-powershell-for-visual-studio-code-1-0/)
+on the PowerShell Team Blog.
+
+#### New script argument UI when debugging ([#705](https://github.com/PowerShell/vscode-powershell/issues/705))
+
+You can now set PowerShell debugger configurations to prompt for arguments to be
+passed to your script when it is executed.  This is configured using the new
+`${command:SpecifyScriptArgs}` configuration variable in `launch.json`:
+
+```json
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Launch DebugTest.ps1 w/Args Prompt",
+            "script": "${workspaceRoot}/DebugTest.ps1",
+            "args": [ "${command:SpecifyScriptArgs}" ],
+            "cwd": "${file}"
+        }
+```
+
+When you launch this configuration you will see a UI popup asking for arguments:
+
+
+![image](https://cloud.githubusercontent.com/assets/5177512/25560503/e60e9822-2d12-11e7-9837-29464d077082.png)
+
+You can type your arguments to the script as you would in PowerShell:
+
+```
+-Count 5
+```
+
+In future executions of this configuration, you will be presented with the arguments
+you typed the last time you ran it so that you can easily edit them and test variations!
+
+#### New hash table alignment formatting rule ([#672](https://github.com/PowerShell/vscode-powershell/issues/672))
+
+We've added a new code formatting rule that automatically aligns the equal sign
+in assignments of keys in hash tables or DSC configurations.  It also works with
+nested hash tables! Here's a simple example:
+
+**Before**
+
+```powershell
+$formatTest = @{
+    Apple = 4
+    Tangerine = @{
+        Orange = 2
+        CornflowerBlue = 6
+    }
+    Banana = 3
+}
+```
+
+**After**
+
+```powershell
+
+$formatTest = @{
+    Apple     = 4
+    Tangerine = @{
+        Orange         = 2
+        CornflowerBlue = 6
+    }
+    Banana    = 3
+}
+```
+
+This formatting rule is enabled by default but can be disabled with the following
+setting:
+
+```
+"powershell.codeFormatting.alignPropertyValuePairs": false
+```
+
+#### Added basic module-wide function references support
+
+In the past, finding the references or definition of a function in `FileA.ps1` only
+worked if `FileA.ps1` had an explicit dot-source invocation of `FileB.ps1`.  We have
+removed this limitation so that you can now find definitions and references of any
+function across all the script files in your project folder!  This is especially
+useful if you write PowerShell modules where all of the source files are dot-sourced
+inside of the .psm1 file.
+
+This new implementation is very basic and may give unexpected results, so please [file
+an issue on GitHub](https://github.com/PowerShell/vscode-powershell/issues) if you get
+a result you did not expect!
+
+#### Other integrated console and debugger improvements
+
+- Fixed [#698](https://github.com/PowerShell/vscode-powershell/issues/698) -
+  When debugging scripts in the integrated console, the cursor position should now
+  be stable after stepping through your code!  Please let us know if you see any
+  other cases where this issue appears.
+
+- Fixed [#626](https://github.com/PowerShell/vscode-powershell/issues/626) -
+  Fixed an issue where debugging a script in one VS Code window would cause that script's
+  output to be written to a different VS Code window in the same process.
+
+- Fixed [#618](https://github.com/PowerShell/vscode-powershell/issues/618) -
+  Pressing enter on an empty command line in the Integrated Console no longer adds the
+  empty line to the command history.
+
+- Fixed [#617](https://github.com/PowerShell/vscode-powershell/issues/617) -
+  Stopping the debugger during a prompt for a mandatory script parameter no
+  longer crashes the language server.
+
+- Fixed [PowerShellEditorServices #428](https://github.com/PowerShell/PowerShellEditorServices/issues/428) -
+  Debugger no longer hangs when you stop debugging while an input or choice prompt is
+  active in the integrated console.
+
 ## 0.12.2
 ### Friday, April 7, 2017
 
