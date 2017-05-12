@@ -2,6 +2,8 @@ import fs = require('fs');
 import os = require('os');
 import path = require('path');
 
+export let PowerShellLanguageId = 'powershell';
+
 export function ensurePathExists(targetPath: string) {
     // Ensure that the path exists
     try {
@@ -13,26 +15,6 @@ export function ensurePathExists(targetPath: string) {
         if (e.code != 'EEXIST') {
             throw e;
         }
-    }
-}
-
-export function getUniqueSessionId() {
-    // We need to uniquely identify the current VS Code session
-    // using some string so that we get a reliable pipe server name
-    // for both the language and debug servers.
-
-    if (os.platform() == "linux") {
-        // Electron running on Linux uses an additional layer of
-        // separation between parent and child processes which
-        // prevents environment variables from being inherited
-        // easily.  This causes VSCODE_PID to not be available
-        // (for now) so use a different variable to get a
-        // unique session.
-        return process.env.VSCODE_PID;
-    }
-    else {
-        // VSCODE_PID is available on Windows and OSX
-        return process.env.VSCODE_PID;
     }
 }
 
@@ -53,18 +35,38 @@ export function getPipePath(pipeName: string) {
 }
 
 export interface EditorServicesSessionDetails {
+    status: string;
+    reason: string;
+    detail: string;
+    powerShellVersion: string;
     channel: string;
     languageServicePort: number;
     debugServicePort: number;
 }
+
 export interface ReadSessionFileCallback {
     (details: EditorServicesSessionDetails): void;
 }
 
-let sessionsFolder = path.resolve(__dirname, "sessions/");
-let sessionFilePath = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
+export interface WaitForSessionFileCallback {
+    (details: EditorServicesSessionDetails, error: string): void;
+}
 
-export function writeSessionFile(sessionDetails: EditorServicesSessionDetails) {
+let sessionsFolder = path.resolve(__dirname, "..", "sessions/");
+let sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
+
+// Create the sessions path if it doesn't exist already
+ensurePathExists(sessionsFolder);
+
+export function getSessionFilePath(uniqueId: number) {
+    return `${sessionFilePathPrefix}-${uniqueId}`;
+}
+
+export function getDebugSessionFilePath() {
+    return `${sessionFilePathPrefix}-Debug`;
+}
+
+export function writeSessionFile(sessionFilePath: string, sessionDetails: EditorServicesSessionDetails) {
     ensurePathExists(sessionsFolder);
 
     var writeStream = fs.createWriteStream(sessionFilePath);
@@ -72,21 +74,53 @@ export function writeSessionFile(sessionDetails: EditorServicesSessionDetails) {
     writeStream.close();
 }
 
-export function readSessionFile(): EditorServicesSessionDetails {
+export function waitForSessionFile(sessionFilePath: string, callback: WaitForSessionFileCallback) {
+
+    function innerTryFunc(remainingTries: number, delayMilliseconds: number) {
+        if (remainingTries == 0) {
+            callback(undefined, "Timed out waiting for session file to appear.");
+        }
+        else if(!checkIfFileExists(sessionFilePath)) {
+            // Wait a bit and try again
+            setTimeout(
+                function() { innerTryFunc(remainingTries - 1, delayMilliseconds); },
+                delayMilliseconds);
+        }
+        else {
+            // Session file was found, load and return it
+            callback(readSessionFile(sessionFilePath), undefined);
+        }
+    }
+
+    // Try once per second for 60 seconds, one full minute
+    innerTryFunc(60, 1000);
+}
+
+export function readSessionFile(sessionFilePath: string): EditorServicesSessionDetails {
     let fileContents = fs.readFileSync(sessionFilePath, "utf-8");
     return JSON.parse(fileContents)
 }
 
-export function deleteSessionFile() {
-    fs.unlinkSync(sessionFilePath);
+export function deleteSessionFile(sessionFilePath: string) {
+    try {
+        fs.unlinkSync(sessionFilePath);
+    }
+    catch (e) {
+        // TODO: Be more specific about what we're catching
+    }
 }
 
 export function checkIfFileExists(filePath: string): boolean {
     try {
-        fs.accessSync(filePath, fs.R_OK)
+        fs.accessSync(filePath, fs.constants.R_OK)
         return true;
     }
     catch (e) {
         return false;
     }
+}
+
+export function getTimestampString() {
+    var time = new Date();
+    return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`
 }

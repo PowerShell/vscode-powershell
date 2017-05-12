@@ -1,4 +1,5 @@
 .vscode/**
+vscode-powershell.build.ps1
 typings/**
 **/*.ts
 .gitignore
@@ -7,5 +8,7 @@ build/**
 bin/EditorServices.log
 bin/DebugAdapter.log
 bin/*.vshost.*
-logs/
-
+bin/PowerShell/**
+logs/**
+sessions/**
+scripts/Install-VSCode.ps1

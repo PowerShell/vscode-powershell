@@ -2,12 +2,49 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "PowerShell",
             "type": "PowerShell",
             "request": "launch",
-            "program": "${file}",
+            "name": "PowerShell Launch Current File",
+            "script": "${file}",
             "args": [],
             "cwd": "${file}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Launch Current File w/Args Prompt",
+            "script": "${file}",
+            "args": [ "${command:SpecifyScriptArgs}" ],
+            "cwd": "${file}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Launch DebugTest.ps1",
+            "script": "${workspaceRoot}/DebugTest.ps1",
+            "args": ["-Count 55 -DelayMilliseconds 250"],
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Interactive Session",
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Pester Tests",
+            "script": "Invoke-Pester",
+            "args": [],
+            "cwd": "${workspaceRoot}"
+        },
+        {
+            "type": "PowerShell",
+            "request": "attach",
+            "name": "PowerShell Attach to Host Process",
+            "processId": "${command:PickPSHostProcess}",
+            "runspaceId": 1
         }
     ]
 }

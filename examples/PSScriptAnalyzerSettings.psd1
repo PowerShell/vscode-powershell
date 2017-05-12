@@ -10,11 +10,13 @@
     # Analyze **only** the following rules. Use IncludeRules when you want
     # to invoke only a small subset of the defualt rules.
     IncludeRules = @('PSAvoidDefaultValueSwitchParameter',
+                     'PSMisleadingBacktick',
                      'PSMissingModuleManifestField',
                      'PSReservedCmdletChar',
                      'PSReservedParams',
                      'PSShouldProcess',
                      'PSUseApprovedVerbs',
+                     'PSAvoidUsingAliases',
                      'PSUseDeclaredVarsMoreThanAssigments')
 
     # Do not analyze the following rules. Use ExcludeRules when you have

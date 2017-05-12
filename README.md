@@ -1,5 +1,7 @@
 # PowerShell Language Support for Visual Studio Code
 
+[![Version](https://vsmarketplacebadge.apphb.com/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) [![Build status](https://ci.appveyor.com/api/projects/status/x2g1u375ih4w1xcc/branch/develop?svg=true)](https://ci.appveyor.com/project/PowerShell/vscode-powershell/branch/develop) [![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
 that Visual Studio Code provides.
@@ -8,7 +10,7 @@ that Visual Studio Code provides.
 
 - **Windows 7 through 10** with PowerShell v3 and higher
 - **Linux** with PowerShell v6 (all PowerShell-supported distribtions)
-- **Mac OS X** with PowerShell v6
+- **macOS and OS X** with PowerShell v6
 
 Read the [installation instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/learning-powershell/using-vscode.md)
 to get more details on how to use the extension on these platforms.
@@ -26,6 +28,45 @@ to get more details on how to use the extension on these platforms.
 - Launch online help for the symbol under the cursor using `Ctrl+F1`
 - Local script debugging and basic interactive console support!
 
+## Quick Installation
+
+If you're on Windows 7 or greater with the [PowerShellGet](https://msdn.microsoft.com/powershell/gallery/readme)
+module installed, you can easily install both Visual Studio Code and the PowerShell
+extension by running the following command:
+
+```powershell
+Install-Script Install-VSCode -Scope CurrentUser; Install-VSCode.ps1
+```
+
+You will need to accept the prompts that appear if this is your first time running
+the `Install-Script` command.
+
+**Alternatively** you can download and execute the script directly from the web
+without the use of `Install-Script`.  However we **highly recommend** that you
+[read the script](https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1)
+first before running it in this way!
+
+```powershell
+iex (iwr https://git.io/v9rJg)
+```
+
+## Installing the Extension
+
+You can install the official release of the PowerShell extension by following the steps
+in the [Visual Studio Code documentation](https://code.visualstudio.com/docs/editor/extension-gallery).
+In the Extensions pane, search for "PowerShell" extension and install it there.  You will
+get notified automatically about any future extension updates!
+
+You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
+[Install from a VSIX](https://code.visualstudio.com/docs/extensions/install-extension#_install-from-a-vsix)
+instructions.  The easiest way is through the command line:
+
+```
+code --install-extension PowerShell-<version>.vsix
+```
+
+> NOTE: If you are using VS Code Insiders, the command will be `code-insiders`.
+
 ## Example Scripts
 
 There are some example scripts in the extension's `examples` folder that you can
@@ -37,7 +78,7 @@ This folder can be found at the following path:
 ```
 c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
 ```
-To open/view the extension's examples Visual Studio Code, run the following from your PowerShell command prompt:
+To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
 ```
 code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
@@ -65,7 +106,7 @@ Restart Visual Studio Code and try to reproduce the problem.  Once you are done 
 that, zip up the logs in the corresponding folder for your operating system:
 
 - **Windows**: `$HOME\.vscode\extensions\ms-vscode.PowerShell-<CURRENT VERSION>\logs`
-- **Linux and Mac OS X**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
+- **Linux and macOS**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
 
 You have two options for sending us the logs:
 

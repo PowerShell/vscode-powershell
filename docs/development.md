@@ -1,52 +1,43 @@
-# Working with the PowerShell extension code
+# Development Instructions for the PowerShell Extension
 
-## Building the code
+## Development Setup
 
-1. Install [Node.js](https://nodejs.org/en/) 4.4.1 or higher.
+You'll need to clone two repositories and set up your development environment
+to before you can proceed.
 
-2. Install the package dependencies by running one of the following commands:
+### 1. [Fork and clone](https://help.github.com/articles/fork-a-repo/) the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell)
 
-   ```
-   # From a PowerShell prompt
-   npm install
+### 2. [Fork and clone](https://help.github.com/articles/fork-a-repo/) the [PowerShell Editor Services repository](https://github.com/PowerShell/PowerShellEditorServices)
 
-   # Or from Visual Studio Code
-   Press Ctrl+P and type "task install"
-   ```
+### 3. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for PowerShell Editor Services
 
-3. Compile the code by running one of the following commands:
+### 4. Install [Visual Studio Code Insiders Release](https://code.visualstudio.com/insiders)
 
-   ```
-   # From a PowerShell prompt
-   npm run compile
+### 5. Install [Node.js](https://nodejs.org/en/) 6.0.0 or higher.
 
-   # Or from Visual Studio Code
-   Press Ctrl+P and type "task compile"
-   ```
-   This will compile the TypeScript files in the project to JavaScript files.
+## Building the Code
 
-   OR
+#### From Visual Studio Code:
 
-   You can compile the files and then have the TypeScript compiler watch for changes to
-   the source files and automatically recompile those files when changes are saved.
-   To do this, run one of the following commands:
+Press <kbd>Ctrl+P</kbd> and type `task build`
 
-   ```
-   # From a PowerShell prompt
-   npm run compile-watch
+This will compile the TypeScript files in the project to JavaScript files.
 
-   # Or from Visual Studio Code
-   Press Ctrl+P and type "task compile-watch"
-   ```
+#### From a command prompt:
 
-## Running the compiled code
+```
+Invoke-Build Build
+```
 
-1. From a PowerShell prompt, run the following command:
+## Launching the extension
 
-   ```
-   code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
-   ```
+#### From Visual Studio Code:
 
-2. If you allow the compiler to continue watching for file changes, you can use
-   the `Reload Window` command found in the command palette `(Ctrl+Shift+P)`
-   so that the new source files are loaded.
+To debug the extension, press <kbd>F5</kbd>.  To run the extension without debugging,
+press <kbd>Ctrl+F5</kbd> or <kbd>Cmd+F5</kbd> on macOS.
+
+#### From a command prompt:
+
+```
+code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
+```

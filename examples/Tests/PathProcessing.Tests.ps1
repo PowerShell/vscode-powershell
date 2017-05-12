@@ -65,10 +65,16 @@ Describe 'Verify Path Processing for Wildcards Allowed Impl' {
             Should Be @("$WorkspaceRoot\README.md", "$WorkspaceRoot\PathProcessingWildcards.ps1")
     }
     It 'Processes wildcard absolute path via -Path param' {
-        Import-FileWildcard -Path $WorkspaceRoot\*.psd1 | Should Be "$WorkspaceRoot\SampleModule.psd1"
+        $files = Import-FileWildcard -Path $WorkspaceRoot\*.psd1
+        $files.Count | Should Be 2
+        $files[0] | Should Be "$WorkspaceRoot\PSScriptAnalyzerSettings.psd1"
+        $files[1] | Should Be "$WorkspaceRoot\SampleModule.psd1"
     }
     It 'Processes wildcard relative path via -Path param' {
-        Import-FileWildcard -Path *.psd1 | Should Be "$WorkspaceRoot\SampleModule.psd1"
+        $files = Import-FileWildcard -Path *.psd1
+        $files.Count | Should Be 2
+        $files[0] | Should Be "$WorkspaceRoot\PSScriptAnalyzerSettings.psd1"
+        $files[1] | Should Be "$WorkspaceRoot\SampleModule.psd1"
     }
     It 'Processes relative path via -Path param' {
         Import-FileWildcard -Path ..\examples\README.md | Should Be "$WorkspaceRoot\README.md"
@@ -79,7 +85,10 @@ Describe 'Verify Path Processing for Wildcards Allowed Impl' {
     }
 
     It 'DefaultParameterSet should be Path' {
-        Import-FileWildcard *.psd1 | Should Be "$WorkspaceRoot\SampleModule.psd1"
+        $files = Import-FileWildcard *.psd1
+        $files.Count | Should Be 2
+        $files[0] | Should Be "$WorkspaceRoot\PSScriptAnalyzerSettings.psd1"
+        $files[1] | Should Be "$WorkspaceRoot\SampleModule.psd1"
     }
 
     It 'Should process absolute literal paths via -LiteralPath param'{

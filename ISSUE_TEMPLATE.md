@@ -1,4 +1,13 @@
-**Please fill in these details so that we can help you!**
+<!--
+
+Please fill in these details so that we can help you!
+
+If you are filing an issue related to PowerShell syntax coloring/highlighting,
+please file it at the EditorSyntax repo:
+
+https://github.com/PowerShell/EditorSyntax/issues
+
+-->
 
 ### System Details
 
@@ -8,7 +17,12 @@
 - Output from `$PSVersionTable`:
 
 ```
-Evaluate $PSVersionTable in PowerShell and paste the output here
+Copy / paste the below commands into the PowerShell Integrated Terminal, and paste the output here
+
+code -v
+$pseditor.EditorServicesVersion
+code --list-extensions --show-versions
+$PSVersionTable
 ```
 
 ### Issue Description

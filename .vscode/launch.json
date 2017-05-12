@@ -9,12 +9,13 @@
 			"args": [ "--extensionDevelopmentPath=${workspaceRoot}" ],
 			"stopOnEntry": false,
 			"sourceMaps": true,
-			"outDir": "${workspaceRoot}/out",
-			"preLaunchTask": "compile"
+			"outFiles": ["${workspaceRoot}/out"],
+			"preLaunchTask": "Build"
 		},
 		{
 			"name": "Attach",
 			"type": "node",
+			"request": "attach",
 			"address": "localhost",
 			"port": 5858,
 			"sourceMaps": false
