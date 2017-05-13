@@ -27,6 +27,7 @@ import { FindModuleFeature } from './features/PowerShellFindModule';
 import { NewFileOrProjectFeature } from './features/NewFileOrProject';
 import { ExtensionCommandsFeature } from './features/ExtensionCommands';
 import { DocumentFormatterFeature } from './features/DocumentFormatter';
+import { HelpCompletionFeature } from "./features/HelpCompletion";
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
@@ -117,7 +118,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new RemoteFilesFeature(),
         new DebugSessionFeature(sessionManager),
         new PickPSHostProcessFeature(),
-        new SpecifyScriptArgsFeature(context)
+        new SpecifyScriptArgsFeature(context),
+        new HelpCompletionFeature()
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
