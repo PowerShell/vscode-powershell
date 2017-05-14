@@ -14,6 +14,7 @@ export namespace CommentHelpRequest {
 interface CommentHelpRequestParams {
     documentUri: string;
     triggerPosition: Position;
+    blockComment: boolean;
 }
 
 interface CommentHelpRequestResult {
@@ -23,12 +24,20 @@ interface CommentHelpRequestResult {
 enum SearchState { Searching, Locked, Found };
 
 export class HelpCompletionFeature implements IFeature {
+    private readonly triggerCharactersBlockComment: string;
+    private readonly triggerCharactersLineComment: string;
+    private triggerCharactersFound: string;
     private languageClient: LanguageClient;
-    private triggerCharacters: string;
     private disposable: Disposable;
     private searchState: SearchState;
+    private get isBlockComment(): boolean {
+        return this.triggerCharactersFound !== undefined &&
+            this.triggerCharactersFound === this.triggerCharactersBlockComment;
+    }
+
     constructor() {
-        this.triggerCharacters = "#<";
+        this.triggerCharactersBlockComment = "#<";
+        this.triggerCharactersLineComment = "##";
         let subscriptions = [];
         workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
         this.searchState = SearchState.Searching;
@@ -47,14 +56,19 @@ export class HelpCompletionFeature implements IFeature {
         let text = changeEvent.contentChanges[0].text;
         switch (this.searchState) {
             case SearchState.Searching:
-                if (text.length === 1 && text[0] === this.triggerCharacters[0]) {
+                if (text.length === 1 && text[0] === this.triggerCharactersBlockComment[0]) {
                     this.searchState = SearchState.Locked;
                 }
                 break;
 
             case SearchState.Locked:
-                if (text.length === 1 && text[0] === this.triggerCharacters[1]) {
+                if (text.length === 1 &&
+                    (text[0] === (this.triggerCharactersFound = this.triggerCharactersBlockComment)[1] ||
+                        text[0] === (this.triggerCharactersFound = this.triggerCharactersLineComment)[1])) {
                     this.searchState = SearchState.Found;
+                }
+                else {
+                    this.searchState = SearchState.Searching;
                 }
                 break;
         }
@@ -72,7 +86,8 @@ export class HelpCompletionFeature implements IFeature {
                     CommentHelpRequest.type,
                     {
                         documentUri: changeEvent.document.uri.toString(),
-                        triggerPosition: triggerStartPos
+                        triggerPosition: triggerStartPos,
+                        blockComment: this.isBlockComment
                     }).then(result => {
                         let content = result.content;
                         if (content === undefined) {
