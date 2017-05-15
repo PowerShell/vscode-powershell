@@ -2,9 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require("vscode");
 import { IFeature } from "../feature";
-import { TextDocumentChangeEvent, workspace, Disposable, Position } from "vscode";
+import { TextDocumentChangeEvent, workspace, Disposable, Position, window, Range, EndOfLine } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 
 export namespace CommentHelpRequest {
@@ -53,6 +52,7 @@ export class HelpCompletionFeature implements IFeature {
     }
 
     onEvent(changeEvent: TextDocumentChangeEvent): void {
+        // todo split this method into logical components
         let text = changeEvent.contentChanges[0].text;
         switch (this.searchState) {
             case SearchState.Searching:
@@ -103,16 +103,24 @@ export class HelpCompletionFeature implements IFeature {
                             return;
                         }
 
-                        // todo get the eol character programmatically or let the server return one whole string
                         // todo add indentation level to the help content
-                        let editor = vscode.window.activeTextEditor;
-                        let replaceRange = new vscode.Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
+                        let editor = window.activeTextEditor;
+                        let replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
 
                         // Trim the last empty line and join the strings.
-                        let text = content.slice(0, -1).join("\r\n");
+                        let text = content.slice(0, -1).join(this.getEOL(doc.eol));
                         editor.edit(editBuilder => editBuilder.replace(replaceRange, text));
                     });
             }
         }
+    }
+
+    private getEOL(eol: EndOfLine): string {
+        // there are only two type of EndOfLine types.
+        if (eol === EndOfLine.CRLF) {
+            return "\r\n";
+        }
+
+        return "\n";
     }
 }
