@@ -8,7 +8,7 @@
 2. [Editor Concepts](#editor-concepts)
 3. [Writing PowerShell](#writing-powershell)
 4. [Debugging PowerShell](#debugging-powershell)
-5. [Configuring the Extension](#configuring-the-extension)
+5. [Configuring the Extension](#configuring-the-editor-and-extension)
 6. [Frequently Asked Questions](#frequently-asked-questions)
 7. [Troubleshooting](#troubleshooting)
 
@@ -59,12 +59,22 @@ other things like string input or a list of selections to choose from.
 
 ### Activity Bar
 
+### Source Control
+
 ### Integrated Terminal
 
-### Editor Settings
+### Tasks
 
-Just about everything in Visual Studio Code is configurable using plain-text files in the
-[JSON](https://en.wikipedia.org/wiki/JSON) format.
+### Extensions
+
+#### Recommended Extensions
+
+- [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
+- [Vim](https://marketplace.visualstudio.com/items?itemName=vscodevim.vim)
+- [Settings Sync](https://marketplace.visualstudio.com/items?itemName=Shan.code-settings-sync)
+
+Check out other [popular extensions](https://marketplace.visualstudio.com/vscode) on
+the Visual Studio Marketplace.
 
 ## Writing PowerShell
 
@@ -72,19 +82,66 @@ Just about everything in Visual Studio Code is configurable using plain-text fil
 > [file issues](https://github.com/PowerShell/vscode-powershell) for any
 > additional content you wish to see in this section.
 
+### IntelliSense
+
+### Analyzing Your Code
+
+- Syntax analysis
+- PSScriptAnalyzer
+- Code fixes
+
+### Navigating Around the Code
+
+### Formatting Your Code
+
+### Expanding Aliases
+
 ## Debugging PowerShell
 
 > NOTE: This section is currently under development.  Please feel free to
 > [file issues](https://github.com/PowerShell/vscode-powershell) for any
 > additional content you wish to see in this section.
 
-## Configuring the Extension
+## Configuring the Editor and Extension
 
 > NOTE: This section is currently under development.  Please feel free to
 > [file issues](https://github.com/PowerShell/vscode-powershell) for any
 > additional content you wish to see in this section.
 
+Just about everything in Visual Studio Code is configurable using plain-text files in the
+[JSON](https://en.wikipedia.org/wiki/JSON) format.
+
+### User and Workspace Settings
+
+### Editor Settings
+
+- `editor.insertSpaces` - Spaces, not tabs!
+- `editor.formatOnSave` - Format your code just before it's saved
+- `editor.formatOnType` - Format your code as you type!
+
+- `editor.fontSize`
+- `editor.fontFamily`
+
+- `terminal.integrated.fontSize` - Override `editor.fontSize in the integrated terminal
+- `terminal.integrated.fontFamily` - Override `editor.fontFamily` in the integrated terminal
+
+### PowerShell Extension Settings
+
 ### Recommended Settings
+
+TODO: Write full descriptions
+
+- `files.defaultLanguage`: Set the default language for files created with <kbd>Ctrl+N</kbd>
+- `files.autoSave`: Save your files automatically as you edit them, very configurable
+
+## Tips and Tricks
+
+**Please feel free to send pull requests to add more tips and tricks to this section!**
+
+- "Hot Exit": retains unsaved files on exit, restores on next session
+- Markdown preview: <kbd>Ctrl+Shift+V</kbd>
+- Zen mode: <kbd>Ctrl+K Z</kbd>
+- Side by side editing: <kbd>Ctrl+\</kbd>
 
 ## Frequently Asked Questions
 
@@ -93,11 +150,17 @@ Just about everything in Visual Studio Code is configurable using plain-text fil
 > additional content you wish to see in this section.
 
 
+### Why doesn't the debugger hit a breakpoint I added?
+
+### Why can't I remove breakpoints from a file while I'm not debugging a script?
+
+### Why does the integrated console steal focus when I run the current selection (F8)?
+
 ## Troubleshooting
 
 ### Windows
 
-#### 1. IntelliSense is extremely slow on PowerShell 5.0
+#### IntelliSense is extremely slow on PowerShell 5.0
 
 There is a known issue with PowerShell 5.0 which, for a small number of users, causes IntelliSense
 (code completions) to return after 5-15 seconds.  The following steps *might* resolve the issue for you:
@@ -109,7 +172,7 @@ This issue has been resolved in PowerShell 5.1.
 
 ### macOS (OS X)
 
-#### 1. PowerShell IntelliSense does not work, can't debug scripts
+#### PowerShell IntelliSense does not work, can't debug scripts
 
 The most common problem when the PowerShell extension doesn't work on macOS is that
 OpenSSL is not installed.  You can check for the installation of OpenSSL by looking for
