@@ -17,16 +17,19 @@ to get more details on how to use the extension on these platforms.
 
 ## Features
 
-- Syntax highlighting
-- Code snippets
-- IntelliSense for cmdlets and more
-- Rule-based analysis provided by [PowerShell Script Analyzer](http://github.com/PowerShell/PSScriptAnalyzer)
-- Go to Definition of cmdlets and variables
-- Find References of cmdlets and variables
-- Document and workspace symbol discovery
-- Run selected selection of PowerShell code using `F8`
-- Launch online help for the symbol under the cursor using `Ctrl+F1`
-- Local script debugging and basic interactive console support!
+- PowerShell ISE-like interactive development experience with the PowerShell Integrated Console
+- Rich debugging experience including variables view, call stack, watch window, and various breakpoint types
+- Integrated script analysis and code fixes provided by [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)
+- Code navigations that allow you to find definitions and references of functions across your script files
+- Highly configurable code formatter based on community best practices
+- New file and project creation using [Plaster](https://github.com/PowerShell/Plaster) templates
+- Editor scripting API through the [$psEditor object model](http://powershell.github.io/PowerShellEditorServices/guide/extensions.html)
+
+## User Guide
+
+We have written a complete [User Guide](./docs/UserGuide.md) to help you learn how to use the features
+of this extension.  If you have any comments or feedback on the User Guide, please feel free to [file an issue](https://github.com/PowerShell/vscode-powershell/issues/new)
+or [edit the file](https://github.com/PowerShell/vscode-powershell/edit/master/docs/UserGuide.md) and submit a pull request!
 
 ## Quick Installation
 
