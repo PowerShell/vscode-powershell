@@ -86,12 +86,12 @@
       },
       {
         "command": "PowerShell.OnlineHelp",
-        "title": "Get online help for command",
+        "title": "Get Online Help for Command",
         "category": "PowerShell"
       },
       {
         "command": "PowerShell.RunSelection",
-        "title": "Run selection",
+        "title": "Run Selection",
         "category": "PowerShell"
       },
       {
@@ -111,17 +111,17 @@
       },
       {
         "command": "PowerShell.OpenInISE",
-        "title": "Open current file in PowerShell ISE",
+        "title": "Open Current file in PowerShell ISE",
         "category": "PowerShell"
       },
       {
         "command": "PowerShell.PowerShellFindModule",
-        "title": "Find/Install PowerShell modules from the gallery",
+        "title": "Find/Install PowerShell Modules from the Gallery",
         "category": "PowerShell"
       },
       {
         "command": "PowerShell.ShowAdditionalCommands",
-        "title": "Show additional commands from PowerShell modules",
+        "title": "Show Additional Commands from PowerShell Modules",
         "category": "PowerShell"
       },
       {
