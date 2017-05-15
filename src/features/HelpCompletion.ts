@@ -103,12 +103,13 @@ export class HelpCompletionFeature implements IFeature {
                             return;
                         }
 
-                        // todo remove the new line after help block
                         // todo get the eol character programmatically or let the server return one whole string
                         // todo add indentation level to the help content
                         let editor = vscode.window.activeTextEditor;
                         let replaceRange = new vscode.Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
-                        let text = content.join("\r\n");
+
+                        // Trim the last empty line and join the strings.
+                        let text = content.slice(0, -1).join("\r\n");
                         editor.edit(editBuilder => editBuilder.replace(replaceRange, text));
                     });
             }
