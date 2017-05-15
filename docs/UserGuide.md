@@ -9,14 +9,27 @@
 3. [Writing PowerShell](#writing-powershell)
 4. [Debugging PowerShell](#debugging-powershell)
 5. [Configuring the Extension](#configuring-the-editor-and-extension)
-6. [Frequently Asked Questions](#frequently-asked-questions)
-7. [Troubleshooting](#troubleshooting)
+6. [Tips and Tricks](#tips-and-tricks)
+7. [Frequently Asked Questions](#frequently-asked-questions)
+8. [Troubleshooting](#troubleshooting)
 
 ## Getting Started
 
+Welcome to the PowerShell extension for Visual Studio Code!  This extension aims to
+provide a complete, high-quality development experience for PowerShell scripts, modules,
+and DSC resources.  We are developing this extension as an open-source project on GitHub
+so please feel free to [file an issue](https://github.com/PowerShell/vscode-powershell/issues)
+if you encounter an issue or if you have any questions or feature requests.
+
 The PowerShell extension works with both the [Stable](https://code.visualstudio.com/) and
-[Insiders](https://code.visualstudio.com/insiders) releases of Visual Studio Code.  To
-install the extension, follow the instructions in our README.md.
+[Insiders](https://code.visualstudio.com/insiders) releases of Visual Studio Code.  You can
+learn how to install either of these releases in Visual Studio Code's [setup instructions](https://code.visualstudio.com/docs/setup/setup-overview).
+Once you've installed Visual Studio Code you can install the PowerShell extension by
+[following the instructions](https://github.com/PowerShell/vscode-powershell#installing-the-extension)
+in our README.
+
+If you'd like a quick and easy way to install both Visual Studio Code and the PowerShell
+extension, try our [quick install script](https://github.com/PowerShell/vscode-powershell#quick-installation)!
 
 ## Editor Concepts
 
@@ -29,13 +42,20 @@ of the editor and its features.
 
 ### Files and Folders
 
-Visual Studio Code is focused around managing projects using folders instead
-of project files.
+Visual Studio Code is designed around managing projects using file system folders
+instead of project files.  This enables individual language extensions to use their
+own tooling to manage the experience for a "project" in the editor instead of having
+an editor-specific project file.
 
-You can only have one top-level workspace folder open at a time.
+Visual Studio Code looks for a special folder in your workspace called `.vscode`.  This
+folder contains workspace-specific settings for the editor, tasks to execute for your
+project (like build scripts or Pester tests) and launch configurations for debugging
+your PowerShell scripts.  For best results, this folder should be checked into your
+source control repository along with your project's source code.
 
-Unlike larger integrated development environments (IDEs) like [Visual Studio](https://www.visualstudio.com/),
-Visual Studio Code
+As this time, you can only have one top-level workspace folder open in a VS Code window.
+This is likely to change in the near future as the VS Code team is working on support
+for [multi-folder workspaces](https://github.com/Microsoft/vscode/issues/396).
 
 ### Command Palette
 
@@ -56,6 +76,10 @@ you can execute it by pressing <kbd>Enter</kbd>.
 
 Some commands in Visual Studio Code will use the Command Palette UI to prompt you for
 other things like string input or a list of selections to choose from.
+
+**TODO: Image**
+
+TODO: File navigation
 
 ### Activity Bar
 
@@ -92,7 +116,16 @@ the Visual Studio Marketplace.
 
 ### Navigating Around the Code
 
+- Document symbols
+- Workspace symbols
+- Go to definition
+- Find References
+
 ### Formatting Your Code
+
+- Formatting the file
+- Formatting the selection
+- Formatting on save, type, paste
 
 ### Expanding Aliases
 
@@ -155,6 +188,10 @@ TODO: Write full descriptions
 ### Why can't I remove breakpoints from a file while I'm not debugging a script?
 
 ### Why does the integrated console steal focus when I run the current selection (F8)?
+
+### Why can't I select more than the visible region in the integrated console?
+
+https://github.com/Microsoft/vscode/issues/9958
 
 ## Troubleshooting
 
