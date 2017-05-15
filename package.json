@@ -111,7 +111,7 @@
       },
       {
         "command": "PowerShell.OpenInISE",
-        "title": "Open Current file in PowerShell ISE",
+        "title": "Open Current File in PowerShell ISE",
         "category": "PowerShell"
       },
       {
