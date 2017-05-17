@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import { IFeature } from "../feature";
-import { TextDocumentChangeEvent, workspace, Disposable, Position, window, Range, EndOfLine } from "vscode";
+import { TextDocumentChangeEvent, workspace, Disposable, Position, window, Range, EndOfLine, SnippetString } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 
 export namespace CommentHelpRequest {
@@ -53,6 +53,8 @@ export class HelpCompletionFeature implements IFeature {
 
     onEvent(changeEvent: TextDocumentChangeEvent): void {
         // todo split this method into logical components
+        // todo create a helpcompletion provider class
+        // todo associate state with a given document
         let text = changeEvent.contentChanges[0].text;
         switch (this.searchState) {
             case SearchState.Searching:
@@ -109,7 +111,7 @@ export class HelpCompletionFeature implements IFeature {
 
                         // Trim the last empty line and join the strings.
                         let text = content.slice(0, -1).join(this.getEOL(doc.eol));
-                        editor.edit(editBuilder => editBuilder.replace(replaceRange, text));
+                        editor.insertSnippet(new SnippetString(text), replaceRange);
                     });
             }
         }
