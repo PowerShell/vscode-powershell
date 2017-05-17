@@ -51,8 +51,7 @@ export class HelpCompletionFeature implements IFeature {
 
         // todo raise an event when trigger is found, and attach complete() to the event.
         if (this.helpCompletionProvider.triggerFound) {
-            this.helpCompletionProvider.reset();
-            this.helpCompletionProvider.complete();
+            this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
         }
 
     }
@@ -148,7 +147,7 @@ class HelpCompletionProvider {
         let triggerStartPos = this.lastChangeRange.start;
         let triggerEndPos = this.lastChangeRange.end;
         let doc = this.lastDocument;
-        this.langClient.sendRequest(
+        return this.langClient.sendRequest(
             CommentHelpRequest.type,
             {
                 documentUri: doc.uri.toString(),
