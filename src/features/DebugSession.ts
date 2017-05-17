@@ -8,6 +8,10 @@ import { IFeature } from '../feature';
 import { SessionManager } from '../session';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
+export namespace StartDebuggerNotification {
+    export const type = new NotificationType<void, void>('powerShell/startDebugger');
+}
+
 export class DebugSessionFeature implements IFeature {
     private command: vscode.Disposable;
     private examplesPath: string;
@@ -18,7 +22,14 @@ export class DebugSessionFeature implements IFeature {
             config => { this.startDebugSession(config); });
     }
 
-    public setLanguageClient(languageclient: LanguageClient) {
+    public setLanguageClient(languageClient: LanguageClient) {
+        languageClient.onNotification(
+            StartDebuggerNotification.type,
+            none => this.startDebugSession({
+                request: 'launch',
+                type: 'PowerShell',
+                name: 'PowerShell Interactive Session'
+            }));
     }
 
     public dispose() {
