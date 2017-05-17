@@ -71,11 +71,6 @@
         "command": "PowerShell.OpenInISE",
         "key": "ctrl+shift+i",
         "when": "editorTextFocus && editorLangId == 'powershell'"
-      },
-      {
-        "command": "PowerShell.PowerShellFindModule",
-        "key": "ctrl+K ctrl+f",
-        "when": "editorTextFocus && editorLangId == 'powershell'"
       }
     ],
     "commands": [
