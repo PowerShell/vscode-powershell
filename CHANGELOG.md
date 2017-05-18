@@ -1,5 +1,60 @@
 # vscode-powershell Release History
 
+## 1.1.0
+### Thursday, May 18, 2017
+
+#### New dynamic snippet for adding comment-based help ([#748](https://github.com/PowerShell/vscode-powershell/issues/748))
+
+We've added a really cool new feature that enables you to create comment-based
+help blocks with ease!  When you've defined a function in a PowerShell script
+file, you can now start typing a comment block above the function definition
+and it will be completed for you:
+
+![Help Comment GIF](https://cloud.githubusercontent.com/assets/79405/26216440/f31a47c8-3bb8-11e7-9fbc-7e3fb596c0ea.GIF)
+
+This comment block works like a snippet, allowing you to tab through the fields
+to quickly add documentation for the parts you care about.
+
+This is a first pass for this feature and we plan to do more with it in the future.
+Please feel free to [file feature requests](https://git.io/v9jnL) for anything else
+you'd like to see!
+
+#### Breakpoints hit in the Integrated Console now activate the debugger UI ([#619](https://github.com/PowerShell/vscode-powershell/issues/619))
+
+In previous releases it was necessary to start the "PowerShell Interactive Session"
+debugging configuration before you could run a command or script from the Integrated
+Console and hit breakpoints in the editor UI.  We've just removed this limitation!
+
+Now when you set a breakpoint using `Set-PSBreakpoint` and run a script or command in the
+Integrated Console, the debugger UI now gets activated:
+
+![Debugger Activate GIF](https://cloud.githubusercontent.com/assets/79405/26217019/d17708f2-3bba-11e7-982f-4d481c2cf533.GIF)
+
+Note that breakpoints set in the Integrated Console [still do not show up](https://github.com/PowerShell/vscode-powershell/issues/660)
+in the editor UI; this requires [changes to VS Code](https://github.com/Microsoft/vscode/issues/8642)
+that we'll be contributing for their next feature release.
+
+#### Improved output when loading profile scripts ([#663](https://github.com/PowerShell/vscode-powershell/issues/663) and [#689](https://github.com/PowerShell/vscode-powershell/issues/689))
+
+We now write the errors and Write-Output calls that occur while loading profile
+scripts so that it's easier to diagnose issues with your profile scripts.  This
+fix will help us identify the things missing from the Integrated Console which
+cause your profile scripts to fail (like the current lack of a [PrivateData object for setting console colors](https://github.com/PowerShell/vscode-powershell/issues/571)).
+
+Please feel free to [file issues](https://git.io/v9jnL) for anything that causes
+your profile scripts to throw errors when they get loaded!
+
+#### Other fixes and improvements
+
+- [#751](https://github.com/PowerShell/vscode-powershell/issues/751) -
+  Removed keybinding for the "Find PowerShell Modules from the Gallery" command
+  because it conflicts with VS Code's default "Format Selection" keybinding.
+
+- [#739](https://github.com/PowerShell/vscode-powershell/issues/739) -
+  Fixed wording of PowerShell extension commands to have consistent capitalization.
+  Thanks to [@AndySchneiderDev](https://github.com/AndySchneiderDev) for the
+  contribution!
+
 ## 1.0.0
 ### Wednesday, May 10, 2017
 
