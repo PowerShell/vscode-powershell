@@ -167,8 +167,9 @@ class HelpCompletionProvider {
                 let editor = window.activeTextEditor;
                 let replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
 
+                // Trim the leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
                 // Trim the last empty line and join the strings.
-                let text = content.slice(0, -1).join(this.getEOL(doc.eol));
+                let text = content.map(x => x.trimLeft()).slice(0, -1).join(this.getEOL(doc.eol));
                 editor.insertSnippet(new SnippetString(text), replaceRange);
             });
     }
