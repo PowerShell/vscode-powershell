@@ -81,7 +81,9 @@ class TriggerFinder {
                 break;
 
             case SearchState.Locked:
-                if (changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count] && document === this.document) {
+                if (document === this.document &&
+                        changeText.length === 1 &&
+                        changeText[0] === this.triggerCharacters[this.count]) {
                     this.count++;
                     if (this.count === this.triggerCharacters.length) {
                         this.state = SearchState.Found;
