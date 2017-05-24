@@ -154,12 +154,7 @@ class HelpCompletionProvider {
                 triggerPosition: triggerStartPos,
                 blockComment: this.triggerFinderBlockComment.found
             }).then(result => {
-                if (result === undefined) {
-                    return;
-                }
-
-                let content = result.content;
-                if (content === undefined) {
+                if (result == null || result.content == null) {
                     return;
                 }
 
@@ -169,7 +164,7 @@ class HelpCompletionProvider {
 
                 // Trim the leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
                 // Trim the last empty line and join the strings.
-                let text = content.map(x => x.trimLeft()).slice(0, -1).join(this.getEOL(doc.eol));
+                let text = result.content.map(x => x.trimLeft()).slice(0, -1).join(this.getEOL(doc.eol));
                 editor.insertSnippet(new SnippetString(text), replaceRange);
             });
     }
