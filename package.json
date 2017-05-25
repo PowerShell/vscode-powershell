@@ -34,7 +34,7 @@
     "onCommand:PowerShell.SpecifyScriptArgs"
   ],
   "dependencies": {
-    "vscode-languageclient": "3.2.0"
+    "vscode-languageclient": "^3.2.2"
   },
   "devDependencies": {
     "@types/node": "^6.0.40",
