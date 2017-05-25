@@ -216,7 +216,9 @@ try {
     $languageServicePort = Get-AvailablePort
     $debugServicePort = Get-AvailablePort
 
-    Write-Host "Starting PowerShell...`n" -ForegroundColor Blue
+    if ($EnableConsoleRepl) {
+        Write-Host "PowerShell Integrated Console`n"
+    }
 
     # Create the Editor Services host
     $editorServicesHost =
