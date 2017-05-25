@@ -13,8 +13,9 @@ import Settings = require('./settings');
 
 import { Logger } from './logging';
 import { IFeature } from './feature';
+import { Message } from 'vscode-jsonrpc';
 import { StringDecoder } from 'string_decoder';
-import { LanguageClient, LanguageClientOptions, Executable, RequestType, RequestType0, NotificationType, StreamInfo } from 'vscode-languageclient';
+import { LanguageClient, LanguageClientOptions, Executable, RequestType, RequestType0, NotificationType, StreamInfo, ErrorAction, CloseAction } from 'vscode-languageclient';
 
 export enum SessionStatus {
     NotStarted,
@@ -395,15 +396,13 @@ export class SessionManager {
 
             vscode.window.onDidCloseTerminal(
                 terminal => {
-                    this.log.write(os.EOL + "powershell.exe terminated or terminal UI was closed" + os.EOL);
+                    if (terminal === this.consoleTerminal) {
+                        this.log.write(os.EOL + "powershell.exe terminated or terminal UI was closed" + os.EOL);
 
-                    if (this.languageServerClient != undefined) {
-                        this.languageServerClient.stop();
-                    }
-
-                    if (this.sessionStatus === SessionStatus.Running) {
-                        this.setSessionStatus("Session exited", SessionStatus.Failed);
-                        this.promptForRestart();
+                        if (this.sessionStatus === SessionStatus.Running) {
+                            this.setSessionStatus("Session exited", SessionStatus.Failed);
+                            this.promptForRestart();
+                        }
                     }
                 });
 
@@ -459,6 +458,19 @@ export class SessionManager {
                 synchronize: {
                     configurationSection: utils.PowerShellLanguageId,
                     //fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
+                },
+                errorHandler: {
+                    // Override the default error handler to prevent it from
+                    // closing the LanguageClient incorrectly when the socket
+                    // hangs up (ECONNRESET errors).
+                    error: (error: any, message: Message, count: number): ErrorAction => {
+                        // TODO: Is there any error worth terminating on?
+                        return ErrorAction.Continue;
+                    },
+                    closed: () => {
+                        // We have our own restart experience
+                        return CloseAction.DoNotRestart
+                    }
                 }
             }
 
@@ -467,7 +479,6 @@ export class SessionManager {
                     'PowerShell Editor Services',
                     connectFunc,
                     clientOptions);
-
 
             this.languageServerClient.onReady().then(
                 () => {
