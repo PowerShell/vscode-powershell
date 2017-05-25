@@ -871,5 +871,21 @@
             "}"
         ],
         "description": "sequence snippet (for use inside a workflow)"
-    }
+    },
+    "PSSA warning override decoration.1": {
+		"prefix": "Suppress - PSSA",
+		"description": "Suppress warnings for a specific rule",
+		"body": [
+			"#Suppress warning",
+			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '$2')]"
+		]
+	}
+	,"PSSA warning override decoration.2": {
+		"prefix": "Suppress - PSSA",
+		"description": "Suppress warnings for a specific class, for a specific function",
+		"body": [
+			"#Suppress warning",
+			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '$2', Scope='Function', Target='*')]"
+		]
+	}
 }
