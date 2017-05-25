@@ -31,7 +31,8 @@
     "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.StartDebugSession",
     "onCommand:PowerShell.PickPSHostProcess",
-    "onCommand:PowerShell.SpecifyScriptArgs"
+    "onCommand:PowerShell.SpecifyScriptArgs",
+    "onCommand:PowerShell.ShowSessionConsole"
   ],
   "dependencies": {
     "vscode-languageclient": "^3.2.2"
