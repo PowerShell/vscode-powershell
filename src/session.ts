@@ -604,6 +604,21 @@ export class SessionManager {
         }
     }
 
+    private getPowerShellCorePaths(): string[] {
+        var paths: string[] = [];
+        if (this.isWindowsOS) {
+            const rootInstallPath = process.env.ProgramFiles + '\\PowerShell'
+
+            var dirs =
+                fs.readdirSync(rootInstallPath)
+                  .filter(file => fs.lstatSync(path.join(rootInstallPath, file)).isDirectory());
+
+            paths.concat(dirs);
+        }
+
+        return paths;
+    }
+
     private getBuiltInPowerShellPath(use32Bit: boolean): string | null {
 
         // Find the path to powershell.exe based on the current platform
