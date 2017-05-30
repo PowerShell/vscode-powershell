@@ -734,12 +734,16 @@ export class SessionManager {
 
             var pscorePaths = this.getPowerShellCorePaths();
             for (var pscorePath of pscorePaths) {
-                var pscoreVersion = path.parse(pscorePath).base;
-                var pscoreExePath = path.join(pscorePath, "powershell.exe");
-                var pscoreItem = new SessionMenuItem(
+                let pscoreVersion = path.parse(pscorePath).base;
+                let pscoreExePath = path.join(pscorePath, "powershell.exe");
+                let pscoreItem = new SessionMenuItem(
                     `Switch to PowerShell Core ${pscoreVersion}`,
-                    () => { this.restartSession({
-                        type: SessionType.UsePath, path: pscoreExePath, isWindowsDevBuild: false })
+                    () => {
+                        this.restartSession({
+                            type: SessionType.UsePath,
+                            path: pscoreExePath,
+                            isWindowsDevBuild: false
+                        })
                 });
 
                 menuItems.push(pscoreItem);
