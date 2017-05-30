@@ -64,13 +64,13 @@
     "Example-Class": {
         "prefix": "ex-class",
         "body": [
-            "class ${classname:MyClass} {",
+            "class ${1:MyClass} {",
             "\t# Property: Holds name",
             "\t[String] \\$Name",
             "",
             "\t# Constructor: Creates a new MyClass object, with the specified name",
-            "\t${classname:MyClass}([String] \\$NewName) {",
-            "\t\t# Set name for ${classname:MyClass}",
+            "\t${1:MyClass}([String] \\$NewName) {",
+            "\t\t# Set name for ${1:MyClass}",
             "\t\t\\$this.Name = \\$NewName",
             "\t}",
             "",
@@ -465,7 +465,7 @@
     "Class": {
         "prefix": "class",
         "body": [
-            "class ${ClassName} {",
+            "class ${1:ClassName} {",
             "\t$0",
             "}"
         ],
@@ -474,7 +474,7 @@
     "Constructor": {
         "prefix": "ctor",
         "body": [
-            "${ClassName}(${OptionalParameters}) {",
+            "${1:ClassName}(${2:OptionalParameters}) {",
             "\t$0",
             "}"
         ],
@@ -483,21 +483,21 @@
     "Hidden Property": {
         "prefix": "proph",
         "body": [
-            "hidden [${string}] $${PropertyName}"
+            "hidden [${1:string}] $${0:PropertyName}"
         ],
         "description": "Class hidden property definition snippet"
     },
     "Property": {
         "prefix": "prop",
         "body": [
-            "[${string}] $${PropertyName}"
+            "[${1:string}] $${0:PropertyName}"
         ],
         "description": "Class property definition snippet"
     },
     "Method": {
         "prefix": "method",
         "body": [
-            "[${void}] ${MethodName}($${OptionalParameters}) {",
+            "[${1:void}] ${2:MethodName}($${3:OptionalParameters}) {",
             "\t$0",
             "}"
         ],
@@ -506,7 +506,7 @@
     "Enum": {
         "prefix": "enum",
         "body": [
-            "enum ${EnumName} {",
+            "enum ${1:EnumName} {",
             "\t$0",
             "}"
         ],
@@ -515,7 +515,7 @@
     "Cmdlet": {
         "prefix": "cmdlet",
         "body": [
-            "function ${name:Verb-Noun} {",
+            "function ${1:Verb-Noun} {",
             "\t[CmdletBinding()]",
             "\tparam (",
             "\t\t$0",
@@ -557,10 +557,10 @@
     "Parameter": {
         "prefix": "parameter",
         "body": [
-            "# ${Parameter help description}",
-            "[Parameter(${AttributeValues})]",
-            "[${ParameterType}]",
-            "$${ParameterName}"
+            "# ${1:Parameter help description}",
+            "[Parameter(${2:AttributeValues})]",
+            "[${3:ParameterType}]",
+            "$${0:ParameterName}"
         ],
         "description": "Parameter declaration snippet"
     },
@@ -569,15 +569,15 @@
         "body": [
             "# Specifies a path to one or more locations.",
             "[Parameter(Mandatory=\\$true,",
-            "           Position=${Position:0},",
-            "           ParameterSetName=\"${ParameterSetName:Path}\",",
+            "           Position=${1:0},",
+            "           ParameterSetName=\"${2:ParameterSetName}\",",
             "           ValueFromPipeline=\\$true,",
             "           ValueFromPipelineByPropertyName=\\$true,",
             "           HelpMessage=\"Path to one or more locations.\")]",
             "[Alias(\"PSPath\")]",
             "[ValidateNotNullOrEmpty()]",
             "[string[]]",
-            "$${ParameterName:Path}$0"
+            "$${3:ParameterName}$0"
         ],
         "description": "Parameter declaration snippet for Path parameter that does not accept wildcards. Do not use with parameter-literalpath."
     },
@@ -586,15 +586,15 @@
         "body": [
             "# Specifies a path to one or more locations. Wildcards are permitted.",
             "[Parameter(Mandatory=\\$true,",
-            "           Position=${Position:0},",
-            "           ParameterSetName=\"${ParameterSetName:Path}\",",
+            "           Position=${1:Position},",
+            "           ParameterSetName=\"${2:ParameterSetName}\",",
             "           ValueFromPipeline=\\$true,",
             "           ValueFromPipelineByPropertyName=\\$true,",
             "           HelpMessage=\"Path to one or more locations.\")]",
             "[ValidateNotNullOrEmpty()]",
             "[SupportsWildcards()]",
             "[string[]]",
-            "$${ParameterName:Path}$0"
+            "$${3:ParameterName}$0"
         ],
         "description": "Parameter declaration snippet for Path parameter that accepts wildcards. Add parameter-literalpath to handle paths with embedded wildcard chars."
     },
@@ -606,14 +606,14 @@
             "# enclose it in single quotation marks. Single quotation marks tell Windows PowerShell not to interpret any",
             "# characters as escape sequences.",
             "[Parameter(Mandatory=\\$true,",
-            "           Position=${Position:0},",
-            "           ParameterSetName=\"${ParameterSetName:LiteralPath}\",",
+            "           Position=${1:0},",
+            "           ParameterSetName=\"${2:LiteralPath}\",",
             "           ValueFromPipelineByPropertyName=\\$true,",
             "           HelpMessage=\"Literal path to one or more locations.\")]",
             "[Alias(\"PSPath\")]",
             "[ValidateNotNullOrEmpty()]",
             "[string[]]",
-            "$${ParameterName:LiteralPath}$0"
+            "$${2:LiteralPath}$0"
         ],
         "description": "Parameter declaration snippet for a LiteralPath parameter"
     },
@@ -690,7 +690,7 @@
         "body": [
             "do {",
             "\t$0",
-            "} until (${condition})"
+            "} until (${1:condition})"
         ],
         "description": "do-until loop snippet"
     },
@@ -699,14 +699,14 @@
         "body": [
             "do {",
             "\t$0",
-            "} while (${condition})"
+            "} while (${1:condition})"
         ],
         "description": "do-while loop snippet"
     },
     "while": {
         "prefix": "while",
         "body": [
-            "while (${condition}) {",
+            "while (${1:condition}) {",
             "\t$0",
             "}"
         ],
@@ -715,7 +715,7 @@
     "for": {
         "prefix": "for",
         "body": [
-            "for ($${variable:i} = 0; $${variable:i} -lt $${array}.Count; $${variable:i}++) {",
+            "for ($${1:i} = 0; $${1:i} -lt $${2:array}.Count; $${1:i}++) {",
             "\t$0",
             "}"
         ],
@@ -724,7 +724,7 @@
     "for-reversed": {
         "prefix": "forr",
         "body": [
-            "for ($${variable:i} = $${array}.Count - 1; $${variable:i} -ge 0 ; $${variable:i}--) {",
+            "for ($${1:i} = $${2:array}.Count - 1; $${1:i} -ge 0 ; $${1:i}--) {",
             "\t$0",
             "}"
         ],
@@ -733,7 +733,7 @@
     "foreach": {
         "prefix": "foreach",
         "body": [
-            "foreach ($${variable:item} in $${collection:collection}) {",
+            "foreach ($${1:item} in $${2:collection}) {",
             "\t$0",
             "}"
         ],
@@ -742,7 +742,7 @@
     "function": {
         "prefix": "function",
         "body": [
-            "function ${FunctionName} (${OptionalParameters}) {",
+            "function ${1:FunctionName} (${2:OptionalParameters}) {",
             "\t$0",
             "}"
         ],
@@ -751,7 +751,7 @@
     "if": {
         "prefix": "if",
         "body": [
-            "if (${condition}) {",
+            "if (${1:condition}) {",
             "\t$0",
             "}"
         ],
@@ -760,7 +760,7 @@
     "elseif": {
         "prefix": "elseif",
         "body": [
-            "elseif (${condition}) {",
+            "elseif (${1:condition}) {",
             "\t$0",
             "}"
         ],
@@ -778,8 +778,8 @@
     "switch": {
         "prefix": "switch",
         "body": [
-            "switch (${variable:\\$x}) {",
-            "\t${condition} { $0 }",
+            "switch (${1:\\$x}) {",
+            "\t${2:condition} { $0 }",
             "\tDefault {}",
             "}"
         ],
