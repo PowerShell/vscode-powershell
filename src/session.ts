@@ -607,13 +607,19 @@ export class SessionManager {
     private getPowerShellCorePaths(): string[] {
         var paths: string[] = [];
         if (this.isWindowsOS) {
-            const rootInstallPath = process.env.ProgramFiles + '\\PowerShell'
+            const is64Bit = process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
+            const rootInstallPath = (is64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + '\\PowerShell';
 
-            var dirs =
-                fs.readdirSync(rootInstallPath)
-                  .filter(file => fs.lstatSync(path.join(rootInstallPath, file)).isDirectory());
+            if (fs.existsSync(rootInstallPath)) {
+                var dirs =
+                    fs.readdirSync(rootInstallPath)
+                    .map(item => path.join(rootInstallPath, item))
+                    .filter(item => fs.lstatSync(item).isDirectory());
 
-            paths.concat(dirs);
+                if (dirs) {
+                    paths = paths.concat(dirs);
+                }
+            }
         }
 
         return paths;
@@ -725,6 +731,19 @@ export class SessionManager {
                 new SessionMenuItem(
                     "Switch to Windows PowerShell (x64)",
                     () => { this.restartSession({ type: SessionType.UseBuiltIn, is32Bit: false }) });
+
+            var pscorePaths = this.getPowerShellCorePaths();
+            for (var pscorePath of pscorePaths) {
+                var pscoreVersion = path.parse(pscorePath).base;
+                var pscoreExePath = path.join(pscorePath, "powershell.exe");
+                var pscoreItem = new SessionMenuItem(
+                    `Switch to PowerShell Core ${pscoreVersion}`,
+                    () => { this.restartSession({
+                        type: SessionType.UsePath, path: pscoreExePath, isWindowsDevBuild: false })
+                });
+
+                menuItems.push(pscoreItem);
+            }
 
             // If the configured PowerShell path isn't being used, offer it as an option
             if (this.sessionSettings.developer.powerShellExePath !== "" &&
