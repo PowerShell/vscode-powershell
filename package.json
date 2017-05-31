@@ -155,6 +155,25 @@
         }
       ]
     },
+    "problemMatchers": [
+      {
+        "name": "pesterError",
+        "owner": "powershell",
+        "fileLocation": ["absolute"],
+        "severity": "error",
+        "pattern": [
+            {
+                "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+                "message": 1
+            },
+            {
+                "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+                "file": 1,
+                "line": 2
+            }
+        ]
+      }
+    ],
     "snippets": [
       {
         "language": "powershell",
