@@ -710,7 +710,7 @@ export class SessionManager {
 
                 new SessionMenuItem(
                     "Restart Current Session",
-                    () => { this.restartSession(); }),
+                    () => { this.restartSession(this.sessionConfiguration); }),
             ];
         }
         else if (this.sessionStatus === SessionStatus.Failed) {
