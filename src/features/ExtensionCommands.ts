@@ -313,7 +313,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private getEditorContext(): EditorContext {
         return {
-            currentFilePath: vscode.window.activeTextEditor.document.fileName,
+            currentFilePath: vscode.window.activeTextEditor.document.uri.toString(),
             cursorPosition: asPosition(vscode.window.activeTextEditor.selection.active),
             selectionRange:
                 asRange(
