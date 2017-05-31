@@ -872,20 +872,25 @@
         ],
         "description": "sequence snippet (for use inside a workflow)"
     },
-    "PSSA warning override decoration.1": {
-		"prefix": "Suppress - PSSA",
-		"description": "Suppress warnings for a specific rule",
+    "Suppress PSScriptAnalyzer Rule": {
+		"prefix": "suppress-message-rule",
+		"description": "Suppress a built-in PSScriptAnalyzer rule using the SuppressMessageAttribute",
 		"body": [
-			"#Suppress warning",
-			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '$2')]"
+			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '')]"
 		]
-	}
-	,"PSSA warning override decoration.2": {
-		"prefix": "Suppress - PSSA",
-		"description": "Suppress warnings for a specific class, for a specific function",
+	},
+    "Suppress PSScriptAnalyzer Rule on Parameter": {
+		"prefix": "suppress-message-rule-for-parameter",
+		"description": "Suppress a built-in PSScriptAnalyzer rule on a parameter using the SuppressMessageAttribute",
 		"body": [
-			"#Suppress warning",
-			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '$2', Scope='Function', Target='*')]"
+			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '${2:ParamName}')]"
+		]
+	},
+	"Suppress PSScriptAnalyzer Rule in Scope": {
+		"prefix": "suppress-message-rule-for-scope",
+		"description": "Suppress a built-in PSScriptAnalyzer rule for functions or classes in a specific scope using the SuppressMessageAttribute",
+		"body": [
+			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '', Scope='Function', Target='${2:*}')]"
 		]
 	}
 }
