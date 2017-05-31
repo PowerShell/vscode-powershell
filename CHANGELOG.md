@@ -1,5 +1,96 @@
 # vscode-powershell Release History
 
+## 1.2.0
+### Wednesday, May 31, 2017
+
+#### Dynamic comment-based help snippets now work inside functions ([#763](https://github.com/PowerShell/vscode-powershell/issues/748))
+
+You asked for it, you got it!  Dynamic comment-based help snippets now work
+inside function definitions, both above the `param()` block and at the end
+of the function body:
+
+![Comment help GIF](https://cloud.githubusercontent.com/assets/79405/26637844/6e76cfa6-45d5-11e7-89b8-a2d6a559536b.GIF)
+
+*NOTE: There is an issue where parameter sections don't get generated inside of a function
+with a `[CmdletBinding()]` attribute.  This is being tracked at [PowerShell/PSScriptAnalyzer#768](https://github.com/PowerShell/PSScriptAnalyzer/issues/768).*
+
+#### Session menu now contains entries for PowerShell Core installations on Windows ([#794](https://github.com/PowerShell/vscode-powershell/issues/794))
+
+It's now much easier to switch between Windows PowerShell and PowerShell Core installs
+on Windows.  When you run the "PowerShell: Show Session Menu" command or click the
+PowerShell version indication in the status bar you'll now see PowerShell Core entries
+in the menu:
+
+![Session menu](https://cloud.githubusercontent.com/assets/79405/26637984/d177f5f8-45d5-11e7-9def-705b3fa68953.png)
+
+#### Improved PSScriptAnalyzer marker display and suppression snippets ([#781](https://github.com/PowerShell/vscode-powershell/issues/781)) and ([#783](https://github.com/PowerShell/vscode-powershell/issues/783))
+
+The green squiggle markers you receive from PSScriptAnalyzer now include the
+name of the corresponding rule in their description:
+
+![Rule name](https://cloud.githubusercontent.com/assets/79405/26638073/15aaaaae-45d6-11e7-93a0-cf6d5397553e.png)
+
+This is really helpful with the new rule suppression snippets contributed by
+[Jos Verlinde](https://github.com/Josverl)!  You can access them by typing
+`suppress-` and selecting one of the suppression snippet options:
+
+![Suppress rule](https://cloud.githubusercontent.com/assets/79405/26638390/d8c42164-45d6-11e7-8844-a34a314654a5.GIF)
+
+#### New built-in Pester problem matcher ([#798](https://github.com/PowerShell/vscode-powershell/issues/798))
+
+We now include a built-in [problem matcher](https://code.visualstudio.com/Docs/editor/tasks#_defining-a-problem-matcher)
+for Pester test output so that you don't need to define one in your `tasks.json`
+file any longer! You can reference the built-in problem matcher in your test
+tasks by using the name `$pester`:
+
+```json
+    {
+        "taskName": "Test",
+        "suppressTaskName": true,
+        "isTestCommand": true,
+        "showOutput": "always",
+        "args": [ "Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true}" ],
+        "problemMatcher": "$pester"
+    }
+```
+
+*NOTE: There is an issue with problem matchers when using the new `2.0.0`
+version of VS Code's task runner.  Pester errors may show up multiple
+times in the Problems panel.  This issue is being tracked at
+[#797](https://github.com/PowerShell/vscode-powershell/issues/797).*
+
+#### Other fixes and improvements
+
+- [#710](https://github.com/PowerShell/vscode-powershell/issues/710) -
+  Variable definitions can now be found across the workspace
+
+- [#771](https://github.com/PowerShell/vscode-powershell/issues/771) -
+  Improved dynamic comment help snippet performance in scripts with many functions
+
+- [#786](https://github.com/PowerShell/vscode-powershell/issues/786) -
+  Running the "Show Integrated Console" command will now start the extension
+  if it isn't already started
+
+- [#774](https://github.com/PowerShell/vscode-powershell/issues/774) -
+  Pressing Enter now causes custom prompt functions to be fully evaluated
+
+- [#770](https://github.com/PowerShell/vscode-powershell/issues/770) -
+  Fixed issue where custom prompt function might be written twice when
+  starting the integrated console
+
+- [#767](https://github.com/PowerShell/vscode-powershell/issues/767) -
+  Fixed placeholder navigation for many built-in snippets
+
+- [#782](https://github.com/PowerShell/vscode-powershell/issues/782) -
+  Fixed extension host crash when restarting the PowerShell session
+
+- [#737](https://github.com/PowerShell/vscode-powershell/issues/737) -
+  Fixed hangs and high CPU when restarting or switching between PowerShell sessions
+
+- [#777](https://github.com/PowerShell/vscode-powershell/issues/777) -
+  Changed "Starting PowerShell" message to clearly indicate that we're in the
+  PowerShell Integrated Console
+
 ## 1.1.0
 ### Thursday, May 18, 2017
 
