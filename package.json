@@ -157,7 +157,7 @@
     },
     "problemMatchers": [
       {
-        "name": "pesterError",
+        "name": "pester",
         "owner": "powershell",
         "fileLocation": ["absolute"],
         "severity": "error",

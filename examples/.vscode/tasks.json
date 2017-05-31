@@ -87,7 +87,7 @@
                 "Write-Host 'Invoking Pester...'; Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true};",
                 "Invoke-Command { Write-Host 'Completed Test task in task runner.' }"
             ],
-            "problemMatcher": "$pesterError"
+            "problemMatcher": "$pester"
         }
     ]
 }
