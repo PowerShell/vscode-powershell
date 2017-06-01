@@ -131,6 +131,8 @@ on how to contribute to this extension!
 
 - [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
 - [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
+- [Kapil Borle](https://github.com/kapilmb) - [@kmborle](http://twitter.com/kmborle)
+- [Trevor Sullivan](https://github.com/pcgeek86) - [@pcgeek86](http://twitter.com/pcgeek86)
 
 ## License
 
