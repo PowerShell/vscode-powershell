@@ -262,7 +262,7 @@ export class SessionManager {
 
     private registerCommands() : void {
         this.registeredCommands = [
-            vscode.commands.registerCommand('PowerShell.RestartSession', () => { this.restartSession(); }),
+            vscode.commands.registerCommand('PowerShell.RestartSession', () => { this.restartSession(this.sessionConfiguration); }),
             vscode.commands.registerCommand(this.ShowSessionMenuCommandName, () => { this.showSessionMenu(); }),
             vscode.workspace.onDidChangeConfiguration(() => this.onConfigurationUpdated()),
             vscode.commands.registerCommand('PowerShell.ShowSessionConsole', (isExecute?: boolean) => { this.showSessionConsole(isExecute); })
