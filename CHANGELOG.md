@@ -1,5 +1,34 @@
 # vscode-powershell Release History
 
+## 1.2.1
+### Thursday, June 1, 2017
+
+#### Fixes and improvements
+
+- [PowerShell/PowerShellEditorServices#478](https://github.com/PowerShell/PowerShellEditorServices/issues/478) -
+  Dynamic comment help snippets now generate parameter fields correctly
+  when `<#` is typed above a `param()` block.
+
+- [#808](https://github.com/PowerShell/vscode-powershell/issues/808) -
+  An extra `PS>` is no longer being written to the Integrated Console for
+  some users who have custom prompt functions.
+
+- [#813](https://github.com/PowerShell/vscode-powershell/issues/813) -
+  Finding references of symbols across the workspace now properly handles
+  inaccessible folders and file paths
+
+- [#810](https://github.com/PowerShell/vscode-powershell/issues/810) -
+  `$psEditor.GetEditorContext()` now doesn't throw exceptions when in an
+  untitled file
+
+- [#807](https://github.com/PowerShell/vscode-powershell/issues/807) -
+  The users's previously selected PowerShell session type is now retained
+  when running the "PowerShell: Restart Current Session" command.
+
+- [#821](https://github.com/PowerShell/vscode-powershell/issues/821) -
+  Note properties on PSObjects are now visible in the debugger's Variables
+  view
+
 ## 1.2.0
 ### Wednesday, May 31, 2017
 
