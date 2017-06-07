@@ -461,7 +461,14 @@
           "description": "Switches focus to the console when a script selection is run or a script file is debugged. This is an accessibility feature. To disable it, set to false."
         }
       }
-    }
+    },
+    "themes": [
+      {
+        "label": "PowerShell ISE",
+        "uiTheme": "vs",
+        "path": "./themes/theme-psise/theme.json"
+      }
+    ]
   },
   "private": true
 }
