@@ -19,6 +19,7 @@ import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
 import { CodeActionsFeature } from './features/CodeActions';
 import { RemoteFilesFeature } from './features/RemoteFiles';
+import { PesterTestsFeature } from './features/PesterTests';
 import { DebugSessionFeature } from './features/DebugSession';
 import { PickPSHostProcessFeature } from './features/DebugSession';
 import { SpecifyScriptArgsFeature } from './features/DebugSession';
@@ -110,6 +111,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new ExpandAliasFeature(),
         new ShowHelpFeature(),
         new FindModuleFeature(),
+        new PesterTestsFeature(sessionManager),
         new ExtensionCommandsFeature(),
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
