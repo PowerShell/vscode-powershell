@@ -15,7 +15,11 @@ import { Logger } from './logging';
 import { IFeature } from './feature';
 import { Message } from 'vscode-jsonrpc';
 import { StringDecoder } from 'string_decoder';
-import { LanguageClient, LanguageClientOptions, Executable, RequestType, RequestType0, NotificationType, StreamInfo, ErrorAction, CloseAction } from 'vscode-languageclient';
+import {
+    LanguageClient, LanguageClientOptions, Executable,
+    RequestType, RequestType0, NotificationType,
+    StreamInfo, ErrorAction, CloseAction, RevealOutputChannelOn,
+    Middleware, ResolveCodeLensSignature } from 'vscode-languageclient';
 
 export enum SessionStatus {
     NotStarted,
@@ -58,7 +62,7 @@ type SessionConfiguration =
     PathSessionConfiguration |
     BuiltInSessionConfiguration;
 
-export class SessionManager {
+export class SessionManager implements Middleware {
 
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
 
@@ -471,7 +475,9 @@ export class SessionManager {
                         // We have our own restart experience
                         return CloseAction.DoNotRestart
                     }
-                }
+                },
+                revealOutputChannelOn: RevealOutputChannelOn.Never,
+                middleware: this
             }
 
             this.languageServerClient =
@@ -792,6 +798,53 @@ export class SessionManager {
             .window
             .showQuickPick<SessionMenuItem>(menuItems)
             .then((selectedItem) => { selectedItem.callback(); });
+    }
+
+    // ----- LanguageClient middleware methods -----
+
+    resolveCodeLens(
+        codeLens: vscode.CodeLens,
+        token: vscode.CancellationToken,
+        next: ResolveCodeLensSignature): vscode.ProviderResult<vscode.CodeLens> {
+            var resolvedCodeLens = next(codeLens, token);
+
+            let resolveFunc =
+                (codeLens: vscode.CodeLens): vscode.CodeLens => {
+                    if (codeLens.command.command === "editor.action.showReferences") {
+                        var oldArgs = codeLens.command.arguments;
+
+                        // Our JSON objects don't get handled correctly by
+                        // VS Code's built in editor.action.showReferences
+                        // command so we need to convert them into the
+                        // appropriate types to send them as command
+                        // arguments.
+
+                        codeLens.command.arguments = [
+                            vscode.Uri.parse(oldArgs[0]),
+                            new vscode.Position(oldArgs[1].line, oldArgs[1].character),
+                            oldArgs[2].map(position => {
+                                return new vscode.Location(
+                                    vscode.Uri.parse(position.uri),
+                                    new vscode.Range(
+                                        position.range.start.line,
+                                        position.range.start.character,
+                                        position.range.end.line,
+                                        position.range.end.character));
+                            })
+                        ]
+                    }
+
+                    return codeLens;
+                }
+
+            if ((<Thenable<vscode.CodeLens>>resolvedCodeLens).then) {
+                return (<Thenable<vscode.CodeLens>>resolvedCodeLens).then(resolveFunc);
+            }
+            else if (<vscode.CodeLens>resolvedCodeLens) {
+                return resolveFunc(<vscode.CodeLens>resolvedCodeLens);
+            }
+
+            return resolvedCodeLens;
     }
 }
 
