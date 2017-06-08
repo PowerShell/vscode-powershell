@@ -18,6 +18,7 @@ install:
   - ps: |
       Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
       Install-Module InvokeBuild -RequiredVersion 3.2.1 -Scope CurrentUser -Force | Out-Null
+      Install-Module platyPS -RequiredVersion 0.7.6 -Scope CurrentUser -Force | Out-Null
 
 build_script:
   - ps: Invoke-Build
