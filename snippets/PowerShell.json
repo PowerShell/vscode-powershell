@@ -655,7 +655,7 @@
         "description": "Class-based DSC resource provider snippet"
     },
     "DSC Resource Provider (function-based)": {
-        "prefix": "DSC resource provier (function-based)",
+        "prefix": "DSC resource provider (function-based)",
         "body": [
             "function Get-TargetResource {",
             "\tparam (",
