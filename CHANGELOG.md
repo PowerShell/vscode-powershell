@@ -1,5 +1,22 @@
 # vscode-powershell Release History
 
+## 1.3.1
+### Friday, June 9, 2017
+
+#### Fixes and improvements
+
+- [#850](https://github.com/PowerShell/vscode-powershell/issues/850) -
+  Fixed an issue where lower-cased "describe" blocks were not identified by
+  the CodeLens feature.
+
+- [#851](https://github.com/PowerShell/vscode-powershell/issues/851) -
+  Fixed an issue where the language server would hang when typing out a describe
+  block.
+
+- [#852](https://github.com/PowerShell/vscode-powershell/issues/852) -
+  Fixed an issue where Pester test names would not be detected correctly when
+  other arguments like -Tags were being used on a Describe block.
+
 ## 1.3.0
 ### Friday, June 9, 2017
 
