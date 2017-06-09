@@ -1,5 +1,74 @@
 # vscode-powershell Release History
 
+## 1.3.0
+### Friday, June 9, 2017
+
+#### CodeLens for running and debugging Pester tests
+
+We've added two new CodeLens actions that show up above Describe blocks in
+your Pester tests, "Run tests" and "Debug tests".  By clicking one of these
+CodeLenses, your tests will be executed in the Integrated Console with
+the debugger attached.  You can now set breakpoints and quickly debug a portion
+of your test script:
+
+![Pester CodeLens](https://user-images.githubusercontent.com/79405/26988706-3c054ed0-4d05-11e7-87f0-5bbf16ee73ef.GIF)
+
+#### CodeLens support for finding references of a function or cmdlet
+
+We've also added CodeLenses for showing the number of references for a function or
+cmdlet that is defined in a script.  If you click this CodeLens, the references
+pane will appear so that you can navigate through all of the references:
+
+![References CodeLens](https://user-images.githubusercontent.com/79405/26989245-384a4866-4d07-11e7-9c1e-076dbd7d6eb4.GIF)
+
+We will add CodeLens support for PowerShell 5+ classes and class methods in a future
+update!
+
+#### Document symbol support for Pester tests
+
+We've also added document symbol support for Pester tests so that you can easily
+navigate among the Describe, Context, and It blocks in large Pester script files:
+
+![Pester symbols](https://user-images.githubusercontent.com/79405/26989077-91e7a306-4d06-11e7-8e26-916bb78720f8.GIF)
+
+#### New PowerShell ISE theme
+
+We now include a new color theme that tries to provide a faithful interpretation
+of the PowerShell ISE's style, including a blue console background!  To use this
+theme open the Command Palette (Ctrl+Shift+P), run the "Preferences: Color Theme"
+command, then select "PowerShell ISE".
+
+![ISE theme](https://user-images.githubusercontent.com/79405/26988805-9769aea6-4d05-11e7-81fc-da79bf1ec3cb.png)
+
+This is a first attempt at making this happen so [give us feedback](https://git.io/v9jnL)
+if you think that the colors can be improved! Super huge thanks to
+[Matt McNabb](https://twitter.com/mcnabbmh) for putting this together!
+
+#### New cmdlets inside the Integrated Console
+
+Thanks to new PowerShell Editor Services co-maintainer [Patrick Meinecke](https://github.com/SeeminglyScience),
+we've gained a new set of useful commands for interacting with the $psEditor APIs
+within the Integrated Console:
+
+- [Find-Ast](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Find-Ast.md)
+- [Get-Token](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Get-Token.md)
+- [ConvertFrom-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/ConvertFrom-ScriptExtent.md)
+- [ConvertTo-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/ConvertTo-ScriptExtent.md)
+- [Set-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Set-ScriptExtent.md)
+- [Join-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Join-ScriptExtent.md)
+- [Test-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Test-ScriptExtent.md)
+- [Import-EditorCommand](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Import-EditorCommand.md)
+
+This should also resolve the issues some people were seeing when we tried
+to load the unsigned temporary script containing `Register-EditorCommand`
+on machines with an AllSigned execution policy ([#784]([https://github.com/PowerShell/vscode-powershell/issues/784])).
+
+#### Fixes and improvements
+
+- [#827](https://github.com/PowerShell/vscode-powershell/issues/827) -
+  Fixed an issue where an Output panel will appear with an error when you close
+  the PowerShell Integrated Terminal
+
 ## 1.2.1
 ### Thursday, June 1, 2017
 
