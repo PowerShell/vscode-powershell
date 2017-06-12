@@ -184,7 +184,7 @@
 		"activityBar.background": "#E1ECF9",
 		"activityBar.foreground": "#A9A9A9",
 		"activityBarBadge.background": "#A9A9A9",
-		"editor.lineHighlightBackground": "#94c6f7",
+		"editor.lineHighlightBackground": "#add8e6",
 		"editor.selectionBackground": "#94c6f7",
 		"statusBar.background": "#999999",
 		"statusBar.debuggingBackground": "#FF4500",
