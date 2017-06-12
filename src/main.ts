@@ -15,6 +15,7 @@ import { PowerShellLanguageId } from './utils';
 import { ConsoleFeature } from './features/Console';
 import { ExamplesFeature } from './features/Examples';
 import { OpenInISEFeature } from './features/OpenInISE';
+import { CustomViewsFeature } from './features/CustomViews';
 import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
 import { CodeActionsFeature } from './features/CodeActions';
@@ -121,7 +122,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new DebugSessionFeature(sessionManager),
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context),
-        new HelpCompletionFeature()
+        new HelpCompletionFeature(),
+        new CustomViewsFeature()
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
