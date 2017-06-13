@@ -17,7 +17,13 @@ import {
     TextEditor,
     TextLine
 } from 'vscode';
-import { LanguageClient, RequestType, DocumentFormattingRequest } from 'vscode-languageclient';
+import {
+    LanguageClient,
+    RequestType,
+    DocumentFormattingRequest,
+    DocumentRangeFormattingParams,
+    DocumentRangeFormattingRequest
+} from 'vscode-languageclient';
 import { TextDocumentIdentifier } from "vscode-languageserver-types";
 import Window = vscode.window;
 import { IFeature } from '../feature';
@@ -221,7 +227,24 @@ class PSDocumentFormattingEditProvider implements
             return this.emptyPromise;
         }
 
-        let textEdits: Thenable<TextEdit[]> = this.executeRulesInOrder(editor, range, options, 0);
+        let requestParams: DocumentRangeFormattingParams = {
+            textDocument: TextDocumentIdentifier.create(document.uri.toString()),
+            range: {
+                start: {
+                    line: range.start.line,
+                    character: range.start.character
+                },
+                end: {
+                    line: range.end.line,
+                    character: range.end.character
+                }
+            },
+            options: this.getEditorSettings()
+        };
+
+        let textEdits = this.languageClient.sendRequest(
+            DocumentRangeFormattingRequest.type,
+            requestParams);
         this.lockDocument(document, textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
         return textEdits;
