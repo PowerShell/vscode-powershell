@@ -17,7 +17,8 @@ import {
     TextEditor,
     TextLine
 } from 'vscode';
-import { LanguageClient, RequestType } from 'vscode-languageclient';
+import { LanguageClient, RequestType, DocumentFormattingRequest } from 'vscode-languageclient';
+import { TextDocumentIdentifier } from "vscode-languageserver-types";
 import Window = vscode.window;
 import { IFeature } from '../feature';
 import * as Settings from '../settings';
@@ -195,7 +196,15 @@ class PSDocumentFormattingEditProvider implements
         document: TextDocument,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
-        return this.provideDocumentRangeFormattingEdits(document, null, options, token);
+        return this.languageClient.sendRequest(
+            DocumentFormattingRequest.type,
+            {
+                textDocument: TextDocumentIdentifier.create(document.uri.toString()),
+                options: {
+                    insertSpaces: true,
+                    tabSize: 4
+                }
+            });
     }
 
     provideDocumentRangeFormattingEdits(
