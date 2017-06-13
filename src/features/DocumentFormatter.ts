@@ -200,10 +200,7 @@ class PSDocumentFormattingEditProvider implements
             DocumentFormattingRequest.type,
             {
                 textDocument: TextDocumentIdentifier.create(document.uri.toString()),
-                options: {
-                    insertSpaces: true,
-                    tabSize: 4
-                }
+                options: this.getEditorSettings()
             });
     }
 
@@ -447,6 +444,14 @@ class PSDocumentFormattingEditProvider implements
         let settings: Object = new Object();
         settings[rule] = ruleSettings;
         return settings;
+    }
+
+    private getEditorSettings(): { insertSpaces: boolean, tabSize: number} {
+        let editorConfiguration = vscode.workspace.getConfiguration("editor");
+        return {
+            insertSpaces: editorConfiguration.get<boolean>("insertSpaces"),
+            tabSize: editorConfiguration.get<number>("tabSize")
+        };
     }
 
     private static showStatusBar(document: TextDocument, hideWhenDone: Thenable<any>): void {
