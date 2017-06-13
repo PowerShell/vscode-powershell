@@ -168,9 +168,9 @@ class DocumentLocker {
 }
 
 class PSDocumentFormattingEditProvider implements
-        DocumentFormattingEditProvider,
-        DocumentRangeFormattingEditProvider,
-        OnTypeFormattingEditProvider {
+    DocumentFormattingEditProvider,
+    DocumentRangeFormattingEditProvider,
+    OnTypeFormattingEditProvider {
     private static documentLocker = new DocumentLocker();
     private static statusBarTracker = new Object();
     private languageClient: LanguageClient;
@@ -303,7 +303,8 @@ class PSDocumentFormattingEditProvider implements
     private snapRangeToEdges(range: Range, document: TextDocument): Range {
         return range.with({
             start: range.start.with({ character: 0 }),
-            end: document.lineAt(range.end.line).range.end });
+            end: document.lineAt(range.end.line).range.end
+        });
     }
 
     private getEditor(document: TextDocument): TextEditor {
@@ -472,7 +473,7 @@ class PSDocumentFormattingEditProvider implements
         return settings;
     }
 
-    private getEditorSettings(): { insertSpaces: boolean, tabSize: number} {
+    private getEditorSettings(): { insertSpaces: boolean, tabSize: number } {
         let editorConfiguration = vscode.workspace.getConfiguration("editor");
         return {
             insertSpaces: editorConfiguration.get<boolean>("insertSpaces"),
