@@ -202,13 +202,8 @@ class PSDocumentFormattingEditProvider implements
         document: TextDocument,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
-        return this.languageClient.sendRequest(
-            DocumentFormattingRequest.type,
-            {
-                textDocument: TextDocumentIdentifier.create(document.uri.toString()),
-                options: this.getEditorSettings()
-            });
-    }
+        return this.provideDocumentRangeFormattingEdits(document, null, options, token);
+   }
 
     provideDocumentRangeFormattingEdits(
         document: TextDocument,
@@ -227,9 +222,12 @@ class PSDocumentFormattingEditProvider implements
             return this.emptyPromise;
         }
 
-        let requestParams: DocumentRangeFormattingParams = {
-            textDocument: TextDocumentIdentifier.create(document.uri.toString()),
-            range: {
+
+        // somehow range object gets serialized to an array of Position objects,
+        // so we need to use the object literal syntax to initialize it.
+        let rangeParam = null;
+        if (range != null) {
+            rangeParam = {
                 start: {
                     line: range.start.line,
                     character: range.start.character
@@ -238,7 +236,12 @@ class PSDocumentFormattingEditProvider implements
                     line: range.end.line,
                     character: range.end.character
                 }
-            },
+            };
+        };
+
+        let requestParams: DocumentRangeFormattingParams = {
+            textDocument: TextDocumentIdentifier.create(document.uri.toString()),
+            range: rangeParam,
             options: this.getEditorSettings()
         };
 
