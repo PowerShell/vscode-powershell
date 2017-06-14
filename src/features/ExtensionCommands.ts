@@ -48,42 +48,42 @@ export interface ExtensionCommandAddedNotificationBody {
 
 function asRange(value: vscode.Range): Range {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return { start: asPosition(value.start), end: asPosition(value.end) };
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return { start: asPosition(value.start), end: asPosition(value.end) };
 }
 
 function asPosition(value: vscode.Position): Position {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return { line: value.line, character: value.character };
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return { line: value.line, character: value.character };
 }
 
 function asCodeRange(value: Range): vscode.Range {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return new vscode.Range(asCodePosition(value.start), asCodePosition(value.end));
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return new vscode.Range(asCodePosition(value.start), asCodePosition(value.end));
 }
 
 function asCodePosition(value: Position): vscode.Position {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return new vscode.Position(value.line, value.character);
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return new vscode.Position(value.line, value.character);
 }
 
 export namespace GetEditorContextRequest {
@@ -120,6 +120,12 @@ export namespace SetSelectionRequest {
 
 export interface SetSelectionRequestArguments {
     selectionRange: Range
+}
+
+export namespace NewFileRequest {
+    export const type =
+        new RequestType<string, EditorOperationResponse, void, void>(
+            'editor/newFile');
 }
 
 export namespace OpenFileRequest {
@@ -211,6 +217,10 @@ export class ExtensionCommandsFeature implements IFeature {
                 details => this.setSelection(details));
 
             this.languageClient.onRequest(
+                NewFileRequest.type,
+                filePath => this.newFile());
+
+            this.languageClient.onRequest(
                 OpenFileRequest.type,
                 filePath => this.openFile(filePath));
 
@@ -252,7 +262,7 @@ export class ExtensionCommandsFeature implements IFeature {
                 a.name.localeCompare(b.name));
     }
 
-    private showExtensionCommands(client: LanguageClient) : Thenable<InvokeExtensionCommandRequestArguments> {
+    private showExtensionCommands(client: LanguageClient): Thenable<InvokeExtensionCommandRequestArguments> {
 
         // If no extension commands are available, show a message
         if (this.extensionCommands.length == 0) {
@@ -273,8 +283,8 @@ export class ExtensionCommandsFeature implements IFeature {
 
         vscode.window
             .showQuickPick(
-                quickPickItems,
-                { placeHolder: "Select a command" })
+            quickPickItems,
+            { placeHolder: "Select a command" })
             .then(command => this.onCommandSelected(command, client));
     }
 
@@ -285,8 +295,10 @@ export class ExtensionCommandsFeature implements IFeature {
         if (chosenItem !== undefined) {
             client.sendRequest(
                 InvokeExtensionCommandRequest.type,
-                { name: chosenItem.command.name,
-                context: this.getEditorContext() });
+                {
+                    name: chosenItem.command.name,
+                    context: this.getEditorContext()
+                });
         }
     }
 
@@ -316,17 +328,26 @@ export class ExtensionCommandsFeature implements IFeature {
             currentFilePath: vscode.window.activeTextEditor.document.uri.toString(),
             cursorPosition: asPosition(vscode.window.activeTextEditor.selection.active),
             selectionRange:
-                asRange(
-                    new vscode.Range(
-                        vscode.window.activeTextEditor.selection.start,
-                        vscode.window.activeTextEditor.selection.end))
+            asRange(
+                new vscode.Range(
+                    vscode.window.activeTextEditor.selection.start,
+                    vscode.window.activeTextEditor.selection.end))
         }
     }
 
-    private openFile(filePath: string): Thenable<EditorOperationResponse> {
+    private newFile(): Thenable<EditorOperationResponse> {
+        var promise =
+            vscode.workspace.openTextDocument('')
+                .then(doc => vscode.window.showTextDocument(doc))
+                .then(_ => EditorOperationResponse.Completed);
 
-        // Make sure the file path is absolute
-        if (!path.win32.isAbsolute(filePath))
+        return promise;
+    }
+
+    private openFile(filePath: string): Thenable < EditorOperationResponse > {
+
+                    // Make sure the file path is absolute
+                    if(!path.win32.isAbsolute(filePath))
         {
             filePath = path.win32.resolve(
                 vscode.workspace.rootPath,
@@ -346,8 +367,7 @@ export class ExtensionCommandsFeature implements IFeature {
         var promise: Thenable<EditorOperationResponse>;
 
         // Make sure the file path is absolute
-        if (!path.win32.isAbsolute(filePath))
-        {
+        if (!path.win32.isAbsolute(filePath)) {
             filePath = path.win32.resolve(
                 vscode.workspace.rootPath,
                 filePath);
@@ -356,16 +376,14 @@ export class ExtensionCommandsFeature implements IFeature {
         // Normalize file path case for comparison
         var normalizedFilePath = filePath.toLowerCase();
 
-        if (vscode.workspace.textDocuments.find(doc => doc.fileName.toLowerCase() == normalizedFilePath))
-        {
+        if (vscode.workspace.textDocuments.find(doc => doc.fileName.toLowerCase() == normalizedFilePath)) {
             promise =
                 vscode.workspace.openTextDocument(filePath)
                     .then(doc => vscode.window.showTextDocument(doc))
                     .then(editor => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
                     .then(_ => EditorOperationResponse.Completed);
         }
-        else
-        {
+        else {
             promise = Promise.resolve(EditorOperationResponse.Completed);
         }
 
@@ -384,20 +402,20 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private showInformationMessage(message: string): Thenable<EditorOperationResponse> {
         return vscode.window
-                     .showInformationMessage(message)
-                     .then(_ => EditorOperationResponse.Completed);
+            .showInformationMessage(message)
+            .then(_ => EditorOperationResponse.Completed);
     }
 
     private showErrorMessage(message: string): Thenable<EditorOperationResponse> {
         return vscode.window
-                     .showErrorMessage(message)
-                     .then(_ => EditorOperationResponse.Completed);
+            .showErrorMessage(message)
+            .then(_ => EditorOperationResponse.Completed);
     }
 
     private showWarningMessage(message: string): Thenable<EditorOperationResponse> {
         return vscode.window
-                     .showWarningMessage(message)
-                     .then(_ => EditorOperationResponse.Completed);
+            .showWarningMessage(message)
+            .then(_ => EditorOperationResponse.Completed);
     }
 
     private setStatusBarMessage(messageDetails: StatusBarMessageDetails): EditorOperationResponse {
