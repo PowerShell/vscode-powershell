@@ -351,6 +351,12 @@
       "type": "object",
       "title": "PowerShell Configuration",
       "properties": {
+        "powershell.powerShellExePath": {
+          "type": "string",
+          "default": "",
+          "isExecutable": true,
+          "description": "Specifies the full path to a PowerShell executable. Changes the installation of PowerShell used for language and debugging services."
+        },
         "powershell.startAutomatically": {
           "type": "boolean",
           "default": true,
@@ -384,7 +390,8 @@
         "powershell.developer.powerShellExePath": {
           "type": "string",
           "default": "",
-          "description": "Specifies the full path to a PowerShell executable. Changes the installation of PowerShell used for language and debugging services."
+          "isExecutable": true,
+          "description": "Deprecated. Please use the 'powershell.powerShellExePath' setting instead"
         },
         "powershell.developer.powerShellExeIsWindowsDevBuild": {
           "type": "boolean",

@@ -5,6 +5,7 @@
 'use strict';
 
 import vscode = require('vscode');
+import utils = require('./utils');
 
 export interface ICodeFormattingSettings {
     openBraceOnSameLine: boolean;
@@ -33,6 +34,7 @@ export interface IDeveloperSettings {
 }
 
 export interface ISettings {
+    powerShellExePath?: string;
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
@@ -47,8 +49,10 @@ export interface IIntegratedConsoleSettings {
     focusConsoleOnExecute?: boolean;
 }
 
-export function load(myPluginId: string): ISettings {
-    let configuration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(myPluginId);
+export function load(): ISettings {
+    let configuration: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration(
+            utils.PowerShellLanguageId);
 
     let defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
         enable: true,
@@ -83,6 +87,7 @@ export function load(myPluginId: string): ISettings {
 
     return {
         startAutomatically: configuration.get<boolean>("startAutomatically", true),
+        powerShellExePath: configuration.get<string>("powerShellExePath", undefined),
         useX86Host: configuration.get<boolean>("useX86Host", false),
         enableProfileLoading: configuration.get<boolean>("enableProfileLoading", false),
         scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
@@ -90,4 +95,12 @@ export function load(myPluginId: string): ISettings {
         codeFormatting: configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
         integratedConsole: configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings)
     };
+}
+
+export function change(settingName: string, newValue: any, global: boolean = false): Thenable<void> {
+    let configuration: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration(
+            utils.PowerShellLanguageId);
+
+    return configuration.update(settingName, newValue, global);
 }

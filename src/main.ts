@@ -126,7 +126,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     sessionManager.setExtensionFeatures(extensionFeatures);
 
-    var extensionSettings = Settings.load(utils.PowerShellLanguageId);
+    var extensionSettings = Settings.load();
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }
