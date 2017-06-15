@@ -4,6 +4,7 @@
 
 import vscode = require('vscode');
 import utils = require('../utils');
+import Settings = require('../settings');
 import { IFeature } from '../feature';
 import { SessionManager } from '../session';
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
@@ -13,6 +14,8 @@ export namespace StartDebuggerNotification {
 }
 
 export class DebugSessionFeature implements IFeature {
+
+    private sessionCount: number = 1;
     private command: vscode.Disposable;
     private examplesPath: string;
 
@@ -41,6 +44,9 @@ export class DebugSessionFeature implements IFeature {
         let currentDocument = vscode.window.activeTextEditor.document;
         let debugCurrentScript = (config.script === "${file}") || !config.request;
         let generateLaunchConfig = !config.request;
+
+        var settings = Settings.load();
+        let createNewIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
 
         if (generateLaunchConfig) {
             // No launch.json, create the default configuration for both unsaved (Untitled) and saved documents.
@@ -106,20 +112,50 @@ export class DebugSessionFeature implements IFeature {
                     }
                 }
             }
+
+            if (config.createTemporaryIntegratedConsole !== undefined) {
+                createNewIntegratedConsole = config.createTemporaryIntegratedConsole;
+            }
         }
 
         // Prevent the Debug Console from opening
         config.internalConsoleOptions = "neverOpen";
 
         // Create or show the interactive console
-        // TODO #367: Check if "newSession" mode is configured
         vscode.commands.executeCommand('PowerShell.ShowSessionConsole', true);
 
-        // Write out temporary debug session file
-        utils.writeSessionFile(
-            utils.getDebugSessionFilePath(),
-            this.sessionManager.getSessionDetails());
+        var sessionFilePath = utils.getDebugSessionFilePath();
 
+        if (createNewIntegratedConsole) {
+            var debugProcess =
+                this.sessionManager.createDebugSessionProcess(
+                    sessionFilePath,
+                    settings);
+
+            debugProcess
+                .start(`DebugSession-${this.sessionCount++}`)
+                .then(
+                    sessionDetails => {
+                        this.startDebugger(
+                            config,
+                            sessionFilePath,
+                            sessionDetails);
+                    });
+        }
+        else {
+            this.startDebugger(
+                config,
+                sessionFilePath,
+                this.sessionManager.getSessionDetails());
+        }
+    }
+
+    private startDebugger(
+        config: any,
+        sessionFilePath: string,
+        sessionDetails: utils.EditorServicesSessionDetails) {
+
+        utils.writeSessionFile(sessionFilePath, sessionDetails);
         vscode.commands.executeCommand('vscode.startDebug', config);
     }
 }

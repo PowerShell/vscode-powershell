@@ -15,7 +15,6 @@ import { Logger } from './logging';
 
 export class PowerShellProcess {
 
-    private sessionFilePath: string;
     private consoleTerminal: vscode.Terminal = undefined;
     private consoleCloseSubscription: vscode.Disposable;
     private sessionDetails: utils.EditorServicesSessionDetails;
@@ -25,15 +24,14 @@ export class PowerShellProcess {
 
     constructor(
         public exePath: string,
+        private title: string,
         private log: Logger,
+        private startArgs: string,
+        private sessionFilePath: string,
         private sessionSettings: Settings.ISettings) {
-
-        this.sessionFilePath =
-            utils.getSessionFilePath(
-                Math.floor(100000 + Math.random() * 900000));
     }
 
-    public start(startArgs: string): Thenable<utils.EditorServicesSessionDetails> {
+    public start(logFileName: string): Thenable<utils.EditorServicesSessionDetails> {
 
         return new Promise<utils.EditorServicesSessionDetails>(
             (resolve, reject) => {
@@ -44,14 +42,14 @@ export class PowerShellProcess {
                             __dirname,
                             '../scripts/Start-EditorServices.ps1');
 
-                    var editorServicesLogPath = this.log.getLogFilePath("EditorServices");
+                    var editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
                     var featureFlags =
                         this.sessionSettings.developer.featureFlags !== undefined
                             ? this.sessionSettings.developer.featureFlags.map(f => `'${f}'`).join(', ')
                             : "";
 
-                    startArgs +=
+                    this.startArgs +=
                         `-LogPath '${editorServicesLogPath}' ` +
                         `-SessionDetailsPath '${this.sessionFilePath}' ` +
                         `-FeatureFlags @(${featureFlags})`
@@ -68,7 +66,7 @@ export class PowerShellProcess {
 
                     powerShellArgs.push(
                         "-Command",
-                        "& '" + startScriptPath + "' " + startArgs);
+                        "& '" + startScriptPath + "' " + this.startArgs);
 
                     var powerShellExePath = this.exePath;
 
@@ -95,7 +93,7 @@ export class PowerShellProcess {
                     // Launch PowerShell in the integrated terminal
                     this.consoleTerminal =
                         vscode.window.createTerminal(
-                            "PowerShell Integrated Console",
+                            this.title,
                             powerShellExePath,
                             powerShellArgs);
 
@@ -148,7 +146,7 @@ export class PowerShellProcess {
                             "powershell.exe started --",
                             "    pid: " + pid,
                             "    exe: " + powerShellExePath,
-                            "    args: " + startScriptPath + ' ' + startArgs + os.EOL + os.EOL);
+                            "    args: " + startScriptPath + ' ' + this.startArgs + os.EOL + os.EOL);
                     });
             }
             catch (e)

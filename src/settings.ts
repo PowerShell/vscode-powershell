@@ -32,6 +32,10 @@ export interface IScriptAnalysisSettings {
     settingsPath: string;
 }
 
+export interface IDebuggingSettings {
+    createTemporaryIntegratedConsole?: boolean;
+}
+
 export interface IDeveloperSettings {
     featureFlags?: string[];
     powerShellExePath?: string;
@@ -47,6 +51,7 @@ export interface ISettings {
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
     scriptAnalysis?: IScriptAnalysisSettings;
+    debugging?: IDebuggingSettings;
     developer?: IDeveloperSettings;
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
@@ -65,6 +70,10 @@ export function load(): ISettings {
     let defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
         enable: true,
         settingsPath: ""
+    };
+
+    let defaultDebuggingSettings: IDebuggingSettings = {
+        createTemporaryIntegratedConsole: false,
     };
 
     let defaultDeveloperSettings: IDeveloperSettings = {
@@ -100,6 +109,7 @@ export function load(): ISettings {
         useX86Host: configuration.get<boolean>("useX86Host", false),
         enableProfileLoading: configuration.get<boolean>("enableProfileLoading", false),
         scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
+        debugging: configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
         developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
         codeFormatting: configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
         integratedConsole: configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings)

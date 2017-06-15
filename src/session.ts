@@ -36,13 +36,15 @@ export class SessionManager implements Middleware {
 
     private hostVersion: string;
     private isWindowsOS: boolean;
+    private editorServicesArgs: string;
     private powerShellExePath: string = "";
     private sessionStatus: SessionStatus;
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
     private extensionFeatures: IFeature[] = [];
     private statusBarItem: vscode.StatusBarItem;
-    private powerShellProcess: PowerShellProcess;
+    private languageServerProcess: PowerShellProcess;
+    private debugSessionProcess: PowerShellProcess;
     private versionDetails: PowerShellVersionDetails;
     private registeredCommands: vscode.Disposable[] = [];
     private languageServerClient: LanguageClient = undefined;
@@ -139,7 +141,7 @@ export class SessionManager implements Middleware {
                 }
             }
 
-            var startArgs =
+            this.editorServicesArgs =
                 "-EditorServicesVersion '" + this.requiredEditorServicesVersion + "' " +
                 "-HostName 'Visual Studio Code Host' " +
                 "-HostProfileId 'Microsoft.VSCode' " +
@@ -149,17 +151,17 @@ export class SessionManager implements Middleware {
                 "-EnableConsoleRepl ";
 
             if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
-                startArgs += '-WaitForDebugger ';
+                this.editorServicesArgs += '-WaitForDebugger ';
             }
             if (this.sessionSettings.developer.editorServicesLogLevel) {
-                startArgs += "-LogLevel '" + this.sessionSettings.developer.editorServicesLogLevel + "' "
+                this.editorServicesArgs += "-LogLevel '" + this.sessionSettings.developer.editorServicesLogLevel + "' "
             }
 
             this.startPowerShell(
                 this.powerShellExePath,
                 this.sessionSettings.developer.powerShellExeIsWindowsDevBuild,
                 bundledModulesPath,
-                startArgs);
+                this.editorServicesArgs);
         }
         else {
             this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
@@ -175,7 +177,7 @@ export class SessionManager implements Middleware {
             // Before moving further, clear out the client and process if
             // the process is already dead (i.e. it crashed)
             this.languageServerClient = undefined;
-            this.powerShellProcess = undefined;
+            this.languageServerProcess = undefined;
         }
 
         this.sessionStatus = SessionStatus.Stopping;
@@ -186,9 +188,12 @@ export class SessionManager implements Middleware {
             this.languageServerClient = undefined;
         }
 
-        // Kill the PowerShell process we spawned
-        if (this.powerShellProcess) {
-            this.powerShellProcess.dispose();
+        // Kill the PowerShell proceses we spawned
+        if (this.debugSessionProcess) {
+            this.debugSessionProcess.dispose();
+        }
+        if (this.languageServerProcess) {
+            this.languageServerProcess.dispose();
         }
 
         this.sessionStatus = SessionStatus.NotStarted;
@@ -204,6 +209,22 @@ export class SessionManager implements Middleware {
 
         // Dispose of all commands
         this.registeredCommands.forEach(command => { command.dispose(); });
+    }
+
+    public createDebugSessionProcess(
+        sessionPath: string,
+        sessionSettings: Settings.ISettings): PowerShellProcess {
+
+        this.debugSessionProcess =
+            new PowerShellProcess(
+                this.powerShellExePath,
+                "[DBG] PowerShell Integrated Console",
+                this.log,
+                this.editorServicesArgs + "-DebugServiceOnly ",
+                sessionPath,
+                sessionSettings);
+
+        return this.debugSessionProcess;
     }
 
     private onConfigurationUpdated() {
@@ -266,13 +287,20 @@ export class SessionManager implements Middleware {
             "Starting PowerShell...",
             SessionStatus.Initializing);
 
-        this.powerShellProcess =
+        var sessionFilePath =
+            utils.getSessionFilePath(
+                Math.floor(100000 + Math.random() * 900000));
+
+        this.languageServerProcess =
             new PowerShellProcess(
                 this.powerShellExePath,
+                "PowerShell Integrated Console",
                 this.log,
+                startArgs,
+                sessionFilePath,
                 this.sessionSettings);
 
-        this.powerShellProcess.onExited(
+        this.languageServerProcess.onExited(
             () => {
                 if (this.sessionStatus === SessionStatus.Running) {
                     this.setSessionStatus("Session exited", SessionStatus.Failed);
@@ -280,8 +308,8 @@ export class SessionManager implements Middleware {
                 }
             });
 
-        this.powerShellProcess
-            .start(startArgs)
+        this.languageServerProcess
+            .start("EditorServices")
             .then(
                 sessionDetails => {
                     this.sessionDetails = sessionDetails;
@@ -612,8 +640,8 @@ export class SessionManager implements Middleware {
     }
 
     private showSessionConsole(isExecute?: boolean) {
-        if (this.powerShellProcess) {
-            this.powerShellProcess.showConsole(
+        if (this.languageServerProcess) {
+            this.languageServerProcess.showConsole(
                 isExecute && !this.focusConsoleOnExecute);
         }
     }
