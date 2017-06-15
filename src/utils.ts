@@ -124,3 +124,7 @@ export function getTimestampString() {
     var time = new Date();
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`
 }
+
+export function isWindowsOS(): boolean {
+    return os.platform() == "win32";
+}
