@@ -14,6 +14,7 @@ import Settings = require('./settings');
 import { Logger } from './logging';
 import { IFeature } from './feature';
 import { Message } from 'vscode-jsonrpc';
+import { PowerShellProcess } from './process';
 import { StringDecoder } from 'string_decoder';
 import {
     LanguageClient, LanguageClientOptions, Executable,
@@ -35,16 +36,15 @@ export class SessionManager implements Middleware {
 
     private hostVersion: string;
     private isWindowsOS: boolean;
-    private sessionFilePath: string;
     private powerShellExePath: string = "";
     private sessionStatus: SessionStatus;
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
     private extensionFeatures: IFeature[] = [];
     private statusBarItem: vscode.StatusBarItem;
+    private powerShellProcess: PowerShellProcess;
     private versionDetails: PowerShellVersionDetails;
     private registeredCommands: vscode.Disposable[] = [];
-    private consoleTerminal: vscode.Terminal = undefined;
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.EditorServicesSessionDetails;
@@ -115,11 +115,6 @@ export class SessionManager implements Middleware {
         }
 
         this.suppressRestartPrompt = false;
-
-        this.sessionFilePath =
-            utils.getSessionFilePath(
-                Math.floor(100000 + Math.random() * 900000));
-
         this.powerShellExePath = this.getPowerShellExePath();
 
         if (this.powerShellExePath) {
@@ -180,7 +175,7 @@ export class SessionManager implements Middleware {
             // Before moving further, clear out the client and process if
             // the process is already dead (i.e. it crashed)
             this.languageServerClient = undefined;
-            this.consoleTerminal = undefined;
+            this.powerShellProcess = undefined;
         }
 
         this.sessionStatus = SessionStatus.Stopping;
@@ -191,14 +186,9 @@ export class SessionManager implements Middleware {
             this.languageServerClient = undefined;
         }
 
-        // Clean up the session file
-        utils.deleteSessionFile(this.sessionFilePath);
-
-        // Kill the PowerShell process we spawned via the console
-        if (this.consoleTerminal !== undefined) {
-            this.log.write(os.EOL + "Terminating PowerShell process...");
-            this.consoleTerminal.dispose();
-            this.consoleTerminal = undefined;
+        // Kill the PowerShell process we spawned
+        if (this.powerShellProcess) {
+            this.powerShellProcess.dispose();
         }
 
         this.sessionStatus = SessionStatus.NotStarted;
@@ -271,152 +261,59 @@ export class SessionManager implements Middleware {
         isWindowsDevBuild: boolean,
         bundledModulesPath: string,
         startArgs: string) {
-        try
-        {
-            this.setSessionStatus(
-                "Starting PowerShell...",
-                SessionStatus.Initializing);
 
-            let startScriptPath =
-                path.resolve(
-                    __dirname,
-                    '../scripts/Start-EditorServices.ps1');
+        this.setSessionStatus(
+            "Starting PowerShell...",
+            SessionStatus.Initializing);
 
-            var editorServicesLogPath = this.log.getLogFilePath("EditorServices");
+        this.powerShellProcess =
+            new PowerShellProcess(
+                this.powerShellExePath,
+                this.log,
+                this.sessionSettings);
 
-            var featureFlags =
-                this.sessionSettings.developer.featureFlags !== undefined
-                ? this.sessionSettings.developer.featureFlags.map(f => `'${f}'`).join(', ')
-                : "";
+        this.powerShellProcess.onExited(
+            () => {
+                if (this.sessionStatus === SessionStatus.Running) {
+                    this.setSessionStatus("Session exited", SessionStatus.Failed);
+                    this.promptForRestart();
+                }
+            });
 
-            startArgs +=
-                `-LogPath '${editorServicesLogPath}' ` +
-                `-SessionDetailsPath '${this.sessionFilePath}' ` +
-                `-FeatureFlags @(${featureFlags})`
-
-            var powerShellArgs = [
-                "-NoProfile",
-                "-NonInteractive"
-            ]
-
-            // Only add ExecutionPolicy param on Windows
-            if (this.isWindowsOS) {
-                powerShellArgs.push("-ExecutionPolicy", "Unrestricted")
-            }
-
-            powerShellArgs.push(
-                "-Command",
-                "& '" + startScriptPath + "' " + startArgs);
-
-            if (isWindowsDevBuild) {
-                // Windows PowerShell development builds need the DEVPATH environment
-                // variable set to the folder where development binaries are held
-
-                // NOTE: This batch file approach is needed temporarily until VS Code's
-                // createTerminal API gets an argument for setting environment variables
-                // on the launched process.
-                var batScriptPath = path.resolve(__dirname, '../sessions/powershell.bat');
-                fs.writeFileSync(
-                    batScriptPath,
-                    `@set DEVPATH=${path.dirname(powerShellExePath)}\r\n@${powerShellExePath} %*`);
-
-                powerShellExePath = batScriptPath;
-            }
-
-            this.log.write(`${utils.getTimestampString()} Language server starting...`);
-
-            // Make sure no old session file exists
-            utils.deleteSessionFile(this.sessionFilePath);
-
-            // Launch PowerShell in the integrated terminal
-            this.consoleTerminal =
-                vscode.window.createTerminal(
-                    "PowerShell Integrated Console",
-                    powerShellExePath,
-                    powerShellArgs);
-
-            if (this.sessionSettings.integratedConsole.showOnStartup) {
-                this.consoleTerminal.show(true);
-            }
-
-            // Start the language client
-            utils.waitForSessionFile(
-                this.sessionFilePath,
-                (sessionDetails, error) => {
+        this.powerShellProcess
+            .start(startArgs)
+            .then(
+                sessionDetails => {
                     this.sessionDetails = sessionDetails;
 
-                    if (sessionDetails) {
-                        if (sessionDetails.status === "started") {
-                            this.log.write(`${utils.getTimestampString()} Language server started.`);
+                    if (sessionDetails.status === "started") {
+                        this.log.write(`${utils.getTimestampString()} Language server started.`);
 
-                            // The session file is no longer needed
-                            utils.deleteSessionFile(this.sessionFilePath);
-
-                            // Start the language service client
-                            this.startLanguageClient(sessionDetails);
+                        // Start the language service client
+                        this.startLanguageClient(sessionDetails);
+                    }
+                    else if (sessionDetails.status === "failed") {
+                        if (sessionDetails.reason === "unsupported") {
+                            this.setSessionFailure(
+                                `PowerShell language features are only supported on PowerShell version 3 and above.  The current version is ${sessionDetails.powerShellVersion}.`)
                         }
-                        else if (sessionDetails.status === "failed") {
-                            if (sessionDetails.reason === "unsupported") {
-                                this.setSessionFailure(
-                                    `PowerShell language features are only supported on PowerShell version 3 and above.  The current version is ${sessionDetails.powerShellVersion}.`)
-                            }
-                            else if (sessionDetails.reason === "languageMode") {
-                                this.setSessionFailure(
-                                    `PowerShell language features are disabled due to an unsupported LanguageMode: ${sessionDetails.detail}`);
-                            }
-                            else {
-                                this.setSessionFailure(`PowerShell could not be started for an unknown reason '${sessionDetails.reason}'`)
-                            }
+                        else if (sessionDetails.reason === "languageMode") {
+                            this.setSessionFailure(
+                                `PowerShell language features are disabled due to an unsupported LanguageMode: ${sessionDetails.detail}`);
                         }
                         else {
-                            // TODO: Handle other response cases
+                            this.setSessionFailure(`PowerShell could not be started for an unknown reason '${sessionDetails.reason}'`)
                         }
                     }
                     else {
-                        this.log.write(`${utils.getTimestampString()} Language server startup failed.`);
-                        this.setSessionFailure("Could not start language service: ", error);
+                        // TODO: Handle other response cases
                     }
-                });
-
-            // this.powerShellProcess.stderr.on(
-            //     'data',
-            //     (data) => {
-            //         this.log.writeError("ERROR: " + data);
-
-            //         if (this.sessionStatus === SessionStatus.Initializing) {
-            //             this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
-            //         }
-            //         else if (this.sessionStatus === SessionStatus.Running) {
-            //             this.promptForRestart();
-            //         }
-            //     });
-
-            vscode.window.onDidCloseTerminal(
-                terminal => {
-                    if (terminal === this.consoleTerminal) {
-                        this.log.write(os.EOL + "powershell.exe terminated or terminal UI was closed" + os.EOL);
-
-                        if (this.sessionStatus === SessionStatus.Running) {
-                            this.setSessionStatus("Session exited", SessionStatus.Failed);
-                            this.promptForRestart();
-                        }
-                    }
-                });
-
-            this.consoleTerminal.processId.then(
-                pid => {
-                    console.log("powershell.exe started, pid: " + pid + ", exe: " + powerShellExePath);
-                    this.log.write(
-                        "powershell.exe started --",
-                        "    pid: " + pid,
-                        "    exe: " + powerShellExePath,
-                        "    args: " + startScriptPath + ' ' + startArgs + os.EOL + os.EOL);
-                });
-        }
-        catch (e)
-        {
-            this.setSessionFailure("The language service could not be started: ", e);
-        }
+                },
+                error => {
+                    this.log.write(`${utils.getTimestampString()} Language server startup failed.`);
+                    this.setSessionFailure("The language service could not be started: ", error);
+                }
+            );
     }
 
     private promptForRestart() {
@@ -715,8 +612,8 @@ export class SessionManager implements Middleware {
     }
 
     private showSessionConsole(isExecute?: boolean) {
-        if (this.consoleTerminal) {
-            this.consoleTerminal.show(
+        if (this.powerShellProcess) {
+            this.powerShellProcess.showConsole(
                 isExecute && !this.focusConsoleOnExecute);
         }
     }
