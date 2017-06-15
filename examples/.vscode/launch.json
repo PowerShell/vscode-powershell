@@ -12,6 +12,15 @@
         {
             "type": "PowerShell",
             "request": "launch",
+            "name": "PowerShell Launch Current File in Temporary Console",
+            "script": "${file}",
+            "args": [],
+            "cwd": "${file}",
+            "createTemporaryIntegratedConsole": true
+        },
+        {
+            "type": "PowerShell",
+            "request": "launch",
             "name": "PowerShell Launch Current File w/Args Prompt",
             "script": "${file}",
             "args": [ "${command:SpecifyScriptArgs}" ],

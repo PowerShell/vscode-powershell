@@ -212,6 +212,19 @@
             }
           },
           {
+            "label": "PowerShell: Launch Current File in Temporary Console",
+            "description": "Launch current file (in active editor window) under debugger in a temporary Integrated Console.",
+            "body": {
+              "type": "PowerShell",
+              "request": "launch",
+              "name": "PowerShell Launch Current File in Temporary Console",
+              "script": "^\"\\${file}\"",
+              "args": [],
+              "cwd": "^\"\\${file}\"",
+              "createTemporaryIntegratedConsole": true
+            }
+          },
+          {
             "label": "PowerShell: Launch - Current File w/Args Prompt",
             "description": "Launch current file (in active editor window) under debugger, prompting first for script arguments",
             "body": {
@@ -292,6 +305,11 @@
                 "type": "string",
                 "description": "Absolute path to the working directory. Default is the current workspace.",
                 "default": "${workspaceRoot}"
+              },
+              "createTemporaryIntegratedConsole": {
+                "type": "boolean",
+                "description": "Determines whether a temporary PowerShell Integrated Console is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
+                "default": false
               }
             }
           },
@@ -322,6 +340,15 @@
             "script": "${file}",
             "args": [],
             "cwd": "${file}"
+          },
+          {
+            "type": "PowerShell",
+            "request": "launch",
+            "name": "PowerShell Launch Current File in Temporary Console",
+            "script": "${file}",
+            "args": [],
+            "cwd": "${file}",
+            "createTemporaryIntegratedConsole": true
           },
           {
             "type": "PowerShell",
@@ -447,6 +474,11 @@
           "type": "boolean",
           "default": true,
           "description": "Switches focus to the console when a script selection is run or a script file is debugged. This is an accessibility feature. To disable it, set to false."
+        },
+        "powershell.debugging.createTemporaryIntegratedConsole": {
+          "type": "boolean",
+          "default": false,
+          "description": "Determines whether a temporary PowerShell Integrated Console is created for each debugging session, useful for debugging PowerShell classes and binary modules."
         },
         "powershell.developer.bundledModulesPath": {
           "type": "string",

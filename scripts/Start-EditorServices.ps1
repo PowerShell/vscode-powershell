@@ -55,7 +55,7 @@ param(
     [switch]
     $EnableConsoleRepl,
 
-    [string]
+    [switch]
     $DebugServiceOnly,
 
     [string[]]
