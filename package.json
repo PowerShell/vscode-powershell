@@ -416,8 +416,8 @@
           "type":"string",
           "enum": [
             "Custom",
-            "KR-Stroustrup",
-            "KR-OTBS",
+            "KR_Stroustrup",
+            "KR_OTBS",
             "Allman"
           ],
           "default": "KR-Stroustrup",
