@@ -416,11 +416,10 @@
           "type":"string",
           "enum": [
             "Custom",
-            "KR_Stroustrup",
-            "KR_OTBS",
+            "OTBS",
             "Allman"
           ],
-          "default": "KR-Stroustrup",
+          "default": "KR_Stroustrup",
           "description": "Sets the codeformatting options to follow the given indent style in a way that is compatible with PowerShell syntax. For more information about the brace styles please refer to https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81."
         },
         "powershell.codeFormatting.openBraceOnSameLine": {

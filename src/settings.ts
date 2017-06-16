@@ -9,8 +9,7 @@ import utils = require('./utils');
 
 enum CodeFormattingPreset {
     Custom,
-    KR_Stroustrup,
-    KR_OTBS,
+    OTBS,
     Allman
 }
 
@@ -77,7 +76,7 @@ export function load(): ISettings {
     };
 
     let defaultCodeFormattingSettings: ICodeFormattingSettings = {
-        preset: CodeFormattingPreset.
+        preset: CodeFormattingPreset.Custom,
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
         newLineAfterCloseBrace: true,
