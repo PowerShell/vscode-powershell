@@ -7,8 +7,15 @@
 import vscode = require('vscode');
 import utils = require('./utils');
 
+enum CodeFormattingPreset {
+    Custom,
+    KR_Stroustrup,
+    KR_OTBS,
+    Allman
+}
+
 export interface ICodeFormattingSettings {
-    preset: string;
+    preset: CodeFormattingPreset;
     openBraceOnSameLine: boolean;
     newLineAfterOpenBrace: boolean;
     newLineAfterCloseBrace: boolean;
