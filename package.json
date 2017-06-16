@@ -412,6 +412,17 @@
           "default": false,
           "description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
         },
+        "powershell.codeFormatting.preset": {
+          "type":"string",
+          "enum": [
+            "Custom",
+            "KR-Stroustrup",
+            "KR-OTBS",
+            "Allman"
+          ],
+          "default": "KR-Stroustrup",
+          "description": "Sets the codeformatting options to follow the given indent style in a way that is compatible with PowerShell syntax. For more information about the brace styles please refer to https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81."
+        },
         "powershell.codeFormatting.openBraceOnSameLine": {
           "type": "boolean",
           "default": true,
