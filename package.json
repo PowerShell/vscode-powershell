@@ -382,36 +382,6 @@
           "default": "",
           "description": "Specifies the path to a PowerShell Script Analyzer settings file. To override the default settings for all projects, enter an absolute path, or enter a path relative to your workspace."
         },
-        "powershell.developer.featureFlags": {
-          "type": "array",
-          "default": [],
-          "description": "An array of strings that enable experimental features in the PowerShell extension."
-        },
-        "powershell.developer.powerShellExePath": {
-          "type": "string",
-          "default": "",
-          "isExecutable": true,
-          "description": "Deprecated. Please use the 'powershell.powerShellExePath' setting instead"
-        },
-        "powershell.developer.powerShellExeIsWindowsDevBuild": {
-          "type": "boolean",
-          "default": false,
-          "description": "Indicates that the powerShellExePath points to a developer build of Windows PowerShell and configures it for development."
-        },
-        "powershell.developer.bundledModulesPath": {
-          "type": "string",
-          "description": "Specifies an alternate path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PSScriptAnalyzer, Plaster)"
-        },
-        "powershell.developer.editorServicesLogLevel": {
-          "type": "string",
-          "default": "Normal",
-          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Verbose', 'Normal', 'Warning', and 'Error'"
-        },
-        "powershell.developer.editorServicesWaitForDebugger": {
-          "type": "boolean",
-          "default": false,
-          "description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
-        },
         "powershell.codeFormatting.preset": {
           "type":"string",
           "enum": [
@@ -477,6 +447,36 @@
           "type": "boolean",
           "default": true,
           "description": "Switches focus to the console when a script selection is run or a script file is debugged. This is an accessibility feature. To disable it, set to false."
+        },
+        "powershell.developer.bundledModulesPath": {
+          "type": "string",
+          "description": "Specifies an alternate path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PSScriptAnalyzer, Plaster)"
+        },
+        "powershell.developer.editorServicesLogLevel": {
+          "type": "string",
+          "default": "Normal",
+          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Verbose', 'Normal', 'Warning', and 'Error'"
+        },
+        "powershell.developer.editorServicesWaitForDebugger": {
+          "type": "boolean",
+          "default": false,
+          "description": "Launches the language service with the /waitForDebugger flag to force it to wait for a .NET debugger to attach before proceeding."
+        },
+        "powershell.developer.featureFlags": {
+          "type": "array",
+          "default": [],
+          "description": "An array of strings that enable experimental features in the PowerShell extension."
+        },
+        "powershell.developer.powerShellExeIsWindowsDevBuild": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates that the powerShellExePath points to a developer build of Windows PowerShell and configures it for development."
+        },
+        "powershell.developer.powerShellExePath": {
+          "type": "string",
+          "default": "",
+          "isExecutable": true,
+          "description": "Deprecated. Please use the 'powershell.powerShellExePath' setting instead"
         }
       }
     },
