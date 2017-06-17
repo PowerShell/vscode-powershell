@@ -9,8 +9,9 @@ import utils = require('./utils');
 
 enum CodeFormattingPreset {
     Custom,
+    Allman,
     OTBS,
-    Allman
+    Stroustrup
 }
 
 export interface ICodeFormattingSettings {
