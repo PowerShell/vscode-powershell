@@ -416,8 +416,9 @@
           "type":"string",
           "enum": [
             "Custom",
+            "Allman",
             "OTBS",
-            "Allman"
+            "Stroustrup"
           ],
           "default": "Custom",
           "description": "Sets the codeformatting options to follow the given indent style in a way that is compatible with PowerShell syntax. For more information about the brace styles please refer to https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81."
