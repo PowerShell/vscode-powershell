@@ -2,7 +2,7 @@
     "version": "2.0.0",
 
     "windows": {
-        "command": "C:\\Windows\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command": "${env:windir}\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
         "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
     },
     "linux": {
