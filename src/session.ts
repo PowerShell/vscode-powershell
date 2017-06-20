@@ -149,6 +149,7 @@ export class SessionManager implements Middleware {
                 "-HostName 'Visual Studio Code Host' " +
                 "-HostProfileId 'Microsoft.VSCode' " +
                 "-HostVersion '" + this.hostVersion + "' " +
+                "-AdditionalModules @('PowerShellEditorServices.VSCode') " +
                 "-BundledModulesPath '" + bundledModulesPath + "' " +
                 "-EnableConsoleRepl ";
 
