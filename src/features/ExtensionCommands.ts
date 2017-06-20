@@ -128,6 +128,12 @@ export namespace OpenFileRequest {
             'editor/openFile');
 }
 
+export namespace NewFileRequest {
+    export const type =
+        new RequestType<string, EditorOperationResponse, void, void>(
+            'editor/newFile');
+}
+
 export namespace CloseFileRequest {
     export const type =
         new RequestType<string, EditorOperationResponse, void, void>(
@@ -211,6 +217,10 @@ export class ExtensionCommandsFeature implements IFeature {
                 details => this.setSelection(details));
 
             this.languageClient.onRequest(
+		        NewFileRequest.type,
+                filePath => this.newFile());
+
+              this.languageClient.onRequest(
                 OpenFileRequest.type,
                 filePath => this.openFile(filePath));
 
@@ -321,6 +331,12 @@ export class ExtensionCommandsFeature implements IFeature {
                         vscode.window.activeTextEditor.selection.start,
                         vscode.window.activeTextEditor.selection.end))
         }
+    }
+
+    private newFile(): Thenable<EditorOperationResponse> {
+        return vscode.workspace.openTextDocument('')
+                     .then(doc => vscode.window.showTextDocument(doc))
+                     .then(_ => EditorOperationResponse.Completed);
     }
 
     private openFile(filePath: string): Thenable<EditorOperationResponse> {
