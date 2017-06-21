@@ -61,7 +61,7 @@ export class PowerShellProcess {
 
                     // Only add ExecutionPolicy param on Windows
                     if (utils.isWindowsOS()) {
-                        powerShellArgs.push("-ExecutionPolicy", "Unrestricted")
+                        powerShellArgs.push("-ExecutionPolicy", "Bypass")
                     }
 
                     powerShellArgs.push(
