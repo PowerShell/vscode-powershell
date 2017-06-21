@@ -41,7 +41,7 @@ export class PesterTestsFeature implements IFeature {
             args: [
                 `-Script "${uri.fsPath}"`,
                 describeBlockName
-                    ? `-TestName "${describeBlockName}"`
+                    ? `-TestName '${describeBlockName}'`
                     : ""
             ],
             internalConsoleOptions: "neverOpen",
