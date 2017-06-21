@@ -33,7 +33,7 @@ import { HelpCompletionFeature } from "./features/HelpCompletion";
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-var requiredEditorServicesVersion = "1.3.2";
+var requiredEditorServicesVersion = "1.4.0";
 
 var logger: Logger = undefined;
 var sessionManager: SessionManager = undefined;

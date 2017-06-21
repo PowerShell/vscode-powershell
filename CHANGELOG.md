@@ -1,5 +1,150 @@
 # vscode-powershell Release History
 
+## 1.4.0
+### Wednesday, June 21, 2017
+
+#### New HTML content view commands enabling custom UI tabs
+
+You can now show editor tabs with custom HTML-based UI by using the
+new HTML content view commands!  This is the first step toward UI
+extensions for VS Code written in PowerShell.
+
+Here's an example:
+
+```powershell
+$view = New-VSCodeHtmlContentView -Title "My Custom View" -ShowInColumn One
+Set-VSCodeHtmlContentView -View $view -Content "<h1>Hello world!</h1>"
+Write-VSCodeHtmlContentView $view -Content "<b>I'm adding new content!</b><br />"
+```
+
+And here's the result:
+
+![HTML view demo](https://user-images.githubusercontent.com/79405/27394133-f96c38cc-565f-11e7-8102-a3727014ea5a.GIF)
+
+Check out the cmdlet help for the following commands to learn more:
+
+- `New-VSCodeHtmlContentView`
+- `Show-VSCodeHtmlContentView`
+- `Close-VSCodeHtmlContentView`
+- `Set-VSCodeHtmlContentView`
+- `Write-VSCodeHtmlContentView`
+
+Since this is a first release, we've restricted the use of JavaScript
+inside of the HTML.  We will add this capability in a future release!
+
+#### Code formatting setting presets for common styles
+
+We've now added code formatting presets for the most common code style
+conventions used in the PowerShell community:
+
+- **[OTBS](https://en.wikipedia.org/wiki/Indent_style#Variant:_1TBS_.28OTBS.29)** -
+  Known as the "One True Brace Style". Causes `else`, `catch`, and other
+  keywords to be "cuddled", keeping them on the same line as the previous
+  closing brace:
+
+  ```powershell
+  if ($var -eq $true) {
+    # Do the thing
+  } else {
+    # Do something else
+  }
+  ```
+
+- **[Stroustrup](https://en.wikipedia.org/wiki/Indent_style#Variant:_Stroustrup)** -
+  Causes beginning curly braces to be placed on the same line as the statement:
+
+  ```powershell
+  if ($var -eq $true) {
+    # Do the thing
+  }
+  else {
+    # Do something else
+  }
+  ```
+
+- **[Allman](https://en.wikipedia.org/wiki/Indent_style#Allman_style)** - All curly braces are preceded by a newline:
+
+  ```powershell
+  if ($var -eq $true)
+  {
+    # Do the thing
+  }
+  else
+  {
+    # Do something else
+  }
+  ```
+
+- **Custom** - Allows full customization of the code formatting settings.
+
+In addition, code formatting now respects your `editor.insertSpaces` and
+`editor.tabSize` settings!
+
+#### Debugging in a temporary PowerShell Integrated Console
+
+We've added the ability to debug your PowerShell code in a temporary
+PowerShell Integrated Console so that you have a fresh runspace and
+PowerShell process each time you hit F5!
+
+This setting is necessary if you are developing with PowerShell 5
+classes or modules using .NET assemblies because .NET types cannot
+be reloaded inside of the same PowerShell process.  This new setting
+saves you from reloading your PowerShell session each time you debug
+your code!
+
+You can configure this behavior in two ways:
+
+- Use the `launch.json` configuration parameter `createTemporaryIntegratedConsole`:
+
+  ```json
+  {
+    "type": "PowerShell",
+    "request": "launch",
+    "name": "PowerShell Launch Current File in Temporary Console",
+    "script": "${file}",
+    "args": [],
+    "cwd": "${file}",
+    "createTemporaryIntegratedConsole": true
+  },
+  ```
+
+- Configure the setting `powershell.debugging.createTemporaryIntegratedConsole`:
+
+  ```json
+  "powershell.debugging.createTemporaryIntegratedConsole": true,
+  ```
+
+The default value for these settings is `false`, meaning that the temporary
+console behavior is **opt-in**.
+
+Configuring the user or workspace setting will cause all debugging sessions
+to be run in a temporary Integrated Console so it's useful if you would prefer
+this to be the default behavior.  The `launch.json` setting overrides the user
+setting so you can always customize the behavior for a specific launch
+configuration.
+
+#### NewFile() API and Out-CurrentFile command
+
+You can now create a new untitled file from within the Integrated Console
+by using the `$psEditor.Workspace.NewFile()` command!  Also, you can send
+the formatted output of any PowerShell command to the current file by using
+the `Out-CurrentFile` command:
+
+```powershell
+Get-Process | Out-CurrentFile
+```
+
+Special thanks to [Doug Finke](https://github.com/dfinke) for the contribution!
+
+#### Other fixes and improvements
+
+- [#881](https://github.com/PowerShell/vscode-powershell/pull/881) -
+  When you select a different PowerShell version in the session menu, your choice
+  is persisted to the `powershell.powerShellExePath` setting.
+
+- [#891](https://github.com/PowerShell/vscode-powershell/issues/891) -
+  Pester CodeLenses now run tests without string interpolation of test names
+
 ## 1.3.2
 ### Monday, June 12, 2017
 
