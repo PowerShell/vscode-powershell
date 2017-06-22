@@ -179,7 +179,7 @@ class HtmlContentView extends CustomView {
 
     getContent(): string {
         // Return an HTML page which disables JavaScript in content by default
-        return `<html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src *; style-src 'self'; script-src 'none';"></head><body>${this.htmlContent}</body></html>`;
+        return `<html><head></head><body>${this.htmlContent}</body></html>`;
     }
 }
 
