@@ -168,10 +168,14 @@ export interface StatusBarMessageDetails {
     message: string;
     timeout?: number;
 }
+interface InvokeRegisteredEditorCommandParameter{
+    commandName : string
+}
 
 export class ExtensionCommandsFeature implements IFeature {
 
     private command: vscode.Disposable;
+    private command2: vscode.Disposable;
     private languageClient: LanguageClient;
     private extensionCommands: ExtensionCommand[] = [];
 
@@ -191,6 +195,21 @@ export class ExtensionCommandsFeature implements IFeature {
 
             this.showExtensionCommands(this.languageClient);
         });
+        this.command2 = vscode.commands.registerCommand('PowerShell.InvokeRegisteredEditorCommand',(param : InvokeRegisteredEditorCommandParameter) => {
+            if(this.extensionCommands.length == 0){
+                return;
+            }
+
+            let commandToExecute = this.extensionCommands.find(x => x.name === param.commandName);
+
+            if(commandToExecute){
+                this.languageClient.sendRequest(
+                    InvokeExtensionCommandRequest.type,
+                    { name: commandToExecute.name,
+                    context: this.getEditorContext() });
+            }
+        });
+
     }
 
     public setLanguageClient(languageclient: LanguageClient) {
@@ -248,6 +267,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
     public dispose() {
         this.command.dispose();
+        this.command2.dispose();
     }
 
     private addExtensionCommand(command: ExtensionCommandAddedNotificationBody) {
