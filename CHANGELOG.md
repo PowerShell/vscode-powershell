@@ -1,5 +1,12 @@
 # vscode-powershell Release History
 
+
+## 1.4.1
+### Thursday, June 22, 2017
+
+- [PowerShell/PowerShellEditorServices#529](https://github.com/PowerShell/PowerShellEditorServices/issues/529) -
+  Fixed an issue with loading the extension with in PowerShell Core 6.0.0-beta3
+
 ## 1.4.0
 ### Wednesday, June 21, 2017
 
