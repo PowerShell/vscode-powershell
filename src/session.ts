@@ -519,7 +519,7 @@ export class SessionManager implements Middleware {
             SessionStatus.Failed);
     }
 
-    private getPowerShellExePath(): string {
+    public getPowerShellExePath(): string {
 
         if (!this.sessionSettings.powerShellExePath &&
             this.sessionSettings.developer.powerShellExePath)

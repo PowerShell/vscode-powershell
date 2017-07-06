@@ -99,6 +99,8 @@ to file an issue on our GitHub repository:
 Make sure to fill in the information that is requested in the issue template as it
 will help us investigate the problem more quickly.
 
+> Note To automatically create a bug report from within the extension run the *"Report a problem on GitHub"* command. Some basic information about your instance and powershell versions will be collected and inserted into a new GitHub issue.
+
 ### 2. Capture verbose logs and send them to us
 
 If you're having an issue with crashing or other erratic behavior, add the following

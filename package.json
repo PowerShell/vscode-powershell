@@ -111,6 +111,11 @@
         "category": "PowerShell"
       },
       {
+        "command": "PowerShell.GenerateBugReport",
+        "title": "Upload Bug Report to Github",
+        "category": "PowerShell"
+      },
+      {
         "command": "PowerShell.OpenInISE",
         "title": "Open Current File in PowerShell ISE",
         "category": "PowerShell"
@@ -403,6 +408,11 @@
           "type": "boolean",
           "default": true,
           "description": "Loads user and system-wide PowerShell profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) into the PowerShell session. This affects IntelliSense and interactive script execution, but it does not affect the debugger."
+        },
+        "powershell.bugReporting.project": {
+          "type": "string",
+          "default": "https://github.com/PowerShell/vscode-powershell",
+          "description": "Specifies the url of the GitHub project in which to generate bug reports."
         },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
