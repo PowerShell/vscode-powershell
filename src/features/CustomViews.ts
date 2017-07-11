@@ -50,7 +50,7 @@ export class CustomViewsFeature implements IFeature {
             args => {
                 this.contentProvider.setHtmlContentView(
                     args.id,
-                    args.htmlBodyContent);
+                    args.htmlContent);
             });
 
         languageClient.onRequest(
@@ -119,7 +119,7 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
         )
     }
 
-    public setHtmlContentView(id: string, content: string) {
+    public setHtmlContentView(id: string, content: HtmlContent) {
         let uriString = this.getUri(id);
         let view: CustomView = this.viewIndex[uriString];
 
@@ -160,7 +160,11 @@ abstract class CustomView {
 
 class HtmlContentView extends CustomView {
 
-    private htmlContent: string = "";
+    private htmlContent: HtmlContent = {
+        bodyContent: "",
+        javaScriptPaths: [],
+        styleSheetPaths: []
+    };
 
     constructor(
         id: string,
@@ -169,17 +173,49 @@ class HtmlContentView extends CustomView {
         super(id, title, CustomViewType.HtmlContent);
     }
 
-    setContent(htmlContent: string) {
+    setContent(htmlContent: HtmlContent) {
         this.htmlContent = htmlContent;
     }
 
     appendContent(content: string) {
-        this.htmlContent += content;
+        this.htmlContent.bodyContent += content;
     }
 
     getContent(): string {
-        // Return an HTML page which disables JavaScript in content by default
-        return `<html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src *; style-src 'self'; script-src 'none';"></head><body>${this.htmlContent}</body></html>`;
+        var styleSrc = "none";
+        var styleTags = "";
+
+        function getNonce(): number {
+            return Math.floor(Math.random() * 100000) + 100000;
+        }
+
+        if (this.htmlContent.styleSheetPaths &&
+            this.htmlContent.styleSheetPaths.length > 0) {
+            styleSrc = "";
+            this.htmlContent.styleSheetPaths.forEach(
+                p => {
+                    var nonce = getNonce();
+                    styleSrc += `'nonce-${nonce}' `;
+                    styleTags += `<link nonce="${nonce}" href="${p}" rel="stylesheet" type="text/css" />\n`;
+                });
+        }
+
+        var scriptSrc = "none";
+        var scriptTags = "";
+
+        if (this.htmlContent.javaScriptPaths &&
+            this.htmlContent.javaScriptPaths.length > 0) {
+            scriptSrc = "";
+            this.htmlContent.javaScriptPaths.forEach(
+                p => {
+                    var nonce = getNonce();
+                    scriptSrc += `'nonce-${nonce}' `;
+                    scriptTags += `<script nonce="${nonce}" src="${p}"></script>\n`;
+                });
+        }
+
+        // Return an HTML page with the specified content
+        return `<html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src *; style-src ${styleSrc}; script-src ${scriptSrc};">${styleTags}</head><body>\n${this.htmlContent.bodyContent}\n${scriptTags}</body></html>`;
     }
 }
 
@@ -226,9 +262,15 @@ namespace SetHtmlContentViewRequest {
             'powerShell/setHtmlViewContent');
 }
 
+interface HtmlContent {
+    bodyContent: string;
+    javaScriptPaths: string[];
+    styleSheetPaths: string[];
+}
+
 interface SetHtmlContentViewRequestArguments {
     id: string;
-    htmlBodyContent: string;
+    htmlContent: HtmlContent;
 }
 
 namespace AppendHtmlOutputViewRequest {
