@@ -56,7 +56,6 @@ Follow the instructions in the [README](https://github.com/PowerShell/vscode-pow
 | Operating System | ${os.type() + ' ' + os.arch() + ' ' + os.release()} |
 | VSCode | ${vscode.version}|
 | PowerShell Extension Version | ${extensionVersion} |
-| PSES | |
 
 ### PowerShell Information ###
 
@@ -120,7 +119,6 @@ ${tableHeader}\n${table};
         var powerShellExePath = this.sessionManager.getPowerShellExePath();
         var powerShellArgs = [
             "-NoProfile",
-
             "-Command",
             '$PSVersionString = "|Name|Value|\n"; $PSVersionString += "|---|---|\n"; $PSVersionTable.keys | ForEach-Object { $PSVersionString += "|$_|$($PSVersionTable.Item($_))|\n" }; $PSVersionString'
         ]
