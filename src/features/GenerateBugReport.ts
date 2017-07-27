@@ -3,7 +3,6 @@ import { SessionManager } from '../session';
 import cp = require('child_process');
 import Settings = require('../settings');
 
-import window = vscode.window;
 const os = require("os");
 
 import { IFeature, LanguageClient } from '../feature';
@@ -32,12 +31,6 @@ export class GenerateBugReportFeature implements IFeature {
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand('PowerShell.GenerateBugReport', () => {
-
-
-            var OutputChannel = window.createOutputChannel('Debug');
-            OutputChannel.show();
-
-            OutputChannel.appendLine('Starting Bug Report');
 
             var body = encodeURIComponent(`## Issue Description ##
 
