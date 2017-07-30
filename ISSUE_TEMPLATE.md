@@ -1,11 +1,14 @@
 <!--
 
-Please fill in these details so that we can help you!
+BEFORE SUBMITTING A NEW ISSUE, PLEASE READ THE FAQ!!
+https://github.com/PowerShell/vscode-powershell/wiki/FAQ
 
-If you are filing an issue related to PowerShell syntax coloring/highlighting,
-please file it at the EditorSyntax repo:
+If your issue is not addressed by the FAQ, please
+fill in the following details so that we can help you!
 
-https://github.com/PowerShell/EditorSyntax/issues
+The more repro details you can provide, along with a zip
+of the log files from your session, the better the chances
+are for a quick resolution.
 
 -->
 
@@ -17,7 +20,7 @@ https://github.com/PowerShell/EditorSyntax/issues
 - Output from `$PSVersionTable`:
 
 ```
-Copy / paste the below commands into the PowerShell Integrated Terminal, and paste the output here
+Copy / paste the following commands into the PowerShell Integrated Console, and paste the output here:
 
 code -v
 $pseditor.EditorServicesVersion

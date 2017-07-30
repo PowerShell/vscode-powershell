@@ -19,6 +19,8 @@ that Visual Studio Code provides.
 Read the [installation instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/learning-powershell/using-vscode.md)
 to get more details on how to use the extension on these platforms.
 
+Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for answers to common questions.
+
 ## Features
 
 - Syntax highlighting
