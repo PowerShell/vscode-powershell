@@ -52,7 +52,7 @@ export interface WaitForSessionFileCallback {
     (details: EditorServicesSessionDetails, error: string): void;
 }
 
-let sessionsFolder = path.resolve(__dirname, "..", "sessions/");
+let sessionsFolder = path.resolve(__dirname, "..", "..", "sessions/");
 let sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
 
 // Create the sessions path if it doesn't exist already
