@@ -2,7 +2,7 @@
     "version": "2.0.0",
 
     "windows": {
-        "command": "${env:windir}\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
         "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
     },
     "linux": {
@@ -20,28 +20,40 @@
         {
             "taskName": "Install",
             "suppressTaskName": true,
-            "args": [ "Invoke-Build Restore" ]
+            "args": [
+                "Invoke-Build Restore"
+            ]
         },
         {
             "taskName": "CleanAll",
             "suppressTaskName": true,
-            "args": [ "Invoke-Build CleanAll" ]
+            "args": [
+                "Invoke-Build CleanAll"
+            ]
         },
         {
             "taskName": "Clean",
             "suppressTaskName": true,
-            "args": [ "Invoke-Build Clean" ]
+            "args": [
+                "Invoke-Build Clean"
+            ]
         },
         {
             "taskName": "BuildAll",
             "suppressTaskName": true,
             "isBuildCommand": true,
-            "args": [ "Invoke-Build BuildAll" ]
+            "args": [
+                "Invoke-Build BuildAll"
+            ],
+            "problemMatcher": []
         },
         {
             "taskName": "Build",
             "suppressTaskName": true,
-            "args": [ "Invoke-Build Build" ]
+            "args": [
+                "Invoke-Build Build"
+            ],
+            "problemMatcher": []
         }
     ]
 }

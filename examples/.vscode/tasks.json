@@ -33,7 +33,7 @@
 
     // Start PowerShell
     "windows": {
-        "command": "${env:windir}\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command": "${env:windir}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
         "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
     },
     "linux": {
