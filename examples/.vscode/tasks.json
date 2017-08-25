@@ -33,7 +33,7 @@
 
     // Start PowerShell
     "windows": {
-        "command": "${env:windir}\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command": "${env:windir}/System32/WindowsPowerShell/v1.0/powershell.exe",
         "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
     },
     "linux": {
@@ -45,15 +45,11 @@
         "args": [ "-NoProfile" ]
     },
 
-    // Show the output window always
-    "showOutput": "always",
-
     // Associate with test task runner
     "tasks": [
         {
             "taskName": "Clean",
             "suppressTaskName": true,
-            "showOutput": "always",
             "args": [
                 "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Clean;",
                 "Invoke-Command { Write-Host 'Completed Clean task in task runner.' }"
@@ -63,7 +59,6 @@
             "taskName": "Build",
             "suppressTaskName": true,
             "isBuildCommand": true,
-            "showOutput": "always",
             "args": [
                 "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Build;",
                 "Invoke-Command { Write-Host 'Completed Build task in task runner.' }"
@@ -72,7 +67,6 @@
         {
             "taskName": "Publish",
             "suppressTaskName": true,
-            "showOutput": "always",
             "args": [
                 "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Publish;",
                 "Invoke-Command { Write-Host 'Completed Publish task in task runner.' }"
@@ -82,7 +76,6 @@
             "taskName": "Test",
             "suppressTaskName": true,
             "isTestCommand": true,
-            "showOutput": "always",
             "args": [
                 "Write-Host 'Invoking Pester...'; $ProgressPreference = 'SilentlyContinue'; Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true};",
                 "Invoke-Command { Write-Host 'Completed Test task in task runner.' }"
