@@ -2,7 +2,7 @@
     "version": "2.0.0",
 
     "windows": {
-        "command": "${env:windir}\\sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command": "${env:windir}/System32/WindowsPowerShell/v1.0/powershell.exe",
         "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
     },
     "linux": {
@@ -13,8 +13,6 @@
         "command": "/usr/local/bin/powershell",
         "args": [ "-NoProfile" ]
     },
-
-    "showOutput": "always",
 
     "tasks": [
         {
