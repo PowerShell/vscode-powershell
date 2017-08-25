@@ -11,3 +11,4 @@ vscode-powershell.zip
 vscps-preview.zip
 *.vsix
 npm-debug.log
+.vscode-test/
