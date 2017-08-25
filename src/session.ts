@@ -121,7 +121,7 @@ export class SessionManager implements Middleware {
 
         if (this.powerShellExePath) {
 
-            var bundledModulesPath = path.resolve(__dirname, "../modules");
+            var bundledModulesPath = path.resolve(__dirname, "../../modules");
 
             if (this.inDevelopmentMode) {
                 var devBundledModulesPath =
@@ -129,7 +129,7 @@ export class SessionManager implements Middleware {
                     path.resolve(
                         __dirname,
                         this.sessionSettings.developer.bundledModulesPath ||
-                        "../../PowerShellEditorServices/module");
+                        "../../../PowerShellEditorServices/module");
 
                 // Make sure the module's bin path exists
                 if (fs.existsSync(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {

@@ -40,7 +40,7 @@ export class PowerShellProcess {
                     let startScriptPath =
                         path.resolve(
                             __dirname,
-                            '../scripts/Start-EditorServices.ps1');
+                            '../../scripts/Start-EditorServices.ps1');
 
                     var editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
@@ -77,7 +77,7 @@ export class PowerShellProcess {
                         // NOTE: This batch file approach is needed temporarily until VS Code's
                         // createTerminal API gets an argument for setting environment variables
                         // on the launched process.
-                        var batScriptPath = path.resolve(__dirname, '../sessions/powershell.bat');
+                        var batScriptPath = path.resolve(__dirname, '../../sessions/powershell.bat');
                         fs.writeFileSync(
                             batScriptPath,
                             `@set DEVPATH=${path.dirname(powerShellExePath)}\r\n@${powerShellExePath} %*`);

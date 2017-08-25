@@ -14,7 +14,7 @@ import { Logger } from './logging';
 // named pipes or a network protocol).  It is purely a naive data
 // relay between the two transports.
 
-var logBasePath = path.resolve(__dirname, "../logs");
+var logBasePath = path.resolve(__dirname, "../../logs");
 
 var debugAdapterLogWriter =
     fs.createWriteStream(

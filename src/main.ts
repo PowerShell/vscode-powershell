@@ -161,7 +161,7 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext) {
                 if (choice === showReleaseNotes) {
                     vscode.commands.executeCommand(
                         'markdown.showPreview',
-                        vscode.Uri.file(path.resolve(__dirname, "../CHANGELOG.md")));
+                        vscode.Uri.file(path.resolve(__dirname, "../../CHANGELOG.md")));
                 }
             });
     }
