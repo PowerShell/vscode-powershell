@@ -460,6 +460,7 @@ export class SessionManager implements Middleware {
                     1);
 
             this.statusBarItem.command = this.ShowSessionMenuCommandName;
+            this.statusBarItem.tooltip = "Show PowerShell Session Menu";
             this.statusBarItem.show();
             vscode.window.onDidChangeActiveTextEditor(textEditor => {
                 if (textEditor === undefined
