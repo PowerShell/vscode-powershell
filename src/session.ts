@@ -16,11 +16,17 @@ import { IFeature } from './feature';
 import { Message } from 'vscode-jsonrpc';
 import { PowerShellProcess } from './process';
 import { StringDecoder } from 'string_decoder';
+
 import {
     LanguageClient, LanguageClientOptions, Executable,
     RequestType, RequestType0, NotificationType,
     StreamInfo, ErrorAction, CloseAction, RevealOutputChannelOn,
     Middleware, ResolveCodeLensSignature } from 'vscode-languageclient';
+
+import {
+    OperatingSystem, PlatformDetails, getDefaultPowerShellPath,
+    getPlatformDetails, fixWindowsPowerShellPath,
+    getPowerShellExeItems } from './platform';
 
 export enum SessionStatus {
     NotStarted,
@@ -35,12 +41,12 @@ export class SessionManager implements Middleware {
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
 
     private hostVersion: string;
-    private isWindowsOS: boolean;
     private editorServicesArgs: string;
     private powerShellExePath: string = "";
     private sessionStatus: SessionStatus;
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
+    private platformDetails: PlatformDetails;
     private extensionFeatures: IFeature[] = [];
     private statusBarItem: vscode.StatusBarItem;
     private languageServerProcess: PowerShellProcess;
@@ -61,7 +67,7 @@ export class SessionManager implements Middleware {
         private requiredEditorServicesVersion: string,
         private log: Logger) {
 
-        this.isWindowsOS = os.platform() == "win32";
+        this.platformDetails = getPlatformDetails();
 
         // Get the current version of this extension
         this.hostVersion =
@@ -542,9 +548,53 @@ export class SessionManager implements Middleware {
              this.sessionSettings.developer.powerShellExePath ||
              "").trim();
 
+        if (this.platformDetails.operatingSystem === OperatingSystem.Windows &&
+            powerShellExePath.length > 0) {
+
+            // Check the path bitness
+            let fixedPath =
+                fixWindowsPowerShellPath(
+                    powerShellExePath,
+                    this.platformDetails);
+
+            if (fixedPath !== powerShellExePath) {
+                let bitness = this.platformDetails.isOS64Bit ? 64 : 32;
+                // Show deprecation message with fix action.
+                // We don't need to wait on this to complete
+                // because we can finish gathering the configured
+                // PowerShell path without the fix
+                vscode
+                    .window
+                    .showWarningMessage(
+                        `The specified PowerShell path is incorrect for ${bitness}-bit VS Code, using '${fixedPath}' instead.`,
+                        "Fix Setting Automatically")
+                    .then(choice => {
+                        if (choice) {
+                            this.suppressRestartPrompt = true;
+                            Settings
+                                .change(
+                                    "powerShellExePath",
+                                    this.sessionSettings.developer.powerShellExePath,
+                                    true)
+                                .then(() => {
+                                    return Settings.change(
+                                        "developer.powerShellExePath",
+                                        undefined,
+                                        true)
+                                })
+                                .then(() => {
+                                    this.suppressRestartPrompt = false;
+                                });
+                        }
+                    });
+
+                powerShellExePath = fixedPath;
+            }
+        }
+
         return powerShellExePath.length > 0
             ? this.resolvePowerShellPath(powerShellExePath)
-            : this.getDefaultPowerShellPath(this.sessionSettings.useX86Host);
+            : getDefaultPowerShellPath(this.platformDetails, this.sessionSettings.useX86Host);
     }
 
     private changePowerShellExePath(exePath: string) {
@@ -552,78 +602,6 @@ export class SessionManager implements Middleware {
         Settings
             .change("powerShellExePath", exePath, true)
             .then(() => this.restartSession());
-    }
-
-    private getPowerShellExeItems(): PowerShellExeDetails[] {
-
-        var paths: PowerShellExeDetails[] = [];
-
-        if (this.isWindowsOS) {
-            const is64Bit = process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432');
-            const rootInstallPath = (is64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + '\\PowerShell';
-
-            if (fs.existsSync(rootInstallPath)) {
-                var psCorePaths =
-                    fs.readdirSync(rootInstallPath)
-                    .map(item => path.join(rootInstallPath, item))
-                    .filter(item => fs.lstatSync(item).isDirectory())
-                    .map(item => {
-                        return {
-                            versionName: `PowerShell Core ${path.parse(item).base}`,
-                            exePath: path.join(item, "powershell.exe")
-                        };
-                    });
-
-                if (psCorePaths) {
-                    paths = paths.concat(psCorePaths);
-                }
-            }
-
-            if (is64Bit) {
-                paths.push({
-                    versionName: "Windows PowerShell (x64)",
-                    exePath: process.env.windir + '\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe'
-                })
-            }
-
-            paths.push({
-                versionName: "Windows PowerShell (x86)",
-                exePath: process.env.windir + '\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'
-            })
-        }
-        else {
-            paths.push({
-                versionName: "PowerShell Core",
-                exePath:
-                    os.platform() === "darwin"
-                         ? "/usr/local/bin/powershell"
-                         : "/usr/bin/powershell"
-            });
-        }
-
-        return paths;
-    }
-
-    private getDefaultPowerShellPath(use32Bit: boolean): string | null {
-
-        // Find the path to powershell.exe based on the current platform
-        // and the user's desire to run the x86 version of PowerShell
-        var powerShellExePath = undefined;
-
-        if (this.isWindowsOS) {
-            powerShellExePath =
-                use32Bit || !process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432')
-                ? process.env.windir + '\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'
-                : process.env.windir + '\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe';
-        }
-        else if (os.platform() == "darwin") {
-            powerShellExePath = "/usr/local/bin/powershell";
-        }
-        else {
-            powerShellExePath = "/usr/bin/powershell";
-        }
-
-        return this.resolvePowerShellPath(powerShellExePath);
     }
 
     private resolvePowerShellPath(powerShellExePath: string): string {
@@ -679,7 +657,7 @@ export class SessionManager implements Middleware {
 
         var currentExePath = this.powerShellExePath.toLowerCase();
         var powerShellItems =
-            this.getPowerShellExeItems()
+            getPowerShellExeItems(this.platformDetails)
                 .filter(item => item.exePath.toLowerCase() !== currentExePath)
                 .map(item => {
                     return new SessionMenuItem(
@@ -746,11 +724,6 @@ export class SessionManager implements Middleware {
 
             return resolvedCodeLens;
     }
-}
-
-interface PowerShellExeDetails {
-    versionName: string;
-    exePath: string;
 }
 
 class SessionMenuItem implements vscode.QuickPickItem {
