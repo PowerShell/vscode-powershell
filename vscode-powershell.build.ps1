@@ -92,6 +92,11 @@ task BuildEditorServices {
 
 task BuildAll BuildEditorServices, Build -Before Package
 
+task Test Build, {
+    Write-Host "`n### Running extension tests" -ForegroundColor Green
+    exec { & npm run test }
+}
+
 task Package {
 
     if ($script:psesBuildScriptPath) {
@@ -112,4 +117,4 @@ task UploadArtifacts -If { $env:AppVeyor } {
 }
 
 # The default task is to run the entire CI build
-task . GetExtensionVersion, CleanAll, BuildAll, Package, UploadArtifacts
+task . GetExtensionVersion, CleanAll, BuildAll, Test, Package, UploadArtifacts
