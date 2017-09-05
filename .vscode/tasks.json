@@ -54,6 +54,18 @@
                 "Invoke-Build Build"
             ],
             "problemMatcher": []
+        },
+        {
+            "taskName": "Test",
+            "suppressTaskName": true,
+            "args": [
+                "Invoke-Build Test"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
         }
     ]
 }

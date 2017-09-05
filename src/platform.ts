@@ -22,7 +22,7 @@ export interface PlatformDetails {
     isProcess64Bit: boolean
 }
 
-interface PowerShellExeDetails {
+export interface PowerShellExeDetails {
     versionName: string;
     exePath: string;
 }
@@ -58,10 +58,18 @@ export function getDefaultPowerShellPath(
     // Find the path to powershell.exe based on the current platform
     // and the user's desire to run the x86 version of PowerShell
     if (platformDetails.operatingSystem == OperatingSystem.Windows) {
-        powerShellExePath =
-            use32Bit || !process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432')
-            ? System32PowerShellPath
-            : SysnativePowerShellPath
+        if (use32Bit) {
+            powerShellExePath =
+                platformDetails.isOS64Bit && platformDetails.isProcess64Bit
+                    ? SysWow64PowerShellPath
+                    : System32PowerShellPath
+        }
+        else {
+            powerShellExePath =
+                !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
+                    ? System32PowerShellPath
+                    : SysnativePowerShellPath
+        }
     }
     else if (platformDetails.operatingSystem == OperatingSystem.MacOS) {
         powerShellExePath = "/usr/local/bin/powershell";
@@ -81,6 +89,9 @@ export const System32PowerShellPath = getWindowsSystemPowerShellPath('System32')
 export const SysnativePowerShellPath = getWindowsSystemPowerShellPath('Sysnative');
 export const SysWow64PowerShellPath = getWindowsSystemPowerShellPath('SysWow64');
 
+export const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
+export const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
+
 const powerShell64BitPathOn32Bit = SysnativePowerShellPath.toLocaleLowerCase();
 const powerShell32BitPathOn64Bit = SysWow64PowerShellPath.toLocaleLowerCase();
 
@@ -96,12 +107,9 @@ export function fixWindowsPowerShellPath(powerShellExePath: string, platformDeta
     return powerShellExePath;
 }
 
-export function getPowerShellExeItems(platformDetails: PlatformDetails): PowerShellExeDetails[] {
+export function getAvailablePowerShellExes(platformDetails: PlatformDetails): PowerShellExeDetails[] {
 
     var paths: PowerShellExeDetails[] = [];
-
-    const windowsPowerShell64BitLabel = "Windows PowerShell (x64)";
-    const windowsPowerShell32BitLabel = "Windows PowerShell (x86)";
 
     if (platformDetails.operatingSystem === OperatingSystem.Windows) {
         const psCoreInstallPath =
@@ -109,25 +117,25 @@ export function getPowerShellExeItems(platformDetails: PlatformDetails): PowerSh
 
         if (platformDetails.isProcess64Bit) {
             paths.push({
-                versionName: windowsPowerShell64BitLabel,
+                versionName: WindowsPowerShell64BitLabel,
                 exePath: System32PowerShellPath
             })
 
             paths.push({
-                versionName: windowsPowerShell32BitLabel,
+                versionName: WindowsPowerShell32BitLabel,
                 exePath: SysWow64PowerShellPath
             })
         }
         else {
             if (platformDetails.isOS64Bit) {
                 paths.push({
-                    versionName: windowsPowerShell64BitLabel,
+                    versionName: WindowsPowerShell64BitLabel,
                     exePath: SysnativePowerShellPath
                 })
             }
 
             paths.push({
-                versionName: windowsPowerShell32BitLabel,
+                versionName: WindowsPowerShell32BitLabel,
                 exePath: System32PowerShellPath
             })
         }
