@@ -628,14 +628,6 @@ export class SessionManager implements Middleware {
     private showSessionMenu() {
         var menuItems: SessionMenuItem[] = [];
 
-        if (this.sessionStatus === SessionStatus.Initializing ||
-            this.sessionStatus === SessionStatus.NotStarted ||
-            this.sessionStatus === SessionStatus.Stopping) {
-
-            // Don't show a menu for these states
-            return;
-        }
-
         if (this.sessionStatus === SessionStatus.Running) {
             menuItems = [
                 new SessionMenuItem(
@@ -655,7 +647,7 @@ export class SessionManager implements Middleware {
             ];
         }
 
-        var currentExePath = this.powerShellExePath.toLowerCase();
+        var currentExePath = (this.powerShellExePath || "").toLowerCase();
         var powerShellItems =
             getAvailablePowerShellExes(this.platformDetails)
                 .filter(item => item.exePath.toLowerCase() !== currentExePath)
