@@ -117,7 +117,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
-        new DocumentFormatterFeature(),
+        new DocumentFormatterFeature(logger),
         new RemoteFilesFeature(),
         new DebugSessionFeature(sessionManager),
         new PickPSHostProcessFeature(),

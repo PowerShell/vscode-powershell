@@ -26,6 +26,7 @@ import {
 } from 'vscode-languageclient';
 import { TextDocumentIdentifier } from "vscode-languageserver-types";
 import Window = vscode.window;
+import { Logger } from '../logging';
 import { IFeature } from '../feature';
 import * as Settings from '../settings';
 import * as Utils from '../utils';
@@ -130,17 +131,55 @@ class PSDocumentFormattingEditProvider implements
         return Promise.resolve(TextEdit[0]);
     }
 
-    constructor() {
+    constructor(private logger: Logger) {
     }
 
     provideDocumentFormattingEdits(
         document: TextDocument,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
-        return this.provideDocumentRangeFormattingEdits(document, null, options, token);
-   }
+
+        this.logger.writeVerbose(`Formatting entire document - ${document.uri}...`)
+        return this.sendDocumentFormatRequest(document, null, options, token);
+    }
 
     provideDocumentRangeFormattingEdits(
+        document: TextDocument,
+        range: Range,
+        options: FormattingOptions,
+        token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
+
+        this.logger.writeVerbose(`Formatting document range ${JSON.stringify(range)} - ${document.uri}...`)
+        return this.sendDocumentFormatRequest(document, range, options, token);
+    }
+
+    provideOnTypeFormattingEdits(
+        document: TextDocument,
+        position: Position,
+        ch: string,
+        options: FormattingOptions,
+        token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
+
+        this.logger.writeVerbose(`Formatting on type at position ${JSON.stringify(position)} - ${document.uri}...`)
+
+        return this.getScriptRegion(document, position, ch).then(scriptRegion => {
+            if (scriptRegion === null) {
+                this.logger.writeVerbose("No formattable range returned.");
+                return this.emptyPromise;
+            }
+
+            return this.sendDocumentFormatRequest(
+                document,
+                toRange(scriptRegion),
+                options,
+                token);
+            },
+            (err) => {
+                this.logger.writeVerbose(`Error while requesting script region for formatting: ${err}`)
+            });
+    }
+
+    private sendDocumentFormatRequest(
         document: TextDocument,
         range: Range,
         options: FormattingOptions,
@@ -156,7 +195,6 @@ class PSDocumentFormattingEditProvider implements
         if (this.isDocumentLocked(document)) {
             return this.emptyPromise;
         }
-
 
         // somehow range object gets serialized to an array of Position objects,
         // so we need to use the object literal syntax to initialize it.
@@ -180,31 +218,25 @@ class PSDocumentFormattingEditProvider implements
             options: this.getEditorSettings()
         };
 
+        let formattingStartTime = new Date().valueOf();
+        function getFormattingDuration() {
+            return ((new Date().valueOf()) - formattingStartTime) / 1000;
+        }
+
         let textEdits = this.languageClient.sendRequest(
             DocumentRangeFormattingRequest.type,
             requestParams);
         this.lockDocument(document, textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
-        return textEdits;
-    }
 
-    provideOnTypeFormattingEdits(
-        document: TextDocument,
-        position: Position,
-        ch: string,
-        options: FormattingOptions,
-        token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
-        return this.getScriptRegion(document, position, ch).then(scriptRegion => {
-            if (scriptRegion === null) {
-                return this.emptyPromise;
-            }
-
-            return this.provideDocumentRangeFormattingEdits(
-                document,
-                toRange(scriptRegion),
-                options,
-                token);
-        });
+        return textEdits.then(
+            (edits) => {
+                this.logger.writeVerbose(`Document formatting finished in ${getFormattingDuration()}s`);
+                return edits;
+            },
+            (err) => {
+                this.logger.writeVerbose(`Document formatting failed in ${getFormattingDuration()}: ${err}`);
+            });
     }
 
     setLanguageClient(languageClient: LanguageClient): void {
@@ -284,8 +316,8 @@ export class DocumentFormatterFeature implements IFeature {
     private languageClient: LanguageClient;
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
-    constructor() {
-        this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider();
+    constructor(private logger: Logger) {
+        this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider(logger);
         this.formattingEditProvider = vscode.languages.registerDocumentFormattingEditProvider(
             "powershell",
             this.documentFormattingEditProvider);
