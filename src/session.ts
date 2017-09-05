@@ -77,6 +77,14 @@ export class SessionManager implements Middleware {
                 .packageJSON
                 .version;
 
+        let osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
+        let procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
+
+        this.log.write(
+            `Visual Studio Code v${vscode.version} ${procBitness}`,
+            `PowerShell Extension v${this.hostVersion}`,
+            `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}\n`);
+
         // Fix the host version so that PowerShell can consume it.
         // This is needed when the extension uses a prerelease
         // version string like 0.9.1-insiders-1234.
