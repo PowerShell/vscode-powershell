@@ -26,7 +26,7 @@ import {
 import {
     OperatingSystem, PlatformDetails, getDefaultPowerShellPath,
     getPlatformDetails, fixWindowsPowerShellPath,
-    getPowerShellExeItems } from './platform';
+    getAvailablePowerShellExes } from './platform';
 
 export enum SessionStatus {
     NotStarted,
@@ -657,7 +657,7 @@ export class SessionManager implements Middleware {
 
         var currentExePath = this.powerShellExePath.toLowerCase();
         var powerShellItems =
-            getPowerShellExeItems(this.platformDetails)
+            getAvailablePowerShellExes(this.platformDetails)
                 .filter(item => item.exePath.toLowerCase() !== currentExePath)
                 .map(item => {
                     return new SessionMenuItem(
