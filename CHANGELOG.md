@@ -1,5 +1,19 @@
 # vscode-powershell Release History
 
+## 1.4.2
+### Tuesday, September 5, 2017
+
+- [#993](https://github.com/PowerShell/vscode-powershell/issues/993) -
+  `powershell.powerShellExePath` using Sysnative path should be automatically
+  corrected when using 64-bit Visual Studio Code
+- [#1008](https://github.com/PowerShell/vscode-powershell/issues/1008) -
+  Windows PowerShell versions (x64 and x86) are not enumerated correctly
+  when using 64-bit Visual Studio Code
+- [#1009](https://github.com/PowerShell/vscode-powershell/issues/1009) -
+  PowerShell version indicator in status bar is missing tooltip
+- [#1020](https://github.com/PowerShell/vscode-powershell/issues/1020) -
+  "Show Session Menu", "Show Integrated Console", and "Restart Current Session"
+  commands should cause PowerShell extension to be activated
 
 ## 1.4.1
 ### Thursday, June 22, 2017
