@@ -49,10 +49,10 @@ export class Logger {
 
     public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]) {
         if (logLevel >= this.MinimumLogLevel) {
-            this.writeLine(message)
+            this.writeLine(message, logLevel)
 
             additionalMessages.forEach((line) => {
-                this.writeLine(line);
+                this.writeLine(line, logLevel);
             });
         }
     }
@@ -136,11 +136,13 @@ export class Logger {
         }
     }
 
-    private writeLine(message: string) {
-        // TODO: Add timestamp
-        this.logChannel.appendLine(message);
+    private writeLine(message: string, level: LogLevel = LogLevel.Normal) {
+        let now = new Date();
+        let timestampedMessage = `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}`
+
+        this.logChannel.appendLine(timestampedMessage);
         if (this.logFilePath) {
-            fs.appendFile(this.logFilePath, message + os.EOL);
+            fs.appendFile(this.logFilePath, timestampedMessage + os.EOL);
         }
     }
 }

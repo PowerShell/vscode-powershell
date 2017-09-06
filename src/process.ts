@@ -85,7 +85,7 @@ export class PowerShellProcess {
                         powerShellExePath = batScriptPath;
                     }
 
-                    this.log.write(`${utils.getTimestampString()} Language server starting...`);
+                    this.log.write("Language server starting...");
 
                     // Make sure no old session file exists
                     utils.deleteSessionFile(this.sessionFilePath);
