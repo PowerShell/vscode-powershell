@@ -329,7 +329,7 @@ export class SessionManager implements Middleware {
                     this.sessionDetails = sessionDetails;
 
                     if (sessionDetails.status === "started") {
-                        this.log.write(`${utils.getTimestampString()} Language server started.`);
+                        this.log.write("Language server started.");
 
                         // Start the language service client
                         this.startLanguageClient(sessionDetails);
@@ -352,7 +352,7 @@ export class SessionManager implements Middleware {
                     }
                 },
                 error => {
-                    this.log.write(`${utils.getTimestampString()} Language server startup failed.`);
+                    this.log.write("Language server startup failed.");
                     this.setSessionFailure("The language service could not be started: ", error);
                 }
             );
