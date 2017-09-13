@@ -85,7 +85,10 @@ export class PowerShellProcess {
                         powerShellExePath = batScriptPath;
                     }
 
-                    this.log.write("Language server starting...");
+                    this.log.write(
+                        "Language server starting --",
+                        "    exe: " + powerShellExePath,
+                        "    args: " + startScriptPath + ' ' + this.startArgs);
 
                     // Make sure no old session file exists
                     utils.deleteSessionFile(this.sessionFilePath);
@@ -134,20 +137,13 @@ export class PowerShellProcess {
                     vscode.window.onDidCloseTerminal(
                         terminal => {
                             if (terminal === this.consoleTerminal) {
-                                this.log.write(os.EOL + "powershell.exe terminated or terminal UI was closed" + os.EOL);
+                                this.log.write("powershell.exe terminated or terminal UI was closed");
                                 this.onExitedEmitter.fire();
                             }
                         });
 
                 this.consoleTerminal.processId.then(
-                    pid => {
-                        console.log("powershell.exe started, pid: " + pid + ", exe: " + powerShellExePath);
-                        this.log.write(
-                            "powershell.exe started --",
-                            "    pid: " + pid,
-                            "    exe: " + powerShellExePath,
-                            "    args: " + startScriptPath + ' ' + this.startArgs + os.EOL + os.EOL);
-                    });
+                    pid => { this.log.write(`powershell.exe started, pid: ${pid}`); });
             }
             catch (e)
             {
@@ -173,7 +169,7 @@ export class PowerShellProcess {
         }
 
         if (this.consoleTerminal) {
-            this.log.write(os.EOL + "Terminating PowerShell process...");
+            this.log.write("Terminating PowerShell process...");
             this.consoleTerminal.dispose();
             this.consoleTerminal = undefined;
         }

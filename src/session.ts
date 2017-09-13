@@ -83,7 +83,7 @@ export class SessionManager implements Middleware {
         this.log.write(
             `Visual Studio Code v${vscode.version} ${procBitness}`,
             `PowerShell Extension v${this.hostVersion}`,
-            `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}\n`);
+            `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`);
 
         // Fix the host version so that PowerShell can consume it.
         // This is needed when the extension uses a prerelease
@@ -185,7 +185,7 @@ export class SessionManager implements Middleware {
     public stop() {
 
         // Shut down existing session if there is one
-        this.log.write(os.EOL + os.EOL + "Shutting down language client...");
+        this.log.write("Shutting down language client...");
 
         if (this.sessionStatus === SessionStatus.Failed) {
             // Before moving further, clear out the client and process if
@@ -374,7 +374,7 @@ export class SessionManager implements Middleware {
 
         try
         {
-            this.log.write("Connecting to language service on port " + port + "..." + os.EOL);
+            this.log.write("Connecting to language service on port " + port + "...");
 
             let connectFunc = () => {
                 return new Promise<StreamInfo>(
