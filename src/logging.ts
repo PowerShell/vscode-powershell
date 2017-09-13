@@ -142,7 +142,14 @@ export class Logger {
 
         this.logChannel.appendLine(timestampedMessage);
         if (this.logFilePath) {
-            fs.appendFile(this.logFilePath, timestampedMessage + os.EOL);
+            fs.appendFile(
+                this.logFilePath,
+                timestampedMessage + os.EOL,
+                err => {
+                    if (err) {
+                        console.log(`Error writing to vscode-powershell log file: ${err}`)
+                    }
+                });
         }
     }
 }
