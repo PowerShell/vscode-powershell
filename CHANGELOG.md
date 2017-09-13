@@ -1,5 +1,13 @@
 # vscode-powershell Release History
 
+## 1.4.3
+### Wednesday, September 13, 2017
+
+- [#1016](https://github.com/PowerShell/vscode-powershell/issues/1016) -
+  Fixed a conflict with the "Azure Resource Manager for Visual Studio
+  Code" extension which prevented the PowerShell extension from loading
+  successfully.
+
 ## 1.4.2
 ### Tuesday, September 5, 2017
 
