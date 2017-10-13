@@ -1,0 +1,19 @@
+{
+  "Windows": [
+    {
+        "Name": "win",
+        "RepoDestinationPath": "C:\\vscode-powershell",
+        "BuildCommand": "C:\\build.ps1 -location _RepoDestinationPath_ -destination _DockerVolume_",
+        "BuildDockerOptions": [
+            "-m",
+            "3968m"
+        ],
+        "DockerFile": ".\\tools\\releaseBuild\\images\\microsoft_windowsservercore\\DockerFile",
+        "AdditionalContextFiles" :[ ".\\tools\\releaseBuild\\images\\microsoft_windowsservercore\\build.ps1"],
+        "DockerImageName": "psvsc-winsrvcore",
+        "BinaryBucket": "release"
+    }
+  ],
+  "Linux": [
+  ]
+}
