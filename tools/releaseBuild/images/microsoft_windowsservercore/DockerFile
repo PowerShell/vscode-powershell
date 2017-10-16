@@ -1,0 +1,18 @@
+# escape=`
+FROM microsoft/windowsservercore
+LABEL maintainer='PowerShell Team <powershellteam@hotmail.com>'
+LABEL version="0.3"
+
+SHELL ["PowerShell.exe", "-command"]
+
+RUN Set-ExecutionPolicy Unrestricted
+RUN iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+RUN Get-PackageProvider -Name nuget -ForceBootstrap
+RUN Install-Module InvokeBuild -Force
+RUN choco install -y nodejs.install --no-progress
+RUN choco install -y git.install --no-progress
+RUN choco install -y netfx-4.5.1-devpack --no-progress; exit 0
+
+COPY ./Build.ps1 /build.ps1
+
+ENTRYPOINT ["powershell", "-executionpolicy", "unrestricted"]
