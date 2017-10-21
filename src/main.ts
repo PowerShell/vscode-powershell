@@ -121,7 +121,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new NewFileOrProjectFeature(),
         new DocumentFormatterFeature(logger),
         new RemoteFilesFeature(),
-        new DebugSessionFeature(sessionManager),
+        new DebugSessionFeature(context, sessionManager),
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(),

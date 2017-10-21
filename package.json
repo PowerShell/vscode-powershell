@@ -5,7 +5,7 @@
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.12.0"
+    "vscode": "^1.17.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -26,10 +26,10 @@
   },
   "main": "./out/src/main",
   "activationEvents": [
+    "onDebug",
     "onLanguage:powershell",
     "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
-    "onCommand:PowerShell.StartDebugSession",
     "onCommand:PowerShell.PickPSHostProcess",
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
@@ -169,18 +169,20 @@
       {
         "name": "pester",
         "owner": "powershell",
-        "fileLocation": ["absolute"],
+        "fileLocation": [
+          "absolute"
+        ],
         "severity": "error",
         "pattern": [
-            {
-                "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
-                "message": 1
-            },
-            {
-                "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
-                "file": 1,
-                "line": 2
-            }
+          {
+            "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+            "message": 1
+          },
+          {
+            "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
+            "file": 1,
+            "line": 2
+          }
         ]
       }
     ],
@@ -207,7 +209,6 @@
         "languages": [
           "powershell"
         ],
-        "startSessionCommand": "PowerShell.StartDebugSession",
         "configurationSnippets": [
           {
             "label": "PowerShell: Launch Current File",
@@ -242,7 +243,9 @@
               "request": "launch",
               "name": "PowerShell Launch Current File w/Args Prompt",
               "script": "^\"\\${file}\"",
-              "args": [ "^\"\\${command:SpecifyScriptArgs}\"" ],
+              "args": [
+                "^\"\\${command:SpecifyScriptArgs}\""
+              ],
               "cwd": "^\"\\${file}\""
             }
           },
@@ -365,7 +368,9 @@
             "request": "launch",
             "name": "PowerShell Launch Current File w/Args Prompt",
             "script": "${file}",
-            "args": [ "${command:SpecifyScriptArgs}" ],
+            "args": [
+              "${command:SpecifyScriptArgs}"
+            ],
             "cwd": "${file}"
           },
           {
@@ -425,7 +430,7 @@
           "description": "Specifies the path to a PowerShell Script Analyzer settings file. To override the default settings for all projects, enter an absolute path, or enter a path relative to your workspace."
         },
         "powershell.codeFormatting.preset": {
-          "type":"string",
+          "type": "string",
           "enum": [
             "Custom",
             "Allman",

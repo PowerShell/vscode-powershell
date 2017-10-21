@@ -4,6 +4,13 @@
     "editor.insertSpaces": true,
     "files.trimTrailingWhitespace": true,
 
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "logs/": true,
+        "out/": true
+    },
+
     // Lock the TypeScript SDK path to the version we use
     "typescript.tsdk": "./node_modules/typescript/lib"
 }

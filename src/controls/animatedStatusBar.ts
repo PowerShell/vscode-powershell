@@ -5,6 +5,7 @@
 import {
     StatusBarItem,
     StatusBarAlignment,
+    ThemeColor,
     Disposable,
     window} from "vscode";
 
@@ -49,11 +50,11 @@ class AnimatedStatusBarItem implements StatusBarItem {
         this.statusBarItem.tooltip = value;
     }
 
-    public get color(): string {
+    public get color(): string | ThemeColor {
         return this.statusBarItem.color;
     }
 
-    public set color(value: string) {
+    public set color(value: string | ThemeColor) {
         this.statusBarItem.color = value;
     }
 
