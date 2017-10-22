@@ -48,6 +48,14 @@ export class DebugSessionFeature implements IFeature {
         var settings = Settings.load();
         let createNewIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
 
+        if (config.request === "attach") {
+            let versionDetails = this.sessionManager.getPowerShellVersionDetais();
+            if (versionDetails.edition.toLowerCase() === "core") {
+                vscode.window.showErrorMessage("PowerShell Core does not support attaching to a PowerShell host process.");
+                return;
+            }
+        }
+
         if (generateLaunchConfig) {
             // No launch.json, create the default configuration for both unsaved (Untitled) and saved documents.
             config.type = 'PowerShell';
