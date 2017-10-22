@@ -217,6 +217,10 @@ export class SessionManager implements Middleware {
         return this.sessionDetails;
     }
 
+    public getPowerShellVersionDetais() : PowerShellVersionDetails {
+        return this.versionDetails;
+    }
+
     public dispose() : void {
         // Stop the current session
         this.stop();
