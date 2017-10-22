@@ -3,43 +3,37 @@
 
     "windows": {
         "command": "${env:windir}/System32/WindowsPowerShell/v1.0/powershell.exe",
-        "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
+        "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command" ]
     },
     "linux": {
         "command": "/usr/bin/powershell",
-        "args": [ "-NoProfile" ]
+        "args": [ "-NoProfile", "-Command" ]
     },
     "osx": {
         "command": "/usr/local/bin/powershell",
-        "args": [ "-NoProfile" ]
+        "args": [ "-NoProfile", "-Command" ]
     },
 
     "tasks": [
         {
             "taskName": "Install",
-            "type": "shell",
-            "command": "Invoke-Build Restore"
+            "suppressTaskName": true,
+            "args": [ "Invoke-Build", "Restore" ]
         },
         {
             "taskName": "CleanAll",
-            "type": "shell",
-            "command": "Invoke-Build CleanAll"
+            "suppressTaskName": true,
+            "args": [ "Invoke-Build", "CleanAll" ]
         },
         {
             "taskName": "Clean",
-            "type": "shell",
-            "command": "Invoke-Build Clean"
+            "suppressTaskName": true,
+            "args": [ "Invoke-Build", "Clean" ]
         },
         {
             "taskName": "BuildAll",
-            "type": "shell",
-            "command": "Invoke-Build BuildAll",
-            "problemMatcher": []
-        },
-        {
-            "taskName": "Build",
-            "type": "shell",
-            "command": "Invoke-Build Build",
+            "suppressTaskName": true,
+            "args": [ "Invoke-Build", "BuildAll" ],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -47,9 +41,16 @@
             "problemMatcher": []
         },
         {
+            "taskName": "Build",
+            "suppressTaskName": true,
+            "args": [ "Invoke-Build", "Build" ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
             "taskName": "Test",
-            "type": "shell",
-            "command": "Invoke-Build Test",
+            "suppressTaskName": true,
+            "args": [ "Invoke-Build", "Test" ],
             "group": {
                 "kind": "test",
                 "isDefault": true
