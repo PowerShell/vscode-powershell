@@ -17,48 +17,39 @@
     "tasks": [
         {
             "taskName": "Install",
-            "suppressTaskName": true,
-            "args": [
-                "Invoke-Build Restore"
-            ]
+            "type": "shell",
+            "command": "Invoke-Build Restore"
         },
         {
             "taskName": "CleanAll",
-            "suppressTaskName": true,
-            "args": [
-                "Invoke-Build CleanAll"
-            ]
+            "type": "shell",
+            "command": "Invoke-Build CleanAll"
         },
         {
             "taskName": "Clean",
-            "suppressTaskName": true,
-            "args": [
-                "Invoke-Build Clean"
-            ]
+            "type": "shell",
+            "command": "Invoke-Build Clean"
         },
         {
             "taskName": "BuildAll",
-            "suppressTaskName": true,
-            "isBuildCommand": true,
-            "args": [
-                "Invoke-Build BuildAll"
-            ],
+            "type": "shell",
+            "command": "Invoke-Build BuildAll",
             "problemMatcher": []
         },
         {
             "taskName": "Build",
-            "suppressTaskName": true,
-            "args": [
-                "Invoke-Build Build"
-            ],
+            "type": "shell",
+            "command": "Invoke-Build Build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": []
         },
         {
             "taskName": "Test",
-            "suppressTaskName": true,
-            "args": [
-                "Invoke-Build Test"
-            ],
+            "type": "shell",
+            "command": "Invoke-Build Test",
             "group": {
                 "kind": "test",
                 "isDefault": true
