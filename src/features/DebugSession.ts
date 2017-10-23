@@ -51,8 +51,10 @@ export class DebugSessionFeature implements IFeature {
         if (config.request === "attach") {
             let versionDetails = this.sessionManager.getPowerShellVersionDetais();
             if (versionDetails.edition.toLowerCase() === "core") {
-                vscode.window.showErrorMessage("PowerShell Core does not support attaching to a PowerShell host process.");
-                return;
+                let msg = "PowerShell Core does not support attaching to a PowerShell host process.";
+                return vscode.window.showErrorMessage(msg).then(_ => {
+                    return undefined;
+                });
             }
         }
 
