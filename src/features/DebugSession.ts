@@ -31,15 +31,6 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     }
 
     // DebugConfigurationProvider method
-    provideDebugConfigurations(
-        folder: WorkspaceFolder | undefined,
-        token?: CancellationToken): ProviderResult<DebugConfiguration[]> {
-
-        // Currently all debugger initialConfigurations are specified in package.json
-        return [];
-    }
-
-    // DebugConfigurationProvider method
     resolveDebugConfiguration(
         folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
