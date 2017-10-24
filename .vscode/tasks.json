@@ -18,17 +18,20 @@
         {
             "taskName": "Install",
             "suppressTaskName": true,
-            "args": [ "Invoke-Build", "Restore" ]
+            "args": [ "Invoke-Build", "Restore" ],
+            "problemMatcher": []
         },
         {
             "taskName": "CleanAll",
             "suppressTaskName": true,
-            "args": [ "Invoke-Build", "CleanAll" ]
+            "args": [ "Invoke-Build", "CleanAll" ],
+            "problemMatcher": []
         },
         {
             "taskName": "Clean",
             "suppressTaskName": true,
-            "args": [ "Invoke-Build", "Clean" ]
+            "args": [ "Invoke-Build", "Clean" ],
+            "problemMatcher": []
         },
         {
             "taskName": "BuildAll",
