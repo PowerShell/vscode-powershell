@@ -8,6 +8,8 @@ import Settings = require('../settings');
 import { dirname } from 'path';
 import { IFeature } from '../feature';
 import { SessionManager } from '../session';
+import { OperatingSystem, PlatformDetails, getPlatformDetails } from '../platform';
+
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, ProviderResult, WorkspaceFolder } from 'vscode';
@@ -44,8 +46,12 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         let createNewIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
 
         if (config.request === "attach") {
-            let versionDetails = this.sessionManager.getPowerShellVersionDetais();
-            if (versionDetails.edition.toLowerCase() === "core") {
+            let platformDetails = getPlatformDetails();
+            let versionDetails = this.sessionManager.getPowerShellVersionDetails();
+
+            if (versionDetails.edition.toLowerCase() === "core" &&
+                platformDetails.operatingSystem !== OperatingSystem.Windows) {
+
                 let msg = "PowerShell Core does not support attaching to a PowerShell host process.";
                 return vscode.window.showErrorMessage(msg).then(_ => {
                     return undefined;
