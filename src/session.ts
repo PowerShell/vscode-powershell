@@ -217,7 +217,7 @@ export class SessionManager implements Middleware {
         return this.sessionDetails;
     }
 
-    public getPowerShellVersionDetais() : PowerShellVersionDetails {
+    public getPowerShellVersionDetails() : PowerShellVersionDetails {
         return this.versionDetails;
     }
 

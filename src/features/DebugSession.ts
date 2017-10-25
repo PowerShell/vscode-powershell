@@ -7,6 +7,8 @@ import utils = require('../utils');
 import Settings = require('../settings');
 import { IFeature } from '../feature';
 import { SessionManager } from '../session';
+import { OperatingSystem, PlatformDetails, getPlatformDetails } from '../platform';
+
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
 export namespace StartDebuggerNotification {
@@ -49,8 +51,12 @@ export class DebugSessionFeature implements IFeature {
         let createNewIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
 
         if (config.request === "attach") {
-            let versionDetails = this.sessionManager.getPowerShellVersionDetais();
-            if (versionDetails.edition.toLowerCase() === "core") {
+            let platformDetails = getPlatformDetails();
+            let versionDetails = this.sessionManager.getPowerShellVersionDetails();
+
+            if (versionDetails.edition.toLowerCase() === "core" &&
+                platformDetails.operatingSystem !== OperatingSystem.Windows) {
+
                 let msg = "PowerShell Core does not support attaching to a PowerShell host process.";
                 return vscode.window.showErrorMessage(msg).then(_ => {
                     return undefined;
