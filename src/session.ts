@@ -560,6 +560,14 @@ export class SessionManager implements Middleware {
              this.sessionSettings.developer.powerShellExePath ||
              "").trim();
 
+        // New versions of PS Core uninstall the previous version
+        // so make sure the path stored in the settings exists.
+        if (!fs.existsSync(powerShellExePath)) {
+            this.log.write(
+                `Path specified by 'powerShellExePath' setting - '${powerShellExePath}' - not found, reverting to default PowerShell path.`);
+            powerShellExePath = "";
+        }
+
         if (this.platformDetails.operatingSystem === OperatingSystem.Windows &&
             powerShellExePath.length > 0) {
 
