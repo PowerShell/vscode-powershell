@@ -58,8 +58,7 @@ export class RemoteFilesFeature implements IFeature {
     }
 
     private isDocumentRemote(doc: vscode.TextDocument) {
-        return doc.languageId === "powershell" &&
-               doc.fileName.toLowerCase().startsWith(this.tempSessionPathPrefix);
+        return doc.fileName.toLowerCase().startsWith(this.tempSessionPathPrefix);
     }
 
     private closeRemoteFiles() {
