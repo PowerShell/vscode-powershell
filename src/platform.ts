@@ -73,7 +73,7 @@ export function getDefaultPowerShellPath(
     }
     else if (platformDetails.operatingSystem == OperatingSystem.MacOS) {
         powerShellExePath = "/usr/local/bin/powershell";
-        if (fs.existsSync("/usr/loca/bin/pwsh")) {
+        if (fs.existsSync("/usr/local/bin/pwsh")) {
             powerShellExePath = "/usr/local/bin/pwsh";
         }
     }
