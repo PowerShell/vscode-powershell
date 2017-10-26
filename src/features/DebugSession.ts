@@ -52,7 +52,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             if (versionDetails.edition.toLowerCase() === "core" &&
                 platformDetails.operatingSystem !== OperatingSystem.Windows) {
 
-                let msg = "PowerShell Core does not support attaching to a host process except on Windows.";
+                let msg = "PowerShell Core only supports attaching to a host process on Windows.";
                 return vscode.window.showErrorMessage(msg).then(_ => {
                     return undefined;
                 });
