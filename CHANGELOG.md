@@ -1,5 +1,67 @@
 # vscode-powershell Release History
 
+## 1.5.0
+### Friday, October 27, 2017
+
+#### Fixes and Improvements
+
+- [PowerShell/vscode-powershell #820](https://github.com/PowerShell/vscode-powershell/issues/820) -
+  Added new "Upload Bug Report to GitHub" command to make it easy to post an issue to the vscode-powershell GitHub repo.  Thanks to [Mark Schill](https://github.com/PowerSchill)!
+
+- [PowerShell/vscode-powershell #910](https://github.com/PowerShell/vscode-powershell/issues/910) -
+  Set-VSCodeHtmlContentView cmdlet now exposes `JavaScriptPaths` and `StyleSheetPaths` parameters to allow using JavaScript code and CSS stylesheets in VS Code HTML preview views.
+
+- [PowerShell/vscode-powershell #909](https://github.com/PowerShell/vscode-powershell/issues/909) -
+  Write-VSCodeHtmlContentView's AppendBodyContent now accepts input from the pipeline
+
+- [PowerShell/vscode-powershell #1071](https://github.com/PowerShell/vscode-powershell/pull/1071) -
+  Updated session menu to find PowerShell Core installs with the new pwsh.exe path
+
+- [PowerShell/vscode-powershell #842](https://github.com/PowerShell/vscode-powershell/issues/842) -
+  psedit can now open empty files in remote sessions
+
+- [PowerShell/vscode-powershell #1040](https://github.com/PowerShell/vscode-powershell/issues/1040) -
+  Non-PowerShell files opened in remote sessions using psedit can now be saved back to the remote server
+
+- [PowerShell/vscode-powershell #660](https://github.com/PowerShell/vscode-powershell/issues/660) -
+  Set/Enable/Disable/Remove-PSBreakpoint commands now cause the VS Code breakpoint UI to be updated while the debugger is active
+
+- [PowerShell/vscode-powershell #625](https://github.com/PowerShell/vscode-powershell/issues/625) -
+  Breakpoints are now cleared from the session when the debugger starts so that stale breakpoints from previous sessions are not hit
+
+- [PowerShell/vscode-powershell #1004](https://github.com/PowerShell/vscode-powershell/issues/1004) -
+  Handle exception case when finding references of a symbol
+
+- [PowerShell/vscode-powershell #942](https://github.com/PowerShell/vscode-powershell/issues/942) -
+  Temporary debugging session now does not hang when running "PowerShell Interactive Session" debugging configuration
+
+- [PowerShell/vscode-powershell #917](https://github.com/PowerShell/vscode-powershell/issues/917) -
+  Added PowerShell.InvokeRegisteredEditorCommand command to be used from HTML preview views for invoking editor commands registered in PowerShell.  Thanks to [Kamil Kosek](https://github.com/kamilkosek)!
+
+- [PowerShell/vscode-powershell #872](https://github.com/PowerShell/vscode-powershell/issues/872) -
+  Watch variables with children are now expandable
+
+- [PowerShell/vscode-powershell #1060](https://github.com/PowerShell/vscode-powershell/issues/1060)  -
+  $psEditor.Workspace.NewFile() now works again in VSC 1.18.0 Insiders builds
+
+- [PowerShell/vscode-powershell #1046](https://github.com/PowerShell/vscode-powershell/issues/1046)  -
+  Debugging now works again in VSC 1.18.0 Insiders builds
+
+- [PowerShell/PowerShellEditorServices #342](https://github.com/PowerShell/PowerShellEditorServices/issues/342) -
+  Unexpected file URI schemes are now handled more reliably
+
+- [PowerShell/PowerShellEditorServices #396](https://github.com/PowerShell/PowerShellEditorServices/issues/396) -
+  Resolved errors being written to Integrated Console when running native applications while transcription is turned on
+
+- [PowerShell/PowerShellEditorServices #529](https://github.com/PowerShell/PowerShellEditorServices/issues/529) -
+  Fixed an issue with loading the PowerShellEditorServices module in PowerShell Core 6.0.0-beta3
+
+- [PowerShell/PowerShellEditorServices #533](https://github.com/PowerShell/PowerShellEditorServices/pull/533)  -
+  Added new $psEditor.GetCommand() method for getting all registered editor commands.  Thanks to [Kamil Kosek](https://github.com/kamilkosek)!
+
+- [PowerShell/PowerShellEditorServices #535](https://github.com/PowerShell/PowerShellEditorServices/pull/535)  -
+  Type information is now exposed on hover for variables in the Variables view
+
 ## 1.4.3
 ### Wednesday, September 13, 2017
 
