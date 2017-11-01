@@ -81,11 +81,14 @@ check out the included [README.md](examples/README.md) file to learn more about
 how to use them.
 
 This folder can be found at the following path:
+
 ```
-c:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
+C:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
 ```
+
 To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
-```
+
+```powershell
 code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
 
@@ -124,7 +127,6 @@ You have two options for sending us the logs:
 
   2. If you are editing scripts that don't contain sensitive information, you can drag and
      drop your logs ZIP file into the GitHub issue that you are creating.
-
 
 ## Contributing to the Code
 
