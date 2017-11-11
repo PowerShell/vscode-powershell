@@ -2,41 +2,53 @@
     "version": "2.0.0",
 
     "windows": {
-        "command": "${env:windir}/System32/WindowsPowerShell/v1.0/powershell.exe",
-        "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command" ]
+        "options": {
+            "shell": {
+                "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command" ]
+            }
+        }
     },
     "linux": {
-        "command": "/usr/bin/powershell",
-        "args": [ "-NoProfile", "-Command" ]
+        "options": {
+            "shell": {
+                "executable": "/usr/bin/pwsh",
+                "args": [ "-NoProfile", "-Command" ]
+            }
+        }
     },
     "osx": {
-        "command": "/usr/local/bin/powershell",
-        "args": [ "-NoProfile", "-Command" ]
+        "options": {
+            "shell": {
+                "executable": "/usr/local/bin/pwsh",
+                "args": [ "-NoProfile", "-Command" ]
+            }
+        }
     },
 
     "tasks": [
         {
-            "taskName": "Install",
-            "suppressTaskName": true,
-            "args": [ "Invoke-Build", "Restore" ],
+            "label": "Install",
+            "type": "shell",
+            "command": "Invoke-Build Restore",
             "problemMatcher": []
         },
         {
-            "taskName": "CleanAll",
-            "suppressTaskName": true,
-            "args": [ "Invoke-Build", "CleanAll" ],
+            "label": "CleanAll",
+            "type": "shell",
+            "command": "Invoke-Build CleanAll",
             "problemMatcher": []
         },
         {
-            "taskName": "Clean",
-            "suppressTaskName": true,
-            "args": [ "Invoke-Build", "Clean" ],
+            "label": "Clean",
+            "type": "shell",
+            "command": "Invoke-Build Clean",
             "problemMatcher": []
         },
         {
-            "taskName": "BuildAll",
-            "suppressTaskName": true,
-            "args": [ "Invoke-Build", "BuildAll" ],
+            "label": "BuildAll",
+            "type": "shell",
+            "command": "Invoke-Build BuildAll",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -44,16 +56,16 @@
             "problemMatcher": []
         },
         {
-            "taskName": "Build",
-            "suppressTaskName": true,
-            "args": [ "Invoke-Build", "Build" ],
+            "label": "Build",
+            "type": "shell",
+            "command": "Invoke-Build Build",
             "group": "build",
             "problemMatcher": []
         },
         {
-            "taskName": "Test",
-            "suppressTaskName": true,
-            "args": [ "Invoke-Build", "Test" ],
+            "label": "Test",
+            "type": "shell",
+            "command": "Invoke-Build Test",
             "group": {
                 "kind": "test",
                 "isDefault": true
