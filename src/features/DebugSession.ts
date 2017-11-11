@@ -121,7 +121,15 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                         vscode.window.showErrorMessage(msg);
                         return;
                     }
+
+                    if (config.script === "${file}") {
+                        config.script = currentDocument.fileName;
+                    }
                 }
+            }
+
+            if (config.cwd === "${file}") {
+                config.cwd = currentDocument.fileName;
             }
 
             if (config.createTemporaryIntegratedConsole !== undefined) {
