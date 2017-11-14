@@ -3,6 +3,9 @@
 ## 1.5.1
 ### Tuesday, November 14, 2017
 
+- [PowerShell/vscode-powershell #1100](https://github.com/PowerShell/vscode-powershell/issues/1100) -
+  Fixed CodeLens on Pester test invocation fails with "Error: command 'vscode.startDebug' not found".
+
 - [PowerShell/vscode-powershell #1091](https://github.com/PowerShell/vscode-powershell/issues/1091) -
   Fixed crash when editing remote file using psedit.
 
