@@ -12,7 +12,8 @@ $null = New-Item -Path "$PSScriptRoot\foo[1].txt" -Force
 
 Import-Module $PSScriptRoot\..\SampleModule.psd1
 
-$WorkspaceRoot = $pwd
+$WorkspaceRoot = Convert-Path $PSScriptRoot/..
+Set-Location $WorkspaceRoot
 
 Describe 'Verify Path Processing for Non-existing Paths Allowed Impl' {
     It 'Processes non-wildcard absolute path to non-existing file via -Path param' {
