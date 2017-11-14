@@ -37,6 +37,7 @@ export class PesterTestsFeature implements IFeature {
         let launchConfig = {
             request: "launch",
             type: "PowerShell",
+            name: "PowerShell Launch Pester Tests",
             script: "Invoke-Pester",
             args: [
                 `-Script "${uri.fsPath}"`,
@@ -61,6 +62,7 @@ export class PesterTestsFeature implements IFeature {
             utils.getDebugSessionFilePath(),
             this.sessionManager.getSessionDetails());
 
-        vscode.commands.executeCommand('vscode.startDebug', launchConfig);
+        // TODO: Update to handle multiple root workspaces.
+        vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
     }
 }
