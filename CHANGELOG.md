@@ -1,5 +1,26 @@
 # vscode-powershell Release History
 
+## 1.5.1
+### Tuesday, November 14, 2017
+
+- [PowerShell/vscode-powershell #1100](https://github.com/PowerShell/vscode-powershell/issues/1100) -
+  Fixed CodeLens on Pester test invocation fails with "Error: command 'vscode.startDebug' not found".
+
+- [PowerShell/vscode-powershell #1091](https://github.com/PowerShell/vscode-powershell/issues/1091) -
+  Fixed crash when editing remote file using psedit.
+
+- [PowerShell/vscode-powershell #1084](https://github.com/PowerShell/vscode-powershell/issues/1084) -
+  Fixed authenticode signature 'HashMismatch' on Start-EditorServices.ps1.
+
+- [PowerShell/vscode-powershell #1078](https://github.com/PowerShell/vscode-powershell/issues/1078) -
+  Fixed debug adapter process terminating when setting breakpoint in an Untitled file or in a Git diff window.
+
+- Update download.sh to remove macOS OpenSSL check since PowerShell Core Beta and higher no longer depend on OpenSSL.  Thanks to [elovelan](https://github.com/elovelan)!
+
+- Get-Help -ShowWindow will no longer error in the PowerShell Integrated Console.  The help window will appear but at the moment, it will appear behind VSCode.
+
+- Fix language server crash when processing a deep directory structure that exceeds max path.
+
 ## 1.5.0
 ### Friday, October 27, 2017
 
