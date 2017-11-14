@@ -14,6 +14,10 @@ enum CodeFormattingPreset {
     Stroustrup
 }
 
+export interface IBugReportingSettings {
+    project: string;
+}
+
 export interface ICodeFormattingSettings {
     preset: CodeFormattingPreset;
     openBraceOnSameLine: boolean;
@@ -55,6 +59,7 @@ export interface ISettings {
     developer?: IDeveloperSettings;
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
+    bugReporting?: IBugReportingSettings
 }
 
 export interface IIntegratedConsoleSettings {
@@ -66,6 +71,10 @@ export function load(): ISettings {
     let configuration: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration(
             utils.PowerShellLanguageId);
+
+    let defaultBugReportingSettings: IBugReportingSettings = {
+        project: "https://github.com/PowerShell/vscode-powershell"
+    };
 
     let defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
         enable: true,
@@ -112,7 +121,8 @@ export function load(): ISettings {
         debugging: configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
         developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
         codeFormatting: configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
-        integratedConsole: configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings)
+        integratedConsole: configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
+        bugReporting: configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings)
     };
 }
 

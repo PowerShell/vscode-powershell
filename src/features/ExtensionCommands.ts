@@ -354,7 +354,7 @@ export class ExtensionCommandsFeature implements IFeature {
     }
 
     private newFile(): Thenable<EditorOperationResponse> {
-        return vscode.workspace.openTextDocument('')
+        return vscode.workspace.openTextDocument({ content: ''})
                      .then(doc => vscode.window.showTextDocument(doc))
                      .then(_ => EditorOperationResponse.Completed);
     }

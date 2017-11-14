@@ -15,6 +15,7 @@ import { PowerShellLanguageId } from './utils';
 import { ConsoleFeature } from './features/Console';
 import { ExamplesFeature } from './features/Examples';
 import { OpenInISEFeature } from './features/OpenInISE';
+import { GenerateBugReportFeature } from './features/GenerateBugReport';
 import { CustomViewsFeature } from './features/CustomViews';
 import { ExpandAliasFeature } from './features/ExpandAlias';
 import { ShowHelpFeature } from './features/ShowOnlineHelp';
@@ -33,7 +34,7 @@ import { HelpCompletionFeature } from "./features/HelpCompletion";
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-var requiredEditorServicesVersion = "1.4.1";
+var requiredEditorServicesVersion = "1.5.0";
 
 var logger: Logger = undefined;
 var sessionManager: SessionManager = undefined;
@@ -109,6 +110,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new ConsoleFeature(),
         new ExamplesFeature(),
         new OpenInISEFeature(),
+        new GenerateBugReportFeature(sessionManager),
         new ExpandAliasFeature(),
         new ShowHelpFeature(),
         new FindModuleFeature(),
@@ -119,7 +121,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new NewFileOrProjectFeature(),
         new DocumentFormatterFeature(logger),
         new RemoteFilesFeature(),
-        new DebugSessionFeature(sessionManager),
+        new DebugSessionFeature(context, sessionManager),
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(),

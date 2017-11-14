@@ -5,41 +5,38 @@
 import vscode = require('vscode');
 import utils = require('../utils');
 import Settings = require('../settings');
+import { dirname } from 'path';
 import { IFeature } from '../feature';
 import { SessionManager } from '../session';
+import { OperatingSystem, PlatformDetails, getPlatformDetails } from '../platform';
+
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
+    ExtensionContext, ProviderResult, WorkspaceFolder } from 'vscode';
 
-export namespace StartDebuggerNotification {
-    export const type = new NotificationType<void, void>('powerShell/startDebugger');
-}
-
-export class DebugSessionFeature implements IFeature {
+export class DebugSessionFeature implements IFeature, DebugConfigurationProvider {
 
     private sessionCount: number = 1;
     private command: vscode.Disposable;
     private examplesPath: string;
 
-    constructor(private sessionManager: SessionManager) {
-        this.command = vscode.commands.registerCommand(
-            'PowerShell.StartDebugSession',
-            config => { this.startDebugSession(config); });
+    constructor(context: ExtensionContext, private sessionManager: SessionManager) {
+        // Register a debug configuration provider
+        context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('PowerShell', this));
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
-        languageClient.onNotification(
-            StartDebuggerNotification.type,
-            none => this.startDebugSession({
-                request: 'launch',
-                type: 'PowerShell',
-                name: 'PowerShell Interactive Session'
-            }));
     }
 
     public dispose() {
         this.command.dispose();
     }
 
-    private startDebugSession(config: any) {
+    // DebugConfigurationProvider method
+    resolveDebugConfiguration(
+        folder: WorkspaceFolder | undefined,
+        config: DebugConfiguration,
+        token?: CancellationToken): ProviderResult<DebugConfiguration> {
 
         let currentDocument = vscode.window.activeTextEditor.document;
         let debugCurrentScript = (config.script === "${file}") || !config.request;
@@ -47,6 +44,20 @@ export class DebugSessionFeature implements IFeature {
 
         var settings = Settings.load();
         let createNewIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
+
+        if (config.request === "attach") {
+            let platformDetails = getPlatformDetails();
+            let versionDetails = this.sessionManager.getPowerShellVersionDetails();
+
+            if (versionDetails.edition.toLowerCase() === "core" &&
+                platformDetails.operatingSystem !== OperatingSystem.Windows) {
+
+                let msg = "PowerShell Core only supports attaching to a host process on Windows.";
+                return vscode.window.showErrorMessage(msg).then(_ => {
+                    return undefined;
+                });
+            }
+        }
 
         if (generateLaunchConfig) {
             // No launch.json, create the default configuration for both unsaved (Untitled) and saved documents.
@@ -110,7 +121,15 @@ export class DebugSessionFeature implements IFeature {
                         vscode.window.showErrorMessage(msg);
                         return;
                     }
+
+                    if (config.script === "${file}") {
+                        config.script = currentDocument.fileName;
+                    }
                 }
+            }
+
+            if (config.cwd === "${file}") {
+                config.cwd = currentDocument.fileName;
             }
 
             if (config.createTemporaryIntegratedConsole !== undefined) {
@@ -136,27 +155,14 @@ export class DebugSessionFeature implements IFeature {
                 .start(`DebugSession-${this.sessionCount++}`)
                 .then(
                     sessionDetails => {
-                        this.startDebugger(
-                            config,
-                            sessionFilePath,
-                            sessionDetails);
+                        utils.writeSessionFile(sessionFilePath, sessionDetails);
                     });
         }
         else {
-            this.startDebugger(
-                config,
-                sessionFilePath,
-                this.sessionManager.getSessionDetails());
+            utils.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
         }
-    }
 
-    private startDebugger(
-        config: any,
-        sessionFilePath: string,
-        sessionDetails: utils.EditorServicesSessionDetails) {
-
-        utils.writeSessionFile(sessionFilePath, sessionDetails);
-        vscode.commands.executeCommand('vscode.startDebug', config);
+        return config;
     }
 }
 
@@ -194,7 +200,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
         this.command.dispose();
     }
 
-    private specifyScriptArguments(): Thenable<string[]> {
+    private specifyScriptArguments(): Thenable<string[] | string> {
         const powerShellDbgScriptArgsKey = 'powerShellDebugScriptArgs';
 
         let options: vscode.InputBoxOptions = {
@@ -215,6 +221,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
                 if (this.emptyInputBoxBugFixed) {
                    this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
                 }
+
                 return new Array(text);
             }
 

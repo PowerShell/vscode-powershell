@@ -73,9 +73,15 @@ export function getDefaultPowerShellPath(
     }
     else if (platformDetails.operatingSystem == OperatingSystem.MacOS) {
         powerShellExePath = "/usr/local/bin/powershell";
+        if (fs.existsSync("/usr/local/bin/pwsh")) {
+            powerShellExePath = "/usr/local/bin/pwsh";
+        }
     }
     else if (platformDetails.operatingSystem == OperatingSystem.Linux) {
         powerShellExePath = "/usr/bin/powershell";
+        if (fs.existsSync("/usr/bin/pwsh")) {
+            powerShellExePath = "/usr/bin/pwsh";
+        }
     }
 
     return powerShellExePath;
@@ -146,9 +152,14 @@ export function getAvailablePowerShellExes(platformDetails: PlatformDetails): Po
                 .map(item => path.join(psCoreInstallPath, item))
                 .filter(item => fs.lstatSync(item).isDirectory())
                 .map(item => {
+                    let exePath = path.join(item, "pwsh.exe");
+                    if (!fs.existsSync(exePath)) {
+                        exePath = path.join(item, "powershell.exe");
+                    }
+
                     return {
                         versionName: `PowerShell Core ${path.parse(item).base}`,
-                        exePath: path.join(item, "powershell.exe")
+                        exePath: exePath
                     };
                 });
 
@@ -158,12 +169,10 @@ export function getAvailablePowerShellExes(platformDetails: PlatformDetails): Po
         }
     }
     else {
+
         paths.push({
             versionName: "PowerShell Core",
-            exePath:
-                os.platform() === "darwin"
-                        ? "/usr/local/bin/powershell"
-                        : "/usr/bin/powershell"
+            exePath: this.getDefaultPowerShellPath(platformDetails)
         });
     }
 

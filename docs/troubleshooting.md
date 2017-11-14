@@ -19,9 +19,12 @@ This issue has been resolved in PowerShell 5.1.
 
 ### 1. PowerShell IntelliSense does not work, can't debug scripts
 
-The most common problem when the PowerShell extension doesn't work on macOS is that
-OpenSSL is not installed.  You can check for the installation of OpenSSL by looking for
-the following files:
+The most common problem when the PowerShell extension doesn't work on macOS is that you have
+an alpha version of PowerShell installed. To upgrade to the latest beta, please follow the
+[Install Instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#macos-1012).
+
+If you'd prefer to use an alpha version of PowerShell, then OpenSSL must be installed.
+You can check for the installation of OpenSSL by looking for the following files:
 
 If installed using Homebrew:
 

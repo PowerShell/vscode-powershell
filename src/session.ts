@@ -105,16 +105,18 @@ export class SessionManager implements Middleware {
 
         this.createStatusBarItem();
 
-        // Check for OpenSSL dependency on macOS.  Look for the default Homebrew installation
-        // path and if that fails check the system-wide library path.
-        if (os.platform() == "darwin") {
+        this.powerShellExePath = this.getPowerShellExePath();
+
+        // Check for OpenSSL dependency on macOS when running PowerShell Core alpha. Look for the default
+        // Homebrew installation path and if that fails check the system-wide library path.
+        if (os.platform() == "darwin" && this.getPowerShellVersionLabel() == "alpha") {
             if (!(utils.checkIfFileExists("/usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib") &&
                     utils.checkIfFileExists("/usr/local/opt/openssl/lib/libssl.1.0.0.dylib")) &&
                 !(utils.checkIfFileExists("/usr/local/lib/libcrypto.1.0.0.dylib") &&
                     utils.checkIfFileExists("/usr/local/lib/libssl.1.0.0.dylib"))) {
                     var thenable =
                         vscode.window.showWarningMessage(
-                            "The PowerShell extension will not work without OpenSSL on macOS and OS X",
+                            "The PowerShell extension will not work without OpenSSL on macOS and OS X when using PowerShell alpha",
                             "Show Documentation");
 
                     thenable.then(
@@ -131,7 +133,6 @@ export class SessionManager implements Middleware {
         }
 
         this.suppressRestartPrompt = false;
-        this.powerShellExePath = this.getPowerShellExePath();
 
         if (this.powerShellExePath) {
 
@@ -215,6 +216,10 @@ export class SessionManager implements Middleware {
 
     public getSessionDetails(): utils.EditorServicesSessionDetails {
         return this.sessionDetails;
+    }
+
+    public getPowerShellVersionDetails() : PowerShellVersionDetails {
+        return this.versionDetails;
     }
 
     public dispose() : void {
@@ -515,7 +520,7 @@ export class SessionManager implements Middleware {
             SessionStatus.Failed);
     }
 
-    private getPowerShellExePath(): string {
+    public getPowerShellExePath(): string {
 
         if (!this.sessionSettings.powerShellExePath &&
             this.sessionSettings.developer.powerShellExePath)
@@ -555,6 +560,14 @@ export class SessionManager implements Middleware {
             (this.sessionSettings.powerShellExePath ||
              this.sessionSettings.developer.powerShellExePath ||
              "").trim();
+
+        // New versions of PS Core uninstall the previous version
+        // so make sure the path stored in the settings exists.
+        if (!fs.existsSync(powerShellExePath)) {
+            this.log.write(
+                `Path specified by 'powerShellExePath' setting - '${powerShellExePath}' - not found, reverting to default PowerShell path.`);
+            powerShellExePath = "";
+        }
 
         if (this.platformDetails.operatingSystem === OperatingSystem.Windows &&
             powerShellExePath.length > 0) {
@@ -624,6 +637,33 @@ export class SessionManager implements Middleware {
         }
 
         return resolvedPath;
+    }
+
+    private getPowerShellVersionLabel(): string {
+        if (this.powerShellExePath) {
+            var powerShellCommandLine = [
+                this.powerShellExePath,
+                "-NoProfile",
+                "-NonInteractive"
+            ];
+
+            // Only add ExecutionPolicy param on Windows
+            if (utils.isWindowsOS()) {
+                powerShellCommandLine.push("-ExecutionPolicy", "Bypass")
+            }
+
+            powerShellCommandLine.push(
+                "-Command",
+                "'$PSVersionTable | ConvertTo-Json'");
+
+            var powerShellOutput = cp.execSync(powerShellCommandLine.join(' '));
+            var versionDetails = JSON.parse(powerShellOutput.toString());
+            return versionDetails.PSVersion.Label;
+        }
+        else {
+            // TODO: throw instead?
+            return null;
+        }
     }
 
     private showSessionConsole(isExecute?: boolean) {
