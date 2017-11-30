@@ -1,7 +1,6 @@
 // A task runner that invokes Pester to run all Pester tests under the
 // current workspace folder.
-
-// NOTE: This Test task runner requires an updated version of Pester (>=3.4.0)
+// NOTE: This Test task runner requires an updated version of Pester (>=4.0.3)
 // in order for the problemMatcher to find failed test information (message, line, file).
 // If you don't have that version, you can update Pester from the PowerShell Gallery
 // with this command:
@@ -14,13 +13,11 @@
 //
 // PS C:\> Install-Module Pester -Scope CurrentUser -Force
 //
-
 // NOTE: The Clean, Build and Publish tasks require PSake. PSake can be installed
 // from the PowerShell Gallery with this command:
 //
 // PS C:\> Install-Module PSake -Scope CurrentUser -Force
 //
-
 // Available variables which can be used inside of strings.
 // ${workspaceRoot}: the root folder of the team
 // ${file}: the current opened file
@@ -29,58 +26,74 @@
 // ${fileExtname}: the current opened file's extension
 // ${cwd}: the current working directory of the spawned process
 {
-	"version": "2.0.0",
+    "version": "2.0.0",
 
-    // Start PowerShell
     "windows": {
-        "command": "${env:windir}/System32/WindowsPowerShell/v1.0/powershell.exe",
-        "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass" ]
+        "options": {
+            "shell": {
+                "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "args": [
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-Command"
+                ]
+            }
+        }
     },
     "linux": {
-        "command": "/usr/bin/powershell",
-        "args": [ "-NoProfile" ]
+        "options": {
+            "shell": {
+                "executable": "/usr/bin/pwsh",
+                "args": [
+                    "-NoProfile",
+                    "-Command"
+                ]
+            }
+        }
     },
     "osx": {
-        "command": "/usr/local/bin/powershell",
-        "args": [ "-NoProfile" ]
+        "options": {
+            "shell": {
+                "executable": "/usr/local/bin/pwsh",
+                "args": [
+                    "-NoProfile",
+                    "-Command"
+                ]
+            }
+        }
     },
 
     // Associate with test task runner
     "tasks": [
         {
-            "taskName": "Clean",
-            "suppressTaskName": true,
-            "args": [
-                "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Clean;",
-                "Invoke-Command { Write-Host 'Completed Clean task in task runner.' }"
-            ]
+            "label": "Clean",
+            "type": "shell",
+            "command": "Invoke-PSake build.ps1 -taskList Clean"
         },
         {
-            "taskName": "Build",
-            "suppressTaskName": true,
-            "isBuildCommand": true,
-            "args": [
-                "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Build;",
-                "Invoke-Command { Write-Host 'Completed Build task in task runner.' }"
-            ]
+            "label": "Build",
+            "type": "shell",
+            "command": "Invoke-PSake build.ps1 -taskList Build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
-            "taskName": "Publish",
-            "suppressTaskName": true,
-            "args": [
-                "Write-Host 'Invoking PSake...'; Invoke-PSake build.ps1 -taskList Publish;",
-                "Invoke-Command { Write-Host 'Completed Publish task in task runner.' }"
-            ]
-        },
-        {
-            "taskName": "Test",
-            "suppressTaskName": true,
-            "isTestCommand": true,
-            "args": [
-                "Write-Host 'Invoking Pester...'; $ProgressPreference = 'SilentlyContinue'; Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true};",
-                "Invoke-Command { Write-Host 'Completed Test task in task runner.' }"
-            ],
+            "label": "Test",
+            "type": "shell",
+            "command": "Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true}",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
             "problemMatcher": "$pester"
+        },
+        {
+            "label": "Publish",
+            "type": "shell",
+            "command": "Invoke-PSake build.ps1 -taskList Publish"
         }
     ]
 }
