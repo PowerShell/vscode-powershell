@@ -75,7 +75,7 @@
       },
       {
         "command": "PowerShell.OpenInISE",
-        "key": "shift+alt+i",
+        "key": "ctrl+alt+i",
         "when": "editorTextFocus && editorLangId == 'powershell'"
       }
     ],
