@@ -24,7 +24,7 @@ import {
     Middleware, ResolveCodeLensSignature } from 'vscode-languageclient';
 
 import {
-    OperatingSystem, PlatformDetails, getDefaultPowerShellPath,
+    OperatingSystem, IPlatformDetails, getDefaultPowerShellPath,
     getPlatformDetails, fixWindowsPowerShellPath,
     getAvailablePowerShellExes } from './platform';
 
@@ -46,7 +46,7 @@ export class SessionManager implements Middleware {
     private sessionStatus: SessionStatus;
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
-    private platformDetails: PlatformDetails;
+    private platformDetails: IPlatformDetails;
     private extensionFeatures: IFeature[] = [];
     private statusBarItem: vscode.StatusBarItem;
     private languageServerProcess: PowerShellProcess;
@@ -55,7 +55,7 @@ export class SessionManager implements Middleware {
     private registeredCommands: vscode.Disposable[] = [];
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
-    private sessionDetails: utils.EditorServicesSessionDetails;
+    private sessionDetails: utils.IEditorServicesSessionDetails;
 
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
@@ -214,7 +214,7 @@ export class SessionManager implements Middleware {
         this.sessionStatus = SessionStatus.NotStarted;
     }
 
-    public getSessionDetails(): utils.EditorServicesSessionDetails {
+    public getSessionDetails(): utils.IEditorServicesSessionDetails {
         return this.sessionDetails;
     }
 
@@ -370,7 +370,7 @@ export class SessionManager implements Middleware {
             .then((answer) => { if (answer === "Yes") { this.restartSession(); }});
     }
 
-    private startLanguageClient(sessionDetails: utils.EditorServicesSessionDetails) {
+    private startLanguageClient(sessionDetails: utils.IEditorServicesSessionDetails) {
 
         var port = sessionDetails.languageServicePort;
 

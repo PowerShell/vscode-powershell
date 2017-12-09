@@ -8,7 +8,7 @@ import Settings = require('../settings');
 import { dirname } from 'path';
 import { IFeature } from '../feature';
 import { SessionManager } from '../session';
-import { OperatingSystem, PlatformDetails, getPlatformDetails } from '../platform';
+import { OperatingSystem, IPlatformDetails, getPlatformDetails } from '../platform';
 
 import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,

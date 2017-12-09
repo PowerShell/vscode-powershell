@@ -15,8 +15,8 @@ function checkDefaultPowerShellPath(platformDetails, expectedPath) {
 }
 
 function checkAvailableWindowsPowerShellPaths(
-    platformDetails: platform.PlatformDetails,
-    expectedPaths: platform.PowerShellExeDetails[]) {
+    platformDetails: platform.IPlatformDetails,
+    expectedPaths: platform.IPowerShellExeDetails[]) {
     test("correctly enumerates available Windows PowerShell paths", () => {
 
         // The system may return PowerShell Core paths so only
@@ -39,7 +39,7 @@ function checkFixedWindowsPowerShellpath(platformDetails, inputPath, expectedPat
 suite("Platform module", () => {
 
     suite("64-bit Windows, 64-bit VS Code", () => {
-        let platformDetails: platform.PlatformDetails = {
+        let platformDetails: platform.IPlatformDetails = {
             operatingSystem: platform.OperatingSystem.Windows,
             isOS64Bit: true,
             isProcess64Bit: true
@@ -69,7 +69,7 @@ suite("Platform module", () => {
     });
 
     suite("64-bit Windows, 32-bit VS Code", () => {
-        let platformDetails: platform.PlatformDetails = {
+        let platformDetails: platform.IPlatformDetails = {
             operatingSystem: platform.OperatingSystem.Windows,
             isOS64Bit: true,
             isProcess64Bit: false
@@ -99,7 +99,7 @@ suite("Platform module", () => {
     });
 
     suite("32-bit Windows, 32-bit VS Code", () => {
-        let platformDetails: platform.PlatformDetails = {
+        let platformDetails: platform.IPlatformDetails = {
             operatingSystem: platform.OperatingSystem.Windows,
             isOS64Bit: false,
             isProcess64Bit: false
