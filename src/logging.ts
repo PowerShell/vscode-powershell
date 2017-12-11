@@ -6,7 +6,6 @@ import fs = require("fs");
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
-import jsonrpc = require("vscode-jsonrpc");
 import utils = require("./utils");
 
 export enum LogLevel {
@@ -155,24 +154,3 @@ export class Logger {
         }
     }
 }
-
-// export class LanguageClientLogger implements jsonrpc.Logger {
-
-//     constructor(private logger: Logger) { }
-
-//     public error(message: string) {
-//         this.logger.writeError(message);
-//     }
-
-//     public warn(message: string) {
-//         this.logger.writeWarning(message);
-//     }
-
-//     public info(message: string) {
-//         this.logger.write(message);
-//     }
-
-//     public log(message: string) {
-//         this.logger.writeVerbose(message);
-//     }
-// }

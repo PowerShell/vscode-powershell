@@ -5,7 +5,8 @@
     ],
     "jsRules": {},
     "rules": {
-        "indent": [true, "spaces", 4]
+        "indent": [true, "spaces", 4],
+        "max-classes-per-file": false
     },
     "rulesDirectory": []
 }
