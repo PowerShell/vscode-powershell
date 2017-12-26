@@ -1,0 +1,105 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0" DefaultTargets="CleanAll;Package;UploadArtifacts">
+  <PropertyGroup Label="Defaults">
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutDir Condition="'$(OutDir)' == ''" >$(MSBuildProjectDirectory)/out</OutDir>
+    <IsPullRequestBuild Condition="'$(APPVEYOR_REPO_BRANCH)' == 'develop' and $(APPVEYOR_PULL_REQUEST_NUMBER) != ''" >true</IsPullRequestBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Version">
+    <UpdateVersion Condition="'$(UpdateVersion)' == ''">false</UpdateVersion>
+    <ExtensionVersion Condition="'$(AppVeyor)' != ''">$(APPVEYOR_BUILD_VERSION)</ExtensionVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="EditorServices">
+    <EditorServicesRepoItem Include="$(MSBuildProjectDirectory)/../PowerShellEditorServices" />
+  </ItemGroup>
+  <PropertyGroup Label="EditorServices">
+    <EditorServicesRepo Condition="'$(EditorServicesRepo)' == ''" >@(EditorServicesRepoItem)</EditorServicesRepo>
+    <EditorServicesBuildScript Condition="'$(EditorServicesRepo)' != ''" >$(EditorServicesRepo)/PowershellEditorServices.build.ps1</EditorServicesBuildScript>
+  </PropertyGroup>
+
+  <Target Name="CleanEditorServices" Condition="Exists('$(EditorServicesRepo)')">
+    <Exec Command="powershell -NoProfile -NonInteractive -Command &quot; Invoke-Build Clean '$(EditorServicesBuildScript)' &quot;"
+          Condition="'$(EditorServicesBuildScript)' != ''"
+          LogStandardErrorAsError="true"
+          WorkingDirectory="$(EditorServicesRepo)"
+          />
+  </Target>
+
+  <Target Name="BuildEditorServices"
+          Condition="Exists('$(EditorServicesRepo)')">
+    <Exec Command="powershell -NoProfile -NonInteractive -Command &quot; Invoke-Build Build '$(EditorServicesBuildScript)' &quot;"
+          Condition="'$(EditorServicesBuildScript)' != ''"
+          LogStandardErrorAsError="true"
+          WorkingDirectory="$(EditorServicesRepo)" />
+  </Target>
+  
+  <Target Name="GetExtensionVersion" BeforeTargets="Package">
+    <Exec Command="powershell -NoProfile -NonInteractive -Command &quot; npm version | ConvertFrom-Json | ForEach-Object { $_.PowerShell } &quot;" 
+          ConsoleToMSBuild="true"
+          Condition="'$(AppVeyor)' == ''"
+          WorkingDirectory="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="ConsoleOutput" PropertyName="ExtensionVersion"/>
+    </Exec>
+    <Exec Command="npm version $(ExtensionVersion) --no-git-tag-version"
+          Condition="'$(UpdateVersion)' == 'true'"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          LogStandardErrorAsError="true"
+          CustomErrorRegularExpression="^npm ERR!"
+          CustomWarningRegularExpression="^npm WARN" />
+  </Target>
+
+  <Target Name="CleanAll" DependsOnTargets="CleanEditorServices;Clean" />
+  
+  <Target Name="Clean">
+    <RemoveDir Directories="$(OutDir)" />
+  </Target>
+
+  <Target Name="Restore">
+    <PropertyGroup>
+      <NpmLogLevel Condition="'$(AppVeyor)' != ''">--loglevel=error</NpmLogLevel>
+      <NpmLogLevel Condition="'$(AppVeyor)' == ''"></NpmLogLevel>
+    </PropertyGroup>
+    <Exec Command="npm install $(NpmLogLevel)"
+          LogStandardErrorAsError="true"
+          CustomErrorRegularExpression="^npm ERR!"
+          CustomWarningRegularExpression="^npm WARN"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          />
+  </Target>
+
+  <Target Name="BuildAll" DependsOnTargets="BuildEditorServices;Build" BeforeTargets="Package" />
+  
+  <Target Name="Build">
+    <Exec Command="npm run compile" 
+          LogStandardErrorAsError="true" 
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+  
+  <Target Name="Package" DependsOnTargets="BuildAll">
+    <ItemGroup>
+      <EditorServicesModule Include="$(EditorServicesPath)\module\PowershellEditorServices\**\*" />
+    </ItemGroup>
+    <Copy Condition="'$(EditorServicesPath)' != ''" 
+          SourceFiles="@(EditorServicesModule)" 
+          DestinationFolder="$(MSBuildProjectDirectory)\modules\%(RecursiveDir)" 
+          OverwriteReadOnlyFiles="true" 
+          SkipUnchangedFiles="false"
+          />
+    <!-- The last two emulate -Force, not sure they're needed -->
+  
+    <Exec Command="node node_modules\vsce\out\vsce package" 
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          LogStandardErrorAsError="true" />
+  
+    <Move SourceFiles="$(MSBuildProjectDirectory)\Powershell-$(ExtensionVersion).vsix" 
+          DestinationFiles="$(MSBuildProjectDirectory)-insiders.visx"
+          />
+  </Target>
+
+  <Target Name="UploadArtifacts" Condition="'$(AppVeyor)' != ''" DependsOnTargets="Package">
+    <Exec Command="powershell -NoProfile -NonInteractive -Command &quot; Push-AppveyorArtifact .\PowerShell-insiders.vsix &quot;" />
+  </Target>
+
+</Project>

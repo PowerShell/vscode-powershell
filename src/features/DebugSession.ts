@@ -182,7 +182,8 @@ export class SpecifyScriptArgsFeature implements IFeature {
                 return new Array(text);
             }
 
-            return text;
+            // Fix error TS2322: Type 'Thenable<string | string[]>' is not assignable to type 'Thenable<string[]>'.
+            return [text];
         });
     }
 }
