@@ -48,8 +48,8 @@
     https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
 
 .PARAMETER Architecture
-    A validated string defining the bit version to download. Values can be either 64 or 32.
-    If 64 is chosen and the OS Architecture does not match, then the x86 build will be
+    A validated string defining the bit version to download. Values can be either 64-bit or 32-bit.
+    If 64-bit is chosen and the OS Architecture does not match, then the 32-bit build will be
     downloaded instead. If parameter is not used, then 64-bit is used as default.
 
 .PARAMETER BuildEdition
@@ -68,7 +68,7 @@
     has finished.
 
 .EXAMPLE
-    Install-VSCode.ps1 -Architecture 32
+    Install-VSCode.ps1 -Architecture 32-bit
 
     Installs Visual Studio Code (32-bit) and the powershell extension.
 .EXAMPLE
@@ -115,8 +115,8 @@
 [CmdletBinding()]
 param(
     [parameter()]
-    [ValidateSet(,"64","32")]
-    [string]$Architecture = "64",
+    [ValidateSet(,"64-bit","32-bit")]
+    [string]$Architecture = "64-bit",
 
     [parameter()]
     [ValidateSet("stable","insider")]
@@ -131,7 +131,7 @@ param(
 
 if (!($IsLinux -or $IsOSX)) {
     switch ($Architecture) {
-        "64" {
+        "64-bit" {
             if ((Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
                 $codePath = $env:ProgramFiles
                 $bitVersion = "win32-x64"
@@ -139,10 +139,11 @@ if (!($IsLinux -or $IsOSX)) {
             else {
                 $codePath = ${env:ProgramFiles(x86)}
                 $bitVersion = "win32"
+                $Architecture = "32-bit"
             }
             break;
         }
-        "32" {
+        "32-bit" {
             $codePath = ${env:ProgramFiles(x86)}
             $bitVersion = "win32"
             break;
@@ -151,10 +152,12 @@ if (!($IsLinux -or $IsOSX)) {
     switch ($BuildEdition) {
         "Stable" {
             $codeCmdPath = "$codePath\Microsoft VS Code\bin\code.cmd"
+            $appName = "Visual Studio Code ($($Architecture))"
             break;
         }
         "Insider" {
             $codeCmdPath = "$codePath\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+            $appName = "Visual Studio Code - Insiders Edition ($($Architecture))"
             break;
         }
     }
@@ -162,15 +165,15 @@ if (!($IsLinux -or $IsOSX)) {
         $ProgressPreference = 'SilentlyContinue'
 
         if (!(Test-Path $codeCmdPath)) {
-            Write-Host "`nDownloading latest $($BuildEdition) Visual Studio Code..." -ForegroundColor Yellow
+            Write-Host "`nDownloading latest $appName..." -ForegroundColor Yellow
             Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
             Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
 
-            Write-Host "`nInstalling Visual Studio Code..." -ForegroundColor Yellow
+            Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
             Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
         }
         else {
-            Write-Host "`nVisual Studio Code is already installed." -ForegroundColor Yellow
+            Write-Host "`n$appName is already installed." -ForegroundColor Yellow
         }
 
         $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
@@ -180,7 +183,7 @@ if (!($IsLinux -or $IsOSX)) {
         }
 
         if ($LaunchWhenDone) {
-            Write-Host "`nInstallation complete, starting Visual Studio Code...`n`n" -ForegroundColor Green
+            Write-Host "`nInstallation complete, starting $appName...`n`n" -ForegroundColor Green
             & $codeCmdPath
         }
         else {
