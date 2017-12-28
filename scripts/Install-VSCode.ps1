@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0
+.VERSION 1.1
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -25,6 +25,9 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    28/12/2017 - added functionality to support 64-bit versions of VSCode
+    & support for installation of VSCode Insiders Edition.
+    --
     Initial release.
 #>
 
@@ -43,6 +46,10 @@
     Please contribute improvements to this script on GitHub!
 
     https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
+
+.PARAMETER BuildEdition
+    A validated string defining which build edition or "stream" to download - stable or
+    insiders edition. If the parameter is not used, then stable is downloaded as default.
 
 .PARAMETER AdditionalExtensions
     An array of strings that are the fully-qualified names of extensions to be
@@ -66,6 +73,12 @@
 
     Installs Visual Studio Code, the PowerShell extension, and additional
     extensions.
+
+.EXAMPLE
+    Install-VSCode.ps1 -BuildEdition Insider -LaunchWhenDone
+
+    Installs Visual Studio Code Insiders Edition and then launches the editor
+    after installation completes.
 
 .NOTES
     This script is licensed under the MIT License:
@@ -92,27 +105,38 @@
 #>
 [CmdletBinding()]
 param(
+    [parameter()]
+    [ValidateSet("stable","insider")]
+    [string]$BuildEdition = "stable",
     [Parameter()]
     [ValidateNotNull()]
     [string[]]$AdditionalExtensions = @(),
-
     [switch]$LaunchWhenDone
 )
 
 if (!($IsLinux -or $IsOSX)) {
+    switch ($BuildEdition) {
+        "Stable" {
+            $codeCmdPath = "C:\Program*\Microsoft VS Code\bin\code.cmd"
+            break;
+        }
+        "Insider" {
+            $codeCmdPath = "C:\Program*\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+            break;
+        }
+    }
 
-    $codeCmdPath = "C:\Program Files (x86)\Microsoft VS Code\bin\code.cmd"
 
     try {
         $ProgressPreference = 'SilentlyContinue'
 
         if (!(Test-Path $codeCmdPath)) {
-            Write-Host "`nDownloading latest stable Visual Studio Code..." -ForegroundColor Yellow
-            Remove-Item -Force $env:TEMP\vscode-stable.exe -ErrorAction SilentlyContinue
-            Invoke-WebRequest -Uri https://vscode-update.azurewebsites.net/latest/win32/stable -OutFile $env:TEMP\vscode-stable.exe
+            Write-Host "`nDownloading latest $($BuildEdition) Visual Studio Code..." -ForegroundColor Yellow
+            Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
+            Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/win32-x64/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
 
             Write-Host "`nInstalling Visual Studio Code..." -ForegroundColor Yellow
-            Start-Process -Wait $env:TEMP\vscode-stable.exe -ArgumentList /silent, /mergetasks=!runcode
+            Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
         }
         else {
             Write-Host "`nVisual Studio Code is already installed." -ForegroundColor Yellow
