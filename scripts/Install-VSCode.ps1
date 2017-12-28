@@ -47,6 +47,11 @@
 
     https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
 
+.PARAMETER Architecture
+    A validated string defining the bit version to download. Values can be either 64 or 32.
+    If 64 is chosen and the OS Architecture does not match, then the x86 build will be
+    downloaded instead. If parameter is not used, then 64-bit is used as default.
+
 .PARAMETER BuildEdition
     A validated string defining which build edition or "stream" to download - stable or
     insiders edition. If the parameter is not used, then stable is downloaded as default.
@@ -63,21 +68,25 @@
     has finished.
 
 .EXAMPLE
+    Install-VSCode.ps1 -Architecture 32
+
+    Installs Visual Studio Code (32-bit) and the powershell extension.
+.EXAMPLE
     Install-VSCode.ps1 -LaunchWhenDone
 
-    Installs Visual Studio Code and the PowerShell extension and then launches
+    Installs Visual Studio Code (64-bit) and the PowerShell extension and then launches
     the editor after installation completes.
 
 .EXAMPLE
     Install-VSCode.ps1 -AdditionalExtensions 'eamodio.gitlens', 'vscodevim.vim'
 
-    Installs Visual Studio Code, the PowerShell extension, and additional
+    Installs Visual Studio Code (64-bit), the PowerShell extension, and additional
     extensions.
 
 .EXAMPLE
     Install-VSCode.ps1 -BuildEdition Insider -LaunchWhenDone
 
-    Installs Visual Studio Code Insiders Edition and then launches the editor
+    Installs Visual Studio Code Insiders Edition (64-bit) and then launches the editor
     after installation completes.
 
 .NOTES
@@ -106,6 +115,10 @@
 [CmdletBinding()]
 param(
     [parameter()]
+    [ValidateSet(,"64","32")]
+    [string]$Architecture = "64",
+
+    [parameter()]
     [ValidateSet("stable","insider")]
     [string]$BuildEdition = "stable",
 
@@ -117,25 +130,41 @@ param(
 )
 
 if (!($IsLinux -or $IsOSX)) {
-    switch ($BuildEdition) {
-        "Stable" {
-            $codeCmdPath = "C:\Program*\Microsoft VS Code\bin\code.cmd"
+    switch ($Architecture) {
+        "64" {
+            if ((Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
+                $codePath = $env:ProgramFiles
+                $bitVersion = "win32-x64"
+            }
+            else {
+                $codePath = ${env:ProgramFiles(x86)}
+                $bitVersion = "win32"
+            }
             break;
         }
-        "Insider" {
-            $codeCmdPath = "C:\Program*\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+        "32" {
+            $codePath = ${env:ProgramFiles(x86)}
+            $bitVersion = "win32"
             break;
         }
     }
-
-
+    switch ($BuildEdition) {
+        "Stable" {
+            $codeCmdPath = "$codePath\Microsoft VS Code\bin\code.cmd"
+            break;
+        }
+        "Insider" {
+            $codeCmdPath = "$codePath\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+            break;
+        }
+    }
     try {
         $ProgressPreference = 'SilentlyContinue'
 
         if (!(Test-Path $codeCmdPath)) {
             Write-Host "`nDownloading latest $($BuildEdition) Visual Studio Code..." -ForegroundColor Yellow
             Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
-            Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/win32-x64/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
+            Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
 
             Write-Host "`nInstalling Visual Studio Code..." -ForegroundColor Yellow
             Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
