@@ -108,9 +108,11 @@ param(
     [parameter()]
     [ValidateSet("stable","insider")]
     [string]$BuildEdition = "stable",
+
     [Parameter()]
     [ValidateNotNull()]
     [string[]]$AdditionalExtensions = @(),
+
     [switch]$LaunchWhenDone
 )
 
