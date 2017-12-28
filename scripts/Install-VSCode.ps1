@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.0
+.VERSION 1.1
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -25,6 +25,9 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    28/12/2017 - added functionality to support 64-bit versions of VSCode
+    & support for installation of VSCode Insiders Edition.
+    --
     Initial release.
 #>
 
@@ -44,6 +47,15 @@
 
     https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
 
+.PARAMETER Architecture
+    A validated string defining the bit version to download. Values can be either 64-bit or 32-bit.
+    If 64-bit is chosen and the OS Architecture does not match, then the 32-bit build will be
+    downloaded instead. If parameter is not used, then 64-bit is used as default.
+
+.PARAMETER BuildEdition
+    A validated string defining which build edition or "stream" to download - stable or
+    insiders edition. If the parameter is not used, then stable is downloaded as default.
+
 .PARAMETER AdditionalExtensions
     An array of strings that are the fully-qualified names of extensions to be
     installed in addition to the PowerShell extension.  The fully qualified
@@ -56,16 +68,26 @@
     has finished.
 
 .EXAMPLE
+    Install-VSCode.ps1 -Architecture 32-bit
+
+    Installs Visual Studio Code (32-bit) and the powershell extension.
+.EXAMPLE
     Install-VSCode.ps1 -LaunchWhenDone
 
-    Installs Visual Studio Code and the PowerShell extension and then launches
+    Installs Visual Studio Code (64-bit) and the PowerShell extension and then launches
     the editor after installation completes.
 
 .EXAMPLE
     Install-VSCode.ps1 -AdditionalExtensions 'eamodio.gitlens', 'vscodevim.vim'
 
-    Installs Visual Studio Code, the PowerShell extension, and additional
+    Installs Visual Studio Code (64-bit), the PowerShell extension, and additional
     extensions.
+
+.EXAMPLE
+    Install-VSCode.ps1 -BuildEdition Insider -LaunchWhenDone
+
+    Installs Visual Studio Code Insiders Edition (64-bit) and then launches the editor
+    after installation completes.
 
 .NOTES
     This script is licensed under the MIT License:
@@ -92,6 +114,14 @@
 #>
 [CmdletBinding()]
 param(
+    [parameter()]
+    [ValidateSet(,"64-bit","32-bit")]
+    [string]$Architecture = "64-bit",
+
+    [parameter()]
+    [ValidateSet("stable","insider")]
+    [string]$BuildEdition = "stable",
+
     [Parameter()]
     [ValidateNotNull()]
     [string[]]$AdditionalExtensions = @(),
@@ -100,22 +130,56 @@ param(
 )
 
 if (!($IsLinux -or $IsOSX)) {
-
-    $codeCmdPath = "C:\Program Files (x86)\Microsoft VS Code\bin\code.cmd"
-
+    switch ($Architecture) {
+        "64-bit" {
+            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
+                $codePath = $env:ProgramFiles
+                $bitVersion = "win32-x64"
+            }
+            else {
+                $codePath = $env:ProgramFiles
+                $bitVersion = "win32"
+                $Architecture = "32-bit"
+            }
+            break;
+        }
+        "32-bit" {
+            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "32-bit"){
+                $codePath = $env:ProgramFiles
+                $bitVersion = "win32"
+            }
+            else {
+                $codePath = ${env:ProgramFiles(x86)}
+                $bitVersion = "win32"
+            }
+            break;
+        }
+    }
+    switch ($BuildEdition) {
+        "Stable" {
+            $codeCmdPath = "$codePath\Microsoft VS Code\bin\code.cmd"
+            $appName = "Visual Studio Code ($($Architecture))"
+            break;
+        }
+        "Insider" {
+            $codeCmdPath = "$codePath\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+            $appName = "Visual Studio Code - Insiders Edition ($($Architecture))"
+            break;
+        }
+    }
     try {
         $ProgressPreference = 'SilentlyContinue'
 
         if (!(Test-Path $codeCmdPath)) {
-            Write-Host "`nDownloading latest stable Visual Studio Code..." -ForegroundColor Yellow
-            Remove-Item -Force $env:TEMP\vscode-stable.exe -ErrorAction SilentlyContinue
-            Invoke-WebRequest -Uri https://vscode-update.azurewebsites.net/latest/win32/stable -OutFile $env:TEMP\vscode-stable.exe
+            Write-Host "`nDownloading latest $appName..." -ForegroundColor Yellow
+            Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
+            Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
 
-            Write-Host "`nInstalling Visual Studio Code..." -ForegroundColor Yellow
-            Start-Process -Wait $env:TEMP\vscode-stable.exe -ArgumentList /silent, /mergetasks=!runcode
+            Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
+            Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
         }
         else {
-            Write-Host "`nVisual Studio Code is already installed." -ForegroundColor Yellow
+            Write-Host "`n$appName is already installed." -ForegroundColor Yellow
         }
 
         $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
@@ -125,7 +189,7 @@ if (!($IsLinux -or $IsOSX)) {
         }
 
         if ($LaunchWhenDone) {
-            Write-Host "`nInstallation complete, starting Visual Studio Code...`n`n" -ForegroundColor Green
+            Write-Host "`nInstallation complete, starting $appName...`n`n" -ForegroundColor Green
             & $codeCmdPath
         }
         else {
