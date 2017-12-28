@@ -137,15 +137,21 @@ if (!($IsLinux -or $IsOSX)) {
                 $bitVersion = "win32-x64"
             }
             else {
-                $codePath = ${env:ProgramFiles(x86)}
+                $codePath = $env:ProgramFiles
                 $bitVersion = "win32"
                 $Architecture = "32-bit"
             }
             break;
         }
         "32-bit" {
-            $codePath = ${env:ProgramFiles(x86)}
-            $bitVersion = "win32"
+            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "32-bit"){
+                $codePath = $env:ProgramFiles
+                $bitVersion = "win32"
+            }
+            else {
+                $codePath = ${env:ProgramFiles(x86)}
+                $bitVersion = "win32"
+            }
             break;
         }
     }
