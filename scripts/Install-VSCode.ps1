@@ -132,7 +132,7 @@ param(
 if (!($IsLinux -or $IsOSX)) {
     switch ($Architecture) {
         "64-bit" {
-            if ((Get-WmiObject -Class Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
+            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
                 $codePath = $env:ProgramFiles
                 $bitVersion = "win32-x64"
             }
