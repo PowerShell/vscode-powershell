@@ -2,6 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
+import os = require('os');
 import path = require('path');
 import vscode = require('vscode');
 import { IFeature } from '../feature';
@@ -371,13 +372,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private openFile(filePath: string): Thenable<EditorOperationResponse> {
 
-        // Make sure the file path is absolute
-        if (!path.win32.isAbsolute(filePath))
-        {
-            filePath = path.win32.resolve(
-                vscode.workspace.rootPath,
-                filePath);
-        }
+        filePath = this.normalizeFilePath(filePath);
 
         var promise =
             vscode.workspace.openTextDocument(filePath)
@@ -391,18 +386,21 @@ export class ExtensionCommandsFeature implements IFeature {
 
         var promise: Thenable<EditorOperationResponse>;
 
-        // Make sure the file path is absolute
-        if (!path.win32.isAbsolute(filePath))
-        {
-            filePath = path.win32.resolve(
-                vscode.workspace.rootPath,
-                filePath);
-        }
+        var normalizedFilePath = this.normalizeFilePath(filePath);
 
-        // Normalize file path case for comparison
-        var normalizedFilePath = filePath.toLowerCase();
+        // since Windows is case-insensitive, we need to normalize it differently
+        var canFind = vscode.workspace.textDocuments.find(doc => {
+            var docPath;
+            if (os.platform() == "win32") {
+                // for windows paths, they are normalized to be lowercase
+                docPath = doc.fileName.toLowerCase();
+            } else {
+                docPath = doc.fileName;
+            }
+            return docPath == normalizedFilePath;
+        });
 
-        if (vscode.workspace.textDocuments.find(doc => doc.fileName.toLowerCase() == normalizedFilePath))
+        if (canFind)
         {
             promise =
                 vscode.workspace.openTextDocument(filePath)
@@ -422,22 +420,29 @@ export class ExtensionCommandsFeature implements IFeature {
 
         var promise: Thenable<EditorOperationResponse>;
 
-        // Make sure the file path is absolute
-        if (!path.win32.isAbsolute(filePath))
-        {
-            filePath = path.win32.resolve(
-                vscode.workspace.rootPath,
-                filePath);
-        }
+        var normalizedFilePath = this.normalizeFilePath(filePath);
 
-        // Normalize file path case for comparison
-        var normalizedFilePath = filePath.toLowerCase();
+        // since Windows is case-insensitive, we need to normalize it differently
+        var canFind = vscode.workspace.textDocuments.find(doc => {
+            var docPath;
+            if (os.platform() == "win32") {
+                // for windows paths, they are normalized to be lowercase
+                docPath = doc.fileName.toLowerCase();
+            } else {
+                docPath = doc.fileName;
+            }
+            return docPath == normalizedFilePath;
+        });
 
-        if (vscode.workspace.textDocuments.find(doc => doc.fileName.toLowerCase() == normalizedFilePath))
+        if (canFind)
         {
             promise =
                 vscode.workspace.openTextDocument(filePath)
-                    .then(doc => doc.save())
+                    .then(doc => {
+                        if (doc.isDirty) {
+                            doc.save();
+                        }
+                    })
                     .then(_ => EditorOperationResponse.Completed);
         }
         else
@@ -446,6 +451,31 @@ export class ExtensionCommandsFeature implements IFeature {
         }
 
         return promise;
+    }
+
+    private normalizeFilePath(filePath: string): string {
+        if (os.platform() == "win32") {
+            // Make sure the file path is absolute
+            if (!path.win32.isAbsolute(filePath))
+            {
+                filePath = path.win32.resolve(
+                    vscode.workspace.rootPath,
+                    filePath);
+            }
+
+            // Normalize file path case for comparison for Windows
+            return filePath.toLowerCase();
+        } else {
+            // Make sure the file path is absolute
+            if (!path.isAbsolute(filePath))
+            {
+                filePath = path.resolve(
+                    vscode.workspace.rootPath,
+                    filePath);
+            }
+
+            return filePath;
+        }
     }
 
     private setSelection(details: SetSelectionRequestArguments): EditorOperationResponse {
