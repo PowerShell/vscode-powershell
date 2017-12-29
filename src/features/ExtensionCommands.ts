@@ -385,22 +385,7 @@ export class ExtensionCommandsFeature implements IFeature {
     private closeFile(filePath: string): Thenable<EditorOperationResponse> {
 
         var promise: Thenable<EditorOperationResponse>;
-
-        var normalizedFilePath = this.normalizeFilePath(filePath);
-
-        // since Windows is case-insensitive, we need to normalize it differently
-        var canFind = vscode.workspace.textDocuments.find(doc => {
-            var docPath, platform = os.platform();
-            if (platform == "win32" || platform == "darwin") {
-                // for windows paths, they are normalized to be lowercase
-                docPath = doc.fileName.toLowerCase();
-            } else {
-                docPath = doc.fileName;
-            }
-            return docPath == normalizedFilePath;
-        });
-
-        if (canFind)
+        if (this.findTextDocument(this.normalizeFilePath(filePath)))
         {
             promise =
                 vscode.workspace.openTextDocument(filePath)
@@ -419,22 +404,7 @@ export class ExtensionCommandsFeature implements IFeature {
     private saveFile(filePath: string): Thenable<EditorOperationResponse> {
 
         var promise: Thenable<EditorOperationResponse>;
-
-        var normalizedFilePath = this.normalizeFilePath(filePath);
-
-        // since Windows is case-insensitive, we need to normalize it differently
-        var canFind = vscode.workspace.textDocuments.find(doc => {
-            var docPath, platform = os.platform();
-            if (platform == "win32" || platform == "darwin") {
-                // for windows paths, they are normalized to be lowercase
-                docPath = doc.fileName.toLowerCase();
-            } else {
-                docPath = doc.fileName;
-            }
-            return docPath == normalizedFilePath;
-        });
-
-        if (canFind)
+        if (this.findTextDocument(this.normalizeFilePath(filePath)))
         {
             promise =
                 vscode.workspace.openTextDocument(filePath)
@@ -482,6 +452,22 @@ export class ExtensionCommandsFeature implements IFeature {
 
             return  filePath;
         }
+    }
+
+    private findTextDocument(filePath: string): boolean {
+        // since Windows and macOS are case-insensitive, we need to normalize them differently
+        var canFind = vscode.workspace.textDocuments.find(doc => {
+            var docPath, platform = os.platform();
+            if (platform == "win32" || platform == "darwin") {
+                // for Windows and macOS paths, they are normalized to be lowercase
+                docPath = doc.fileName.toLowerCase();
+            } else {
+                docPath = doc.fileName;
+            }
+            return docPath == filePath;
+        });
+
+        return canFind != null;
     }
 
     private setSelection(details: SetSelectionRequestArguments): EditorOperationResponse {
