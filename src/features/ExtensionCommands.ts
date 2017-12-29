@@ -390,8 +390,8 @@ export class ExtensionCommandsFeature implements IFeature {
 
         // since Windows is case-insensitive, we need to normalize it differently
         var canFind = vscode.workspace.textDocuments.find(doc => {
-            var docPath;
-            if (os.platform() == "win32") {
+            var docPath, platform = os.platform();
+            if (platform == "win32" || platform == "darwin") {
                 // for windows paths, they are normalized to be lowercase
                 docPath = doc.fileName.toLowerCase();
             } else {
@@ -424,8 +424,8 @@ export class ExtensionCommandsFeature implements IFeature {
 
         // since Windows is case-insensitive, we need to normalize it differently
         var canFind = vscode.workspace.textDocuments.find(doc => {
-            var docPath;
-            if (os.platform() == "win32") {
+            var docPath, platform = os.platform();
+            if (platform == "win32" || platform == "darwin") {
                 // for windows paths, they are normalized to be lowercase
                 docPath = doc.fileName.toLowerCase();
             } else {
@@ -454,7 +454,8 @@ export class ExtensionCommandsFeature implements IFeature {
     }
 
     private normalizeFilePath(filePath: string): string {
-        if (os.platform() == "win32") {
+        var platform = os.platform();
+        if (platform == "win32") {
             // Make sure the file path is absolute
             if (!path.win32.isAbsolute(filePath))
             {
@@ -474,7 +475,12 @@ export class ExtensionCommandsFeature implements IFeature {
                     filePath);
             }
 
-            return filePath;
+            //macOS is case-insensitive
+            if (platform == "darwin") {
+                filePath = filePath.toLowerCase();
+            }
+
+            return  filePath;
         }
     }
 
