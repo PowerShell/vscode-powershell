@@ -49,7 +49,7 @@ without the use of `Install-Script`.  However we **highly recommend** that you
 first before running it in this way!
 
 ```powershell
-iex (iwr https://git.io/v9rJg)
+iex (iwr https://git.io/vbxjj)
 ```
 
 ## Installing the Extension
