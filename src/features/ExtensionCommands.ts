@@ -193,9 +193,9 @@ export class ExtensionCommandsFeature implements IFeature {
                 return;
             }
 
-            var editor = vscode.window.activeTextEditor;
-            var start = editor.selection.start;
-            var end = editor.selection.end;
+            let editor = vscode.window.activeTextEditor;
+            let start = editor.selection.start;
+            let end = editor.selection.end;
             if (editor.selection.isEmpty) {
                 start = new vscode.Position(start.line, 0)
             }
@@ -303,7 +303,7 @@ export class ExtensionCommandsFeature implements IFeature {
             return;
         }
 
-        var quickPickItems =
+        let quickPickItems =
             this.extensionCommands.map<ExtensionCommandQuickPickItem>(command => {
                 return {
                     label: command.displayName,
@@ -332,7 +332,7 @@ export class ExtensionCommandsFeature implements IFeature {
     }
 
     private insertText(details: InsertTextRequestArguments): EditorOperationResponse {
-        var edit = new vscode.WorkspaceEdit();
+        let edit = new vscode.WorkspaceEdit();
 
         edit.set(
             vscode.Uri.parse(details.filePath),
@@ -374,7 +374,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
         filePath = this.normalizeFilePath(filePath);
 
-        var promise =
+        let promise =
             vscode.workspace.openTextDocument(filePath)
                 .then(doc => vscode.window.showTextDocument(doc))
                 .then(_ => EditorOperationResponse.Completed);
@@ -384,7 +384,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private closeFile(filePath: string): Thenable<EditorOperationResponse> {
 
-        var promise: Thenable<EditorOperationResponse>;
+        let promise: Thenable<EditorOperationResponse>;
         if (this.findTextDocument(this.normalizeFilePath(filePath)))
         {
             promise =
@@ -403,12 +403,12 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private saveFile(filePath: string): Thenable<EditorOperationResponse> {
 
-        var promise: Thenable<EditorOperationResponse>;
+        let promise: Thenable<EditorOperationResponse>;
         if (this.findTextDocument(this.normalizeFilePath(filePath)))
         {
             promise =
                 vscode.workspace.openTextDocument(filePath)
-                    .then(doc => {
+                    .then((doc) => {
                         if (doc.isDirty) {
                             doc.save();
                         }
@@ -424,7 +424,7 @@ export class ExtensionCommandsFeature implements IFeature {
     }
 
     private normalizeFilePath(filePath: string): string {
-        var platform = os.platform();
+        let platform = os.platform();
         if (platform == "win32") {
             // Make sure the file path is absolute
             if (!path.win32.isAbsolute(filePath))
@@ -456,15 +456,15 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private findTextDocument(filePath: string): boolean {
         // since Windows and macOS are case-insensitive, we need to normalize them differently
-        var canFind = vscode.workspace.textDocuments.find(doc => {
-            var docPath, platform = os.platform();
+        let canFind = vscode.workspace.textDocuments.find(doc => {
+            let docPath, platform = os.platform();
             if (platform == "win32" || platform == "darwin") {
                 // for Windows and macOS paths, they are normalized to be lowercase
                 docPath = doc.fileName.toLowerCase();
             } else {
                 docPath = doc.fileName;
             }
-            return docPath == filePath;
+            return docPath === filePath;
         });
 
         return canFind != null;
