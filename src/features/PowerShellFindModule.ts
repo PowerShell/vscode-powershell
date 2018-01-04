@@ -2,19 +2,17 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
+import vscode = require("vscode");
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import Window = vscode.window;
-import { IFeature } from '../feature';
+import { IFeature } from "../feature";
 import QuickPickItem = vscode.QuickPickItem;
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
 
-export namespace FindModuleRequest {
-    export const type = new RequestType<any, any, void, void>('powerShell/findModule');
-}
+export const FindModuleRequestType =
+    new RequestType<any, any, void, void>("powerShell/findModule");
 
-export namespace InstallModuleRequest {
-    export const type = new RequestType<string, void, void, void>('powerShell/installModule');
-}
+export const InstallModuleRequestType =
+    new RequestType<string, void, void, void>("powerShell/installModule");
 
 export class FindModuleFeature implements IFeature {
 
@@ -23,7 +21,7 @@ export class FindModuleFeature implements IFeature {
     private cancelFindToken: vscode.CancellationTokenSource;
 
     constructor() {
-        this.command = vscode.commands.registerCommand('PowerShell.PowerShellFindModule', () => {
+        this.command = vscode.commands.registerCommand("PowerShell.PowerShellFindModule", () => {
             // It takes a while to get the list of PowerShell modules, display some UI to let user know
             this.cancelFindToken = new vscode.CancellationTokenSource();
             vscode.window
@@ -31,7 +29,9 @@ export class FindModuleFeature implements IFeature {
                 ["Cancel"],
                 { placeHolder: "Please wait, retrieving list of PowerShell modules. This can take some time..." },
                 this.cancelFindToken.token)
-                .then(response => { if (response === "Cancel") { this.clearCancelFindToken(); } });
+                .then((response) => {
+                    if (response === "Cancel") { this.clearCancelFindToken(); }
+                });
 
             // Cancel the loading prompt after 60 seconds
             setTimeout(() => {
@@ -39,14 +39,15 @@ export class FindModuleFeature implements IFeature {
                     this.clearCancelFindToken();
 
                     vscode.window.showErrorMessage(
-                        "The online source for PowerShell modules is not responding. Cancelling Find/Install PowerShell command.");
+                        "The online source for PowerShell modules is not responding. " +
+                        "Cancelling Find/Install PowerShell command.");
                 }
             }, 60000);
 
             this.pickPowerShellModule().then((moduleName) => {
                 if (moduleName) {
                     // vscode.window.setStatusBarMessage("Installing PowerShell Module " + moduleName, 1500);
-                    this.languageClient.sendRequest(InstallModuleRequest.type, moduleName);
+                    this.languageClient.sendRequest(InstallModuleRequestType, moduleName);
                 }
             });
         });
@@ -61,33 +62,34 @@ export class FindModuleFeature implements IFeature {
     }
 
     private pickPowerShellModule(): Thenable<string> {
-        return this.languageClient.sendRequest(FindModuleRequest.type, null).then((modules) => {
-            var items: QuickPickItem[] = [];
+        return this.languageClient.sendRequest(FindModuleRequestType, null).then((modules) => {
+            const items: QuickPickItem[] = [];
 
             // We've got the modules info, let's cancel the timeout unless it's already been cancelled
             if (this.cancelFindToken) {
                 this.clearCancelFindToken();
-            }
-            else {
+            } else {
                 // Already timed out, would be weird to dislay modules after we said it timed out.
                 return Promise.resolve("");
             }
 
-            for (var item in modules) {
-                items.push({ label: modules[item].name, description: modules[item].description });
-            };
+            for (const item in modules) {
+                if (modules.hasOwnProperty(item)) {
+                    items.push({ label: modules[item].name, description: modules[item].description });
+                }
+            }
 
             if (items.length === 0) {
                 return Promise.reject("No PowerShell modules were found.");
             }
 
-            let options: vscode.QuickPickOptions = {
+            const options: vscode.QuickPickOptions = {
                 placeHolder: "Select a PowerShell module to install",
                 matchOnDescription: true,
-                matchOnDetail: true
+                matchOnDetail: true,
             };
 
-            return vscode.window.showQuickPick(items, options).then(item => {
+            return vscode.window.showQuickPick(items, options).then((item) => {
                 return item ? item.label : "";
             });
         });

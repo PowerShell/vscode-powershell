@@ -2,9 +2,9 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
-import { IFeature } from '../feature';
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import vscode = require("vscode");
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { IFeature } from "../feature";
 
 export class NewFileOrProjectFeature implements IFeature {
 
@@ -15,7 +15,7 @@ export class NewFileOrProjectFeature implements IFeature {
 
     constructor() {
         this.command =
-            vscode.commands.registerCommand('PowerShell.NewProjectFromTemplate', () => {
+            vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", () => {
 
                 if (!this.languageClient && !this.waitingForClientToken) {
 
@@ -27,7 +27,11 @@ export class NewFileOrProjectFeature implements IFeature {
                             ["Cancel"],
                             { placeHolder: "New Project: Please wait, starting PowerShell..." },
                             this.waitingForClientToken.token)
-                        .then(response => { if (response === "Cancel") { this.clearWaitingToken(); } });
+                        .then((response) => {
+                            if (response === "Cancel") {
+                                this.clearWaitingToken();
+                            }
+                        });
 
                     // Cancel the loading prompt after 60 seconds
                     setTimeout(() => {
@@ -38,11 +42,14 @@ export class NewFileOrProjectFeature implements IFeature {
                                     "New Project: PowerShell session took too long to start.");
                             }
                         }, 60000);
-                }
-                else {
+                } else {
                     this.showProjectTemplates();
                 }
             });
+    }
+
+    public dispose() {
+        this.command.dispose();
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
@@ -54,57 +61,56 @@ export class NewFileOrProjectFeature implements IFeature {
         }
     }
 
-    public dispose() {
-        this.command.dispose();
-    }
-
     private showProjectTemplates(includeInstalledModules: boolean = false): void {
         vscode.window
             .showQuickPick(
                 this.getProjectTemplates(includeInstalledModules),
                 { placeHolder: "Choose a template to create a new project",
                   ignoreFocusOut: true })
-            .then(template => {
+            .then((template) => {
                 if (template.label.startsWith(this.loadIcon)) {
                     this.showProjectTemplates(true);
-                }
-                else {
+                } else {
                     this.createProjectFromTemplate(template.template);
                 }
             });
     }
 
-    private getProjectTemplates(includeInstalledModules: boolean): Thenable<TemplateQuickPickItem[]> {
+    private getProjectTemplates(includeInstalledModules: boolean): Thenable<ITemplateQuickPickItem[]> {
         return this.languageClient
-            .sendRequest(
-                GetProjectTemplatesRequest.type,
-                { includeInstalledModules: includeInstalledModules })
-            .then(response => {
+            .sendRequest(GetProjectTemplatesRequestType, { includeInstalledModules })
+            .then((response) => {
                 if (response.needsModuleInstall) {
                     // TODO: Offer to install Plaster
                     vscode.window.showErrorMessage("Plaster is not installed!");
-                    return Promise.reject<TemplateQuickPickItem[]>("Plaster needs to be installed");
-                }
-                else {
-                    var templates = response.templates.map<TemplateQuickPickItem>(
-                        template => {
+                    return Promise.reject<ITemplateQuickPickItem[]>("Plaster needs to be installed");
+                } else {
+                    let templates = response.templates.map<ITemplateQuickPickItem>(
+                        (template) => {
                             return {
                                 label: template.title,
                                 description: `v${template.version} by ${template.author}, tags: ${template.tags}`,
                                 detail: template.description,
-                                template: template
-                            }
+                                template,
+                            };
                         });
 
                     if (!includeInstalledModules) {
                         templates =
-                            [{ label: this.loadIcon, description: "Load additional templates from installed modules", template: undefined }]
-                                .concat(templates)
-                    }
-                    else {
+                            [{
+                                label: this.loadIcon,
+                                description: "Load additional templates from installed modules",
+                                template: undefined,
+                            }]
+                            .concat(templates);
+                    } else {
                         templates =
-                            [{ label: this.loadIcon, description: "Refresh template list", template: undefined }]
-                                .concat(templates)
+                            [{
+                                label: this.loadIcon,
+                                description: "Refresh template list",
+                                template: undefined,
+                            }]
+                            .concat(templates);
                     }
 
                     return templates;
@@ -112,12 +118,12 @@ export class NewFileOrProjectFeature implements IFeature {
             });
     }
 
-    private createProjectFromTemplate(template: TemplateDetails): void {
+    private createProjectFromTemplate(template: ITemplateDetails): void {
         vscode.window
             .showInputBox(
                 { placeHolder: "Enter an absolute path to the folder where the project should be created",
                   ignoreFocusOut: true })
-            .then(destinationPath => {
+            .then((destinationPath) => {
 
                 if (destinationPath) {
                     // Show the PowerShell session output in case an error occurred
@@ -125,29 +131,26 @@ export class NewFileOrProjectFeature implements IFeature {
 
                     this.languageClient
                         .sendRequest(
-                            NewProjectFromTemplateRequest.type,
-                            { templatePath: template.templatePath, destinationPath: destinationPath })
-                        .then(result => {
+                            NewProjectFromTemplateRequestType,
+                            { templatePath: template.templatePath, destinationPath })
+                        .then((result) => {
                             if (result.creationSuccessful) {
                                 this.openWorkspacePath(destinationPath);
-                            }
-                            else {
+                            } else {
                                 vscode.window.showErrorMessage(
                                     "Project creation failed, read the Output window for more details.");
                             }
                         });
-                }
-                else {
+                } else {
                     vscode.window
                         .showErrorMessage(
                             "New Project: You must enter an absolute folder path to continue.  Try again?",
                             "Yes", "No")
-                        .then(
-                            response => {
-                                if (response === "Yes") {
-                                    this.createProjectFromTemplate(template);
-                                }
-                            });
+                        .then((response) => {
+                            if (response === "Yes") {
+                                this.createProjectFromTemplate(template);
+                            }
+                        });
                 }
             });
     }
@@ -168,11 +171,11 @@ export class NewFileOrProjectFeature implements IFeature {
     }
 }
 
-interface TemplateQuickPickItem extends vscode.QuickPickItem {
-    template: TemplateDetails
+interface ITemplateQuickPickItem extends vscode.QuickPickItem {
+    template: ITemplateDetails;
 }
 
-interface TemplateDetails {
+interface ITemplateDetails {
     title: string;
     version: string;
     author: string;
@@ -181,32 +184,28 @@ interface TemplateDetails {
     templatePath: string;
 }
 
-namespace GetProjectTemplatesRequest {
-    export const type =
-        new RequestType<GetProjectTemplatesRequestArgs, GetProjectTemplatesResponseBody, string, void>(
-            'powerShell/getProjectTemplates');
-}
+export const GetProjectTemplatesRequestType =
+    new RequestType<IGetProjectTemplatesRequestArgs, IGetProjectTemplatesResponseBody, string, void>(
+        "powerShell/getProjectTemplates");
 
-interface GetProjectTemplatesRequestArgs {
+interface IGetProjectTemplatesRequestArgs {
     includeInstalledModules: boolean;
 }
 
-interface GetProjectTemplatesResponseBody {
+interface IGetProjectTemplatesResponseBody {
     needsModuleInstall: boolean;
-    templates: TemplateDetails[];
+    templates: ITemplateDetails[];
 }
 
-namespace NewProjectFromTemplateRequest {
-    export const type =
-        new RequestType<any, NewProjectFromTemplateResponseBody, string, void>(
-            'powerShell/newProjectFromTemplate');
-}
+export const NewProjectFromTemplateRequestType =
+    new RequestType<any, INewProjectFromTemplateResponseBody, string, void>(
+        "powerShell/newProjectFromTemplate");
 
-interface NewProjectFromTemplateRequestArgs {
+interface INewProjectFromTemplateRequestArgs {
     destinationPath: string;
     templatePath: string;
 }
 
-interface NewProjectFromTemplateResponseBody {
+interface INewProjectFromTemplateResponseBody {
     creationSuccessful: boolean;
 }
