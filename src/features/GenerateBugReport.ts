@@ -1,28 +1,33 @@
-import vscode = require('vscode');
-import { SessionManager } from '../session';
-import cp = require('child_process');
-import Settings = require('../settings');
+/*---------------------------------------------------------
+ * Copyright (C) Microsoft Corporation. All rights reserved.
+ *--------------------------------------------------------*/
 
-const os = require("os");
+import cp = require("child_process");
+import os = require("os");
+import vscode = require("vscode");
+import { IFeature, LanguageClient } from "../feature";
+import { SessionManager } from "../session";
+import Settings = require("../settings");
 
-import { IFeature, LanguageClient } from '../feature';
-// import { IExtensionManagementService, LocalExtensionType, ILocalExtension } from 'vs/platform/extensionManagement/common/extensionManagement';
-
-const extensionId: string = 'ms-vscode.PowerShell';
+const extensionId: string = "ms-vscode.PowerShell";
 const extensionVersion: string = vscode.extensions.getExtension(extensionId).packageJSON.version;
+const queryStringPrefix: string = "?";
 
-const queryStringPrefix: string = '?'
+const settings = Settings.load();
+const project = settings.bugReporting.project;
+const issuesUrl: string = `${project}/issues/new`;
 
-var settings = Settings.load();
-let project = settings.bugReporting.project;
-
-const issuesUrl: string = `${project}/issues/new`
-
-var extensions = vscode.extensions.all.filter(element => element.packageJSON.isBuiltin == false).sort((leftside, rightside): number => {
-    if (leftside.packageJSON.name.toLowerCase() < rightside.packageJSON.name.toLowerCase()) return -1;
-    if (leftside.packageJSON.name.toLowerCase() > rightside.packageJSON.name.toLowerCase()) return 1;
-    return 0;
-})
+const extensions =
+    vscode.extensions.all.filter((element) => element.packageJSON.isBuiltin === false)
+        .sort((leftside, rightside): number => {
+            if (leftside.packageJSON.name.toLowerCase() < rightside.packageJSON.name.toLowerCase()) {
+                 return -1;
+            }
+            if (leftside.packageJSON.name.toLowerCase() > rightside.packageJSON.name.toLowerCase()) {
+                return 1;
+            }
+            return 0;
+        });
 
 export class GenerateBugReportFeature implements IFeature {
 
@@ -30,15 +35,16 @@ export class GenerateBugReportFeature implements IFeature {
     private powerShellProcess: cp.ChildProcess;
 
     constructor(private sessionManager: SessionManager) {
-        this.command = vscode.commands.registerCommand('PowerShell.GenerateBugReport', () => {
+        this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", () => {
 
-            var body = encodeURIComponent(`## Issue Description ##
+            const body = encodeURIComponent(`## Issue Description ##
 
 I am experiencing a problem with...
 
 ## Attached Logs ##
 
-Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell#reporting-problems) about capturing and sending logs.
+Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell#reporting-problems) about
+capturing and sending logs.
 
 ## Environment Information ##
 
@@ -46,7 +52,7 @@ Follow the instructions in the [README](https://github.com/PowerShell/vscode-pow
 
 | Name | Version |
 | --- | --- |
-| Operating System | ${os.type() + ' ' + os.arch() + ' ' + os.release()} |
+| Operating System | ${os.type() + " " + os.arch() + " " + os.release()} |
 | VSCode | ${vscode.version}|
 | PowerShell Extension Version | ${extensionVersion} |
 
@@ -63,36 +69,31 @@ ${this.generateExtensionTable(extensions)}
 
 `);
 
-            var encodedBody = encodeURIComponent(body);
-            var fullUrl = `${issuesUrl}${queryStringPrefix}body=${encodedBody}`;
-            vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(fullUrl));
-
+            const encodedBody = encodeURIComponent(body);
+            const fullUrl = `${issuesUrl}${queryStringPrefix}body=${encodedBody}`;
+            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(fullUrl));
         });
-
-    }
-
-
-    public setLanguageClient(LanguageClient: LanguageClient) {
-        // Not needed for this feature.
     }
 
     public dispose() {
         this.command.dispose();
     }
 
+    public setLanguageClient(languageclient: LanguageClient) {
+        // Elimiinate tslint warning.
+    }
 
-    private generateExtensionTable(extensions): string {
-        if (!extensions.length) {
-            return 'none';
+    private generateExtensionTable(installedExtensions): string {
+        if (!installedExtensions.length) {
+            return "none";
         }
 
-        let tableHeader = `|Extension|Author|Version|\n|---|---|---|`;
-        const table = extensions.map(e => {
-
-            if (e.packageJSON.isBuiltin == false) {
+        const tableHeader = `|Extension|Author|Version|\n|---|---|---|`;
+        const table = installedExtensions.map((e) => {
+            if (e.packageJSON.isBuiltin === false) {
                 return `|${e.packageJSON.name}|${e.packageJSON.publisher}|${e.packageJSON.version}|`;
             }
-        }).join('\n');
+        }).join("\n");
 
         const extensionTable = `
 ${tableHeader}\n${table};
@@ -108,19 +109,16 @@ ${tableHeader}\n${table};
 
     private getRuntimeInfo() {
 
-        var psOutput;
-        var powerShellExePath = this.sessionManager.getPowerShellExePath();
-        var powerShellArgs = [
+        const powerShellExePath = this.sessionManager.getPowerShellExePath();
+        const powerShellArgs = [
             "-NoProfile",
             "-Command",
-            '$PSVersionString = "|Name|Value|\n"; $PSVersionString += "|---|---|\n"; $PSVersionTable.keys | ForEach-Object { $PSVersionString += "|$_|$($PSVersionTable.Item($_))|\n" }; $PSVersionString'
-        ]
+            '$PSVersionString = "|Name|Value|\n"; $PSVersionString += "|---|---|\n"; $PSVersionTable.keys | ' +
+            'ForEach-Object { $PSVersionString += "|$_|$($PSVersionTable.Item($_))|\n" }; $PSVersionString',
+        ];
 
-        var spawn = require('child_process').spawnSync;
-        var child = spawn(powerShellExePath, powerShellArgs);
-        return child.stdout.toString().replace(';', ',');
-
+        const spawn = require("child_process").spawnSync;
+        const child = spawn(powerShellExePath, powerShellArgs);
+        return child.stdout.toString().replace(";", ",");
     }
-
 }
-

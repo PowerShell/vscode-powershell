@@ -2,28 +2,26 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import os = require('os');
-import path = require('path');
-import vscode = require('vscode');
-import { IFeature } from '../feature';
-import { LanguageClient, RequestType, NotificationType, Range, Position } from 'vscode-languageclient';
+import os = require("os");
+import path = require("path");
+import vscode = require("vscode");
+import { LanguageClient, NotificationType, Position, Range, RequestType } from "vscode-languageclient";
+import { IFeature } from "../feature";
 
-export interface ExtensionCommand {
+export interface IExtensionCommand {
     name: string;
     displayName: string;
 }
 
-export interface ExtensionCommandQuickPickItem extends vscode.QuickPickItem {
-    command: ExtensionCommand;
+export interface IExtensionCommandQuickPickItem extends vscode.QuickPickItem {
+    command: IExtensionCommand;
 }
 
-export namespace InvokeExtensionCommandRequest {
-    export const type =
-        new RequestType<InvokeExtensionCommandRequestArguments, void, void, void>(
-            'powerShell/invokeExtensionCommand');
-}
+export const InvokeExtensionCommandRequestType =
+    new RequestType<InvokeExtensionCommandRequestArguments, void, void, void>(
+        "powerShell/invokeExtensionCommand");
 
-export interface EditorContext {
+export interface IEditorContext {
     currentFilePath: string;
     cursorPosition: Position;
     selectionRange: Range;
@@ -31,16 +29,14 @@ export interface EditorContext {
 
 export interface InvokeExtensionCommandRequestArguments {
     name: string;
-    context: EditorContext;
+    context: IEditorContext;
 }
 
-export namespace ExtensionCommandAddedNotification {
-    export const type =
-        new NotificationType<ExtensionCommandAddedNotificationBody, void>(
-            'powerShell/extensionCommandAdded');
-}
+export const ExtensionCommandAddedNotificationType =
+    new NotificationType<IExtensionCommandAddedNotificationBody, void>(
+        "powerShell/extensionCommandAdded");
 
-export interface ExtensionCommandAddedNotificationBody {
+export interface IExtensionCommandAddedNotificationBody {
     name: string;
     displayName: string;
 }
@@ -49,134 +45,113 @@ export interface ExtensionCommandAddedNotificationBody {
 
 function asRange(value: vscode.Range): Range {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return { start: asPosition(value.start), end: asPosition(value.end) };
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return { start: asPosition(value.start), end: asPosition(value.end) };
 }
 
 function asPosition(value: vscode.Position): Position {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return { line: value.line, character: value.character };
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return { line: value.line, character: value.character };
 }
 
 function asCodeRange(value: Range): vscode.Range {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return new vscode.Range(asCodePosition(value.start), asCodePosition(value.end));
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return new vscode.Range(asCodePosition(value.start), asCodePosition(value.end));
 }
 
 function asCodePosition(value: Position): vscode.Position {
 
-	if (value === undefined) {
-		return undefined;
-	} else if (value === null) {
-		return null;
-	}
-	return new vscode.Position(value.line, value.character);
+    if (value === undefined) {
+        return undefined;
+    } else if (value === null) {
+        return null;
+    }
+    return new vscode.Position(value.line, value.character);
 }
 
-export namespace GetEditorContextRequest {
-    export const type =
-        new RequestType<GetEditorContextRequestArguments, EditorContext, void, void>(
-            'editor/getEditorContext');
-}
+export const GetEditorContextRequestType =
+    new RequestType<IGetEditorContextRequestArguments, IEditorContext, void, void>(
+        "editor/getEditorContext");
 
-export interface GetEditorContextRequestArguments {
+// tslint:disable-next-line:no-empty-interface
+export interface IGetEditorContextRequestArguments {
 }
 
 enum EditorOperationResponse {
     Unsupported = 0,
-    Completed
+    Completed,
 }
 
-export namespace InsertTextRequest {
-    export const type =
-        new RequestType<InsertTextRequestArguments, EditorOperationResponse, void, void>(
-            'editor/insertText');
-}
+export const InsertTextRequestType =
+    new RequestType<IInsertTextRequestArguments, EditorOperationResponse, void, void>(
+        "editor/insertText");
 
-export interface InsertTextRequestArguments {
+export interface IInsertTextRequestArguments {
     filePath: string;
     insertText: string;
-    insertRange: Range
+    insertRange: Range;
 }
 
-export namespace SetSelectionRequest {
-    export const type =
-        new RequestType<SetSelectionRequestArguments, EditorOperationResponse, void, void>(
-            'editor/setSelection');
+export const SetSelectionRequestType =
+    new RequestType<ISetSelectionRequestArguments, EditorOperationResponse, void, void>(
+        "editor/setSelection");
+
+export interface ISetSelectionRequestArguments {
+    selectionRange: Range;
 }
 
-export interface SetSelectionRequestArguments {
-    selectionRange: Range
-}
+export const OpenFileRequestType =
+    new RequestType<string, EditorOperationResponse, void, void>(
+        "editor/openFile");
 
-export namespace OpenFileRequest {
-    export const type =
-        new RequestType<string, EditorOperationResponse, void, void>(
-            'editor/openFile');
-}
+export const NewFileRequestType =
+    new RequestType<string, EditorOperationResponse, void, void>(
+        "editor/newFile");
 
-export namespace NewFileRequest {
-    export const type =
-        new RequestType<string, EditorOperationResponse, void, void>(
-            'editor/newFile');
-}
+export const CloseFileRequestType =
+    new RequestType<string, EditorOperationResponse, void, void>(
+        "editor/closeFile");
 
-export namespace CloseFileRequest {
-    export const type =
-        new RequestType<string, EditorOperationResponse, void, void>(
-            'editor/closeFile');
-}
+export const SaveFileRequestType =
+    new RequestType<string, EditorOperationResponse, void, void>(
+        "editor/saveFile");
 
-export namespace SaveFileRequest {
-    export const type =
-        new RequestType<string, EditorOperationResponse, void, void>(
-            'editor/saveFile');
-}
+export const ShowErrorMessageRequestType =
+    new RequestType<string, EditorOperationResponse, void, void>(
+        "editor/showErrorMessage");
 
-export namespace ShowErrorMessageRequest {
-    export const type =
-        new RequestType<string, EditorOperationResponse, void, void>(
-            'editor/showErrorMessage');
-}
+export const ShowWarningMessageRequestType =
+    new RequestType<string, EditorOperationResponse, void, void>(
+        "editor/showWarningMessage");
 
-export namespace ShowWarningMessageRequest {
-    export const type =
-        new RequestType<string, EditorOperationResponse, void, void>(
-            'editor/showWarningMessage');
-}
+export const ShowInformationMessageRequestType =
+    new RequestType<string, EditorOperationResponse, void, void>(
+        "editor/showInformationMessage");
 
-export namespace ShowInformationMessageRequest {
-    export const type =
-        new RequestType<string, EditorOperationResponse, void, void>(
-            'editor/showInformationMessage');
-}
+export const SetStatusBarMessageRequestType =
+    new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void, void>(
+        "editor/setStatusBarMessage");
 
-export namespace SetStatusBarMessageRequest {
-    export const type =
-        new RequestType<StatusBarMessageDetails, EditorOperationResponse, void, void>(
-            'editor/setStatusBarMessage');
-}
-
-export interface StatusBarMessageDetails {
+export interface IStatusBarMessageDetails {
     message: string;
     timeout?: number;
 }
-interface InvokeRegisteredEditorCommandParameter{
-    commandName : string
+interface IInvokeRegisteredEditorCommandParameter {
+    commandName: string;
 }
 
 export class ExtensionCommandsFeature implements IFeature {
@@ -184,34 +159,36 @@ export class ExtensionCommandsFeature implements IFeature {
     private command: vscode.Disposable;
     private command2: vscode.Disposable;
     private languageClient: LanguageClient;
-    private extensionCommands: ExtensionCommand[] = [];
+    private extensionCommands: IExtensionCommand[] = [];
 
     constructor() {
-        this.command = vscode.commands.registerCommand('PowerShell.ShowAdditionalCommands', () => {
+        this.command = vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", () => {
             if (this.languageClient === undefined) {
                 // TODO: Log error message
                 return;
             }
 
-            let editor = vscode.window.activeTextEditor;
+            const editor = vscode.window.activeTextEditor;
             let start = editor.selection.start;
-            let end = editor.selection.end;
+            const end = editor.selection.end;
             if (editor.selection.isEmpty) {
-                start = new vscode.Position(start.line, 0)
+                start = new vscode.Position(start.line, 0);
             }
 
             this.showExtensionCommands(this.languageClient);
         });
-        this.command2 = vscode.commands.registerCommand('PowerShell.InvokeRegisteredEditorCommand',(param : InvokeRegisteredEditorCommandParameter) => {
-            if(this.extensionCommands.length == 0){
+
+        this.command2 = vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
+                                                        (param: IInvokeRegisteredEditorCommandParameter) => {
+            if (this.extensionCommands.length === 0) {
                 return;
             }
 
-            let commandToExecute = this.extensionCommands.find(x => x.name === param.commandName);
+            const commandToExecute = this.extensionCommands.find((x) => x.name === param.commandName);
 
-            if(commandToExecute){
+            if (commandToExecute) {
                 this.languageClient.sendRequest(
-                    InvokeExtensionCommandRequest.type,
+                    InvokeExtensionCommandRequestType,
                     { name: commandToExecute.name,
                     context: this.getEditorContext() });
             }
@@ -227,52 +204,52 @@ export class ExtensionCommandsFeature implements IFeature {
         this.languageClient = languageclient;
         if (this.languageClient !== undefined) {
             this.languageClient.onNotification(
-                ExtensionCommandAddedNotification.type,
-                command => this.addExtensionCommand(command));
+                ExtensionCommandAddedNotificationType,
+                (command) => this.addExtensionCommand(command));
 
             this.languageClient.onRequest(
-                GetEditorContextRequest.type,
-                details => this.getEditorContext());
+                GetEditorContextRequestType,
+                (details) => this.getEditorContext());
 
             this.languageClient.onRequest(
-                InsertTextRequest.type,
-                details => this.insertText(details));
+                InsertTextRequestType,
+                (details) => this.insertText(details));
 
             this.languageClient.onRequest(
-                SetSelectionRequest.type,
-                details => this.setSelection(details));
+                SetSelectionRequestType,
+                (details) => this.setSelection(details));
 
             this.languageClient.onRequest(
-		        NewFileRequest.type,
-                filePath => this.newFile());
+                NewFileRequestType,
+                (filePath) => this.newFile());
 
             this.languageClient.onRequest(
-                OpenFileRequest.type,
-                filePath => this.openFile(filePath));
+                OpenFileRequestType,
+                (filePath) => this.openFile(filePath));
 
             this.languageClient.onRequest(
-                CloseFileRequest.type,
-                filePath => this.closeFile(filePath));
+                CloseFileRequestType,
+                (filePath) => this.closeFile(filePath));
 
             this.languageClient.onRequest(
-                SaveFileRequest.type,
-                filePath => this.saveFile(filePath));
+                SaveFileRequestType,
+                (filePath) => this.saveFile(filePath));
 
             this.languageClient.onRequest(
-                ShowInformationMessageRequest.type,
-                message => this.showInformationMessage(message));
+                ShowInformationMessageRequestType,
+                (message) => this.showInformationMessage(message));
 
             this.languageClient.onRequest(
-                ShowErrorMessageRequest.type,
-                message => this.showErrorMessage(message));
+                ShowErrorMessageRequestType,
+                (message) => this.showErrorMessage(message));
 
             this.languageClient.onRequest(
-                ShowWarningMessageRequest.type,
-                message => this.showWarningMessage(message));
+                ShowWarningMessageRequestType,
+                (message) => this.showWarningMessage(message));
 
             this.languageClient.onRequest(
-                SetStatusBarMessageRequest.type,
-                messageDetails => this.setStatusBarMessage(messageDetails));
+                SetStatusBarMessageRequestType,
+                (messageDetails) => this.setStatusBarMessage(messageDetails));
         }
     }
 
@@ -281,58 +258,58 @@ export class ExtensionCommandsFeature implements IFeature {
         this.command2.dispose();
     }
 
-    private addExtensionCommand(command: ExtensionCommandAddedNotificationBody) {
+    private addExtensionCommand(command: IExtensionCommandAddedNotificationBody) {
 
         this.extensionCommands.push({
             name: command.name,
-            displayName: command.displayName
+            displayName: command.displayName,
         });
 
         this.extensionCommands.sort(
-            (a: ExtensionCommand, b: ExtensionCommand) =>
+            (a: IExtensionCommand, b: IExtensionCommand) =>
                 a.name.localeCompare(b.name));
     }
 
-    private showExtensionCommands(client: LanguageClient) : Thenable<InvokeExtensionCommandRequestArguments> {
+    private showExtensionCommands(client: LanguageClient): Thenable<InvokeExtensionCommandRequestArguments> {
 
         // If no extension commands are available, show a message
-        if (this.extensionCommands.length == 0) {
+        if (this.extensionCommands.length === 0) {
             vscode.window.showInformationMessage(
                 "No extension commands have been loaded into the current session.");
 
             return;
         }
 
-        let quickPickItems =
-            this.extensionCommands.map<ExtensionCommandQuickPickItem>(command => {
+        const quickPickItems =
+            this.extensionCommands.map<IExtensionCommandQuickPickItem>((command) => {
                 return {
                     label: command.displayName,
                     description: command.name,
-                    command: command
-                }
+                    command,
+                };
             });
 
         vscode.window
             .showQuickPick(
                 quickPickItems,
                 { placeHolder: "Select a command" })
-            .then(command => this.onCommandSelected(command, client));
+            .then((command) => this.onCommandSelected(command, client));
     }
 
     private onCommandSelected(
-        chosenItem: ExtensionCommandQuickPickItem,
+        chosenItem: IExtensionCommandQuickPickItem,
         client: LanguageClient) {
 
         if (chosenItem !== undefined) {
             client.sendRequest(
-                InvokeExtensionCommandRequest.type,
+                InvokeExtensionCommandRequestType,
                 { name: chosenItem.command.name,
                 context: this.getEditorContext() });
         }
     }
 
-    private insertText(details: InsertTextRequestArguments): EditorOperationResponse {
-        let edit = new vscode.WorkspaceEdit();
+    private insertText(details: IInsertTextRequestArguments): EditorOperationResponse {
+        const edit = new vscode.WorkspaceEdit();
 
         edit.set(
             vscode.Uri.parse(details.filePath),
@@ -343,8 +320,8 @@ export class ExtensionCommandsFeature implements IFeature {
                         details.insertRange.start.character,
                         details.insertRange.end.line,
                         details.insertRange.end.character),
-                    details.insertText)
-            ]
+                        details.insertText),
+            ],
         );
 
         vscode.workspace.applyEdit(edit);
@@ -352,7 +329,7 @@ export class ExtensionCommandsFeature implements IFeature {
         return EditorOperationResponse.Completed;
     }
 
-    private getEditorContext(): EditorContext {
+    private getEditorContext(): IEditorContext {
         return {
             currentFilePath: vscode.window.activeTextEditor.document.uri.toString(),
             cursorPosition: asPosition(vscode.window.activeTextEditor.selection.active),
@@ -360,24 +337,24 @@ export class ExtensionCommandsFeature implements IFeature {
                 asRange(
                     new vscode.Range(
                         vscode.window.activeTextEditor.selection.start,
-                        vscode.window.activeTextEditor.selection.end))
-        }
+                        vscode.window.activeTextEditor.selection.end)),
+        };
     }
 
     private newFile(): Thenable<EditorOperationResponse> {
-        return vscode.workspace.openTextDocument({ content: ''})
-                     .then(doc => vscode.window.showTextDocument(doc))
-                     .then(_ => EditorOperationResponse.Completed);
+        return vscode.workspace.openTextDocument({ content: ""})
+                     .then((doc) => vscode.window.showTextDocument(doc))
+                     .then((_) => EditorOperationResponse.Completed);
     }
 
     private openFile(filePath: string): Thenable<EditorOperationResponse> {
 
         filePath = this.normalizeFilePath(filePath);
 
-        let promise =
+        const promise =
             vscode.workspace.openTextDocument(filePath)
-                .then(doc => vscode.window.showTextDocument(doc))
-                .then(_ => EditorOperationResponse.Completed);
+                .then((doc) => vscode.window.showTextDocument(doc))
+                .then((_) => EditorOperationResponse.Completed);
 
         return promise;
     }
@@ -385,16 +362,13 @@ export class ExtensionCommandsFeature implements IFeature {
     private closeFile(filePath: string): Thenable<EditorOperationResponse> {
 
         let promise: Thenable<EditorOperationResponse>;
-        if (this.findTextDocument(this.normalizeFilePath(filePath)))
-        {
+        if (this.findTextDocument(this.normalizeFilePath(filePath))) {
             promise =
                 vscode.workspace.openTextDocument(filePath)
-                    .then(doc => vscode.window.showTextDocument(doc))
-                    .then(editor => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
-                    .then(_ => EditorOperationResponse.Completed);
-        }
-        else
-        {
+                    .then((doc) => vscode.window.showTextDocument(doc))
+                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+                    .then((_) => EditorOperationResponse.Completed);
+        } else {
             promise = Promise.resolve(EditorOperationResponse.Completed);
         }
 
@@ -404,8 +378,7 @@ export class ExtensionCommandsFeature implements IFeature {
     private saveFile(filePath: string): Thenable<EditorOperationResponse> {
 
         let promise: Thenable<EditorOperationResponse>;
-        if (this.findTextDocument(this.normalizeFilePath(filePath)))
-        {
+        if (this.findTextDocument(this.normalizeFilePath(filePath))) {
             promise =
                 vscode.workspace.openTextDocument(filePath)
                     .then((doc) => {
@@ -413,10 +386,8 @@ export class ExtensionCommandsFeature implements IFeature {
                             doc.save();
                         }
                     })
-                    .then(_ => EditorOperationResponse.Completed);
-        }
-        else
-        {
+                    .then((_) => EditorOperationResponse.Completed);
+        } else {
             promise = Promise.resolve(EditorOperationResponse.Completed);
         }
 
@@ -424,11 +395,10 @@ export class ExtensionCommandsFeature implements IFeature {
     }
 
     private normalizeFilePath(filePath: string): string {
-        let platform = os.platform();
-        if (platform == "win32") {
+        const platform = os.platform();
+        if (platform === "win32") {
             // Make sure the file path is absolute
-            if (!path.win32.isAbsolute(filePath))
-            {
+            if (!path.win32.isAbsolute(filePath)) {
                 filePath = path.win32.resolve(
                     vscode.workspace.rootPath,
                     filePath);
@@ -438,15 +408,14 @@ export class ExtensionCommandsFeature implements IFeature {
             return filePath.toLowerCase();
         } else {
             // Make sure the file path is absolute
-            if (!path.isAbsolute(filePath))
-            {
+            if (!path.isAbsolute(filePath)) {
                 filePath = path.resolve(
                     vscode.workspace.rootPath,
                     filePath);
             }
 
-            //macOS is case-insensitive
-            if (platform == "darwin") {
+            // macOS is case-insensitive
+            if (platform === "darwin") {
                 filePath = filePath.toLowerCase();
             }
 
@@ -456,9 +425,10 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private findTextDocument(filePath: string): boolean {
         // since Windows and macOS are case-insensitive, we need to normalize them differently
-        let canFind = vscode.workspace.textDocuments.find(doc => {
-            let docPath, platform = os.platform();
-            if (platform == "win32" || platform == "darwin") {
+        const canFind = vscode.workspace.textDocuments.find((doc) => {
+            let docPath;
+            const platform = os.platform();
+            if (platform === "win32" || platform === "darwin") {
                 // for Windows and macOS paths, they are normalized to be lowercase
                 docPath = doc.fileName.toLowerCase();
             } else {
@@ -470,12 +440,12 @@ export class ExtensionCommandsFeature implements IFeature {
         return canFind != null;
     }
 
-    private setSelection(details: SetSelectionRequestArguments): EditorOperationResponse {
+    private setSelection(details: ISetSelectionRequestArguments): EditorOperationResponse {
         vscode.window.activeTextEditor.selections = [
             new vscode.Selection(
                 asCodePosition(details.selectionRange.start),
-                asCodePosition(details.selectionRange.end))
-        ]
+                asCodePosition(details.selectionRange.end)),
+        ];
 
         return EditorOperationResponse.Completed;
     }
@@ -483,27 +453,26 @@ export class ExtensionCommandsFeature implements IFeature {
     private showInformationMessage(message: string): Thenable<EditorOperationResponse> {
         return vscode.window
                      .showInformationMessage(message)
-                     .then(_ => EditorOperationResponse.Completed);
+                     .then((_) => EditorOperationResponse.Completed);
     }
 
     private showErrorMessage(message: string): Thenable<EditorOperationResponse> {
         return vscode.window
                      .showErrorMessage(message)
-                     .then(_ => EditorOperationResponse.Completed);
+                     .then((_) => EditorOperationResponse.Completed);
     }
 
     private showWarningMessage(message: string): Thenable<EditorOperationResponse> {
         return vscode.window
                      .showWarningMessage(message)
-                     .then(_ => EditorOperationResponse.Completed);
+                     .then((_) => EditorOperationResponse.Completed);
     }
 
-    private setStatusBarMessage(messageDetails: StatusBarMessageDetails): EditorOperationResponse {
+    private setStatusBarMessage(messageDetails: IStatusBarMessageDetails): EditorOperationResponse {
 
         if (messageDetails.timeout) {
             vscode.window.setStatusBarMessage(messageDetails.message, messageDetails.timeout);
-        }
-        else {
+        } else {
             vscode.window.setStatusBarMessage(messageDetails.message);
         }
 
