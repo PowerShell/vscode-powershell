@@ -2,9 +2,9 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
-import { IFeature } from '../feature';
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import vscode = require("vscode");
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { IFeature } from "../feature";
 
 export class CustomViewsFeature implements IFeature {
 
@@ -20,11 +20,15 @@ export class CustomViewsFeature implements IFeature {
                 this.contentProvider));
     }
 
+    public dispose() {
+        this.commands.forEach((d) => d.dispose());
+    }
+
     public setLanguageClient(languageClient: LanguageClient) {
 
         languageClient.onRequest(
-            NewCustomViewRequest.type,
-            args => {
+            NewCustomViewRequestType,
+            (args) => {
                 this.contentProvider.createView(
                     args.id,
                     args.title,
@@ -32,40 +36,36 @@ export class CustomViewsFeature implements IFeature {
             });
 
         languageClient.onRequest(
-            ShowCustomViewRequest.type,
-            args => {
+            ShowCustomViewRequestType,
+            (args) => {
                 this.contentProvider.showView(
                     args.id,
                     args.viewColumn);
             });
 
         languageClient.onRequest(
-            CloseCustomViewRequest.type,
-            args => {
+            CloseCustomViewRequestType,
+            (args) => {
                 this.contentProvider.closeView(args.id);
             });
 
         languageClient.onRequest(
-            SetHtmlContentViewRequest.type,
-            args => {
+            SetHtmlContentViewRequestType,
+            (args) => {
                 this.contentProvider.setHtmlContentView(
                     args.id,
                     args.htmlContent);
             });
 
         languageClient.onRequest(
-            AppendHtmlOutputViewRequest.type,
-            args => {
+            AppendHtmlOutputViewRequestType,
+            (args) => {
                 this.contentProvider.appendHtmlOutputView(
                     args.id,
                     args.appendedHtmlBodyContent);
             });
 
         this.languageClient = languageClient;
-    }
-
-    public dispose() {
-        this.commands.forEach(d => d.dispose());
     }
 }
 
@@ -75,23 +75,26 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
     private viewIndex: { [id: string]: CustomView } = {};
     private didChangeEvent: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
 
+    // tslint:disable-next-line:member-ordering
+    public onDidChange: vscode.Event<vscode.Uri> = this.didChangeEvent.event;
+
     public provideTextDocumentContent(uri: vscode.Uri): string {
         return this.viewIndex[uri.toString()].getContent();
     }
 
     public createView(id: string, title: string, viewType: CustomViewType) {
-        let view = undefined;
+        let view;
         switch (viewType) {
             case CustomViewType.HtmlContent:
                 view = new HtmlContentView(id, title);
-        };
+        }
 
         this.viewIndex[this.getUri(view.id)] = view;
     }
 
     public showView(id: string, viewColumn: vscode.ViewColumn) {
-        let uriString = this.getUri(id);
-        let view: CustomView = this.viewIndex[uriString];
+        const uriString = this.getUri(id);
+        const view: CustomView = this.viewIndex[uriString];
 
         vscode.commands.executeCommand(
             "vscode.previewHtml",
@@ -101,40 +104,38 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
     }
 
     public closeView(id: string) {
-        let uriString = this.getUri(id);
-        let view: CustomView = this.viewIndex[uriString];
+        const uriString = this.getUri(id);
+        const view: CustomView = this.viewIndex[uriString];
 
-        vscode.workspace.textDocuments.some(
-            doc => {
-                if (doc.uri.toString() === uriString) {
-                    vscode.window
-                        .showTextDocument(doc)
-                        .then(editor => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+        vscode.workspace.textDocuments.some((doc) => {
+            if (doc.uri.toString() === uriString) {
+                vscode.window
+                    .showTextDocument(doc)
+                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"));
 
-                    return true;
-                }
-
-                return false;
+                return true;
             }
-        )
+
+            return false;
+        });
     }
 
-    public setHtmlContentView(id: string, content: HtmlContent) {
-        let uriString = this.getUri(id);
-        let view: CustomView = this.viewIndex[uriString];
+    public setHtmlContentView(id: string, content: IHtmlContent) {
+        const uriString = this.getUri(id);
+        const view: CustomView = this.viewIndex[uriString];
 
         if (view.viewType === CustomViewType.HtmlContent) {
-            (<HtmlContentView>view).setContent(content);
+            (view as HtmlContentView).setContent(content);
             this.didChangeEvent.fire(vscode.Uri.parse(uriString));
         }
     }
 
     public appendHtmlOutputView(id: string, content: string) {
-        let uriString = this.getUri(id);
-        let view: CustomView = this.viewIndex[uriString];
+        const uriString = this.getUri(id);
+        const view: CustomView = this.viewIndex[uriString];
 
         if (view.viewType === CustomViewType.HtmlContent) {
-            (<HtmlContentView>view).appendContent(content);
+            (view as HtmlContentView).appendContent(content);
             this.didChangeEvent.fire(vscode.Uri.parse(uriString));
         }
     }
@@ -142,8 +143,6 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
     private getUri(id: string) {
         return `powershell://views/${id}`;
     }
-
-    public onDidChange: vscode.Event<vscode.Uri> = this.didChangeEvent.event;
 }
 
 abstract class CustomView {
@@ -151,39 +150,37 @@ abstract class CustomView {
     constructor(
         public id: string,
         public title: string,
-        public viewType: CustomViewType)
-    {
+        public viewType: CustomViewType) {
     }
 
-    abstract getContent(): string;
+    public abstract getContent(): string;
 }
 
 class HtmlContentView extends CustomView {
 
-    private htmlContent: HtmlContent = {
+    private htmlContent: IHtmlContent = {
         bodyContent: "",
         javaScriptPaths: [],
-        styleSheetPaths: []
+        styleSheetPaths: [],
     };
 
     constructor(
         id: string,
-        title: string)
-    {
+        title: string) {
         super(id, title, CustomViewType.HtmlContent);
     }
 
-    setContent(htmlContent: HtmlContent) {
+    public setContent(htmlContent: IHtmlContent) {
         this.htmlContent = htmlContent;
     }
 
-    appendContent(content: string) {
+    public appendContent(content: string) {
         this.htmlContent.bodyContent += content;
     }
 
-    getContent(): string {
-        var styleSrc = "none";
-        var styleTags = "";
+    public getContent(): string {
+        let styleSrc = "none";
+        let styleTags = "";
 
         function getNonce(): number {
             return Math.floor(Math.random() * 100000) + 100000;
@@ -193,29 +190,31 @@ class HtmlContentView extends CustomView {
             this.htmlContent.styleSheetPaths.length > 0) {
             styleSrc = "";
             this.htmlContent.styleSheetPaths.forEach(
-                p => {
-                    var nonce = getNonce();
+                (p) => {
+                    const nonce = getNonce();
                     styleSrc += `'nonce-${nonce}' `;
                     styleTags += `<link nonce="${nonce}" href="${p}" rel="stylesheet" type="text/css" />\n`;
                 });
         }
 
-        var scriptSrc = "none";
-        var scriptTags = "";
+        let scriptSrc = "none";
+        let scriptTags = "";
 
         if (this.htmlContent.javaScriptPaths &&
             this.htmlContent.javaScriptPaths.length > 0) {
             scriptSrc = "";
             this.htmlContent.javaScriptPaths.forEach(
-                p => {
-                    var nonce = getNonce();
+                (p) => {
+                    const nonce = getNonce();
                     scriptSrc += `'nonce-${nonce}' `;
                     scriptTags += `<script nonce="${nonce}" src="${p}"></script>\n`;
                 });
         }
 
         // Return an HTML page with the specified content
-        return `<html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src *; style-src ${styleSrc}; script-src ${scriptSrc};">${styleTags}</head><body>\n${this.htmlContent.bodyContent}\n${scriptTags}</body></html>`;
+        return `<html><head><meta http-equiv="Content-Security-Policy" ` +
+               `content="default-src 'none'; img-src *; style-src ${styleSrc}; script-src ${scriptSrc};">` +
+               `${styleTags}</head><body>\n${this.htmlContent.bodyContent}\n${scriptTags}</body></html>`;
     }
 }
 
@@ -223,63 +222,53 @@ enum CustomViewType {
     HtmlContent = 1,
 }
 
-namespace NewCustomViewRequest {
-    export const type =
-        new RequestType<NewCustomViewRequestArguments, void, void, void>(
-            'powerShell/newCustomView');
-}
+export const NewCustomViewRequestType =
+    new RequestType<INewCustomViewRequestArguments, void, void, void>(
+        "powerShell/newCustomView");
 
-interface NewCustomViewRequestArguments {
+interface INewCustomViewRequestArguments {
     id: string;
     title: string;
     viewType: CustomViewType;
 }
 
-namespace ShowCustomViewRequest {
-    export const type =
-        new RequestType<ShowCustomViewRequestArguments, void, void, void>(
-            'powerShell/showCustomView');
-}
+export const ShowCustomViewRequestType =
+    new RequestType<IShowCustomViewRequestArguments, void, void, void>(
+        "powerShell/showCustomView");
 
-interface ShowCustomViewRequestArguments {
+interface IShowCustomViewRequestArguments {
     id: string;
     viewColumn: vscode.ViewColumn;
 }
 
-namespace CloseCustomViewRequest {
-    export const type =
-        new RequestType<CloseCustomViewRequestArguments, void, void, void>(
-            'powerShell/closeCustomView');
-}
+export const CloseCustomViewRequestType =
+    new RequestType<ICloseCustomViewRequestArguments, void, void, void>(
+        "powerShell/closeCustomView");
 
-interface CloseCustomViewRequestArguments {
+interface ICloseCustomViewRequestArguments {
     id: string;
 }
 
-namespace SetHtmlContentViewRequest {
-    export const type =
-        new RequestType<SetHtmlContentViewRequestArguments, void, void, void>(
-            'powerShell/setHtmlViewContent');
-}
+export const SetHtmlContentViewRequestType =
+    new RequestType<ISetHtmlContentViewRequestArguments, void, void, void>(
+        "powerShell/setHtmlViewContent");
 
-interface HtmlContent {
+interface IHtmlContent {
     bodyContent: string;
     javaScriptPaths: string[];
     styleSheetPaths: string[];
 }
 
-interface SetHtmlContentViewRequestArguments {
+interface ISetHtmlContentViewRequestArguments {
     id: string;
-    htmlContent: HtmlContent;
+    htmlContent: IHtmlContent;
 }
 
-namespace AppendHtmlOutputViewRequest {
-    export const type =
-        new RequestType<AppendHtmlOutputViewRequestArguments, void, void, void>(
-            'powerShell/appendHtmlViewContent');
-}
+export const AppendHtmlOutputViewRequestType =
+    new RequestType<IAppendHtmlOutputViewRequestArguments, void, void, void>(
+        "powerShell/appendHtmlViewContent");
 
-interface AppendHtmlOutputViewRequestArguments {
+interface IAppendHtmlOutputViewRequestArguments {
     id: string;
     appendedHtmlBodyContent: string;
 }
