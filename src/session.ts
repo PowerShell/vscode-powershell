@@ -767,15 +767,18 @@ class SessionMenuItem implements vscode.QuickPickItem {
 
     constructor(
         public readonly label: string,
-        public readonly callback: () => void = () => { })
-    {
+        // tslint:disable-next-line:no-empty
+        public readonly callback: () => void = () => {}) {
     }
 }
 
 export const PowerShellVersionRequestType =
-    new RequestType0<IPowerShellVersionDetails, void, void>("powerShell/getVersion");
+    new RequestType0<IPowerShellVersionDetails, void, void>(
+        "powerShell/getVersion");
 
-export const RunspaceChangedEventType = new NotificationType<IRunspaceDetails, void>("powerShell/runspaceChanged");
+export const RunspaceChangedEventType =
+    new NotificationType<IRunspaceDetails, void>(
+        "powerShell/runspaceChanged");
 
 export enum RunspaceType {
     Local,
