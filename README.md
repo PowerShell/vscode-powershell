@@ -119,7 +119,7 @@ You have two options for sending us the logs:
 
   1. If you are editing scripts that contain sensitive information (intellectual property,
      deployment or administrative information, etc), e-mail the logs directly to
-     *daviwil [at] microsoft.com*
+     *tyleonha [at] microsoft.com* or reach out to one of the [other maintainers](https://github.com/powershell/vscode-powershell#maintainers) directly.
 
   2. If you are editing scripts that don't contain sensitive information, you can drag and
      drop your logs ZIP file into the GitHub issue that you are creating.
@@ -131,13 +131,22 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
 - [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
-- [Kapil Borle](https://github.com/kapilmb) - [@kmborle](http://twitter.com/kmborle)
-- [Trevor Sullivan](https://github.com/pcgeek86) - [@pcgeek86](http://twitter.com/pcgeek86)
+- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
+- [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
 
 ## License
 
 This extension is [licensed under the MIT License](LICENSE.txt).  Please see the
 [third-party notices](Third%20Party%20Notices.txt) file for details on the third-party
 binaries that we include with releases of this project.
+
+## [Code of Conduct][conduct-md]
+
+This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
+For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
+
+[conduct-code]: http://opensource.microsoft.com/codeofconduct/
+[conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
+[conduct-email]: mailto:opencode@microsoft.com
+[conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/master/CODE_OF_CONDUCT.md
