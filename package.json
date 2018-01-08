@@ -72,11 +72,6 @@
         "command": "PowerShell.RunSelection",
         "key": "f8",
         "when": "editorTextFocus && editorLangId == 'powershell'"
-      },
-      {
-        "command": "PowerShell.OpenInISE",
-        "key": "shift+alt+p",
-        "when": "editorTextFocus && editorLangId == 'powershell'"
       }
     ],
     "commands": [
