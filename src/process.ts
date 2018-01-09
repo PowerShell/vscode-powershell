@@ -119,20 +119,6 @@ export class PowerShellProcess {
                             }
                     });
 
-                    // this.powerShellProcess.stderr.on(
-                    //     'data',
-                    //     (data) => {
-                    //         this.log.writeError("ERROR: " + data);
-
-                    //         if (this.sessionStatus === SessionStatus.Initializing) {
-                    //             this.setSessionFailure(
-                    //                 "PowerShell could not be started, click 'Show Logs' for more details.");
-                    //         }
-                    //         else if (this.sessionStatus === SessionStatus.Running) {
-                    //             this.promptForRestart();
-                    //         }
-                    //     });
-
                     this.consoleCloseSubscription =
                         vscode.window.onDidCloseTerminal(
                             (terminal) => {

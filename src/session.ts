@@ -148,7 +148,6 @@ export class SessionManager implements Middleware {
 
             if (this.inDevelopmentMode) {
                 const devBundledModulesPath =
-                    // this.sessionSettings.developer.bundledModulesPath ||
                     path.resolve(
                         __dirname,
                         this.sessionSettings.developer.bundledModulesPath ||
@@ -159,8 +158,8 @@ export class SessionManager implements Middleware {
                     bundledModulesPath = devBundledModulesPath;
                 } else {
                     this.log.write(
-                        `\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
-                        "found (or has not been built yet): ${devBundledModulesPath}\n`);
+                        "\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
+                        `found (or has not been built yet): ${devBundledModulesPath}\n`);
                 }
             }
 

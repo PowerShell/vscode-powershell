@@ -52,7 +52,7 @@ capturing and sending logs.
 
 | Name | Version |
 | --- | --- |
-| Operating System | ${os.type() + " " + os.arch() + " " + os.release()} |
+| Operating System | ${os.type()} ${os.arch()} ${os.release()} |
 | VSCode | ${vscode.version}|
 | PowerShell Extension Version | ${extensionVersion} |
 

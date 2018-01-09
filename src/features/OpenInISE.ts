@@ -26,7 +26,7 @@ export class OpenInISEFeature implements IFeature {
 
             ISEPath += "\\WindowsPowerShell\\v1.0\\powershell_ise.exe";
 
-            ChildProcess.exec(ISEPath + ' -File "' + uri.fsPath + '"').unref();
+            ChildProcess.exec(ISEPath + ` -File "${uri.fsPath}"`).unref();
         });
     }
 
