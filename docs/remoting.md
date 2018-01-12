@@ -26,17 +26,17 @@ In this section, I will walk through remote editing and debugging from my MacBoo
 
 With the PowerShell extension for VSCode started and the PowerShell Integrated Console opened, we can type `psedit foo.ps1` to open the local foo.ps1 file right in the editor.
 
-![psedit foo.ps1 works locally](assets/pseditlocal.png)
+![psedit foo.ps1 works locally](Assets/pseditlocal.png)
 
 NOTE: foo.ps1 must already exist.
 
 From there, we can:
 
 add breakpoints to the gutter
-![adding breakpoint to gutter](assets/addbreakpoints.png)
+![adding breakpoint to gutter](Assets/addbreakpoints.png)
 
 and hit F5 to debug the PowerShell script.
-![debugging the PowerShell local script](assets/debugging.png)
+![debugging the PowerShell local script](Assets/debugging.png)
 
 While debugging, you can interact with the debug console, check out the variables in the scope on the left, and all the other standard debugging tools.
 
@@ -60,17 +60,17 @@ First, in the Integrated Console, let's run our Enter-PSSession. You will know t
 
 NOTE: I've blacked out the IP address.
 
-![The call to Enter-PSSession](assets/enterpssession.png)
+![The call to Enter-PSSession](Assets/enterpssession.png)
 
 From there, we can do the exact steps as if we were editing a local script.
 
 1. Run `psedit test.ps1` to open the remote `test.ps1` file
-![psedit the test.ps1 file](assets/pseditremote.png)
+![psedit the test.ps1 file](Assets/pseditremote.png)
 2. Edit the file/set breakpoints
-![edit and set breakpoints](assets/addbreakpointremote.png)
+![edit and set breakpoints](Assets/addbreakpointremote.png)
 3. Start debugging the remote file
 
-![debugging the remote file](assets/debuggingremote.png)
+![debugging the remote file](Assets/debuggingremote.png)
 
 That's all there is to it! We hope that this helped clear up any questions about remote debugging and editing PowerShell in VSCode.
 
