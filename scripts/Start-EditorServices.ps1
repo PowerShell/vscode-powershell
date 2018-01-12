@@ -195,7 +195,7 @@ if ((Test-ModuleAvailable "PowerShellGet") -eq $false) {
 # Check if the expected version of the PowerShell Editor Services
 # module is installed
 $parsedVersion = New-Object System.Version @($EditorServicesVersion)
-if ((Test-ModuleAvailable "PowerShellEditorServices" -RequiredVersion $parsedVersion) -eq $false) {
+if ((Test-ModuleAvailable "PowerShellEditorServices" $parsedVersion) -eq $false) {
     if ($ConfirmInstall -and $isPS5orLater) {
         # TODO: Check for error and return failure if necessary
         Install-Module "PowerShellEditorServices" -RequiredVersion $parsedVersion -Confirm
