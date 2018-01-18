@@ -4,7 +4,7 @@ For those of you that were familiar with the ISE, you may recall that you were a
 
 As it turns out, this feature is also availible out of the box in the PowerShell extension for VSCode. This guide will show you how to do it.
 
-NOTE: `psedit` is an alias of `Open-EditorFile`
+NOTE: `Open-EditorFile` was added in 1.6.0. Pre-1.6.0 it was called `psedit`. In 1.6.0+ `psedit` is an alias of `Open-EditorFile`.
 
 ## Prerequisites
 
