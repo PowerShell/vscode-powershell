@@ -4,6 +4,8 @@ For those of you that were familiar with the ISE, you may recall that you were a
 
 As it turns out, this feature is also availible out of the box in the PowerShell extension for VSCode. This guide will show you how to do it.
 
+NOTE: `psedit` is an alias of `Open-EditorFile`
+
 ## Prerequisites
 
 This guide assumes that you have:
@@ -22,11 +24,11 @@ This also works when connecting to a remote machine via WinRM, PowerShell Direct
 
 In this section, I will walk through remote editing and debugging from my MacBook Pro, to an Ubuntu VM running in Azure. I might not be using Windows, but **the process is identical**.
 
-### Local file editing with psedit
+### Local file editing with Open-EditorFile
 
-With the PowerShell extension for VSCode started and the PowerShell Integrated Console opened, we can type `psedit foo.ps1` to open the local foo.ps1 file right in the editor.
+With the PowerShell extension for VSCode started and the PowerShell Integrated Console opened, we can type `Open-EditorFile foo.ps1` or `psedit foo.ps1` to open the local foo.ps1 file right in the editor.
 
-![psedit foo.ps1 works locally](https://user-images.githubusercontent.com/2644648/34895897-7c2c46ac-f79c-11e7-9410-a252aff52f13.png)
+![Open-EditorFile foo.ps1 works locally](https://user-images.githubusercontent.com/2644648/34895897-7c2c46ac-f79c-11e7-9410-a252aff52f13.png)
 
 NOTE: foo.ps1 must already exist.
 
@@ -40,7 +42,7 @@ and hit F5 to debug the PowerShell script.
 
 While debugging, you can interact with the debug console, check out the variables in the scope on the left, and all the other standard debugging tools.
 
-### Remote file editing with psedit
+### Remote file editing with Open-EditorFile
 
 Now let's get into remote file editing and debugging. The steps are nearly the same, there's just one thing we need to do first - enter our PowerShell session to the remote server.
 
@@ -64,8 +66,8 @@ NOTE: I've blacked out the IP address.
 
 From there, we can do the exact steps as if we were editing a local script.
 
-1. Run `psedit test.ps1` to open the remote `test.ps1` file
-![psedit the test.ps1 file](https://user-images.githubusercontent.com/2644648/34895898-7c3e6a12-f79c-11e7-8bdf-549b591ecbcb.png)
+1. Run `Open-EditorFile test.ps1` or `psedit test.ps1` to open the remote `test.ps1` file
+![Open-EditorFile the test.ps1 file](https://user-images.githubusercontent.com/2644648/34895898-7c3e6a12-f79c-11e7-8bdf-549b591ecbcb.png)
 2. Edit the file/set breakpoints
 ![edit and set breakpoints](https://user-images.githubusercontent.com/2644648/34895892-7bb68246-f79c-11e7-8c0a-c2121773afbb.png)
 3. Start debugging (F5) the remote file
