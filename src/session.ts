@@ -352,9 +352,9 @@ export class SessionManager implements Middleware {
         next: ResolveCodeLensSignature): vscode.ProviderResult<vscode.CodeLens> {
             const resolvedCodeLens = next(codeLens, token);
             const resolveFunc =
-                (codeLens: vscode.CodeLens): vscode.CodeLens => {
-                    if (codeLens.command.command === "editor.action.showReferences") {
-                        const oldArgs = codeLens.command.arguments;
+                (codeLensToFix: vscode.CodeLens): vscode.CodeLens => {
+                    if (codeLensToFix.command.command === "editor.action.showReferences") {
+                        const oldArgs = codeLensToFix.command.arguments;
 
                         // Our JSON objects don't get handled correctly by
                         // VS Code's built in editor.action.showReferences
@@ -362,7 +362,7 @@ export class SessionManager implements Middleware {
                         // appropriate types to send them as command
                         // arguments.
 
-                        codeLens.command.arguments = [
+                        codeLensToFix.command.arguments = [
                             vscode.Uri.parse(oldArgs[0]),
                             new vscode.Position(oldArgs[1].line, oldArgs[1].character),
                             oldArgs[2].map((position) => {
@@ -377,7 +377,7 @@ export class SessionManager implements Middleware {
                         ];
                     }
 
-                    return codeLens;
+                    return codeLensToFix;
                 };
 
             if ((resolvedCodeLens as Thenable<vscode.CodeLens>).then) {
