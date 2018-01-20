@@ -2,25 +2,25 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { IFeature } from "../feature";
-import { TextDocumentChangeEvent, workspace, Disposable, Position, window, Range, EndOfLine, SnippetString, TextDocument } from "vscode";
+import { Disposable, EndOfLine, Position, Range, SnippetString,
+    TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
+import { IFeature } from "../feature";
 
-export namespace CommentHelpRequest {
-    export const type = new RequestType<any, any, void, void>("powerShell/getCommentHelp");
-}
+export const CommentHelpRequestType =
+    new RequestType<any, any, void, void>("powerShell/getCommentHelp");
 
-interface CommentHelpRequestParams {
+interface ICommentHelpRequestParams {
     documentUri: string;
     triggerPosition: Position;
     blockComment: boolean;
 }
 
-interface CommentHelpRequestResult {
+interface ICommentHelpRequestResult {
     content: string[];
 }
 
-enum SearchState { Searching, Locked, Found };
+enum SearchState { Searching, Locked, Found }
 
 export class HelpCompletionFeature implements IFeature {
     private helpCompletionProvider: HelpCompletionProvider;
@@ -29,21 +29,21 @@ export class HelpCompletionFeature implements IFeature {
 
     constructor() {
         this.helpCompletionProvider = new HelpCompletionProvider();
-        let subscriptions = [];
+        const subscriptions = [];
         workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
         this.disposable = Disposable.from(...subscriptions);
     }
 
-    setLanguageClient(languageClient: LanguageClient) {
+    public dispose() {
+        this.disposable.dispose();
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
         this.helpCompletionProvider.languageClient = languageClient;
     }
 
-    dispose() {
-        this.disposable.dispose();
-    }
-
-    onEvent(changeEvent: TextDocumentChangeEvent): void {
+    public onEvent(changeEvent: TextDocumentChangeEvent): void {
         this.helpCompletionProvider.updateState(
             changeEvent.document,
             changeEvent.contentChanges[0].text,
@@ -53,7 +53,6 @@ export class HelpCompletionFeature implements IFeature {
         if (this.helpCompletionProvider.triggerFound) {
             this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
         }
-
     }
 }
 
@@ -88,8 +87,7 @@ class TriggerFinder {
                     if (this.count === this.triggerCharacters.length) {
                         this.state = SearchState.Found;
                     }
-                }
-                else {
+                } else {
                     this.reset();
                 }
                 break;
@@ -145,28 +143,29 @@ class HelpCompletionProvider {
             return;
         }
 
-        let change = this.lastChangeText;
-        let triggerStartPos = this.lastChangeRange.start;
-        let triggerEndPos = this.lastChangeRange.end;
-        let doc = this.lastDocument;
+        const change = this.lastChangeText;
+        const triggerStartPos = this.lastChangeRange.start;
+        const triggerEndPos = this.lastChangeRange.end;
+        const doc = this.lastDocument;
+
         return this.langClient.sendRequest(
-            CommentHelpRequest.type,
+            CommentHelpRequestType,
             {
                 documentUri: doc.uri.toString(),
                 triggerPosition: triggerStartPos,
-                blockComment: this.triggerFinderBlockComment.found
-            }).then(result => {
+                blockComment: this.triggerFinderBlockComment.found,
+            }).then((result) => {
                 if (result == null || result.content == null) {
                     return;
                 }
 
                 // todo add indentation level to the help content
-                let editor = window.activeTextEditor;
-                let replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
+                const editor = window.activeTextEditor;
+                const replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
 
-                // Trim the leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
+                // Trim leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
                 // Trim the last empty line and join the strings.
-                let text = result.content.map(x => x.trimLeft()).slice(0, -1).join(this.getEOL(doc.eol));
+                const text = result.content.map((x) => x.trimLeft()).slice(0, -1).join(this.getEOL(doc.eol));
                 editor.insertSnippet(new SnippetString(text), replaceRange);
             });
     }

@@ -2,43 +2,43 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-'use strict';
+"use strict";
 
-import vscode = require('vscode');
-import utils = require('./utils');
-import path = require('path');
-import Settings = require('./settings');
-import { Logger, LogLevel } from './logging';
-import { IFeature } from './feature';
-import { SessionManager } from './session';
-import { PowerShellLanguageId } from './utils';
-import { ConsoleFeature } from './features/Console';
-import { ExamplesFeature } from './features/Examples';
-import { OpenInISEFeature } from './features/OpenInISE';
-import { GenerateBugReportFeature } from './features/GenerateBugReport';
-import { CustomViewsFeature } from './features/CustomViews';
-import { ExpandAliasFeature } from './features/ExpandAlias';
-import { ShowHelpFeature } from './features/ShowOnlineHelp';
-import { CodeActionsFeature } from './features/CodeActions';
-import { RemoteFilesFeature } from './features/RemoteFiles';
-import { PesterTestsFeature } from './features/PesterTests';
-import { DebugSessionFeature } from './features/DebugSession';
-import { PickPSHostProcessFeature } from './features/DebugSession';
-import { SpecifyScriptArgsFeature } from './features/DebugSession';
-import { SelectPSSARulesFeature } from './features/SelectPSSARules';
-import { FindModuleFeature } from './features/PowerShellFindModule';
-import { NewFileOrProjectFeature } from './features/NewFileOrProject';
-import { ExtensionCommandsFeature } from './features/ExtensionCommands';
-import { DocumentFormatterFeature } from './features/DocumentFormatter';
+import path = require("path");
+import vscode = require("vscode");
+import { IFeature } from "./feature";
+import { CodeActionsFeature } from "./features/CodeActions";
+import { ConsoleFeature } from "./features/Console";
+import { CustomViewsFeature } from "./features/CustomViews";
+import { DebugSessionFeature } from "./features/DebugSession";
+import { PickPSHostProcessFeature } from "./features/DebugSession";
+import { SpecifyScriptArgsFeature } from "./features/DebugSession";
+import { DocumentFormatterFeature } from "./features/DocumentFormatter";
+import { ExamplesFeature } from "./features/Examples";
+import { ExpandAliasFeature } from "./features/ExpandAlias";
+import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
+import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
+import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
+import { OpenInISEFeature } from "./features/OpenInISE";
+import { PesterTestsFeature } from "./features/PesterTests";
+import { FindModuleFeature } from "./features/PowerShellFindModule";
+import { RemoteFilesFeature } from "./features/RemoteFiles";
+import { SelectPSSARulesFeature } from "./features/SelectPSSARules";
+import { ShowHelpFeature } from "./features/ShowOnlineHelp";
+import { Logger, LogLevel } from "./logging";
+import { SessionManager } from "./session";
+import Settings = require("./settings");
+import { PowerShellLanguageId } from "./utils";
+import utils = require("./utils");
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-var requiredEditorServicesVersion = "1.5.1";
+const requiredEditorServicesVersion = "1.5.1";
 
-var logger: Logger = undefined;
-var sessionManager: SessionManager = undefined;
-var extensionFeatures: IFeature[] = [];
+let logger: Logger;
+let sessionManager: SessionManager;
+let extensionFeatures: IFeature[] = [];
 
 export function activate(context: vscode.ExtensionContext): void {
 
@@ -53,48 +53,48 @@ export function activate(context: vscode.ExtensionContext): void {
                 // ^(.*\*/)?\s*\}.*$
                 decreaseIndentPattern: /^(.*\*\/)?\s*\}.*$/,
                 // ^.*\{[^}"']*$
-                increaseIndentPattern: /^.*\{[^}"']*$/
+                increaseIndentPattern: /^.*\{[^}"']*$/,
             },
 
             comments: {
-                lineComment: '#',
-                blockComment: ['<#', '#>']
+                lineComment: "#",
+                blockComment: ["<#", "#>"],
             },
 
             brackets: [
-                ['{', '}'],
-                ['[', ']'],
-                ['(', ')'],
+                ["{", "}"],
+                ["[", "]"],
+                ["(", ")"],
             ],
 
-			onEnterRules: [
-				{
-					// e.g. /** | */
-					beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
-					afterText: /^\s*\*\/$/,
-					action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: ' * ' }
-				},
-				{
-					// e.g. /** ...|
-					beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
-					action: { indentAction: vscode.IndentAction.None, appendText: ' * ' }
-				},
-				{
-					// e.g.  * ...|
-					beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
-					action: { indentAction: vscode.IndentAction.None, appendText: '* ' }
-				},
-				{
-					// e.g.  */|
-					beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
-					action: { indentAction: vscode.IndentAction.None, removeText: 1 }
-				},
-				{
-					// e.g.  *-----*/|
-					beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
-					action: { indentAction: vscode.IndentAction.None, removeText: 1 }
-				}
-			]
+            onEnterRules: [
+                {
+                    // e.g. /** | */
+                    beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+                    afterText: /^\s*\*\/$/,
+                    action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: " * " },
+                },
+                {
+                    // e.g. /** ...|
+                    beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+                    action: { indentAction: vscode.IndentAction.None, appendText: " * " },
+                },
+                {
+                    // e.g.  * ...|
+                    beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
+                    action: { indentAction: vscode.IndentAction.None, appendText: "* " },
+                },
+                {
+                    // e.g.  */|
+                    beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
+                    action: { indentAction: vscode.IndentAction.None, removeText: 1 },
+                },
+                {
+                    // e.g.  *-----*/|
+                    beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
+                    action: { indentAction: vscode.IndentAction.None, removeText: 1 },
+                },
+            ],
         });
 
     // Create the logger
@@ -125,12 +125,12 @@ export function activate(context: vscode.ExtensionContext): void {
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(),
-        new CustomViewsFeature()
+        new CustomViewsFeature(),
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
 
-    var extensionSettings = Settings.load();
+    const extensionSettings = Settings.load();
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }
@@ -139,30 +139,29 @@ export function activate(context: vscode.ExtensionContext): void {
 function checkForUpdatedVersion(context: vscode.ExtensionContext) {
 
     const showReleaseNotes = "Show Release Notes";
-    const powerShellExtensionVersionKey = 'powerShellExtensionVersion';
+    const powerShellExtensionVersionKey = "powerShellExtensionVersion";
 
-    var extensionVersion: string =
+    const extensionVersion: string =
         vscode
             .extensions
             .getExtension("ms-vscode.PowerShell")
             .packageJSON
             .version;
 
-    var storedVersion = context.globalState.get(powerShellExtensionVersionKey);
+    const storedVersion = context.globalState.get(powerShellExtensionVersionKey);
 
     if (!storedVersion) {
         // TODO: Prompt to show User Guide for first-time install
-    }
-    else if (extensionVersion !== storedVersion) {
+    } else if (extensionVersion !== storedVersion) {
         vscode
             .window
             .showInformationMessage(
                 `The PowerShell extension has been updated to version ${extensionVersion}!`,
                 showReleaseNotes)
-            .then(choice => {
+            .then((choice) => {
                 if (choice === showReleaseNotes) {
                     vscode.commands.executeCommand(
-                        'markdown.showPreview',
+                        "markdown.showPreview",
                         vscode.Uri.file(path.resolve(__dirname, "../../CHANGELOG.md")));
                 }
             });
@@ -175,7 +174,7 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext) {
 
 export function deactivate(): void {
     // Clean up all extension features
-    extensionFeatures.forEach(feature => {
+    extensionFeatures.forEach((feature) => {
        feature.dispose();
     });
 

@@ -2,13 +2,12 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
-import { IFeature } from '../feature';
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import vscode = require("vscode");
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { IFeature } from "../feature";
 
-export namespace ShowOnlineHelpRequest {
-    export const type = new RequestType<string, void, void, void>('powerShell/showOnlineHelp');
-}
+export const ShowOnlineHelpRequestType =
+    new RequestType<string, void, void, void>("powerShell/showOnlineHelp");
 
 export class ShowHelpFeature implements IFeature {
 
@@ -16,7 +15,7 @@ export class ShowHelpFeature implements IFeature {
     private languageClient: LanguageClient;
 
     constructor() {
-        this.command = vscode.commands.registerCommand('PowerShell.OnlineHelp', () => {
+        this.command = vscode.commands.registerCommand("PowerShell.OnlineHelp", () => {
             if (this.languageClient === undefined) {
                 // TODO: Log error message
                 return;
@@ -24,20 +23,20 @@ export class ShowHelpFeature implements IFeature {
 
             const editor = vscode.window.activeTextEditor;
 
-            var selection = editor.selection;
-            var doc = editor.document;
-            var cwr = doc.getWordRangeAtPosition(selection.active)
-            var text = doc.getText(cwr);
+            const selection = editor.selection;
+            const doc = editor.document;
+            const cwr = doc.getWordRangeAtPosition(selection.active);
+            const text = doc.getText(cwr);
 
-            this.languageClient.sendRequest(ShowOnlineHelpRequest.type, text);
+            this.languageClient.sendRequest(ShowOnlineHelpRequestType, text);
         });
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     public dispose() {
         this.command.dispose();
+    }
+
+    public setLanguageClient(languageclient: LanguageClient) {
+        this.languageClient = languageclient;
     }
 }

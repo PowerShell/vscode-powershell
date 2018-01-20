@@ -2,36 +2,39 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
-import Window = vscode.window;
-import ChildProcess = require('child_process');
-import { IFeature, LanguageClient } from '../feature';
+import ChildProcess = require("child_process");
+import vscode = require("vscode");
+import { IFeature, LanguageClient } from "../feature";
 
 export class OpenInISEFeature implements IFeature {
     private command: vscode.Disposable;
 
     constructor() {
-        this.command = vscode.commands.registerCommand('PowerShell.OpenInISE', () => {
+        this.command = vscode.commands.registerCommand("PowerShell.OpenInISE", () => {
 
-            var editor = Window.activeTextEditor;
-            var document = editor.document;
-            var uri = document.uri
+            const editor = vscode.window.activeTextEditor;
+            const document = editor.document;
+            const uri = document.uri;
 
-            if (process.env.hasOwnProperty('PROCESSOR_ARCHITEW6432')) {
-                var ISEPath = process.env.windir + '\\Sysnative\\WindowsPowerShell\\v1.0\\powershell_ise.exe';
+            let ISEPath = process.env.windir;
+
+            if (process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")) {
+                ISEPath += "\\Sysnative";
             } else {
-                var ISEPath = process.env.windir + '\\System32\\WindowsPowerShell\\v1.0\\powershell_ise.exe';
+                ISEPath += "\\System32";
             }
 
-            ChildProcess.exec(ISEPath + ' -File "' + uri.fsPath + '"').unref();
-        });
-    }
+            ISEPath += "\\WindowsPowerShell\\v1.0\\powershell_ise.exe";
 
-    public setLanguageClient(languageClient: LanguageClient) {
-        // Not needed for this feature.
+            ChildProcess.exec(ISEPath + ` -File "${uri.fsPath}"`).unref();
+        });
     }
 
     public dispose() {
         this.command.dispose();
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
+        // Not needed for this feature.
     }
 }

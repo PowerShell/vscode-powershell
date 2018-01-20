@@ -2,91 +2,82 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
-import { IFeature } from '../feature';
-import { showCheckboxQuickPick, CheckboxQuickPickItem } from '../controls/checkboxQuickPick'
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import vscode = require("vscode");
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
+import { IFeature } from "../feature";
 
-export namespace EvaluateRequest {
-    export const type = new RequestType<EvaluateRequestArguments, void, void, void>('evaluate');
-}
+export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void, void>("evaluate");
+export const OutputNotificationType = new NotificationType<IOutputNotificationBody, void>("output");
 
-export interface EvaluateRequestArguments {
+export const ShowChoicePromptRequestType =
+    new RequestType<IShowChoicePromptRequestArgs,
+                    IShowChoicePromptResponseBody, string, void>("powerShell/showChoicePrompt");
+
+export const ShowInputPromptRequestType =
+    new RequestType<IShowInputPromptRequestArgs,
+                    IShowInputPromptResponseBody, string, void>("powerShell/showInputPrompt");
+
+export interface IEvaluateRequestArguments {
     expression: string;
 }
 
-export namespace OutputNotification {
-    export const type = new NotificationType<OutputNotificationBody, void>('output');
-}
-
-export interface OutputNotificationBody {
+export interface IOutputNotificationBody {
     category: string;
     output: string;
 }
 
-export namespace ShowChoicePromptRequest {
-    export const type =
-        new RequestType<ShowChoicePromptRequestArgs, ShowChoicePromptResponseBody, string, void>('powerShell/showChoicePrompt');
-}
-
-export namespace ShowInputPromptRequest {
-    export const type =
-        new RequestType<ShowInputPromptRequestArgs, ShowInputPromptResponseBody, string, void>('powerShell/showInputPrompt');
-}
-
-interface ChoiceDetails {
+interface IChoiceDetails {
     label: string;
     helpMessage: string;
 }
 
-interface ShowInputPromptRequestArgs {
+interface IShowInputPromptRequestArgs {
     name: string;
     label: string;
 }
 
-interface ShowChoicePromptRequestArgs {
+interface IShowChoicePromptRequestArgs {
     isMultiChoice: boolean;
     caption: string;
     message: string;
-    choices: ChoiceDetails[];
+    choices: IChoiceDetails[];
     defaultChoices: number[];
 }
 
-interface ShowChoicePromptResponseBody {
+interface IShowChoicePromptResponseBody {
     responseText: string;
     promptCancelled: boolean;
 }
 
-interface ShowInputPromptResponseBody {
+interface IShowInputPromptResponseBody {
     responseText: string;
     promptCancelled: boolean;
 }
 
 function showChoicePrompt(
-    promptDetails: ShowChoicePromptRequestArgs,
-    client: LanguageClient) : Thenable<ShowChoicePromptResponseBody> {
+    promptDetails: IShowChoicePromptRequestArgs,
+    client: LanguageClient): Thenable<IShowChoicePromptResponseBody> {
 
-    var resultThenable: Thenable<ShowChoicePromptResponseBody> = undefined;
+    let resultThenable: Thenable<IShowChoicePromptResponseBody>;
 
     if (!promptDetails.isMultiChoice) {
-        var quickPickItems =
-            promptDetails.choices.map<vscode.QuickPickItem>(choice => {
+        let quickPickItems =
+            promptDetails.choices.map<vscode.QuickPickItem>((choice) => {
                 return {
                     label: choice.label,
-                    description: choice.helpMessage
-                }
+                    description: choice.helpMessage,
+                };
             });
 
-        if (promptDetails.defaultChoices &&
-            promptDetails.defaultChoices.length > 0) {
-
+        if (promptDetails.defaultChoices && promptDetails.defaultChoices.length > 0) {
             // Shift the default items to the front of the
             // array so that the user can select it easily
-            var defaultChoice = promptDetails.defaultChoices[0];
+            const defaultChoice = promptDetails.defaultChoices[0];
             if (defaultChoice > -1 &&
                 defaultChoice < promptDetails.choices.length) {
 
-                var defaultChoiceItem = quickPickItems[defaultChoice];
+                const defaultChoiceItem = quickPickItems[defaultChoice];
                 quickPickItems.splice(defaultChoice, 1);
 
                 // Add the default choice to the head of the array
@@ -100,20 +91,19 @@ function showChoicePrompt(
                     quickPickItems,
                     { placeHolder: promptDetails.caption + " - " + promptDetails.message })
                 .then(onItemSelected);
-    }
-    else {
-        var checkboxQuickPickItems =
-            promptDetails.choices.map<CheckboxQuickPickItem>(choice => {
+    } else {
+        const checkboxQuickPickItems =
+            promptDetails.choices.map<ICheckboxQuickPickItem>((choice) => {
                 return {
                     label: choice.label,
                     description: choice.helpMessage,
-                    isSelected: false
-                }
+                    isSelected: false,
+                };
             });
 
         // Select the defaults
-        promptDetails.defaultChoices.forEach(choiceIndex => {
-            checkboxQuickPickItems[choiceIndex].isSelected = true
+        promptDetails.defaultChoices.forEach((choiceIndex) => {
+            checkboxQuickPickItems[choiceIndex].isSelected = true;
         });
 
         resultThenable =
@@ -127,61 +117,58 @@ function showChoicePrompt(
 }
 
 function showInputPrompt(
-    promptDetails: ShowInputPromptRequestArgs,
-    client: LanguageClient) : Thenable<ShowInputPromptResponseBody> {
+    promptDetails: IShowInputPromptRequestArgs,
+    client: LanguageClient): Thenable<IShowInputPromptResponseBody> {
 
-    var resultThenable =
+    const resultThenable =
         vscode.window.showInputBox({
-            placeHolder: promptDetails.name + ": "
-        }).then(onInputEntered)
+            placeHolder: promptDetails.name + ": ",
+        }).then(onInputEntered);
 
     return resultThenable;
 }
 
-function onItemsSelected(chosenItems: CheckboxQuickPickItem[]): ShowChoicePromptResponseBody {
+function onItemsSelected(chosenItems: ICheckboxQuickPickItem[]): IShowChoicePromptResponseBody {
     if (chosenItems !== undefined) {
         return {
             promptCancelled: false,
-            responseText: chosenItems.filter(item => item.isSelected).map(item => item.label).join(", ")
+            responseText: chosenItems.filter((item) => item.isSelected).map((item) => item.label).join(", "),
         };
-    }
-    else {
+    } else {
         // User cancelled the prompt, send the cancellation
         return {
             promptCancelled: true,
-            responseText: undefined
+            responseText: undefined,
         };
     }
 }
 
-function onItemSelected(chosenItem: vscode.QuickPickItem): ShowChoicePromptResponseBody {
+function onItemSelected(chosenItem: vscode.QuickPickItem): IShowChoicePromptResponseBody {
     if (chosenItem !== undefined) {
         return {
             promptCancelled: false,
-            responseText: chosenItem.label
+            responseText: chosenItem.label,
         };
-    }
-    else {
+    } else {
         // User cancelled the prompt, send the cancellation
         return {
             promptCancelled: true,
-            responseText: undefined
+            responseText: undefined,
         };
     }
 }
 
-function onInputEntered(responseText: string): ShowInputPromptResponseBody {
+function onInputEntered(responseText: string): IShowInputPromptResponseBody {
     if (responseText !== undefined) {
         return {
             promptCancelled: false,
-            responseText: responseText
-        }
-    }
-    else {
+            responseText,
+        };
+    } else {
         return {
             promptCancelled: true,
-            responseText: undefined
-        }
+            responseText: undefined,
+        };
     }
 }
 
@@ -191,48 +178,47 @@ export class ConsoleFeature implements IFeature {
 
     constructor() {
         this.commands = [
-            vscode.commands.registerCommand('PowerShell.RunSelection', () => {
+            vscode.commands.registerCommand("PowerShell.RunSelection", () => {
                 if (this.languageClient === undefined) {
                     // TODO: Log error message
                     return;
                 }
 
-                var editor = vscode.window.activeTextEditor;
-                var selectionRange: vscode.Range = undefined;
+                const editor = vscode.window.activeTextEditor;
+                let selectionRange: vscode.Range;
 
                 if (!editor.selection.isEmpty) {
                     selectionRange =
                         new vscode.Range(
                             editor.selection.start,
                             editor.selection.end);
-                }
-                else {
+                } else {
                     selectionRange = editor.document.lineAt(editor.selection.start.line).range;
                 }
 
-                this.languageClient.sendRequest(EvaluateRequest.type, {
-                    expression: editor.document.getText(selectionRange)
+                this.languageClient.sendRequest(EvaluateRequestType, {
+                    expression: editor.document.getText(selectionRange),
                 });
 
                 // Show the integrated console if it isn't already visible
                 vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
-            })
+            }),
         ];
+    }
+
+    public dispose() {
+        this.commands.forEach((command) => command.dispose());
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
 
         this.languageClient.onRequest(
-            ShowChoicePromptRequest.type,
-            promptDetails => showChoicePrompt(promptDetails, this.languageClient));
+            ShowChoicePromptRequestType,
+            (promptDetails) => showChoicePrompt(promptDetails, this.languageClient));
 
         this.languageClient.onRequest(
-            ShowInputPromptRequest.type,
-            promptDetails => showInputPrompt(promptDetails, this.languageClient));
-    }
-
-    public dispose() {
-        this.commands.forEach(command => command.dispose());
+            ShowInputPromptRequestType,
+            (promptDetails) => showInputPrompt(promptDetails, this.languageClient));
     }
 }

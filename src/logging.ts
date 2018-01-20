@@ -2,29 +2,28 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import fs = require('fs');
-import os = require('os');
-import path = require('path');
-import vscode = require('vscode');
-import utils = require('./utils');
-import jsonrpc = require('vscode-jsonrpc');
+import fs = require("fs");
+import os = require("os");
+import path = require("path");
+import vscode = require("vscode");
+import utils = require("./utils");
 
 export enum LogLevel {
     Verbose,
     Normal,
     Warning,
-    Error
+    Error,
 }
 
 export class Logger {
 
-    private commands: vscode.Disposable[];
-    private logChannel: vscode.OutputChannel;
-    private logFilePath: string;
-
     public logBasePath: string;
     public logSessionPath: string;
     public MinimumLogLevel: LogLevel = LogLevel.Normal;
+
+    private commands: vscode.Disposable[];
+    private logChannel: vscode.OutputChannel;
+    private logFilePath: string;
 
     constructor() {
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
@@ -34,13 +33,18 @@ export class Logger {
 
         this.commands = [
             vscode.commands.registerCommand(
-                'PowerShell.ShowLogs',
+                "PowerShell.ShowLogs",
                 () => { this.showLogPanel(); }),
 
             vscode.commands.registerCommand(
-                'PowerShell.OpenLogFolder',
-                () => { this.openLogFolder(); })
-        ]
+                "PowerShell.OpenLogFolder",
+                () => { this.openLogFolder(); }),
+        ];
+    }
+
+    public dispose() {
+        this.commands.forEach((command) => { command.dispose(); });
+        this.logChannel.dispose();
     }
 
     public getLogFilePath(baseName: string): string {
@@ -49,7 +53,7 @@ export class Logger {
 
     public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]) {
         if (logLevel >= this.MinimumLogLevel) {
-            this.writeLine(message, logLevel)
+            this.writeLine(message, logLevel);
 
             additionalMessages.forEach((line) => {
                 this.writeLine(line, logLevel);
@@ -116,11 +120,6 @@ export class Logger {
         }
     }
 
-    public dispose() {
-        this.commands.forEach((command) => { command.dispose() });
-        this.logChannel.dispose();
-    }
-
     private showLogPanel() {
         this.logChannel.show();
     }
@@ -130,47 +129,28 @@ export class Logger {
             // Open the folder in VS Code since there isn't an easy way to
             // open the folder in the platform's file browser
             vscode.commands.executeCommand(
-                'vscode.openFolder',
+                "vscode.openFolder",
                 vscode.Uri.file(this.logSessionPath),
                 true);
         }
     }
 
     private writeLine(message: string, level: LogLevel = LogLevel.Normal) {
-        let now = new Date();
-        let timestampedMessage = `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}`
+        const now = new Date();
+        const timestampedMessage =
+            `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}`;
 
         this.logChannel.appendLine(timestampedMessage);
         if (this.logFilePath) {
             fs.appendFile(
                 this.logFilePath,
                 timestampedMessage + os.EOL,
-                err => {
+                (err) => {
                     if (err) {
-                        console.log(`Error writing to vscode-powershell log file: ${err}`)
+                        // tslint:disable-next-line:no-console
+                        console.log(`Error writing to vscode-powershell log file: ${err}`);
                     }
                 });
         }
-    }
-}
-
-export class LanguageClientLogger implements jsonrpc.Logger {
-
-    constructor(private logger: Logger) { }
-
-    public error(message: string) {
-        this.logger.writeError(message);
-    }
-
-    public warn(message: string) {
-        this.logger.writeWarning(message);
-    }
-
-    public info(message: string) {
-        this.logger.write(message);
-    }
-
-    public log(message: string) {
-        this.logger.writeVerbose(message);
     }
 }

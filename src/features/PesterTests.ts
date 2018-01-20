@@ -2,12 +2,12 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
-import utils = require('../utils');
+import ChildProcess = require("child_process");
+import vscode = require("vscode");
 import Window = vscode.window;
-import ChildProcess = require('child_process');
-import { SessionManager } from '../session';
-import { IFeature, LanguageClient } from '../feature';
+import { IFeature, LanguageClient } from "../feature";
+import { SessionManager } from "../session";
+import utils = require("../utils");
 
 export class PesterTestsFeature implements IFeature {
 
@@ -16,25 +16,25 @@ export class PesterTestsFeature implements IFeature {
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand(
-            'PowerShell.RunPesterTests',
+            "PowerShell.RunPesterTests",
             (uriString, runInDebugger, describeBlockName?) => {
                 this.launchTests(uriString, runInDebugger, describeBlockName);
             });
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
-        this.languageClient = languageClient;
     }
 
     public dispose() {
         this.command.dispose();
     }
 
-    private launchTests(uriString, runInDebugger, describeBlockName?) {
-        var uri = vscode.Uri.parse(uriString);
-        let currentDocument = vscode.window.activeTextEditor.document;
+    public setLanguageClient(languageClient: LanguageClient) {
+        this.languageClient = languageClient;
+    }
 
-        let launchConfig = {
+    private launchTests(uriString, runInDebugger, describeBlockName?) {
+        const uri = vscode.Uri.parse(uriString);
+        const currentDocument = vscode.window.activeTextEditor.document;
+
+        const launchConfig = {
             request: "launch",
             type: "PowerShell",
             name: "PowerShell Launch Pester Tests",
@@ -43,19 +43,19 @@ export class PesterTestsFeature implements IFeature {
                 `-Script "${uri.fsPath}"`,
                 describeBlockName
                     ? `-TestName '${describeBlockName}'`
-                    : ""
+                    : "",
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: !runInDebugger,
             cwd:
                 currentDocument.isUntitled
                     ? vscode.workspace.rootPath
-                    : currentDocument.fileName
-        }
+                    : currentDocument.fileName,
+        };
 
         // Create or show the interactive console
         // TODO #367: Check if "newSession" mode is configured
-        vscode.commands.executeCommand('PowerShell.ShowSessionConsole', true);
+        vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
         // Write out temporary debug session file
         utils.writeSessionFile(

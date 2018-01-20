@@ -2,17 +2,17 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require('vscode');
-import utils = require('../utils');
-import Settings = require('../settings');
-import { dirname } from 'path';
-import { IFeature } from '../feature';
-import { SessionManager } from '../session';
-import { OperatingSystem, PlatformDetails, getPlatformDetails } from '../platform';
-
-import { LanguageClient, RequestType, NotificationType } from 'vscode-languageclient';
+import { dirname } from "path";
+import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
-    ExtensionContext, ProviderResult, WorkspaceFolder } from 'vscode';
+    ExtensionContext, ProviderResult, WorkspaceFolder } from "vscode";
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { IFeature } from "../feature";
+import { getPlatformDetails, IPlatformDetails, OperatingSystem } from "../platform";
+import { SessionManager } from "../session";
+import Settings = require("../settings");
+import utils = require("../utils");
+import { hostname } from "os";
 
 export class DebugSessionFeature implements IFeature, DebugConfigurationProvider {
 
@@ -22,38 +22,39 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager) {
         // Register a debug configuration provider
-        context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('PowerShell', this));
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
+        context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("PowerShell", this));
     }
 
     public dispose() {
         this.command.dispose();
     }
 
+    public setLanguageClient(languageClient: LanguageClient) {
+        // There is no implementation for this IFeature method
+    }
+
     // DebugConfigurationProvider method
-    resolveDebugConfiguration(
+    public resolveDebugConfiguration(
         folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
         token?: CancellationToken): ProviderResult<DebugConfiguration> {
 
-        let currentDocument = vscode.window.activeTextEditor.document;
-        let debugCurrentScript = (config.script === "${file}") || !config.request;
-        let generateLaunchConfig = !config.request;
+        const currentDocument = vscode.window.activeTextEditor.document;
+        const debugCurrentScript = (config.script === "${file}") || !config.request;
+        const generateLaunchConfig = !config.request;
 
-        var settings = Settings.load();
+        const settings = Settings.load();
         let createNewIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
 
         if (config.request === "attach") {
-            let platformDetails = getPlatformDetails();
-            let versionDetails = this.sessionManager.getPowerShellVersionDetails();
+            const platformDetails = getPlatformDetails();
+            const versionDetails = this.sessionManager.getPowerShellVersionDetails();
 
             if (versionDetails.edition.toLowerCase() === "core" &&
                 platformDetails.operatingSystem !== OperatingSystem.Windows) {
 
-                let msg = "PowerShell Core only supports attaching to a host process on Windows.";
-                return vscode.window.showErrorMessage(msg).then(_ => {
+                const msg = "PowerShell Core only supports attaching to a host process on Windows.";
+                return vscode.window.showErrorMessage(msg).then((_) => {
                     return undefined;
                 });
             }
@@ -61,9 +62,9 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
 
         if (generateLaunchConfig) {
             // No launch.json, create the default configuration for both unsaved (Untitled) and saved documents.
-            config.type = 'PowerShell';
-            config.name = 'PowerShell Launch Current File';
-            config.request = 'launch';
+            config.type = "PowerShell";
+            config.name = "PowerShell Launch Current File";
+            config.request = "launch";
             config.args = [];
 
             config.script =
@@ -79,7 +80,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     : currentDocument.fileName;
         }
 
-        if (config.request === 'launch') {
+        if (config.request === "launch") {
 
             // For debug launch of "current script" (saved or unsaved), warn before starting the debugger if either
             // A) the unsaved document's language type is not PowerShell or
@@ -87,37 +88,35 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             if (debugCurrentScript) {
 
                 if (currentDocument.isUntitled) {
-                    if (currentDocument.languageId === 'powershell') {
+                    if (currentDocument.languageId === "powershell") {
                         if (!generateLaunchConfig) {
                             // Cover the case of existing launch.json but unsaved (Untitled) document.
                             // In this case, vscode.workspace.rootPath will not be undefined.
                             config.script = currentDocument.uri.toString();
-                            config.cwd = vscode.workspace.rootPath
+                            config.cwd = vscode.workspace.rootPath;
                         }
-                    }
-                    else {
-                        let msg = "To debug '" + currentDocument.fileName +
-                                  "', change the document's language mode to PowerShell or save the file with a PowerShell extension.";
+                    } else {
+                        const msg = "To debug '" + currentDocument.fileName + "', change the document's " +
+                                    "language mode to PowerShell or save the file with a PowerShell extension.";
                         vscode.window.showErrorMessage(msg);
                         return;
                     }
-                }
-                else {
+                } else {
                     let isValidExtension = false;
-                    let extIndex = currentDocument.fileName.lastIndexOf('.');
+                    const extIndex = currentDocument.fileName.lastIndexOf(".");
                     if (extIndex !== -1) {
-                        let ext = currentDocument.fileName.substr(extIndex + 1).toUpperCase();
+                        const ext = currentDocument.fileName.substr(extIndex + 1).toUpperCase();
                         isValidExtension = (ext === "PS1" || ext === "PSM1");
                     }
 
-                    if ((currentDocument.languageId !== 'powershell') || !isValidExtension) {
+                    if ((currentDocument.languageId !== "powershell") || !isValidExtension) {
                         let path = currentDocument.fileName;
-                        let workspaceRootPath = vscode.workspace.rootPath;
+                        const workspaceRootPath = vscode.workspace.rootPath;
                         if (currentDocument.fileName.startsWith(workspaceRootPath)) {
                             path = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
                         }
 
-                        let msg = "'" + path + "' is a file type that cannot be debugged by the PowerShell debugger.";
+                        const msg = "'" + path + "' is a file type that cannot be debugged by the PowerShell debugger.";
                         vscode.window.showErrorMessage(msg);
                         return;
                     }
@@ -141,24 +140,22 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         config.internalConsoleOptions = "neverOpen";
 
         // Create or show the interactive console
-        vscode.commands.executeCommand('PowerShell.ShowSessionConsole', true);
+        vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
-        var sessionFilePath = utils.getDebugSessionFilePath();
+        const sessionFilePath = utils.getDebugSessionFilePath();
 
         if (createNewIntegratedConsole) {
-            var debugProcess =
+            const debugProcess =
                 this.sessionManager.createDebugSessionProcess(
                     sessionFilePath,
                     settings);
 
             debugProcess
                 .start(`DebugSession-${this.sessionCount++}`)
-                .then(
-                    sessionDetails => {
+                .then((sessionDetails) => {
                         utils.writeSessionFile(sessionFilePath, sessionDetails);
-                    });
-        }
-        else {
+                });
+        } else {
             utils.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
         }
 
@@ -176,18 +173,18 @@ export class SpecifyScriptArgsFeature implements IFeature {
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
 
-        let vscodeVersionArray = vscode.version.split('.');
-        let editorVersion = {
+        const vscodeVersionArray = vscode.version.split(".");
+        const editorVersion = {
             major: Number(vscodeVersionArray[0]),
             minor: Number(vscodeVersionArray[1]),
-        }
+        };
 
         this.emptyInputBoxBugFixed =
             ((editorVersion.major > 1) ||
-            ((editorVersion.major == 1) && (editorVersion.minor > 12)));
+            ((editorVersion.major === 1) && (editorVersion.minor > 12)));
 
         this.command =
-            vscode.commands.registerCommand('PowerShell.SpecifyScriptArgs', () => {
+            vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
                 return this.specifyScriptArguments();
             });
     }
@@ -201,21 +198,21 @@ export class SpecifyScriptArgsFeature implements IFeature {
     }
 
     private specifyScriptArguments(): Thenable<string[] | string> {
-        const powerShellDbgScriptArgsKey = 'powerShellDebugScriptArgs';
+        const powerShellDbgScriptArgsKey = "powerShellDebugScriptArgs";
 
-        let options: vscode.InputBoxOptions = {
+        const options: vscode.InputBoxOptions = {
             ignoreFocusOut: true,
-            placeHolder: "Enter script arguments or leave empty to pass no args"
-        }
+            placeHolder: "Enter script arguments or leave empty to pass no args",
+        };
 
         if (this.emptyInputBoxBugFixed) {
-            let prevArgs = this.context.workspaceState.get(powerShellDbgScriptArgsKey, '');
+            const prevArgs = this.context.workspaceState.get(powerShellDbgScriptArgsKey, "");
             if (prevArgs.length > 0) {
                 options.value = prevArgs;
             }
         }
 
-        return vscode.window.showInputBox(options).then(text => {
+        return vscode.window.showInputBox(options).then((text) => {
             // When user cancel's the input box (by pressing Esc), the text value is undefined.
             if (text !== undefined) {
                 if (this.emptyInputBoxBugFixed) {
@@ -230,24 +227,22 @@ export class SpecifyScriptArgsFeature implements IFeature {
     }
 }
 
-interface ProcessItem extends vscode.QuickPickItem {
-	pid: string;	// payload for the QuickPick UI
+interface IProcessItem extends vscode.QuickPickItem {
+    pid: string;	// payload for the QuickPick UI
 }
 
-interface PSHostProcessInfo {
+interface IPSHostProcessInfo {
     processName: string;
     processId: string;
     appDomainName: string;
     mainWindowTitle: string;
 }
 
-namespace GetPSHostProcessesRequest {
-    export const type =
-        new RequestType<any, GetPSHostProcessesResponseBody, string, void>('powerShell/getPSHostProcesses');
-}
+export const GetPSHostProcessesRequestType =
+    new RequestType<any, IGetPSHostProcessesResponseBody, string, void>("powerShell/getPSHostProcesses");
 
-interface GetPSHostProcessesResponseBody {
-    hostProcesses: PSHostProcessInfo[];
+interface IGetPSHostProcessesResponseBody {
+    hostProcesses: IPSHostProcessInfo[];
 }
 
 export class PickPSHostProcessFeature implements IFeature {
@@ -260,9 +255,9 @@ export class PickPSHostProcessFeature implements IFeature {
     constructor() {
 
         this.command =
-            vscode.commands.registerCommand('PowerShell.PickPSHostProcess', () => {
+            vscode.commands.registerCommand("PowerShell.PickPSHostProcess", () => {
                 return this.getLanguageClient()
-                           .then(_ => this.pickPSHostProcess(), _ => undefined);
+                           .then((_) => this.pickPSHostProcess(), (_) => undefined);
             });
     }
 
@@ -282,8 +277,7 @@ export class PickPSHostProcessFeature implements IFeature {
     private getLanguageClient(): Thenable<LanguageClient> {
         if (this.languageClient) {
             return Promise.resolve(this.languageClient);
-        }
-        else {
+        } else {
             // If PowerShell isn't finished loading yet, show a loading message
             // until the LanguageClient is passed on to us
             this.waitingForClientToken = new vscode.CancellationTokenSource();
@@ -297,7 +291,7 @@ export class PickPSHostProcessFeature implements IFeature {
                             ["Cancel"],
                             { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
                             this.waitingForClientToken.token)
-                        .then(response => {
+                        .then((response) => {
                             if (response === "Cancel") {
                                 this.clearWaitingToken();
                                 reject();
@@ -306,51 +300,53 @@ export class PickPSHostProcessFeature implements IFeature {
 
                     // Cancel the loading prompt after 60 seconds
                     setTimeout(() => {
-                            if (this.waitingForClientToken) {
-                                this.clearWaitingToken();
-                                reject();
+                        if (this.waitingForClientToken) {
+                            this.clearWaitingToken();
+                            reject();
 
-                                vscode.window.showErrorMessage(
-                                    "Attach to PowerShell host process: PowerShell session took too long to start.");
-                            }
-                        }, 60000);
-                }
+                            vscode.window.showErrorMessage(
+                                "Attach to PowerShell host process: PowerShell session took too long to start.");
+                        }
+                    }, 60000);
+                },
             );
         }
     }
 
-	private pickPSHostProcess(): Thenable<string> {
-        return this.languageClient.sendRequest(GetPSHostProcessesRequest.type, null).then(hostProcesses => {
-            var items: ProcessItem[] = [];
+    private pickPSHostProcess(): Thenable<string> {
+        return this.languageClient.sendRequest(GetPSHostProcessesRequestType, null).then((hostProcesses) => {
+            const items: IProcessItem[] = [];
 
-            for (var p in hostProcesses) {
-                var windowTitle = "";
-                if (hostProcesses[p].mainWindowTitle) {
-                    windowTitle = `, Title: ${hostProcesses[p].mainWindowTitle}`;
+            for (const p in hostProcesses) {
+                if (hostProcesses.hasOwnProperty(p)) {
+                    let windowTitle = "";
+                    if (hostProcesses[p].mainWindowTitle) {
+                        windowTitle = `, Title: ${hostProcesses[p].mainWindowTitle}`;
+                    }
+
+                    items.push({
+                        label: hostProcesses[p].processName,
+                        description: `PID: ${hostProcesses[p].processId.toString()}${windowTitle}`,
+                        pid: hostProcesses[p].processId,
+                    });
                 }
-
-                items.push({
-                    label: hostProcesses[p].processName,
-                    description: `PID: ${hostProcesses[p].processId.toString()}${windowTitle}`,
-                    pid: hostProcesses[p].processId
-                });
-            };
+            }
 
             if (items.length === 0) {
                 return Promise.reject("There are no PowerShell host processes to attach to.");
             }
 
-            let options : vscode.QuickPickOptions = {
+            const options: vscode.QuickPickOptions = {
                 placeHolder: "Select a PowerShell host process to attach to",
                 matchOnDescription: true,
-                matchOnDetail: true
+                matchOnDetail: true,
             };
 
-            return vscode.window.showQuickPick(items, options).then(item => {
+            return vscode.window.showQuickPick(items, options).then((item) => {
                 return item ? item.pid : "";
             });
         });
-	}
+    }
 
     private clearWaitingToken() {
         if (this.waitingForClientToken) {
