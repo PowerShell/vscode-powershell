@@ -52,7 +52,7 @@
     "vscode.powershell"
   ],
   "scripts": {
-    "compile": "tsc -p ./ && tslint -p ./ -e test/*.ts",
+    "compile": "tsc -p ./ && tslint -p ./ -e test/*",
     "compile-watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test"
