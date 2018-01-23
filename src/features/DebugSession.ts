@@ -2,6 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
+import { hostname } from "os";
 import { dirname } from "path";
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
@@ -12,7 +13,6 @@ import { getPlatformDetails, IPlatformDetails, OperatingSystem } from "../platfo
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
-import { hostname } from "os";
 
 export class DebugSessionFeature implements IFeature, DebugConfigurationProvider {
 
