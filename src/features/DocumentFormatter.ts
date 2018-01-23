@@ -69,6 +69,7 @@ function toOneBasedPosition(position: Position): Position {
 }
 
 class DocumentLocker {
+    // tslint:disable-next-line:ban-types
     private lockedDocuments: Object;
 
     constructor() {
