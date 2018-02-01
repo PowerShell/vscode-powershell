@@ -533,6 +533,27 @@
         ],
         "description": "Script cmdlet definition snippet"
     },
+    "Function-Advanced": {
+        "prefix": "function-advanced",
+        "body": [
+            "function ${1:Verb-Noun} {",
+            "\t[CmdletBinding()]",
+            "\tparam (",
+            "\t\t$0",
+            "\t)",
+            "\t",
+            "\tbegin {",
+            "\t}",
+            "\t",
+            "\tprocess {",
+            "\t}",
+            "\t",
+            "\tend {",
+            "\t}",
+            "}"
+        ],
+        "description": "Script advanced function definition snippet"
+    },
     "Cmdlet-Comment-Help": {
         "prefix": "comment-help",
         "body": [
