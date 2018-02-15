@@ -71,13 +71,22 @@ param(
     $ConfirmInstall
 )
 
+$minPortNumber = 10000
+$maxPortNumber = 30000
+
 if ($LogLevel -ne "Normal") {
     $VerbosePreference = 'Continue'
     Start-Transcript (Join-Path (Split-Path $LogPath -Parent) Start-EditorServices.log) -Force
 }
 
-function ExitWithError($errorString) {
+function LogSection([string]$msg) {
+    Write-Verbose "`n#-- $msg $('-' * ([Math]::Max(0, 73 - $msg.Length)))"
+}
 
+function Log([string[]]$msg) {
+    $msg | Write-Verbose
+}
+function ExitWithError($errorString) {
     Write-Host -ForegroundColor Red "`n`n$errorString"
 
     # Sleep for a while to make sure the user has time to see and copy the
@@ -97,7 +106,10 @@ if ($PSVersionTable.PSVersion.Major -le 2) {
 }
 
 function WriteSessionFile($sessionInfo) {
-    ConvertTo-Json -InputObject $sessionInfo -Compress | Set-Content -Force -Path "$SessionDetailsPath" -ErrorAction Stop
+    $sessionInfoJson = ConvertTo-Json -InputObject $sessionInfo -Compress
+    Log "Writing session file with contents:"
+    Log $sessionInfoJson
+    $sessionInfoJson | Set-Content -Force -Path "$SessionDetailsPath" -ErrorAction Stop
 }
 
 if ($host.Runspace.LanguageMode -eq 'ConstrainedLanguage') {
@@ -116,6 +128,7 @@ $isPS5orLater = $PSVersionTable.PSVersion.Major -ge 5
 # If PSReadline is present in the session, remove it so that runspace
 # management is easier
 if ((Get-Module PSReadline).Count -gt 0) {
+    LogSection "Removing PSReadLine module"
     Remove-Module PSReadline -ErrorAction SilentlyContinue
 }
 
@@ -125,28 +138,64 @@ if ((Get-Module PSReadline).Count -gt 0) {
 $resultDetails = $null;
 
 function Test-ModuleAvailable($ModuleName, $ModuleVersion) {
+    Log "Testing module availability $ModuleName $ModuleVersion"
+
     $modules = Get-Module -ListAvailable $moduleName
     if ($modules -ne $null) {
         if ($ModuleVersion -ne $null) {
             foreach ($module in $modules) {
                 if ($module.Version.Equals($moduleVersion)) {
+                    Log "$ModuleName $ModuleVersion found"
                     return $true;
                 }
             }
         }
         else {
+            Log "$ModuleName $ModuleVersion found"
             return $true;
         }
     }
 
+    Log "$ModuleName $ModuleVersion NOT found"
     return $false;
 }
 
-function Test-PortAvailability($PortNumber) {
-    $portAvailable = $true;
+function Get-PortsInUse {
+    $portsInUse = @{}
+    $ipGlobalProps = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
+
+    $tcpConns = $ipGlobalProps.GetActiveTcpConnections()
+    foreach ($tcpConn in $tcpConns) {
+        $port = $tcpConn.LocalEndpoint.Port
+        if (($port -ge $minPortNumber) -and ($port -le $maxPortNumber)) {
+            $portsInUse[$port] = 1
+        }
+    }
+
+    $tcpListeners = $ipGlobalProps.GetActiveTcpListeners()
+    foreach ($tcpList in $tcpListeners) {
+        $port = $tcpList.Port
+        if (($port -ge $minPortNumber) -and ($port -le $maxPortNumber)) {
+            $portsInUse[$port] = 1
+        }
+    }
+
+    $udpListeners = $ipGlobalProps.GetActiveUdpListeners()
+    foreach ($udpList in $udpListeners) {
+        $port = $udpList.Port
+        if (($port -ge $minPortNumber) -and ($port -le $maxPortNumber)) {
+            $portsInUse[$port] = 1
+        }
+    }
+
+    $portsInUse
+}
+
+<#
+function Test-PortAvailability([Parameter(Mandatory=$true)][int]$PortNumber) {
+    $portAvailable = $false;
 
     try {
-        Write-Host "Testing for availability of port $PortNumber"
         if ($isPS5orLater) {
             $ipAddress = [System.Net.Dns]::GetHostEntryAsync("localhost").Result.AddressList[0];
         }
@@ -154,52 +203,60 @@ function Test-PortAvailability($PortNumber) {
             $ipAddress = [System.Net.Dns]::GetHostEntry("localhost").AddressList[0];
         }
 
+        Log "Testing availability of port $PortNumber on IP address $ipAddress"
+
         $tcpListener = New-Object System.Net.Sockets.TcpListener @($ipAddress, $portNumber)
         $tcpListener.Start();
         $tcpListener.Stop();
-
+        $portAvailable = $true;
     }
     catch [System.Net.Sockets.SocketException] {
         # Check the SocketErrorCode to see if it's the expected exception
-        if ($error[0].Exception.InnerException.SocketErrorCode -eq [System.Net.Sockets.SocketError]::AddressAlreadyInUse) {
-            Write-Host "Port $PortNumber is in use."
-            $portAvailable = $false;
+        if ($_.Exception.SocketErrorCode -eq [System.Net.Sockets.SocketError]::AddressAlreadyInUse) {
+            Log "Port $PortNumber is in use."
         }
         else {
-            Write-Warning ("Failed to listen on port $PortNumber. Error code: " + $error[0].SocketErrorCode)
+            Log "Unexpected SocketException on port ${PortNumber}: $($_.Exception)"
         }
     }
 
-    return $portAvailable;
+    $portAvailable;
 }
+#>
 
 $rand = New-Object System.Random
-function Get-AvailablePort {
+function Get-AvailablePort($portsInUse) {
     $triesRemaining = 10;
 
     while ($triesRemaining -gt 0) {
-        $port = $rand.Next(10000, 30000)
-        if ((Test-PortAvailability -PortAvailability $port) -eq $true) {
-            Write-Host "Found available port $port"
+        $port = $rand.Next($minPortNumber, $maxPortNumber)
+        Log "Checking port: $port, attempts remaining $triesRemaining --------------------"
+        #if ($true -eq (Test-PortAvailability -PortNumber $port)) {
+        if (!$portsInUse.ContainsKey($port)) {
+            Write-Verbose "Port: $port is available"
+            $portsInUse[$port] = 1
             return $port
         }
 
+        Log "Port: $port is NOT available"
         $triesRemaining--;
     }
 
-    Write-Warning "Did not find any available ports!!"
+    Log "Did not find any available ports!!"
     return $null
 }
 
 # Add BundledModulesPath to $env:PSModulePath
 if ($BundledModulesPath) {
-    $env:PSModulePath = $env:PSModulePath + [System.IO.Path]::PathSeparator + $BundledModulesPath
-    Write-Host "Updated PSModulePath to:"
-    $env:PSModulePath -split [System.IO.Path]::PathSeparator | Write-Host
+    $env:PSModulePath = $env:PSModulePath.TrimEnd([System.IO.Path]::PathSeparator) + [System.IO.Path]::PathSeparator + $BundledModulesPath
+    LogSection "Updated PSModulePath to:"
+    Log ($env:PSModulePath -split [System.IO.Path]::PathSeparator)
 }
 
+LogSection "Check required modules available"
 # Check if PowerShellGet module is available
 if ((Test-ModuleAvailable "PowerShellGet") -eq $false) {
+    Log "Failed to find PowerShellGet module"
     # TODO: WRITE ERROR
 }
 
@@ -209,6 +266,7 @@ $parsedVersion = New-Object System.Version @($EditorServicesVersion)
 if ((Test-ModuleAvailable "PowerShellEditorServices" $parsedVersion) -eq $false) {
     if ($ConfirmInstall -and $isPS5orLater) {
         # TODO: Check for error and return failure if necessary
+        LogSection "Install PowerShellEditorServices"
         Install-Module "PowerShellEditorServices" -RequiredVersion $parsedVersion -Confirm
     }
     else {
@@ -219,6 +277,9 @@ if ((Test-ModuleAvailable "PowerShellEditorServices" $parsedVersion) -eq $false)
 }
 
 try {
+    LogSection "Start up PowerShellEditorServices"
+    Log "Importing PowerShellEditorServices"
+
     if ($isPS5orLater) {
         Import-Module PowerShellEditorServices -RequiredVersion $parsedVersion -ErrorAction Stop
     }
@@ -227,14 +288,27 @@ try {
     }
 
     # Locate available port numbers for services
-    $languageServicePort = Get-AvailablePort
-    $debugServicePort = Get-AvailablePort
+    Log "Ports in use in range ${minPortNumber}-${maxPortNumber}:"
+    $portsInUse = Get-PortsInUse
+    $OFS = ","
+    Log "$($portsInUse.Keys | Sort-Object -Unique)"
+
+    Log "Searching for available socket port for the language service"
+    $languageServicePort = Get-AvailablePort $portsInUse
+
+    Log "Searching for available socket port for the debug service"
+    $debugServicePort = Get-AvailablePort $portsInUse
+
+    if (!$languageServicePort -or !$debugServicePort) {
+        ExitWithError "failed to find an open socket port for either the language or debug service"
+    }
 
     if ($EnableConsoleRepl) {
         Write-Host "PowerShell Integrated Console`n"
     }
 
     # Create the Editor Services host
+    Log "Invoking Start-EditorServicesHost"
     $editorServicesHost =
         Start-EditorServicesHost `
             -HostName $HostName `
@@ -251,24 +325,30 @@ try {
             -WaitForDebugger:$WaitForDebugger.IsPresent
 
     # TODO: Verify that the service is started
+    Log "Start-EditorServicesHost returned $editorServicesHost"
 
     $resultDetails = @{
         "status" = "started";
         "channel" = "tcp";
         "languageServicePort" = $languageServicePort;
         "debugServicePort" = $debugServicePort;
-    };
+    }
 
     # Notify the client that the services have started
     WriteSessionFile $resultDetails
+
+    Log "Wrote out session file"
 }
 catch [System.Exception] {
     $e = $_.Exception;
     $errorString = ""
 
+    Log "ERRORS caught starting up EditorServicesHost"
+
     while ($e -ne $null) {
         $errorString = $errorString + ($e.Message + "`r`n" + $e.StackTrace + "`r`n")
         $e = $e.InnerException;
+        Log $errorString
     }
 
     ExitWithError ("An error occurred while starting PowerShell Editor Services:`r`n`r`n" + $errorString)
@@ -276,19 +356,19 @@ catch [System.Exception] {
 
 try {
     # Wait for the host to complete execution before exiting
-    Write-Host "Waiting for EditorServicesHost to complete execution"
+    LogSection "Waiting for EditorServicesHost to complete execution"
     $editorServicesHost.WaitForCompletion()
-    Write-Host "EditorServicesHost has completed execution"
+    Log "EditorServicesHost has completed execution"
 }
 catch [System.Exception] {
     $e = $_.Exception;
     $errorString = ""
 
-    Write-Warning "Errors caught while waiting for EditorServicesHost to complete execution"
+    Log "ERRORS caught while waiting for EditorServicesHost to complete execution"
 
     while ($e -ne $null) {
         $errorString = $errorString + ($e.Message + "`r`n" + $e.StackTrace + "`r`n")
         $e = $e.InnerException;
-        Write-Warning $errorString
+        Log $errorString
     }
 }
