@@ -160,81 +160,64 @@ function Test-ModuleAvailable($ModuleName, $ModuleVersion) {
     return $false;
 }
 
-function Get-PortsInUse {
-    $portsInUse = @{}
-    $ipGlobalProps = [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties()
+function Test-PortAvailability {
+    param(
+        [Parameter(Mandatory=$true)]
+        [int]
+        $PortNumber
+    )
 
-    $tcpConns = $ipGlobalProps.GetActiveTcpConnections()
-    foreach ($tcpConn in $tcpConns) {
-        $port = $tcpConn.LocalEndpoint.Port
-        if (($port -ge $minPortNumber) -and ($port -le $maxPortNumber)) {
-            $portsInUse[$port] = 1
-        }
-    }
-
-    $tcpListeners = $ipGlobalProps.GetActiveTcpListeners()
-    foreach ($tcpList in $tcpListeners) {
-        $port = $tcpList.Port
-        if (($port -ge $minPortNumber) -and ($port -le $maxPortNumber)) {
-            $portsInUse[$port] = 1
-        }
-    }
-
-    $udpListeners = $ipGlobalProps.GetActiveUdpListeners()
-    foreach ($udpList in $udpListeners) {
-        $port = $udpList.Port
-        if (($port -ge $minPortNumber) -and ($port -le $maxPortNumber)) {
-            $portsInUse[$port] = 1
-        }
-    }
-
-    $portsInUse
-}
-
-<#
-function Test-PortAvailability([Parameter(Mandatory=$true)][int]$PortNumber) {
-    $portAvailable = $false;
+    $portAvailable = $true
 
     try {
         if ($isPS5orLater) {
-            $ipAddress = [System.Net.Dns]::GetHostEntryAsync("localhost").Result.AddressList[0];
+            $ipAddresses = [System.Net.Dns]::GetHostEntryAsync("localhost").Result.AddressList
         }
         else {
-            $ipAddress = [System.Net.Dns]::GetHostEntry("localhost").AddressList[0];
+            $ipAddresses = [System.Net.Dns]::GetHostEntry("localhost").AddressList
         }
 
-        Log "Testing availability of port $PortNumber on IP address $ipAddress"
+        foreach ($ipAddress in $ipAddresses)
+        {
+            Log "Testing availability of port ${PortNumber} at address ${ipAddress} / $($ipAddress.AddressFamily)"
 
-        $tcpListener = New-Object System.Net.Sockets.TcpListener @($ipAddress, $portNumber)
-        $tcpListener.Start();
-        $tcpListener.Stop();
-        $portAvailable = $true;
+            $tcpListener = New-Object System.Net.Sockets.TcpListener @($ipAddress, $PortNumber)
+            $tcpListener.Start()
+            $tcpListener.Stop()
+        }
     }
     catch [System.Net.Sockets.SocketException] {
+        $portAvailable = $false
+
         # Check the SocketErrorCode to see if it's the expected exception
         if ($_.Exception.SocketErrorCode -eq [System.Net.Sockets.SocketError]::AddressAlreadyInUse) {
             Log "Port $PortNumber is in use."
         }
         else {
-            Log "Unexpected SocketException on port ${PortNumber}: $($_.Exception)"
+            Log "SocketException on port ${PortNumber}: $($_.Exception)"
         }
     }
 
-    $portAvailable;
+    $portAvailable
 }
-#>
 
+$portsInUse = @{}
 $rand = New-Object System.Random
-function Get-AvailablePort($portsInUse) {
+function Get-AvailablePort() {
     $triesRemaining = 10;
 
     while ($triesRemaining -gt 0) {
-        $port = $rand.Next($minPortNumber, $maxPortNumber)
+        do {
+            $port = $rand.Next($minPortNumber, $maxPortNumber)
+        }
+        while ($portsInUse.ContainsKey($port))
+
+        # Whether we succeed or fail, don't try this port again
+        $portsInUse[$port] = 1
+
         Log "Checking port: $port, attempts remaining $triesRemaining --------------------"
-        #if ($true -eq (Test-PortAvailability -PortNumber $port)) {
-        if (!$portsInUse.ContainsKey($port)) {
-            Write-Verbose "Port: $port is available"
-            $portsInUse[$port] = 1
+        if ($true -eq (Test-PortAvailability -PortNumber $port)) {
+            Log "Port: $port is available"
             return $port
         }
 
@@ -288,19 +271,14 @@ try {
     }
 
     # Locate available port numbers for services
-    Log "Ports in use in range ${minPortNumber}-${maxPortNumber}:"
-    $portsInUse = Get-PortsInUse
-    $OFS = ","
-    Log "$($portsInUse.Keys | Sort-Object -Unique)"
-
     Log "Searching for available socket port for the language service"
-    $languageServicePort = Get-AvailablePort $portsInUse
+    $languageServicePort = Get-AvailablePort
 
     Log "Searching for available socket port for the debug service"
-    $debugServicePort = Get-AvailablePort $portsInUse
+    $debugServicePort = Get-AvailablePort
 
     if (!$languageServicePort -or !$debugServicePort) {
-        ExitWithError "failed to find an open socket port for either the language or debug service"
+        ExitWithError "Failed to find an open socket port for either the language or debug service."
     }
 
     if ($EnableConsoleRepl) {
