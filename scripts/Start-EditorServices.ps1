@@ -86,6 +86,7 @@ function LogSection([string]$msg) {
 function Log([string[]]$msg) {
     $msg | Write-Verbose
 }
+
 function ExitWithError($errorString) {
     Write-Host -ForegroundColor Red "`n`n$errorString"
 
