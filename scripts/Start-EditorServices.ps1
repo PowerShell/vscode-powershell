@@ -217,7 +217,7 @@ function Get-AvailablePort() {
         $portsInUse[$port] = 1
 
         Log "Checking port: $port, attempts remaining $triesRemaining --------------------"
-        if ($true -eq (Test-PortAvailability -PortNumber $port)) {
+        if ((Test-PortAvailability -PortNumber $port) -eq $true) {
             Log "Port: $port is available"
             return $port
         }
