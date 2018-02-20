@@ -115,8 +115,13 @@ export interface ISetSelectionRequestArguments {
 }
 
 export const OpenFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<IOpenFileDetails, EditorOperationResponse, void, void>(
         "editor/openFile");
+
+export interface IOpenFileDetails {
+    filePath: string;
+    preview: boolean;
+}
 
 export const NewFileRequestType =
     new RequestType<string, EditorOperationResponse, void, void>(
@@ -347,13 +352,15 @@ export class ExtensionCommandsFeature implements IFeature {
                      .then((_) => EditorOperationResponse.Completed);
     }
 
-    private openFile(filePath: string): Thenable<EditorOperationResponse> {
+    private openFile(openFileDetails: IOpenFileDetails): Thenable<EditorOperationResponse> {
 
-        filePath = this.normalizeFilePath(filePath);
+        const filePath = this.normalizeFilePath(openFileDetails.filePath);
 
         const promise =
             vscode.workspace.openTextDocument(filePath)
-                .then((doc) => vscode.window.showTextDocument(doc))
+                .then((doc) => vscode.window.showTextDocument(
+                    doc,
+                    { preview: openFileDetails.preview }))
                 .then((_) => EditorOperationResponse.Completed);
 
         return promise;
