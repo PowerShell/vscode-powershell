@@ -10,6 +10,7 @@ import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { getPlatformDetails, IPlatformDetails, OperatingSystem } from "../platform";
+import { PowerShellProcess} from "../process";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
@@ -19,6 +20,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     private sessionCount: number = 1;
     private command: vscode.Disposable;
     private examplesPath: string;
+    private tempDebugProcess: PowerShellProcess;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager) {
         // Register a debug configuration provider
@@ -145,12 +147,16 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         const sessionFilePath = utils.getDebugSessionFilePath();
 
         if (createNewIntegratedConsole) {
-            const debugProcess =
+            if (this.tempDebugProcess) {
+                this.tempDebugProcess.dispose();
+            }
+
+            this.tempDebugProcess =
                 this.sessionManager.createDebugSessionProcess(
                     sessionFilePath,
                     settings);
 
-            debugProcess
+            this.tempDebugProcess
                 .start(`DebugSession-${this.sessionCount++}`)
                 .then((sessionDetails) => {
                         utils.writeSessionFile(sessionFilePath, sessionDetails);
