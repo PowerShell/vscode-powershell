@@ -1,5 +1,49 @@
 # vscode-powershell Release History
 
+## 1.6.0
+### Thursday, February 22, 2018
+
+#### Fixes and Improvements
+
+- [PowerShell/vscode-powershell #907](https://github.com/PowerShell/vscode-powershell/issues/907) -
+  Persist temp console debug session.
+
+- [PowerShell/vscode-powershell #1198](https://github.com/PowerShell/vscode-powershell/pull/1198) -
+  Enhance Start-EditorServices.ps1 for better logging and fix bugs.
+
+- [PowerShell/PowerShellEditorServices #413](https://github.com/PowerShell/PowerShellEditorServices/issues/413) -
+  Allow opening files as not previews to allow Open-EditorFile to open multiple files passed in.
+
+- [PowerShell/vscode-powershell #1177](https://github.com/PowerShell/vscode-powershell/issues/1177) -
+  Add function-advanced snippet. Thanks to [Benny1007](https://github.com/Benny1007)!
+
+- [PowerShell/vscode-powershell #1179](https://github.com/PowerShell/vscode-powershell/issues/1179) -
+  Switch onDebug to onDebugResolve:type for better debugging perf.
+
+- [PowerShell/vscode-powershell #1086](https://github.com/PowerShell/vscode-powershell/issues/1086) -
+  Add tslint to vscode-powershell and address all issues.
+
+- [PowerShell/vscode-powershell #1153](https://github.com/PowerShell/vscode-powershell/issues/1153) -
+  Add docs for ps remoting in vscode.
+
+- [PowerShell/vscode-powershell #1161](https://github.com/PowerShell/vscode-powershell/pull/1161) -
+  Check for the expected version of the PowerShell Editor Services module fails because of the wrong function parameters. Thanks to [ant-druha](https://github.com/ant-druha)!
+
+- [PowerShell/vscode-powershell #1141](https://github.com/PowerShell/vscode-powershell/pull/1141) -
+  Updated install script minified URL. Thanks to [tabs-not-spaces](https://github.com/tabs-not-spaces)!
+
+- [PowerShell/PowerShellEditorServices #258](https://github.com/PowerShell/PowerShellEditorServices/issues/258) -
+  add .Save() to FileContext API.
+
+- [PowerShell/vscode-powershell #1137](https://github.com/PowerShell/vscode-powershell/pull/1137) -
+  Added 64bit support & vscode-insiders install support. Thanks to [tabs-not-spaces](https://github.com/tabs-not-spaces)!
+
+- [PowerShell/vscode-powershell #1115](https://github.com/PowerShell/vscode-powershell/issues/1115) -
+  Fixed "Open in ISE" keyboard shortcut from overwriting basic editing keyboard shortcut.
+
+- [PowerShell/vscode-powershell #1111](https://github.com/PowerShell/vscode-powershell/issues/1111) -
+  Update examples tasks.json for 2.0.0 schema.
+
 ## 1.5.1
 ### Tuesday, November 14, 2017
 
