@@ -9,6 +9,7 @@ import vscode = require("vscode");
 import utils = require("./utils");
 
 export enum LogLevel {
+    Diagnostic,
     Verbose,
     Normal,
     Warning,
@@ -65,6 +66,10 @@ export class Logger {
         this.writeAtLevel(LogLevel.Normal, message, ...additionalMessages);
     }
 
+    public writeDiagnostic(message: string, ...additionalMessages: string[]) {
+        this.writeAtLevel(LogLevel.Diagnostic, message, ...additionalMessages);
+    }
+
     public writeVerbose(message: string, ...additionalMessages: string[]) {
         this.writeAtLevel(LogLevel.Verbose, message, ...additionalMessages);
     }
@@ -112,8 +117,9 @@ export class Logger {
 
     private logLevelNameToValue(logLevelName: string): LogLevel {
         switch (logLevelName.toLowerCase()) {
-            case "normal": return LogLevel.Normal;
+            case "diagnostic": return LogLevel.Diagnostic;
             case "verbose": return LogLevel.Verbose;
+            case "normal": return LogLevel.Normal;
             case "warning": return LogLevel.Warning;
             case "error": return LogLevel.Error;
             default: return LogLevel.Normal;

@@ -44,7 +44,7 @@ param(
     [ValidateNotNullOrEmpty()]
     $LogPath,
 
-    [ValidateSet("Normal", "Verbose", "Error", "Diagnostic")]
+    [ValidateSet("Diagnostic", "Normal", "Verbose", "Error", "Diagnostic")]
     $LogLevel,
 
 	[Parameter(Mandatory=$true)]
@@ -74,7 +74,7 @@ param(
 $minPortNumber = 10000
 $maxPortNumber = 30000
 
-if ($LogLevel -ne "Normal") {
+if ($LogLevel -eq "Diagnostic") {
     $VerbosePreference = 'Continue'
     Start-Transcript (Join-Path (Split-Path $LogPath -Parent) Start-EditorServices.log) -Force
 }
