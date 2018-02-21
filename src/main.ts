@@ -34,7 +34,7 @@ import utils = require("./utils");
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-const requiredEditorServicesVersion = "1.5.1";
+const requiredEditorServicesVersion = "1.6.0";
 
 let logger: Logger;
 let sessionManager: SessionManager;
