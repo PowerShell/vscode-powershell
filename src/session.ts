@@ -235,7 +235,7 @@ export class SessionManager implements Middleware {
         this.debugSessionProcess =
             new PowerShellProcess(
                 this.powerShellExePath,
-                "[DBG] PowerShell Integrated Console",
+                "[TEMP] PowerShell Integrated Console",
                 this.log,
                 this.editorServicesArgs + "-DebugServiceOnly ",
                 sessionPath,

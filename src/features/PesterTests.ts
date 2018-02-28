@@ -7,6 +7,7 @@ import vscode = require("vscode");
 import Window = vscode.window;
 import { IFeature, LanguageClient } from "../feature";
 import { SessionManager } from "../session";
+import Settings = require("../settings");
 import utils = require("../utils");
 
 export class PesterTestsFeature implements IFeature {
@@ -33,6 +34,7 @@ export class PesterTestsFeature implements IFeature {
     private launchTests(uriString, runInDebugger, describeBlockName?) {
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
+        const settings = Settings.load();
 
         const launchConfig = {
             request: "launch",
@@ -47,6 +49,7 @@ export class PesterTestsFeature implements IFeature {
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: !runInDebugger,
+            createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
             cwd:
                 currentDocument.isUntitled
                     ? vscode.workspace.rootPath
