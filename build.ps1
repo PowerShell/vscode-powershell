@@ -3,15 +3,15 @@
 # Licensed under the MIT License.
 
 param(
-    [Parameter()]
+    [Parameter(ParameterSetName="Bootstrap")]
     [switch]
     $Bootstrap,
 
-    [Parameter()]
+    [Parameter(ParameterSetName="Build")]
     [switch]
     $Clean,
 
-    [Parameter()]
+    [Parameter(ParameterSetName="Build")]
     [switch]
     $Test
 )
@@ -22,15 +22,6 @@ $NeededTools = @{
     PowerShellGet = "PowerShellGet latest"
     InvokeBuild = "InvokeBuild latest"
 }
-
-if ((-not $PSVersionTable["OS"]) -or $PSVersionTable["OS"].Contains("Windows")) {
-    $OS = "Windows"
-} elseif ($PSVersionTable["OS"].Contains("Darwin")) {
-    $OS = "macOS"
-} else {
-    $OS = "Linux"
-}
-
 
 function needsVSCode () {
     try {
