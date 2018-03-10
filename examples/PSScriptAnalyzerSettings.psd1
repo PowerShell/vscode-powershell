@@ -17,7 +17,7 @@
                      'PSShouldProcess',
                      'PSUseApprovedVerbs',
                      'PSAvoidUsingCmdletAliases',
-                     'PSUseDeclaredVarsMoreThanAssigments')
+                     'PSUseDeclaredVarsMoreThanAssignments')
 
     # Do not analyze the following rules. Use ExcludeRules when you have
     # commented out the IncludeRules settings above and want to include all
