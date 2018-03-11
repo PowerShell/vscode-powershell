@@ -133,7 +133,11 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                 config.cwd = currentDocument.fileName;
             }
 
-            if (config.createTemporaryIntegratedConsole !== undefined) {
+            // If the createTemporaryIntegratedConsole field is not specified in the launch config, set the field using
+            // the value from the corresponding setting.  Otherwise, the launch config value overrides the setting.
+            if (config.createTemporaryIntegratedConsole === undefined) {
+                config.createTemporaryIntegratedConsole = createNewIntegratedConsole;
+            } else {
                 createNewIntegratedConsole = config.createTemporaryIntegratedConsole;
             }
         }
