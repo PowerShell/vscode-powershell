@@ -71,7 +71,7 @@
       },
       {
         "command": "PowerShell.ShowAdditionalCommands",
-        "key": "ctrl+alt+a",
+        "key": "shift+alt+s",
         "when": "editorTextFocus && editorLangId == 'powershell'"
       },
       {
