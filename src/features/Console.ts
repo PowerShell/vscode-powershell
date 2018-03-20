@@ -9,6 +9,8 @@ import { IFeature } from "../feature";
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody, void>("output");
+export const ExecutionStatusChangedNotificationType =
+    new NotificationType<IExecutionStatusDetails, void>("powerShell/executionStatusChanged");
 
 export const ShowChoicePromptRequestType =
     new RequestType<IShowChoicePromptRequestArgs,
@@ -25,6 +27,12 @@ export interface IEvaluateRequestArguments {
 export interface IOutputNotificationBody {
     category: string;
     output: string;
+}
+
+interface IExecutionStatusDetails {
+    executionOptions: IExecutionOptions;
+    executionStatus: ExecutionStatus;
+    hadErrors: boolean;
 }
 
 interface IChoiceDetails {
@@ -53,6 +61,21 @@ interface IShowChoicePromptResponseBody {
 interface IShowInputPromptResponseBody {
     responseText: string;
     promptCancelled: boolean;
+}
+
+enum ExecutionStatus {
+    Pending,
+    Running,
+    Failed,
+    Aborted,
+    Completed,
+}
+
+interface IExecutionOptions {
+    writeOutputToHost: boolean;
+    writeErrorsToHost: boolean;
+    addToHistory: boolean;
+    interruptCommandPrompt: boolean;
 }
 
 function showChoicePrompt(
@@ -175,6 +198,7 @@ function onInputEntered(responseText: string): IShowInputPromptResponseBody {
 export class ConsoleFeature implements IFeature {
     private commands: vscode.Disposable[];
     private languageClient: LanguageClient;
+    private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 
     constructor() {
         this.commands = [
@@ -207,6 +231,8 @@ export class ConsoleFeature implements IFeature {
     }
 
     public dispose() {
+        // Make sure we cancel any status bar
+        this.clearStatusBar();
         this.commands.forEach((command) => command.dispose());
     }
 
@@ -220,5 +246,44 @@ export class ConsoleFeature implements IFeature {
         this.languageClient.onRequest(
             ShowInputPromptRequestType,
             (promptDetails) => showInputPrompt(promptDetails, this.languageClient));
+
+        // Set up status bar alerts for when PowerShell is executing a script
+        this.languageClient.onNotification(
+            ExecutionStatusChangedNotificationType,
+            (executionStatusDetails) => {
+                switch (executionStatusDetails.executionStatus) {
+                    // If execution has changed to running, make a notification
+                    case ExecutionStatus.Running:
+                        this.showExecutionStatus("PowerShell");
+                        break;
+
+                    // If the execution has stopped, destroy the previous notification
+                    case ExecutionStatus.Completed:
+                    case ExecutionStatus.Aborted:
+                    case ExecutionStatus.Failed:
+                        this.clearStatusBar();
+                        break;
+                }
+            });
+
+    }
+
+    private showExecutionStatus(message: string) {
+        vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+            }, (progress) => {
+                return new Promise((resolve, reject) => {
+                    this.clearStatusBar();
+
+                    this.resolveStatusBarPromise = resolve;
+                    progress.report({ message });
+                });
+            });
+    }
+
+    private clearStatusBar() {
+        if (this.resolveStatusBarPromise) {
+            this.resolveStatusBarPromise();
+        }
     }
 }
