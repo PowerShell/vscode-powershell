@@ -70,6 +70,11 @@
         "when": "editorTextFocus && editorLangId == 'powershell'"
       },
       {
+        "command": "PowerShell.ShowAdditionalCommands",
+        "key": "ctrl+alt+a",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+      },
+      {
         "command": "PowerShell.RunSelection",
         "key": "f8",
         "when": "editorTextFocus && editorLangId == 'powershell'"
