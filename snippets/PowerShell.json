@@ -913,5 +913,23 @@
 		"body": [
 			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '', Scope='Function', Target='${2:*}')]"
 		]
-	}
+	},
+    "PSCustomObject": {
+        "prefix": "PSCustomObject",
+        "body": [
+            "[PSCustomObject]@{",
+            "\t${1:Name} = ${2:Value}",
+            "}"
+        ],
+        "description": "Creates a PSCustomObject"
+    },
+    "Hashtable": {
+        "prefix": "Hashtable",
+        "body": [
+            "\\$${1:Var} = @{",
+            "\t${2:Name} = ${3:Value}",
+            "}"
+        ],
+        "description": "Creates a Hashtable"
+    }
 }
