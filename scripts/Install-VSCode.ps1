@@ -131,7 +131,7 @@ param(
     [switch]$LaunchWhenDone
 )
 
-if ($env:windir -ne $null) {
+if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
     switch ($Architecture) {
         "64-bit" {
             if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
