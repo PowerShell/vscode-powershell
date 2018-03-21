@@ -53,7 +53,9 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices 
     }
 }
 
-task Restore -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } -Before Build {
+task Restore RestoreNodeModules, RestorePowerShellModules -Before Build
+
+task RestoreNodeModules -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } {
 
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
 
@@ -61,6 +63,11 @@ task Restore -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } 
     # package install warnings don't cause PowerShell to throw up
     $logLevelParam = if ($env:AppVeyor) { "--loglevel=error" } else { "" }
     exec { & npm install $logLevelParam }
+}
+
+task RestorePowerShellModules -If { "Restore" -in $BuildTask -or !(Test-Path "./modules/Plaster") } {
+    Save-Module -Name Plaster -Path "$PSScriptRoot/modules/"
+    Save-Module -Name PSScriptAnalyzer -Path "$PSScriptRoot/modules/"
 }
 
 task Clean {
