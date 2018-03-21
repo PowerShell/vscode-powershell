@@ -44,6 +44,10 @@ export class HelpCompletionFeature implements IFeature {
     }
 
     public onEvent(changeEvent: TextDocumentChangeEvent): void {
+        if (!changeEvent) {
+            return;
+        }
+
         this.helpCompletionProvider.updateState(
             changeEvent.document,
             changeEvent.contentChanges[0].text,
