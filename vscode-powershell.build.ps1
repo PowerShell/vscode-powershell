@@ -53,9 +53,9 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices 
     }
 }
 
-task Restore RestoreNodeModules, RestorePowerShellModules -Before Build
+task Restore -If { "Restore" -in $BuildTask } RestoreNodeModules, RestorePowerShellModules -Before Build
 
-task RestoreNodeModules -If { "Restore" -in $BuildTask -or !(Test-Path "./node_modules") } {
+task RestoreNodeModules -If { -not (Test-Path "./node_modules") } {
 
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
 
@@ -65,7 +65,7 @@ task RestoreNodeModules -If { "Restore" -in $BuildTask -or !(Test-Path "./node_m
     exec { & npm install $logLevelParam }
 }
 
-task RestorePowerShellModules -If { "Restore" -in $BuildTask -or !(Test-Path "./modules/Plaster") } {
+task RestorePowerShellModules -If { -not (Test-Path "./modules/Plaster") } {
     Save-Module -Name Plaster -Path "$PSScriptRoot/modules/"
     Save-Module -Name PSScriptAnalyzer -Path "$PSScriptRoot/modules/"
 }
