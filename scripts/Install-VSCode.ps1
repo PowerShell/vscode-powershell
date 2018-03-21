@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.1
+.VERSION 1.2
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -25,6 +25,7 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    21/03/2018 - added functionality to install the VSCode context menus. Also, VSCode is now always added to the search path
     28/12/2017 - added functionality to support 64-bit versions of VSCode
     & support for installation of VSCode Insiders Edition.
     --
@@ -66,6 +67,9 @@
 .PARAMETER LaunchWhenDone
     When present, causes Visual Studio Code to be launched as soon as installation
     has finished.
+
+.PARAMETER EnableContextMenus
+    When present, causes the installer to configure the Explorer context menus
 
 .EXAMPLE
     Install-VSCode.ps1 -Architecture 32-bit
@@ -126,7 +130,9 @@ param(
     [ValidateNotNull()]
     [string[]]$AdditionalExtensions = @(),
 
-    [switch]$LaunchWhenDone
+    [switch]$LaunchWhenDone,
+
+    [switch]$EnableContextMenus
 )
 
 if (!($IsLinux -or $IsOSX)) {
@@ -176,7 +182,12 @@ if (!($IsLinux -or $IsOSX)) {
             Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
 
             Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
-            Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
+            if ($EnableContextMenus) {
+                Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList "/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath"
+            }
+            else {
+                Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList "/verysilent /tasks=addtopath"
+            }
         }
         else {
             Write-Host "`n$appName is already installed." -ForegroundColor Yellow
