@@ -114,6 +114,7 @@ task Package {
     if ($script:psesBuildScriptPath) {
         Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
         Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\PowerShellEditorServices .\modules
+        Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\PowerShellEditorServices.VSCode .\modules
     }
 
     Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
