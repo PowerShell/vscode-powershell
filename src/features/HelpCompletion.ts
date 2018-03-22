@@ -6,6 +6,7 @@ import { Disposable, EndOfLine, Position, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export const CommentHelpRequestType =
     new RequestType<any, any, void, void>("powerShell/getCommentHelp");
@@ -27,7 +28,7 @@ export class HelpCompletionFeature implements IFeature {
     private languageClient: LanguageClient;
     private disposable: Disposable;
 
-    constructor() {
+    constructor(private log: Logger) {
         this.helpCompletionProvider = new HelpCompletionProvider();
         const subscriptions = [];
         workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
@@ -44,7 +45,8 @@ export class HelpCompletionFeature implements IFeature {
     }
 
     public onEvent(changeEvent: TextDocumentChangeEvent): void {
-        if (!changeEvent) {
+        if (!(changeEvent && changeEvent.contentChanges && changeEvent.contentChanges[0])) {
+            this.log.write(`Bad change event message: ${JSON.stringify(changeEvent)}`);
             return;
         }
 
