@@ -66,8 +66,17 @@ task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
 }
 
 task RestorePowerShellModules -If { -not (Test-Path "$PSScriptRoot/modules/Plaster") } {
-    Save-Module -Name Plaster -Path "$PSScriptRoot/modules/"
-    Save-Module -Name PSScriptAnalyzer -Path "$PSScriptRoot/modules/"
+    $modules = Get-Content -Raw "./modules.json" | ConvertFrom-Json
+    $modules.PSObject.Properties | ForEach-Object {
+        $params = @{
+            Name = $_.Name
+            MinimumVersion = $_.Value.MinimumVersion
+            MaximumVersion = $_.Value.MaximumVersion
+            AllowPrerelease = $_.Value.AllowPrerelease
+            Path = "$PSScriptRoot/modules/"
+        }
+        Save-Module @params
+    }
 }
 
 task Clean {
