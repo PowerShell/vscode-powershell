@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.1
+.VERSION 1.2
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -25,6 +25,8 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    20/03/2018 - fix OS detection to prevent error
+    --
     28/12/2017 - added functionality to support 64-bit versions of VSCode
     & support for installation of VSCode Insiders Edition.
     --
@@ -129,7 +131,7 @@ param(
     [switch]$LaunchWhenDone
 )
 
-if (!($IsLinux -or $IsOSX)) {
+if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
     switch ($Architecture) {
         "64-bit" {
             if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
