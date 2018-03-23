@@ -66,7 +66,7 @@ task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
 }
 
 task RestorePowerShellModules -If { -not (Test-Path "$PSScriptRoot/modules/Plaster") } {
-    $modules = Get-Content -Raw "./modules.json" | ConvertFrom-Json
+    $modules = Get-Content -Raw "$PSScriptRoot/modules.json" | ConvertFrom-Json
     $modules.PSObject.Properties | ForEach-Object {
         $params = @{
             Name = $_.Name

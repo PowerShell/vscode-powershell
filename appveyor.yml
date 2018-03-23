@@ -19,10 +19,10 @@ install:
       Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
       Install-Module InvokeBuild -RequiredVersion 3.2.1 -Scope CurrentUser -Force | Out-Null
       Install-Module platyPS -RequiredVersion 0.7.6 -Scope CurrentUser -Force | Out-Null
-  - powershell.exe -c "Install-Module PowerShellGet -Force"
+  - powershell.exe -Command "Install-Module PowerShellGet -Force"
 
 build_script:
-  - powershell.exe -c "Invoke-Build"
+  - powershell.exe -Command "Invoke-Build"
 
 # The build script takes care of the tests
 test: off
