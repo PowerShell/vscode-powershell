@@ -47,7 +47,7 @@ export class SelectPSSARulesFeature implements IFeature {
                         this.languageClient.sendRequest(
                             SetPSSARulesRequestType,
                             {
-                                filepath: vscode.window.activeTextEditor.document.uri.fsPath,
+                                filepath: vscode.window.activeTextEditor.document.uri.toString(),
                                 ruleInfos: updatedOptions.map((option: ICheckboxQuickPickItem): RuleInfo => {
                                     return { name: option.label, isEnabled: option.isSelected };
                                 }),
