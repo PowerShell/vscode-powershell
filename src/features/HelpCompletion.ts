@@ -45,19 +45,21 @@ export class HelpCompletionFeature implements IFeature {
     }
 
     public onEvent(changeEvent: TextDocumentChangeEvent): void {
-        if (!(changeEvent && changeEvent.contentChanges && changeEvent.contentChanges[0])) {
-            this.log.write(`Bad change event message: ${JSON.stringify(changeEvent)}`);
+        if (!(changeEvent && changeEvent.contentChanges)) {
+            this.log.write(`Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
             return;
         }
 
-        this.helpCompletionProvider.updateState(
-            changeEvent.document,
-            changeEvent.contentChanges[0].text,
-            changeEvent.contentChanges[0].range);
+        if (changeEvent.contentChanges.length > 0) {
+            this.helpCompletionProvider.updateState(
+                changeEvent.document,
+                changeEvent.contentChanges[0].text,
+                changeEvent.contentChanges[0].range);
 
-        // todo raise an event when trigger is found, and attach complete() to the event.
-        if (this.helpCompletionProvider.triggerFound) {
-            this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+            // todo raise an event when trigger is found, and attach complete() to the event.
+            if (this.helpCompletionProvider.triggerFound) {
+                this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+            }
         }
     }
 }
