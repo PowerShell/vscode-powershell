@@ -109,7 +109,7 @@ task BuildEditorServices {
 task BuildAll BuildEditorServices, Build -Before Package
 
 task Test Build, {
-    if (!$global:IsLinux -and !$global:IsOSX) {
+    if (!$global:IsLinux -and !$global:IsMacOS) {
         Write-Host "`n### Running extension tests" -ForegroundColor Green
         exec { & npm run test }
     }
