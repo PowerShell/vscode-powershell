@@ -124,7 +124,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new DebugSessionFeature(context, sessionManager),
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context),
-        new HelpCompletionFeature(),
+        new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
     ];
 

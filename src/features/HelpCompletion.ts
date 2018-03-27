@@ -6,6 +6,7 @@ import { Disposable, EndOfLine, Position, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export const CommentHelpRequestType =
     new RequestType<any, any, void, void>("powerShell/getCommentHelp");
@@ -27,7 +28,7 @@ export class HelpCompletionFeature implements IFeature {
     private languageClient: LanguageClient;
     private disposable: Disposable;
 
-    constructor() {
+    constructor(private log: Logger) {
         this.helpCompletionProvider = new HelpCompletionProvider();
         const subscriptions = [];
         workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
@@ -44,14 +45,21 @@ export class HelpCompletionFeature implements IFeature {
     }
 
     public onEvent(changeEvent: TextDocumentChangeEvent): void {
-        this.helpCompletionProvider.updateState(
-            changeEvent.document,
-            changeEvent.contentChanges[0].text,
-            changeEvent.contentChanges[0].range);
+        if (!(changeEvent && changeEvent.contentChanges)) {
+            this.log.write(`Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
+            return;
+        }
 
-        // todo raise an event when trigger is found, and attach complete() to the event.
-        if (this.helpCompletionProvider.triggerFound) {
-            this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+        if (changeEvent.contentChanges.length > 0) {
+            this.helpCompletionProvider.updateState(
+                changeEvent.document,
+                changeEvent.contentChanges[0].text,
+                changeEvent.contentChanges[0].range);
+
+            // todo raise an event when trigger is found, and attach complete() to the event.
+            if (this.helpCompletionProvider.triggerFound) {
+                this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+            }
         }
     }
 }
