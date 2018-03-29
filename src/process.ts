@@ -40,7 +40,7 @@ export class PowerShellProcess {
                     const startScriptPath =
                         path.resolve(
                             __dirname,
-                            "../../scripts/Start-EditorServices.ps1");
+                            "../../../PowerShellEditorServices/module/Start-EditorServices.ps1");
 
                     const editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
