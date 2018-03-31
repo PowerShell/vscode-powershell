@@ -53,7 +53,7 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices 
     }
 }
 
-task Restore RestoreNodeModules, RestorePowerShellModules -Before Build
+task Restore RestoreNodeModules -Before Build
 
 task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
 
@@ -63,20 +63,6 @@ task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
     # package install warnings don't cause PowerShell to throw up
     $logLevelParam = if ($env:AppVeyor) { "--loglevel=error" } else { "" }
     exec { & npm install $logLevelParam }
-}
-
-task RestorePowerShellModules -If { -not (Test-Path "$PSScriptRoot/modules/Plaster") } {
-    $modules = Get-Content -Raw "$PSScriptRoot/modules.json" | ConvertFrom-Json
-    $modules.PSObject.Properties | ForEach-Object {
-        $params = @{
-            Name = $_.Name
-            MinimumVersion = $_.Value.MinimumVersion
-            MaximumVersion = $_.Value.MaximumVersion
-            AllowPrerelease = $_.Value.AllowPrerelease
-            Path = "$PSScriptRoot/modules/"
-        }
-        Save-Module @params
-    }
 }
 
 task Clean {
@@ -122,15 +108,14 @@ task Package {
 
     if ($script:psesBuildScriptPath) {
         Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
-        Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\PowerShellEditorServices .\modules
-        Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\PowerShellEditorServices.VSCode .\modules
+        Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\* .\modules
     }
 
     Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
     exec { & node ./node_modules/vsce/out/vsce package }
 
     # Change the package to have a static name for automation purposes
-    Move-Item .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
+    Move-Item -Force .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
