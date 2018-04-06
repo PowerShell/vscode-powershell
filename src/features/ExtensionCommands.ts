@@ -132,7 +132,7 @@ export const CloseFileRequestType =
         "editor/closeFile");
 
 export const SaveFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<ISaveFileDetails, EditorOperationResponse, void, void>(
         "editor/saveFile");
 
 export const ShowErrorMessageRequestType =
@@ -150,6 +150,11 @@ export const ShowInformationMessageRequestType =
 export const SetStatusBarMessageRequestType =
     new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void, void>(
         "editor/setStatusBarMessage");
+
+export interface ISaveFileDetails {
+    filePath: string;
+    newPath?: string;
+}
 
 export interface IStatusBarMessageDetails {
     message: string;
@@ -238,7 +243,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
             this.languageClient.onRequest(
                 SaveFileRequestType,
-                (filePath) => this.saveFile(filePath));
+                (saveFileDetails) => this.saveFile(saveFileDetails));
 
             this.languageClient.onRequest(
                 ShowInformationMessageRequestType,
@@ -382,23 +387,54 @@ export class ExtensionCommandsFeature implements IFeature {
         return promise;
     }
 
-    private saveFile(filePath: string): Thenable<EditorOperationResponse> {
+    private saveFile(saveFileDetails: ISaveFileDetails): Thenable<EditorOperationResponse> {
 
-        let promise: Thenable<EditorOperationResponse>;
-        if (this.findTextDocument(this.normalizeFilePath(filePath))) {
-            promise =
-                vscode.workspace.openTextDocument(filePath)
-                    .then((doc) => {
-                        if (doc.isDirty) {
-                            doc.save();
-                        }
-                    })
-                    .then((_) => EditorOperationResponse.Completed);
-        } else {
-            promise = Promise.resolve(EditorOperationResponse.Completed);
+        // If the file to save can't be found, just complete the request
+        if (!this.findTextDocument(this.normalizeFilePath(saveFileDetails.filePath))) {
+            return Promise.resolve(EditorOperationResponse.Completed);
         }
 
-        return promise;
+        // If no newFile is given, just save the current file
+        if (!saveFileDetails.newPath) {
+            return vscode.workspace.openTextDocument(saveFileDetails.filePath)
+                .then((doc) => {
+                    if (doc.isDirty) {
+                        doc.save();
+                    }
+                })
+                .then((_) => EditorOperationResponse.Completed);
+        }
+
+        // Otherwise we want to save as a new file
+
+        // First turn the path we were given into an absolute path
+        // Relative paths are interpreted as relative to the original file
+        const newFileAbsolutePath = path.isAbsolute(saveFileDetails.newPath) ?
+            saveFileDetails.newPath :
+            path.resolve(path.dirname(saveFileDetails.filePath), saveFileDetails.newPath);
+
+        // Create an "untitled-scheme" path so that VSCode will let us create a new file with a given path
+        const newFileUri = vscode.Uri.parse("untitled:" + newFileAbsolutePath);
+
+        // Now we need to copy the content of the current file,
+        // then create a new file at the given path, insert the content,
+        // save it and open the document
+        return vscode.workspace.openTextDocument(saveFileDetails.filePath)
+            .then((oldDoc) => {
+                return vscode.workspace.openTextDocument(newFileUri)
+                    .then((newDoc) => {
+                        return vscode.window.showTextDocument(newDoc, 1, false)
+                            .then((editor) => {
+                                return editor.edit((editBuilder) => {
+                                    editBuilder.insert(new vscode.Position(0, 0), oldDoc.getText());
+                                })
+                                .then(() => {
+                                    return newDoc.save()
+                                        .then(() => EditorOperationResponse.Completed);
+                                });
+                            });
+                    });
+            });
     }
 
     private normalizeFilePath(filePath: string): string {
