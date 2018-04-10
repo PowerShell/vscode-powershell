@@ -6,6 +6,7 @@
 
 import path = require("path");
 import vscode = require("vscode");
+import { DocumentSelector } from "vscode-languageclient";
 import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
@@ -39,6 +40,11 @@ const requiredEditorServicesVersion = "1.6.0";
 let logger: Logger;
 let sessionManager: SessionManager;
 let extensionFeatures: IFeature[] = [];
+
+const documentSelector: DocumentSelector = [
+    { language: "powershell", scheme: "file" },
+    { language: "powershell", scheme: "untitled" },
+];
 
 export function activate(context: vscode.ExtensionContext): void {
 
@@ -103,7 +109,7 @@ export function activate(context: vscode.ExtensionContext): void {
     sessionManager =
         new SessionManager(
             requiredEditorServicesVersion,
-            logger);
+            logger, documentSelector);
 
     // Create features
     extensionFeatures = [
@@ -119,7 +125,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
-        new DocumentFormatterFeature(logger),
+        new DocumentFormatterFeature(logger, documentSelector),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager),
         new PickPSHostProcessFeature(),

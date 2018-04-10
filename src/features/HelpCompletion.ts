@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { Disposable, EndOfLine, Position, Range, SnippetString,
+import { Disposable, DocumentSelector, EndOfLine, Position, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";

@@ -17,7 +17,7 @@ import Settings = require("./settings");
 import utils = require("./utils");
 
 import {
-    CloseAction, ErrorAction, Executable, LanguageClient, LanguageClientOptions,
+    CloseAction, DocumentSelector, ErrorAction, Executable, LanguageClient, LanguageClientOptions,
     Middleware, NotificationType, RequestType, RequestType0,
     ResolveCodeLensSignature, RevealOutputChannelOn, StreamInfo } from "vscode-languageclient";
 
@@ -62,7 +62,8 @@ export class SessionManager implements Middleware {
 
     constructor(
         private requiredEditorServicesVersion: string,
-        private log: Logger) {
+        private log: Logger,
+        private documentSelector: DocumentSelector) {
 
         this.platformDetails = getPlatformDetails();
 
@@ -541,7 +542,7 @@ export class SessionManager implements Middleware {
             };
 
             const clientOptions: LanguageClientOptions = {
-                documentSelector: [utils.PowerShellLanguageId],
+                documentSelector: this.documentSelector,
                 synchronize: {
                     configurationSection: utils.PowerShellLanguageId,
                     // fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')

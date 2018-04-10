@@ -21,6 +21,7 @@ import {
     DocumentFormattingRequest,
     DocumentRangeFormattingParams,
     DocumentRangeFormattingRequest,
+    DocumentSelector,
     LanguageClient,
     RequestType,
 } from "vscode-languageclient";
@@ -317,16 +318,16 @@ export class DocumentFormatterFeature implements IFeature {
     private languageClient: LanguageClient;
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
-    constructor(private logger: Logger) {
+    constructor(private logger: Logger, documentSelector: DocumentSelector) {
         this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider(logger);
         this.formattingEditProvider = vscode.languages.registerDocumentFormattingEditProvider(
-            "powershell",
+            documentSelector,
             this.documentFormattingEditProvider);
         this.rangeFormattingEditProvider = vscode.languages.registerDocumentRangeFormattingEditProvider(
-            "powershell",
+            documentSelector,
             this.documentFormattingEditProvider);
         this.onTypeFormattingEditProvider = vscode.languages.registerOnTypeFormattingEditProvider(
-            "powershell",
+            documentSelector,
             this.documentFormattingEditProvider,
             this.firstTriggerCharacter,
             ...this.moreTriggerCharacters);
