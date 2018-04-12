@@ -13,3 +13,4 @@ vscps-preview.zip
 npm-debug.log
 .vscode-test/
 *.DS_Store
+package-lock.json

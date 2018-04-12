@@ -387,22 +387,21 @@ export class ExtensionCommandsFeature implements IFeature {
         return promise;
     }
 
-    private saveFile(saveFileDetails: ISaveFileDetails): Thenable<EditorOperationResponse> {
+    private async saveFile(saveFileDetails: ISaveFileDetails): Promise<EditorOperationResponse> {
 
         // If the file to save can't be found, just complete the request
         if (!this.findTextDocument(this.normalizeFilePath(saveFileDetails.filePath))) {
-            return Promise.resolve(EditorOperationResponse.Completed);
+            return EditorOperationResponse.Completed;
         }
 
         // If no newFile is given, just save the current file
         if (!saveFileDetails.newPath) {
-            return vscode.workspace.openTextDocument(saveFileDetails.filePath)
-                .then((doc) => {
-                    if (doc.isDirty) {
-                        doc.save();
-                    }
-                })
-                .then((_) => EditorOperationResponse.Completed);
+            const doc = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
+            if (doc.isDirty) {
+                await doc.save();
+            }
+
+            return EditorOperationResponse.Completed;
         }
 
         // Otherwise we want to save as a new file
@@ -419,23 +418,18 @@ export class ExtensionCommandsFeature implements IFeature {
         // Now we need to copy the content of the current file,
         // then create a new file at the given path, insert the content,
         // save it and open the document
-        return vscode.workspace.openTextDocument(saveFileDetails.filePath)
-            .then((oldDoc) => {
-                return vscode.workspace.openTextDocument(newFileUri)
-                    .then((newDoc) => {
-                        return vscode.window.showTextDocument(newDoc, 1, false)
-                            .then((editor) => {
-                                return editor.edit((editBuilder) => {
-                                    editBuilder.insert(new vscode.Position(0, 0), oldDoc.getText());
-                                })
-                                .then(() => {
-                                    return newDoc.save()
-                                        .then(() => EditorOperationResponse.Completed);
-                                });
-                            });
-                    });
-            });
-    }
+        const oldDoc = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
+        const newDoc = await vscode.workspace.openTextDocument(newFileUri);
+        const editor = await vscode.window.showTextDocument(newDoc, 1, false);
+
+        await editor.edit((editBuilder) => {
+            editBuilder.insert(new vscode.Position(0, 0), oldDoc.getText());
+        });
+
+        await newDoc.save();
+
+        return EditorOperationResponse.Completed;
+   }
 
     private normalizeFilePath(filePath: string): string {
         const platform = os.platform();
