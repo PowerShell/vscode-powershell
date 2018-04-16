@@ -14,6 +14,11 @@ enum CodeFormattingPreset {
     Stroustrup,
 }
 
+export interface IPowerShellAdditionalExePathSettings {
+    versionName: string;
+    exePath: string;
+}
+
 export interface IBugReportingSettings {
     project: string;
 }
@@ -50,6 +55,8 @@ export interface IDeveloperSettings {
 }
 
 export interface ISettings {
+    powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
+    powerShellDefaultVersion?: string;
     powerShellExePath?: string;
     startAutomatically?: boolean;
     useX86Host?: boolean;
@@ -115,6 +122,10 @@ export function load(): ISettings {
     return {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
+        powerShellAdditionalExePaths:
+            configuration.get<IPowerShellAdditionalExePathSettings[]>("powerShellAdditionalExePaths", undefined),
+        powerShellDefaultVersion:
+            configuration.get<string>("powerShellDefaultVersion", undefined),
         powerShellExePath:
             configuration.get<string>("powerShellExePath", undefined),
         useX86Host:

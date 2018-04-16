@@ -26,6 +26,7 @@ import {
     getPlatformDetails, IPlatformDetails, OperatingSystem } from "./platform";
 
 export enum SessionStatus {
+    NeverStarted,
     NotStarted,
     Initializing,
     Running,
@@ -40,7 +41,7 @@ export class SessionManager implements Middleware {
     private hostVersion: string;
     private editorServicesArgs: string;
     private powerShellExePath: string = "";
-    private sessionStatus: SessionStatus;
+    private sessionStatus: SessionStatus = SessionStatus.NeverStarted;
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
     private platformDetails: IPlatformDetails;
@@ -246,6 +247,7 @@ export class SessionManager implements Middleware {
     }
 
     public getPowerShellExePath(): string {
+        let powerShellExePath: string;
 
         if (!this.sessionSettings.powerShellExePath &&
             this.sessionSettings.developer.powerShellExePath) {
@@ -280,11 +282,27 @@ export class SessionManager implements Middleware {
                 });
         }
 
+        // If powershell.powerShellDefaultVersion specified, attempt to find the PowerShell exe path
+        // of the version specified by the setting.
+        if ((this.sessionStatus === SessionStatus.NeverStarted) && this.sessionSettings.powerShellDefaultVersion) {
+            const powerShellExePaths = getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
+            const powerShellDefaultVersion =
+                powerShellExePaths.find((item) => item.versionName === this.sessionSettings.powerShellDefaultVersion);
+
+            if (powerShellDefaultVersion) {
+                powerShellExePath = powerShellDefaultVersion.exePath;
+            } else {
+                this.log.writeWarning(
+                    `Could not find powerShellDefaultVersion: '${this.sessionSettings.powerShellDefaultVersion}'`);
+            }
+        }
+
         // Is there a setting override for the PowerShell path?
-        let powerShellExePath =
-            (this.sessionSettings.powerShellExePath ||
-                this.sessionSettings.developer.powerShellExePath ||
-                "").trim();
+        powerShellExePath =
+            (powerShellExePath ||
+             this.sessionSettings.powerShellExePath ||
+             this.sessionSettings.developer.powerShellExePath ||
+             "").trim();
 
         // New versions of PS Core uninstall the previous version
         // so make sure the path stored in the settings exists.
@@ -718,12 +736,25 @@ export class SessionManager implements Middleware {
     private showSessionMenu() {
         let menuItems: SessionMenuItem[] = [];
 
+        const currentExePath = (this.powerShellExePath || "").toLowerCase();
+        const availablePowerShellExes =
+            getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
+
         if (this.sessionStatus === SessionStatus.Running) {
+            const currentPowerShellExe =
+                availablePowerShellExes
+                    .find((item) => item.exePath.toLowerCase() === currentExePath);
+
+            const powerShellSessionName =
+                currentPowerShellExe ?
+                    currentPowerShellExe.versionName :
+                    `PowerShell ${this.versionDetails.displayVersion} ` +
+                    `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
+                    `[${this.versionDetails.version}]`;
+
             menuItems = [
                 new SessionMenuItem(
-                    `Current session: PowerShell ${this.versionDetails.displayVersion} ` +
-                    `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
-                    `[${this.versionDetails.version}]`,
+                    `Current session: ${powerShellSessionName}`,
                     () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
 
                 new SessionMenuItem(
@@ -738,9 +769,8 @@ export class SessionManager implements Middleware {
             ];
         }
 
-        const currentExePath = (this.powerShellExePath || "").toLowerCase();
         const powerShellItems =
-            getAvailablePowerShellExes(this.platformDetails)
+            availablePowerShellExes
                 .filter((item) => item.exePath.toLowerCase() !== currentExePath)
                 .map((item) => {
                     return new SessionMenuItem(

@@ -5,6 +5,7 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as platform from "../src/platform";
+import { SessionManager } from "../src/session";
 
 function checkDefaultPowerShellPath(platformDetails, expectedPath) {
     test("returns correct default path", () => {
@@ -21,7 +22,7 @@ function checkAvailableWindowsPowerShellPaths(
 
         // The system may return PowerShell Core paths so only
         // enumerate the first list items.
-        const enumeratedPaths = platform.getAvailablePowerShellExes(platformDetails);
+        const enumeratedPaths = platform.getAvailablePowerShellExes(platformDetails, undefined);
         for (let i; i < expectedPaths.length; i++) {
             assert.equal(enumeratedPaths[i], expectedPaths[i]);
         }
