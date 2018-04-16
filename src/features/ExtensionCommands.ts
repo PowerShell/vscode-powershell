@@ -422,7 +422,7 @@ export class ExtensionCommandsFeature implements IFeature {
         // Finally open the new document
         const newFileUri = vscode.Uri.file(newFileAbsolutePath);
         const newFile = await vscode.workspace.openTextDocument(newFileUri);
-        vscode.window.showTextDocument(newFile);
+        vscode.window.showTextDocument(newFile, { preview: true });
 
         return EditorOperationResponse.Completed;
    }
