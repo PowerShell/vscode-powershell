@@ -415,15 +415,14 @@ export class ExtensionCommandsFeature implements IFeature {
 
         // Retrieve the text out of the current document
         const oldDocument = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
-        const oldDocText = oldDocument.getText();
 
         // Write it to the new document path
-        fs.writeFileSync(newFileAbsolutePath, oldDocText);
+        fs.writeFileSync(newFileAbsolutePath, oldDocument.getText());
 
         // Finally open the new document
         const newFileUri = vscode.Uri.file(newFileAbsolutePath);
         const newFile = await vscode.workspace.openTextDocument(newFileUri);
-        vscode.window.showTextDocument(newFile, { preview: false });
+        vscode.window.showTextDocument(newFile);
 
         return EditorOperationResponse.Completed;
    }
