@@ -2,9 +2,10 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import os = require("os");
-import path = require("path");
-import vscode = require("vscode");
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as vscode from "vscode";
 import { LanguageClient, NotificationType, Position, Range, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
@@ -412,21 +413,17 @@ export class ExtensionCommandsFeature implements IFeature {
             saveFileDetails.newPath :
             path.resolve(path.dirname(saveFileDetails.filePath), saveFileDetails.newPath);
 
-        // Create an "untitled-scheme" path so that VSCode will let us create a new file with a given path
-        const newFileUri = vscode.Uri.parse("untitled:" + newFileAbsolutePath);
+        // Retrieve the text out of the current document
+        const oldDocument = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
+        const oldDocText = oldDocument.getText();
 
-        // Now we need to copy the content of the current file,
-        // then create a new file at the given path, insert the content,
-        // save it and open the document
-        const oldDoc = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
-        const newDoc = await vscode.workspace.openTextDocument(newFileUri);
-        const editor = await vscode.window.showTextDocument(newDoc, 1, false);
+        // Write it to the new document path
+        fs.writeFileSync(newFileAbsolutePath, oldDocText);
 
-        await editor.edit((editBuilder) => {
-            editBuilder.insert(new vscode.Position(0, 0), oldDoc.getText());
-        });
-
-        await newDoc.save();
+        // Finally open the new document
+        const newFileUri = vscode.Uri.file(newFileAbsolutePath);
+        const newFile = await vscode.workspace.openTextDocument(newFileUri);
+        vscode.window.showTextDocument(newFile, { preview: false });
 
         return EditorOperationResponse.Completed;
    }
