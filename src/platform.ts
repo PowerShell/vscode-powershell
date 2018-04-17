@@ -151,13 +151,10 @@ export function getAvailablePowerShellExes(
                     const exePath = path.join(item, "pwsh.exe");
                     return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
                 })
-                .map((item) => {
-                    const exePath = path.join(item, "pwsh.exe");
-                    return {
-                        versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
-                        exePath,
-                    };
-                });
+                .map((item) => ({
+                    versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
+                    exePath: path.join(item, "pwsh.exe"),
+                }));
 
             if (psCorePaths) {
                 paths = paths.concat(psCorePaths);

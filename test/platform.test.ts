@@ -5,7 +5,6 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as platform from "../src/platform";
-import { SessionManager } from "../src/session";
 
 function checkDefaultPowerShellPath(platformDetails, expectedPath) {
     test("returns correct default path", () => {
