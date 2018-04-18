@@ -2,9 +2,10 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import os = require("os");
-import path = require("path");
-import vscode = require("vscode");
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as vscode from "vscode";
 import { LanguageClient, NotificationType, Position, Range, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
@@ -132,7 +133,7 @@ export const CloseFileRequestType =
         "editor/closeFile");
 
 export const SaveFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<ISaveFileDetails, EditorOperationResponse, void, void>(
         "editor/saveFile");
 
 export const ShowErrorMessageRequestType =
@@ -150,6 +151,11 @@ export const ShowInformationMessageRequestType =
 export const SetStatusBarMessageRequestType =
     new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void, void>(
         "editor/setStatusBarMessage");
+
+export interface ISaveFileDetails {
+    filePath: string;
+    newPath?: string;
+}
 
 export interface IStatusBarMessageDetails {
     message: string;
@@ -238,7 +244,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
             this.languageClient.onRequest(
                 SaveFileRequestType,
-                (filePath) => this.saveFile(filePath));
+                (saveFileDetails) => this.saveFile(saveFileDetails));
 
             this.languageClient.onRequest(
                 ShowInformationMessageRequestType,
@@ -382,24 +388,44 @@ export class ExtensionCommandsFeature implements IFeature {
         return promise;
     }
 
-    private saveFile(filePath: string): Thenable<EditorOperationResponse> {
+    private async saveFile(saveFileDetails: ISaveFileDetails): Promise<EditorOperationResponse> {
 
-        let promise: Thenable<EditorOperationResponse>;
-        if (this.findTextDocument(this.normalizeFilePath(filePath))) {
-            promise =
-                vscode.workspace.openTextDocument(filePath)
-                    .then((doc) => {
-                        if (doc.isDirty) {
-                            doc.save();
-                        }
-                    })
-                    .then((_) => EditorOperationResponse.Completed);
-        } else {
-            promise = Promise.resolve(EditorOperationResponse.Completed);
+        // If the file to save can't be found, just complete the request
+        if (!this.findTextDocument(this.normalizeFilePath(saveFileDetails.filePath))) {
+            return EditorOperationResponse.Completed;
         }
 
-        return promise;
-    }
+        // If no newFile is given, just save the current file
+        if (!saveFileDetails.newPath) {
+            const doc = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
+            if (doc.isDirty) {
+                await doc.save();
+            }
+
+            return EditorOperationResponse.Completed;
+        }
+
+        // Otherwise we want to save as a new file
+
+        // First turn the path we were given into an absolute path
+        // Relative paths are interpreted as relative to the original file
+        const newFileAbsolutePath = path.isAbsolute(saveFileDetails.newPath) ?
+            saveFileDetails.newPath :
+            path.resolve(path.dirname(saveFileDetails.filePath), saveFileDetails.newPath);
+
+        // Retrieve the text out of the current document
+        const oldDocument = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
+
+        // Write it to the new document path
+        fs.writeFileSync(newFileAbsolutePath, oldDocument.getText());
+
+        // Finally open the new document
+        const newFileUri = vscode.Uri.file(newFileAbsolutePath);
+        const newFile = await vscode.workspace.openTextDocument(newFileUri);
+        vscode.window.showTextDocument(newFile, { preview: true });
+
+        return EditorOperationResponse.Completed;
+   }
 
     private normalizeFilePath(filePath: string): string {
         const platform = os.platform();
