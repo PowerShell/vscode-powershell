@@ -108,14 +108,13 @@ export function fixWindowsPowerShellPath(powerShellExePath: string, platformDeta
     return powerShellExePath;
 }
 
-export function getAvailablePowerShellExes(platformDetails: IPlatformDetails): IPowerShellExeDetails[] {
+export function getAvailablePowerShellExes(
+    platformDetails: IPlatformDetails,
+    sessionSettings: Settings.ISettings | undefined): IPowerShellExeDetails[] {
 
     let paths: IPowerShellExeDetails[] = [];
 
     if (platformDetails.operatingSystem === OperatingSystem.Windows) {
-        const psCoreInstallPath =
-            (!platformDetails.isProcess64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + "\\PowerShell";
-
         if (platformDetails.isProcess64Bit) {
             paths.push({
                 versionName: WindowsPowerShell64BitLabel,
@@ -140,32 +139,44 @@ export function getAvailablePowerShellExes(platformDetails: IPlatformDetails): I
             });
         }
 
+        const psCoreInstallPath =
+            (!platformDetails.isProcess64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + "\\PowerShell";
+
         if (fs.existsSync(psCoreInstallPath)) {
+            const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
             const psCorePaths =
                 fs.readdirSync(psCoreInstallPath)
                 .map((item) => path.join(psCoreInstallPath, item))
-                .filter((item) => fs.lstatSync(item).isDirectory())
-                .map((item) => {
-                    let exePath = path.join(item, "pwsh.exe");
-                    if (!fs.existsSync(exePath)) {
-                        exePath = path.join(item, "powershell.exe");
-                    }
-
-                    return {
-                        versionName: `PowerShell Core ${path.parse(item).base}`,
-                        exePath,
-                    };
-                });
+                .filter((item) => {
+                    const exePath = path.join(item, "pwsh.exe");
+                    return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
+                })
+                .map((item) => ({
+                    versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
+                    exePath: path.join(item, "pwsh.exe"),
+                }));
 
             if (psCorePaths) {
                 paths = paths.concat(psCorePaths);
             }
         }
     } else {
+        // Handle Linux and macOS case
         paths.push({
             versionName: "PowerShell Core",
             exePath: this.getDefaultPowerShellPath(platformDetails),
         });
+    }
+
+    // When unit testing, we don't have session settings to test so skip reading this setting
+    if (sessionSettings) {
+        // Add additional PowerShell paths as configured in settings
+        for (const additionalPowerShellExePath of sessionSettings.powerShellAdditionalExePaths) {
+            paths.push({
+                versionName: additionalPowerShellExePath.versionName,
+                exePath: additionalPowerShellExePath.exePath,
+            });
+        }
     }
 
     return paths;
