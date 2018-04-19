@@ -89,7 +89,7 @@ export function load(): ISettings {
     const defaultDeveloperSettings: IDeveloperSettings = {
         featureFlags: [],
         powerShellExePath: undefined,
-        bundledModulesPath: "../../../PowerShellEditorServices/module/",
+        bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
         powerShellExeIsWindowsDevBuild: false,
@@ -119,7 +119,7 @@ export function load(): ISettings {
         powerShellExePath:
             configuration.get<string>("powerShellExePath", undefined),
         bundledModulesPath:
-            "../modules/",
+            "../../modules",
         useX86Host:
             configuration.get<boolean>("useX86Host", false),
         enableProfileLoading:
