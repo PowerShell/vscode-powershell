@@ -164,7 +164,6 @@ export class SessionManager implements Middleware {
             }
 
             this.editorServicesArgs =
-                "-EditorServicesVersion '" + this.requiredEditorServicesVersion + "' " +
                 "-HostName 'Visual Studio Code Host' " +
                 "-HostProfileId 'Microsoft.VSCode' " +
                 "-HostVersion '" + this.hostVersion + "' " +

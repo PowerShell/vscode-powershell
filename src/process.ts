@@ -42,7 +42,7 @@ export class PowerShellProcess {
                         path.resolve(
                             __dirname,
                             this.bundledModulesPath,
-                            "../scripts/Start-EditorServices.ps1");
+                            "PowerShellEditorServices/Start-EditorServices.ps1");
 
                     const editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
