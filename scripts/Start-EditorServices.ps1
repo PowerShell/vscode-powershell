@@ -171,21 +171,15 @@ function Test-PortAvailability {
     $portAvailable = $true
 
     try {
-        if ($isPS5orLater) {
-            $ipAddresses = [System.Net.Dns]::GetHostEntryAsync("localhost").Result.AddressList
-        }
-        else {
-            $ipAddresses = [System.Net.Dns]::GetHostEntry("localhost").AddressList
-        }
+        # After some research, I don't believe we should run into problems using an IPv4 port
+        # that happens to be in use via an IPv6 address.  That is based on this info:
+        # https://www.ibm.com/support/knowledgecenter/ssw_i5_54/rzai2/rzai2compipv4ipv6.htm#rzai2compipv4ipv6__compports
+        $ipAddress = [System.Net.IPAddress]::Loopback
+        Log "Testing availability of port ${PortNumber} at address ${ipAddress} / $($ipAddress.AddressFamily)"
 
-        foreach ($ipAddress in $ipAddresses)
-        {
-            Log "Testing availability of port ${PortNumber} at address ${ipAddress} / $($ipAddress.AddressFamily)"
-
-            $tcpListener = New-Object System.Net.Sockets.TcpListener @($ipAddress, $PortNumber)
-            $tcpListener.Start()
-            $tcpListener.Stop()
-        }
+        $tcpListener = New-Object System.Net.Sockets.TcpListener @($ipAddress, $PortNumber)
+        $tcpListener.Start()
+        $tcpListener.Stop()
     }
     catch [System.Net.Sockets.SocketException] {
         $portAvailable = $false
