@@ -14,6 +14,12 @@ enum CodeFormattingPreset {
     Stroustrup,
 }
 
+export class HelpCompletion {
+    public static readonly Disabled: string = "Disabled";
+    public static readonly BlockComment: string = "BlockComment";
+    public static readonly LineComment: string = "LineComment";
+}
+
 export interface IPowerShellAdditionalExePathSettings {
     versionName: string;
     exePath: string;
@@ -61,6 +67,7 @@ export interface ISettings {
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
+    helpCompletion: string;
     scriptAnalysis?: IScriptAnalysisSettings;
     debugging?: IDebuggingSettings;
     developer?: IDeveloperSettings;
@@ -132,6 +139,8 @@ export function load(): ISettings {
             configuration.get<boolean>("useX86Host", false),
         enableProfileLoading:
             configuration.get<boolean>("enableProfileLoading", false),
+        helpCompletion:
+            configuration.get<string>("helpCompletion", HelpCompletion.BlockComment),
         scriptAnalysis:
             configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
         debugging:
