@@ -124,7 +124,7 @@ class TriggerFinder {
 }
 
 class HelpCompletionProvider {
-    private triggerFinderLineComment: TriggerFinder;
+    private triggerFinderHelpComment: TriggerFinder;
     private lastChangeText: string;
     private lastChangeRange: Range;
     private lastDocument: TextDocument;
@@ -132,12 +132,12 @@ class HelpCompletionProvider {
     private settings: Settings.ISettings;
 
     constructor() {
-        this.triggerFinderLineComment = new TriggerFinder("##");
+        this.triggerFinderHelpComment = new TriggerFinder("##");
         this.settings = Settings.load();
     }
 
     public get triggerFound(): boolean {
-        return this.triggerFinderLineComment.found;
+        return this.triggerFinderHelpComment.found;
     }
 
     public set languageClient(value: LanguageClient) {
@@ -148,11 +148,11 @@ class HelpCompletionProvider {
         this.lastDocument = document;
         this.lastChangeText = changeText;
         this.lastChangeRange = changeRange;
-        this.triggerFinderLineComment.updateState(document, changeText);
+        this.triggerFinderHelpComment.updateState(document, changeText);
     }
 
     public reset(): void {
-        this.triggerFinderLineComment.reset();
+        this.triggerFinderHelpComment.reset();
     }
 
     public complete(): Thenable<void> {
