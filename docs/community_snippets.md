@@ -17,6 +17,7 @@ _To contribute, check out our [guide here](#contributing)._
 | Table of Contents |
 |:-----------------:|
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
+| [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 
 ## Snippets
 
@@ -38,6 +39,22 @@ A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab t
         "}"
     ],
     "description": "Creates a PSCustomObject"
+}
+```
+
+### DateTimeWriteVerbose
+
+Quickly add a `Write-Verbose` with the current date and time inserted before the message you're going to write to the verbose stream, by @ThmsRynr.
+
+#### Snippet
+
+```json
+"DateTimeWriteVerbose": {
+    "prefix": "dtwv",
+    "body": [
+        "Write-Verbose \"[$(Get-Date -format G)] ${1:message}\"$0"
+    ],
+    "description": "Pre-pend datetime for Write-Verbose"
 }
 ```
 
