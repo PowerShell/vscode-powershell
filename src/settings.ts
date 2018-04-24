@@ -64,6 +64,7 @@ export interface ISettings {
     powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
     powerShellDefaultVersion?: string;
     powerShellExePath?: string;
+    bundledModulesPath?: string;
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
@@ -102,7 +103,7 @@ export function load(): ISettings {
     const defaultDeveloperSettings: IDeveloperSettings = {
         featureFlags: [],
         powerShellExePath: undefined,
-        bundledModulesPath: undefined,
+        bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
         powerShellExeIsWindowsDevBuild: false,
@@ -135,6 +136,8 @@ export function load(): ISettings {
             configuration.get<string>("powerShellDefaultVersion", undefined),
         powerShellExePath:
             configuration.get<string>("powerShellExePath", undefined),
+        bundledModulesPath:
+            "../../modules",
         useX86Host:
             configuration.get<boolean>("useX86Host", false),
         enableProfileLoading:
@@ -146,7 +149,7 @@ export function load(): ISettings {
         debugging:
             configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
         developer:
-            configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
+            getWorkspaceSettingsWithDefaults<IDeveloperSettings>(configuration, "developer", defaultDeveloperSettings),
         codeFormatting:
             configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
         integratedConsole:
@@ -162,4 +165,19 @@ export function change(settingName: string, newValue: any, global: boolean = fal
             utils.PowerShellLanguageId);
 
     return configuration.update(settingName, newValue, global);
+}
+
+function getWorkspaceSettingsWithDefaults<TSettings>(
+    workspaceConfiguration: vscode.WorkspaceConfiguration,
+    settingName: string,
+    defaultSettings: TSettings): TSettings {
+
+    const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
+
+    for (const setting in importedSettings) {
+        if (importedSettings[setting]) {
+            defaultSettings[setting] = importedSettings[setting];
+        }
+    }
+    return defaultSettings;
 }

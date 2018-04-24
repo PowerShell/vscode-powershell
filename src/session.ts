@@ -54,6 +54,7 @@ export class SessionManager implements Middleware {
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
+    private bundledModulesPath: string;
 
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
@@ -146,18 +147,17 @@ export class SessionManager implements Middleware {
 
         if (this.powerShellExePath) {
 
-            let bundledModulesPath = path.resolve(__dirname, "../../modules");
+            this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
 
             if (this.inDevelopmentMode) {
                 const devBundledModulesPath =
                     path.resolve(
                         __dirname,
-                        this.sessionSettings.developer.bundledModulesPath ||
-                        "../../../PowerShellEditorServices/module");
+                        this.sessionSettings.developer.bundledModulesPath);
 
                 // Make sure the module's bin path exists
                 if (fs.existsSync(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
-                    bundledModulesPath = devBundledModulesPath;
+                    this.bundledModulesPath = devBundledModulesPath;
                 } else {
                     this.log.write(
                         "\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
@@ -166,12 +166,11 @@ export class SessionManager implements Middleware {
             }
 
             this.editorServicesArgs =
-                "-EditorServicesVersion '" + this.requiredEditorServicesVersion + "' " +
                 "-HostName 'Visual Studio Code Host' " +
                 "-HostProfileId 'Microsoft.VSCode' " +
                 "-HostVersion '" + this.hostVersion + "' " +
                 "-AdditionalModules @('PowerShellEditorServices.VSCode') " +
-                "-BundledModulesPath '" + bundledModulesPath + "' " +
+                "-BundledModulesPath '" + this.bundledModulesPath + "' " +
                 "-EnableConsoleRepl ";
 
             if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
@@ -181,11 +180,7 @@ export class SessionManager implements Middleware {
                 this.editorServicesArgs += "-LogLevel '" + this.sessionSettings.developer.editorServicesLogLevel + "' ";
             }
 
-            this.startPowerShell(
-                this.powerShellExePath,
-                this.sessionSettings.developer.powerShellExeIsWindowsDevBuild,
-                bundledModulesPath,
-                this.editorServicesArgs);
+            this.startPowerShell();
         } else {
             this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
         }
@@ -237,6 +232,7 @@ export class SessionManager implements Middleware {
         this.debugSessionProcess =
             new PowerShellProcess(
                 this.powerShellExePath,
+                this.bundledModulesPath,
                 "[TEMP] PowerShell Integrated Console",
                 this.log,
                 this.editorServicesArgs + "-DebugServiceOnly ",
@@ -463,11 +459,7 @@ export class SessionManager implements Middleware {
         ];
     }
 
-    private startPowerShell(
-        powerShellExePath: string,
-        isWindowsDevBuild: boolean,
-        bundledModulesPath: string,
-        startArgs: string) {
+    private startPowerShell() {
 
         this.setSessionStatus(
             "Starting PowerShell...",
@@ -480,9 +472,10 @@ export class SessionManager implements Middleware {
         this.languageServerProcess =
             new PowerShellProcess(
                 this.powerShellExePath,
+                this.bundledModulesPath,
                 "PowerShell Integrated Console",
                 this.log,
-                startArgs,
+                this.editorServicesArgs,
                 sessionFilePath,
                 this.sessionSettings);
 
