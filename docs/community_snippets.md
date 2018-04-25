@@ -62,9 +62,9 @@ Quickly add a `Write-Verbose` with the current date and time inserted before the
 
 If you'd like to add a snippet to this list, [open a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request) with the following changes:
 
-### Table of context
+### Table of contents
 
-You need to add an item to the table of context. The addition should follow the *alpha ordering* of the list.
+You need to add an item to the table of contents. The addition should follow the *alpha ordering* of the list.
 The ToC item template looks like this:
 
 ```md
