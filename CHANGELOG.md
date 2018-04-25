@@ -7,7 +7,7 @@
   Add a community snippet for date-annotated `Write-Verbose` messages.
 
 - [PowerShell/vscode-powershell #1228](https://github.com/PowerShell/vscode-powershell/issues/1228) -
-  Make comment-based help trigger always be `##` with a new setting `powershell.helpCompletion` to 
+  Make comment-based help trigger always be `##` with a new setting `powershell.helpCompletion` to
   allow you to select between help comment styles: `BlockComment` (default) or `LineComment`.
   You can also specify Disabled to disable this functionality.
 
@@ -17,7 +17,7 @@
 - [PowerShell/vscode-powershell #1243](https://github.com/PowerShell/vscode-powershell/issues/1243) -
   Support custom PowerShell executable paths in user configuration which can be selected (via name)
   in either user or workspace configuration.
-  
+
 - [PowerShell/vscode-powershell #1264](https://github.com/PowerShell/vscode-powershell/pull/1264) -
   Add support for [Visual Studio Live Share](https://code.visualstudio.com/visual-studio-live-share).
 
