@@ -1,5 +1,59 @@
 # vscode-powershell Release History
 
+## 1.7.0
+### Wednesday, April 25, 2018
+
+- [PowerShell/vscode-powershell #1285](https://github.com/PowerShell/vscode-powershell/pull/1285) -
+  Add a community snippet for date-annotated `Write-Verbose` messages.
+
+- [PowerShell/vscode-powershell #1228](https://github.com/PowerShell/vscode-powershell/issues/1228) -
+  Make comment-based help trigger customizable (between `##`, `<#` and disabled).
+
+- [PowerShell/vscode-powershell #603](https://github.com/PowerShell/vscode-powershell/issues/603) -
+  Fix PowerShell crashing on machines with IPv6 disabled.
+
+- [PowerShell/vscode-powershell #1243](https://github.com/PowerShell/vscode-powershell/issues/1243) -
+  Support custom PowerShell executable paths in user and workspace configurations.
+
+- [PowerShell/vscode-powershell #1264](https://github.com/PowerShell/vscode-powershell/pull/1264) -
+  Add support for [Visual Studio Live Share](https://code.visualstudio.com/visual-studio-live-share).
+
+- [PowerShell/vscode-powershell #1261](https://github.com/PowerShell/vscode-powershell/pull/1261) -
+  Add support for `$psEditor.GetEditorContext.CurrentFile.SaveAs("NewFileName.ps1")`.
+
+- [PowerShell/vscode-powershell #1252](https://github.com/PowerShell/vscode-powershell/pull/1252) -
+  Change the way the extension builds and runs, so that PowerShellEditorServices is self-contained.
+
+- [PowerShell/vscode-powershell #1248](https://github.com/PowerShell/vscode-powershell/pull/1248) -
+  Replace `$global:IsOSX` with `$global:IsMacOS`.
+
+- [PowerShell/vscode-powershell #1246](https://github.com/PowerShell/vscode-powershell/pull/1246) -
+  Create [community_snippets.md](./docs/community_snippets.md) for user created snippets.
+
+- [PowerShell/vscode-powershell #1155](https://github.com/PowerShell/vscode-powershell/issues/1155) -
+  Fix PSES crashes caused by running "Set PSScriptAnalyzer Rules" on an untitled file.
+
+- [PowerShell/vscode-powershell #1236](https://github.com/PowerShell/vscode-powershell/pull/1236) -
+  Stop an error occurring when VSCode trims trailing whitespace and sends document update messages.
+
+- [PowerShell/vscode-powershell #996](https://github.com/PowerShell/vscode-powershell/issues/996) -
+  Fix `Install-PSCode.ps1` crashing due to `$IsLinux` variable in older PowerShell versions.
+
+- [PowerShell/vscode-powershell #1234](https://github.com/PowerShell/vscode-powershell/pull/1234) -
+  Add snippets for Hashtable and PSCustomObject.
+
+- [PowerShell/vscode-powershell #1233](https://github.com/PowerShell/vscode-powershell/pull/1233) -
+  Add a keybinding for Show Addtional Commands to <kbd>Shift</kdb>-<kbd>Alt</kbd>-<kbd>S</kbd>.
+
+- [PowerShell/vscode-powershell #1227](https://github.com/PowerShell/vscode-powershell/pull/1227) -
+  Add an indicator for when PowerShell is running in the status bar.
+
+- [PowerShell/vscode-powershell #1225](https://github.com/PowerShell/vscode-powershell/pull/1225) -
+  Fix launch config not using temporary integrated console setting.
+
+- [PowerShell/vscode-powershell #1208](https://github.com/PowerShell/vscode-powershell/issues/1208) -
+  Stop configured temporary windows closing after running Pester tests.
+
 ## 1.6.0
 ### Thursday, February 22, 2018
 
