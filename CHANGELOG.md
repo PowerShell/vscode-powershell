@@ -7,14 +7,17 @@
   Add a community snippet for date-annotated `Write-Verbose` messages.
 
 - [PowerShell/vscode-powershell #1228](https://github.com/PowerShell/vscode-powershell/issues/1228) -
-  Make comment-based help trigger customizable (between `##`, `<#` and disabled).
+  Make comment-based help trigger always be `##` with a new setting `powershell.helpCompletion` to 
+  allow you to select between help comment styles: `BlockComment` (default) or `LineComment`.
+  You can also specify Disabled to disable this functionality.
 
 - [PowerShell/vscode-powershell #603](https://github.com/PowerShell/vscode-powershell/issues/603) -
   Fix PowerShell crashing on machines with IPv6 disabled.
 
 - [PowerShell/vscode-powershell #1243](https://github.com/PowerShell/vscode-powershell/issues/1243) -
-  Support custom PowerShell executable paths in user and workspace configurations.
-
+  Support custom PowerShell executable paths in user configuration which can be selected (via name)
+  in either user or workspace configuration.
+  
 - [PowerShell/vscode-powershell #1264](https://github.com/PowerShell/vscode-powershell/pull/1264) -
   Add support for [Visual Studio Live Share](https://code.visualstudio.com/visual-studio-live-share).
 
@@ -43,7 +46,7 @@
   Add snippets for Hashtable and PSCustomObject.
 
 - [PowerShell/vscode-powershell #1233](https://github.com/PowerShell/vscode-powershell/pull/1233) -
-  Add a keybinding for Show Addtional Commands to <kbd>Shift</kdb>-<kbd>Alt</kbd>-<kbd>S</kbd>.
+  Add a keybinding for Show Addtional Commands to <kbd>Shift</kbd>-<kbd>Alt</kbd>-<kbd>S</kbd>.
 
 - [PowerShell/vscode-powershell #1227](https://github.com/PowerShell/vscode-powershell/pull/1227) -
   Add an indicator for when PowerShell is running in the status bar.
