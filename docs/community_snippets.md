@@ -64,7 +64,7 @@ If you'd like to add a snippet to this list, [open a pull request](https://opens
 
 ### Table of contents
 
-You need to add an item to the table of context. The addition should follow the *alpha ordering* of the list.
+You need to add an item to the table of contents. The addition should follow the *alpha ordering* of the list.
 The ToC item template looks like this:
 
 ```md
