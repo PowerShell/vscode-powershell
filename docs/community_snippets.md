@@ -18,6 +18,7 @@ _To contribute, check out our [guide here](#contributing)._
 |:-----------------:|
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
+| [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
 
 ## Snippets
 
@@ -55,6 +56,27 @@ Quickly add a `Write-Verbose` with the current date and time inserted before the
         "Write-Verbose \"[$(Get-Date -format G)] ${1:message}\"$0"
     ],
     "description": "Pre-pend datetime for Write-Verbose"
+}
+```
+
+### Parameter-Credential
+
+Add a `-Credential` parameter that supports a PSCredential object in a variable, `-Credential (Get-Credential)`, or `-Credential Username` (will prompt). Includes an empty PSCredential object as the default value but this is the first tabstop so pressing backspace after inserting the snippet removes it. by @omniomi
+
+#### Snippet
+
+```json
+"Parameter-Credential": {
+    "prefix": "parameter-credential",
+    "body": [
+        "# Specifies the user account credentials to use when performing this task.\r",
+        "[Parameter()]\r",
+        "[ValidateNotNull()]\r",
+        "[System.Management.Automation.PSCredential]\r",
+        "[System.Management.Automation.Credential()]\r",
+        "$$Credential${1: = [System.Management.Automation.PSCredential]::Empty}"
+    ],
+    "description": "Parameter declaration snippet for a Credential parameter."
 }
 ```
 
