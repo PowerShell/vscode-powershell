@@ -16,10 +16,27 @@ _To contribute, check out our [guide here](#contributing)._
 
 | Table of Contents |
 |:-----------------:|
+| [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 
 ## Snippets
+
+### CalculatedProperty
+
+Create calculated property for use in Select Statements
+
+#### Snippet
+
+```json
+"Add Calculated Property": {
+	"prefix": "cf",
+	"body": [
+		"@{'Name' = '$1' ; 'Expression' = {$2}}",
+	],
+	"description": "Create calculated property for use in Select Statements"
+}
+```
 
 ### PSCustomObject
 
