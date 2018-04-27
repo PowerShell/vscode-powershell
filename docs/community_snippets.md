@@ -16,14 +16,38 @@ _To contribute, check out our [guide here](#contributing)._
 
 | Table of Contents |
 |:------------------|
+| [AssertMock](#assertmock): _Creates assert mock Pester test_ |
 | [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
+| [DataTable](#datatable): _Creates a DataTable_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
+| [IfShouldProcess](#ifshouldprocess): _Added If Should Process_ |
+| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
-| [DataTable](#datatable): _Creates a DataTable_ |
-| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
+
 
 ## Snippets
+
+### Assert Mock
+
+Creates Assert Mock for Pester Tests y @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "AssertMock": {
+        "prefix": "AssertMock",
+        "body": [
+            "$$assertMockParams = @{",
+                "'CommandName' = '${1:Command}'",
+                "'Times'       = ${2:1}",
+                "'Exactly'     = $$true",
+            "}",
+            "Assert-MockCalled @assertMockParams"
+        ],
+        "description": "AssertMock snippet for Pestering"
+    }
+```
 
 ### CalculatedProperty
 
@@ -90,6 +114,24 @@ Quickly add a `Write-Verbose` with the current date and time inserted before the
     ],
     "description": "Pre-pend datetime for Write-Verbose"
 }
+```
+
+### IfShouldProcess
+
+Add If Should Process with easy tab inputs
+
+#### Snippet
+
+```json
+"IfShouldProcess": {
+        "prefix": "IfShouldProcess",
+        "body": [
+            "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
+            "   # Place Code here",
+            "}"
+                ],
+            "description": "Creates an if should process"
+    }
 ```
 
 ### MaxColumnLengthinDataTable
