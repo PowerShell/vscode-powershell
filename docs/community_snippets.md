@@ -15,11 +15,11 @@ _To contribute, check out our [guide here](#contributing)._
 ## Table of contents
 
 | Table of Contents |
-|:-----------------:|
+|:------------------|
 | [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
-| [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
+| [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 
 ## Snippets
 
@@ -36,27 +36,6 @@ Create calculated property for use in Select Statements
 		"@{'Name' = '$1' ; 'Expression' = {$2}}",
 	],
 	"description": "Create calculated property for use in Select Statements"
-}
-```
-
-### PSCustomObject
-
-A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
-
-#### Snippet
-
-```json
-"PSCustomObject": {
-    "prefix": "PSCustomObject",
-    "body": [
-        "[PSCustomObject]@{\r",
-            "\t${item1} = ${Property1}\r",
-            "\t${item2} = ${Property2}\r",
-            "\t${item3} = ${Property3}\r",
-            "\t${item4} = ${Property4}\r",
-        "}"
-    ],
-    "description": "Creates a PSCustomObject"
 }
 ```
 
@@ -97,6 +76,27 @@ Add a `-Credential` parameter that supports a PSCredential object in a variable,
 }
 ```
 
+### PSCustomObject
+
+A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
+
+#### Snippet
+
+```json
+"PSCustomObject": {
+    "prefix": "PSCustomObject",
+    "body": [
+        "[PSCustomObject]@{\r",
+            "\t${item1} = ${Property1}\r",
+            "\t${item2} = ${Property2}\r",
+            "\t${item3} = ${Property3}\r",
+            "\t${item4} = ${Property4}\r",
+        "}"
+    ],
+    "description": "Creates a PSCustomObject"
+}
+```
+
 ## Contributing
 
 If you'd like to add a snippet to this list, [open a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request) with the following changes:
@@ -119,7 +119,7 @@ An example looks like this (NOTE: all lowercase link):
 which will show up in the ToC like this:
 
 | Table of Contents |
-|:-----------------:|
+|:------------------|
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject_ |
 
 ### Body
