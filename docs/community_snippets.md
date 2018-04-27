@@ -23,7 +23,8 @@ _To contribute, check out our [guide here](#contributing)._
 | [IfShouldProcess](#ifshouldprocess): _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
-| [PesterTestForParameter](#PesterTestForParameter): _Create Pester Test for Parameter_ |
+| [PesterTestForMandatoryParameter](#pestertestformandatoryparameter): _Create Pester test for a mandatory parameter_ |
+| [PesterTestForParameter](#pestertestforparameter): _Create Pester test for parameter_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 
 
@@ -179,6 +180,24 @@ Add a `-Credential` parameter that supports a PSCredential object in a variable,
     ],
     "description": "Parameter declaration snippet for a Credential parameter."
 }
+```
+
+### PesterTestForMandatoryParameter
+
+Quickly create a Pester Test for existence of a mandatory parameter by @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "Pester for Mandatory Pester": {
+        "prefix": "mandatoryParamPester",
+        "body": [
+            "It \"${1:FunctionName} Should have a mandatory parameter ${2:ParameterName}\" {",
+            "   (Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Attributes.Mandatory | Should -BeTrue",
+            "}"
+        ],
+        "description": "Pester Test for Parameter"
+    }
 ```
 
 ### PesterTestForParameter
