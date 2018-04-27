@@ -23,6 +23,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [IfShouldProcess](#ifshouldprocess): _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
+| [PesterTestForParameter](#PesterTestForParameter): _Create Pester Test for Parameter_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 
 
@@ -180,6 +181,23 @@ Add a `-Credential` parameter that supports a PSCredential object in a variable,
 }
 ```
 
+### PesterTestForParameter
+
+Quickly create a Pester Test for existence of a parameter by @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "Pester for Parameter": {
+        "prefix": "Param Pester",
+        "body": [
+            "It \"${1:FunctionName} Should have a parameter ${2:ParameterName}\" {",
+            "    (Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Count | Should -Be 1",
+            "}"
+        ],
+        "description": "Pester Test for Parameter"
+    }
+```
 ### PSCustomObject
 
 A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
