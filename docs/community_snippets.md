@@ -15,11 +15,66 @@ _To contribute, check out our [guide here](#contributing)._
 ## Table of contents
 
 | Table of Contents |
-|:-----------------:|
-| [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
+|:------------------|
+| [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
+| [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
+| [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 
 ## Snippets
+
+### CalculatedProperty
+
+Create calculated property for use in Select Statements
+
+#### Snippet
+
+```json
+"Add Calculated Property": {
+	"prefix": "cf",
+	"body": [
+		"@{'Name' = '$1' ; 'Expression' = {$2}}",
+	],
+	"description": "Create calculated property for use in Select Statements"
+}
+```
+
+### DateTimeWriteVerbose
+
+Quickly add a `Write-Verbose` with the current date and time inserted before the message you're going to write to the verbose stream, by @ThmsRynr.
+
+#### Snippet
+
+```json
+"DateTimeWriteVerbose": {
+    "prefix": "dtwv",
+    "body": [
+        "Write-Verbose \"[$(Get-Date -format G)] ${1:message}\"$0"
+    ],
+    "description": "Pre-pend datetime for Write-Verbose"
+}
+```
+
+### Parameter-Credential
+
+Add a `-Credential` parameter that supports a PSCredential object in a variable, `-Credential (Get-Credential)`, or `-Credential Username` (will prompt). Includes an empty PSCredential object as the default value but this is the first tabstop so pressing backspace after inserting the snippet removes it. by @omniomi
+
+#### Snippet
+
+```json
+"Parameter-Credential": {
+    "prefix": "parameter-credential",
+    "body": [
+        "# Specifies the user account credentials to use when performing this task.\r",
+        "[Parameter()]\r",
+        "[ValidateNotNull()]\r",
+        "[System.Management.Automation.PSCredential]\r",
+        "[System.Management.Automation.Credential()]\r",
+        "$$Credential${1: = [System.Management.Automation.PSCredential]::Empty}"
+    ],
+    "description": "Parameter declaration snippet for a Credential parameter."
+}
+```
 
 ### PSCustomObject
 
@@ -39,22 +94,6 @@ A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab t
         "}"
     ],
     "description": "Creates a PSCustomObject"
-}
-```
-
-### DateTimeWriteVerbose
-
-Quickly add a `Write-Verbose` with the current date and time inserted before the message you're going to write to the verbose stream, by @ThmsRynr.
-
-#### Snippet
-
-```json
-"DateTimeWriteVerbose": {
-    "prefix": "dtwv",
-    "body": [
-        "Write-Verbose \"[$(Get-Date -format G)] ${1:message}\"$0"
-    ],
-    "description": "Pre-pend datetime for Write-Verbose"
 }
 ```
 
@@ -80,7 +119,7 @@ An example looks like this (NOTE: all lowercase link):
 which will show up in the ToC like this:
 
 | Table of Contents |
-|:-----------------:|
+|:------------------|
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject_ |
 
 ### Body
