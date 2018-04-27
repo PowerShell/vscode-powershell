@@ -21,7 +21,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 | [DataTable](#datatable): _Creates a DataTable_ |
-| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets teh max length of string columns in datatables_ |
+| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
 
 ## Snippets
 
