@@ -8,6 +8,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, NotificationType, Position, Range, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export interface IExtensionCommand {
     name: string;
@@ -388,44 +389,100 @@ export class ExtensionCommandsFeature implements IFeature {
         return promise;
     }
 
+    /**
+     * Save a file, possibly to a new path. If the save is not possible, return a completed response
+     * @param saveFileDetails the object detailing the path of the file to save and optionally its new path to save to
+     */
     private async saveFile(saveFileDetails: ISaveFileDetails): Promise<EditorOperationResponse> {
-
-        // If the file to save can't be found, just complete the request
-        if (!this.findTextDocument(this.normalizeFilePath(saveFileDetails.filePath))) {
-            return EditorOperationResponse.Completed;
+        // Try to interpret the filepath as a URI, defaulting to "file://" if we don't succeed
+        let currentFileUri: vscode.Uri;
+        if (saveFileDetails.filePath.startsWith("untitled") || saveFileDetails.filePath.startsWith("file")) {
+            currentFileUri = vscode.Uri.parse(saveFileDetails.filePath);
+        } else {
+            currentFileUri = vscode.Uri.file(saveFileDetails.filePath);
         }
 
-        // If no newFile is given, just save the current file
-        if (!saveFileDetails.newPath) {
-            const doc = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
-            if (doc.isDirty) {
-                await doc.save();
+        let newFileAbsolutePath: string;
+        switch (currentFileUri.scheme) {
+            case "file":
+                // If the file to save can't be found, just complete the request
+                if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
+                    return EditorOperationResponse.Completed;
+                }
+
+                // If no newFile is given, just save the current file
+                if (!saveFileDetails.newPath) {
+                    const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
+                    if (doc.isDirty) {
+                        await doc.save();
+                    }
+
+                    return EditorOperationResponse.Completed;
+                }
+
+                // Make sure we have an absolute path
+                if (path.isAbsolute(saveFileDetails.newPath)) {
+                    newFileAbsolutePath = saveFileDetails.newPath;
+                } else {
+                    // If not, interpret the path as relative to the current file
+                    newFileAbsolutePath = path.resolve(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
+                }
+
+                await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
+                return EditorOperationResponse.Completed;
+
+            case "untitled":
+                // We need a new name to save an untitled file
+                if (!saveFileDetails.newPath) {
+                    return EditorOperationResponse.Completed;
+                }
+
+                // Make sure we have an absolute path
+                if (path.isAbsolute(saveFileDetails.newPath)) {
+                    newFileAbsolutePath = saveFileDetails.newPath;
+                } else {
+                    // If not, interpret the path as relative to the workspace root
+                    const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
+                    if (workspaceRootUri.scheme !== "file") {
+                        // We don't support URI schemes for file saves
+                        return EditorOperationResponse.Completed;
+                    }
+                    newFileAbsolutePath = path.resolve(workspaceRootUri.fsPath, saveFileDetails.newPath);
+                }
+
+                await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
+                return EditorOperationResponse.Completed;
+
+            default:
+                // TODO log something here about an unsupported URI scheme
+                return EditorOperationResponse.Completed;
+        }
+    }
+
+    /**
+     * Take a document available to vscode at the given URI and save it to the given absolute path
+     * @param documentUri the URI of the vscode document to save
+     * @param destinationAbsolutePath the absolute path to save the document contents to
+     */
+    private async saveDocumentContentToAbsolutePath(
+        documentUri: vscode.Uri,
+        destinationAbsolutePath: string): Promise<void> {
+            // Retrieve the text out of the current document
+            const oldDocument = await vscode.workspace.openTextDocument(documentUri);
+
+            // Write it to the new document path
+            try {
+                fs.writeFileSync(destinationAbsolutePath, oldDocument.getText());
+            } catch (e) {
+                const x = 1;
+                return;
             }
 
-            return EditorOperationResponse.Completed;
-        }
-
-        // Otherwise we want to save as a new file
-
-        // First turn the path we were given into an absolute path
-        // Relative paths are interpreted as relative to the original file
-        const newFileAbsolutePath = path.isAbsolute(saveFileDetails.newPath) ?
-            saveFileDetails.newPath :
-            path.resolve(path.dirname(saveFileDetails.filePath), saveFileDetails.newPath);
-
-        // Retrieve the text out of the current document
-        const oldDocument = await vscode.workspace.openTextDocument(saveFileDetails.filePath);
-
-        // Write it to the new document path
-        fs.writeFileSync(newFileAbsolutePath, oldDocument.getText());
-
-        // Finally open the new document
-        const newFileUri = vscode.Uri.file(newFileAbsolutePath);
-        const newFile = await vscode.workspace.openTextDocument(newFileUri);
-        vscode.window.showTextDocument(newFile, { preview: true });
-
-        return EditorOperationResponse.Completed;
-   }
+            // Finally open the new document
+            const newFileUri = vscode.Uri.file(destinationAbsolutePath);
+            const newFile = await vscode.workspace.openTextDocument(newFileUri);
+            vscode.window.showTextDocument(newFile, { preview: true });
+    }
 
     private normalizeFilePath(filePath: string): string {
         const platform = os.platform();
