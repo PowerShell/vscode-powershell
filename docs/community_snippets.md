@@ -16,12 +16,46 @@ _To contribute, check out our [guide here](#contributing)._
 
 | Table of Contents |
 |:------------------|
+| [AWSRegionDynamicParameter](#awsregiondynamicparameter): _Creates a dynamic parameter of current AWS regions by @jbruett_ |
 | [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 
 ## Snippets
+
+### AWSRegionDynamicParameter
+
+Creates a dynamic parameter of the current AWS regions.  Includes parameter validation.
+
+#### Snippet
+
+```json
+"AWSRegionDynamicParam": {
+	"prefix": "aws_region",
+	"body": [
+		"DynamicParam {",
+		"\t$ParamDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary",
+		"\t$CR_ParamName = 'Region'",
+		"\t$CR_AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]",
+		"\t$CR_Attribute = New-Object System.Management.Automation.ParameterAttribute",
+		"\t$CR_Attribute.HelpMessage = 'List all the regions to be included in the document'",
+		"\t$CR_Attribute.Mandatory = $true",
+		"\t$CR_Attribute.ValueFromPipelineByPropertyName = $true",
+		"\t$CR_AttributeCollection.add($CR_Attribute)",
+		"\t$CR_intRegions = Get-AWSRegion -IncludeChina | Select-Object -ExpandProperty Region",
+		"\t$CR_intRegions += Get-AWSRegion -IncludeGovCloud | Select-Object -ExpandProperty Region",
+		"\t$CR_intRegions = $CR_intRegions | Select-Object -Unique",
+		"\t$CR_ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($CR_intRegions)",
+		"\t$CR_AttributeCollection.add($CR_ValidateSetAttribute)",
+		"\t$CR_Param = New-Object System.Management.Automation.RuntimeDefinedParameter($CR_ParamName, [String[]],$CR_AttributeCollection)",
+		"\t$ParamDictionary.Add($CR_ParamName, $CR_Param)",
+		"\treturn $paramDictionary",
+		"\t}"
+	],
+	"description": "A dynamic parameter that builds a list of AWS regions"
+}
+```
 
 ### CalculatedProperty
 
