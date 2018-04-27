@@ -20,6 +20,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
+| [DataTable](#datatable): _Creates a DataTable_ |
 
 ## Snippets
 
@@ -37,6 +38,41 @@ Create calculated property for use in Select Statements
 	],
 	"description": "Create calculated property for use in Select Statements"
 }
+```
+
+### DataTable
+
+Quickly create a Data Table object by @SQLDBAWithABeard.
+
+#### Snippet
+
+```json
+"DataTable": {
+        "prefix": "DataTable",
+        "body": [
+             "# Create DataTable Object",
+ "$$table = New-Object system.Data.DataTable $$TableName",
+
+ "\r# Create Columns",
+ "$$col1 = New-Object system.Data.DataColumn NAME1,([string])",
+ "$$col2 = New-Object system.Data.DataColumn NAME2,([decimal])",
+
+ "\r#Add the Columns to the table",
+ "$$table.columns.add($$col1)",
+ "$$table.columns.add($$col2)",
+
+ "\r# Create a new Row",
+ "$$row = $$table.NewRow() ",
+
+ "\r# Add values to new row",
+ "$$row.Name1 = 'VALUE'",
+ "$$row.NAME2 = 'VALUE'",
+
+ "\r#Add new row to table",
+ "$$table.Rows.Add($$row)"
+        ],
+        "description": "Creates a Data Table Object"
+    }
 ```
 
 ### DateTimeWriteVerbose
