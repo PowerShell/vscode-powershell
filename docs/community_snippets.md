@@ -21,6 +21,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 | [DataTable](#datatable): _Creates a DataTable_ |
+| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets teh max length of string columns in datatables_ |
 
 ## Snippets
 
@@ -89,6 +90,31 @@ Quickly add a `Write-Verbose` with the current date and time inserted before the
     ],
     "description": "Pre-pend datetime for Write-Verbose"
 }
+```
+
+### MaxColumnLengthinDataTable
+
+Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads into a SQL Server table with fixed column widths by @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "Max Length of Datatable": {
+        "prefix": "Max Length of Datatable",
+        "body": [
+            "$$columns = ($$datatable | Get-Member -MemberType Property).Name",
+            "foreach($$column in $$Columns) {",
+            "    $$max = 0",
+            "    foreach ($$a in $$datatable){",
+            "        if($$max -lt $$a.$$column.length){",
+            "            $$max = $$a.$$column.length",
+            "        }",
+            "    }",
+            "    Write-Output \"$$column max length is $$max\"",
+            "}"
+        ],
+        "description": "Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads"
+    }
 ```
 
 ### Parameter-Credential
