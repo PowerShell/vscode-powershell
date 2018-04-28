@@ -56,7 +56,8 @@ export class HelpCompletionFeature implements IFeature {
 
     public onEvent(changeEvent: TextDocumentChangeEvent): void {
         if (!(changeEvent && changeEvent.contentChanges)) {
-            this.log.write(`Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
+            this.log.writeWarning("<HelpCompletion>: " +
+                `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
             return;
         }
 

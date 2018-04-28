@@ -173,10 +173,10 @@ export class ExtensionCommandsFeature implements IFeature {
     private languageClient: LanguageClient;
     private extensionCommands: IExtensionCommand[] = [];
 
-    constructor() {
+    constructor(private log: Logger) {
         this.command = vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", () => {
             if (this.languageClient === undefined) {
-                // TODO: Log error message
+                this.log.writeAndShowError(`<ExtensionCommands>: Unable to instantiate; language client undefined.`);
                 return;
             }
 
@@ -425,7 +425,7 @@ export class ExtensionCommandsFeature implements IFeature {
                     newFileAbsolutePath = saveFileDetails.newPath;
                 } else {
                     // If not, interpret the path as relative to the current file
-                    newFileAbsolutePath = path.resolve(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
+                    newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
                 }
 
                 await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
@@ -447,14 +447,18 @@ export class ExtensionCommandsFeature implements IFeature {
                     if (workspaceRootUri.scheme !== "file") {
                         return EditorOperationResponse.Completed;
                     }
-                    newFileAbsolutePath = path.resolve(workspaceRootUri.fsPath, saveFileDetails.newPath);
+                    newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
                 }
 
                 await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
                 return EditorOperationResponse.Completed;
 
             default:
-                // TODO log something here about an unsupported URI scheme
+                // Other URI schemes are not supported
+                const msg = JSON.stringify(saveFileDetails);
+                this.log.writeVerbose(
+                    `<ExtensionCommands>: Saving a document with scheme '${currentFileUri.scheme}' ` +
+                    `is currently unsupported. Message: '${msg}'`);
                 return EditorOperationResponse.Completed;
         }
     }
@@ -472,9 +476,11 @@ export class ExtensionCommandsFeature implements IFeature {
 
             // Write it to the new document path
             try {
+                // TODO: Change this to be asyncronous
                 fs.writeFileSync(destinationAbsolutePath, oldDocument.getText());
             } catch (e) {
-                const x = 1;
+                this.log.writeAndShowWarning("<ExtensionCommands>: " +
+                    `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
                 return;
             }
 

@@ -121,7 +121,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new ShowHelpFeature(),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
-        new ExtensionCommandsFeature(),
+        new ExtensionCommandsFeature(logger),
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
