@@ -443,8 +443,8 @@ export class ExtensionCommandsFeature implements IFeature {
                 } else {
                     // If not, interpret the path as relative to the workspace root
                     const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
+                    // We don't saving to a non-file URI-schemed workspace
                     if (workspaceRootUri.scheme !== "file") {
-                        // We don't support URI schemes for file saves
                         return EditorOperationResponse.Completed;
                     }
                     newFileAbsolutePath = path.resolve(workspaceRootUri.fsPath, saveFileDetails.newPath);
