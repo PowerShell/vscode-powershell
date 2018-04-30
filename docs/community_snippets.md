@@ -16,12 +16,40 @@ _To contribute, check out our [guide here](#contributing)._
 
 | Table of Contents |
 |:------------------|
+| [AssertMock](#assertmock): _Creates assert mock Pester test_ |
 | [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
+| [DataTable](#datatable): _Creates a DataTable_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
+| [IfShouldProcess](#ifshouldprocess): _Added If Should Process_ |
+| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
+| [PesterTestForMandatoryParameter](#pestertestformandatoryparameter): _Create Pester test for a mandatory parameter_ |
+| [PesterTestForParameter](#pestertestforparameter): _Create Pester test for parameter_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
 
+
 ## Snippets
+
+### Assert Mock
+
+Creates Assert Mock for Pester Tests y @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "AssertMock": {
+        "prefix": "AssertMock",
+        "body": [
+            "$$assertMockParams = @{",
+                "'CommandName' = '${1:Command}'",
+                "'Times'       = ${2:1}",
+                "'Exactly'     = $$true",
+            "}",
+            "Assert-MockCalled @assertMockParams"
+        ],
+        "description": "AssertMock snippet for Pestering"
+    }
+```
 
 ### CalculatedProperty
 
@@ -39,6 +67,41 @@ Create calculated property for use in Select Statements
 }
 ```
 
+### DataTable
+
+Quickly create a Data Table object by @SQLDBAWithABeard.
+
+#### Snippet
+
+```json
+"DataTable": {
+        "prefix": "DataTable",
+        "body": [
+             "# Create DataTable Object",
+ "$$table = New-Object system.Data.DataTable $$TableName",
+
+ "\r# Create Columns",
+ "$$col1 = New-Object system.Data.DataColumn NAME1,([string])",
+ "$$col2 = New-Object system.Data.DataColumn NAME2,([decimal])",
+
+ "\r#Add the Columns to the table",
+ "$$table.columns.add($$col1)",
+ "$$table.columns.add($$col2)",
+
+ "\r# Create a new Row",
+ "$$row = $$table.NewRow() ",
+
+ "\r# Add values to new row",
+ "$$row.Name1 = 'VALUE'",
+ "$$row.NAME2 = 'VALUE'",
+
+ "\r#Add new row to table",
+ "$$table.Rows.Add($$row)"
+        ],
+        "description": "Creates a Data Table Object"
+    }
+```
+
 ### DateTimeWriteVerbose
 
 Quickly add a `Write-Verbose` with the current date and time inserted before the message you're going to write to the verbose stream, by @ThmsRynr.
@@ -53,6 +116,49 @@ Quickly add a `Write-Verbose` with the current date and time inserted before the
     ],
     "description": "Pre-pend datetime for Write-Verbose"
 }
+```
+
+### IfShouldProcess
+
+Add If Should Process with easy tab inputs
+
+#### Snippet
+
+```json
+"IfShouldProcess": {
+        "prefix": "IfShouldProcess",
+        "body": [
+            "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
+            "   # Place Code here",
+            "}"
+                ],
+            "description": "Creates an if should process"
+    }
+```
+
+### MaxColumnLengthinDataTable
+
+Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads into a SQL Server table with fixed column widths by @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "Max Length of Datatable": {
+        "prefix": "Max Length of Datatable",
+        "body": [
+            "$$columns = ($$datatable | Get-Member -MemberType Property).Name",
+            "foreach($$column in $$Columns) {",
+            "    $$max = 0",
+            "    foreach ($$a in $$datatable){",
+            "        if($$max -lt $$a.$$column.length){",
+            "            $$max = $$a.$$column.length",
+            "        }",
+            "    }",
+            "    Write-Output \"$$column max length is $$max\"",
+            "}"
+        ],
+        "description": "Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads"
+    }
 ```
 
 ### Parameter-Credential
@@ -76,6 +182,41 @@ Add a `-Credential` parameter that supports a PSCredential object in a variable,
 }
 ```
 
+### PesterTestForMandatoryParameter
+
+Quickly create a Pester Test for existence of a mandatory parameter by @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "Pester for Mandatory Pester": {
+        "prefix": "mandatoryParamPester",
+        "body": [
+            "It \"${1:FunctionName} Should have a mandatory parameter ${2:ParameterName}\" {",
+            "   (Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Attributes.Mandatory | Should -BeTrue",
+            "}"
+        ],
+        "description": "Pester Test for Parameter"
+    }
+```
+
+### PesterTestForParameter
+
+Quickly create a Pester Test for existence of a parameter by @SQLDBAWithABeard
+
+#### Snippet
+
+```json
+    "Pester for Parameter": {
+        "prefix": "Param Pester",
+        "body": [
+            "It \"${1:FunctionName} Should have a parameter ${2:ParameterName}\" {",
+            "    (Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Count | Should -Be 1",
+            "}"
+        ],
+        "description": "Pester Test for Parameter"
+    }
+```
 ### PSCustomObject
 
 A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
