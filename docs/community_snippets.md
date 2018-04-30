@@ -16,17 +16,17 @@ _To contribute, check out our [guide here](#contributing)._
 
 | Table of Contents |
 |:------------------|
-| [AssertMock](#assertmock): _Creates assert mock Pester test_ |
+| [AssertMock](#assert_mock): _Creates assert mock Pester test_ |
 | [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
 | [DataTable](#datatable): _Creates a DataTable_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
+| [Error-Terminating](#error-terminating): _Create a full terminating error by @omniomi_ |
 | [IfShouldProcess](#ifshouldprocess): _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
 | [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
 | [PesterTestForMandatoryParameter](#pestertestformandatoryparameter): _Create Pester test for a mandatory parameter_ |
 | [PesterTestForParameter](#pestertestforparameter): _Create Pester test for parameter_ |
 | [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
-
 
 ## Snippets
 
@@ -115,6 +115,24 @@ Quickly add a `Write-Verbose` with the current date and time inserted before the
         "Write-Verbose \"[$(Get-Date -format G)] ${1:message}\"$0"
     ],
     "description": "Pre-pend datetime for Write-Verbose"
+}
+```
+
+### Error-Terminating
+
+Quickly add a fully defined error record and throw. by @omniomi
+
+```json
+"Throw Terminating Error": {
+    "prefix": "error-terminating",
+    "body": [
+        "\\$Exception     = New-Object ${1:System.ArgumentException} (\"${2:Invalid argument provided.}\")\r",
+        "\\$ErrorCategory = [System.Management.Automation.ErrorCategory]::${3:InvalidArgument}\r",
+        "# Exception, ErrorId as [string], Category, and TargetObject (e.g. the parameter that was invalid)\r",
+        "\\$ErrorRecord   = New-Object System.Management.Automation.ErrorRecord(\\$Exception, '${4:InvalidArgument}', \\$ErrorCategory, ${5:\\$null})\r",
+        "\\$PSCmdlet.ThrowTerminatingError(\\$ErrorRecord)"
+    ],
+    "description": "Throw a full terminating error."
 }
 ```
 
