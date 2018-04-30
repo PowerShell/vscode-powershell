@@ -176,7 +176,8 @@ export class ExtensionCommandsFeature implements IFeature {
     constructor(private log: Logger) {
         this.command = vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", () => {
             if (this.languageClient === undefined) {
-                this.log.writeAndShowError(`<ExtensionCommands>: Unable to instantiate; language client undefined.`);
+                this.log.writeAndShowError(`<${ExtensionCommandsFeature.name}>: ` +
+                    "Unable to instantiate; language client undefined.");
                 return;
             }
 
@@ -457,7 +458,7 @@ export class ExtensionCommandsFeature implements IFeature {
                 // Other URI schemes are not supported
                 const msg = JSON.stringify(saveFileDetails);
                 this.log.writeVerbose(
-                    `<ExtensionCommands>: Saving a document with scheme '${currentFileUri.scheme}' ` +
+                    `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
                     `is currently unsupported. Message: '${msg}'`);
                 return EditorOperationResponse.Completed;
         }
@@ -479,7 +480,7 @@ export class ExtensionCommandsFeature implements IFeature {
                 // TODO: Change this to be asyncronous
                 fs.writeFileSync(destinationAbsolutePath, oldDocument.getText());
             } catch (e) {
-                this.log.writeAndShowWarning("<ExtensionCommands>: " +
+                this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
                     `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
                 return;
             }
