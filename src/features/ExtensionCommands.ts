@@ -428,9 +428,7 @@ export class ExtensionCommandsFeature implements IFeature {
                     // If not, interpret the path as relative to the current file
                     newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
                 }
-
-                await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
-                return EditorOperationResponse.Completed;
+                break;
 
             case "untitled":
                 // We need a new name to save an untitled file
@@ -444,15 +442,13 @@ export class ExtensionCommandsFeature implements IFeature {
                 } else {
                     // If not, interpret the path as relative to the workspace root
                     const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
-                    // We don't saving to a non-file URI-schemed workspace
+                    // We don't support saving to a non-file URI-schemed workspace
                     if (workspaceRootUri.scheme !== "file") {
                         return EditorOperationResponse.Completed;
                     }
                     newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
                 }
-
-                await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
-                return EditorOperationResponse.Completed;
+                break;
 
             default:
                 // Other URI schemes are not supported
@@ -462,6 +458,10 @@ export class ExtensionCommandsFeature implements IFeature {
                     `is currently unsupported. Message: '${msg}'`);
                 return EditorOperationResponse.Completed;
         }
+
+        await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
+        return EditorOperationResponse.Completed;
+
     }
 
     /**
@@ -478,7 +478,14 @@ export class ExtensionCommandsFeature implements IFeature {
             // Write it to the new document path
             try {
                 // TODO: Change this to be asyncronous
-                fs.writeFileSync(destinationAbsolutePath, oldDocument.getText());
+                await new Promise<void>((resolve, reject) => {
+                    fs.writeFile(destinationAbsolutePath, oldDocument.getText(), (err) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        return resolve();
+                    });
+                });
             } catch (e) {
                 this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
                     `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
