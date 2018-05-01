@@ -16,7 +16,7 @@ _To contribute, check out our [guide here](#contributing)._
 
 | Snippet name | Description |
 | --------- | ---------|
-| [AssertMock](#assert_mock) | _Creates assert mock Pester test_ |
+| [AssertMock](#assert-mock) | _Creates assert mock Pester test_ |
 | [AWSRegionDynamicParameter](#awsregiondynamicparameter) | _Creates a dynamic parameter of current AWS regions by @jbruett_ |
 | [CalculatedProperty](#calculatedproperty) | _Create a calculated property for use in a select-object call by @corbob_ |
 | [DataTable](#datatable) | _Creates a DataTable_ |
