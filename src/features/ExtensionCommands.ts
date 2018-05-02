@@ -444,10 +444,20 @@ export class ExtensionCommandsFeature implements IFeature {
                 if (path.isAbsolute(saveFileDetails.newPath)) {
                     newFileAbsolutePath = saveFileDetails.newPath;
                 } else {
+                    // In fresh contexts, workspaceFolders is not defined...
+                    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+                        this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
+                            "Try saving to an absolute path, or open a workspace.");
+                        return EditorOperationResponse.Completed;
+                    }
+
                     // If not, interpret the path as relative to the workspace root
                     const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
                     // We don't support saving to a non-file URI-schemed workspace
                     if (workspaceRootUri.scheme !== "file") {
+                        this.log.writeAndShowWarning(
+                            "Cannot save untitled file to a relative path in an untitled workspace. " +
+                            "Try saving to an absolute path or opening a workspace folder.");
                         return EditorOperationResponse.Completed;
                     }
                     newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
