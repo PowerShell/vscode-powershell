@@ -408,6 +408,7 @@ export class ExtensionCommandsFeature implements IFeature {
             case "file":
                 // If the file to save can't be found, just complete the request
                 if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
+                    this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
                     return EditorOperationResponse.Completed;
                 }
 
@@ -417,7 +418,6 @@ export class ExtensionCommandsFeature implements IFeature {
                     if (doc.isDirty) {
                         await doc.save();
                     }
-
                     return EditorOperationResponse.Completed;
                 }
 
@@ -433,6 +433,10 @@ export class ExtensionCommandsFeature implements IFeature {
             case "untitled":
                 // We need a new name to save an untitled file
                 if (!saveFileDetails.newPath) {
+                    // TODO: Create a class handle vscode warnings and errors so we can warn easily
+                    //       without logging
+                    this.log.writeAndShowWarning(
+                        "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
                     return EditorOperationResponse.Completed;
                 }
 
