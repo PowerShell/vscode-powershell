@@ -14,20 +14,20 @@ _To contribute, check out our [guide here](#contributing)._
 
 ## Table of contents
 
-| Table of Contents |
-|:------------------|
-| [AssertMock](#assert_mock): _Creates assert mock Pester test_ |
-| [AWSRegionDynamicParameter](#awsregiondynamicparameter): _Creates a dynamic parameter of current AWS regions by @jbruett_ |
-| [CalculatedProperty](#calculatedproperty): _Create a calculated property for use in a select-object call by @corbob_ |
-| [DataTable](#datatable): _Creates a DataTable_ |
-| [DateTimeWriteVerbose](#datetimewriteverbose): _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
-| [Error-Terminating](#error-terminating): _Create a full terminating error by @omniomi_ |
-| [IfShouldProcess](#ifshouldprocess): _Added If Should Process_ |
-| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable): _Gets the max length of string columns in datatables_ |
-| [Parameter-Credential](#parameter-credential): _Add a standard credential parameter to your function by @omniomi_ |
-| [PesterTestForMandatoryParameter](#pestertestformandatoryparameter): _Create Pester test for a mandatory parameter_ |
-| [PesterTestForParameter](#pestertestforparameter): _Create Pester test for parameter_ |
-| [PSCustomObject](#pscustomobject): _A simple PSCustomObject by @brettmillerb_ |
+| Snippet name | Description |
+| --------- | ---------|
+| [AssertMock](#assert-mock) | _Creates assert mock Pester test_ |
+| [AWSRegionDynamicParameter](#awsregiondynamicparameter) | _Creates a dynamic parameter of current AWS regions by @jbruett_ |
+| [CalculatedProperty](#calculatedproperty) | _Create a calculated property for use in a select-object call by @corbob_ |
+| [DataTable](#datatable) | _Creates a DataTable_ |
+| [DateTimeWriteVerbose](#datetimewriteverbose) | _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
+| [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
+| [IfShouldProcess](#ifshouldprocess) | _Added If Should Process_ |
+| [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
+| [Parameter-Credential](#parameter-credential) | _Add a standard credential parameter to your function by @omniomi_ |
+| [PesterTestForMandatoryParameter](#pestertestformandatoryparameter) | _Create Pester test for a mandatory parameter_ |
+| [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
+| [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
 
 ## Snippets
 
@@ -302,20 +302,20 @@ You need to add an item to the table of contents. The addition should follow the
 The ToC item template looks like this:
 
 ```md
-| [Name of snippet](link to header of your snippet): _some short description_ |
+| [Name of snippet](link to header of your snippet) | _some short description_ |
 ```
 
 An example looks like this (NOTE: all lowercase link):
 
 ```md
-| [PSCustomObject](#pscustomobject): _A simple PSCustomObject_ |
+| [PSCustomObject](#pscustomobject) |  _A simple PSCustomObject_ |
 ```
 
 which will show up in the ToC like this:
 
-| Table of Contents |
-|:------------------|
-| [PSCustomObject](#pscustomobject): _A simple PSCustomObject_ |
+| Snippet Name | Description |
+|--------- | ---------|
+| [PSCustomObject](#pscustomobject) | _A simple PSCustomObject_ |
 
 ### Body
 
