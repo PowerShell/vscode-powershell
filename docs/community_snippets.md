@@ -302,13 +302,13 @@ You need to add an item to the table of contents. The addition should follow the
 The ToC item template looks like this:
 
 ```md
-| [Name of snippet](link to header of your snippet): _some short description_ |
+| [Name of snippet](link to header of your snippet) | _some short description_ |
 ```
 
 An example looks like this (NOTE: all lowercase link):
 
 ```md
-| [PSCustomObject](#pscustomobject): _A simple PSCustomObject_ |
+| [PSCustomObject](#pscustomobject) |  _A simple PSCustomObject_ |
 ```
 
 which will show up in the ToC like this:
