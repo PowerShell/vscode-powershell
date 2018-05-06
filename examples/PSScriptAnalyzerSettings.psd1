@@ -1,5 +1,12 @@
+# Use the PowerShell extension setting `powershell.scriptAnalysis.settingsPath` to get the current workspace
+# to use this PSScriptAnalyzerSettings.psd1 file to configure code analysis in Visual Studio Code.
+# This setting is configured in the workspace's `.vscode\settings.json`.
+#
 # For more information on PSScriptAnalyzer settings see:
 # https://github.com/PowerShell/PSScriptAnalyzer/blob/master/README.md#settings-support-in-scriptanalyzer
+#
+# You can see the predefined PSScriptAnalyzer settings here:
+# https://github.com/PowerShell/PSScriptAnalyzer/tree/master/Engine/Settings
 @{
     # Only diagnostic records of the specified severity will be generated.
     # Uncomment the following line if you only want Errors and Warnings but
@@ -27,45 +34,8 @@
 
     # You can use rule configuration to configure rules that support it:
     #Rules = @{
-    #     PSAlignAssignmentStatement = @{
-    #         Enable         = $true
-    #         CheckHashtable = $true
-    #     }
     #     PSAvoidUsingCmdletAliases = @{
     #         Whitelist = @("cd")
-    #     }
-    #     PSPlaceCloseBrace = @{
-    #         Enable             = $true
-    #         NoEmptyLineBefore  = $false
-    #         IgnoreOneLineBlock = $true
-    #         NewLineAfter       = $true
-    #     }
-    #     PSPlaceOpenBrace = @{
-    #         Enable             = $true
-    #         OnSameLine         = $true
-    #         NewLineAfter       = $true
-    #         IgnoreOneLineBlock = $true
-    #     }
-    #     PSProvideCommentHelp = @{
-    #         Enable                  = $true
-    #         ExportedOnly            = $false
-    #         BlockComment            = $true
-    #         VSCodeSnippetCorrection = $false
-    #         Placement               = "before"
-    #     }
-    #     PSUseCompatibleCmdlets = @{
-    #         compatibility = @("core-6.0.0-alpha-windows", "core-6.0.0-alpha-linux")
-    #     }
-    #     PSUseConsistentIndentation = @{
-    #         Enable          = $true
-    #         IndentationSize = 4
-    #     }
-    #     PSUseConsistentWhitespace = @{
-    #         Enable         = $true
-    #         CheckOpenBrace = $true
-    #         CheckOpenParen = $true
-    #         CheckOperator  = $true
-    #         CheckSeparator = $true
     #     }
     # }
 }
