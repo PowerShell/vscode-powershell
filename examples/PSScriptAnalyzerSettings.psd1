@@ -34,8 +34,8 @@
 
     # You can use rule configuration to configure rules that support it:
     #Rules = @{
-    #     PSAvoidUsingCmdletAliases = @{
-    #         Whitelist = @("cd")
-    #     }
-    # }
+    #    PSAvoidUsingCmdletAliases = @{
+    #        Whitelist = @("cd")
+    #    }
+    #}
 }
