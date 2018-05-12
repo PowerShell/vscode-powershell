@@ -1,3 +1,9 @@
+---
+name: Bug report 🐛
+about: Report errors or unexpected behavior 🤔
+
+---
+
 <!--
 
 BEFORE SUBMITTING A NEW ISSUE, PLEASE READ THE FAQ!!
@@ -5,6 +11,10 @@ https://github.com/PowerShell/vscode-powershell/wiki/FAQ
 
 If your issue is not addressed by the FAQ, please
 fill in the following details so that we can help you!
+
+IMPORTANT: you can generate a bug report directly from the
+PowerShell extension in Visual Studio Code by selecting
+"PowerShell: Upload Bug Report to GitHub" from the command palette.
 
 The more repro details you can provide, along with a zip
 of the log files from your session, the better the chances
