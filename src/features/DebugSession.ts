@@ -178,20 +178,9 @@ export class SpecifyScriptArgsFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
     private context: vscode.ExtensionContext;
-    private emptyInputBoxBugFixed: boolean;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
-
-        const vscodeVersionArray = vscode.version.split(".");
-        const editorVersion = {
-            major: Number(vscodeVersionArray[0]),
-            minor: Number(vscodeVersionArray[1]),
-        };
-
-        this.emptyInputBoxBugFixed =
-            ((editorVersion.major > 1) ||
-            ((editorVersion.major === 1) && (editorVersion.minor > 12)));
 
         this.command =
             vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
@@ -207,7 +196,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
         this.command.dispose();
     }
 
-    private specifyScriptArguments(): Thenable<string[] | string> {
+    private specifyScriptArguments(): Thenable<string> {
         const powerShellDbgScriptArgsKey = "powerShellDebugScriptArgs";
 
         const options: vscode.InputBoxOptions = {
@@ -215,21 +204,16 @@ export class SpecifyScriptArgsFeature implements IFeature {
             placeHolder: "Enter script arguments or leave empty to pass no args",
         };
 
-        if (this.emptyInputBoxBugFixed) {
-            const prevArgs = this.context.workspaceState.get(powerShellDbgScriptArgsKey, "");
-            if (prevArgs.length > 0) {
-                options.value = prevArgs;
-            }
+        const prevArgs = this.context.workspaceState.get(powerShellDbgScriptArgsKey, "");
+        if (prevArgs.length > 0) {
+            options.value = prevArgs;
         }
 
         return vscode.window.showInputBox(options).then((text) => {
             // When user cancel's the input box (by pressing Esc), the text value is undefined.
+            // Let's not blow away the previous settting.
             if (text !== undefined) {
-                if (this.emptyInputBoxBugFixed) {
-                   this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
-                }
-
-                return new Array(text);
+                this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
             }
 
             return text;
