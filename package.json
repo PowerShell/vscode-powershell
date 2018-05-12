@@ -401,31 +401,31 @@
           "description": "Specifies the full path to a PowerShell executable. Changes the installation of PowerShell used for language and debugging services."
         },
         "powershell.powerShellAdditionalExePaths": {
-            "type":"array",
-            "description": "Specifies an array of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
-            "isExecutable": true,
-            "uniqueItems": true,
-            "items": {
-                "type": "object",
-                "required":[
-                    "versionName",
-                    "exePath"
-                ],
-                "properties": {
-                    "versionName": {
-                        "type":"string",
-                        "description": "Specifies the version name of this PowerShell executable. The version name can be referenced via the powershell.powerShellDefaultVersion setting."
-                    },
-                    "exePath": {
-                        "type":"string",
-                        "description": "Specifies the path to the PowerShell executable. Typically this is a path to a non-standard install location."
-                    }
-                }
+          "type": "array",
+          "description": "Specifies an array of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
+          "isExecutable": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": [
+              "versionName",
+              "exePath"
+            ],
+            "properties": {
+              "versionName": {
+                "type": "string",
+                "description": "Specifies the version name of this PowerShell executable. The version name can be referenced via the powershell.powerShellDefaultVersion setting."
+              },
+              "exePath": {
+                "type": "string",
+                "description": "Specifies the path to the PowerShell executable. Typically this is a path to a non-standard install location."
+              }
             }
+          }
         },
         "powershell.powerShellDefaultVersion": {
-            "type":"string",
-            "description": "Specifies the name of the PowerShell version used in the startup session when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6.0.2 (x64)\"."
+          "type": "string",
+          "description": "Specifies the name of the PowerShell version used in the startup session when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6.0.2 (x64)\"."
         },
         "powershell.startAutomatically": {
           "type": "boolean",
