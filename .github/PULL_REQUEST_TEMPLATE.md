@@ -11,5 +11,3 @@ Please mark anything not applicable to this PR `NA`.
 - [ ] Summarized changes
 - [ ] This PR is ready to merge and is not work in progress
     - If the PR is work in progress, please add the prefix `WIP:` to the beginning of the title and remove the prefix when the PR is ready
-
-@tylerl0706
