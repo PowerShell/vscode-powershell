@@ -1,5 +1,5 @@
 ---
-name: Editor Syntax Colorization bug report ❓
+name: Editor Syntax Colorization bug report 🌈
 about: Editor syntax colorization bugs are tracked in a separate GitHub repo.
 
 ---
