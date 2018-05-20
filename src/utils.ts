@@ -26,15 +26,9 @@ export function getPipePath(pipeName: string) {
     if (os.platform() === "win32") {
         return "\\\\.\\pipe\\" + pipeName;
     } else {
-        // On UNIX platforms the pipe will live under the temp path
-        // For details on how this path is computed, see the corefx
-        // source for System.IO.Pipes.PipeStream:
-        // tslint:disable-next-line:max-line-length
-        // https://github.com/dotnet/corefx/blob/d0dc5fc099946adc1035b34a8b1f6042eddb0c75/src/System.IO.Pipes/src/System/IO/Pipes/PipeStream.Unix.cs#L340
-        return path.resolve(
-            os.tmpdir(),
-            ".dotnet", "corefx", "pipe",
-            pipeName);
+        // Windows uses NamedPipes where non-Windows platforms use Unix Domain Sockets.
+        // This requires connecting to the pipe file in different locations on Windows vs non-Windows.
+        return path.join(os.tmpdir(), `CoreFxPipe_${pipeName}`);
     }
 }
 
@@ -46,6 +40,8 @@ export interface IEditorServicesSessionDetails {
     channel: string;
     languageServicePort: number;
     debugServicePort: number;
+    languageServicePipeName: string;
+    debugServicePipeName: string;
 }
 
 export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;

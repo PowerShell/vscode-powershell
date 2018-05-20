@@ -3,6 +3,7 @@
  *--------------------------------------------------------*/
 
 import cp = require("child_process");
+import crypto = require("crypto");
 import fs = require("fs");
 import net = require("net");
 import os = require("os");
@@ -165,19 +166,23 @@ export class SessionManager implements Middleware {
                 }
             }
 
+            // Generate a random id for the named pipes in case they have multiple instances of PSES running
+            const id = crypto.randomBytes(10).toString("hex");
             this.editorServicesArgs =
-                "-HostName 'Visual Studio Code Host' " +
-                "-HostProfileId 'Microsoft.VSCode' " +
-                "-HostVersion '" + this.hostVersion + "' " +
-                "-AdditionalModules @('PowerShellEditorServices.VSCode') " +
-                "-BundledModulesPath '" + this.bundledModulesPath + "' " +
-                "-EnableConsoleRepl ";
+                `-HostName 'Visual Studio Code Host' ` +
+                `-HostProfileId 'Microsoft.VSCode' ` +
+                `-HostVersion '${this.hostVersion}'` +
+                `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
+                `-BundledModulesPath '${this.bundledModulesPath}'` +
+                `-EnableConsoleRepl ` +
+                `-LanguageServicePipeName LanguageService_${id}.pipe ` +
+                `-DebugServicePipeName DebugService_${id}.pipe `;
 
             if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
-                this.editorServicesArgs += "-WaitForDebugger ";
+                this.editorServicesArgs += `-WaitForDebugger `;
             }
             if (this.sessionSettings.developer.editorServicesLogLevel) {
-                this.editorServicesArgs += "-LogLevel '" + this.sessionSettings.developer.editorServicesLogLevel + "' ";
+                this.editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
             }
 
             this.startPowerShell();
@@ -531,18 +536,18 @@ export class SessionManager implements Middleware {
 
     private startLanguageClient(sessionDetails: utils.IEditorServicesSessionDetails) {
 
-        const port = sessionDetails.languageServicePort;
+        const pipeName = sessionDetails.languageServicePipeName;
 
         // Log the session details object
         this.log.write(JSON.stringify(sessionDetails));
 
         try {
-            this.log.write("Connecting to language service on port " + port + "...");
+            this.log.write("Connecting to language service on pipe " + pipeName + "...");
 
             const connectFunc = () => {
                 return new Promise<StreamInfo>(
                     (resolve, reject) => {
-                        const socket = net.connect(port);
+                        const socket = net.connect(utils.getPipePath(pipeName));
                         socket.on(
                             "connect",
                             () => {
