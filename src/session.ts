@@ -179,7 +179,7 @@ export class SessionManager implements Middleware {
                 `-DebugServicePipeName DebugService_${id}.pipe `;
 
             if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
-                this.editorServicesArgs += `-WaitForDebugger `;
+                this.editorServicesArgs += "-WaitForDebugger ";
             }
             if (this.sessionSettings.developer.editorServicesLogLevel) {
                 this.editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
