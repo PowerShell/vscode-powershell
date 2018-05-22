@@ -4,6 +4,7 @@
 
 import fs = require("fs");
 import net = require("net");
+import os = require("os");
 import path = require("path");
 import { Logger } from "./logging";
 import utils = require("./utils");
@@ -39,10 +40,10 @@ function startDebugging() {
     utils.deleteSessionFile(debugSessionFilePath);
 
     // Establish connection before setting up the session
-    debugAdapterLogWriter.write("Connecting to port: " + sessionDetails.debugServicePort + "\r\n");
+    debugAdapterLogWriter.write("Connecting to pipe: " + sessionDetails.debugServicePipeName + "\r\n");
 
     let isConnected = false;
-    const debugServiceSocket = net.connect(sessionDetails.debugServicePort, "127.0.0.1");
+    const debugServiceSocket = net.connect(utils.getPipePath(sessionDetails.debugServicePipeName));
 
     // Write any errors to the log file
     debugServiceSocket.on(
@@ -73,7 +74,7 @@ function startDebugging() {
 
             // Resume the stdin stream
             process.stdin.resume();
-        });
+    });
 
     // When the socket closes, end the session
     debugServiceSocket.on(
