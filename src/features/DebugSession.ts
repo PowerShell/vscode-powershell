@@ -41,7 +41,8 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         config: DebugConfiguration,
         token?: CancellationToken): ProviderResult<DebugConfiguration> {
 
-        const currentDocument = vscode.window.activeTextEditor.document;
+        // Starting a debug session can be done when there is no document open e.g. attach to PS host process
+        const currentDocument = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.document : undefined;
         const debugCurrentScript = (config.script === "${file}") || !config.request;
         const generateLaunchConfig = !config.request;
 
@@ -85,9 +86,17 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         if (config.request === "launch") {
 
             // For debug launch of "current script" (saved or unsaved), warn before starting the debugger if either
-            // A) the unsaved document's language type is not PowerShell or
-            // B) the saved document's extension is a type that PowerShell can't debug.
+            // A) there is not an active document
+            // B) the unsaved document's language type is not PowerShell
+            // C) the saved document's extension is a type that PowerShell can't debug.
             if (debugCurrentScript) {
+
+                if (currentDocument === undefined) {
+                    const msg = "To debug the \"Current File\", you must first open a " +
+                                "PowerShell script file in the editor.";
+                    vscode.window.showErrorMessage(msg);
+                    return;
+                }
 
                 if (currentDocument.isUntitled) {
                     if (currentDocument.languageId === "powershell") {
@@ -118,7 +127,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                             path = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
                         }
 
-                        const msg = "'" + path + "' is a file type that cannot be debugged by the PowerShell debugger.";
+                        const msg = "PowerShell does not support debugging this file type: '" + path + "'.";
                         vscode.window.showErrorMessage(msg);
                         return;
                     }
@@ -129,7 +138,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                 }
             }
 
-            if (config.cwd === "${file}") {
+            if ((currentDocument !== undefined) && (config.cwd === "${file}")) {
                 config.cwd = currentDocument.fileName;
             }
 
@@ -337,7 +346,9 @@ export class PickPSHostProcessFeature implements IFeature {
             };
 
             return vscode.window.showQuickPick(items, options).then((item) => {
-                return item ? item.pid : "";
+                // Return undefined when user presses Esc.
+                // This prevents VSCode from opening launch.json in this case which happens if we return "".
+                return item ? `${item.pid}` : undefined;
             });
         });
     }
