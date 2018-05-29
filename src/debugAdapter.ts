@@ -43,7 +43,7 @@ function startDebugging() {
     debugAdapterLogWriter.write("Connecting to pipe: " + sessionDetails.debugServicePipeName + "\r\n");
 
     let isConnected = false;
-    const debugServiceSocket = net.connect(utils.getPipePath(sessionDetails.debugServicePipeName));
+    const debugServiceSocket = net.connect(sessionDetails.debugServicePipeName);
 
     // Write any errors to the log file
     debugServiceSocket.on(
