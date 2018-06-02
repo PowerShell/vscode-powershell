@@ -41,9 +41,9 @@
     "vscode-languageclient": "^4.1.4"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.0",
+    "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
-    "mocha": "^5.2.0",
+    "mocha": "^4.0.1",
     "tslint": "^5.9.1",
     "typescript": "2.9.x",
     "vsce": "^1.18.0"
