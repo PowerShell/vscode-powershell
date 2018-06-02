@@ -260,14 +260,23 @@ class PSDocumentFormattingEditProvider implements
         this.lockDocument(document, textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
 
-        return textEdits.then(
-            (edits) => {
-                this.logger.writeVerbose(`Document formatting finished in ${getFormattingDuration()}s`);
-                return edits;
-            },
-            (err) => {
-                this.logger.writeVerbose(`Document formatting failed in ${getFormattingDuration()}: ${err}`);
-            });
+        return this.logAndReturnTextEdits(textEdits, getFormattingDuration);
+    }
+
+    // There is something about having this code in the calling method that causes a TS compile error.
+    // It causes the following error:
+    // Type 'import("C:/Users/Keith/GitHub/rkeithhill/vscode-powershell/node_modules/vscode-languageserver-typ...'
+    // is not assignable to type ''vscode'.TextEdit'. Property 'newEol' is missing in type 'TextEdit'.
+    private logAndReturnTextEdits(
+        textEdits,
+        getFormattingDuration: () => number): vscode.TextEdit[] | Thenable<vscode.TextEdit[]> {
+
+        return textEdits.then((edits) => {
+            this.logger.writeVerbose(`Document formatting finished in ${getFormattingDuration()}s`);
+            return edits;
+        }, (err) => {
+            this.logger.writeVerbose(`Document formatting failed in ${getFormattingDuration()}: ${err}`);
+        });
     }
 
     private getScriptRegion(document: TextDocument, position: Position, ch: string): Thenable<IScriptRegion> {

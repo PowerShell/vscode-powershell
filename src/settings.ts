@@ -14,10 +14,10 @@ enum CodeFormattingPreset {
     Stroustrup,
 }
 
-export class HelpCompletion {
-    public static readonly Disabled: string = "Disabled";
-    public static readonly BlockComment: string = "BlockComment";
-    public static readonly LineComment: string = "LineComment";
+export enum HelpCompletion {
+    Disabled = "Disabled",
+    BlockComment = "BlockComment",
+    LineComment = "LineComment",
 }
 
 export interface IPowerShellAdditionalExePathSettings {
