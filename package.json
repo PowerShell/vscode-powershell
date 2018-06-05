@@ -10,9 +10,9 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
   "categories": [
-    "Languages",
-    "Snippets",
     "Debuggers",
+    "Programming Languages",
+    "Snippets",
     "Linters"
   ],
   "icon": "images/PowerShell_icon.png",
@@ -37,22 +37,22 @@
     "onCommand:PowerShell.RestartSession"
   ],
   "dependencies": {
-    "vscode-languageclient": "3.3.0"
+    "vscode": "^1.1.18",
+    "vscode-languageclient": "^4.1.4"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
-    "mocha": "^2.3.3",
+    "mocha": "^4.0.1",
     "tslint": "^5.9.1",
-    "typescript": "2.3.x",
-    "vsce": "^1.18.0",
-    "vscode": "^1.1.0"
+    "typescript": "2.9.x",
+    "vsce": "^1.18.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
   ],
   "scripts": {
-    "compile": "tsc -p ./ && tslint -p ./ -e test/*",
+    "compile": "tsc -v && tsc -p ./ && tslint -p ./ -e test/*",
     "compile-watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test"
