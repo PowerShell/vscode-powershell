@@ -97,19 +97,19 @@ export class NewFileOrProjectFeature implements IFeature {
 
                     if (!includeInstalledModules) {
                         templates =
-                            [{
+                            [({
                                 label: this.loadIcon,
                                 description: "Load additional templates from installed modules",
                                 template: undefined,
-                            }]
+                            } as ITemplateQuickPickItem)]
                             .concat(templates);
                     } else {
                         templates =
-                            [{
+                            [({
                                 label: this.loadIcon,
                                 description: "Refresh template list",
                                 template: undefined,
-                            }]
+                            }  as ITemplateQuickPickItem)]
                             .concat(templates);
                     }
 
