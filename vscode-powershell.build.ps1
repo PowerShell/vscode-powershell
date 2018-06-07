@@ -128,7 +128,7 @@ task V2Process {
 
         # grab 2.0 PSRL bits
         Write-Host "`n### Grabbing 2.0 bits"
-        Push-Location $script:psesBuildScriptPath
+        Push-Location ..\PowerShellEditorServices
         git remote add patrick https://github.com/SeeminglyScience/PowerShellEditorServices.git
         git fetch --all
         git checkout integrate-psreadline-2
