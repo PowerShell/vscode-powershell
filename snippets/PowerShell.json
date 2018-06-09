@@ -763,7 +763,10 @@
     "function": {
         "prefix": "function",
         "body": [
-            "function ${1:FunctionName} (${2:OptionalParameters}) {",
+            "function ${1:FunctionName} {",
+            "\tparam (",
+            "\t ${2:OptionalParameters}",
+            "\t)",
             "\t$0",
             "}"
         ],
