@@ -119,10 +119,44 @@ task Package {
     Move-Item -Force .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
 }
 
+task V2Process {
+    # Throwing this in so that we can get v2 builds going. This should be refactored later.
+    try {
+        if (!$script:psesBuildScriptPath) {
+            throw "PSES path required."
+        }
+
+        # grab 2.0 PSRL bits
+        Write-Host "`n### Grabbing 2.0 bits"
+        Push-Location ..\PowerShellEditorServices
+        git remote add patrick https://github.com/SeeminglyScience/PowerShellEditorServices.git
+        git fetch --all
+        git checkout integrate-psreadline-2
+        Invoke-Build Build
+        Pop-Location
+
+        Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
+        Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\* .\modules
+
+        Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
+        exec { & node ./node_modules/vsce/out/vsce package }
+
+        # Change the package to have a static name for automation purposes
+        Move-Item -Force .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-v2-insiders.vsix
+    }
+    catch {
+        Write-Host "tried to build v2 but failed because of: `n`n$_"
+    }
+
+}
+
 task UploadArtifacts -If { $env:AppVeyor } {
 
     Push-AppveyorArtifact .\PowerShell-insiders.vsix
+    if (Test-Path .\PowerShell-v2-insiders.vsix) {
+        Push-AppveyorArtifact .\PowerShell-v2-insiders.vsix
+    }
 }
 
 # The default task is to run the entire CI build
-task . GetExtensionVersion, CleanAll, BuildAll, Test, Package, UploadArtifacts
+task . GetExtensionVersion, CleanAll, BuildAll, Test, Package, V2Process, UploadArtifacts

@@ -5,7 +5,7 @@
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.19.0"
+    "vscode": "^1.22.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -38,7 +38,7 @@
   ],
   "dependencies": {
     "vscode": "^1.1.18",
-    "vscode-languageclient": "^4.1.4"
+    "vscode-languageclient": "^4.2.1"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.32",
