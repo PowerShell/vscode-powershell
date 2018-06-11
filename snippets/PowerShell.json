@@ -770,7 +770,16 @@
             "\t$0",
             "}"
         ],
-        "description": "function definition snippet"
+        "description": "function definition snippet that contains a param block"
+    },
+    "function-NoParam": {
+        "prefix": "function-noparam",
+        "body": [
+            "function ${1:FunctionName} (${2:OptionalParameters}) {",
+            "\t$0",
+            "}"
+        ],
+        "description": "function definition snippet that does not contain a param block and is more typically seen in C#"
     },
     "if": {
         "prefix": "if",
