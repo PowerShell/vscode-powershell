@@ -770,16 +770,16 @@
             "\t$0",
             "}"
         ],
-        "description": "function definition snippet that contains a param block"
+        "description": "Function definition snippet that contains a param block"
     },
-    "function-NoParam": {
-        "prefix": "function-noparam",
+    "Function-Inline": {
+        "prefix": "Function-Inline",
         "body": [
             "function ${1:FunctionName} (${2:OptionalParameters}) {",
             "\t$0",
             "}"
         ],
-        "description": "function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other lanaguages"
+        "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other lanaguages"
     },
     "if": {
         "prefix": "if",
