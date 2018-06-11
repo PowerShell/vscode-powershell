@@ -779,7 +779,7 @@
             "\t$0",
             "}"
         ],
-        "description": "function definition snippet that does not contain a param block and is more typically seen in C#"
+        "description": "function definition snippet that does not contain a param block and is commonly used in other lanaguages"
     },
     "if": {
         "prefix": "if",
