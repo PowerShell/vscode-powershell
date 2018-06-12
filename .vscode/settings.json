@@ -3,6 +3,8 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "files.trimTrailingWhitespace": true,
+    // Add a visual ruler for the typescript linting line length
+    "editor.rulers": [120],
 
     "search.exclude": {
         "**/node_modules": true,
