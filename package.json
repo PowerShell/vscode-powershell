@@ -176,7 +176,7 @@
         "severity": "error",
         "pattern": [
           {
-            "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+            "regexp": "^\\s*(?:\\[-\\]\\s)(\\s*.*?)(?:\\s\\d*\\.?\\d*s|ms)\\s*$",
             "message": 1
           },
           {
