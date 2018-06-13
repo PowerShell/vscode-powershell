@@ -18,6 +18,7 @@ import { DocumentFormatterFeature } from "./features/DocumentFormatter";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
+import { FoldingFeature } from "./features/Folding";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
@@ -132,6 +133,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
+        new FoldingFeature(logger, documentSelector),
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
