@@ -287,6 +287,138 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
     }
 
     /**
+     * Given a zero based offset, find the line text preceeding it in the document
+     * @param offset   Zero based offset in the document
+     * @param document The source text document
+     * @returns        The line text preceeding the offset, not including the preceeding Line Feed
+     */
+    private preceedingText(
+        offset: number,
+        document: vscode.TextDocument,
+    ): string {
+        const endPos = document.positionAt(offset);
+        const startPos = endPos.translate(0, -endPos.character);
+
+        return document.getText(new vscode.Range(startPos, endPos));
+    }
+
+    /**
+     * Given a zero based offset, find the line text after it in the document
+     * @param offset   Zero based offset in the document
+     * @param document The source text document
+     * @returns        The line text after the offset, not including the subsequent Line Feed
+     */
+    private subsequentText(
+        offset: number,
+        document: vscode.TextDocument,
+    ): string {
+        const startPos: vscode.Position = document.positionAt(offset);
+        const endPos: vscode.Position = document.lineAt(document.positionAt(offset)).range.end;
+        return document.getText(new vscode.Range(startPos, endPos));
+    }
+
+    /**
+     * Finding blocks of comment tokens is more complicated as the newline characters are not
+     * classed as comments.  To workaround this we search for the comment character `#` scope name
+     * "punctuation.definition.comment.powershell" and then determine contiguous line numbers from there
+     * @param tokens   List of grammar tokens to parse
+     * @param document The source text document
+     * @returns        A list of LineNumberRange objects for blocks of comment lines
+     */
+    private matchBlockCommentScopeElements(
+        tokens: ITokenList,
+        document: vscode.TextDocument,
+    ): ILineNumberRangeList {
+        const result = [];
+
+        const emptyLine = /^[\s]+$/;
+
+        let startLine: number = -1;
+        let nextLine: number = -1;
+
+        tokens.forEach((token) => {
+            if (token.scopes.indexOf("punctuation.definition.comment.powershell") !== -1) {
+                // The punctuation.definition.comment.powershell token matches new-line comments
+                // and inline comments e.g. `$x = 'foo' # inline comment`.  We are only interested
+                // in comments which begin the line i.e. no preceeding text
+                if (emptyLine.test(this.preceedingText(token.startIndex, document))) {
+                    const lineNum = document.positionAt(token.startIndex).line;
+                    // A simple pattern for keeping track of contiguous numbers in a known sorted array
+                    if (startLine === -1) {
+                        startLine = lineNum;
+                    } else if (lineNum !== nextLine) {
+                        result.push(
+                            (
+                                new LineNumberRange(vscode.FoldingRangeKind.Comment)
+                            ).fromLinePair(startLine, nextLine - 1),
+                        );
+                        startLine = lineNum;
+                    }
+                    nextLine = lineNum + 1;
+                }
+            }
+        });
+
+        // If we exit the token array and we're still processing comment lines, then the
+        // comment block simply ends at the end of document
+        if (startLine !== -1) {
+            result.push((new LineNumberRange(vscode.FoldingRangeKind.Comment)).fromLinePair(startLine, nextLine - 1));
+        }
+
+        return result;
+    }
+
+    /**
+     * Create a new token object with an appended scopeName
+     * @param token     The token to append the scope to
+     * @param scopeName The scope name to append
+     * @returns         A copy of the original token, but with the scope appended
+     */
+    private addTokenScope(
+        token: IToken,
+        scopeName: string,
+    ): IToken {
+        // Only a shallow clone is required
+        const tokenClone = Object.assign({}, token);
+        tokenClone.scopes.push(scopeName);
+        return tokenClone;
+    }
+
+    /**
+     * Given a list of grammar tokens, find the tokens that are comments and
+     * the comment text is either `# region` or `# endregion`.  Return a new list of tokens
+     * with custom scope names added, "custom.start.region" and "custom.end.region" respectively
+     * @param tokens   List of grammar tokens to parse
+     * @param document The source text document
+     * @returns        A list of LineNumberRange objects of the line comment region blocks
+     */
+    private extractRegionScopeElements(
+        tokens: ITokenList,
+        document: vscode.TextDocument,
+    ): ITokenList {
+        const result = [];
+
+        const emptyLine = /^[\s]+$/;
+        const startRegionText = /^#\s*region\b/;
+        const endRegionText = /^#\s*endregion\b/;
+
+        tokens.forEach((token) => {
+            if (token.scopes.indexOf("punctuation.definition.comment.powershell") !== -1) {
+                if (emptyLine.test(this.preceedingText(token.startIndex, document))) {
+                    const commentText = this.subsequentText(token.startIndex, document);
+                    if (startRegionText.test(commentText)) {
+                        result.push(this.addTokenScope(token, "custom.start.region"));
+                    }
+                    if (endRegionText.test(commentText)) {
+                        result.push(this.addTokenScope(token, "custom.end.region"));
+                    }
+                }
+            }
+        });
+        return result;
+    }
+
+    /**
      * Given a list of tokens, return a list of line number ranges which could be folding regions in the document
      * @param tokens   List of grammar tokens to parse
      * @param document The source text document
@@ -326,6 +458,25 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             tokens,
             "string.quoted.double.heredoc.powershell",
             vscode.FoldingRangeKind.Region, document)
+            .forEach((match) => { matchedTokens.push(match); });
+
+        // Find matching comment regions   #region -> #endregion
+        this.matchScopeElements(
+            this.extractRegionScopeElements(tokens, document),
+            "custom.start.region",
+            "custom.end.region",
+            vscode.FoldingRangeKind.Region, document)
+            .forEach((match) => { matchedTokens.push(match); });
+
+        // Find blocks of line comments   # comment1\n# comment2\n...
+        this.matchBlockCommentScopeElements(tokens, document).forEach((match) => { matchedTokens.push(match); });
+
+        // Find matching block comments   <# -> #>
+        this.matchScopeElements(
+            tokens,
+            "punctuation.definition.comment.block.begin.powershell",
+            "punctuation.definition.comment.block.end.powershell",
+            vscode.FoldingRangeKind.Comment, document)
             .forEach((match) => { matchedTokens.push(match); });
 
         return matchedTokens;
