@@ -221,6 +221,38 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
     }
 
     /**
+     * Given a start and end textmate scope name, find matching grammar tokens
+     * and pair them together.  Uses a simple stack to take into account nested regions.
+     * @param tokens         List of grammar tokens to parse
+     * @param startScopeName The name of the starting scope to match
+     * @param endScopeName   The name of the ending scope to match
+     * @param matchType      The type of range this matched token pair represents e.g. A comment
+     * @param document       The source text document
+     * @returns              A list of LineNumberRange objects of the matched token scopes
+     */
+    private matchScopeElements(
+        tokens: ITokenList,
+        startScopeName: string,
+        endScopeName: string,
+        matchType: vscode.FoldingRangeKind,
+        document: vscode.TextDocument,
+    ): ILineNumberRangeList {
+        const result = [];
+        const tokenStack = [];
+
+        tokens.forEach((token) => {
+            if (token.scopes.indexOf(startScopeName) !== -1) {
+                tokenStack.push(token);
+            }
+            if (token.scopes.indexOf(endScopeName) !== -1) {
+                result.unshift((new LineNumberRange(matchType)).fromTokenPair(tokenStack.pop(), token, document));
+            }
+        });
+
+        return result;
+    }
+
+    /**
      * Given a list of tokens, return a list of line number ranges which could be folding regions in the document
      * @param tokens   List of grammar tokens to parse
      * @param document The source text document
@@ -231,6 +263,22 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
         document: vscode.TextDocument,
     ): ILineNumberRangeList {
         const matchedTokens: ILineNumberRangeList = [];
+
+        // Find matching braces   { -> }
+        this.matchScopeElements(
+            tokens,
+            "punctuation.section.braces.begin.powershell",
+            "punctuation.section.braces.end.powershell",
+            vscode.FoldingRangeKind.Region, document)
+            .forEach((match) => { matchedTokens.push(match); });
+
+        // Find matching parentheses   ( -> )
+        this.matchScopeElements(
+            tokens,
+            "punctuation.section.group.begin.powershell",
+            "punctuation.section.group.end.powershell",
+            vscode.FoldingRangeKind.Region, document)
+            .forEach((match) => { matchedTokens.push(match); });
 
         return matchedTokens;
     }
