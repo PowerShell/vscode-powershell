@@ -253,6 +253,40 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
     }
 
     /**
+     * Given a textmate scope name, find a series of contiguous tokens which contain
+     * that scope name and pair them together.
+     * @param tokens    List of grammar tokens to parse
+     * @param scopeName The name of the scope to match
+     * @param matchType The type of range this region represents e.g. A comment
+     * @param document  The source text document
+     * @returns         A list of LineNumberRange objects of the contiguous token scopes
+     */
+    private matchContiguousScopeElements(
+        tokens: ITokenList,
+        scopeName: string,
+        matchType: vscode.FoldingRangeKind,
+        document: vscode.TextDocument,
+    ): ILineNumberRangeList {
+        const result = [];
+        let startToken;
+
+        tokens.forEach((token, index) => {
+            if (token.scopes.indexOf(scopeName) !== -1) {
+                if (startToken === undefined) { startToken = token; }
+
+                // If we're at the end of the token list, or the next token does not include the scopeName
+                // we've reached the end of the contiguous block.
+                if (((index + 1) >= tokens.length) || (tokens[index + 1].scopes.indexOf(scopeName) === -1)) {
+                    result.push((new LineNumberRange(matchType)).fromTokenPair(startToken, token, document));
+                    startToken = undefined;
+                }
+            }
+        });
+
+        return result;
+    }
+
+    /**
      * Given a list of tokens, return a list of line number ranges which could be folding regions in the document
      * @param tokens   List of grammar tokens to parse
      * @param document The source text document
@@ -277,6 +311,20 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             tokens,
             "punctuation.section.group.begin.powershell",
             "punctuation.section.group.end.powershell",
+            vscode.FoldingRangeKind.Region, document)
+            .forEach((match) => { matchedTokens.push(match); });
+
+        // Find contiguous here strings   @' -> '@
+        this.matchContiguousScopeElements(
+            tokens,
+            "string.quoted.single.heredoc.powershell",
+            vscode.FoldingRangeKind.Region, document)
+            .forEach((match) => { matchedTokens.push(match); });
+
+        // Find contiguous here strings   @" -> "@
+        this.matchContiguousScopeElements(
+            tokens,
+            "string.quoted.double.heredoc.powershell",
             vscode.FoldingRangeKind.Region, document)
             .forEach((match) => { matchedTokens.push(match); });
 
