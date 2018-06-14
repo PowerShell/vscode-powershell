@@ -3,11 +3,17 @@
  *--------------------------------------------------------*/
 
 import fs = require("fs");
-import os = require("os");
 import path = require("path");
 import process = require("process");
-import vscode = require("vscode");
 import Settings = require("./settings");
+
+const linuxLegacyExePath  = "/usr/bin/powershell";
+const linuxExePath        = "/usr/bin/pwsh";
+const linuxPreviewExePath = "/usr/bin/pwsh-preview";
+
+const macOSLegacyExePath  = "/usr/local/bin/powershell";
+const macOSExePath        = "/usr/local/bin/pwsh";
+const macOSPreviewExePath = "/usr/local/bin/pwsh-preview";
 
 export enum OperatingSystem {
     Unknown,
@@ -68,14 +74,18 @@ export function getDefaultPowerShellPath(
                     : SysnativePowerShellPath;
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
-        powerShellExePath = "/usr/local/bin/powershell";
-        if (fs.existsSync("/usr/local/bin/pwsh")) {
-            powerShellExePath = "/usr/local/bin/pwsh";
+        powerShellExePath = macOSLegacyExePath;
+        if (fs.existsSync(macOSExePath)) {
+            powerShellExePath = macOSExePath;
+        } else if (fs.existsSync(macOSPreviewExePath)) {
+            powerShellExePath = macOSPreviewExePath;
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
-        powerShellExePath = "/usr/bin/powershell";
-        if (fs.existsSync("/usr/bin/pwsh")) {
-            powerShellExePath = "/usr/bin/pwsh";
+        powerShellExePath = linuxLegacyExePath;
+        if (fs.existsSync(linuxExePath)) {
+            powerShellExePath = linuxExePath;
+        } else if (fs.existsSync(linuxPreviewExePath)) {
+            powerShellExePath = linuxPreviewExePath;
         }
     }
 
@@ -162,10 +172,29 @@ export function getAvailablePowerShellExes(
         }
     } else {
         // Handle Linux and macOS case
+        const defaultExePath =  this.getDefaultPowerShellPath(platformDetails);
         paths.push({
             versionName: "PowerShell Core",
-            exePath: this.getDefaultPowerShellPath(platformDetails),
+            exePath: defaultExePath,
         });
+
+        // If defaultExePath is pwsh, check to see if pwsh-preview is installed and if so, make it available.
+        // If the defaultExePath is already pwsh-preview, then pwsh is not installed - nothing to do.
+        if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
+            if ((defaultExePath === macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
+                paths.push({
+                    versionName: "PowerShell Core Preview",
+                    exePath: macOSPreviewExePath,
+                });
+            }
+        } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
+            if ((defaultExePath === linuxExePath) && fs.existsSync(linuxPreviewExePath)) {
+                paths.push({
+                    versionName: "PowerShell Core Preview",
+                    exePath: linuxPreviewExePath,
+                });
+            }
+        }
     }
 
     // When unit testing, we don't have session settings to test so skip reading this setting
