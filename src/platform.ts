@@ -174,7 +174,7 @@ export function getAvailablePowerShellExes(
         // Handle Linux and macOS case
         const defaultExePath =  this.getDefaultPowerShellPath(platformDetails);
         paths.push({
-            versionName: "PowerShell Core",
+            versionName: "PowerShell Core" + (/-preview/.test(defaultExePath) ? " Preview" : ""),
             exePath: defaultExePath,
         });
 
