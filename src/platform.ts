@@ -180,20 +180,21 @@ export function getAvailablePowerShellExes(
 
         // If defaultExePath is pwsh, check to see if pwsh-preview is installed and if so, make it available.
         // If the defaultExePath is already pwsh-preview, then pwsh is not installed - nothing to do.
+        let osExePath;
+        let osPreviewExePath;
         if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
-            if ((defaultExePath === macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
-                paths.push({
-                    versionName: "PowerShell Core Preview",
-                    exePath: macOSPreviewExePath,
-                });
-            }
+            osExePath = macOSExePath;
+            osPreviewExePath = macOSPreviewExePath;
         } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
-            if ((defaultExePath === linuxExePath) && fs.existsSync(linuxPreviewExePath)) {
-                paths.push({
-                    versionName: "PowerShell Core Preview",
-                    exePath: linuxPreviewExePath,
-                });
-            }
+            osExePath = linuxExePath;
+            osPreviewExePath = linuxPreviewExePath;
+        }
+
+        if ((osExePath === defaultExePath) && fs.existsSync(osPreviewExePath)) {
+            paths.push({
+                versionName: "PowerShell Core Preview",
+                exePath: osPreviewExePath,
+            });
         }
     }
 
