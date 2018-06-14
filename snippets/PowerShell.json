@@ -943,5 +943,14 @@
             "}"
         ],
         "description": "Creates a Hashtable"
+    },
+    "Region Block": {
+        "prefix": "#region",
+        "body": [
+            "#region ${1}",
+            "${2}",
+            "#endregion ${1}"
+        ],
+        "description": "Region Block for organizing and folding of your code"
     }
 }
