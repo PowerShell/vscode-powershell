@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD024 -->
+
 # Awesome VSCode Snippets for PowerShell
 
 > A curated list of awesome vscode snippets for PowerShell.
@@ -272,6 +274,7 @@ Quickly create a Pester Test for existence of a parameter by @SQLDBAWithABeard
         "description": "Pester Test for Parameter"
     }
 ```
+
 ### PSCustomObject
 
 A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
@@ -305,7 +308,7 @@ Use the `#region` for organizing your code (including good code folding).
     "body": [
         "#region ${1}",
         "${2}",
-        "#endregion ${1}"
+        "#endregion"
     ],
     "description": "Region Block for organizing and folding of your code"
 }
