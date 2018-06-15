@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD024 -->
-
 # Awesome VSCode Snippets for PowerShell
 
 > A curated list of awesome vscode snippets for PowerShell.
