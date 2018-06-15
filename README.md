@@ -98,7 +98,11 @@ to file an issue on our GitHub repository:
 Make sure to fill in the information that is requested in the issue template as it
 will help us investigate the problem more quickly.
 
-> Note To automatically create a bug report from within the extension run the *"Report a problem on GitHub"* command. Some basic information about your instance and powershell versions will be collected and inserted into a new GitHub issue.
+To automatically create a bug report from within the extension, open the Command pallet (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and run the *"Report a problem on GitHub"* command. Some basic information about your instance and powershell versions will be collected and inserted into a new GitHub issue.
+
+NOTE: If you believe that there is a security vulnerability in the PowerShell extension for VSCode,
+it **must** be reported to [secure@microsoft.com](https://technet.microsoft.com/security/ff852094.aspx) to allow for [Coordinated Vulnerability Disclosure](https://technet.microsoft.com/security/dn467923).
+**Only** file an issue, if secure@microsoft.com has confirmed filing an issue is appropriate.
 
 ### 2. Capture verbose logs and send them to us
 
