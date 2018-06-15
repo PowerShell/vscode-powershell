@@ -119,6 +119,8 @@ that, zip up the logs in the corresponding folder for your operating system:
 - **Windows**: `$HOME\.vscode\extensions\ms-vscode.PowerShell-<CURRENT VERSION>\logs`
 - **Linux and macOS**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
 
+Alternatively, you can open the log folder using the Command pallet (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and running the *"Open powerShell Extension Logs Folder"* command.
+
 You have two options for sending us the logs:
 
   1. If you are editing scripts that contain sensitive information (intellectual property,
