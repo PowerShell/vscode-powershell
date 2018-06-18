@@ -28,6 +28,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [PesterTestForMandatoryParameter](#pestertestformandatoryparameter) | _Create Pester test for a mandatory parameter_ |
 | [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
 | [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
+| [Region Block](#region-block) | _Region Block for organizing and folding of your code_ |
 
 ## Snippets
 
@@ -271,6 +272,7 @@ Quickly create a Pester Test for existence of a parameter by @SQLDBAWithABeard
         "description": "Pester Test for Parameter"
     }
 ```
+
 ### PSCustomObject
 
 A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
@@ -289,6 +291,24 @@ A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab t
         "}"
     ],
     "description": "Creates a PSCustomObject"
+}
+```
+
+### Region Block
+
+Use the `#region` for organizing your code (including good code folding).
+
+#### Snippet
+
+```json
+"Region Block": {
+    "prefix": "#region",
+    "body": [
+        "#region ${1}",
+        "${2}",
+        "#endregion"
+    ],
+    "description": "Region Block for organizing and folding of your code"
 }
 ```
 
