@@ -7,11 +7,9 @@ import path = require("path");
 import process = require("process");
 import Settings = require("./settings");
 
-const linuxLegacyExePath  = "/usr/bin/powershell";
 const linuxExePath        = "/usr/bin/pwsh";
 const linuxPreviewExePath = "/usr/bin/pwsh-preview";
 
-const macOSLegacyExePath  = "/usr/local/bin/powershell";
 const macOSExePath        = "/usr/local/bin/pwsh";
 const macOSPreviewExePath = "/usr/local/bin/pwsh-preview";
 
@@ -53,6 +51,13 @@ export function getPlatformDetails(): IPlatformDetails {
     };
 }
 
+/**
+ * Gets the default instance of PowerShell for the specified platform.
+ * On Windows, the default version of PowerShell is "Windows PowerShell".
+ * @param platformDetails Specifies information about the platform - primarily the operating system.
+ * @param use32Bit On Windows, this boolean determines will find the 32-bit version of Windows PowerShell.
+ * @returns A string containing the path of the default version of PowerShell.
+ */
 export function getDefaultPowerShellPath(
     platformDetails: IPlatformDetails,
     use32Bit: boolean = false): string | null {
@@ -74,17 +79,15 @@ export function getDefaultPowerShellPath(
                     : SysnativePowerShellPath;
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
-        powerShellExePath = macOSLegacyExePath;
-        if (fs.existsSync(macOSExePath)) {
-            powerShellExePath = macOSExePath;
-        } else if (fs.existsSync(macOSPreviewExePath)) {
+        // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
+        powerShellExePath = macOSExePath;
+        if (!fs.existsSync(macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
             powerShellExePath = macOSPreviewExePath;
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
-        powerShellExePath = linuxLegacyExePath;
-        if (fs.existsSync(linuxExePath)) {
-            powerShellExePath = linuxExePath;
-        } else if (fs.existsSync(linuxPreviewExePath)) {
+        // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
+        powerShellExePath = linuxExePath;
+        if (!fs.existsSync(linuxExePath) && fs.existsSync(linuxPreviewExePath)) {
             powerShellExePath = linuxPreviewExePath;
         }
     }
@@ -118,6 +121,12 @@ export function fixWindowsPowerShellPath(powerShellExePath: string, platformDeta
     return powerShellExePath;
 }
 
+/**
+ * Gets a list of all available PowerShell instance on the specified platform.
+ * @param platformDetails Specifies information about the platform - primarily the operating system.
+ * @param sessionSettings Specifies the user/workspace settings. Additional PowerShell exe paths loaded from settings.
+ * @returns An array of IPowerShellExeDetails objects with the PowerShell name & exe path for each instance found.
+ */
 export function getAvailablePowerShellExes(
     platformDetails: IPlatformDetails,
     sessionSettings: Settings.ISettings | undefined): IPowerShellExeDetails[] {
@@ -178,7 +187,7 @@ export function getAvailablePowerShellExes(
             exePath: defaultExePath,
         });
 
-        // If defaultExePath is pwsh, check to see if pwsh-preview is installed and if so, make it available.
+        // If defaultExePath is pwsh, check to see if pwsh-preview is also installed and if so, make it available.
         // If the defaultExePath is already pwsh-preview, then pwsh is not installed - nothing to do.
         let osExePath;
         let osPreviewExePath;
