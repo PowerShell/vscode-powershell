@@ -17,10 +17,9 @@ before_install:
 install:
   - git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
   - pushd build
-  - ./download.sh
+  - bash <(curl -s https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/install-powershell.sh)
   - popd
 
 script:
   - ulimit -n 4096
-  - sudo powershell -Command "Install-Module PowerShellGet -Force"
-  - powershell -File build/travis.ps1
+  - pwsh -File build/travis.ps1
