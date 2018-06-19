@@ -93,7 +93,7 @@ task BuildEditorServices {
     }
 }
 
-task BuildAll BuildEditorServices, Build -Before Package
+task BuildAll BuildEditorServices, Build
 
 task Test Build, {
     if (!$global:IsLinux -and !$global:IsMacOS) {
@@ -110,6 +110,12 @@ task Package {
     if ($script:psesBuildScriptPath) {
         Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
         Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\* .\modules
+    } elseif (Test-Path .\PowerShellEditorServices) {
+        Write-Host "`n### Moving PowerShellEditorServices module files" -ForegroundColor Green
+        Move-Item -Force .\PowerShellEditorServices\* .\modules
+        Remove-Item -Force .\PowerShellEditorServices
+    } else {
+        throw "Unable to find PowerShell EditorServices"
     }
 
     Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green

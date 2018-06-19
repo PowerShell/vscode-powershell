@@ -1,55 +1,74 @@
-param(
-    [ValidateSet('win')]
-    [String]
-    $Name
-)
+[cmdletbinding()]
+param()
 
-$ErrorActionPreference = 'Stop'
-
-$psReleaseBranch = 'master'
-$psReleaseFork = 'PowerShell'
-$location = Join-Path -Path $PSScriptRoot -ChildPath 'PSRelease'
-if(Test-Path $location)
+Begin
 {
-    Remove-Item -Path $location -Recurse -Force
+    $ErrorActionPreference = 'Stop'
+
+    $gitBinFullPath = (Get-Command -Name git -CommandType Application).Path | Select-Object -First 1
+    if ( ! $gitBinFullPath )
+    {
+        throw "Git is missing! Install from 'https://git-scm.com/download/win'"
+    }
+
+    # clone the release tools
+    $releaseToolsDirName = "PSRelease"
+    $releaseToolsLocation = Join-Path -Path $PSScriptRoot -ChildPath PSRelease
+    if ( Test-Path $releaseToolsLocation )
+    {
+        Remove-Item -Force -Recurse -Path $releaseToolsLocation
+    }
+    & $gitBinFullPath clone -b master --quiet https://github.com/PowerShell/${releaseToolsDirName}.git $releaseToolsLocation
+    Import-Module "$releaseToolsLocation/vstsBuild" -Force
+    Import-Module "$releaseToolsLocation/dockerBasedBuild" -Force -Prefix DockerBased
 }
 
-$gitBinFullPath = (Get-Command -Name git).Source
-if (-not $gitBinFullPath)
-{
-    throw "Git is required to proceed. Install from 'https://git-scm.com/download/win'"
-}
+End {
 
-Write-Verbose "cloning -b $psReleaseBranch --quiet https://github.com/$psReleaseFork/PSRelease.git" -verbose
-& $gitBinFullPath clone -b $psReleaseBranch --quiet https://github.com/$psReleaseFork/PSRelease.git $location
+    $AdditionalFiles = .{
+        Join-Path $PSScriptRoot -child "Image/build.ps1"
+        Join-Path $PSScriptRoot -child "Image/dockerInstall.psm1"
+        "$env:BUILD_ARTIFACTSTAGINGDIRECTORY\PowerShellEditorServices"
+        }
+    $buildPackageName = $null
 
-Push-Location -Path $PWD.Path
-try{
-    Set-Location $location
-    & $gitBinFullPath  submodule update --init --recursive --quiet
-}
-finally
-{
-    Pop-Location
-}
+    # defined if building in VSTS
+    if($env:BUILD_STAGINGDIRECTORY)
+    {
+        # Use artifact staging if running in VSTS
+        $destFolder = $env:BUILD_STAGINGDIRECTORY
+    }
+    else
+    {
+        # Use temp as destination if not running in VSTS
+        $destFolder = $env:temp
+    }
 
-$unresolvedRepoRoot = Join-Path -Path $PSScriptRoot '../..'
-$resolvedRepoRoot = (Resolve-Path -Path $unresolvedRepoRoot).ProviderPath
+    $resolvedRepoRoot = (Resolve-Path (Join-Path -Path $PSScriptRoot -ChildPath "../../")).Path
 
-try
-{
-    Write-Verbose "Starting build at $resolvedRepoRoot  ..." -Verbose
-    Import-Module "$location/vstsBuild" -Force
-    Import-Module "$location/dockerBasedBuild" -Force
-    Clear-VstsTaskState
+    try
+    {
+        Write-Verbose "Starting build at $resolvedRepoRoot  ..." -Verbose
+        Clear-VstsTaskState
 
-    Invoke-Build -RepoPath $resolvedRepoRoot  -BuildJsonPath './tools/releaseBuild/build.json' -Name $Name -Parameters $PSBoundParameters
-}
-catch
-{
-    Write-VstsError -Error $_
-}
-finally{
-    Write-VstsTaskState
-    exit 0
+        $buildParameters = @{
+            ReleaseTag = $ReleaseTag
+        }
+        $buildArgs = @{
+            RepoPath = $resolvedRepoRoot
+            BuildJsonPath = './tools/releaseBuild/build.json'
+            Parameters = $buildParameters
+            AdditionalFiles = $AdditionalFiles
+            Name = "win7-x64"
+        }
+        Invoke-DockerBasedBuild @buildArgs
+    }
+    catch
+    {
+        Write-VstsError -Error $_
+    }
+    finally{
+        Write-VstsTaskState
+        exit 0
+    }
 }
