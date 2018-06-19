@@ -22,5 +22,4 @@ install:
 
 script:
   - ulimit -n 4096
-  - sudo powershell -Command "Install-Module PowerShellGet -Force"
-  - powershell -File build/travis.ps1
+  - pwsh -File build/travis.ps1
