@@ -17,7 +17,7 @@ before_install:
 install:
   - git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
   - pushd build
-  - ./download.sh
+  - bash <(curl -s https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/install-powershell.sh)
   - popd
 
 script:
