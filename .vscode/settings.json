@@ -14,5 +14,10 @@
     },
 
     // Lock the TypeScript SDK path to the version we use
-    "typescript.tsdk": "./node_modules/typescript/lib"
+    "typescript.tsdk": "./node_modules/typescript/lib",
+
+    // Ignore the MD rule:
+    "markdownlint.config": {
+        "MD024": false // no-duplicate-header
+    }
 }
