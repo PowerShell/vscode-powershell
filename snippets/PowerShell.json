@@ -765,7 +765,7 @@
         "body": [
             "function ${1:FunctionName} {",
             "\tparam (",
-            "\t ${2:OptionalParameters}",
+            "\t\t${2:OptionalParameters}",
             "\t)",
             "\t$0",
             "}"
@@ -863,7 +863,7 @@
             "workflow ${name:Verb-Noun} {",
             "\tparam (",
             "\t)",
-            "\t",
+            "",
             "\t$0",
             "}"
         ],
