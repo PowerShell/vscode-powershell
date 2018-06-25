@@ -1,5 +1,34 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+
+##############################
+#.SYNOPSIS
+#Generate the draft change log of the PowerShell Extension for VSCode
+#
+#.PARAMETER LastReleaseTag
+#The last release tag
+#
+#.PARAMETER Token
+#The authentication token to use for retrieving the GitHub user log-in names for external contributors. Get it from:
+# https://github.com/settings/tokens
+#
+#.PARAMETER NewReleaseTag
+#The github tag that will be associated with the next release
+#
+#.PARAMETER HasCherryPick
+#Indicate whether there are any commits in the last release branch that were cherry-picked from the master branch
+#
+#.OUTPUTS
+#The generated change log draft of vscode-powershell AND PowerShellEditorServices
+#
+#.NOTES
+#Run from the path to /vscode-powershell
+#
+#.EXAMPLE
+#
+# .\tools\Get-PowerShellExtensionChangelog.ps1 -LastReleaseTag v1.7.0 -Token $TOKENSTR -NewReleaseTag v1.8.0
+#
+##############################
 param(
         [Parameter(Mandatory)]
         [string]$LastReleaseTag,
@@ -236,13 +265,14 @@ function Get-ChangeLog
 
 ##############################
 #.SYNOPSIS
-#Generate the draft change log of the git repo in the current directory
+#Generate the draft change log of the PowerShell Extension for VSCode
 #
 #.PARAMETER LastReleaseTag
 #The last release tag
 #
 #.PARAMETER Token
-#The authentication token to use for retrieving the GitHub user log-in names for external contributors
+#The authentication token to use for retrieving the GitHub user log-in names for external contributors. Get it from:
+# https://github.com/settings/tokens
 #
 #.PARAMETER NewReleaseTag
 #The github tag that will be associated with the next release
