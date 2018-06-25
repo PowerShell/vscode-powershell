@@ -948,7 +948,7 @@
         "prefix": "#region",
         "body": [
             "#region ${1}",
-            "${2}",
+            "$0",
             "#endregion"
         ],
         "description": "Region Block for organizing and folding of your code"

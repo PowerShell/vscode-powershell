@@ -305,7 +305,7 @@ Use the `#region` for organizing your code (including good code folding).
     "prefix": "#region",
     "body": [
         "#region ${1}",
-        "${2}",
+        "$0",
         "#endregion"
     ],
     "description": "Region Block for organizing and folding of your code"
