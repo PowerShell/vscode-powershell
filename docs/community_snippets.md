@@ -244,7 +244,7 @@ Quickly create a Pester Test for existence of a mandatory parameter by @SQLDBAWi
 #### Snippet
 
 ```json
-"Pester for Mandatory Pester": {
+"Pester for Mandatory Parameter": {
     "prefix": "mandatoryParamPester",
     "body": [
         "It \"${1:FunctionName} Should have a mandatory parameter ${2:ParameterName}\" {",
