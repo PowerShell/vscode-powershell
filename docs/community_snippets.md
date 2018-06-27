@@ -39,18 +39,18 @@ Creates Assert Mock for Pester Tests y @SQLDBAWithABeard
 #### Snippet
 
 ```json
-    "AssertMock": {
-        "prefix": "AssertMock",
-        "body": [
-            "$$assertMockParams = @{",
-                "'CommandName' = '${1:Command}'",
-                "'Times'       = ${2:1}",
-                "'Exactly'     = $$true",
-            "}",
-            "Assert-MockCalled @assertMockParams"
-        ],
-        "description": "AssertMock snippet for Pestering"
-    }
+"AssertMock": {
+    "prefix": "AssertMock",
+    "body": [
+        "$$assertMockParams = @{",
+            "\t'CommandName' = '${1:Command}'",
+            "\t'Times'       = ${2:1}",
+            "\t'Exactly'     = $$true",
+        "}",
+        "Assert-MockCalled @assertMockParams"
+    ],
+    "description": "AssertMock snippet for Pestering"
+}
 ```
 
 ### AWSRegionDynamicParameter
@@ -61,28 +61,28 @@ Creates a dynamic parameter of the current AWS regions.  Includes parameter vali
 
 ```json
 "AWSRegionDynamicParam": {
-	"prefix": "aws_region",
-	"body": [
-		"DynamicParam {",
-		"\t$ParamDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary",
-		"\t$CR_ParamName = 'Region'",
-		"\t$CR_AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]",
-		"\t$CR_Attribute = New-Object System.Management.Automation.ParameterAttribute",
-		"\t$CR_Attribute.HelpMessage = 'List all the regions to be included in the document'",
-		"\t$CR_Attribute.Mandatory = $true",
-		"\t$CR_Attribute.ValueFromPipelineByPropertyName = $true",
-		"\t$CR_AttributeCollection.add($CR_Attribute)",
-		"\t$CR_intRegions = Get-AWSRegion -IncludeChina | Select-Object -ExpandProperty Region",
-		"\t$CR_intRegions += Get-AWSRegion -IncludeGovCloud | Select-Object -ExpandProperty Region",
-		"\t$CR_intRegions = $CR_intRegions | Select-Object -Unique",
-		"\t$CR_ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($CR_intRegions)",
-		"\t$CR_AttributeCollection.add($CR_ValidateSetAttribute)",
-		"\t$CR_Param = New-Object System.Management.Automation.RuntimeDefinedParameter($CR_ParamName, [String[]],$CR_AttributeCollection)",
-		"\t$ParamDictionary.Add($CR_ParamName, $CR_Param)",
-		"\treturn $paramDictionary",
-		"\t}"
-	],
-	"description": "A dynamic parameter that builds a list of AWS regions"
+    "prefix": "aws_region",
+    "body": [
+        "DynamicParam {",
+            "\t$ParamDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary",
+            "\t$CR_ParamName = 'Region'",
+            "\t$CR_AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]",
+            "\t$CR_Attribute = New-Object System.Management.Automation.ParameterAttribute",
+            "\t$CR_Attribute.HelpMessage = 'List all the regions to be included in the document'",
+            "\t$CR_Attribute.Mandatory = $true",
+            "\t$CR_Attribute.ValueFromPipelineByPropertyName = $true",
+            "\t$CR_AttributeCollection.add($CR_Attribute)",
+            "\t$CR_intRegions = Get-AWSRegion -IncludeChina | Select-Object -ExpandProperty Region",
+            "\t$CR_intRegions += Get-AWSRegion -IncludeGovCloud | Select-Object -ExpandProperty Region",
+            "\t$CR_intRegions = $CR_intRegions | Select-Object -Unique",
+            "\t$CR_ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($CR_intRegions)",
+            "\t$CR_AttributeCollection.add($CR_ValidateSetAttribute)",
+            "\t$CR_Param = New-Object System.Management.Automation.RuntimeDefinedParameter($CR_ParamName, [String[]],$CR_AttributeCollection)",
+            "\t$ParamDictionary.Add($CR_ParamName, $CR_Param)",
+            "\treturn $paramDictionary",
+        "\t}"
+    ],
+    "description": "A dynamic parameter that builds a list of AWS regions"
 }
 ```
 
@@ -94,11 +94,11 @@ Create calculated property for use in Select Statements
 
 ```json
 "Add Calculated Property": {
-	"prefix": "cf",
-	"body": [
-		"@{'Name' = '$1' ; 'Expression' = {$2}}",
-	],
-	"description": "Create calculated property for use in Select Statements"
+    "prefix": "cf",
+    "body": [
+        "@{'Name' = '$1' ; 'Expression' = {$2}}",
+    ],
+    "description": "Create calculated property for use in Select Statements"
 }
 ```
 
@@ -110,31 +110,31 @@ Quickly create a Data Table object by @SQLDBAWithABeard.
 
 ```json
 "DataTable": {
-        "prefix": "DataTable",
-        "body": [
-             "# Create DataTable Object",
- "$$table = New-Object system.Data.DataTable $$TableName",
+    "prefix": "DataTable",
+    "body": [
+        "# Create DataTable Object",
+        "$$table = New-Object system.Data.DataTable $$TableName",
 
- "\r# Create Columns",
- "$$col1 = New-Object system.Data.DataColumn NAME1,([string])",
- "$$col2 = New-Object system.Data.DataColumn NAME2,([decimal])",
+        "\r# Create Columns",
+        "$$col1 = New-Object system.Data.DataColumn NAME1,([string])",
+        "$$col2 = New-Object system.Data.DataColumn NAME2,([decimal])",
 
- "\r#Add the Columns to the table",
- "$$table.columns.add($$col1)",
- "$$table.columns.add($$col2)",
+        "\r#Add the Columns to the table",
+        "$$table.columns.add($$col1)",
+        "$$table.columns.add($$col2)",
 
- "\r# Create a new Row",
- "$$row = $$table.NewRow() ",
+        "\r# Create a new Row",
+        "$$row = $$table.NewRow() ",
 
- "\r# Add values to new row",
- "$$row.Name1 = 'VALUE'",
- "$$row.NAME2 = 'VALUE'",
+        "\r# Add values to new row",
+        "$$row.Name1 = 'VALUE'",
+        "$$row.NAME2 = 'VALUE'",
 
- "\r#Add new row to table",
- "$$table.Rows.Add($$row)"
-        ],
-        "description": "Creates a Data Table Object"
-    }
+        "\r#Add new row to table",
+        "$$table.Rows.Add($$row)"
+    ],
+    "description": "Creates a Data Table Object"
+}
 ```
 
 ### DateTimeWriteVerbose
@@ -181,14 +181,14 @@ Add If Should Process with easy tab inputs
 
 ```json
 "IfShouldProcess": {
-        "prefix": "IfShouldProcess",
-        "body": [
-            "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
-            "   # Place Code here",
-            "}"
-                ],
-            "description": "Creates an if should process"
-    }
+    "prefix": "IfShouldProcess",
+    "body": [
+        "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
+        "\t# Place Code here",
+        "}"
+    ],
+    "description": "Creates an if should process"
+}
 ```
 
 ### MaxColumnLengthinDataTable
@@ -198,22 +198,22 @@ Takes a datatable object and iterates through it to get the max length of the st
 #### Snippet
 
 ```json
-    "Max Length of Datatable": {
-        "prefix": "Max Length of Datatable",
-        "body": [
-            "$$columns = ($$datatable | Get-Member -MemberType Property).Name",
-            "foreach($$column in $$Columns) {",
-            "    $$max = 0",
-            "    foreach ($$a in $$datatable){",
-            "        if($$max -lt $$a.$$column.length){",
-            "            $$max = $$a.$$column.length",
-            "        }",
-            "    }",
-            "    Write-Output \"$$column max length is $$max\"",
-            "}"
-        ],
-        "description": "Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads"
-    }
+"Max Length of Datatable": {
+    "prefix": "Max Length of Datatable",
+    "body": [
+        "$$columns = ($$datatable | Get-Member -MemberType Property).Name",
+        "foreach($$column in $$Columns) {",
+        "\t$$max = 0",
+        "\tforeach ($$a in $$datatable){",
+        "\t\tif($$max -lt $$a.$$column.length){",
+        "\t\t\t$$max = $$a.$$column.length",
+        "\t\t}",
+        "\t}",
+        "\tWrite-Output \"$$column max length is $$max\"",
+        "}"
+    ],
+    "description": "Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads"
+}
 ```
 
 ### Parameter-Credential
@@ -244,15 +244,15 @@ Quickly create a Pester Test for existence of a mandatory parameter by @SQLDBAWi
 #### Snippet
 
 ```json
-    "Pester for Mandatory Pester": {
-        "prefix": "mandatoryParamPester",
-        "body": [
-            "It \"${1:FunctionName} Should have a mandatory parameter ${2:ParameterName}\" {",
-            "   (Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Attributes.Mandatory | Should -BeTrue",
-            "}"
-        ],
-        "description": "Pester Test for Parameter"
-    }
+"Pester for Mandatory Parameter": {
+    "prefix": "mandatoryParamPester",
+    "body": [
+        "It \"${1:FunctionName} Should have a mandatory parameter ${2:ParameterName}\" {",
+        "\t(Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Attributes.Mandatory | Should -BeTrue",
+        "}"
+    ],
+    "description": "Pester Test for Parameter"
+}
 ```
 
 ### PesterTestForParameter
@@ -262,15 +262,15 @@ Quickly create a Pester Test for existence of a parameter by @SQLDBAWithABeard
 #### Snippet
 
 ```json
-    "Pester for Parameter": {
-        "prefix": "Param Pester",
-        "body": [
-            "It \"${1:FunctionName} Should have a parameter ${2:ParameterName}\" {",
-            "    (Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Count | Should -Be 1",
-            "}"
-        ],
-        "description": "Pester Test for Parameter"
-    }
+"Pester for Parameter": {
+    "prefix": "Param Pester",
+    "body": [
+        "It \"${1:FunctionName} Should have a parameter ${2:ParameterName}\" {",
+        "\t(Get-Command ${1:FunctionName}).Parameters['${2:ParameterName}'].Count | Should -Be 1",
+        "}"
+    ],
+    "description": "Pester Test for Parameter"
+}
 ```
 
 ### PSCustomObject
@@ -305,7 +305,7 @@ Use the `#region` for organizing your code (including good code folding).
     "prefix": "#region",
     "body": [
         "#region ${1}",
-        "${2}",
+        "$0",
         "#endregion"
     ],
     "description": "Region Block for organizing and folding of your code"
