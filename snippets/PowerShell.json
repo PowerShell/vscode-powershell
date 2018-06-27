@@ -953,4 +953,24 @@
         ],
         "description": "Region Block for organizing and folding of your code"
     }
+    "Send eMail": {
+	"prefix": "ex-SendeMail",
+	"body": [
+		"$$Params = @{",
+		"    'SmtpServer'  = 'smtp.mycompany.com'",
+		"    'Port'        = 25",
+		"    'Priority'    = 'Normal'",
+		"    'From'        = 'sender@mycompany.com'",
+		"    'To'          = 'mainrecipient@mycompany.com'",
+		"    'Cc'          = 'copyrecipient@mycompany.com'",
+		"    'Bcc'         = 'hiddenrecipient@mycompany.com'",
+		"    'Subject'     = 'Mail title'",
+		"    'Body'        = 'This is the content of my mail'",
+		"    'BodyAsHtml'  = $$false",
+		"    'Attachments' = 'c:\\MyFile.txt'",
+		"}",
+		"Send-MailMessage @Params"
+	],
+	"description": "Send eMail snippet"
+    }
 }
