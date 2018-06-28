@@ -467,6 +467,11 @@
           "default": "",
           "description": "Specifies the path to a PowerShell Script Analyzer settings file. To override the default settings for all projects, enter an absolute path, or enter a path relative to your workspace."
         },
+        "powershell.codeFolding.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables syntax based code folding. When disabled, the default indentation based code folding is used."
+        },
         "powershell.codeFormatting.preset": {
           "type": "string",
           "enum": [

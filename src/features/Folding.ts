@@ -6,6 +6,7 @@ import {
 } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
+import * as Settings from "../settings";
 
 /**
  * Defines a grammar file that is in a VS Code Extension
@@ -494,6 +495,9 @@ export class FoldingFeature implements IFeature {
      */
     constructor(private logger: Logger, documentSelector: DocumentSelector) {
         const grammar: IGrammar = this.grammar(logger);
+
+        const settings = Settings.load();
+        if (!(settings.codeFolding && settings.codeFolding.enable)) { return; }
 
         // If the PowerShell grammar is not available for some reason, don't register a folding provider,
         // which reverts VSCode to the default indentation style folding
