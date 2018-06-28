@@ -10,6 +10,9 @@ import Settings = require("./settings");
 const linuxExePath        = "/usr/bin/pwsh";
 const linuxPreviewExePath = "/usr/bin/pwsh-preview";
 
+const snapExePath         = "/snap/bin/pwsh";
+const snapPreviewExePath  = "/snap/bin/pwsh-preview";
+
 const macOSExePath        = "/usr/local/bin/pwsh";
 const macOSPreviewExePath = "/usr/local/bin/pwsh-preview";
 
@@ -86,9 +89,14 @@ export function getDefaultPowerShellPath(
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
+        // as well as the Snaps case - https://snapcraft.io/
         powerShellExePath = linuxExePath;
         if (!fs.existsSync(linuxExePath) && fs.existsSync(linuxPreviewExePath)) {
             powerShellExePath = linuxPreviewExePath;
+        } else if (fs.existsSync(snapExePath)) {
+            powerShellExePath = snapExePath;
+        } else if (fs.existsSync(snapPreviewExePath)) {
+            powerShellExePath = snapPreviewExePath;
         }
     }
 
@@ -196,7 +204,7 @@ export function getAvailablePowerShellExes(
             osPreviewExePath = macOSPreviewExePath;
         } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
             osExePath = linuxExePath;
-            osPreviewExePath = linuxPreviewExePath;
+            osPreviewExePath = fs.existsSync(linuxPreviewExePath) ? linuxPreviewExePath : snapPreviewExePath;
         }
 
         if ((osExePath === defaultExePath) && fs.existsSync(osPreviewExePath)) {
