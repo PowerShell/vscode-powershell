@@ -163,6 +163,11 @@
           "when": "resourceLangId == powershell",
           "command": "PowerShell.RunSelection",
           "group": "2_powershell"
+        },
+        {
+          "when": "resourceLangId == powershell",
+          "command": "PowerShell.OnlineHelp",
+          "group": "2_powershell"
         }
       ]
     },
