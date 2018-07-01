@@ -58,7 +58,7 @@ export function getPlatformDetails(): IPlatformDetails {
  * Gets the default instance of PowerShell for the specified platform.
  * On Windows, the default version of PowerShell is "Windows PowerShell".
  * @param platformDetails Specifies information about the platform - primarily the operating system.
- * @param use32Bit On Windows, this boolean determines will find the 32-bit version of Windows PowerShell.
+ * @param use32Bit On Windows, this boolean determines whether the 32-bit version of Windows PowerShell is returned.
  * @returns A string containing the path of the default version of PowerShell.
  */
 export function getDefaultPowerShellPath(
@@ -189,33 +189,25 @@ export function getAvailablePowerShellExes(
         }
     } else {
         // Handle Linux and macOS case
-        const defaultExePath =  this.getDefaultPowerShellPath(platformDetails);
-        paths.push({
-            versionName: "PowerShell Core" + (/-preview/.test(defaultExePath) ? " Preview" : ""),
-            exePath: defaultExePath,
+        let exePaths: string[];
+
+        if (platformDetails.operatingSystem === OperatingSystem.Linux) {
+            exePaths = [ linuxExePath, snapExePath, linuxPreviewExePath, snapPreviewExePath ];
+        } else {
+            exePaths = [ macOSExePath, macOSPreviewExePath ];
+        }
+
+        exePaths.forEach((exePath) => {
+            if (fs.existsSync(exePath)) {
+                paths.push({
+                    versionName: "PowerShell Core" + (/-preview/.test(exePath) ? " Preview" : ""),
+                    exePath,
+                });
+            }
         });
-
-        // If defaultExePath is pwsh, check to see if pwsh-preview is also installed and if so, make it available.
-        // If the defaultExePath is already pwsh-preview, then pwsh is not installed - nothing to do.
-        let osExePath;
-        let osPreviewExePath;
-        if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
-            osExePath = macOSExePath;
-            osPreviewExePath = macOSPreviewExePath;
-        } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
-            osExePath = linuxExePath;
-            osPreviewExePath = fs.existsSync(linuxPreviewExePath) ? linuxPreviewExePath : snapPreviewExePath;
-        }
-
-        if ((osExePath === defaultExePath) && fs.existsSync(osPreviewExePath)) {
-            paths.push({
-                versionName: "PowerShell Core Preview",
-                exePath: osPreviewExePath,
-            });
-        }
     }
 
-    // When unit testing, we don't have session settings to test so skip reading this setting
+    // When unit testing, we don't have session settings available to test, so skip reading this setting
     if (sessionSettings) {
         // Add additional PowerShell paths as configured in settings
         for (const additionalPowerShellExePath of sessionSettings.powerShellAdditionalExePaths) {
