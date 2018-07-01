@@ -23,13 +23,13 @@ _To contribute, check out our [guide here](#contributing)._
 | [DateTimeWriteVerbose](#datetimewriteverbose) | _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
 | [IfShouldProcess](#ifshouldprocess) | _Added If Should Process_ |
-| [Mail](#mail) | _Send an eMail with the most common parameters by @fullenw1_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
 | [Parameter-Credential](#parameter-credential) | _Add a standard credential parameter to your function by @omniomi_ |
 | [PesterTestForMandatoryParameter](#pestertestformandatoryparameter) | _Create Pester test for a mandatory parameter_ |
 | [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
 | [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
 | [Region Block](#region-block) | _Region Block for organizing and folding of your code_ |
+| [Send-MailMessage](#send-mailmessage) | _Send an mail message with the most common parameters by @fullenw1_ |
 
 ## Snippets
 
@@ -192,35 +192,6 @@ Add If Should Process with easy tab inputs
 }
 ```
 
-### Mail
-
-Add the Send-MailMessage cmdlet with the most common parameters in a hashtable for splatting, by @ThmsRynr.
-
-#### Snippet
-
-```json
-"Send-MailMessage": { 
-	"prefix": "Send-MailMessage", 
-	"body": [ 
-		"$$Params = @{", 
-		"    'SmtpServer'  = 'smtp.mycompany.com'", 
-		"    'Port'        = 25", 
-		"    'Priority'    = 'Normal'", 
-		"    'From'        = 'sender@mycompany.com'", 
-		"    'To'          = 'mainrecipient@mycompany.com'", 
-		"    'Cc'          = 'copyrecipient@mycompany.com'", 
-		"    'Bcc'         = 'hiddenrecipient@mycompany.com'", 
-		"    'Subject'     = 'Mail title'", 
-		"    'Body'        = 'This is the content of my mail'", 
-		"    'BodyAsHtml'  = $$false", 
-		"    'Attachments' = 'c:\\MyFile.txt'", 
-		"}", 
-		"Send-MailMessage @Params" 
-	], 
-	"description": "Send a Mail" 
-}
-```
-
 ### MaxColumnLengthinDataTable
 
 Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads into a SQL Server table with fixed column widths by @SQLDBAWithABeard
@@ -339,6 +310,35 @@ Use the `#region` for organizing your code (including good code folding).
         "#endregion"
     ],
     "description": "Region Block for organizing and folding of your code"
+}
+```
+
+### Send-MailMessage
+
+Add the Send-MailMessage cmdlet with the most common parameters in a hashtable for splatting, by @fullenw1.
+
+#### Snippet
+
+```json
+"Send-MailMessage": { 
+	"prefix": "Send-MailMessage", 
+	"body": [ 
+		"$$Params = @{", 
+		"    'SmtpServer'  = 'smtp.mycompany.com'", 
+		"    'Port'        = 25", 
+		"    'Priority'    = 'Normal'", 
+		"    'From'        = 'sender@mycompany.com'", 
+		"    'To'          = 'mainrecipient@mycompany.com'", 
+		"    'Cc'          = 'copyrecipient@mycompany.com'", 
+		"    'Bcc'         = 'hiddenrecipient@mycompany.com'", 
+		"    'Subject'     = 'Mail title'", 
+		"    'Body'        = 'This is the content of my mail'", 
+		"    'BodyAsHtml'  = $$false", 
+		"    'Attachments' = 'c:\\MyFile.txt'", 
+		"}", 
+		"Send-MailMessage @Params" 
+	], 
+	"description": "Send a mail message" 
 }
 ```
 
