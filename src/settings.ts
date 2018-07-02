@@ -29,6 +29,10 @@ export interface IBugReportingSettings {
     project: string;
 }
 
+export interface ICodeFoldingSettings {
+    enable?: boolean;
+}
+
 export interface ICodeFormattingSettings {
     preset: CodeFormattingPreset;
     openBraceOnSameLine: boolean;
@@ -72,6 +76,7 @@ export interface ISettings {
     scriptAnalysis?: IScriptAnalysisSettings;
     debugging?: IDebuggingSettings;
     developer?: IDeveloperSettings;
+    codeFolding?: ICodeFoldingSettings;
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
     bugReporting?: IBugReportingSettings;
@@ -107,6 +112,10 @@ export function load(): ISettings {
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
         powerShellExeIsWindowsDevBuild: false,
+    };
+
+    const defaultCodeFoldingSettings: ICodeFoldingSettings = {
+        enable: true,
     };
 
     const defaultCodeFormattingSettings: ICodeFormattingSettings = {
@@ -150,6 +159,8 @@ export function load(): ISettings {
             configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
         developer:
             getWorkspaceSettingsWithDefaults<IDeveloperSettings>(configuration, "developer", defaultDeveloperSettings),
+        codeFolding:
+            configuration.get<ICodeFoldingSettings>("codeFolding", defaultCodeFoldingSettings),
         codeFormatting:
             configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
         integratedConsole:
