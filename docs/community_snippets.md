@@ -29,6 +29,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
 | [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
 | [Region Block](#region-block) | _Region Block for organizing and folding of your code_ |
+| [Send-MailMessage](#send-mailmessage) | _Send an mail message with the most common parameters by @fullenw1_ |
 
 ## Snippets
 
@@ -309,6 +310,35 @@ Use the `#region` for organizing your code (including good code folding).
         "#endregion"
     ],
     "description": "Region Block for organizing and folding of your code"
+}
+```
+
+### Send-MailMessage
+
+Add the Send-MailMessage cmdlet with the most common parameters in a hashtable for splatting, by @fullenw1.
+
+#### Snippet
+
+```json
+"ex-Send-MailMessage": { 
+	"prefix": "ex-Send-MailMessage", 
+	"body": [ 
+		"$$Params = @{", 
+		"    'SmtpServer'  = 'smtp.mycompany.com'", 
+		"    'Port'        = 25", 
+		"    'Priority'    = 'Normal'", 
+		"    'From'        = 'sender@mycompany.com'", 
+		"    'To'          = 'mainrecipient@mycompany.com'", 
+		"    'Cc'          = 'copyrecipient@mycompany.com'", 
+		"    'Bcc'         = 'hiddenrecipient@mycompany.com'", 
+		"    'Subject'     = 'Mail title'", 
+		"    'Body'        = 'This is the content of my mail'", 
+		"    'BodyAsHtml'  = $$false", 
+		"    'Attachments' = 'c:\\MyFile.txt'", 
+		"}", 
+		"Send-MailMessage @Params" 
+	], 
+	"description": "Send a mail message" 
 }
 ```
 
