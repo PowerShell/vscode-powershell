@@ -320,8 +320,8 @@ Add the Send-MailMessage cmdlet with the most common parameters in a hashtable f
 #### Snippet
 
 ```json
-"Send-MailMessage": { 
-	"prefix": "Send-MailMessage", 
+"ex-Send-MailMessage": { 
+	"prefix": "ex-Send-MailMessage", 
 	"body": [ 
 		"$$Params = @{", 
 		"    'SmtpServer'  = 'smtp.mycompany.com'", 
