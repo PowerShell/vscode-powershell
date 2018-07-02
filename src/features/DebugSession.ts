@@ -2,14 +2,12 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { hostname } from "os";
-import { dirname } from "path";
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, ProviderResult, WorkspaceFolder } from "vscode";
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
-import { getPlatformDetails, IPlatformDetails, OperatingSystem } from "../platform";
+import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
@@ -19,7 +17,6 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
 
     private sessionCount: number = 1;
     private command: vscode.Disposable;
-    private examplesPath: string;
     private tempDebugProcess: PowerShellProcess;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager) {
@@ -75,12 +72,18 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     ? currentDocument.uri.toString()
                     : currentDocument.fileName;
 
-            // For a folder-less workspace, vscode.workspace.rootPath will be undefined.
-            // PSES will convert that undefined to a reasonable working dir.
-            config.cwd =
-                currentDocument.isUntitled
-                    ? vscode.workspace.rootPath
-                    : currentDocument.fileName;
+            if (settings.debugging.createTemporaryIntegratedConsole) {
+                // For a folder-less workspace, vscode.workspace.rootPath will be undefined.
+                // PSES will convert that undefined to a reasonable working dir.
+                config.cwd =
+                    currentDocument.isUntitled
+                        ? vscode.workspace.rootPath
+                        : currentDocument.fileName;
+
+            } else {
+                // If the non-temp integrated console is being used, default to the current working dir.
+                config.cwd = "";
+            }
         }
 
         if (config.request === "launch") {
