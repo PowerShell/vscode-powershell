@@ -1,7 +1,7 @@
-// tslint:disable no-var-requires
 /*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+* Copyright (C) Microsoft Corporation. All rights reserved.
+*--------------------------------------------------------*/
+// tslint:disable no-var-requires
 
 let testRunner = require("vscode/lib/testrunner");
 
