@@ -143,7 +143,7 @@ export function activate(context: vscode.ExtensionContext): void {
     ];
 
     commandExplorer = new CommandExplorerProvider();
-    vscode.window.registerTreeDataProvider("functions", commandExplorer);
+    vscode.window.registerTreeDataProvider("commands", commandExplorer);
     sessionManager.setExtensionFeatures(extensionFeatures);
 
     if (extensionSettings.startAutomatically) {

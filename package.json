@@ -68,7 +68,7 @@
       ]
     },
     "views": {
-      "function-explorer": [
+      "command-explorer": [
         {
           "id": "commands",
           "name": "PowerShell Commands"
