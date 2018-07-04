@@ -262,9 +262,9 @@
               "type": "PowerShell",
               "request": "launch",
               "name": "PowerShell Launch ${Script}",
-              "script": "^\"\\${workspaceRoot}/${Script}\"",
+              "script": "^\"\\${workspaceFolder}/${Script}\"",
               "args": [],
-              "cwd": "^\"\\${workspaceRoot}\""
+              "cwd": "^\"\\${workspaceFolder}\""
             }
           },
           {
@@ -276,7 +276,7 @@
               "name": "PowerShell Pester Tests",
               "script": "Invoke-Pester",
               "args": [],
-              "cwd": "^\"\\${workspaceRoot}\""
+              "cwd": "^\"\\${workspaceFolder}\""
             }
           },
           {
@@ -297,17 +297,13 @@
               "type": "PowerShell",
               "request": "launch",
               "name": "PowerShell Interactive Session",
-              "cwd": "^\"\\${workspaceRoot}\""
+              "cwd": ""
             }
           }
         ],
         "configurationAttributes": {
           "launch": {
             "properties": {
-              "program": {
-                "type": "string",
-                "description": "Deprecated. Please use the 'script' property instead to specify the absolute path to the PowerShell script to launch under the debugger."
-              },
               "script": {
                 "type": "string",
                 "description": "Optional: Absolute path to the PowerShell script to launch under the debugger."
@@ -322,8 +318,8 @@
               },
               "cwd": {
                 "type": "string",
-                "description": "Absolute path to the working directory. Default is the current workspace.",
-                "default": "${workspaceRoot}"
+                "description": "Absolute path to the working directory. Default is the current workspace folder.",
+                "default": "${workspaceFolder}"
               },
               "createTemporaryIntegratedConsole": {
                 "type": "boolean",
@@ -390,7 +386,7 @@
             "type": "PowerShell",
             "request": "launch",
             "name": "PowerShell Interactive Session",
-            "cwd": "${workspaceRoot}"
+            "cwd": ""
           }
         ]
       }
