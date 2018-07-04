@@ -58,6 +58,23 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "command-explorer",
+          "title": "Command Explorer",
+          "icon": "media/dep.svg"
+        }
+      ]
+    },
+    "views": {
+      "function-explorer": [
+        {
+          "id": "commands",
+          "name": "PowerShell Commands"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "PowerShell.ShowHelp",

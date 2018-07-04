@@ -9,6 +9,7 @@ import vscode = require("vscode");
 import { DocumentSelector } from "vscode-languageclient";
 import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
+import { CommandExplorerProvider } from "./features/CommandExplorer";
 import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
@@ -41,6 +42,7 @@ const requiredEditorServicesVersion = "1.9.1";
 let logger: Logger;
 let sessionManager: SessionManager;
 let extensionFeatures: IFeature[] = [];
+let commandExplorer: CommandExplorerProvider;
 
 const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "file" },
@@ -140,6 +142,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new FoldingFeature(logger, documentSelector),
     ];
 
+    commandExplorer = new CommandExplorerProvider();
+    vscode.window.registerTreeDataProvider("functions", commandExplorer);
     sessionManager.setExtensionFeatures(extensionFeatures);
 
     if (extensionSettings.startAutomatically) {
