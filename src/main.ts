@@ -22,6 +22,7 @@ import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
 import { FindModuleFeature } from "./features/FindModule";
 import { FoldingFeature } from "./features/Folding";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
+import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
@@ -125,6 +126,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new OpenInISEFeature(),
         new GenerateBugReportFeature(sessionManager),
         new ExpandAliasFeature(logger),
+        new GetCommandsFeature(),
         new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),

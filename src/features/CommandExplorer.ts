@@ -6,10 +6,12 @@
 
 import * as fs from "fs";
 import * as vscode from "vscode";
+import * as utils from "../utils";
 
 export class CommandExplorerProvider implements vscode.TreeDataProvider<Command> {
     public readonly didChangeTreeDataEvent: vscode.Event<Command | undefined>;
     private didChangeTreeData: vscode.EventEmitter<Command | undefined>;
+    private test: any = utils;
 
     constructor() {
         this.didChangeTreeData = new vscode.EventEmitter<Command | undefined>();
@@ -30,7 +32,7 @@ export class CommandExplorerProvider implements vscode.TreeDataProvider<Command>
 
     public getCommandsFromJson(): Command[] {
         const commandsJson = JSON.parse(fs.readFileSync("e:\\temp\\commands.json", "utf-8"));
-
+        vscode.commands.executeCommand("PowerShell.GetCommands");
         const toCommand = (command: any): Command => {
             return new Command(command.ModuleName + "\\" + command.Name, vscode.TreeItemCollapsibleState.None);       };
         const commands = commandsJson.map(toCommand);
