@@ -1,12 +1,12 @@
 /*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
-
+// tslint:disable:no-console
 import * as vscode from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
-export const GetCommandsRequestType = new RequestType<string, any, void, void>("powershell/expandAlias");
+export const GetCommandsRequestType = new RequestType<any, any, void, void>("powerShell/getCommands");
 
 export class GetCommandsFeature implements IFeature {
     private command: vscode.Disposable;
@@ -18,12 +18,11 @@ export class GetCommandsFeature implements IFeature {
                 // We be screwed
                 return;
             }
-            vscode.window.showInformationMessage("Before calling PSES");
-            this.languageClient.sendRequest(GetCommandsRequestType, "gci").then((result) => {
-                vscode.window.showInformationMessage("In the Promise from calling PSES")
-                vscode.window.showInformationMessage(result);
+            console.log("Before calling PSES");
+            this.languageClient.sendRequest(GetCommandsRequestType, "").then((result) => {
+                console.log(result);
             });
-            vscode.window.showInformationMessage("After calling PSES");
+            console.log("After calling PSES");
         });
     }
 
