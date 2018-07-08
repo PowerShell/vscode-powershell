@@ -5,13 +5,16 @@
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, ProviderResult, WorkspaceFolder } from "vscode";
-import { LanguageClient, RequestType } from "vscode-languageclient";
+import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
+
+export const StartDebuggerNotificationType =
+    new NotificationType<void, void>("powerShell/startDebugger");
 
 export class DebugSessionFeature implements IFeature, DebugConfigurationProvider {
 
@@ -29,7 +32,14 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
-        // There is no implementation for this IFeature method
+        languageClient.onNotification(
+            StartDebuggerNotificationType,
+            () =>
+                vscode.debug.startDebugging(undefined, {
+                    request: "launch",
+                    type: "PowerShell",
+                    name: "PowerShell Interactive Session",
+        }));
     }
 
     // DebugConfigurationProvider method
