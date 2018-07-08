@@ -11,6 +11,7 @@ export const GetCommandsRequestType = new RequestType<any, any, void, void>("pow
 export class GetCommandsFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
+    private commandsExplorerProvider: CommandsExplorerProvider;
 
     constructor() {
         this.command = vscode.commands.registerCommand("PowerShell.GetCommands", () => {
@@ -18,12 +19,25 @@ export class GetCommandsFeature implements IFeature {
                 // We be screwed
                 return;
             }
-            console.log("Before calling PSES");
             this.languageClient.sendRequest(GetCommandsRequestType, "").then((result) => {
-                console.log(result);
+                const toCommand = (command: any): Command => {
+                    return new Command(
+                        command.name,
+                        command.moduleName,
+                        command.defaultParameterSet,
+                        command.parameterSets,
+                        command.parameters,
+                    );
+                };
+                this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
+                this.commandsExplorerProvider.refresh();
             });
-            console.log("After calling PSES");
         });
+        this.commandsExplorerProvider = new CommandsExplorerProvider();
+        vscode.window.registerTreeDataProvider("commands", this.commandsExplorerProvider);
+        vscode.commands.registerCommand(
+            "PowerShell.refreshCommandsExplorer",
+            () => this.commandsExplorerProvider.refresh());
     }
 
     public dispose() {
@@ -35,12 +49,12 @@ export class GetCommandsFeature implements IFeature {
     }
 }
 
-class CommandExplorerProvider implements vscode.TreeDataProvider<Command> {
-    public readonly didChangeTreeDataEvent: vscode.Event<Command | undefined>;
-    private didChangeTreeData: vscode.EventEmitter<Command | undefined>;
+class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
+    public readonly didChangeTreeDataEvent: vscode.Event<Command>;
+    public powerShellCommands: Command[];
+    private didChangeTreeData: vscode.EventEmitter<Command> = new vscode.EventEmitter<Command>();
 
     constructor() {
-        this.didChangeTreeData = new vscode.EventEmitter<Command | undefined>();
         this.didChangeTreeDataEvent = this.didChangeTreeData.event;
     }
 
@@ -52,23 +66,74 @@ class CommandExplorerProvider implements vscode.TreeDataProvider<Command> {
         return element;
     }
 
-    public getChildren(element?: Command): Thenable<Command[]> {
+    public async getChildren(element?: Command): Promise<Command[]> {
         return Promise.resolve(this.getCommandsFromJson());
     }
 
-    public getCommandsFromJson(): Command[] {
-        const commandsJson = JSON.parse(fs.readFileSync("e:\\temp\\commands.json", "utf-8"));
-        // vscode.commands.executeCommand("PowerShell.GetCommands");
-        const toCommand = (command: any): Command => {
-            return new Command(command.ModuleName + "\\" + command.Name);       };
-        const commands = commandsJson.map(toCommand);
-        return commands;
+    public getCommandsFromJson(element?: Command): Command[] {
+        if (undefined !== this.powerShellCommands) {
+            return this.powerShellCommands;
+        }
+        return [];
     }
 
 }
 
 class Command extends vscode.TreeItem {
-    constructor(public readonly label: string) {
-        super(label);
+    constructor(
+        public readonly Name: string,
+        public readonly ModuleName: string,
+        public readonly defaultParameterSet: string,
+        public readonly ParameterSets: object,
+        public readonly Parameters: object,
+        public readonly collapsibleState = vscode.TreeItemCollapsibleState.None,
+    ) {
+        super(Name, collapsibleState);
+    }
+
+    public getTreeItem(): vscode.TreeItem {
+        return {
+            label: this.label,
+            collapsibleState: this.collapsibleState,
+        };
+    }
+
+    public async getChildren(element): Promise<Command[]> {
+        return [];
+    }
+}
+
+class CommandNode extends Command {
+    public populatedCommands: Command[];
+    constructor(
+        public eventEmitter: vscode.EventEmitter<Command>,
+        public readonly Name: string = "PowerShell",
+        public readonly ModuleName: string = "PowerShell",
+        public readonly defaultParameterSet: string = "",
+        public readonly ParameterSets: object = {},
+        public readonly Parameters: object = {},
+        public readonly collapsibleState = vscode.TreeItemCollapsibleState.Expanded,
+    ) {
+        super(
+            Name,
+            ModuleName,
+            defaultParameterSet,
+            ParameterSets,
+            Parameters,
+            collapsibleState,
+        );
+    }
+
+    public getTreeItem(): vscode.TreeItem {
+        return {
+            label: this.Name,
+            collapsibleState: this.collapsibleState,
+        };
+    }
+
+    public async getChildren(element): Promise<Command[]> {
+        if (undefined !== this.populatedCommands) {
+            return this.populatedCommands;
+        }
     }
 }
