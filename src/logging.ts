@@ -16,7 +16,19 @@ export enum LogLevel {
     Error,
 }
 
-export class Logger {
+/** Interface for logging operations. New features should use this interface for the "type" of logger.
+ *  This will allow for easy mocking of the logger during unit tests.
+ */
+export interface ILogger {
+    write(message: string, ...additionalMessages: string[]);
+    writeDiagnostic(message: string, ...additionalMessages: string[]);
+    writeVerbose(message: string, ...additionalMessages: string[]);
+    writeWarning(message: string, ...additionalMessages: string[]);
+    writeAndShowWarning(message: string, ...additionalMessages: string[]);
+    writeError(message: string, ...additionalMessages: string[]);
+}
+
+export class Logger implements ILogger {
 
     public logBasePath: string;
     public logSessionPath: string;
