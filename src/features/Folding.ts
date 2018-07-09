@@ -1,7 +1,7 @@
 /*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
-
+import fs = require("fs");
 import * as path from "path";
 import * as vscode from "vscode";
 import {
@@ -9,7 +9,7 @@ import {
     LanguageClient,
 } from "vscode-languageclient";
 import { IFeature } from "../feature";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import * as Settings from "../settings";
 
 /**
@@ -497,23 +497,26 @@ export class FoldingFeature implements IFeature {
      * @param logger           The logging object to send messages to
      * @param documentSelector documentSelector object for this Folding Provider
      */
-    constructor(private logger: Logger, documentSelector: DocumentSelector) {
-        const grammar: IGrammar = this.grammar(logger);
-
+    constructor(private logger: ILogger, documentSelector: DocumentSelector) {
         const settings = Settings.load();
         if (!(settings.codeFolding && settings.codeFolding.enable)) { return; }
 
-        // If the PowerShell grammar is not available for some reason, don't register a folding provider,
-        // which reverts VSCode to the default indentation style folding
-        if (grammar == null) {
-            logger.writeWarning("Unable to load the PowerShell grammar file");
-            return;
-        }
+        this.loadGrammar(logger)
+            .then((grammar) => {
+                // If the PowerShell grammar is not available for some reason, don't register a folding provider,
+                // which reverts VSCode to the default indentation style folding
+                if (!grammar) {
+                    logger.writeWarning("Unable to load the PowerShell grammar file");
+                    return;
+                }
 
-        this.foldingProvider = new FoldingProvider(grammar);
-        vscode.languages.registerFoldingRangeProvider(documentSelector, this.foldingProvider);
+                this.foldingProvider = new FoldingProvider(grammar);
+                vscode.languages.registerFoldingRangeProvider(documentSelector, this.foldingProvider);
 
-        logger.write("Syntax Folding Provider registered");
+                logger.write("Syntax Folding Provider registered");
+            }, (err) => {
+                this.logger.writeError(`Failed to load grammar file - error: ${err}`);
+            });
     }
 
     /* dispose() is required by the IFeature interface, but is not required by this feature */
@@ -527,21 +530,43 @@ export class FoldingFeature implements IFeature {
      * @param logger The logging object to send messages to
      * @returns      A grammar parser for the PowerShell language is succesful or undefined if an error occured
      */
-    public grammar(logger: Logger): IGrammar {
+    public loadGrammar(logger: ILogger): Thenable<IGrammar> {
         const tm = this.getCoreNodeModule("vscode-textmate", logger);
         if (tm == null) { return undefined; }
         logger.writeDiagnostic(`Loaded the vscode-textmate module`);
-        const registry = new tm.Registry();
-        if (registry == null) { return undefined; }
-        logger.writeDiagnostic(`Created the textmate Registry`);
+
         const grammarPath = this.powerShellGrammarPath();
         if (grammarPath == null) { return undefined; }
         logger.writeDiagnostic(`PowerShell grammar file specified as ${grammarPath}`);
-        try {
-            return registry.loadGrammarFromPathSync(grammarPath);
-        } catch (err) {
-            logger.writeError(`Error while loading the PowerShell grammar file at ${grammarPath}`, err);
-        }
+
+        const grammarPaths = {
+            powershell: grammarPath,
+        };
+
+        const registry = new tm.Registry({
+            loadGrammar(scopeName) {
+                const gpath = grammarPaths[scopeName];
+                if (gpath) {
+                    return new Promise((c, e) => {
+                        fs.readFile(gpath, (error, content) => {
+                            if (error) {
+                                e(error);
+                            } else {
+                                const rawGrammar = tm.parseRawGrammar(content.toString(), gpath);
+                                c(rawGrammar);
+                            }
+                        });
+                    });
+                }
+                return null;
+            },
+        });
+
+        if (registry == null) { return undefined; }
+        logger.writeDiagnostic(`Created the textmate Registry`);
+
+        const grammar = registry.loadGrammar("powershell");
+        return grammar;
     }
 
     /**
@@ -552,7 +577,7 @@ export class FoldingFeature implements IFeature {
      * @param logger     The logging object to send messages to
      * @returns          The required module, or null if the module cannot be required
      */
-    private getCoreNodeModule(moduleName: string, logger: Logger) {
+    private getCoreNodeModule(moduleName: string, logger: ILogger) {
         // Attempt to load the module from known locations
         const loadLocations: string[] = [
             `${vscode.env.appRoot}/node_modules.asar/${moduleName}`,
