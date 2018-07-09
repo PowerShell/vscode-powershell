@@ -173,7 +173,7 @@ export class SessionManager implements Middleware {
                 `-HostProfileId 'Microsoft.VSCode' ` +
                 `-HostVersion '${this.hostVersion}'` +
                 `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
-                `-BundledModulesPath '${this.bundledModulesPath}'` +
+                `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}'` +
                 `-EnableConsoleRepl ` +
                 `-LanguageServicePipeName LanguageService_${id}.pipe ` +
                 `-DebugServicePipeName DebugService_${id}.pipe `;
