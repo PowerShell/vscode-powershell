@@ -9,11 +9,11 @@ import vscode = require("vscode");
 import utils = require("./utils");
 
 export enum LogLevel {
+    Diagnostic,
     Verbose,
     Normal,
     Warning,
     Error,
-    Diagnostic,
 }
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
