@@ -1,6 +1,7 @@
 /*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
+
 import fs = require("fs");
 import * as path from "path";
 import * as vscode from "vscode";
