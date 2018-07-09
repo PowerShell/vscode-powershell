@@ -21,7 +21,7 @@ import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
 import { FindModuleFeature } from "./features/FindModule";
 import { FoldingFeature } from "./features/Folding";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
-import { CommandsExplorerProvider, GetCommandsFeature } from "./features/GetCommands";
+import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
@@ -42,7 +42,6 @@ const requiredEditorServicesVersion = "1.9.1";
 let logger: Logger;
 let sessionManager: SessionManager;
 let extensionFeatures: IFeature[] = [];
-const commandsExplorerProvider = new CommandsExplorerProvider();
 
 const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "file" },
@@ -142,10 +141,6 @@ export function activate(context: vscode.ExtensionContext): void {
         new CustomViewsFeature(),
         new FoldingFeature(logger, documentSelector),
     ];
-    vscode.window.registerTreeDataProvider("powerShellCommands", commandsExplorerProvider);
-    vscode.commands.registerCommand(
-        "PowerShell.refreshCommandsExplorer",
-        () => commandsExplorerProvider.refresh());
     sessionManager.setExtensionFeatures(extensionFeatures);
 
     if (extensionSettings.startAutomatically) {
@@ -192,7 +187,7 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext) {
 export function deactivate(): void {
     // Clean up all extension features
     extensionFeatures.forEach((feature) => {
-        feature.dispose();
+       feature.dispose();
     });
 
     // Dispose of the current session

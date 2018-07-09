@@ -34,7 +34,8 @@
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
-    "onCommand:PowerShell.RestartSession"
+    "onCommand:PowerShell.RestartSession",
+    "onView:powerShellCommands"
   ],
   "dependencies": {
     "vscode": "~1.1.21",
@@ -63,14 +64,14 @@
         {
           "id": "command-explorer",
           "title": "Command Explorer",
-          "icon": "media/dep.svg"
+          "icon": "media/PwSh.svg"
         }
       ]
     },
     "views": {
       "command-explorer": [
         {
-          "id": "commands",
+          "id": "powerShellCommands",
           "name": "PowerShell Commands"
         }
       ]
@@ -108,6 +109,14 @@
         "title": "Get Commands",
         "category": "PowerShell"
       },
+      {
+				"command": "PowerShell.refreshCommandsExplorer",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
       {
         "command": "PowerShell.OnlineHelp",
         "title": "Get Online Help for Command (Deprecated)",
@@ -195,6 +204,13 @@
           "when": "editorLangId == powershell",
           "command": "PowerShell.ShowHelp",
           "group": "2_powershell"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "PowerShell.refreshCommandsExplorer",
+          "when": "view == powerShellCommands",
+          "group": "navigation"
         }
       ]
     },
@@ -589,7 +605,7 @@
             "Warning",
             "Error"
           ],
-          "default": "Normal",
+          "default": "Diagnostic",
           "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Diagnostic', 'Verbose', 'Normal', 'Warning', and 'Error'"
         },
         "powershell.developer.editorServicesWaitForDebugger": {
