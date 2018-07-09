@@ -24,12 +24,12 @@ function assertFoldingRegions(result, expected): void {
 
 suite("Features", () => {
 
-    suite("Folding Provider", () => {
+    suite("Folding Provider", async () => {
         const logger: MockLogger = new MockLogger();
         const mockSelector: DocumentSelector = [
             { language: "powershell", scheme: "file" },
         ];
-        const psGrammar = (new folding.FoldingFeature(logger, mockSelector)).grammar(logger);
+        const psGrammar = await (new folding.FoldingFeature(logger, mockSelector)).loadPSGrammar(logger);
         const provider = (new folding.FoldingProvider(psGrammar));
 
         test("Can detect the PowerShell Grammar", () => {
