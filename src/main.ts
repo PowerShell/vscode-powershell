@@ -107,6 +107,10 @@ export function activate(context: vscode.ExtensionContext): void {
     // Create the logger
     logger = new Logger();
 
+    // Set the log level
+    const extensionSettings = Settings.load();
+    logger.MinimumLogLevel = LogLevel[extensionSettings.developer.editorServicesLogLevel];
+
     sessionManager =
         new SessionManager(
             requiredEditorServicesVersion,
@@ -138,7 +142,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
     sessionManager.setExtensionFeatures(extensionFeatures);
 
-    const extensionSettings = Settings.load();
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }
