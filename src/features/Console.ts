@@ -202,7 +202,7 @@ export class ConsoleFeature implements IFeature {
 
     constructor() {
         this.commands = [
-            vscode.commands.registerCommand("PowerShell.RunSelection", () => {
+            vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
                 if (this.languageClient === undefined) {
                     // TODO: Log error message
                     return;
@@ -224,8 +224,10 @@ export class ConsoleFeature implements IFeature {
                     expression: editor.document.getText(selectionRange),
                 });
 
-                // Show the integrated console if it isn't already visible
-                vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+                // Show the integrated console if it isn't already visible and
+                // scroll terminal to bottom so new output is visible
+                await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+                await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
             }),
         ];
     }
