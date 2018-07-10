@@ -545,8 +545,8 @@ export class FoldingFeature implements IFeature {
         // Branching for the different vscode-textmate modules
         if ("loadGrammarFromPathSync" in registry) {
             // V3 of the module allows synchronous loading of a grammar
-            return new Promise( (grammar) => {
-                return registry.loadGrammarFromPathSync(grammarPath);
+            return new Promise( (resolve) => {
+                resolve(registry.loadGrammarFromPathSync(grammarPath));
             });
         } else {
             // However in V4+ this is async only
