@@ -13,6 +13,9 @@ import Settings = require("./settings");
 import utils = require("./utils");
 
 export class PowerShellProcess {
+    public static escapeSingleQuotes(pspath: string): string {
+        return pspath.replace(new RegExp("'", "g"), "''");
+    }
 
     public onExited: vscode.Event<void>;
     private onExitedEmitter = new vscode.EventEmitter<void>();
@@ -52,8 +55,8 @@ export class PowerShellProcess {
                             : "";
 
                     this.startArgs +=
-                        `-LogPath '${editorServicesLogPath}' ` +
-                        `-SessionDetailsPath '${this.sessionFilePath}' ` +
+                        `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
+                        `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
                         `-FeatureFlags @(${featureFlags})`;
 
                     const powerShellArgs = [
@@ -68,7 +71,7 @@ export class PowerShellProcess {
 
                     powerShellArgs.push(
                         "-Command",
-                        "& '" + startScriptPath + "' " + this.startArgs);
+                        "& '" + PowerShellProcess.escapeSingleQuotes(startScriptPath) + "' " + this.startArgs);
 
                     let powerShellExePath = this.exePath;
 
