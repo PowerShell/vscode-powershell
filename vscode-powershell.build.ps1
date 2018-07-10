@@ -21,6 +21,10 @@ task GetExtensionVersion -Before Package {
             $updateVersion = $true
             $env:APPVEYOR_BUILD_VERSION
         }
+        elseif ($env:VSTS_BUILD) {
+            $updateVersion = $true
+            $env:VSTS_BUILD_VERSION
+        }
         else {
             exec { & npm version | ConvertFrom-Json | ForEach-Object { $_.PowerShell } }
         }
@@ -28,7 +32,7 @@ task GetExtensionVersion -Before Package {
     Write-Host "`n### Extension Version: $script:ExtensionVersion`n" -ForegroundColor Green
 
     if ($updateVersion) {
-        exec { & npm version $script:ExtensionVersion --no-git-tag-version }
+        exec { & npm version $script:ExtensionVersion --no-git-tag-version --allow-same-version }
     }
 }
 
@@ -61,7 +65,7 @@ task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
 
     # When in a CI build use the --loglevel=error parameter so that
     # package install warnings don't cause PowerShell to throw up
-    $logLevelParam = if ($env:AppVeyor) { "--loglevel=error" } else { "" }
+    $logLevelParam = if ($env:AppVeyor -or $env:VSTS_BUILD) { "--loglevel=error" } else { "" }
     exec { & npm install $logLevelParam }
 }
 
