@@ -25,7 +25,6 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
-    --
     21/03/2018 - added functionality to install the VSCode context menus. Also, VSCode is now always added to the search path
     --
     20/03/2018 - fix OS detection to prevent error
