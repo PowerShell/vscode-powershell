@@ -1,0 +1,8 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# These test fixtures require crlf
+folding-crlf.ps1  text eol=crlf
+
+# These test fixtures require lf
+folding-lf.ps1    text eol=lf

@@ -36,10 +36,32 @@ suite("Features", () => {
             assert.notEqual(psGrammar, null);
         });
 
-        test("Can detect all of the foldable regions in a document", async () => {
-            // Integration test against the test fixture 'folding.ps1' that contains
+        test("Can detect all of the foldable regions in a document with CRLF line endings", async () => {
+            // Integration test against the test fixture 'folding-crlf.ps1' that contains
             // all of the different types of folding available
-            const uri = vscode.Uri.file(path.join(fixturePath, "folding.ps1"));
+            const uri = vscode.Uri.file(path.join(fixturePath, "folding-crlf.ps1"));
+            const document = await vscode.workspace.openTextDocument(uri);
+            const result = await provider.provideFoldingRanges(document, null, null);
+
+            const expected = [
+                { start: 1,  end: 6,  kind: 1 },
+                { start: 7,  end: 46, kind: 3 },
+                { start: 8,  end: 13, kind: 1 },
+                { start: 14, end: 17, kind: 3 },
+                { start: 21, end: 23, kind: 1 },
+                { start: 25, end: 35, kind: 3 },
+                { start: 27, end: 31, kind: 3 },
+                { start: 37, end: 39, kind: 3 },
+                { start: 42, end: 45, kind: 3 },
+            ];
+
+            assertFoldingRegions(result, expected);
+        });
+
+        test("Can detect all of the foldable regions in a document with LF line endings", async () => {
+            // Integration test against the test fixture 'folding-lf.ps1' that contains
+            // all of the different types of folding available
+            const uri = vscode.Uri.file(path.join(fixturePath, "folding-lf.ps1"));
             const document = await vscode.workspace.openTextDocument(uri);
             const result = await provider.provideFoldingRanges(document, null, null);
 
