@@ -2,19 +2,9 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { Logger, LogLevel } from "../src/logging";
+import { ILogger } from "../src/logging";
 
-export class MockLogger extends Logger {
-    // Note - This is not a true mock as the constructor is inherited and causes errors due to trying load
-    // the "PowerShell Extension Logs" multiple times.  Ideally logging should be via an interface and then
-    // we can mock correctly.
-
-    public dispose() { return undefined; }
-
-    public getLogFilePath(baseName: string): string { return "mock"; }
-
-    public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]) { return undefined; }
-
+export class MockLogger implements ILogger {
     public write(message: string, ...additionalMessages: string[]) { return undefined; }
 
     public writeDiagnostic(message: string, ...additionalMessages: string[]) { return undefined; }
@@ -28,6 +18,4 @@ export class MockLogger extends Logger {
     public writeError(message: string, ...additionalMessages: string[]) { return undefined; }
 
     public writeAndShowError(message: string, ...additionalMessages: string[]) { return undefined; }
-
-    public startNewLog(minimumLogLevel: string = "Normal") { return undefined; }
 }
