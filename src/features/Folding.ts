@@ -8,6 +8,7 @@ import * as vscode from "vscode";
 import {
     DocumentSelector,
     LanguageClient,
+    Position,
 } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { ILogger } from "../logging";
@@ -193,8 +194,24 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
         // If the grammar hasn't been setup correctly, return empty result
         if (this.powershellGrammar == null) { return []; }
 
-        // Convert the document text into a series of grammar tokens
-        const tokens: ITokenList = this.powershellGrammar.tokenizeLine(document.getText(), null).tokens;
+        // Tokenize each line and build up an array of document-wide tokens
+        // Note that line endings (CRLF/LF/CR) have interpolation issues so don't
+        // tokenize an entire document if the line endings are variable.
+        const tokens: ITokenList = new Array<IToken>();
+        let tokenizationState = null;
+        for (let i = 0; i < document.lineCount; i++) {
+            const result = this.powershellGrammar.tokenizeLine(document.lineAt(i).text, tokenizationState);
+            const offset = document.offsetAt(new vscode.Position(i, 0)) ;
+
+            for (const item of result.tokens) {
+                // Add the offset of the line to translate a character offset into
+                // a document based index
+                item.startIndex += offset;
+                item.endIndex += offset;
+                tokens.push(item);
+            }
+            tokenizationState = result.ruleStack;
+        }
 
         // Parse the token list looking for matching tokens and return
         // a list of LineNumberRange objects.  Then filter the list and only return matches
