@@ -13,6 +13,9 @@ import Settings = require("./settings");
 import utils = require("./utils");
 
 export class PowerShellProcess {
+    public static escapeSingleQuotes(pspath: string): string {
+        return pspath.replace(new RegExp("'", "g"), "''");
+    }
 
     public onExited: vscode.Event<void>;
     private onExitedEmitter = new vscode.EventEmitter<void>();
@@ -23,6 +26,7 @@ export class PowerShellProcess {
 
     constructor(
         public exePath: string,
+        private bundledModulesPath: string,
         private title: string,
         private log: Logger,
         private startArgs: string,
@@ -40,7 +44,8 @@ export class PowerShellProcess {
                     const startScriptPath =
                         path.resolve(
                             __dirname,
-                            "../../scripts/Start-EditorServices.ps1");
+                            this.bundledModulesPath,
+                            "PowerShellEditorServices/Start-EditorServices.ps1");
 
                     const editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
@@ -50,8 +55,8 @@ export class PowerShellProcess {
                             : "";
 
                     this.startArgs +=
-                        `-LogPath '${editorServicesLogPath}' ` +
-                        `-SessionDetailsPath '${this.sessionFilePath}' ` +
+                        `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
+                        `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
                         `-FeatureFlags @(${featureFlags})`;
 
                     const powerShellArgs = [
@@ -66,7 +71,7 @@ export class PowerShellProcess {
 
                     powerShellArgs.push(
                         "-Command",
-                        "& '" + startScriptPath + "' " + this.startArgs);
+                        "& '" + PowerShellProcess.escapeSingleQuotes(startScriptPath) + "' " + this.startArgs);
 
                     let powerShellExePath = this.exePath;
 

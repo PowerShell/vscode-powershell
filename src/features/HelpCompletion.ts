@@ -6,6 +6,8 @@ import { Disposable, EndOfLine, Position, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
+import Settings = require("../settings");
 
 export const CommentHelpRequestType =
     new RequestType<any, any, void, void>("powerShell/getCommentHelp");
@@ -26,32 +28,49 @@ export class HelpCompletionFeature implements IFeature {
     private helpCompletionProvider: HelpCompletionProvider;
     private languageClient: LanguageClient;
     private disposable: Disposable;
+    private settings: Settings.ISettings;
 
-    constructor() {
-        this.helpCompletionProvider = new HelpCompletionProvider();
-        const subscriptions = [];
-        workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
-        this.disposable = Disposable.from(...subscriptions);
+    constructor(private log: Logger) {
+        this.settings = Settings.load();
+
+        if (this.settings.helpCompletion !== Settings.HelpCompletion.Disabled) {
+            this.helpCompletionProvider = new HelpCompletionProvider();
+            const subscriptions = [];
+            workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
+            this.disposable = Disposable.from(...subscriptions);
+        }
     }
 
     public dispose() {
-        this.disposable.dispose();
+        if (this.disposable) {
+            this.disposable.dispose();
+        }
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
-        this.helpCompletionProvider.languageClient = languageClient;
+        if (this.helpCompletionProvider) {
+            this.helpCompletionProvider.languageClient = languageClient;
+        }
     }
 
     public onEvent(changeEvent: TextDocumentChangeEvent): void {
-        this.helpCompletionProvider.updateState(
-            changeEvent.document,
-            changeEvent.contentChanges[0].text,
-            changeEvent.contentChanges[0].range);
+        if (!(changeEvent && changeEvent.contentChanges)) {
+            this.log.writeWarning(`<${HelpCompletionFeature.name}>: ` +
+                `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
+            return;
+        }
 
-        // todo raise an event when trigger is found, and attach complete() to the event.
-        if (this.helpCompletionProvider.triggerFound) {
-            this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+        if (changeEvent.contentChanges.length > 0) {
+            this.helpCompletionProvider.updateState(
+                changeEvent.document,
+                changeEvent.contentChanges[0].text,
+                changeEvent.contentChanges[0].range);
+
+            // todo raise an event when trigger is found, and attach complete() to the event.
+            if (this.helpCompletionProvider.triggerFound) {
+                this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+            }
         }
     }
 }
@@ -60,6 +79,7 @@ class TriggerFinder {
     private state: SearchState;
     private document: TextDocument;
     private count: number;
+
     constructor(private triggerCharacters: string) {
         this.state = SearchState.Searching;
         this.count = 0;
@@ -105,20 +125,20 @@ class TriggerFinder {
 }
 
 class HelpCompletionProvider {
-    private triggerFinderBlockComment: TriggerFinder;
-    private triggerFinderLineComment: TriggerFinder;
+    private triggerFinderHelpComment: TriggerFinder;
     private lastChangeText: string;
     private lastChangeRange: Range;
     private lastDocument: TextDocument;
     private langClient: LanguageClient;
+    private settings: Settings.ISettings;
 
     constructor() {
-        this.triggerFinderBlockComment = new TriggerFinder("<#");
-        this.triggerFinderLineComment = new TriggerFinder("##");
+        this.triggerFinderHelpComment = new TriggerFinder("##");
+        this.settings = Settings.load();
     }
 
     public get triggerFound(): boolean {
-        return this.triggerFinderBlockComment.found || this.triggerFinderLineComment.found;
+        return this.triggerFinderHelpComment.found;
     }
 
     public set languageClient(value: LanguageClient) {
@@ -129,13 +149,11 @@ class HelpCompletionProvider {
         this.lastDocument = document;
         this.lastChangeText = changeText;
         this.lastChangeRange = changeRange;
-        this.triggerFinderBlockComment.updateState(document, changeText);
-        this.triggerFinderLineComment.updateState(document, changeText);
+        this.triggerFinderHelpComment.updateState(document, changeText);
     }
 
     public reset(): void {
-        this.triggerFinderBlockComment.reset();
-        this.triggerFinderLineComment.reset();
+        this.triggerFinderHelpComment.reset();
     }
 
     public complete(): Thenable<void> {
@@ -153,7 +171,7 @@ class HelpCompletionProvider {
             {
                 documentUri: doc.uri.toString(),
                 triggerPosition: triggerStartPos,
-                blockComment: this.triggerFinderBlockComment.found,
+                blockComment: this.settings.helpCompletion === Settings.HelpCompletion.BlockComment,
             }).then((result) => {
                 if (result == null || result.content == null) {
                     return;

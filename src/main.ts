@@ -6,6 +6,7 @@
 
 import path = require("path");
 import vscode = require("vscode");
+import { DocumentSelector } from "vscode-languageclient";
 import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
@@ -17,12 +18,13 @@ import { DocumentFormatterFeature } from "./features/DocumentFormatter";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
+import { FindModuleFeature } from "./features/FindModule";
+import { FoldingFeature } from "./features/Folding";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
-import { FindModuleFeature } from "./features/PowerShellFindModule";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { SelectPSSARulesFeature } from "./features/SelectPSSARules";
 import { ShowHelpFeature } from "./features/ShowOnlineHelp";
@@ -34,11 +36,16 @@ import utils = require("./utils");
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-const requiredEditorServicesVersion = "1.6.0";
+const requiredEditorServicesVersion = "1.7.0";
 
 let logger: Logger;
 let sessionManager: SessionManager;
 let extensionFeatures: IFeature[] = [];
+
+const documentSelector: DocumentSelector = [
+    { language: "powershell", scheme: "file" },
+    { language: "powershell", scheme: "untitled" },
+];
 
 export function activate(context: vscode.ExtensionContext): void {
 
@@ -100,10 +107,14 @@ export function activate(context: vscode.ExtensionContext): void {
     // Create the logger
     logger = new Logger();
 
+    // Set the log level
+    const extensionSettings = Settings.load();
+    logger.MinimumLogLevel = LogLevel[extensionSettings.developer.editorServicesLogLevel];
+
     sessionManager =
         new SessionManager(
             requiredEditorServicesVersion,
-            logger);
+            logger, documentSelector);
 
     // Create features
     extensionFeatures = [
@@ -115,22 +126,22 @@ export function activate(context: vscode.ExtensionContext): void {
         new ShowHelpFeature(),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
-        new ExtensionCommandsFeature(),
+        new ExtensionCommandsFeature(logger),
         new SelectPSSARulesFeature(),
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
-        new DocumentFormatterFeature(logger),
+        new DocumentFormatterFeature(logger, documentSelector),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager),
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context),
-        new HelpCompletionFeature(),
+        new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
+        new FoldingFeature(logger, documentSelector),
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
 
-    const extensionSettings = Settings.load();
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }

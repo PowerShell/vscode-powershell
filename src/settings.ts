@@ -14,8 +14,23 @@ enum CodeFormattingPreset {
     Stroustrup,
 }
 
+export enum HelpCompletion {
+    Disabled = "Disabled",
+    BlockComment = "BlockComment",
+    LineComment = "LineComment",
+}
+
+export interface IPowerShellAdditionalExePathSettings {
+    versionName: string;
+    exePath: string;
+}
+
 export interface IBugReportingSettings {
     project: string;
+}
+
+export interface ICodeFoldingSettings {
+    enable?: boolean;
 }
 
 export interface ICodeFormattingSettings {
@@ -50,13 +65,18 @@ export interface IDeveloperSettings {
 }
 
 export interface ISettings {
+    powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
+    powerShellDefaultVersion?: string;
     powerShellExePath?: string;
+    bundledModulesPath?: string;
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
+    helpCompletion: string;
     scriptAnalysis?: IScriptAnalysisSettings;
     debugging?: IDebuggingSettings;
     developer?: IDeveloperSettings;
+    codeFolding?: ICodeFoldingSettings;
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
     bugReporting?: IBugReportingSettings;
@@ -88,10 +108,14 @@ export function load(): ISettings {
     const defaultDeveloperSettings: IDeveloperSettings = {
         featureFlags: [],
         powerShellExePath: undefined,
-        bundledModulesPath: undefined,
+        bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
         powerShellExeIsWindowsDevBuild: false,
+    };
+
+    const defaultCodeFoldingSettings: ICodeFoldingSettings = {
+        enable: true,
     };
 
     const defaultCodeFormattingSettings: ICodeFormattingSettings = {
@@ -115,18 +139,28 @@ export function load(): ISettings {
     return {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
+        powerShellAdditionalExePaths:
+            configuration.get<IPowerShellAdditionalExePathSettings[]>("powerShellAdditionalExePaths", undefined),
+        powerShellDefaultVersion:
+            configuration.get<string>("powerShellDefaultVersion", undefined),
         powerShellExePath:
             configuration.get<string>("powerShellExePath", undefined),
+        bundledModulesPath:
+            "../../modules",
         useX86Host:
             configuration.get<boolean>("useX86Host", false),
         enableProfileLoading:
             configuration.get<boolean>("enableProfileLoading", false),
+        helpCompletion:
+            configuration.get<string>("helpCompletion", HelpCompletion.BlockComment),
         scriptAnalysis:
             configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
         debugging:
             configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
         developer:
-            configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
+            getWorkspaceSettingsWithDefaults<IDeveloperSettings>(configuration, "developer", defaultDeveloperSettings),
+        codeFolding:
+            configuration.get<ICodeFoldingSettings>("codeFolding", defaultCodeFoldingSettings),
         codeFormatting:
             configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
         integratedConsole:
@@ -142,4 +176,19 @@ export function change(settingName: string, newValue: any, global: boolean = fal
             utils.PowerShellLanguageId);
 
     return configuration.update(settingName, newValue, global);
+}
+
+function getWorkspaceSettingsWithDefaults<TSettings>(
+    workspaceConfiguration: vscode.WorkspaceConfiguration,
+    settingName: string,
+    defaultSettings: TSettings): TSettings {
+
+    const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
+
+    for (const setting in importedSettings) {
+        if (importedSettings[setting]) {
+            defaultSettings[setting] = importedSettings[setting];
+        }
+    }
+    return defaultSettings;
 }

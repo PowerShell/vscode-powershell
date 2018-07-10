@@ -2,24 +2,24 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { hostname } from "os";
-import { dirname } from "path";
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, ProviderResult, WorkspaceFolder } from "vscode";
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
-import { getPlatformDetails, IPlatformDetails, OperatingSystem } from "../platform";
+import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
 
+export const StartDebuggerNotificationType =
+    new NotificationType<void, void>("powerShell/startDebugger");
+
 export class DebugSessionFeature implements IFeature, DebugConfigurationProvider {
 
     private sessionCount: number = 1;
     private command: vscode.Disposable;
-    private examplesPath: string;
     private tempDebugProcess: PowerShellProcess;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager) {
@@ -32,7 +32,14 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
-        // There is no implementation for this IFeature method
+        languageClient.onNotification(
+            StartDebuggerNotificationType,
+            () =>
+                vscode.debug.startDebugging(undefined, {
+                    request: "launch",
+                    type: "PowerShell",
+                    name: "PowerShell Interactive Session",
+        }));
     }
 
     // DebugConfigurationProvider method
@@ -41,7 +48,8 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         config: DebugConfiguration,
         token?: CancellationToken): ProviderResult<DebugConfiguration> {
 
-        const currentDocument = vscode.window.activeTextEditor.document;
+        // Starting a debug session can be done when there is no document open e.g. attach to PS host process
+        const currentDocument = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.document : undefined;
         const debugCurrentScript = (config.script === "${file}") || !config.request;
         const generateLaunchConfig = !config.request;
 
@@ -74,20 +82,34 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     ? currentDocument.uri.toString()
                     : currentDocument.fileName;
 
-            // For a folder-less workspace, vscode.workspace.rootPath will be undefined.
-            // PSES will convert that undefined to a reasonable working dir.
-            config.cwd =
-                currentDocument.isUntitled
-                    ? vscode.workspace.rootPath
-                    : currentDocument.fileName;
+            if (settings.debugging.createTemporaryIntegratedConsole) {
+                // For a folder-less workspace, vscode.workspace.rootPath will be undefined.
+                // PSES will convert that undefined to a reasonable working dir.
+                config.cwd =
+                    currentDocument.isUntitled
+                        ? vscode.workspace.rootPath
+                        : currentDocument.fileName;
+
+            } else {
+                // If the non-temp integrated console is being used, default to the current working dir.
+                config.cwd = "";
+            }
         }
 
         if (config.request === "launch") {
 
             // For debug launch of "current script" (saved or unsaved), warn before starting the debugger if either
-            // A) the unsaved document's language type is not PowerShell or
-            // B) the saved document's extension is a type that PowerShell can't debug.
+            // A) there is not an active document
+            // B) the unsaved document's language type is not PowerShell
+            // C) the saved document's extension is a type that PowerShell can't debug.
             if (debugCurrentScript) {
+
+                if (currentDocument === undefined) {
+                    const msg = "To debug the \"Current File\", you must first open a " +
+                                "PowerShell script file in the editor.";
+                    vscode.window.showErrorMessage(msg);
+                    return;
+                }
 
                 if (currentDocument.isUntitled) {
                     if (currentDocument.languageId === "powershell") {
@@ -118,7 +140,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                             path = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
                         }
 
-                        const msg = "'" + path + "' is a file type that cannot be debugged by the PowerShell debugger.";
+                        const msg = "PowerShell does not support debugging this file type: '" + path + "'.";
                         vscode.window.showErrorMessage(msg);
                         return;
                     }
@@ -129,7 +151,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                 }
             }
 
-            if (config.cwd === "${file}") {
+            if ((currentDocument !== undefined) && (config.cwd === "${file}")) {
                 config.cwd = currentDocument.fileName;
             }
 
@@ -178,20 +200,9 @@ export class SpecifyScriptArgsFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
     private context: vscode.ExtensionContext;
-    private emptyInputBoxBugFixed: boolean;
 
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
-
-        const vscodeVersionArray = vscode.version.split(".");
-        const editorVersion = {
-            major: Number(vscodeVersionArray[0]),
-            minor: Number(vscodeVersionArray[1]),
-        };
-
-        this.emptyInputBoxBugFixed =
-            ((editorVersion.major > 1) ||
-            ((editorVersion.major === 1) && (editorVersion.minor > 12)));
 
         this.command =
             vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
@@ -207,7 +218,7 @@ export class SpecifyScriptArgsFeature implements IFeature {
         this.command.dispose();
     }
 
-    private specifyScriptArguments(): Thenable<string[] | string> {
+    private specifyScriptArguments(): Thenable<string> {
         const powerShellDbgScriptArgsKey = "powerShellDebugScriptArgs";
 
         const options: vscode.InputBoxOptions = {
@@ -215,21 +226,16 @@ export class SpecifyScriptArgsFeature implements IFeature {
             placeHolder: "Enter script arguments or leave empty to pass no args",
         };
 
-        if (this.emptyInputBoxBugFixed) {
-            const prevArgs = this.context.workspaceState.get(powerShellDbgScriptArgsKey, "");
-            if (prevArgs.length > 0) {
-                options.value = prevArgs;
-            }
+        const prevArgs = this.context.workspaceState.get(powerShellDbgScriptArgsKey, "");
+        if (prevArgs.length > 0) {
+            options.value = prevArgs;
         }
 
         return vscode.window.showInputBox(options).then((text) => {
             // When user cancel's the input box (by pressing Esc), the text value is undefined.
+            // Let's not blow away the previous settting.
             if (text !== undefined) {
-                if (this.emptyInputBoxBugFixed) {
-                   this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
-                }
-
-                return new Array(text);
+                this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
             }
 
             return text;
@@ -353,7 +359,9 @@ export class PickPSHostProcessFeature implements IFeature {
             };
 
             return vscode.window.showQuickPick(items, options).then((item) => {
-                return item ? item.pid : "";
+                // Return undefined when user presses Esc.
+                // This prevents VSCode from opening launch.json in this case which happens if we return "".
+                return item ? `${item.pid}` : undefined;
             });
         });
     }

@@ -3,6 +3,7 @@
  *--------------------------------------------------------*/
 
 import cp = require("child_process");
+import crypto = require("crypto");
 import fs = require("fs");
 import net = require("net");
 import os = require("os");
@@ -17,7 +18,7 @@ import Settings = require("./settings");
 import utils = require("./utils");
 
 import {
-    CloseAction, ErrorAction, Executable, LanguageClient, LanguageClientOptions,
+    CloseAction, DocumentSelector, ErrorAction, Executable, LanguageClient, LanguageClientOptions,
     Middleware, NotificationType, RequestType, RequestType0,
     ResolveCodeLensSignature, RevealOutputChannelOn, StreamInfo } from "vscode-languageclient";
 
@@ -26,6 +27,7 @@ import {
     getPlatformDetails, IPlatformDetails, OperatingSystem } from "./platform";
 
 export enum SessionStatus {
+    NeverStarted,
     NotStarted,
     Initializing,
     Running,
@@ -40,7 +42,7 @@ export class SessionManager implements Middleware {
     private hostVersion: string;
     private editorServicesArgs: string;
     private powerShellExePath: string = "";
-    private sessionStatus: SessionStatus;
+    private sessionStatus: SessionStatus = SessionStatus.NeverStarted;
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
     private platformDetails: IPlatformDetails;
@@ -53,6 +55,7 @@ export class SessionManager implements Middleware {
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
+    private bundledModulesPath: string;
 
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
@@ -62,7 +65,8 @@ export class SessionManager implements Middleware {
 
     constructor(
         private requiredEditorServicesVersion: string,
-        private log: Logger) {
+        private log: Logger,
+        private documentSelector: DocumentSelector) {
 
         this.platformDetails = getPlatformDetails();
 
@@ -144,18 +148,17 @@ export class SessionManager implements Middleware {
 
         if (this.powerShellExePath) {
 
-            let bundledModulesPath = path.resolve(__dirname, "../../modules");
+            this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
 
             if (this.inDevelopmentMode) {
                 const devBundledModulesPath =
                     path.resolve(
                         __dirname,
-                        this.sessionSettings.developer.bundledModulesPath ||
-                        "../../../PowerShellEditorServices/module");
+                        this.sessionSettings.developer.bundledModulesPath);
 
                 // Make sure the module's bin path exists
                 if (fs.existsSync(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
-                    bundledModulesPath = devBundledModulesPath;
+                    this.bundledModulesPath = devBundledModulesPath;
                 } else {
                     this.log.write(
                         "\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
@@ -163,27 +166,26 @@ export class SessionManager implements Middleware {
                 }
             }
 
+            // Generate a random id for the named pipes in case they have multiple instances of PSES running
+            const id = crypto.randomBytes(10).toString("hex");
             this.editorServicesArgs =
-                "-EditorServicesVersion '" + this.requiredEditorServicesVersion + "' " +
-                "-HostName 'Visual Studio Code Host' " +
-                "-HostProfileId 'Microsoft.VSCode' " +
-                "-HostVersion '" + this.hostVersion + "' " +
-                "-AdditionalModules @('PowerShellEditorServices.VSCode') " +
-                "-BundledModulesPath '" + bundledModulesPath + "' " +
-                "-EnableConsoleRepl ";
+                `-HostName 'Visual Studio Code Host' ` +
+                `-HostProfileId 'Microsoft.VSCode' ` +
+                `-HostVersion '${this.hostVersion}'` +
+                `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
+                `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}'` +
+                `-EnableConsoleRepl ` +
+                `-LanguageServicePipeName LanguageService_${id}.pipe ` +
+                `-DebugServicePipeName DebugService_${id}.pipe `;
 
             if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
                 this.editorServicesArgs += "-WaitForDebugger ";
             }
             if (this.sessionSettings.developer.editorServicesLogLevel) {
-                this.editorServicesArgs += "-LogLevel '" + this.sessionSettings.developer.editorServicesLogLevel + "' ";
+                this.editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
             }
 
-            this.startPowerShell(
-                this.powerShellExePath,
-                this.sessionSettings.developer.powerShellExeIsWindowsDevBuild,
-                bundledModulesPath,
-                this.editorServicesArgs);
+            this.startPowerShell();
         } else {
             this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
         }
@@ -235,6 +237,7 @@ export class SessionManager implements Middleware {
         this.debugSessionProcess =
             new PowerShellProcess(
                 this.powerShellExePath,
+                this.bundledModulesPath,
                 "[TEMP] PowerShell Integrated Console",
                 this.log,
                 this.editorServicesArgs + "-DebugServiceOnly ",
@@ -245,6 +248,7 @@ export class SessionManager implements Middleware {
     }
 
     public getPowerShellExePath(): string {
+        let powerShellExePath: string;
 
         if (!this.sessionSettings.powerShellExePath &&
             this.sessionSettings.developer.powerShellExePath) {
@@ -279,11 +283,27 @@ export class SessionManager implements Middleware {
                 });
         }
 
+        // If powershell.powerShellDefaultVersion specified, attempt to find the PowerShell exe path
+        // of the version specified by the setting.
+        if ((this.sessionStatus === SessionStatus.NeverStarted) && this.sessionSettings.powerShellDefaultVersion) {
+            const powerShellExePaths = getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
+            const powerShellDefaultVersion =
+                powerShellExePaths.find((item) => item.versionName === this.sessionSettings.powerShellDefaultVersion);
+
+            if (powerShellDefaultVersion) {
+                powerShellExePath = powerShellDefaultVersion.exePath;
+            } else {
+                this.log.writeWarning(
+                    `Could not find powerShellDefaultVersion: '${this.sessionSettings.powerShellDefaultVersion}'`);
+            }
+        }
+
         // Is there a setting override for the PowerShell path?
-        let powerShellExePath =
-            (this.sessionSettings.powerShellExePath ||
-                this.sessionSettings.developer.powerShellExePath ||
-                "").trim();
+        powerShellExePath =
+            (powerShellExePath ||
+             this.sessionSettings.powerShellExePath ||
+             this.sessionSettings.developer.powerShellExePath ||
+             "").trim();
 
         // New versions of PS Core uninstall the previous version
         // so make sure the path stored in the settings exists.
@@ -444,11 +464,7 @@ export class SessionManager implements Middleware {
         ];
     }
 
-    private startPowerShell(
-        powerShellExePath: string,
-        isWindowsDevBuild: boolean,
-        bundledModulesPath: string,
-        startArgs: string) {
+    private startPowerShell() {
 
         this.setSessionStatus(
             "Starting PowerShell...",
@@ -461,9 +477,10 @@ export class SessionManager implements Middleware {
         this.languageServerProcess =
             new PowerShellProcess(
                 this.powerShellExePath,
+                this.bundledModulesPath,
                 "PowerShell Integrated Console",
                 this.log,
-                startArgs,
+                this.editorServicesArgs,
                 sessionFilePath,
                 this.sessionSettings);
 
@@ -519,18 +536,18 @@ export class SessionManager implements Middleware {
 
     private startLanguageClient(sessionDetails: utils.IEditorServicesSessionDetails) {
 
-        const port = sessionDetails.languageServicePort;
+        const pipeName = sessionDetails.languageServicePipeName;
 
         // Log the session details object
         this.log.write(JSON.stringify(sessionDetails));
 
         try {
-            this.log.write("Connecting to language service on port " + port + "...");
+            this.log.write("Connecting to language service on pipe " + pipeName + "...");
 
             const connectFunc = () => {
                 return new Promise<StreamInfo>(
                     (resolve, reject) => {
-                        const socket = net.connect(port);
+                        const socket = net.connect(utils.getPipePath(pipeName));
                         socket.on(
                             "connect",
                             () => {
@@ -541,7 +558,7 @@ export class SessionManager implements Middleware {
             };
 
             const clientOptions: LanguageClientOptions = {
-                documentSelector: [utils.PowerShellLanguageId],
+                documentSelector: this.documentSelector,
                 synchronize: {
                     configurationSection: utils.PowerShellLanguageId,
                     // fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
@@ -717,12 +734,25 @@ export class SessionManager implements Middleware {
     private showSessionMenu() {
         let menuItems: SessionMenuItem[] = [];
 
+        const currentExePath = (this.powerShellExePath || "").toLowerCase();
+        const availablePowerShellExes =
+            getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
+
         if (this.sessionStatus === SessionStatus.Running) {
+            const currentPowerShellExe =
+                availablePowerShellExes
+                    .find((item) => item.exePath.toLowerCase() === currentExePath);
+
+            const powerShellSessionName =
+                currentPowerShellExe ?
+                    currentPowerShellExe.versionName :
+                    `PowerShell ${this.versionDetails.displayVersion} ` +
+                    `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
+                    `[${this.versionDetails.version}]`;
+
             menuItems = [
                 new SessionMenuItem(
-                    `Current session: PowerShell ${this.versionDetails.displayVersion} ` +
-                    `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
-                    `[${this.versionDetails.version}]`,
+                    `Current session: ${powerShellSessionName}`,
                     () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
 
                 new SessionMenuItem(
@@ -737,9 +767,8 @@ export class SessionManager implements Middleware {
             ];
         }
 
-        const currentExePath = (this.powerShellExePath || "").toLowerCase();
         const powerShellItems =
-            getAvailablePowerShellExes(this.platformDetails)
+            availablePowerShellExes
                 .filter((item) => item.exePath.toLowerCase() !== currentExePath)
                 .map((item) => {
                     return new SessionMenuItem(

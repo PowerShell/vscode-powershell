@@ -3,11 +3,18 @@
  *--------------------------------------------------------*/
 
 import fs = require("fs");
-import os = require("os");
 import path = require("path");
 import process = require("process");
-import vscode = require("vscode");
 import Settings = require("./settings");
+
+const linuxExePath        = "/usr/bin/pwsh";
+const linuxPreviewExePath = "/usr/bin/pwsh-preview";
+
+const snapExePath         = "/snap/bin/pwsh";
+const snapPreviewExePath  = "/snap/bin/pwsh-preview";
+
+const macOSExePath        = "/usr/local/bin/pwsh";
+const macOSPreviewExePath = "/usr/local/bin/pwsh-preview";
 
 export enum OperatingSystem {
     Unknown,
@@ -47,6 +54,13 @@ export function getPlatformDetails(): IPlatformDetails {
     };
 }
 
+/**
+ * Gets the default instance of PowerShell for the specified platform.
+ * On Windows, the default version of PowerShell is "Windows PowerShell".
+ * @param platformDetails Specifies information about the platform - primarily the operating system.
+ * @param use32Bit On Windows, this boolean determines whether the 32-bit version of Windows PowerShell is returned.
+ * @returns A string containing the path of the default version of PowerShell.
+ */
 export function getDefaultPowerShellPath(
     platformDetails: IPlatformDetails,
     use32Bit: boolean = false): string | null {
@@ -68,14 +82,21 @@ export function getDefaultPowerShellPath(
                     : SysnativePowerShellPath;
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
-        powerShellExePath = "/usr/local/bin/powershell";
-        if (fs.existsSync("/usr/local/bin/pwsh")) {
-            powerShellExePath = "/usr/local/bin/pwsh";
+        // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
+        powerShellExePath = macOSExePath;
+        if (!fs.existsSync(macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
+            powerShellExePath = macOSPreviewExePath;
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
-        powerShellExePath = "/usr/bin/powershell";
-        if (fs.existsSync("/usr/bin/pwsh")) {
-            powerShellExePath = "/usr/bin/pwsh";
+        // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
+        // as well as the Snaps case - https://snapcraft.io/
+        powerShellExePath = linuxExePath;
+        if (!fs.existsSync(linuxExePath) && fs.existsSync(linuxPreviewExePath)) {
+            powerShellExePath = linuxPreviewExePath;
+        } else if (fs.existsSync(snapExePath)) {
+            powerShellExePath = snapExePath;
+        } else if (fs.existsSync(snapPreviewExePath)) {
+            powerShellExePath = snapPreviewExePath;
         }
     }
 
@@ -108,14 +129,19 @@ export function fixWindowsPowerShellPath(powerShellExePath: string, platformDeta
     return powerShellExePath;
 }
 
-export function getAvailablePowerShellExes(platformDetails: IPlatformDetails): IPowerShellExeDetails[] {
+/**
+ * Gets a list of all available PowerShell instance on the specified platform.
+ * @param platformDetails Specifies information about the platform - primarily the operating system.
+ * @param sessionSettings Specifies the user/workspace settings. Additional PowerShell exe paths loaded from settings.
+ * @returns An array of IPowerShellExeDetails objects with the PowerShell name & exe path for each instance found.
+ */
+export function getAvailablePowerShellExes(
+    platformDetails: IPlatformDetails,
+    sessionSettings: Settings.ISettings | undefined): IPowerShellExeDetails[] {
 
     let paths: IPowerShellExeDetails[] = [];
 
     if (platformDetails.operatingSystem === OperatingSystem.Windows) {
-        const psCoreInstallPath =
-            (!platformDetails.isProcess64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + "\\PowerShell";
-
         if (platformDetails.isProcess64Bit) {
             paths.push({
                 versionName: WindowsPowerShell64BitLabel,
@@ -140,32 +166,56 @@ export function getAvailablePowerShellExes(platformDetails: IPlatformDetails): I
             });
         }
 
+        const psCoreInstallPath =
+            (!platformDetails.isProcess64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + "\\PowerShell";
+
         if (fs.existsSync(psCoreInstallPath)) {
+            const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
             const psCorePaths =
                 fs.readdirSync(psCoreInstallPath)
                 .map((item) => path.join(psCoreInstallPath, item))
-                .filter((item) => fs.lstatSync(item).isDirectory())
-                .map((item) => {
-                    let exePath = path.join(item, "pwsh.exe");
-                    if (!fs.existsSync(exePath)) {
-                        exePath = path.join(item, "powershell.exe");
-                    }
-
-                    return {
-                        versionName: `PowerShell Core ${path.parse(item).base}`,
-                        exePath,
-                    };
-                });
+                .filter((item) => {
+                    const exePath = path.join(item, "pwsh.exe");
+                    return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
+                })
+                .map((item) => ({
+                    versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
+                    exePath: path.join(item, "pwsh.exe"),
+                }));
 
             if (psCorePaths) {
                 paths = paths.concat(psCorePaths);
             }
         }
     } else {
-        paths.push({
-            versionName: "PowerShell Core",
-            exePath: this.getDefaultPowerShellPath(platformDetails),
+        // Handle Linux and macOS case
+        let exePaths: string[];
+
+        if (platformDetails.operatingSystem === OperatingSystem.Linux) {
+            exePaths = [ linuxExePath, snapExePath, linuxPreviewExePath, snapPreviewExePath ];
+        } else {
+            exePaths = [ macOSExePath, macOSPreviewExePath ];
+        }
+
+        exePaths.forEach((exePath) => {
+            if (fs.existsSync(exePath)) {
+                paths.push({
+                    versionName: "PowerShell Core" + (/-preview/.test(exePath) ? " Preview" : ""),
+                    exePath,
+                });
+            }
         });
+    }
+
+    // When unit testing, we don't have session settings available to test, so skip reading this setting
+    if (sessionSettings) {
+        // Add additional PowerShell paths as configured in settings
+        for (const additionalPowerShellExePath of sessionSettings.powerShellAdditionalExePaths) {
+            paths.push({
+                versionName: additionalPowerShellExePath.versionName,
+                exePath: additionalPowerShellExePath.exePath,
+            });
+        }
     }
 
     return paths;

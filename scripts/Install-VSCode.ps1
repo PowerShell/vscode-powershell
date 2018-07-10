@@ -25,7 +25,11 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    --
     21/03/2018 - added functionality to install the VSCode context menus. Also, VSCode is now always added to the search path
+    --
+    20/03/2018 - fix OS detection to prevent error
+    --
     28/12/2017 - added functionality to support 64-bit versions of VSCode
     & support for installation of VSCode Insiders Edition.
     --
@@ -135,7 +139,7 @@ param(
     [switch]$EnableContextMenus
 )
 
-if (!($IsLinux -or $IsOSX)) {
+if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
     switch ($Architecture) {
         "64-bit" {
             if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit") {

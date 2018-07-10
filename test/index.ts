@@ -1,3 +1,8 @@
+/*---------------------------------------------------------
+* Copyright (C) Microsoft Corporation. All rights reserved.
+*--------------------------------------------------------*/
+// tslint:disable no-var-requires
+
 let testRunner = require("vscode/lib/testrunner");
 
 // See https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options for options

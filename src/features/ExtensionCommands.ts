@@ -2,11 +2,13 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import os = require("os");
-import path = require("path");
-import vscode = require("vscode");
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as vscode from "vscode";
 import { LanguageClient, NotificationType, Position, Range, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export interface IExtensionCommand {
     name: string;
@@ -132,7 +134,7 @@ export const CloseFileRequestType =
         "editor/closeFile");
 
 export const SaveFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<ISaveFileDetails, EditorOperationResponse, void, void>(
         "editor/saveFile");
 
 export const ShowErrorMessageRequestType =
@@ -151,6 +153,11 @@ export const SetStatusBarMessageRequestType =
     new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void, void>(
         "editor/setStatusBarMessage");
 
+export interface ISaveFileDetails {
+    filePath: string;
+    newPath?: string;
+}
+
 export interface IStatusBarMessageDetails {
     message: string;
     timeout?: number;
@@ -166,10 +173,11 @@ export class ExtensionCommandsFeature implements IFeature {
     private languageClient: LanguageClient;
     private extensionCommands: IExtensionCommand[] = [];
 
-    constructor() {
+    constructor(private log: Logger) {
         this.command = vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", () => {
             if (this.languageClient === undefined) {
-                // TODO: Log error message
+                this.log.writeAndShowError(`<${ExtensionCommandsFeature.name}>: ` +
+                    "Unable to instantiate; language client undefined.");
                 return;
             }
 
@@ -238,7 +246,7 @@ export class ExtensionCommandsFeature implements IFeature {
 
             this.languageClient.onRequest(
                 SaveFileRequestType,
-                (filePath) => this.saveFile(filePath));
+                (saveFileDetails) => this.saveFile(saveFileDetails));
 
             this.languageClient.onRequest(
                 ShowInformationMessageRequestType,
@@ -382,23 +390,126 @@ export class ExtensionCommandsFeature implements IFeature {
         return promise;
     }
 
-    private saveFile(filePath: string): Thenable<EditorOperationResponse> {
-
-        let promise: Thenable<EditorOperationResponse>;
-        if (this.findTextDocument(this.normalizeFilePath(filePath))) {
-            promise =
-                vscode.workspace.openTextDocument(filePath)
-                    .then((doc) => {
-                        if (doc.isDirty) {
-                            doc.save();
-                        }
-                    })
-                    .then((_) => EditorOperationResponse.Completed);
+    /**
+     * Save a file, possibly to a new path. If the save is not possible, return a completed response
+     * @param saveFileDetails the object detailing the path of the file to save and optionally its new path to save to
+     */
+    private async saveFile(saveFileDetails: ISaveFileDetails): Promise<EditorOperationResponse> {
+        // Try to interpret the filepath as a URI, defaulting to "file://" if we don't succeed
+        let currentFileUri: vscode.Uri;
+        if (saveFileDetails.filePath.startsWith("untitled") || saveFileDetails.filePath.startsWith("file")) {
+            currentFileUri = vscode.Uri.parse(saveFileDetails.filePath);
         } else {
-            promise = Promise.resolve(EditorOperationResponse.Completed);
+            currentFileUri = vscode.Uri.file(saveFileDetails.filePath);
         }
 
-        return promise;
+        let newFileAbsolutePath: string;
+        switch (currentFileUri.scheme) {
+            case "file":
+                // If the file to save can't be found, just complete the request
+                if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
+                    this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
+                    return EditorOperationResponse.Completed;
+                }
+
+                // If no newFile is given, just save the current file
+                if (!saveFileDetails.newPath) {
+                    const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
+                    if (doc.isDirty) {
+                        await doc.save();
+                    }
+                    return EditorOperationResponse.Completed;
+                }
+
+                // Make sure we have an absolute path
+                if (path.isAbsolute(saveFileDetails.newPath)) {
+                    newFileAbsolutePath = saveFileDetails.newPath;
+                } else {
+                    // If not, interpret the path as relative to the current file
+                    newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
+                }
+                break;
+
+            case "untitled":
+                // We need a new name to save an untitled file
+                if (!saveFileDetails.newPath) {
+                    // TODO: Create a class handle vscode warnings and errors so we can warn easily
+                    //       without logging
+                    this.log.writeAndShowWarning(
+                        "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
+                    return EditorOperationResponse.Completed;
+                }
+
+                // Make sure we have an absolute path
+                if (path.isAbsolute(saveFileDetails.newPath)) {
+                    newFileAbsolutePath = saveFileDetails.newPath;
+                } else {
+                    // In fresh contexts, workspaceFolders is not defined...
+                    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+                        this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
+                            "Try saving to an absolute path, or open a workspace.");
+                        return EditorOperationResponse.Completed;
+                    }
+
+                    // If not, interpret the path as relative to the workspace root
+                    const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
+                    // We don't support saving to a non-file URI-schemed workspace
+                    if (workspaceRootUri.scheme !== "file") {
+                        this.log.writeAndShowWarning(
+                            "Cannot save untitled file to a relative path in an untitled workspace. " +
+                            "Try saving to an absolute path or opening a workspace folder.");
+                        return EditorOperationResponse.Completed;
+                    }
+                    newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
+                }
+                break;
+
+            default:
+                // Other URI schemes are not supported
+                const msg = JSON.stringify(saveFileDetails);
+                this.log.writeVerbose(
+                    `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
+                    `is currently unsupported. Message: '${msg}'`);
+                return EditorOperationResponse.Completed;
+        }
+
+        await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
+        return EditorOperationResponse.Completed;
+
+    }
+
+    /**
+     * Take a document available to vscode at the given URI and save it to the given absolute path
+     * @param documentUri the URI of the vscode document to save
+     * @param destinationAbsolutePath the absolute path to save the document contents to
+     */
+    private async saveDocumentContentToAbsolutePath(
+        documentUri: vscode.Uri,
+        destinationAbsolutePath: string): Promise<void> {
+            // Retrieve the text out of the current document
+            const oldDocument = await vscode.workspace.openTextDocument(documentUri);
+
+            // Write it to the new document path
+            try {
+                // TODO: Change this to be asyncronous
+                await new Promise<void>((resolve, reject) => {
+                    fs.writeFile(destinationAbsolutePath, oldDocument.getText(), (err) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        return resolve();
+                    });
+                });
+            } catch (e) {
+                this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
+                    `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
+                return;
+            }
+
+            // Finally open the new document
+            const newFileUri = vscode.Uri.file(destinationAbsolutePath);
+            const newFile = await vscode.workspace.openTextDocument(newFileUri);
+            vscode.window.showTextDocument(newFile, { preview: true });
     }
 
     private normalizeFilePath(filePath: string): string {
