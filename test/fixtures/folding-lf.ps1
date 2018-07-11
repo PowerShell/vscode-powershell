@@ -17,6 +17,11 @@ herestrings should fold
 
 '@
 
+$I = @"
+double quoted herestrings should also fold
+
+"@
+
   # this won't be folded
 
   # This block of comments should be foldable as a single block

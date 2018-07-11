@@ -45,14 +45,15 @@ suite("Features", () => {
 
             const expected = [
                 { start: 1,  end: 6,  kind: 1 },
-                { start: 7,  end: 46, kind: 3 },
+                { start: 7,  end: 51, kind: 3 },
                 { start: 8,  end: 13, kind: 1 },
                 { start: 14, end: 17, kind: 3 },
-                { start: 21, end: 23, kind: 1 },
-                { start: 25, end: 35, kind: 3 },
-                { start: 27, end: 31, kind: 3 },
-                { start: 37, end: 39, kind: 3 },
-                { start: 42, end: 45, kind: 3 },
+                { start: 19, end: 22, kind: 3 },
+                { start: 26, end: 28, kind: 1 },
+                { start: 30, end: 40, kind: 3 },
+                { start: 32, end: 36, kind: 3 },
+                { start: 42, end: 44, kind: 3 },
+                { start: 47, end: 50, kind: 3 },
             ];
 
             assertFoldingRegions(result, expected);
@@ -67,14 +68,15 @@ suite("Features", () => {
 
             const expected = [
                 { start: 1,  end: 6,  kind: 1 },
-                { start: 7,  end: 46, kind: 3 },
+                { start: 7,  end: 51, kind: 3 },
                 { start: 8,  end: 13, kind: 1 },
                 { start: 14, end: 17, kind: 3 },
-                { start: 21, end: 23, kind: 1 },
-                { start: 25, end: 35, kind: 3 },
-                { start: 27, end: 31, kind: 3 },
-                { start: 37, end: 39, kind: 3 },
-                { start: 42, end: 45, kind: 3 },
+                { start: 19, end: 22, kind: 3 },
+                { start: 26, end: 28, kind: 1 },
+                { start: 30, end: 40, kind: 3 },
+                { start: 32, end: 36, kind: 3 },
+                { start: 42, end: 44, kind: 3 },
+                { start: 47, end: 50, kind: 3 },
             ];
 
             assertFoldingRegions(result, expected);
