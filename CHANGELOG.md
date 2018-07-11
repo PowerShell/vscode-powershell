@@ -1,5 +1,11 @@
 # vscode-powershell Release History
 
+## v1.8.1
+### Wednesday, July 11, 2018
+
+- [PowerShell/vscode-powershell #1418](https://github.com/PowerShell/vscode-powershell/pull/1418) -
+  Fix code folding in documents using CRLF newlines. (Thanks @glennsarti!)
+
 ## v1.8.0
 ### Tuesday, July 10, 2018
 
