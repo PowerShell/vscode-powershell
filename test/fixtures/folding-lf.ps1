@@ -1,31 +1,31 @@
-function short-func {};
+function short-func-not-fold {};
 <#
 .SYNOPSIS
-  Displays a list of WMI Classes based upon a search criteria
+  This whole comment block should fold, not just the SYNOPSIS
 .EXAMPLE
- Get-WmiClasses -class disk -ns rootcimv2"
+  This whole comment block should fold, not just the EXAMPLE
 #>
-function New-VSCodeCannotFold {
+function New-VSCodeShouldFold {
 <#
 .SYNOPSIS
-  Displays a list of WMI Classes based upon a search criteria
+  This whole comment block should fold, not just the SYNOPSIS
 .EXAMPLE
- Get-WmiClasses -class disk -ns rootcimv2"
+  This whole comment block should fold, not just the EXAMPLE
 #>
   $I = @'
-cannot fold
+herestrings should fold
 
 '@
 
   # this won't be folded
 
-  # This should be foldable
-  # This should be foldable
-  # This should be foldable
+  # This block of comments should be foldable as a single block
+  # This block of comments should be foldable as a single block
+  # This block of comments should be foldable as a single block
 
   #region This fools the indentation folding.
   Write-Host "Hello"
-    # region
+    # region Nested regions should be foldable
     Write-Host "Hello"
     # comment1
     Write-Host "Hello"
@@ -36,12 +36,12 @@ cannot fold
     # endregion
 
   $c = {
-    Write-Host "Hello"
+    Write-Host "Script blocks should be foldable"
   }
 
   # Array fools indentation folding
   $d = @(
-  'element1',
-  'elemet2'
+  'should fold1',
+  'should fold2'
   )
 }
