@@ -172,7 +172,7 @@ export class SessionManager implements Middleware {
                 `-HostVersion '${this.hostVersion}'` +
                 `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
                 `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}'` +
-                `-EnableConsoleRepl ` +
+                `-EnableConsoleRepl `;
 
             if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
                 this.editorServicesArgs += "-WaitForDebugger ";
