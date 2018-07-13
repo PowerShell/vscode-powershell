@@ -28,12 +28,12 @@ export class GetCommandsFeature implements IFeature {
                         command.parameters,
                     );
                 };
-                this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
+                this.commandsExplorerProvider.PowerShellCommands = result.map(toCommand);
                 // this.commandsExplorerProvider.refresh();
             });
         });
         this.commandsExplorerProvider = new CommandsExplorerProvider();
-        vscode.window.registerTreeDataProvider("powerShellCommands", this.commandsExplorerProvider);
+        vscode.window.registerTreeDataProvider("PowerShellCommands", this.commandsExplorerProvider);
         vscode.commands.registerCommand(
             "PowerShell.RefreshCommandsExplorer",
             () => this.commandsExplorerProvider.refresh());
@@ -50,7 +50,7 @@ export class GetCommandsFeature implements IFeature {
 
 class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     public readonly didChangeTreeDataEvent: vscode.Event<Command | undefined>;
-    public powerShellCommands: Command[];
+    public PowerShellCommands: Command[];
     private didChangeTreeData: vscode.EventEmitter<Command | undefined> = new vscode.EventEmitter<Command>();
 
     constructor() {
@@ -66,7 +66,7 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     }
 
     public getChildren(element?: Command): Thenable<Command[]> {
-        return Promise.resolve(this.powerShellCommands ? this.powerShellCommands : []);
+        return Promise.resolve(this.PowerShellCommands ? this.PowerShellCommands : []);
     }
 
 }

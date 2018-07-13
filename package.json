@@ -62,16 +62,16 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "command-explorer",
-          "title": "Command Explorer",
+          "id": "PowerShellCommandExplorer",
+          "title": "PowerShell Command Explorer",
           "icon": "media/PwSh.svg"
         }
       ]
     },
     "views": {
-      "command-explorer": [
+      "PowerShellCommandExplorer": [
         {
-          "id": "powerShellCommands",
+          "id": "PowerShellCommands",
           "name": "PowerShell Commands"
         }
       ]
@@ -110,7 +110,7 @@
         "category": "PowerShell"
       },
       {
-				"command": "PowerShell.refreshCommandsExplorer",
+				"command": "PowerShell.RefreshCommandsExplorer",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
