@@ -222,6 +222,10 @@ export class SessionManager implements Middleware {
         return this.sessionDetails;
     }
 
+    public getSessionStatus(): SessionStatus {
+        return this.sessionStatus;
+    }
+
     public getPowerShellVersionDetails(): IPowerShellVersionDetails {
         return this.versionDetails;
     }

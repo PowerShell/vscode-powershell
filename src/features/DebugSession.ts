@@ -9,7 +9,7 @@ import { LanguageClient, NotificationType, RequestType } from "vscode-languagecl
 import { IFeature } from "../feature";
 import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
-import { SessionManager } from "../session";
+import { SessionManager, SessionStatus } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
 
@@ -48,6 +48,14 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         config: DebugConfiguration,
         token?: CancellationToken): ProviderResult<DebugConfiguration> {
 
+        // Make sure there is a session running before attempting to debug/run a program
+        if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
+            const msg = "Cannot debug or run a PowerShell script until the PowerShell session has started. " +
+                "Wait for the PowerShell session to finish starting and try again.";
+            vscode.window.showWarningMessage(msg);
+            return;
+        }
+
         // Starting a debug session can be done when there is no document open e.g. attach to PS host process
         const currentDocument = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.document : undefined;
         const debugCurrentScript = (config.script === "${file}") || !config.request;
@@ -60,10 +68,8 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             const platformDetails = getPlatformDetails();
             const versionDetails = this.sessionManager.getPowerShellVersionDetails();
 
-            if (versionDetails.edition.toLowerCase() === "core" &&
-                platformDetails.operatingSystem !== OperatingSystem.Windows) {
-
-                const msg = "PowerShell Core only supports attaching to a host process on Windows.";
+            if (platformDetails.operatingSystem !== OperatingSystem.Windows) {
+                const msg = "Attaching to a PowerShell Host Process is supported only on Windows.";
                 return vscode.window.showErrorMessage(msg).then((_) => {
                     return undefined;
                 });
