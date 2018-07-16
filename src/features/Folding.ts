@@ -180,6 +180,14 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
      */
     private readonly startRegionText = /^\s*#region\b/i;
     private readonly endRegionText = /^\s*#endregion\b/i;
+    /**
+     * This regular expressions is used to detect a line comment (as opposed to an inline comment), that is not a region
+     * block directive i.e.
+     * - No text between the beginning of the line and `#`
+     * - Comment does start with region
+     * - Comment does start with endregion
+     */
+    private readonly lineCommentText = /\s*#(?!region\b|endregion\b)/i;
 
     constructor(
         powershellGrammar: IGrammar,
@@ -318,22 +326,6 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
     }
 
     /**
-     * Given a zero based offset, find the line text preceeding it in the document
-     * @param offset   Zero based offset in the document
-     * @param document The source text document
-     * @returns        The line text preceeding the offset, not including the preceeding Line Feed
-     */
-    private preceedingText(
-        offset: number,
-        document: vscode.TextDocument,
-    ): string {
-        const endPos = document.positionAt(offset);
-        const startPos = endPos.translate(0, -endPos.character);
-
-        return document.getText(new vscode.Range(startPos, endPos));
-    }
-
-    /**
      * Given a zero based offset, find the line in the document
      * @param offset   Zero based offset in the document
      * @param document The source text document
@@ -359,19 +351,16 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
         document: vscode.TextDocument,
     ): ILineNumberRangeList {
         const result = [];
-
-        const emptyLine = /^\s*$/;
-
         let startLine: number = -1;
         let nextLine: number = -1;
 
         tokens.forEach((token) => {
             if (token.scopes.indexOf("punctuation.definition.comment.powershell") !== -1) {
+                const line: vscode.TextLine = this.lineAtOffset(token.startIndex, document);
                 // The punctuation.definition.comment.powershell token matches new-line comments
-                // and inline comments e.g. `$x = 'foo' # inline comment`.  We are only interested
-                // in comments which begin the line i.e. no preceeding text
-                if (emptyLine.test(this.preceedingText(token.startIndex, document))) {
-                    const lineNum = document.positionAt(token.startIndex).line;
+                // and inline comments e.g. `$x = 'foo' # inline comment`.
+                if (this.lineCommentText.test(line.text)) {
+                    const lineNum = line.lineNumber;
                     // A simple pattern for keeping track of contiguous numbers in a known sorted array
                     if (startLine === -1) {
                         startLine = lineNum;
