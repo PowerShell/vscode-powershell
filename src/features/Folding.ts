@@ -173,6 +173,14 @@ interface ILineNumberRangeList extends Array<LineNumberRange> { }
 export class FoldingProvider implements vscode.FoldingRangeProvider {
     private powershellGrammar: IGrammar;
 
+    /**
+     * These regular expressions are used to match lines which mark the start and end of region comment in a PowerShell
+     * script. They are based on the defaults in the VS Code Language Configuration at;
+     * https://github.com/Microsoft/vscode/blob/64186b0a26/extensions/powershell/language-configuration.json#L26-L31
+     */
+    private readonly startRegionText = /^\s*#region\b/i;
+    private readonly endRegionText = /^\s*#endregion\b/i;
+
     constructor(
         powershellGrammar: IGrammar,
     ) {
@@ -326,18 +334,16 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
     }
 
     /**
-     * Given a zero based offset, find the line text after it in the document
+     * Given a zero based offset, find the line in the document
      * @param offset   Zero based offset in the document
      * @param document The source text document
-     * @returns        The line text after the offset, not including the subsequent Line Feed
+     * @returns        The line at the offset
      */
-    private subsequentText(
+    private lineAtOffset(
         offset: number,
         document: vscode.TextDocument,
-    ): string {
-        const startPos: vscode.Position = document.positionAt(offset);
-        const endPos: vscode.Position = document.lineAt(document.positionAt(offset)).range.end;
-        return document.getText(new vscode.Range(startPos, endPos));
+    ): vscode.TextLine {
+        return document.lineAt(document.positionAt(offset));
     }
 
     /**
@@ -420,21 +426,14 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
         document: vscode.TextDocument,
     ): ITokenList {
         const result = [];
-
-        const emptyLine = /^\s*$/;
-        const startRegionText = /^#region\b/i;
-        const endRegionText = /^#endregion\b/i;
-
         tokens.forEach((token) => {
             if (token.scopes.indexOf("punctuation.definition.comment.powershell") !== -1) {
-                if (emptyLine.test(this.preceedingText(token.startIndex, document))) {
-                    const commentText = this.subsequentText(token.startIndex, document);
-                    if (startRegionText.test(commentText)) {
-                        result.push(this.addTokenScope(token, "custom.start.region"));
-                    }
-                    if (endRegionText.test(commentText)) {
-                        result.push(this.addTokenScope(token, "custom.end.region"));
-                    }
+                const line: string = this.lineAtOffset(token.startIndex, document).text;
+                if (this.startRegionText.test(line)) {
+                    result.push(this.addTokenScope(token, "custom.start.region"));
+                }
+                if (this.endRegionText.test(line)) {
+                    result.push(this.addTokenScope(token, "custom.end.region"));
                 }
             }
         });
