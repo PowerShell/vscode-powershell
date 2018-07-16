@@ -354,7 +354,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
     ): ILineNumberRangeList {
         const result = [];
 
-        const emptyLine = /^[\s]+$/;
+        const emptyLine = /^\s*$/;
 
         let startLine: number = -1;
         let nextLine: number = -1;
@@ -421,9 +421,9 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
     ): ITokenList {
         const result = [];
 
-        const emptyLine = /^[\s]+$/;
-        const startRegionText = /^#\s*region\b/;
-        const endRegionText = /^#\s*endregion\b/;
+        const emptyLine = /^\s*$/;
+        const startRegionText = /^#region\b/i;
+        const endRegionText = /^#endregion\b/i;
 
         tokens.forEach((token) => {
             if (token.scopes.indexOf("punctuation.definition.comment.powershell") !== -1) {

@@ -38,16 +38,18 @@ suite("Features", () => {
 
         suite("For a single document", async () => {
             const expectedFoldingRegions = [
-                { start: 1,  end: 6,  kind: 1 },
-                { start: 7,  end: 51, kind: 3 },
-                { start: 8,  end: 13, kind: 1 },
-                { start: 14, end: 17, kind: 3 },
-                { start: 19, end: 22, kind: 3 },
-                { start: 26, end: 28, kind: 1 },
-                { start: 30, end: 40, kind: 3 },
-                { start: 32, end: 36, kind: 3 },
-                { start: 42, end: 44, kind: 3 },
-                { start: 47, end: 50, kind: 3 },
+                { start: 0,  end: 4,  kind: 3 },
+                { start: 1,  end: 3,  kind: 1 },
+                { start: 10, end: 15, kind: 1 },
+                { start: 16, end: 60, kind: 3 },
+                { start: 17, end: 22, kind: 1 },
+                { start: 23, end: 26, kind: 3 },
+                { start: 28, end: 31, kind: 3 },
+                { start: 35, end: 37, kind: 1 },
+                { start: 39, end: 49, kind: 3 },
+                { start: 41, end: 45, kind: 3 },
+                { start: 51, end: 53, kind: 3 },
+                { start: 56, end: 59, kind: 3 },
             ];
 
             test("Can detect all of the foldable regions in a document with CRLF line endings", async () => {

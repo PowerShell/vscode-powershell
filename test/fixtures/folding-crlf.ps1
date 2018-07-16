@@ -1,3 +1,12 @@
+#RegIon This should fold
+<#
+Nested different comment types.  This should fold
+#>
+#EnDReGion
+
+# region This should not fold due to whitespace
+$shouldFold = $false
+#    endRegion
 function short-func-not-fold {};
 <#
 .SYNOPSIS
@@ -30,7 +39,7 @@ double quoted herestrings should also fold
 
   #region This fools the indentation folding.
   Write-Host "Hello"
-    # region Nested regions should be foldable
+    #region Nested regions should be foldable
     Write-Host "Hello"
     # comment1
     Write-Host "Hello"
@@ -38,7 +47,7 @@ double quoted herestrings should also fold
     Write-Host "Hello"
     # comment2
     Write-Host "Hello"
-    # endregion
+    #endregion
 
   $c = {
     Write-Host "Script blocks should be foldable"
