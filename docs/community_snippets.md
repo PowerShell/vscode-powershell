@@ -8,7 +8,9 @@
 
 ## What are snippets
 
-Code snippets are templates that make it easier to enter repeating code patterns, such as loops or conditional-statements. Check out the [VSCode documentation on snippets](https://code.visualstudio.com/docs/editor/userdefinedsnippets). It provides an overview and instructions on how to author snippets. It's really simple - just a little bit of JSON.
+Code snippets are templates that make it easier to enter repeating code patterns, such as loops or conditional-statements.
+The list of snippets below is not integrated into the extension. However, instead, users can add them to their own, custom snippets file.
+Check out the [VSCode documentation on snippets](https://code.visualstudio.com/docs/editor/userdefinedsnippets). It provides an overview and instructions on how to author snippets. It's really simple - just a little bit of JSON.
 
 _To contribute, check out our [guide here](#contributing)._
 
