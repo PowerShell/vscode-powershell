@@ -13,7 +13,7 @@ export class GetCommandsFeature implements IFeature {
     private commandsExplorerProvider: CommandsExplorerProvider;
 
     constructor() {
-        this.command = vscode.commands.registerCommand("PowerShell.GetCommands", () => {
+        this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer", () => {
             if (this.languageClient === undefined) {
                 // TODO: Log error message
                 return;
@@ -29,14 +29,11 @@ export class GetCommandsFeature implements IFeature {
                     );
                 };
                 this.commandsExplorerProvider.PowerShellCommands = result.map(toCommand);
-                // this.commandsExplorerProvider.refresh();
+                this.commandsExplorerProvider.refresh();
             });
         });
         this.commandsExplorerProvider = new CommandsExplorerProvider();
         vscode.window.registerTreeDataProvider("PowerShellCommands", this.commandsExplorerProvider);
-        vscode.commands.registerCommand(
-            "PowerShell.RefreshCommandsExplorer",
-            () => this.commandsExplorerProvider.refresh());
     }
 
     public dispose() {
@@ -49,12 +46,12 @@ export class GetCommandsFeature implements IFeature {
 }
 
 class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
-    public readonly didChangeTreeDataEvent: vscode.Event<Command | undefined>;
+    public readonly onDidChangeTreeData: vscode.Event<Command | undefined>;
     public PowerShellCommands: Command[];
     private didChangeTreeData: vscode.EventEmitter<Command | undefined> = new vscode.EventEmitter<Command>();
 
     constructor() {
-        this.didChangeTreeDataEvent = this.didChangeTreeData.event;
+        this.onDidChangeTreeData = this.didChangeTreeData.event;
     }
 
     public refresh(): void {

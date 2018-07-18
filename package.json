@@ -34,8 +34,7 @@
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
-    "onCommand:PowerShell.RestartSession",
-    "onView:powerShellCommands"
+    "onCommand:PowerShell.RestartSession"
   ],
   "dependencies": {
     "vscode": "~1.1.21",
@@ -102,11 +101,6 @@
       {
         "command": "PowerShell.ExpandAlias",
         "title": "Expand Alias",
-        "category": "PowerShell"
-      },
-      {
-        "command": "PowerShell.GetCommands",
-        "title": "Get Commands",
         "category": "PowerShell"
       },
       {
@@ -208,8 +202,8 @@
       ],
       "view/title": [
         {
-          "command": "PowerShell.refreshCommandsExplorer",
-          "when": "view == powerShellCommands",
+          "command": "PowerShell.RefreshCommandsExplorer",
+          "when": "view == PowerShellCommands",
           "group": "navigation"
         }
       ]
