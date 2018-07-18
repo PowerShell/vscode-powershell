@@ -50,6 +50,9 @@ suite("Features", () => {
                 { start: 41, end: 45, kind: 3 },
                 { start: 51, end: 53, kind: 3 },
                 { start: 56, end: 59, kind: 3 },
+                { start: 64, end: 66, kind: 1 },
+                { start: 67, end: 72, kind: 3 },
+                { start: 68, end: 70, kind: 1 },
             ];
 
             test("Can detect all of the foldable regions in a document with CRLF line endings", async () => {

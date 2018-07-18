@@ -59,3 +59,15 @@ double quoted herestrings should also fold
   'should fold2'
   )
 }
+
+# Make sure contiguous comment blocks can be folded properly
+
+# Comment Block 1
+# Comment Block 1
+# Comment Block 1
+#region Comment Block 3
+# Comment Block 2
+# Comment Block 2
+# Comment Block 2
+$something = $true
+#endregion Comment Block 3
