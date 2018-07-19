@@ -34,6 +34,17 @@ export class GetCommandsFeature implements IFeature {
         });
         this.commandsExplorerProvider = new CommandsExplorerProvider();
         vscode.window.registerTreeDataProvider("PowerShellCommands", this.commandsExplorerProvider);
+        vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => {
+            const editor = vscode.window.activeTextEditor;
+            const document = editor.document;
+            const selection = editor.selection;
+            const sls = selection.start;
+            const sle = selection.end;
+            const range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
+            editor.edit((editBuilder) => {
+                editBuilder.replace(range, item.Name);
+            });
+        });
     }
 
     public dispose() {

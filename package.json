@@ -34,7 +34,8 @@
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
-    "onCommand:PowerShell.RestartSession"
+    "onCommand:PowerShell.RestartSession",
+    "onView:PowerShellCommands"
   ],
   "dependencies": {
     "vscode": "~1.1.21",
@@ -109,8 +110,14 @@
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
-				}
-			},
+        },
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.InsertCommand",
+        "title": "Insert Command",
+        "category": "PowerShell"
+      },
       {
         "command": "PowerShell.OnlineHelp",
         "title": "Get Online Help for Command (Deprecated)",
@@ -205,6 +212,16 @@
           "command": "PowerShell.RefreshCommandsExplorer",
           "when": "view == PowerShellCommands",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "PowerShell.OnlineHelp",
+          "when": "view == PowerShellCommands"
+        },
+        {
+          "command": "PowerShell.InsertCommand",
+          "when": "view == PowerShellCommands"
         }
       ]
     },
@@ -599,7 +616,7 @@
             "Warning",
             "Error"
           ],
-          "default": "Diagnostic",
+          "default": "Normal",
           "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Diagnostic', 'Verbose', 'Normal', 'Warning', and 'Error'"
         },
         "powershell.developer.editorServicesWaitForDebugger": {
