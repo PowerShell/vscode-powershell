@@ -53,6 +53,7 @@ export class GetCommandsFeature implements IFeature {
 
     public setLanguageClient(languageclient: LanguageClient) {
         this.languageClient = languageclient;
+        vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
     }
 }
 
