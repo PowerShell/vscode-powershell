@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
-export const GetCommandsRequestType = new RequestType<any, any, void, void>("powerShell/getCommands");
+export const GetAllCommandsRequestType = new RequestType<any, any, void, void>("powerShell/getAllCommands");
 
 export class GetCommandsFeature implements IFeature {
     private command: vscode.Disposable;
@@ -18,7 +18,7 @@ export class GetCommandsFeature implements IFeature {
                 // TODO: Log error message
                 return;
             }
-            this.languageClient.sendRequest(GetCommandsRequestType, "").then((result) => {
+            this.languageClient.sendRequest(GetAllCommandsRequestType, "").then((result) => {
                 const toCommand = (command: any): Command => {
                     return new Command(
                         command.name,
