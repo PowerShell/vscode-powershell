@@ -112,7 +112,7 @@ function Get-ChildMergeCommit
     if ($PSCmdlet.ParameterSetName -eq "TagName") { $tag_hash = git rev-parse "$LastReleaseTag^0" }
 
     ## Get the merge commits that are reachable from 'HEAD' but not from the release tag
-    $merge_commits_not_in_release_branch = git --no-pager log --merges "$tag_hash..HEAD" --format='%H||%P'
+    $merge_commits_not_in_release_branch = git --no-pager log "$tag_hash..HEAD" --format='%H||%P'
     ## Find the child merge commit, whose parent-commit-hashes contains the release tag hash
     $child_merge_commit = $merge_commits_not_in_release_branch | Select-String -SimpleMatch $tag_hash
     return $child_merge_commit.Line
