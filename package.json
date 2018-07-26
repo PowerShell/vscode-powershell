@@ -38,15 +38,15 @@
   ],
   "dependencies": {
     "vscode": "^1.1.18",
-    "vscode-languageclient": "^4.2.1"
+    "vscode-languageclient": "^4.4.0"
   },
   "devDependencies": {
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.40",
-    "mocha": "^4.0.1",
-    "tslint": "^5.9.1",
-    "typescript": "2.9.x",
-    "vsce": "^1.18.0"
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.5.3",
+    "mocha": "^5.2.0",
+    "tslint": "^5.11.0",
+    "typescript": "2.9.2",
+    "vsce": "^1.44.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
