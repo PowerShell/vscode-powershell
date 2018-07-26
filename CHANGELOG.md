@@ -24,6 +24,8 @@
   stdio should only launch language service not debug (#710)
 - [PowerShell/PowerShellEditorServices #705](https://github.com/PowerShell/PowerShellEditorServices/pull/705) -
   Fix load order of PSSA modules (#705)
+- [PowerShell/PowerShellEditorServices #704](https://github.com/PowerShell/PowerShellEditorServices/pull/704) -
+  Do not enable PSAvoidTrailingWhitespace rule by default as it currenly flags whitespace-only lines as well (#704) (Thanks @bergmeister!)
 
 ## v1.8.1
 ### Wednesday, July 11, 2018
