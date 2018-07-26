@@ -37,16 +37,16 @@
     "onCommand:PowerShell.RestartSession"
   ],
   "dependencies": {
-    "vscode": "^1.1.18",
-    "vscode-languageclient": "^4.4.0"
+    "vscode": "~1.1.0",
+    "vscode-languageclient": "~4.3.0"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^10.5.3",
-    "mocha": "^5.2.0",
-    "tslint": "^5.11.0",
-    "typescript": "2.9.2",
-    "vsce": "^1.44.0"
+    "@types/mocha": "~5.2.0",
+    "@types/node": "~10.5.0",
+    "mocha": "~5.2.0",
+    "tslint": "~5.11.0",
+    "typescript": "~2.9.0",
+    "vsce": "~1.44.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
