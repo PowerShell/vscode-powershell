@@ -1,4 +1,4 @@
-version: '1.8.1-insiders-{build}'
+version: '1.8.2-insiders-{build}'
 image: Visual Studio 2017
 clone_depth: 10
 skip_tags: true

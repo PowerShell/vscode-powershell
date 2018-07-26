@@ -1,5 +1,32 @@
 # vscode-powershell Release History
 
+## v1.8.2
+### Thursday, July 26, 2018
+
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [PowerShell/vscode-powershell #1438](https://github.com/PowerShell/vscode-powershell/pull/1438) -
+  (GH-1437) Fix detecting contiguous comment blocks and regions (#1438) (Thanks @glennsarti!)
+- [PowerShell/vscode-powershell #1436](https://github.com/PowerShell/vscode-powershell/pull/1436) -
+  First approach to fix issue with dbg/run start before PSES running (#1436) (Thanks @rkeithhill!)
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShell/PowerShellEditorServices #712](https://github.com/PowerShell/PowerShellEditorServices/pull/712) -
+  workaround to support inmemory:// (#712)
+- [PowerShell/PowerShellEditorServices #706](https://github.com/PowerShell/PowerShellEditorServices/pull/706) -
+  Go To Definition works with different Ast types (#706)
+- [PowerShell/PowerShellEditorServices #707](https://github.com/PowerShell/PowerShellEditorServices/pull/707) -
+  fix stdio passing (#707)
+- [PowerShell/PowerShellEditorServices #709](https://github.com/PowerShell/PowerShellEditorServices/pull/709) -
+  Stop Diagnostic logging from logging to stdio when the communication protocol is set to stdio (#709)
+- [PowerShell/PowerShellEditorServices #710](https://github.com/PowerShell/PowerShellEditorServices/pull/710) -
+  stdio should only launch language service not debug (#710)
+- [PowerShell/PowerShellEditorServices #705](https://github.com/PowerShell/PowerShellEditorServices/pull/705) -
+  Fix load order of PSSA modules (#705)
+- [PowerShell/PowerShellEditorServices #704](https://github.com/PowerShell/PowerShellEditorServices/pull/704) -
+  Do not enable PSAvoidTrailingWhitespace rule by default as it currenly flags whitespace-only lines as well (#704) (Thanks @bergmeister!)
+
 ## v1.8.1
 ### Wednesday, July 11, 2018
 
