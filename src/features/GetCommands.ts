@@ -19,15 +19,6 @@ export class GetCommandsFeature implements IFeature {
                 return;
             }
             this.languageClient.sendRequest(GetAllCommandsRequestType, "").then((result) => {
-                const toCommand = (command: any): Command => {
-                    return new Command(
-                        command.name,
-                        command.moduleName,
-                        command.defaultParameterSet,
-                        command.parameterSets,
-                        command.parameters,
-                    );
-                };
                 this.commandsExplorerProvider.PowerShellCommands = result.map(toCommand);
                 this.commandsExplorerProvider.refresh();
             });
@@ -78,6 +69,15 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
         return Promise.resolve(this.PowerShellCommands ? this.PowerShellCommands : []);
     }
 
+}
+function toCommand(command: any): Command {
+    return new Command(
+        command.name,
+        command.moduleName,
+        command.defaultParameterSet,
+        command.parameterSets,
+        command.parameters,
+    );
 }
 
 class Command extends vscode.TreeItem {
