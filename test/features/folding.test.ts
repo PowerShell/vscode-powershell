@@ -82,6 +82,20 @@ suite("Features", () => {
 
                 assertFoldingRegions(result, expectedFoldingRegions);
             });
+
+            test("Can detect all of the foldable regions in a document with mismatched regions", async () => {
+                const expectedMismatchedFoldingRegions = [
+                    { start: 2,  end: 4,  kind: 3 },
+                ];
+
+                // Integration test against the test fixture 'folding-mismatch.ps1' that contains
+                // comment regions with mismatched beginning and end
+                const uri = vscode.Uri.file(path.join(fixturePath, "folding-mismatch.ps1"));
+                const document = await vscode.workspace.openTextDocument(uri);
+                const result = await provider.provideFoldingRanges(document, null, null);
+
+                assertFoldingRegions(result, expectedMismatchedFoldingRegions);
+            });
         });
     });
 });
