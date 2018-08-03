@@ -283,7 +283,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             if (token.scopes.indexOf(startScopeName) !== -1) {
                 tokenStack.push(token);
             }
-            if (token.scopes.indexOf(endScopeName) !== -1) {
+            if ((tokenStack.length > 0) && (token.scopes.indexOf(endScopeName) !== -1)) {
                 result.unshift((new LineNumberRange(matchType)).fromTokenPair(tokenStack.pop(), token, document));
             }
         });
