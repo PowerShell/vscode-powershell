@@ -446,7 +446,7 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             tokens,
             "punctuation.section.braces.begin.powershell",
             "punctuation.section.braces.end.powershell",
-            vscode.FoldingRangeKind.Region, document)
+            null, document)
             .forEach((match) => { matchedTokens.push(match); });
 
         // Find matching parentheses   ( -> )
@@ -454,21 +454,21 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             tokens,
             "punctuation.section.group.begin.powershell",
             "punctuation.section.group.end.powershell",
-            vscode.FoldingRangeKind.Region, document)
+            null, document)
             .forEach((match) => { matchedTokens.push(match); });
 
         // Find contiguous here strings   @' -> '@
         this.matchContiguousScopeElements(
             tokens,
             "string.quoted.single.heredoc.powershell",
-            vscode.FoldingRangeKind.Region, document)
+            null, document)
             .forEach((match) => { matchedTokens.push(match); });
 
         // Find contiguous here strings   @" -> "@
         this.matchContiguousScopeElements(
             tokens,
             "string.quoted.double.heredoc.powershell",
-            vscode.FoldingRangeKind.Region, document)
+            null, document)
             .forEach((match) => { matchedTokens.push(match); });
 
         // Find matching comment regions   #region -> #endregion
