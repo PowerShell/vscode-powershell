@@ -160,12 +160,12 @@
     "menus": {
       "editor/context": [
         {
-          "when": "resourceLangId == powershell",
+          "when": "editorLangId == powershell",
           "command": "PowerShell.RunSelection",
           "group": "2_powershell"
         },
         {
-          "when": "resourceLangId == powershell",
+          "when": "editorLangId == powershell",
           "command": "PowerShell.OnlineHelp",
           "group": "2_powershell"
         }
