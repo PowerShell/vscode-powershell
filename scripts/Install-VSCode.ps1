@@ -56,6 +56,10 @@
     A validated string defining which build edition or "stream" to download - stable or
     insiders edition. If the parameter is not used, then stable is downloaded as default.
 
+.PARAMETER User
+    When present, the latest VSCode "User Profile" Insider Edition will be installed.
+    if BuildEdition is set to "stable" this will revert back to the current standard.
+
 .PARAMETER AdditionalExtensions
     An array of strings that are the fully-qualified names of extensions to be
     installed in addition to the PowerShell extension.  The fully qualified
@@ -123,6 +127,10 @@ param(
     [string]$BuildEdition = "stable",
 
     [Parameter()]
+        [switch]
+        $User,
+
+    [Parameter()]
     [ValidateNotNull()]
     [string[]]$AdditionalExtensions = @(),
 
@@ -167,13 +175,21 @@ if (!($IsLinux -or $IsOSX)) {
             break;
         }
     }
+    if (($User -eq $true) -and ($BuildEdition -eq "Insider")) {
+        $codeCmdPath = "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+        $appName = "Visual Studio Code - Insiders Edition ($($Architecture) - User)"
+        $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)-user/$($BuildEdition)"
+    }
+    else {
+        $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)"
+    }
     try {
         $ProgressPreference = 'SilentlyContinue'
 
         if (!(Test-Path $codeCmdPath)) {
             Write-Host "`nDownloading latest $appName..." -ForegroundColor Yellow
             Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
-            Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
+            Start-BitsTransfer $fileUri -Destination "$env:TEMP\vscode-$($BuildEdition).exe"
 
             Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
             Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
