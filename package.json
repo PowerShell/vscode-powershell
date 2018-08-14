@@ -105,11 +105,11 @@
         "category": "PowerShell"
       },
       {
-				"command": "PowerShell.RefreshCommandsExplorer",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
+        "command": "PowerShell.RefreshCommandsExplorer",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
         },
         "category": "PowerShell"
       },

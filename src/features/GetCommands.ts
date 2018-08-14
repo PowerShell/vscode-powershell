@@ -19,7 +19,7 @@ export class GetCommandsFeature implements IFeature {
                 return;
             }
             this.languageClient.sendRequest(GetAllCommandsRequestType, "").then((result) => {
-                this.commandsExplorerProvider.PowerShellCommands = result.map(toCommand);
+                this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
                 this.commandsExplorerProvider.refresh();
             });
         });
@@ -27,10 +27,8 @@ export class GetCommandsFeature implements IFeature {
         vscode.window.registerTreeDataProvider("PowerShellCommands", this.commandsExplorerProvider);
         vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => {
             const editor = vscode.window.activeTextEditor;
-            const document = editor.document;
-            const selection = editor.selection;
-            const sls = selection.start;
-            const sle = selection.end;
+            const sls = editor.selection.start;
+            const sle = editor.selection.end;
             const range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
             editor.edit((editBuilder) => {
                 editBuilder.replace(range, item.Name);
@@ -50,7 +48,7 @@ export class GetCommandsFeature implements IFeature {
 
 class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     public readonly onDidChangeTreeData: vscode.Event<Command | undefined>;
-    public PowerShellCommands: Command[];
+    public powerShellCommands: Command[];
     private didChangeTreeData: vscode.EventEmitter<Command | undefined> = new vscode.EventEmitter<Command>();
 
     constructor() {
@@ -66,10 +64,11 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     }
 
     public getChildren(element?: Command): Thenable<Command[]> {
-        return Promise.resolve(this.PowerShellCommands ? this.PowerShellCommands : []);
+        return Promise.resolve(this.powerShellCommands || []);
     }
 
 }
+
 function toCommand(command: any): Command {
     return new Command(
         command.name,

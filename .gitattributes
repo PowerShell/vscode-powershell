@@ -1,6 +1,9 @@
 # Set the default behavior, in case people don't have core.autocrlf set.
 * text=auto
 
+# Set svg to binary type, as SVG is unlikely to be editted by hand. Can be treated as checked in blob
+*.svg binary
+
 # .gitattributes in project root
 # npm now seems to be insisting on LF - see https://github.com/npm/npm/issues/17161
 package.json      text eol=lf

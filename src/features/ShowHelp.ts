@@ -24,11 +24,12 @@ export class ShowHelpFeature implements IFeature {
             }
             if (item === undefined) {
 
-	            const editor = vscode.window.activeTextEditor;
-	            const selection = editor.selection;
-	            const doc = editor.document;
-	            const cwr = doc.getWordRangeAtPosition(selection.active);
-	            const text = doc.getText(cwr);
+                const editor = vscode.window.activeTextEditor;
+
+                const selection = editor.selection;
+                const doc = editor.document;
+                const cwr = doc.getWordRangeAtPosition(selection.active);
+                const text = doc.getText(cwr);
 
 	            this.languageClient.sendRequest(ShowHelpRequestType, text);
             } else {
