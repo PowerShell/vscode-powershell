@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <SignConfigXML>
   <job platform="" configuration="" dest="__OUTPATHROOT__\signed" jobname="vscode powershell" approvers="vigarg;gstolt">
-    <file src="__INPATHROOT__\release\out\PowerShell-insiders.vsix" signType="100040160"
+    <file src="__INPATHROOT__\release\out\PowerShell-insiders.vsix" signType="Vsix"
       dest="__OUTPATHROOT__\PowerShell-insiders.vsix" />
   </job>
 </SignConfigXML>

@@ -21,6 +21,11 @@ Begin
     & $gitBinFullPath clone -b master --quiet https://github.com/PowerShell/${releaseToolsDirName}.git $releaseToolsLocation
     Import-Module "$releaseToolsLocation/vstsBuild" -Force
     Import-Module "$releaseToolsLocation/dockerBasedBuild" -Force -Prefix DockerBased
+
+    # Get the update signing script and update the signing XML file
+    $updateSigningPath = Join-Path $releaseToolsLocation 'updateSigning.ps1'
+    Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/releaseBuild/updateSigning.ps1' -OutFile $updateSigningPath
+    & $updateSigningPath -SigningXmlPath (Join-Path $PSScriptRoot 'signing.xml')
 }
 
 End {
