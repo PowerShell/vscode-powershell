@@ -127,8 +127,7 @@ param(
     [string]$BuildEdition = "stable",
 
     [Parameter()]
-        [switch]
-        $User,
+    [switch]$User,
 
     [Parameter()]
     [ValidateNotNull()]
@@ -175,7 +174,7 @@ if (!($IsLinux -or $IsOSX)) {
             break;
         }
     }
-    if (($User -eq $true) -and ($BuildEdition -eq "Insider")) {
+    if ($User -and $BuildEdition -eq "Insider") {
         $codeCmdPath = "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
         $appName = "Visual Studio Code - Insiders Edition ($($Architecture) - User)"
         $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)-user/$($BuildEdition)"
@@ -188,8 +187,12 @@ if (!($IsLinux -or $IsOSX)) {
 
         if (!(Test-Path $codeCmdPath)) {
             Write-Host "`nDownloading latest $appName..." -ForegroundColor Yellow
-            Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
-            Start-BitsTransfer $fileUri -Destination "$env:TEMP\vscode-$($BuildEdition).exe"
+            Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinuev
+            $bitsDl = Start-BitsTransfer $fileUri -Destination "$env:TEMP\vscode-$($BuildEdition).exe" -Asynchronous
+            do {
+                Write-Progress -Activity "Downloading: $AppName" -Status "$([math]::round($bitsDl.BytesTransferred / 1mb))mb / $([math]::round($bitsDl.BytesTotal / 1mb))mb" -PercentComplete ($($bitsDl.BytesTransferred) / $($bitsDl.BytesTotal) * 100 )
+            }
+            until ($bitsDl.JobState -eq "Transferred")
 
             Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
             Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
