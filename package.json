@@ -1,7 +1,7 @@
 {
   "name": "PowerShell",
   "displayName": "PowerShell",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
