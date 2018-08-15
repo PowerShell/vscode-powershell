@@ -25,6 +25,8 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    15/08/2018 - added functionality to install the new "User Install" variant of Insiders Edition.
+    --
     28/12/2017 - added functionality to support 64-bit versions of VSCode
     & support for installation of VSCode Insiders Edition.
     --
@@ -53,12 +55,10 @@
     downloaded instead. If parameter is not used, then 64-bit is used as default.
 
 .PARAMETER BuildEdition
-    A validated string defining which build edition or "stream" to download - stable or
-    insiders edition. If the parameter is not used, then stable is downloaded as default.
+    A validated string defining which build edition or "stream" to download:
+    Stable or Insiders Edition (system install or user profile install).
+    If the parameter is not used, then stable is downloaded as default.
 
-.PARAMETER User
-    When present, the latest VSCode "User Profile" Insider Edition will be installed.
-    if BuildEdition is set to "stable" this will revert back to the current standard.
 
 .PARAMETER AdditionalExtensions
     An array of strings that are the fully-qualified names of extensions to be
@@ -88,9 +88,9 @@
     extensions.
 
 .EXAMPLE
-    Install-VSCode.ps1 -BuildEdition Insider -LaunchWhenDone
+    Install-VSCode.ps1 -BuildEdition Insider-User -LaunchWhenDone
 
-    Installs Visual Studio Code Insiders Edition (64-bit) and then launches the editor
+    Installs Visual Studio Code Insiders Edition (64-bit) to the user profile and then launches the editor
     after installation completes.
 
 .NOTES
@@ -123,8 +123,8 @@ param(
     [string]$Architecture = "64-bit",
 
     [parameter()]
-    [ValidateSet("stable","insider")]
-    [string]$BuildEdition = "stable",
+    [ValidateSet("Stable","Insider-System","Insider-User")]
+    [string]$BuildEdition = "Stable",
 
     [Parameter()]
     [switch]$User,
@@ -166,21 +166,23 @@ if (!($IsLinux -or $IsOSX)) {
         "Stable" {
             $codeCmdPath = "$codePath\Microsoft VS Code\bin\code.cmd"
             $appName = "Visual Studio Code ($($Architecture))"
+            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)"
+
             break;
         }
-        "Insider" {
+        "Insider-System" {
             $codeCmdPath = "$codePath\Microsoft VS Code Insiders\bin\code-insiders.cmd"
             $appName = "Visual Studio Code - Insiders Edition ($($Architecture))"
+            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)"
+
             break;
         }
-    }
-    if ($User -and $BuildEdition -eq "Insider") {
-        $codeCmdPath = "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
-        $appName = "Visual Studio Code - Insiders Edition ($($Architecture) - User)"
-        $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)-user/$($BuildEdition)"
-    }
-    else {
-        $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)"
+        "Insider-User" {
+            $codeCmdPath = "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+            $appName = "Visual Studio Code - Insiders Edition ($($Architecture) - User)"
+            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)-user/$($BuildEdition)"
+            break;
+        }
     }
     try {
         $ProgressPreference = 'SilentlyContinue'
