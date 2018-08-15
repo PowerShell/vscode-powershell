@@ -189,7 +189,7 @@ if (!($IsLinux -or $IsOSX)) {
 
         if (!(Test-Path $codeCmdPath)) {
             Write-Host "`nDownloading latest $appName..." -ForegroundColor Yellow
-            Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinuev
+            Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
             $bitsDl = Start-BitsTransfer $fileUri -Destination "$env:TEMP\vscode-$($BuildEdition).exe" -Asynchronous
             while (($bitsDL.JobState -eq "Transferring") -or ($bitsDL.JobState -eq "Connecting")) {
                 Write-Progress -Activity "Downloading: $AppName" -Status "$([math]::round($bitsDl.BytesTransferred / 1mb))mb / $([math]::round($bitsDl.BytesTotal / 1mb))mb" -PercentComplete ($($bitsDl.BytesTransferred) / $($bitsDl.BytesTotal) * 100 )
