@@ -19,9 +19,9 @@
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
 - [PowerShell/vscode-powershell #1438](https://github.com/PowerShell/vscode-powershell/pull/1438) -
-  Fix detecting contiguous comment blocks and regions (#1438) (Thanks @glennsarti!)
+  Fix detecting contiguous comment blocks and regions (Thanks @glennsarti!)
 - [PowerShell/vscode-powershell #1436](https://github.com/PowerShell/vscode-powershell/pull/1436) -
-  First approach to fix issue with dbg/run start before PSES running (#1436) (Thanks @rkeithhill!)
+  First approach to fix issue with dbg/run start before PSES running (Thanks @rkeithhill!)
 
 #### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
 
