@@ -2,6 +2,7 @@
 
 ## v1.8.3
 ### Wednesday, August 15, 2018
+
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
 -  [PowerShell/vscode-powershell #1480](https://github.com/PowerShell/vscode-powershell/pull/1480) -
@@ -12,6 +13,15 @@
    Change resourceLangId to editorLangId so right-click works properly with unsaved files (Thanks @corbob!)
 -  [PowerShell/vscode-powershell #1467](https://github.com/PowerShell/vscode-powershell/pull/1467) -
    Remove region folding from non-region areas (Thanks @glennsarti!)
+   
+ #### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShell/PowerShellEditorServices #722](https://github.com/PowerShell/PowerShellEditorServices/pull/722) -
+  Add VSTS signing step
+- [PowerShell/PowerShellEditorServices #717](https://github.com/PowerShell/PowerShellEditorServices/pull/717) -
+  Increment version for prerelease
+- [PowerShell/PowerShellEditorServices #715](https://github.com/PowerShell/PowerShellEditorServices/pull/715) -
+  Reduce allocations when parsing files (Thanks @mattpwhite!)
 
 ## v1.8.2
 ### Thursday, July 26, 2018
