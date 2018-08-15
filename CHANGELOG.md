@@ -1,5 +1,14 @@
 # vscode-powershell Release History
 
+## v1.8.3
+### Wednesday, August 15, 2018
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- Use PowerShell signing script in VSTS builds (#1480)
+- Use newer version for preleases (#1460)
+- Change resourceLangId to editorLangId so right-click works properly with unsaved files (#1475) (Thanks @corbob!)
+- (GH-1458) Remove region folding from non-region areas (#1467) (Thanks @glennsarti!)
+
 ## v1.8.2
 ### Thursday, July 26, 2018
 
