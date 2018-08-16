@@ -85,8 +85,8 @@ export function waitForSessionFile(sessionFilePath: string, callback: IWaitForSe
         }
     }
 
-    // Try once per second for 60 seconds, one full minute
-    innerTryFunc(60, 1000);
+    // Try once every 2 seconds, 60 times - making two full minutes
+    innerTryFunc(60, 2000);
 }
 
 export function readSessionFile(sessionFilePath: string): IEditorServicesSessionDetails {
