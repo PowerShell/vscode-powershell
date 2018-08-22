@@ -36,7 +36,7 @@ task GetExtensionVersion -Before Package {
     }
 }
 
-task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices {
+task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices, Package {
 
     $script:psesRepoPath = `
         if ($EditorServicesRepoPath) {
