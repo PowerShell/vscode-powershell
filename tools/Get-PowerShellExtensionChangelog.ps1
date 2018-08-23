@@ -301,6 +301,11 @@ function Get-ChangeLog
     }
 
     foreach ($commit in $new_commits) {
+        if ($commit.Subject.StartsWith('[ignore]', [System.StringComparison]::OrdinalIgnoreCase))
+        {
+            continue
+        }
+
         $messageParts = Get-PRNumberFromCommitSubject $commit.Subject
         if ($messageParts)
         {
