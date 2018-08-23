@@ -27,6 +27,10 @@
 .RELEASENOTES
     15/08/2018 - added functionality to install the new "User Install" variant of Insiders Edition.
     --
+    21/03/2018 - added functionality to install the VSCode context menus. Also, VSCode is now always added to the search path
+    --
+    20/03/2018 - fix OS detection to prevent error
+    --
     28/12/2017 - added functionality to support 64-bit versions of VSCode
     & support for installation of VSCode Insiders Edition.
     --
