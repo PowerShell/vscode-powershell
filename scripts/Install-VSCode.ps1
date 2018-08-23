@@ -25,6 +25,8 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    15/08/2018 - added functionality to install the new "User Install" variant of Insiders Edition.
+    --
     21/03/2018 - added functionality to install the VSCode context menus. Also, VSCode is now always added to the search path
     --
     20/03/2018 - fix OS detection to prevent error
@@ -57,8 +59,10 @@
     downloaded instead. If parameter is not used, then 64-bit is used as default.
 
 .PARAMETER BuildEdition
-    A validated string defining which build edition or "stream" to download - stable or
-    insiders edition. If the parameter is not used, then stable is downloaded as default.
+    A validated string defining which build edition or "stream" to download:
+    Stable or Insiders Edition (system install or user profile install).
+    If the parameter is not used, then stable is downloaded as default.
+
 
 .PARAMETER AdditionalExtensions
     An array of strings that are the fully-qualified names of extensions to be
@@ -91,9 +95,9 @@
     extensions.
 
 .EXAMPLE
-    Install-VSCode.ps1 -BuildEdition Insider -LaunchWhenDone
+    Install-VSCode.ps1 -BuildEdition Insider-User -LaunchWhenDone
 
-    Installs Visual Studio Code Insiders Edition (64-bit) and then launches the editor
+    Installs Visual Studio Code Insiders Edition (64-bit) to the user profile and then launches the editor
     after installation completes.
 
 .NOTES
@@ -122,12 +126,15 @@
 [CmdletBinding()]
 param(
     [parameter()]
-    [ValidateSet(,"64-bit","32-bit")]
+    [ValidateSet(, "64-bit", "32-bit")]
     [string]$Architecture = "64-bit",
 
     [parameter()]
-    [ValidateSet("stable","insider")]
-    [string]$BuildEdition = "stable",
+    [ValidateSet("Stable", "Insider-System", "Insider-User")]
+    [string]$BuildEdition = "Stable",
+
+    [Parameter()]
+    [switch]$User,
 
     [Parameter()]
     [ValidateNotNull()]
@@ -153,7 +160,7 @@ if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
             break;
         }
         "32-bit" {
-            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "32-bit"){
+            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "32-bit") {
                 $codePath = $env:ProgramFiles
                 $bitVersion = "win32"
             }
@@ -168,11 +175,21 @@ if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
         "Stable" {
             $codeCmdPath = "$codePath\Microsoft VS Code\bin\code.cmd"
             $appName = "Visual Studio Code ($($Architecture))"
+            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/stable"
+
             break;
         }
-        "Insider" {
+        "Insider-System" {
             $codeCmdPath = "$codePath\Microsoft VS Code Insiders\bin\code-insiders.cmd"
             $appName = "Visual Studio Code - Insiders Edition ($($Architecture))"
+            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/insider"
+
+            break;
+        }
+        "Insider-User" {
+            $codeCmdPath = "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+            $appName = "Visual Studio Code - Insiders Edition ($($Architecture) - User)"
+            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)-user/insider"
             break;
         }
     }
@@ -182,7 +199,21 @@ if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
         if (!(Test-Path $codeCmdPath)) {
             Write-Host "`nDownloading latest $appName..." -ForegroundColor Yellow
             Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
-            Invoke-WebRequest -Uri "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/$($BuildEdition)" -OutFile "$env:TEMP\vscode-$($BuildEdition).exe"
+            $bitsDl = Start-BitsTransfer $fileUri -Destination "$env:TEMP\vscode-$($BuildEdition).exe" -Asynchronous
+            while (($bitsDL.JobState -eq "Transferring") -or ($bitsDL.JobState -eq "Connecting")) {
+                Write-Progress -Activity "Downloading: $AppName" -Status "$([math]::round($bitsDl.BytesTransferred / 1mb))mb / $([math]::round($bitsDl.BytesTotal / 1mb))mb" -PercentComplete ($($bitsDl.BytesTransferred) / $($bitsDl.BytesTotal) * 100 )
+            }
+            switch ($bitsDl.JobSTate) {
+                "Transferred" {
+                    Complete-BitsTransfer -BitsJob $bitsDl
+                    break;
+                }
+                "Error" {
+                    throw "Error downloading installation media."
+                    break;
+                }
+            }
+
 
             Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
             if ($EnableContextMenus) {
