@@ -1,18 +1,18 @@
 {
   "name": "PowerShell",
   "displayName": "PowerShell",
-  "version": "1.5.1",
+  "version": "1.8.4",
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.25.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
   "categories": [
-    "Languages",
-    "Snippets",
     "Debuggers",
+    "Programming Languages",
+    "Snippets",
     "Linters"
   ],
   "icon": "images/PowerShell_icon.png",
@@ -26,7 +26,7 @@
   },
   "main": "./out/src/main",
   "activationEvents": [
-    "onDebug",
+    "onDebugResolve:powershell",
     "onLanguage:powershell",
     "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
@@ -37,21 +37,22 @@
     "onCommand:PowerShell.RestartSession"
   ],
   "dependencies": {
-    "vscode-languageclient": "3.3.0"
+    "vscode": "~1.1.21",
+    "vscode-languageclient": "~5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^6.0.40",
-    "typescript": "2.3.x",
-    "vsce": "^1.18.0",
-    "vscode": "^1.1.0",
-    "mocha": "^2.3.3",
-    "@types/mocha": "^2.2.32"
+    "@types/mocha": "^2.2.32",
+    "@types/node": "~10.7.1",
+    "mocha": "^4.0.1",
+    "tslint": "~5.11.0",
+    "typescript": "~3.0.1",
+    "vsce": "~1.46.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
   ],
   "scripts": {
-    "compile": "tsc -p ./",
+    "compile": "tsc -v && tsc -p ./ && tslint -p ./",
     "compile-watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test"
@@ -69,13 +70,13 @@
         "when": "editorTextFocus && editorLangId == 'powershell'"
       },
       {
-        "command": "PowerShell.RunSelection",
-        "key": "f8",
+        "command": "PowerShell.ShowAdditionalCommands",
+        "key": "shift+alt+s",
         "when": "editorTextFocus && editorLangId == 'powershell'"
       },
       {
-        "command": "PowerShell.OpenInISE",
-        "key": "shift+alt+i",
+        "command": "PowerShell.RunSelection",
+        "key": "f8",
         "when": "editorTextFocus && editorLangId == 'powershell'"
       }
     ],
@@ -159,8 +160,13 @@
     "menus": {
       "editor/context": [
         {
-          "when": "resourceLangId == powershell",
+          "when": "editorLangId == powershell",
           "command": "PowerShell.RunSelection",
+          "group": "2_powershell"
+        },
+        {
+          "when": "editorLangId == powershell",
+          "command": "PowerShell.OnlineHelp",
           "group": "2_powershell"
         }
       ]
@@ -175,7 +181,7 @@
         "severity": "error",
         "pattern": [
           {
-            "regexp": "^\\s*(\\[-\\]\\s*.*?)(\\d+)ms\\s*$",
+            "regexp": "^\\s*(?:\\[-\\]\\s+)(.*?)(?:\\s+\\d+\\.?\\d*\\s*m?s)\\s*$",
             "message": 1
           },
           {
@@ -256,9 +262,9 @@
               "type": "PowerShell",
               "request": "launch",
               "name": "PowerShell Launch ${Script}",
-              "script": "^\"\\${workspaceRoot}/${Script}\"",
+              "script": "^\"\\${workspaceFolder}/${Script}\"",
               "args": [],
-              "cwd": "^\"\\${workspaceRoot}\""
+              "cwd": "^\"\\${workspaceFolder}\""
             }
           },
           {
@@ -270,7 +276,7 @@
               "name": "PowerShell Pester Tests",
               "script": "Invoke-Pester",
               "args": [],
-              "cwd": "^\"\\${workspaceRoot}\""
+              "cwd": "^\"\\${workspaceFolder}\""
             }
           },
           {
@@ -291,17 +297,13 @@
               "type": "PowerShell",
               "request": "launch",
               "name": "PowerShell Interactive Session",
-              "cwd": "^\"\\${workspaceRoot}\""
+              "cwd": ""
             }
           }
         ],
         "configurationAttributes": {
           "launch": {
             "properties": {
-              "program": {
-                "type": "string",
-                "description": "Deprecated. Please use the 'script' property instead to specify the absolute path to the PowerShell script to launch under the debugger."
-              },
               "script": {
                 "type": "string",
                 "description": "Optional: Absolute path to the PowerShell script to launch under the debugger."
@@ -316,8 +318,8 @@
               },
               "cwd": {
                 "type": "string",
-                "description": "Absolute path to the working directory. Default is the current workspace.",
-                "default": "${workspaceRoot}"
+                "description": "Absolute path to the working directory. Default is the current workspace folder.",
+                "default": "${workspaceFolder}"
               },
               "createTemporaryIntegratedConsole": {
                 "type": "boolean",
@@ -384,7 +386,7 @@
             "type": "PowerShell",
             "request": "launch",
             "name": "PowerShell Interactive Session",
-            "cwd": "${workspaceRoot}"
+            "cwd": ""
           }
         ]
       }
@@ -398,6 +400,33 @@
           "default": "",
           "isExecutable": true,
           "description": "Specifies the full path to a PowerShell executable. Changes the installation of PowerShell used for language and debugging services."
+        },
+        "powershell.powerShellAdditionalExePaths": {
+          "type": "array",
+          "description": "Specifies an array of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
+          "isExecutable": true,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": [
+              "versionName",
+              "exePath"
+            ],
+            "properties": {
+              "versionName": {
+                "type": "string",
+                "description": "Specifies the version name of this PowerShell executable. The version name can be referenced via the powershell.powerShellDefaultVersion setting."
+              },
+              "exePath": {
+                "type": "string",
+                "description": "Specifies the path to the PowerShell executable. Typically this is a path to a non-standard install location."
+              }
+            }
+          }
+        },
+        "powershell.powerShellDefaultVersion": {
+          "type": "string",
+          "description": "Specifies the name of the PowerShell version used in the startup session when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6.0.2 (x64)\"."
         },
         "powershell.startAutomatically": {
           "type": "boolean",
@@ -419,6 +448,16 @@
           "default": "https://github.com/PowerShell/vscode-powershell",
           "description": "Specifies the url of the GitHub project in which to generate bug reports."
         },
+        "powershell.helpCompletion": {
+          "type": "string",
+          "enum": [
+            "Disabled",
+            "BlockComment",
+            "LineComment"
+          ],
+          "default": "BlockComment",
+          "description": "Controls the comment-based help completion behavior triggered by typing '##'. Set the generated help style with 'BlockComment' or 'LineComment'. Disable the feature with 'Disabled'."
+        },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
           "default": true,
@@ -428,6 +467,11 @@
           "type": "string",
           "default": "",
           "description": "Specifies the path to a PowerShell Script Analyzer settings file. To override the default settings for all projects, enter an absolute path, or enter a path relative to your workspace."
+        },
+        "powershell.codeFolding.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables syntax based code folding. When disabled, the default indentation based code folding is used."
         },
         "powershell.codeFormatting.preset": {
           "type": "string",
@@ -506,8 +550,15 @@
         },
         "powershell.developer.editorServicesLogLevel": {
           "type": "string",
+          "enum": [
+            "Diagnostic",
+            "Verbose",
+            "Normal",
+            "Warning",
+            "Error"
+          ],
           "default": "Normal",
-          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Verbose', 'Normal', 'Warning', and 'Error'"
+          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Diagnostic', 'Verbose', 'Normal', 'Warning', and 'Error'"
         },
         "powershell.developer.editorServicesWaitForDebugger": {
           "type": "boolean",

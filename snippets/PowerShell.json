@@ -533,6 +533,27 @@
         ],
         "description": "Script cmdlet definition snippet"
     },
+    "Function-Advanced": {
+        "prefix": "function-advanced",
+        "body": [
+            "function ${1:Verb-Noun} {",
+            "\t[CmdletBinding()]",
+            "\tparam (",
+            "\t\t$0",
+            "\t)",
+            "\t",
+            "\tbegin {",
+            "\t}",
+            "\t",
+            "\tprocess {",
+            "\t}",
+            "\t",
+            "\tend {",
+            "\t}",
+            "}"
+        ],
+        "description": "Script advanced function definition snippet"
+    },
     "Cmdlet-Comment-Help": {
         "prefix": "comment-help",
         "body": [
@@ -742,11 +763,23 @@
     "function": {
         "prefix": "function",
         "body": [
+            "function ${1:FunctionName} {",
+            "\tparam (",
+            "\t\t${2:OptionalParameters}",
+            "\t)",
+            "\t$0",
+            "}"
+        ],
+        "description": "Function definition snippet that contains a param block"
+    },
+    "Function-Inline": {
+        "prefix": "Function-Inline",
+        "body": [
             "function ${1:FunctionName} (${2:OptionalParameters}) {",
             "\t$0",
             "}"
         ],
-        "description": "function definition snippet"
+        "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other lanaguages"
     },
     "if": {
         "prefix": "if",
@@ -830,7 +863,7 @@
             "workflow ${name:Verb-Noun} {",
             "\tparam (",
             "\t)",
-            "\t",
+            "",
             "\t$0",
             "}"
         ],
@@ -892,5 +925,32 @@
 		"body": [
 			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '', Scope='Function', Target='${2:*}')]"
 		]
-	}
+	},
+    "PSCustomObject": {
+        "prefix": "PSCustomObject",
+        "body": [
+            "[PSCustomObject]@{",
+            "\t${1:Name} = ${2:Value}",
+            "}"
+        ],
+        "description": "Creates a PSCustomObject"
+    },
+    "Hashtable": {
+        "prefix": "Hashtable",
+        "body": [
+            "\\$${1:Var} = @{",
+            "\t${2:Name} = ${3:Value}",
+            "}"
+        ],
+        "description": "Creates a Hashtable"
+    },
+    "Region Block": {
+        "prefix": "#region",
+        "body": [
+            "#region ${1}",
+            "$0",
+            "#endregion"
+        ],
+        "description": "Region Block for organizing and folding of your code"
+    }
 }

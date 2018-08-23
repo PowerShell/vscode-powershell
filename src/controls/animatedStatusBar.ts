@@ -3,14 +3,14 @@
  *--------------------------------------------------------*/
 
 import {
-    StatusBarItem,
-    StatusBarAlignment,
-    ThemeColor,
     Disposable,
+    StatusBarAlignment,
+    StatusBarItem,
+    ThemeColor,
     window} from "vscode";
 
 export function showAnimatedStatusBarMessage(text: string, hideWhenDone: Thenable<any>): Disposable {
-    let animatedStatusBarItem: AnimatedStatusBarItem = new AnimatedStatusBarItem(text);
+    const animatedStatusBarItem: AnimatedStatusBarItem = new AnimatedStatusBarItem(text);
     animatedStatusBarItem.show(hideWhenDone);
     return animatedStatusBarItem;
 }
@@ -73,7 +73,7 @@ class AnimatedStatusBarItem implements StatusBarItem {
         this.counter = 0;
         this.suffixStates = ["  ", ".  ", ".. ", "..."];
         this.maxCount = this.suffixStates.length;
-        this.timerInterval = ((1/this.maxCount) * 1000) / this.animationRate;
+        this.timerInterval = ((1 / this.maxCount) * 1000) / this.animationRate;
         this.elapsedTime = 0;
     }
 

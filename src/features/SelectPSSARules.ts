@@ -3,21 +3,16 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { IFeature } from "../feature";
 import { LanguageClient, RequestType } from "vscode-languageclient";
-import { CheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
+import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
+import { IFeature } from "../feature";
 
-export namespace GetPSSARulesRequest {
-    export const type = new RequestType<any, any, void, void>("powerShell/getPSSARules");
-}
-
-export namespace SetPSSARulesRequest {
-    export const type = new RequestType<any, any, void, void>("powerShell/setPSSARules");
-}
+export const GetPSSARulesRequestType = new RequestType<any, any, void, void>("powerShell/getPSSARules");
+export const SetPSSARulesRequestType = new RequestType<any, any, void, void>("powerShell/setPSSARules");
 
 class RuleInfo {
-    name: string;
-    isEnabled: boolean;
+    public name: string;
+    public isEnabled: boolean;
 }
 
 export class SelectPSSARulesFeature implements IFeature {
@@ -31,40 +26,42 @@ export class SelectPSSARulesFeature implements IFeature {
                 return;
             }
 
-            this.languageClient.sendRequest(GetPSSARulesRequest.type, null).then((returnedRules) => {
+            this.languageClient.sendRequest(GetPSSARulesRequestType, null).then((returnedRules) => {
                 if (returnedRules == null) {
                     vscode.window.showWarningMessage(
                         "PowerShell extension uses PSScriptAnalyzer settings file - Cannot update rules.");
                     return;
                 }
-                let options: CheckboxQuickPickItem[] = returnedRules.map(function (rule: RuleInfo): CheckboxQuickPickItem {
-                    return { label: rule.name, isSelected: rule.isEnabled };
+
+                const options: ICheckboxQuickPickItem[] =
+                    returnedRules.map((rule: RuleInfo): ICheckboxQuickPickItem => {
+                        return { label: rule.name, isSelected: rule.isEnabled };
                 });
 
                 showCheckboxQuickPick(options)
-                    .then((updatedOptions: CheckboxQuickPickItem[]) => {
+                    .then((updatedOptions: ICheckboxQuickPickItem[]) => {
                         if (updatedOptions === undefined) {
                             return;
                         }
+
                         this.languageClient.sendRequest(
-                            SetPSSARulesRequest.type,
+                            SetPSSARulesRequestType,
                             {
-                                filepath: vscode.window.activeTextEditor.document.uri.fsPath,
-                                ruleInfos: updatedOptions.map(
-                                    function (option: CheckboxQuickPickItem): RuleInfo {
-                                        return { name: option.label, isEnabled: option.isSelected };
-                                    })
+                                filepath: vscode.window.activeTextEditor.document.uri.toString(),
+                                ruleInfos: updatedOptions.map((option: ICheckboxQuickPickItem): RuleInfo => {
+                                    return { name: option.label, isEnabled: option.isSelected };
+                                }),
                             });
                     });
             });
         });
     }
 
-    public setLanguageClient(languageclient: LanguageClient): void {
-        this.languageClient = languageclient;
-    }
-
     public dispose(): void {
         this.command.dispose();
+    }
+
+    public setLanguageClient(languageclient: LanguageClient): void {
+        this.languageClient = languageclient;
     }
 }

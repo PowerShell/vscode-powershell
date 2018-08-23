@@ -2,20 +2,35 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-'use strict';
+"use strict";
 
-import vscode = require('vscode');
-import utils = require('./utils');
+import vscode = require("vscode");
+import utils = require("./utils");
 
 enum CodeFormattingPreset {
     Custom,
     Allman,
     OTBS,
-    Stroustrup
+    Stroustrup,
+}
+
+export enum HelpCompletion {
+    Disabled = "Disabled",
+    BlockComment = "BlockComment",
+    LineComment = "LineComment",
+}
+
+export interface IPowerShellAdditionalExePathSettings {
+    versionName: string;
+    exePath: string;
 }
 
 export interface IBugReportingSettings {
     project: string;
+}
+
+export interface ICodeFoldingSettings {
+    enable?: boolean;
 }
 
 export interface ICodeFormattingSettings {
@@ -50,16 +65,21 @@ export interface IDeveloperSettings {
 }
 
 export interface ISettings {
+    powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
+    powerShellDefaultVersion?: string;
     powerShellExePath?: string;
+    bundledModulesPath?: string;
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
+    helpCompletion: string;
     scriptAnalysis?: IScriptAnalysisSettings;
     debugging?: IDebuggingSettings;
     developer?: IDeveloperSettings;
+    codeFolding?: ICodeFoldingSettings;
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
-    bugReporting?: IBugReportingSettings
+    bugReporting?: IBugReportingSettings;
 }
 
 export interface IIntegratedConsoleSettings {
@@ -68,33 +88,37 @@ export interface IIntegratedConsoleSettings {
 }
 
 export function load(): ISettings {
-    let configuration: vscode.WorkspaceConfiguration =
+    const configuration: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration(
             utils.PowerShellLanguageId);
 
-    let defaultBugReportingSettings: IBugReportingSettings = {
-        project: "https://github.com/PowerShell/vscode-powershell"
+    const defaultBugReportingSettings: IBugReportingSettings = {
+        project: "https://github.com/PowerShell/vscode-powershell",
     };
 
-    let defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
+    const defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
         enable: true,
-        settingsPath: ""
+        settingsPath: "",
     };
 
-    let defaultDebuggingSettings: IDebuggingSettings = {
+    const defaultDebuggingSettings: IDebuggingSettings = {
         createTemporaryIntegratedConsole: false,
     };
 
-    let defaultDeveloperSettings: IDeveloperSettings = {
+    const defaultDeveloperSettings: IDeveloperSettings = {
         featureFlags: [],
         powerShellExePath: undefined,
-        bundledModulesPath: undefined,
+        bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
-        powerShellExeIsWindowsDevBuild: false
+        powerShellExeIsWindowsDevBuild: false,
     };
 
-    let defaultCodeFormattingSettings: ICodeFormattingSettings = {
+    const defaultCodeFoldingSettings: ICodeFoldingSettings = {
+        enable: true,
+    };
+
+    const defaultCodeFormattingSettings: ICodeFormattingSettings = {
         preset: CodeFormattingPreset.Custom,
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
@@ -104,32 +128,67 @@ export function load(): ISettings {
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
         ignoreOneLineBlock: true,
-        alignPropertyValuePairs: true
+        alignPropertyValuePairs: true,
     };
 
-    let defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
+    const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
         showOnStartup: true,
-        focusConsoleOnExecute: true
+        focusConsoleOnExecute: true,
     };
 
     return {
-        startAutomatically: configuration.get<boolean>("startAutomatically", true),
-        powerShellExePath: configuration.get<string>("powerShellExePath", undefined),
-        useX86Host: configuration.get<boolean>("useX86Host", false),
-        enableProfileLoading: configuration.get<boolean>("enableProfileLoading", false),
-        scriptAnalysis: configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
-        debugging: configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
-        developer: configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
-        codeFormatting: configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
-        integratedConsole: configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
-        bugReporting: configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings)
+        startAutomatically:
+            configuration.get<boolean>("startAutomatically", true),
+        powerShellAdditionalExePaths:
+            configuration.get<IPowerShellAdditionalExePathSettings[]>("powerShellAdditionalExePaths", undefined),
+        powerShellDefaultVersion:
+            configuration.get<string>("powerShellDefaultVersion", undefined),
+        powerShellExePath:
+            configuration.get<string>("powerShellExePath", undefined),
+        bundledModulesPath:
+            "../../modules",
+        useX86Host:
+            configuration.get<boolean>("useX86Host", false),
+        enableProfileLoading:
+            configuration.get<boolean>("enableProfileLoading", false),
+        helpCompletion:
+            configuration.get<string>("helpCompletion", HelpCompletion.BlockComment),
+        scriptAnalysis:
+            configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
+        debugging:
+            configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
+        developer:
+            getWorkspaceSettingsWithDefaults<IDeveloperSettings>(configuration, "developer", defaultDeveloperSettings),
+        codeFolding:
+            configuration.get<ICodeFoldingSettings>("codeFolding", defaultCodeFoldingSettings),
+        codeFormatting:
+            configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
+        integratedConsole:
+            configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
+        bugReporting:
+            configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
     };
 }
 
 export function change(settingName: string, newValue: any, global: boolean = false): Thenable<void> {
-    let configuration: vscode.WorkspaceConfiguration =
+    const configuration: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration(
             utils.PowerShellLanguageId);
 
     return configuration.update(settingName, newValue, global);
+}
+
+function getWorkspaceSettingsWithDefaults<TSettings>(
+    workspaceConfiguration: vscode.WorkspaceConfiguration,
+    settingName: string,
+    defaultSettings: TSettings): TSettings {
+
+    const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
+
+    for (const setting in importedSettings) {
+        if (importedSettings[setting]) {
+            defaultSettings[setting] = importedSettings[setting];
+        }
+    }
+    return defaultSettings;
 }

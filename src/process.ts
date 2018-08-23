@@ -2,73 +2,78 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import os = require('os');
-import fs = require('fs');
-import net = require('net');
-import path = require('path');
-import utils = require('./utils');
-import vscode = require('vscode');
-import cp = require('child_process');
-import Settings = require('./settings');
-
-import { Logger } from './logging';
+import cp = require("child_process");
+import fs = require("fs");
+import net = require("net");
+import os = require("os");
+import path = require("path");
+import vscode = require("vscode");
+import { Logger } from "./logging";
+import Settings = require("./settings");
+import utils = require("./utils");
 
 export class PowerShellProcess {
+    public static escapeSingleQuotes(pspath: string): string {
+        return pspath.replace(new RegExp("'", "g"), "''");
+    }
+
+    public onExited: vscode.Event<void>;
+    private onExitedEmitter = new vscode.EventEmitter<void>();
 
     private consoleTerminal: vscode.Terminal = undefined;
     private consoleCloseSubscription: vscode.Disposable;
-    private sessionDetails: utils.EditorServicesSessionDetails;
-
-    private onExitedEmitter = new vscode.EventEmitter<void>();
-    public onExited: vscode.Event<void> = this.onExitedEmitter.event;
+    private sessionDetails: utils.IEditorServicesSessionDetails;
 
     constructor(
         public exePath: string,
+        private bundledModulesPath: string,
         private title: string,
         private log: Logger,
         private startArgs: string,
         private sessionFilePath: string,
         private sessionSettings: Settings.ISettings) {
+
+        this.onExited = this.onExitedEmitter.event;
     }
 
-    public start(logFileName: string): Thenable<utils.EditorServicesSessionDetails> {
+    public start(logFileName: string): Thenable<utils.IEditorServicesSessionDetails> {
 
-        return new Promise<utils.EditorServicesSessionDetails>(
+        return new Promise<utils.IEditorServicesSessionDetails>(
             (resolve, reject) => {
-                try
-                {
-                    let startScriptPath =
+                try {
+                    const startScriptPath =
                         path.resolve(
                             __dirname,
-                            '../../scripts/Start-EditorServices.ps1');
+                            this.bundledModulesPath,
+                            "PowerShellEditorServices/Start-EditorServices.ps1");
 
-                    var editorServicesLogPath = this.log.getLogFilePath(logFileName);
+                    const editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
-                    var featureFlags =
+                    const featureFlags =
                         this.sessionSettings.developer.featureFlags !== undefined
-                            ? this.sessionSettings.developer.featureFlags.map(f => `'${f}'`).join(', ')
+                            ? this.sessionSettings.developer.featureFlags.map((f) => `'${f}'`).join(", ")
                             : "";
 
                     this.startArgs +=
-                        `-LogPath '${editorServicesLogPath}' ` +
-                        `-SessionDetailsPath '${this.sessionFilePath}' ` +
-                        `-FeatureFlags @(${featureFlags})`
+                        `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
+                        `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
+                        `-FeatureFlags @(${featureFlags})`;
 
-                    var powerShellArgs = [
+                    const powerShellArgs = [
                         "-NoProfile",
-                        "-NonInteractive"
-                    ]
+                        "-NonInteractive",
+                    ];
 
                     // Only add ExecutionPolicy param on Windows
                     if (utils.isWindowsOS()) {
-                        powerShellArgs.push("-ExecutionPolicy", "Bypass")
+                        powerShellArgs.push("-ExecutionPolicy", "Bypass");
                     }
 
                     powerShellArgs.push(
                         "-Command",
-                        "& '" + startScriptPath + "' " + this.startArgs);
+                        "& '" + PowerShellProcess.escapeSingleQuotes(startScriptPath) + "' " + this.startArgs);
 
-                    var powerShellExePath = this.exePath;
+                    let powerShellExePath = this.exePath;
 
                     if (this.sessionSettings.developer.powerShellExeIsWindowsDevBuild) {
                         // Windows PowerShell development builds need the DEVPATH environment
@@ -77,7 +82,7 @@ export class PowerShellProcess {
                         // NOTE: This batch file approach is needed temporarily until VS Code's
                         // createTerminal API gets an argument for setting environment variables
                         // on the launched process.
-                        var batScriptPath = path.resolve(__dirname, '../../sessions/powershell.bat');
+                        const batScriptPath = path.resolve(__dirname, "../../sessions/powershell.bat");
                         fs.writeFileSync(
                             batScriptPath,
                             `@set DEVPATH=${path.dirname(powerShellExePath)}\r\n@${powerShellExePath} %*`);
@@ -88,7 +93,7 @@ export class PowerShellProcess {
                     this.log.write(
                         "Language server starting --",
                         "    exe: " + powerShellExePath,
-                        "    args: " + startScriptPath + ' ' + this.startArgs);
+                        "    args: " + startScriptPath + " " + this.startArgs);
 
                     // Make sure no old session file exists
                     utils.deleteSessionFile(this.sessionFilePath);
@@ -113,43 +118,27 @@ export class PowerShellProcess {
 
                             if (error) {
                                 reject(error);
-                            }
-                            else {
+                            } else {
                                 this.sessionDetails = sessionDetails;
                                 resolve(this.sessionDetails);
                             }
                     });
 
-                // this.powerShellProcess.stderr.on(
-                //     'data',
-                //     (data) => {
-                //         this.log.writeError("ERROR: " + data);
+                    this.consoleCloseSubscription =
+                        vscode.window.onDidCloseTerminal(
+                            (terminal) => {
+                                if (terminal === this.consoleTerminal) {
+                                    this.log.write("powershell.exe terminated or terminal UI was closed");
+                                    this.onExitedEmitter.fire();
+                                }
+                            });
 
-                //         if (this.sessionStatus === SessionStatus.Initializing) {
-                //             this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
-                //         }
-                //         else if (this.sessionStatus === SessionStatus.Running) {
-                //             this.promptForRestart();
-                //         }
-                //     });
-
-                this.consoleCloseSubscription =
-                    vscode.window.onDidCloseTerminal(
-                        terminal => {
-                            if (terminal === this.consoleTerminal) {
-                                this.log.write("powershell.exe terminated or terminal UI was closed");
-                                this.onExitedEmitter.fire();
-                            }
-                        });
-
-                this.consoleTerminal.processId.then(
-                    pid => { this.log.write(`powershell.exe started, pid: ${pid}`); });
-            }
-            catch (e)
-            {
-                reject(e);
-            }
-        });
+                    this.consoleTerminal.processId.then(
+                        (pid) => { this.log.write(`powershell.exe started, pid: ${pid}`); });
+                } catch (e) {
+                    reject(e);
+                }
+            });
     }
 
     public showConsole(preserveFocus: boolean) {

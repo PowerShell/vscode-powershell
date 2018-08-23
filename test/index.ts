@@ -1,9 +1,14 @@
-var testRunner = require('vscode/lib/testrunner');
+/*---------------------------------------------------------
+* Copyright (C) Microsoft Corporation. All rights reserved.
+*--------------------------------------------------------*/
+// tslint:disable no-var-requires
+
+let testRunner = require("vscode/lib/testrunner");
 
 // See https://github.com/mochajs/mocha/wiki/Using-mocha-programmatically#set-options for options
 testRunner.configure({
-    ui: 'tdd', 		// the TDD UI is being used in extension.test.ts (suite, test, etc.)
-    useColors: true // colored output from test results
+    ui: "tdd", 		// the TDD UI is being used in extension.test.ts (suite, test, etc.)
+    useColors: true, // colored output from test results
 });
 
 module.exports = testRunner;

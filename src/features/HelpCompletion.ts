@@ -2,58 +2,76 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import { IFeature } from "../feature";
-import { TextDocumentChangeEvent, workspace, Disposable, Position, window, Range, EndOfLine, SnippetString, TextDocument } from "vscode";
+import { Disposable, EndOfLine, Position, Range, SnippetString,
+    TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
+import { IFeature } from "../feature";
+import { Logger } from "../logging";
+import Settings = require("../settings");
 
-export namespace CommentHelpRequest {
-    export const type = new RequestType<any, any, void, void>("powerShell/getCommentHelp");
-}
+export const CommentHelpRequestType =
+    new RequestType<any, any, void, void>("powerShell/getCommentHelp");
 
-interface CommentHelpRequestParams {
+interface ICommentHelpRequestParams {
     documentUri: string;
     triggerPosition: Position;
     blockComment: boolean;
 }
 
-interface CommentHelpRequestResult {
+interface ICommentHelpRequestResult {
     content: string[];
 }
 
-enum SearchState { Searching, Locked, Found };
+enum SearchState { Searching, Locked, Found }
 
 export class HelpCompletionFeature implements IFeature {
     private helpCompletionProvider: HelpCompletionProvider;
     private languageClient: LanguageClient;
     private disposable: Disposable;
+    private settings: Settings.ISettings;
 
-    constructor() {
-        this.helpCompletionProvider = new HelpCompletionProvider();
-        let subscriptions = [];
-        workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
-        this.disposable = Disposable.from(...subscriptions);
+    constructor(private log: Logger) {
+        this.settings = Settings.load();
+
+        if (this.settings.helpCompletion !== Settings.HelpCompletion.Disabled) {
+            this.helpCompletionProvider = new HelpCompletionProvider();
+            const subscriptions = [];
+            workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
+            this.disposable = Disposable.from(...subscriptions);
+        }
     }
 
-    setLanguageClient(languageClient: LanguageClient) {
+    public dispose() {
+        if (this.disposable) {
+            this.disposable.dispose();
+        }
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
-        this.helpCompletionProvider.languageClient = languageClient;
+        if (this.helpCompletionProvider) {
+            this.helpCompletionProvider.languageClient = languageClient;
+        }
     }
 
-    dispose() {
-        this.disposable.dispose();
-    }
-
-    onEvent(changeEvent: TextDocumentChangeEvent): void {
-        this.helpCompletionProvider.updateState(
-            changeEvent.document,
-            changeEvent.contentChanges[0].text,
-            changeEvent.contentChanges[0].range);
-
-        // todo raise an event when trigger is found, and attach complete() to the event.
-        if (this.helpCompletionProvider.triggerFound) {
-            this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+    public onEvent(changeEvent: TextDocumentChangeEvent): void {
+        if (!(changeEvent && changeEvent.contentChanges)) {
+            this.log.writeWarning(`<${HelpCompletionFeature.name}>: ` +
+                `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
+            return;
         }
 
+        if (changeEvent.contentChanges.length > 0) {
+            this.helpCompletionProvider.updateState(
+                changeEvent.document,
+                changeEvent.contentChanges[0].text,
+                changeEvent.contentChanges[0].range);
+
+            // todo raise an event when trigger is found, and attach complete() to the event.
+            if (this.helpCompletionProvider.triggerFound) {
+                this.helpCompletionProvider.complete().then(() => this.helpCompletionProvider.reset());
+            }
+        }
     }
 }
 
@@ -61,6 +79,7 @@ class TriggerFinder {
     private state: SearchState;
     private document: TextDocument;
     private count: number;
+
     constructor(private triggerCharacters: string) {
         this.state = SearchState.Searching;
         this.count = 0;
@@ -88,8 +107,7 @@ class TriggerFinder {
                     if (this.count === this.triggerCharacters.length) {
                         this.state = SearchState.Found;
                     }
-                }
-                else {
+                } else {
                     this.reset();
                 }
                 break;
@@ -107,20 +125,20 @@ class TriggerFinder {
 }
 
 class HelpCompletionProvider {
-    private triggerFinderBlockComment: TriggerFinder;
-    private triggerFinderLineComment: TriggerFinder;
+    private triggerFinderHelpComment: TriggerFinder;
     private lastChangeText: string;
     private lastChangeRange: Range;
     private lastDocument: TextDocument;
     private langClient: LanguageClient;
+    private settings: Settings.ISettings;
 
     constructor() {
-        this.triggerFinderBlockComment = new TriggerFinder("<#");
-        this.triggerFinderLineComment = new TriggerFinder("##");
+        this.triggerFinderHelpComment = new TriggerFinder("##");
+        this.settings = Settings.load();
     }
 
     public get triggerFound(): boolean {
-        return this.triggerFinderBlockComment.found || this.triggerFinderLineComment.found;
+        return this.triggerFinderHelpComment.found;
     }
 
     public set languageClient(value: LanguageClient) {
@@ -131,13 +149,11 @@ class HelpCompletionProvider {
         this.lastDocument = document;
         this.lastChangeText = changeText;
         this.lastChangeRange = changeRange;
-        this.triggerFinderBlockComment.updateState(document, changeText);
-        this.triggerFinderLineComment.updateState(document, changeText);
+        this.triggerFinderHelpComment.updateState(document, changeText);
     }
 
     public reset(): void {
-        this.triggerFinderBlockComment.reset();
-        this.triggerFinderLineComment.reset();
+        this.triggerFinderHelpComment.reset();
     }
 
     public complete(): Thenable<void> {
@@ -145,28 +161,29 @@ class HelpCompletionProvider {
             return;
         }
 
-        let change = this.lastChangeText;
-        let triggerStartPos = this.lastChangeRange.start;
-        let triggerEndPos = this.lastChangeRange.end;
-        let doc = this.lastDocument;
+        const change = this.lastChangeText;
+        const triggerStartPos = this.lastChangeRange.start;
+        const triggerEndPos = this.lastChangeRange.end;
+        const doc = this.lastDocument;
+
         return this.langClient.sendRequest(
-            CommentHelpRequest.type,
+            CommentHelpRequestType,
             {
                 documentUri: doc.uri.toString(),
                 triggerPosition: triggerStartPos,
-                blockComment: this.triggerFinderBlockComment.found
-            }).then(result => {
+                blockComment: this.settings.helpCompletion === Settings.HelpCompletion.BlockComment,
+            }).then((result) => {
                 if (result == null || result.content == null) {
                     return;
                 }
 
                 // todo add indentation level to the help content
-                let editor = window.activeTextEditor;
-                let replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
+                const editor = window.activeTextEditor;
+                const replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
 
-                // Trim the leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
+                // Trim leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
                 // Trim the last empty line and join the strings.
-                let text = result.content.map(x => x.trimLeft()).slice(0, -1).join(this.getEOL(doc.eol));
+                const text = result.content.map((x) => x.trimLeft()).slice(0, -1).join(this.getEOL(doc.eol));
                 editor.insertSnippet(new SnippetString(text), replaceRange);
             });
     }

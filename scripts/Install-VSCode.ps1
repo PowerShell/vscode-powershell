@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.1
+.VERSION 1.2
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -75,6 +75,9 @@
     When present, causes Visual Studio Code to be launched as soon as installation
     has finished.
 
+.PARAMETER EnableContextMenus
+    When present, causes the installer to configure the Explorer context menus
+
 .EXAMPLE
     Install-VSCode.ps1 -Architecture 32-bit
 
@@ -137,10 +140,12 @@ param(
     [ValidateNotNull()]
     [string[]]$AdditionalExtensions = @(),
 
-    [switch]$LaunchWhenDone
+    [switch]$LaunchWhenDone,
+
+    [switch]$EnableContextMenus
 )
 
-if (!($IsLinux -or $IsOSX)) {
+if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
     switch ($Architecture) {
         "64-bit" {
             if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
@@ -211,7 +216,12 @@ if (!($IsLinux -or $IsOSX)) {
 
 
             Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
-            Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList /silent, /mergetasks=!runcode
+            if ($EnableContextMenus) {
+                Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList "/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath"
+            }
+            else {
+                Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList "/verysilent /tasks=addtopath"
+            }
         }
         else {
             Write-Host "`n$appName is already installed." -ForegroundColor Yellow

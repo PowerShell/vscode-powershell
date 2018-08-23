@@ -1,0 +1,14 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "indent": [true, "spaces", 4],
+        "max-classes-per-file": false,
+        "object-literal-sort-keys": false,
+        "file-header": [true, "Copyright \\(C\\) Microsoft Corporation. All rights reserved."]
+    },
+    "rulesDirectory": []
+}

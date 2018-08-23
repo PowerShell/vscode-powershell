@@ -1,5 +1,230 @@
 # vscode-powershell Release History
 
+## v1.8.3
+### Wednesday, August 15, 2018
+
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+-  [PowerShell/vscode-powershell #1480](https://github.com/PowerShell/vscode-powershell/pull/1480) -
+   Use PowerShell signing script in VSTS builds
+-  [PowerShell/vscode-powershell #1460](https://github.com/PowerShell/vscode-powershell/pull/1460) -
+   Use newer version for preleases
+-  [PowerShell/vscode-powershell #1475](https://github.com/PowerShell/vscode-powershell/pull/1475) -
+   Change resourceLangId to editorLangId so right-click works properly with unsaved files (Thanks @corbob!)
+-  [PowerShell/vscode-powershell #1467](https://github.com/PowerShell/vscode-powershell/pull/1467) -
+   Remove region folding from non-region areas (Thanks @glennsarti!)
+   
+ #### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShell/PowerShellEditorServices #722](https://github.com/PowerShell/PowerShellEditorServices/pull/722) -
+  Add VSTS signing step
+- [PowerShell/PowerShellEditorServices #717](https://github.com/PowerShell/PowerShellEditorServices/pull/717) -
+  Increment version for prerelease
+- [PowerShell/PowerShellEditorServices #715](https://github.com/PowerShell/PowerShellEditorServices/pull/715) -
+  Reduce allocations when parsing files (Thanks @mattpwhite!)
+
+## v1.8.2
+### Thursday, July 26, 2018
+
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [PowerShell/vscode-powershell #1438](https://github.com/PowerShell/vscode-powershell/pull/1438) -
+  Fix detecting contiguous comment blocks and regions (Thanks @glennsarti!)
+- [PowerShell/vscode-powershell #1436](https://github.com/PowerShell/vscode-powershell/pull/1436) -
+  First approach to fix issue with dbg/run start before PSES running (Thanks @rkeithhill!)
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShell/PowerShellEditorServices #712](https://github.com/PowerShell/PowerShellEditorServices/pull/712) -
+  workaround to support inmemory://
+- [PowerShell/PowerShellEditorServices #706](https://github.com/PowerShell/PowerShellEditorServices/pull/706) -
+  Go To Definition works with different Ast types
+- [PowerShell/PowerShellEditorServices #707](https://github.com/PowerShell/PowerShellEditorServices/pull/707) -
+  fix stdio passing
+- [PowerShell/PowerShellEditorServices #709](https://github.com/PowerShell/PowerShellEditorServices/pull/709) -
+  Stop Diagnostic logging from logging to stdio when the communication protocol is set to stdio
+- [PowerShell/PowerShellEditorServices #710](https://github.com/PowerShell/PowerShellEditorServices/pull/710) -
+  stdio should only launch language service not debug
+- [PowerShell/PowerShellEditorServices #705](https://github.com/PowerShell/PowerShellEditorServices/pull/705) -
+  Fix load order of PSSA modules
+- [PowerShell/PowerShellEditorServices #704](https://github.com/PowerShell/PowerShellEditorServices/pull/704) -
+  Do not enable PSAvoidTrailingWhitespace rule by default as it currenly flags whitespace-only lines as well (Thanks @bergmeister!)
+
+## v1.8.1
+### Wednesday, July 11, 2018
+
+- [PowerShell/vscode-powershell #1418](https://github.com/PowerShell/vscode-powershell/pull/1418) -
+  Fix code folding in documents using CRLF newlines. (Thanks @glennsarti!)
+
+## v1.8.0
+### Tuesday, July 10, 2018
+
+- [PowerShell/vscode-powershell #1238](https://github.com/PowerShell/vscode-powershell/pull/1238) -
+  Added functionality to install the VSCode context menus. (Thanks @detlefs!)
+- [PowerShell/vscode-powershell #1354](https://github.com/PowerShell/vscode-powershell/pull/1354) -
+  Edit snippet to fix issue #1353 (Thanks @kilasuit!)
+- [PowerShell/vscode-powershell #1362](https://github.com/PowerShell/vscode-powershell/pull/1362) -
+  Updated Pester Problem Matcher (Thanks @awickham10!)
+- [PowerShell/vscode-powershell #1359](https://github.com/PowerShell/vscode-powershell/pull/1359) -
+  (maint) Add visual ruler for line length (Thanks @glennsarti!)
+- [PowerShell/vscode-powershell #1344](https://github.com/PowerShell/vscode-powershell/pull/1344) -
+  Update to TypeScript 2.9.x (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1323](https://github.com/PowerShell/vscode-powershell/pull/1323) -
+  SpecProcId - interactive var replacement supports only string type (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1327](https://github.com/PowerShell/vscode-powershell/pull/1327) -
+  Switch to named pipes
+- [PowerShell/vscode-powershell #1321](https://github.com/PowerShell/vscode-powershell/pull/1321) -
+  GitHub issue template tweaks and add PSSA template (Thanks @bergmeister!)
+- [PowerShell/vscode-powershell #1320](https://github.com/PowerShell/vscode-powershell/pull/1320) -
+  Take advantage of multiple issue templates (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1317](https://github.com/PowerShell/vscode-powershell/pull/1317) -
+  Change SpecifyScriptArgs command to only return string - not string[] (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1318](https://github.com/PowerShell/vscode-powershell/pull/1318) -
+  Update package veresion in lock file, format package.json file. (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1312](https://github.com/PowerShell/vscode-powershell/pull/1312) -
+  Updates to Examples PSSA settings file to include more rule config (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1305](https://github.com/PowerShell/vscode-powershell/pull/1305) -
+  Make SaveAs work for untitled files
+- [PowerShell/vscode-powershell #1307](https://github.com/PowerShell/vscode-powershell/pull/1307) -
+  Added Columns, Improved readability for ToC. (Thanks @st0le!)
+- [PowerShell/vscode-powershell #1368](https://github.com/PowerShell/vscode-powershell/pull/1368) -
+  Add new snippet for #region (#1368) (Thanks @lipkau!)
+- [PowerShell/vscode-powershell #1416](https://github.com/PowerShell/vscode-powershell/pull/1416) -
+  (GH-1413) Resolve promise correctly in Folding feature (Thanks @glennsarti!)
+- [PowerShell/vscode-powershell #1412](https://github.com/PowerShell/vscode-powershell/pull/1412) -
+  Set the extension's log level based on settings value (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1411](https://github.com/PowerShell/vscode-powershell/pull/1411) -
+  Escape paths w/single quotes before passing to powershell in single-quoted strings (#1411) (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1409](https://github.com/PowerShell/vscode-powershell/pull/1409) -
+  Rename file to match type name (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1408](https://github.com/PowerShell/vscode-powershell/pull/1408) -
+  Restore ability to start debug session when script run in PSIC hits breakpoint (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1407](https://github.com/PowerShell/vscode-powershell/pull/1407) -
+  Scroll the terminal to bottom for F8 executionPartial fix #1257 (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1414](https://github.com/PowerShell/vscode-powershell/pull/1414) -
+  Update grammar parsing for vscode-textmate v4 module (Thanks @glennsarti!)
+- [PowerShell/vscode-powershell #1397](https://github.com/PowerShell/vscode-powershell/pull/1397) -
+  Allow debugging in interactive session with no dir change (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1402](https://github.com/PowerShell/vscode-powershell/pull/1402) -
+  Move lint directive after the file-header to fix lint error (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1366](https://github.com/PowerShell/vscode-powershell/pull/1366) -
+  Add support for side-by-side PS Core preview on Linux/macOS (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1391](https://github.com/PowerShell/vscode-powershell/pull/1391) -
+  Add PowerShell Online Help lookup to context menu (Thanks @corbob!)
+- [PowerShell/vscode-powershell #1396](https://github.com/PowerShell/vscode-powershell/pull/1396) -
+  Add tslint rule file-header to enforce copyright in TS files (Thanks @rkeithhill!)
+- [PowerShell/vscode-powershell #1355](https://github.com/PowerShell/vscode-powershell/pull/1355) -
+  Add syntax aware folding provider (Thanks @glennsarti!)
+- [PowerShell/vscode-powershell #1395](https://github.com/PowerShell/vscode-powershell/pull/1395) -
+  Update community_snippets.md (Thanks @fullenw1!)
+- [PowerShell/vscode-powershell #1382](https://github.com/PowerShell/vscode-powershell/pull/1382) -
+  Fix markdown syntax (Thanks @lipkau!)
+- [PowerShell/vscode-powershell #1369](https://github.com/PowerShell/vscode-powershell/pull/1369) -
+  Update README.md with kbds and what to do if you find a vulnerability
+- [PowerShell/vscode-powershell #1297](https://github.com/PowerShell/vscode-powershell/pull/1297) -
+  Added some snippets (#1297) (Thanks @SQLDBAWithABeard!)
+
+## 1.7.0
+### Wednesday, April 25, 2018
+
+- [PowerShell/vscode-powershell #1285](https://github.com/PowerShell/vscode-powershell/pull/1285) -
+  Add a community snippet for date-annotated `Write-Verbose` messages.
+
+- [PowerShell/vscode-powershell #1228](https://github.com/PowerShell/vscode-powershell/issues/1228) -
+  Make comment-based help trigger always be `##` with a new setting `powershell.helpCompletion` to
+  allow you to select between help comment styles: `BlockComment` (default) or `LineComment`.
+  You can also specify Disabled to disable this functionality.
+
+- [PowerShell/vscode-powershell #603](https://github.com/PowerShell/vscode-powershell/issues/603) -
+  Fix PowerShell crashing on machines with IPv6 disabled.
+
+- [PowerShell/vscode-powershell #1243](https://github.com/PowerShell/vscode-powershell/issues/1243) -
+  Support custom PowerShell executable paths in user configuration which can be selected (via name)
+  in either user or workspace configuration.
+
+- [PowerShell/vscode-powershell #1264](https://github.com/PowerShell/vscode-powershell/pull/1264) -
+  Add support for [Visual Studio Live Share](https://code.visualstudio.com/visual-studio-live-share).
+
+- [PowerShell/vscode-powershell #1261](https://github.com/PowerShell/vscode-powershell/pull/1261) -
+  Add support for `$psEditor.GetEditorContext.CurrentFile.SaveAs("NewFileName.ps1")`.
+
+- [PowerShell/vscode-powershell #1252](https://github.com/PowerShell/vscode-powershell/pull/1252) -
+  Change the way the extension builds and runs, so that PowerShellEditorServices is self-contained.
+
+- [PowerShell/vscode-powershell #1248](https://github.com/PowerShell/vscode-powershell/pull/1248) -
+  Replace `$global:IsOSX` with `$global:IsMacOS`.
+
+- [PowerShell/vscode-powershell #1246](https://github.com/PowerShell/vscode-powershell/pull/1246) -
+  Create [community_snippets.md](./docs/community_snippets.md) for user created snippets.
+
+- [PowerShell/vscode-powershell #1155](https://github.com/PowerShell/vscode-powershell/issues/1155) -
+  Fix PSES crashes caused by running "Set PSScriptAnalyzer Rules" on an untitled file.
+
+- [PowerShell/vscode-powershell #1236](https://github.com/PowerShell/vscode-powershell/pull/1236) -
+  Stop an error occurring when VSCode trims trailing whitespace and sends document update messages.
+
+- [PowerShell/vscode-powershell #996](https://github.com/PowerShell/vscode-powershell/issues/996) -
+  Fix `Install-PSCode.ps1` crashing due to `$IsLinux` variable in older PowerShell versions.
+
+- [PowerShell/vscode-powershell #1234](https://github.com/PowerShell/vscode-powershell/pull/1234) -
+  Add snippets for Hashtable and PSCustomObject.
+
+- [PowerShell/vscode-powershell #1233](https://github.com/PowerShell/vscode-powershell/pull/1233) -
+  Add a keybinding for Show Addtional Commands to <kbd>Shift</kbd>-<kbd>Alt</kbd>-<kbd>S</kbd>.
+
+- [PowerShell/vscode-powershell #1227](https://github.com/PowerShell/vscode-powershell/pull/1227) -
+  Add an indicator for when PowerShell is running in the status bar.
+
+- [PowerShell/vscode-powershell #1225](https://github.com/PowerShell/vscode-powershell/pull/1225) -
+  Fix launch config not using temporary integrated console setting.
+
+- [PowerShell/vscode-powershell #1208](https://github.com/PowerShell/vscode-powershell/issues/1208) -
+  Stop configured temporary windows closing after running Pester tests.
+
+## 1.6.0
+### Thursday, February 22, 2018
+
+#### Fixes and Improvements
+
+- [PowerShell/vscode-powershell #907](https://github.com/PowerShell/vscode-powershell/issues/907) -
+  Persist temp console debug session.
+
+- [PowerShell/vscode-powershell #1198](https://github.com/PowerShell/vscode-powershell/pull/1198) -
+  Enhance Start-EditorServices.ps1 for better logging and fix bugs.
+
+- [PowerShell/PowerShellEditorServices #413](https://github.com/PowerShell/PowerShellEditorServices/issues/413) -
+  Allow opening files as not previews to allow Open-EditorFile to open multiple files passed in.
+
+- [PowerShell/vscode-powershell #1177](https://github.com/PowerShell/vscode-powershell/issues/1177) -
+  Add function-advanced snippet. Thanks to [Benny1007](https://github.com/Benny1007)!
+
+- [PowerShell/vscode-powershell #1179](https://github.com/PowerShell/vscode-powershell/issues/1179) -
+  Switch onDebug to onDebugResolve:type for better debugging perf.
+
+- [PowerShell/vscode-powershell #1086](https://github.com/PowerShell/vscode-powershell/issues/1086) -
+  Add tslint to vscode-powershell and address all issues.
+
+- [PowerShell/vscode-powershell #1153](https://github.com/PowerShell/vscode-powershell/issues/1153) -
+  Add docs for ps remoting in vscode.
+
+- [PowerShell/vscode-powershell #1161](https://github.com/PowerShell/vscode-powershell/pull/1161) -
+  Check for the expected version of the PowerShell Editor Services module fails because of the wrong function parameters. Thanks to [ant-druha](https://github.com/ant-druha)!
+
+- [PowerShell/vscode-powershell #1141](https://github.com/PowerShell/vscode-powershell/pull/1141) -
+  Updated install script minified URL. Thanks to [tabs-not-spaces](https://github.com/tabs-not-spaces)!
+
+- [PowerShell/PowerShellEditorServices #258](https://github.com/PowerShell/PowerShellEditorServices/issues/258) -
+  add .Save() to FileContext API.
+
+- [PowerShell/vscode-powershell #1137](https://github.com/PowerShell/vscode-powershell/pull/1137) -
+  Added 64bit support & vscode-insiders install support. Thanks to [tabs-not-spaces](https://github.com/tabs-not-spaces)!
+
+- [PowerShell/vscode-powershell #1115](https://github.com/PowerShell/vscode-powershell/issues/1115) -
+  Fixed "Open in ISE" keyboard shortcut from overwriting basic editing keyboard shortcut.
+
+- [PowerShell/vscode-powershell #1111](https://github.com/PowerShell/vscode-powershell/issues/1111) -
+  Update examples tasks.json for 2.0.0 schema.
+
 ## 1.5.1
 ### Tuesday, November 14, 2017
 

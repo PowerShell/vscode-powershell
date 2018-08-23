@@ -2,9 +2,9 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import * as assert from 'assert';
-import * as vscode from 'vscode';
-import * as platform from '../src/platform';
+import * as assert from "assert";
+import * as vscode from "vscode";
+import * as platform from "../src/platform";
 
 function checkDefaultPowerShellPath(platformDetails, expectedPath) {
     test("returns correct default path", () => {
@@ -15,14 +15,14 @@ function checkDefaultPowerShellPath(platformDetails, expectedPath) {
 }
 
 function checkAvailableWindowsPowerShellPaths(
-    platformDetails: platform.PlatformDetails,
-    expectedPaths: platform.PowerShellExeDetails[]) {
+    platformDetails: platform.IPlatformDetails,
+    expectedPaths: platform.IPowerShellExeDetails[]) {
     test("correctly enumerates available Windows PowerShell paths", () => {
 
         // The system may return PowerShell Core paths so only
         // enumerate the first list items.
-        let enumeratedPaths = platform.getAvailablePowerShellExes(platformDetails);
-        for (var i; i < expectedPaths.length; i++) {
+        const enumeratedPaths = platform.getAvailablePowerShellExes(platformDetails, undefined);
+        for (let i; i < expectedPaths.length; i++) {
             assert.equal(enumeratedPaths[i], expectedPaths[i]);
         }
     });
@@ -39,10 +39,10 @@ function checkFixedWindowsPowerShellpath(platformDetails, inputPath, expectedPat
 suite("Platform module", () => {
 
     suite("64-bit Windows, 64-bit VS Code", () => {
-        let platformDetails: platform.PlatformDetails = {
+        const platformDetails: platform.IPlatformDetails = {
             operatingSystem: platform.OperatingSystem.Windows,
             isOS64Bit: true,
-            isProcess64Bit: true
+            isProcess64Bit: true,
         };
 
         checkDefaultPowerShellPath(
@@ -54,12 +54,12 @@ suite("Platform module", () => {
             [
                 {
                     versionName: platform.WindowsPowerShell64BitLabel,
-                    exePath: platform.System32PowerShellPath
+                    exePath: platform.System32PowerShellPath,
                 },
                 {
                     versionName: platform.WindowsPowerShell32BitLabel,
-                    exePath: platform.SysWow64PowerShellPath
-                }
+                    exePath: platform.SysWow64PowerShellPath,
+                },
             ]);
 
         checkFixedWindowsPowerShellpath(
@@ -69,10 +69,10 @@ suite("Platform module", () => {
     });
 
     suite("64-bit Windows, 32-bit VS Code", () => {
-        let platformDetails: platform.PlatformDetails = {
+        const platformDetails: platform.IPlatformDetails = {
             operatingSystem: platform.OperatingSystem.Windows,
             isOS64Bit: true,
-            isProcess64Bit: false
+            isProcess64Bit: false,
         };
 
         checkDefaultPowerShellPath(
@@ -84,12 +84,12 @@ suite("Platform module", () => {
             [
                 {
                     versionName: platform.WindowsPowerShell64BitLabel,
-                    exePath: platform.SysnativePowerShellPath
+                    exePath: platform.SysnativePowerShellPath,
                 },
                 {
                     versionName: platform.WindowsPowerShell32BitLabel,
-                    exePath: platform.System32PowerShellPath
-                }
+                    exePath: platform.System32PowerShellPath,
+                },
             ]);
 
         checkFixedWindowsPowerShellpath(
@@ -99,10 +99,10 @@ suite("Platform module", () => {
     });
 
     suite("32-bit Windows, 32-bit VS Code", () => {
-        let platformDetails: platform.PlatformDetails = {
+        const platformDetails: platform.IPlatformDetails = {
             operatingSystem: platform.OperatingSystem.Windows,
             isOS64Bit: false,
-            isProcess64Bit: false
+            isProcess64Bit: false,
         };
 
         checkDefaultPowerShellPath(
@@ -114,8 +114,8 @@ suite("Platform module", () => {
             [
                 {
                     versionName: platform.WindowsPowerShell32BitLabel,
-                    exePath: platform.System32PowerShellPath
-                }
+                    exePath: platform.System32PowerShellPath,
+                },
             ]);
     });
 });

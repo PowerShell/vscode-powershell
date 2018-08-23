@@ -1,6 +1,12 @@
-# The PowerShell Script Analyzer will generate a warning
-# diagnostic record for this file due to a bug -
-# https://github.com/PowerShell/PSScriptAnalyzer/issues/472
+# Use the PowerShell extension setting `powershell.scriptAnalysis.settingsPath` to get the current workspace
+# to use this PSScriptAnalyzerSettings.psd1 file to configure code analysis in Visual Studio Code.
+# This setting is configured in the workspace's `.vscode\settings.json`.
+#
+# For more information on PSScriptAnalyzer settings see:
+# https://github.com/PowerShell/PSScriptAnalyzer/blob/master/README.md#settings-support-in-scriptanalyzer
+#
+# You can see the predefined PSScriptAnalyzer settings here:
+# https://github.com/PowerShell/PSScriptAnalyzer/tree/master/Engine/Settings
 @{
     # Only diagnostic records of the specified severity will be generated.
     # Uncomment the following line if you only want Errors and Warnings but
@@ -8,7 +14,7 @@
     #Severity = @('Error','Warning')
 
     # Analyze **only** the following rules. Use IncludeRules when you want
-    # to invoke only a small subset of the defualt rules.
+    # to invoke only a small subset of the default rules.
     IncludeRules = @('PSAvoidDefaultValueSwitchParameter',
                      'PSMisleadingBacktick',
                      'PSMissingModuleManifestField',
@@ -17,7 +23,7 @@
                      'PSShouldProcess',
                      'PSUseApprovedVerbs',
                      'PSAvoidUsingCmdletAliases',
-                     'PSUseDeclaredVarsMoreThanAssigments')
+                     'PSUseDeclaredVarsMoreThanAssignments')
 
     # Do not analyze the following rules. Use ExcludeRules when you have
     # commented out the IncludeRules settings above and want to include all
@@ -25,4 +31,11 @@
     # Note: if a rule is in both IncludeRules and ExcludeRules, the rule
     # will be excluded.
     #ExcludeRules = @('PSAvoidUsingWriteHost')
+
+    # You can use rule configuration to configure rules that support it:
+    #Rules = @{
+    #    PSAvoidUsingCmdletAliases = @{
+    #        Whitelist = @("cd")
+    #    }
+    #}
 }

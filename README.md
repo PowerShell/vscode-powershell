@@ -98,7 +98,11 @@ to file an issue on our GitHub repository:
 Make sure to fill in the information that is requested in the issue template as it
 will help us investigate the problem more quickly.
 
-> Note To automatically create a bug report from within the extension run the *"Report a problem on GitHub"* command. Some basic information about your instance and powershell versions will be collected and inserted into a new GitHub issue.
+To automatically create a bug report from within the extension, open the Command pallet (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and run the *"Report a problem on GitHub"* command. Some basic information about your instance and powershell versions will be collected and inserted into a new GitHub issue.
+
+NOTE: If you believe that there is a security vulnerability in the PowerShell extension for VSCode,
+it **must** be reported to [secure@microsoft.com](https://technet.microsoft.com/security/ff852094.aspx) to allow for [Coordinated Vulnerability Disclosure](https://technet.microsoft.com/security/dn467923).
+**Only** file an issue, if secure@microsoft.com has confirmed filing an issue is appropriate.
 
 ### 2. Capture verbose logs and send them to us
 
@@ -115,11 +119,13 @@ that, zip up the logs in the corresponding folder for your operating system:
 - **Windows**: `$HOME\.vscode\extensions\ms-vscode.PowerShell-<CURRENT VERSION>\logs`
 - **Linux and macOS**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
 
+Alternatively, you can open the log folder using the Command pallet (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and running the *"Open powerShell Extension Logs Folder"* command.
+
 You have two options for sending us the logs:
 
   1. If you are editing scripts that contain sensitive information (intellectual property,
      deployment or administrative information, etc), e-mail the logs directly to
-     *daviwil [at] microsoft.com*
+     *vscode-powershell@microsoft.com*.
 
   2. If you are editing scripts that don't contain sensitive information, you can drag and
      drop your logs ZIP file into the GitHub issue that you are creating.
@@ -131,13 +137,22 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
 - [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
-- [Kapil Borle](https://github.com/kapilmb) - [@kmborle](http://twitter.com/kmborle)
-- [Trevor Sullivan](https://github.com/pcgeek86) - [@pcgeek86](http://twitter.com/pcgeek86)
+- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
+- [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
 
 ## License
 
 This extension is [licensed under the MIT License](LICENSE.txt).  Please see the
 [third-party notices](Third%20Party%20Notices.txt) file for details on the third-party
 binaries that we include with releases of this project.
+
+## [Code of Conduct][conduct-md]
+
+This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
+For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
+
+[conduct-code]: http://opensource.microsoft.com/codeofconduct/
+[conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
+[conduct-email]: mailto:opencode@microsoft.com
+[conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/master/CODE_OF_CONDUCT.md

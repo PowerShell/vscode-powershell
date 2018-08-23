@@ -3,51 +3,50 @@
  *--------------------------------------------------------*/
 
 import * as path from "path";
-import vscode = require('vscode');
+import vscode = require("vscode");
 import {
-    TextDocument,
-    TextEdit,
-    FormattingOptions,
     CancellationToken,
     DocumentFormattingEditProvider,
     DocumentRangeFormattingEditProvider,
+    FormattingOptions,
     OnTypeFormattingEditProvider,
     Position,
     Range,
+    TextDocument,
+    TextEdit,
     TextEditor,
-    TextLine
-} from 'vscode';
+    TextLine,
+} from "vscode";
 import {
-    LanguageClient,
-    RequestType,
     DocumentFormattingRequest,
     DocumentRangeFormattingParams,
-    DocumentRangeFormattingRequest
-} from 'vscode-languageclient';
+    DocumentRangeFormattingRequest,
+    DocumentSelector,
+    LanguageClient,
+    RequestType,
+} from "vscode-languageclient";
 import { TextDocumentIdentifier } from "vscode-languageserver-types";
 import Window = vscode.window;
-import { Logger } from '../logging';
-import { IFeature } from '../feature';
-import * as Settings from '../settings';
-import * as Utils from '../utils';
-import * as AnimatedStatusBar from '../controls/animatedStatusBar';
+import * as AnimatedStatusBar from "../controls/animatedStatusBar";
+import { IFeature } from "../feature";
+import { Logger } from "../logging";
+import * as Settings from "../settings";
+import * as Utils from "../utils";
 
-export namespace ScriptRegionRequest {
-    export const type = new RequestType<any, any, void, void>("powerShell/getScriptRegion");
-}
+export const ScriptRegionRequestType = new RequestType<any, any, void, void>("powerShell/getScriptRegion");
 
-interface ScriptRegionRequestParams {
+interface IScriptRegionRequestParams {
     fileUri: string;
     character: string;
     line: number;
     column: number;
 }
 
-interface ScriptRegionRequestResult {
-    scriptRegion: ScriptRegion;
+interface IScriptRegionRequestResult {
+    scriptRegion: IScriptRegion;
 }
 
-interface ScriptRegion {
+interface IScriptRegion {
     file: string;
     text: string;
     startLineNumber: number;
@@ -58,7 +57,7 @@ interface ScriptRegion {
     endOffset: number;
 }
 
-function toRange(scriptRegion: ScriptRegion): vscode.Range {
+function toRange(scriptRegion: IScriptRegion): vscode.Range {
     return new vscode.Range(
         scriptRegion.startLineNumber - 1,
         scriptRegion.startColumnNumber - 1,
@@ -71,26 +70,27 @@ function toOneBasedPosition(position: Position): Position {
 }
 
 class DocumentLocker {
+    // tslint:disable-next-line:ban-types
     private lockedDocuments: Object;
 
     constructor() {
         this.lockedDocuments = new Object();
     }
 
-    isLocked(document: TextDocument): boolean {
+    public isLocked(document: TextDocument): boolean {
         return this.isLockedInternal(this.getKey(document));
     }
 
-    lock(document: TextDocument, unlockWhenDone?: Thenable<any>): void {
+    public lock(document: TextDocument, unlockWhenDone?: Thenable<any>): void {
         this.lockInternal(this.getKey(document), unlockWhenDone);
     }
 
-    unlock(document: TextDocument): void {
+    public unlock(document: TextDocument): void {
         this.unlockInternal(this.getKey(document));
     }
 
-    unlockAll(): void {
-        Object.keys(this.lockedDocuments).slice().forEach(documentKey => this.unlockInternal(documentKey));
+    public unlockAll(): void {
+        Object.keys(this.lockedDocuments).slice().forEach((documentKey) => this.unlockInternal(documentKey));
     }
 
     private getKey(document: TextDocument): string {
@@ -125,6 +125,27 @@ class PSDocumentFormattingEditProvider implements
 
     private static documentLocker = new DocumentLocker();
     private static statusBarTracker = new Object();
+
+    private static showStatusBar(document: TextDocument, hideWhenDone: Thenable<any>): void {
+        const statusBar =
+            AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", hideWhenDone);
+        this.statusBarTracker[document.uri.toString()] = statusBar;
+        hideWhenDone.then(() => {
+            this.disposeStatusBar(document.uri.toString());
+        });
+    }
+
+    private static disposeStatusBar(documentUri: string) {
+        if (this.statusBarTracker.hasOwnProperty(documentUri)) {
+            this.statusBarTracker[documentUri].dispose();
+            delete this.statusBarTracker[documentUri];
+        }
+    }
+
+    private static disposeAllStatusBars() {
+        Object.keys(this.statusBarTracker).slice().forEach((key) => this.disposeStatusBar(key));
+    }
+
     private languageClient: LanguageClient;
 
     private get emptyPromise(): Promise<TextEdit[]> {
@@ -134,35 +155,45 @@ class PSDocumentFormattingEditProvider implements
     constructor(private logger: Logger) {
     }
 
-    provideDocumentFormattingEdits(
+    public setLanguageClient(languageClient: LanguageClient): void {
+        this.languageClient = languageClient;
+
+        // setLanguageClient is called while restarting a session,
+        // so this makes sure we clean up the document locker and
+        // any residual status bars
+        PSDocumentFormattingEditProvider.documentLocker.unlockAll();
+        PSDocumentFormattingEditProvider.disposeAllStatusBars();
+    }
+
+    public provideDocumentFormattingEdits(
         document: TextDocument,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
-        this.logger.writeVerbose(`Formatting entire document - ${document.uri}...`)
+        this.logger.writeVerbose(`Formatting entire document - ${document.uri}...`);
         return this.sendDocumentFormatRequest(document, null, options, token);
     }
 
-    provideDocumentRangeFormattingEdits(
+    public provideDocumentRangeFormattingEdits(
         document: TextDocument,
         range: Range,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
-        this.logger.writeVerbose(`Formatting document range ${JSON.stringify(range)} - ${document.uri}...`)
+        this.logger.writeVerbose(`Formatting document range ${JSON.stringify(range)} - ${document.uri}...`);
         return this.sendDocumentFormatRequest(document, range, options, token);
     }
 
-    provideOnTypeFormattingEdits(
+    public provideOnTypeFormattingEdits(
         document: TextDocument,
         position: Position,
         ch: string,
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
-        this.logger.writeVerbose(`Formatting on type at position ${JSON.stringify(position)} - ${document.uri}...`)
+        this.logger.writeVerbose(`Formatting on type at position ${JSON.stringify(position)} - ${document.uri}...`);
 
-        return this.getScriptRegion(document, position, ch).then(scriptRegion => {
+        return this.getScriptRegion(document, position, ch).then((scriptRegion) => {
             if (scriptRegion === null) {
                 this.logger.writeVerbose("No formattable range returned.");
                 return this.emptyPromise;
@@ -175,7 +206,7 @@ class PSDocumentFormattingEditProvider implements
                 token);
             },
             (err) => {
-                this.logger.writeVerbose(`Error while requesting script region for formatting: ${err}`)
+                this.logger.writeVerbose(`Error while requesting script region for formatting: ${err}`);
             });
     }
 
@@ -185,7 +216,7 @@ class PSDocumentFormattingEditProvider implements
         options: FormattingOptions,
         token: CancellationToken): TextEdit[] | Thenable<TextEdit[]> {
 
-        let editor: TextEditor = this.getEditor(document);
+        const editor: TextEditor = this.getEditor(document);
         if (editor === undefined) {
             return this.emptyPromise;
         }
@@ -203,62 +234,61 @@ class PSDocumentFormattingEditProvider implements
             rangeParam = {
                 start: {
                     line: range.start.line,
-                    character: range.start.character
+                    character: range.start.character,
                 },
                 end: {
                     line: range.end.line,
-                    character: range.end.character
-                }
+                    character: range.end.character,
+                },
             };
-        };
+        }
 
-        let requestParams: DocumentRangeFormattingParams = {
+        const requestParams: DocumentRangeFormattingParams = {
             textDocument: TextDocumentIdentifier.create(document.uri.toString()),
             range: rangeParam,
-            options: this.getEditorSettings()
+            options: this.getEditorSettings(),
         };
 
-        let formattingStartTime = new Date().valueOf();
+        const formattingStartTime = new Date().valueOf();
         function getFormattingDuration() {
             return ((new Date().valueOf()) - formattingStartTime) / 1000;
         }
 
-        let textEdits = this.languageClient.sendRequest(
+        const textEdits = this.languageClient.sendRequest(
             DocumentRangeFormattingRequest.type,
             requestParams);
         this.lockDocument(document, textEdits);
         PSDocumentFormattingEditProvider.showStatusBar(document, textEdits);
 
-        return textEdits.then(
-            (edits) => {
-                this.logger.writeVerbose(`Document formatting finished in ${getFormattingDuration()}s`);
-                return edits;
-            },
-            (err) => {
-                this.logger.writeVerbose(`Document formatting failed in ${getFormattingDuration()}: ${err}`);
-            });
+        return this.logAndReturnTextEdits(textEdits, getFormattingDuration);
     }
 
-    setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
+    // There is something about having this code in the calling method that causes a TS compile error.
+    // It causes the following error:
+    // Type 'import("C:/Users/Keith/GitHub/rkeithhill/vscode-powershell/node_modules/vscode-languageserver-typ...'
+    // is not assignable to type ''vscode'.TextEdit'. Property 'newEol' is missing in type 'TextEdit'.
+    private logAndReturnTextEdits(
+        textEdits,
+        getFormattingDuration: () => number): vscode.TextEdit[] | Thenable<vscode.TextEdit[]> {
 
-        // setLanguageClient is called while restarting a session,
-        // so this makes sure we clean up the document locker and
-        // any residual status bars
-        PSDocumentFormattingEditProvider.documentLocker.unlockAll();
-        PSDocumentFormattingEditProvider.disposeAllStatusBars();
+        return textEdits.then((edits) => {
+            this.logger.writeVerbose(`Document formatting finished in ${getFormattingDuration()}s`);
+            return edits;
+        }, (err) => {
+            this.logger.writeVerbose(`Document formatting failed in ${getFormattingDuration()}: ${err}`);
+        });
     }
 
-    private getScriptRegion(document: TextDocument, position: Position, ch: string): Thenable<ScriptRegion> {
-        let oneBasedPosition = toOneBasedPosition(position);
+    private getScriptRegion(document: TextDocument, position: Position, ch: string): Thenable<IScriptRegion> {
+        const oneBasedPosition = toOneBasedPosition(position);
         return this.languageClient.sendRequest(
-            ScriptRegionRequest.type,
+            ScriptRegionRequestType,
             {
                 fileUri: document.uri.toString(),
                 character: ch,
                 line: oneBasedPosition.line,
-                column: oneBasedPosition.character
-            }).then((result: ScriptRegionRequestResult) => {
+                column: oneBasedPosition.character,
+            }).then((result: IScriptRegionRequestResult) => {
                 if (result === null) {
                     return null;
                 }
@@ -268,7 +298,7 @@ class PSDocumentFormattingEditProvider implements
     }
 
     private getEditor(document: TextDocument): TextEditor {
-        return Window.visibleTextEditors.find((e, n, obj) => { return e.document === document; });
+        return Window.visibleTextEditors.find((e, n, obj) => e.document === document);
     }
 
     private isDocumentLocked(document: TextDocument): boolean {
@@ -280,30 +310,11 @@ class PSDocumentFormattingEditProvider implements
     }
 
     private getEditorSettings(): { insertSpaces: boolean, tabSize: number } {
-        let editorConfiguration = vscode.workspace.getConfiguration("editor");
+        const editorConfiguration = vscode.workspace.getConfiguration("editor");
         return {
             insertSpaces: editorConfiguration.get<boolean>("insertSpaces"),
-            tabSize: editorConfiguration.get<number>("tabSize")
+            tabSize: editorConfiguration.get<number>("tabSize"),
         };
-    }
-
-    private static showStatusBar(document: TextDocument, hideWhenDone: Thenable<any>): void {
-        let statusBar = AnimatedStatusBar.showAnimatedStatusBarMessage("Formatting PowerShell document", hideWhenDone);
-        this.statusBarTracker[document.uri.toString()] = statusBar;
-        hideWhenDone.then(() => {
-            this.disposeStatusBar(document.uri.toString());
-        });
-    }
-
-    private static disposeStatusBar(documentUri: string) {
-        if (this.statusBarTracker.hasOwnProperty(documentUri)) {
-            this.statusBarTracker[documentUri].dispose();
-            delete this.statusBarTracker[documentUri];
-        }
-    }
-
-    private static disposeAllStatusBars() {
-        Object.keys(this.statusBarTracker).slice().forEach((key) => this.disposeStatusBar(key));
     }
 }
 
@@ -316,29 +327,29 @@ export class DocumentFormatterFeature implements IFeature {
     private languageClient: LanguageClient;
     private documentFormattingEditProvider: PSDocumentFormattingEditProvider;
 
-    constructor(private logger: Logger) {
+    constructor(private logger: Logger, documentSelector: DocumentSelector) {
         this.documentFormattingEditProvider = new PSDocumentFormattingEditProvider(logger);
         this.formattingEditProvider = vscode.languages.registerDocumentFormattingEditProvider(
-            "powershell",
+            documentSelector,
             this.documentFormattingEditProvider);
         this.rangeFormattingEditProvider = vscode.languages.registerDocumentRangeFormattingEditProvider(
-            "powershell",
+            documentSelector,
             this.documentFormattingEditProvider);
         this.onTypeFormattingEditProvider = vscode.languages.registerOnTypeFormattingEditProvider(
-            "powershell",
+            documentSelector,
             this.documentFormattingEditProvider,
             this.firstTriggerCharacter,
             ...this.moreTriggerCharacters);
-    }
-
-    public setLanguageClient(languageclient: LanguageClient): void {
-        this.languageClient = languageclient;
-        this.documentFormattingEditProvider.setLanguageClient(languageclient);
     }
 
     public dispose(): any {
         this.formattingEditProvider.dispose();
         this.rangeFormattingEditProvider.dispose();
         this.onTypeFormattingEditProvider.dispose();
+    }
+
+    public setLanguageClient(languageclient: LanguageClient): void {
+        this.languageClient = languageclient;
+        this.documentFormattingEditProvider.setLanguageClient(languageclient);
     }
 }
