@@ -300,30 +300,24 @@ function Get-ChangeLog
         $new_commits = $new_commits_during_last_release + $new_commits_after_last_release
     }
 
+    $new_commits = $new_commits | Where-Object { -not $_.Subject.StartsWith('[Ignore]', [System.StringComparison]::OrdinalIgnoreCase) }
+
     foreach ($commit in $new_commits) {
         $messageParts = Get-PRNumberFromCommitSubject $commit.Subject
-        if ($messageParts)
-        {
+        if ($messageParts) {
             $message = $messageParts.Message
             $prNumber = $messageParts.PR
-        }
-        else
-        {
+        } else {
             $message = $commit.Subject
         }
 
-        if (-not ($commit.AuthorEmail.EndsWith("@microsoft.com") -or ($powershell_team -contains $commit.AuthorName) -or ($powershell_team_emails -contains $commit.AuthorEmail)))
-        {
-            if ($Script:community_login_map.ContainsKey($commit.AuthorEmail))
-            {
+        if (-not ($commit.AuthorEmail.EndsWith("@microsoft.com") -or ($powershell_team -contains $commit.AuthorName) -or ($powershell_team_emails -contains $commit.AuthorEmail))) {
+            if ($Script:community_login_map.ContainsKey($commit.AuthorEmail)) {
                 $commit.AuthorGitHubLogin = $Script:community_login_map[$commit.AuthorEmail]
-            }
-            else
-            {
+            } else {
                 $uri = "$RepoUri/commits/$($commit.Hash)"
                 $response = Invoke-WebRequest -Uri $uri -Method Get -Headers $header -ErrorAction SilentlyContinue
-                if($response)
-                {
+                if($response) {
                     $content = ConvertFrom-Json -InputObject $response.Content
                     $commit.AuthorGitHubLogin = $content.author.login
                     $Script:community_login_map[$commit.AuthorEmail] = $commit.AuthorGitHubLogin
