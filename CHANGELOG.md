@@ -22,7 +22,7 @@
 - [PowerShellEditorServices #729](https://github.com/PowerShell/PowerShellEditorServices/pulls/729) -
   Fix a null dereference when an invalid cast exception has no inner exception
 - [PowerShellEditorServices #719](https://github.com/PowerShell/PowerShellEditorServices/pulls/719) -
-  Reduce allocations in the CodeLens providers (Thanks @mattpwhite!)
+  Reduce allocations in the CodeLens providers
 - [PowerShellEditorServices #725](https://github.com/PowerShell/PowerShellEditorServices/pulls/725) -
   Fix null dereference when debugging untitlted filesj
 - [PowerShellEditorServices #726](https://github.com/PowerShell/PowerShellEditorServices/pulls/726) -
