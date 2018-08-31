@@ -188,7 +188,7 @@ function New-ChangeLogEntry
 
     $entry = if ($PRNumber)
     {
-        "- [$RepositoryName #$PRNumber]($repoUrl/pulls/$PRNumber) -"
+        "- [$RepositoryName #$PRNumber]($repoUrl/pull/$PRNumber) -"
     }
     else
     {
