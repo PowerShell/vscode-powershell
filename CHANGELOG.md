@@ -4,28 +4,28 @@
 ### Friday, August 31, 2018
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
-- [vscode-PowerShell #1489](https://github.com/PowerShell/vscode-PowerShell/pulls/1489) -
+- [vscode-PowerShell #1489](https://github.com/PowerShell/vscode-PowerShell/pull/1489) -
   Use asynchronous logic for help completions
-- [vscode-PowerShell #1477](https://github.com/PowerShell/vscode-PowerShell/pulls/1477) -
+- [vscode-PowerShell #1477](https://github.com/PowerShell/vscode-PowerShell/pull/1477) -
   Add BitsTransfer & user switch to install latest user profile insiders edition with Install-VSCode.ps1 script  (Thanks @tabs-not-spaces!)
-- [vscode-PowerShell #1485](https://github.com/PowerShell/vscode-PowerShell/pulls/1485) -
+- [vscode-PowerShell #1485](https://github.com/PowerShell/vscode-PowerShell/pull/1485) -
   Increase connection timeout
 
 #### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
 
-- [PowerShellEditorServices #728](https://github.com/PowerShell/PowerShellEditorServices/pulls/728) -
+- [PowerShellEditorServices #728](https://github.com/PowerShell/PowerShellEditorServices/pull/728) -
   Fix formatter crash when script contains parse errors
-- [PowerShellEditorServices #730](https://github.com/PowerShell/PowerShellEditorServices/pulls/730) -
+- [PowerShellEditorServices #730](https://github.com/PowerShell/PowerShellEditorServices/pull/730) -
   Fix crash where lines appended to end of script file causes out of bounds exception
-- [PowerShellEditorServices #732](https://github.com/PowerShell/PowerShellEditorServices/pulls/732) -
+- [PowerShellEditorServices #732](https://github.com/PowerShell/PowerShellEditorServices/pull/732) -
   Fix CodeLens crash when a file cannot be opened, stop unnecessary file reads in CodeLens
-- [PowerShellEditorServices #729](https://github.com/PowerShell/PowerShellEditorServices/pulls/729) -
+- [PowerShellEditorServices #729](https://github.com/PowerShell/PowerShellEditorServices/pull/729) -
   Fix a null dereference when an invalid cast exception has no inner exception
-- [PowerShellEditorServices #719](https://github.com/PowerShell/PowerShellEditorServices/pulls/719) -
+- [PowerShellEditorServices #719](https://github.com/PowerShell/PowerShellEditorServices/pull/719) -
   Reduce allocations in the CodeLens providers
-- [PowerShellEditorServices #725](https://github.com/PowerShell/PowerShellEditorServices/pulls/725) -
+- [PowerShellEditorServices #725](https://github.com/PowerShell/PowerShellEditorServices/pull/725) -
   Fix null dereference when debugging untitlted filesj
-- [PowerShellEditorServices #726](https://github.com/PowerShell/PowerShellEditorServices/pulls/726) -
+- [PowerShellEditorServices #726](https://github.com/PowerShell/PowerShellEditorServices/pull/726) -
   Fix comment-based help snippet
 
 
