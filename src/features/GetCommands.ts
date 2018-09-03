@@ -7,7 +7,7 @@ import { IFeature } from "../feature";
 
 // TODO: Document this export: https://github.com/PowerShell/vscode-powershell/pull/1406#discussion_r209325655
 // TODO: Also use something other than any if possible... We may have already addressed this with a previous attempt.
-export const GetAllCommandsRequestType = new RequestType<any, any, void, void>("powerShell/getAllCommands");
+export const GetAllCommandsRequestType = new RequestType<any, any, void, void>("powerShell/getCommand");
 
 export class GetCommandsFeature implements IFeature {
     private command: vscode.Disposable;
@@ -104,6 +104,8 @@ class Command extends vscode.TreeItem {
 
     public async getChildren(element): Promise<Command[]> {
         return [];
-        // TODO: Determine why we're returning an empty array... I think it's because we have to return something and we're not actually using the tree view part just yet...
+        // TODO: Determine why we're returning an empty array...
+        // I think it's because we have to return something and
+        // we're not actually using the tree view part just yet...
     }
 }
