@@ -15,7 +15,7 @@ before_install:
       nvm install v6.0.0;
     fi
 install:
-  - git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
+  - git clone --single-branch -b 2.0.0 https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
   - pushd build
   - bash <(curl -s https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/install-powershell.sh)
   - popd
