@@ -12,8 +12,8 @@ osx_image: xcode8.3
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      nvm install v6.0.0
-      sudo apt-get install libunwind8
+      nvm install v6.0.0;
+      sudo apt-get install libunwind8;
     fi
 install:
   - git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
