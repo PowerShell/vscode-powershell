@@ -27,7 +27,7 @@ import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { SelectPSSARulesFeature } from "./features/SelectPSSARules";
-import { ShowHelpFeature } from "./features/ShowOnlineHelp";
+import { ShowHelpFeature } from "./features/ShowHelp";
 import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");

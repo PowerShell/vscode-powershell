@@ -60,7 +60,7 @@
   "contributes": {
     "keybindings": [
       {
-        "command": "PowerShell.OnlineHelp",
+        "command": "PowerShell.ShowHelp",
         "key": "ctrl+f1",
         "when": "editorTextFocus && editorLangId == 'powershell'"
       },
@@ -88,7 +88,16 @@
       },
       {
         "command": "PowerShell.OnlineHelp",
+        "title": "Get Online Help for Command(Deprecated)",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.ShowHelp",
         "title": "Get Help for Command",
+        "category": "PowerShell"
+      },{
+        "command": "PowerShell.ShowOnlineHelp",
+        "title": "Dummy command. Shouldn't be released...",
         "category": "PowerShell"
       },
       {
@@ -166,7 +175,7 @@
         },
         {
           "when": "editorLangId == powershell",
-          "command": "PowerShell.OnlineHelp",
+          "command": "PowerShell.ShowHelp",
           "group": "2_powershell"
         }
       ]
