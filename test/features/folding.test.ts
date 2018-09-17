@@ -96,6 +96,21 @@ suite("Features", () => {
 
                 assertFoldingRegions(result, expectedMismatchedFoldingRegions);
             });
+
+            test("Does not return duplicate or overlapping regions", async () => {
+                const expectedMismatchedFoldingRegions = [
+                    { start: 1,  end: 2,  kind: null },
+                    { start: 2,  end: 4,  kind: null },
+                ];
+
+                // Integration test against the test fixture 'folding-mismatch.ps1' that contains
+                // duplicate/overlapping ranges due to the `(` and `{` characters
+                const uri = vscode.Uri.file(path.join(fixturePath, "folding-duplicate.ps1"));
+                const document = await vscode.workspace.openTextDocument(uri);
+                const result = await provider.provideFoldingRanges(document, null, null);
+
+                assertFoldingRegions(result, expectedMismatchedFoldingRegions);
+            });
         });
     });
 });

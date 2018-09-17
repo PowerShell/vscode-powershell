@@ -238,8 +238,8 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
         // Sort the list of matched tokens, starting at the top of the document,
         // and ensure that, in the case of multiple ranges starting the same line,
         // that the largest range (i.e. most number of lines spanned) is sorted
-        // first.  This is needed as vscode will just ignore any duplicate folding
-        // ranges.
+        // first.  This is needed to detect duplicate regions. The first in the list
+        // will be used and subsequent duplicates ignored.
         foldableRegions.sort((a: LineNumberRange, b: LineNumberRange) => {
             // Initially look at the start line
             if (a.startline > b.startline) { return 1; }
@@ -252,11 +252,13 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             return 0;
         });
 
-        // Convert the matched token list into a FoldingRange[]
-        const foldingRanges = [];
-        foldableRegions.forEach((item) => { foldingRanges.push(item.toFoldingRange()); });
-
-        return foldingRanges;
+        return foldableRegions
+            // It's possible to have duplicate or overlapping ranges, that is, regions which have the same starting
+            // line number as the previous region. Therefore only emit ranges which have a different starting line
+            // than the previous range.
+            .filter((item, index, src) => index === 0 || item.startline !== src[index - 1].startline)
+            // Convert the internal representation into the VSCode expected type
+            .map((item) => item.toFoldingRange());
     }
 
     /**
