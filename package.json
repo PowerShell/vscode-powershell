@@ -95,10 +95,6 @@
         "command": "PowerShell.ShowHelp",
         "title": "Get Help for Command",
         "category": "PowerShell"
-      },{
-        "command": "PowerShell.ShowOnlineHelp",
-        "title": "Dummy command. Shouldn't be released...",
-        "category": "PowerShell"
       },
       {
         "command": "PowerShell.RunSelection",
