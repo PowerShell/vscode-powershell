@@ -52,7 +52,7 @@ $Script:powershell_team = @(
 
 $Script:powershell_team_emails = @(
     "tylerl0706@gmail.com"
-    "rjmholt@gmail.com"
+    "rjmholt_msft@outlook.com"
 )
 
 # Very active contributors; keep their email-login mappings here to save a few queries to Github.
@@ -311,6 +311,7 @@ function Get-ChangeLog
             $message = $commit.Subject
         }
 
+        $userToThank = $null
         if (-not ($commit.AuthorEmail.EndsWith("@microsoft.com") -or ($powershell_team -contains $commit.AuthorName) -or ($powershell_team_emails -contains $commit.AuthorEmail))) {
             if ($Script:community_login_map.ContainsKey($commit.AuthorEmail)) {
                 $commit.AuthorGitHubLogin = $Script:community_login_map[$commit.AuthorEmail]
