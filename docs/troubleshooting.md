@@ -1,84 +1,114 @@
 # Troubleshooting PowerShell Extension Issues
 
 This document contains troubleshooting steps for commonly reported issues when using the
-PowerShell extension for Visual Studio Code.
+[PowerShell Extension] for Visual Studio Code.
 
-## Windows
+## Script Analysis is Reporting False Errors
 
-### 1. IntelliSense is extremely slow on PowerShell 5.0
+Script analysis is provided by the [PSScriptAnalyzer] project on GitHub.
+Please [open an issue there] if you are getting fault script diagnostics
+(red and green squiggly lines under PowerShell in scripts).
 
-There is a known issue with PowerShell 5.0 which, for a small number of users, causes IntelliSense
-(code completions) to return after 5-15 seconds.  The following steps *might* resolve the issue for you:
+## Problems with Syntax Highlighting
 
-1. In a PowerShell console, run the following command: `Remove-Item -Force -Recurse $env:LOCALAPPDATA\Microsoft\Windows\PowerShell\CommandAnalysis`
-2. Restart Visual Studio Code and try getting IntelliSense again.
+PowerShell syntax highlighting is not performed by the [PowerShell Extension].
+Instead syntax highlighting for VSCode, Atom, SublimeText and even GitHub is
+provided by the [Editor Syntax] repository on GitHub. Please open any
+[syntax highlighting issues there].
 
-This issue has been resolved in PowerShell 5.1.
+## Known Issues in the Extension
 
-## macOS (OS X)
+- Highlighting/completions/command history don't work as I expect in the
+  Integrated Console - [#535]
+  - The Integrated Console implements a [custom host]
+    to work with VSCode, making it incompatible with
+    [PSReadLine] (the module providing these features in regular PowerShell).
+- Command history is not preserved when debugging in the Integrated Console -
+  [#550]
+  - This feature is also provided by [PSReadLine].
+- Intellisense is slow - [#647]
+  - This is a known issue that we've been chipping away at. There doesn't seem
+    to be any one performance drain, but we've been trying to incrementally
+    improve performance bit-by-bit everywhere.
+- Variable renaming doesn't work properly - [#261]
+  - PowerShell's usage of [dynamic scope] rather than [lexical scope]
+    makes it [formally undecidable] to statically rename variables correctly
+    (the only way to know for sure which `$x`s refer to the same variable is to
+    run the PowerShell script).
+    However, like with many features, we attempt a best effort.
+- "Go to Definition" doesn't work through module imports - [#499]
+  - Again this is a best-effort task.
+- Completions don't cycle when <kbd>Tab</kbd> is pressed like in the ISE - [#25]
+  - VSCode itself provides the user experience for completions, and they
+    currently don't allow us to customize this.
+- My command that opens a dialog does nothing - [#410 (comment)]
+  - Check that the dialog hasn't opened behind VSCode. This is a known
+    [VSCode issue].
+- PowerShell classes don't have proper reference/symbol support - [#3]
+  - To maintain compatibility with PowerShell v3/v4 we use an older
+    PowerShell parsing API that does not support classes. A future version
+    of the [PowerShell Extension] [will break this compatibility] to support
+    classes, among other things.
+- Document formatting takes a long time - [#984]
+  - Document formatting is provided by [PSScriptAnalyzer], but there
+    may be opportunities to improve our integration with it in the
+    [PowerShell Extension] too.
+- `Write-Progress` doesn't output to the console - [#140]
 
-### 1. PowerShell IntelliSense does not work, can't debug scripts
+## Reporting an Issue
 
-The most common problem when the PowerShell extension doesn't work on macOS is that you have
-an alpha version of PowerShell installed. To upgrade to the latest beta, please follow the
-[Install Instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#macos-1012).
+If you experience a problem with the [PowerShell Extension]:
 
-If you'd prefer to use an alpha version of PowerShell, then OpenSSL must be installed.
-You can check for the installation of OpenSSL by looking for the following files:
+1. Search through [existing issues] on GitHub.
+   In some circumstances, an issue may already be closed due to
+   a fix being merged but not yet released - so be sure to quickly
+   check closed issues as well.
+2. Most features are provided by the client-agnostic [PowerShell Editor Services]
+   backend project that the extension leverages, so it's also worth a
+   [look there].
+3. If you don't see the issue you're experiencing, please [open a new issue].
 
-If installed using Homebrew:
+## Opening a New Issue
 
-```
-/usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib
-/usr/local/opt/openssl/lib/libssl.1.0.0.dylib
-```
+To open a new issue on the [PowerShell Extension], use our [GitHub issues page].
 
-If installed by some other means:
+### Note on Security
 
-```
-/usr/local/lib/libcrypto.1.0.0.dylib
-/usr/local/lib/libssl.1.0.0.dylib
-```
+If you believe there is a security vulnerability in the [PowerShell Extension]
+(or in [PowerShell Editor Services]), it **must** be reported directly to
+secure@microsoft.com to allow for [Coordinated Vulnerability Disclosure].
+**Only** open an issue if secure@microsoft.com has confirmed that filing
+an issue on GitHub is appropriate.
 
-The extension should check for these files and direct you to this documentation if you
-do not have OpenSSL installed.
+[Editor Syntax]: https://github.com/PowerShell/EditorSyntax
+[PSScriptAnalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
+[PSReadLine]: https://github.com/lzybkr/PSReadLine
+[PowerShell Editor Services]: https://github.com/PowerShell/PowerShellEditorServices
+[PowerShell Extension]: https:github.com/PowerShell/vscode-powershell
 
-#### Installing OpenSSL via Homebrew
+[Coordinated Vulnerability Disclosure]: https://technet.microsoft.com/security/dn467923
+[custom host]: https://docs.microsoft.com/en-us/powershell/developer/hosting/custom-host-samples
+[dynamic scope]: http://ig2600.blogspot.com/2010/01/powershell-is-dynamically-scoped-and.html
+[existing issues]: https://github.com/PowerShell/vscode-powershell/issues
+[formally undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
+[GitHub issues page]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
+[lexical scope]: https://stackoverflow.com/questions/1047454/what-is-lexical-scope
+[look there]: https://github.com/PowerShell/PowerShellEditorServices/issues
+[open an issue]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
+[open a new issue]: #opening-a-new-issue
+[open an issue there]: https://github.com/PowerShell/PSScriptAnalyzer/issues/new/choose
+[Reporting Problems]: ../README.md#reporting-problems
+[syntax highlighting issues there]: https://github.com/PowerShell/EditorSyntax/issues/new
+[VSCode issue]: https://github.com/Microsoft/vscode/issues/42356
+[will break this compatibility]: https://github.com/PowerShell/vscode-powershell/issues/1310
 
-We **highly recommend** that you use [Homebrew](http://brew.sh) to install OpenSSL.  The PowerShell distribution for macOS
-has built-in support for Homebrew's OpenSSL library paths.  If you install with Homebrew, you will avoid
-[security concerns](https://github.com/PowerShell/PowerShell/blob/master/docs/installation/linux.md#openssl)
-around creating symbolic links in your `/usr/local/lib` path which are needed when using other means of installation.
-
-If you don't already have Homebrew installed, you can do so by downloading and installing Homebrew via this ruby script:
-
-````
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-````
-
-Once Homebrew is installed, run the following command:
-
-```
-brew install openssl
-```
-
-Restart VS Code after completing the installation and verify that the extension is working correctly.
-
-#### Installing OpenSSL via MacPorts
-
-If you prefer to use [MacPorts](https://www.macports.org/), you can run the following command to install OpenSSL:
-
-```
-sudo port install openssl
-```
-
-You will need to take an additional step once installation completes:
-
-```
-sudo ln -s /opt/local/lib/libcrypto.1.0.0.dylib /usr/local/lib/libcrypto.1.0.0.dylib
-sudo ln -s /opt/local/lib/libssl.1.0.0.dylib /usr/local/lib/libssl.1.0.0.dylib
-```
-
-Thanks to [@MarlonRodriguez](https://github.com/MarlonRodriguez) for the tip!
-
-Restart VS Code after completing the installation and verify that the extension is working correctly.
+[#3]: https://github.com/PowerShell/vscode-powershell/issues/3
+[#25]: https://github.com/PowerShell/vscode-powershell/issues/25
+[#140]: https://github.com/PowerShell/vscode-powershell/issues/140
+[#261]: https://github.com/PowerShell/vscode-powershell/issues/261
+[#410 (comment)]: https://github.com/PowerShell/vscode-powershell/issues/410#issuecomment-397531817
+[#499]: https://github.com/PowerShell/vscode-powershell/issues/499
+[#535]: https://github.com/PowerShell/vscode-powershell/issues/535
+[#550]: https://github.com/PowerShell/vscode-powershell/issues/550
+[#647]: https://github.com/PowerShell/vscode-powershell/issues/647
+[#984]: https://github.com/PowerShell/vscode-powershell/issues/984
