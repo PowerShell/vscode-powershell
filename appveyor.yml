@@ -6,7 +6,7 @@ skip_tags: true
 branches:
   only:
   - master
-  - develop
+  - 2.0.0
 
 environment:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true  # Don't download unneeded packages
