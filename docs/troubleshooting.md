@@ -70,7 +70,127 @@ If you experience a problem with the [PowerShell Extension]:
 
 ## Opening a New Issue
 
-To open a new issue on the [PowerShell Extension], use our [GitHub issues page].
+If you experience an issue with the [PowerShell Extension] and can't find
+an existing issue for it, [open an issue on us on GitHub].
+
+You can also open an issue directly from VSCode by entering the
+[Command Palette] with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>
+(<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and running the
+`PowerShell: Upload Bug Report to GitHub` command.
+
+When opening an issue, keep in mind:
+
+- The fastest way to fixing a bug is reproducing it, and reproducing it
+  is easier with [more information].
+- The issue templates are designed to help you provide all the information
+  needed to solve your issue
+- As Free and Open Source Software, the [PowerShell Extension] thrives on
+  the contributions of community members &mdash; if you're interested in
+  [tackling an issue], we always accept contributions and will help you
+  through the entire process.
+
+## Providing Information About Your Environment
+
+For solving most issues, the following information is important to provide:
+
+- Logs, which provide context for what was happening when the issue occurred
+  - Before sending through logs, try and reproduce the issue with
+    **log level set to Verbose** or **Diagnostic**. You can set this
+    in the [VSCode Settings] (<kbd>Ctrl</kbd>+<kbd>,</kbd>) with:
+    ```json
+    "powershell.developer.editorServicesLogLevel": "Verbose"
+    ```
+    or for diagnostic logging:
+    ```json
+    "powershell.developer.editorServicesLogLevel": "Diagnostic"
+    ```
+    After you have captured the issue with the log level turned up,
+    you may want to return it (since verbose logging can use disk space):
+    ```json
+    "powershell.developer.editorServicesLogLevel": "Normal"
+    ```
+  - Logs are located at
+    ```powershell
+    $HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-<version>/logs/
+    ```
+    For example:
+
+    ```powershell
+    $HOME/vscode/extensions/ms-vscode.powershell-1.8.4/logs
+    ```
+  - In VSCode you can open and read the logs directly from the [Command Palette]
+    (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
+    with `PowerShell: Open PowerShell Extension Logs Folder`.
+  - You can attach your logs to an issue by zipping them and drag/dropping
+    them onto your open issue description in the browser.
+  - If you prefer to share your logs privately, you can send them to
+    vscode-powershell@microsoft.com. Please still open an issue though
+    so we can track the work &mdash; other users may have the same issue.
+
+- [Your VSCode version], obtained from the Integrated Console
+  or PowerShell like this:
+
+  ```shell
+  code -v
+  ```
+
+  If you are using VSCode Insiders, use this command:
+
+  ```shell
+  code-insiders -v
+  ```
+
+  If VSCode is not on your path, you will get a message like
+
+  ```text
+  code: The term 'code' is not recognized as the name of a cmdlet, ...
+  ```
+
+  in this case, use the file menu in VSCode and choose `Help`>`About`
+  (or `Code`>`About Visual Studio Code` on macOS) to get version information.
+
+- [Your installed PowerShell Extension version]:
+
+  ```shell
+  code --list-extensions --show-versions
+  ```
+
+  With VSCode Insiders:
+
+  ```shell
+  code-insiders --list-extensions --show-versions
+  ```
+
+  If VSCode isn't on your path use the [Command Palette]
+  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) to enter
+  `Extensions: Show Installed Extensions` and list your extensions.
+
+- [Your PowerShell version table], which you can get
+  from the Integrated Console:
+
+  ```powershell
+  > $PSVersionTable
+  Name                           Value
+  ----                           -----
+  PSVersion                      6.1.0
+  PSEdition                      Core
+  GitCommitId                    6.1.0
+  OS                             Microsoft Windows 10.0.18242
+  Platform                       Win32NT
+  PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}
+  PSRemotingProtocolVersion      2.3
+  SerializationVersion           1.1.0.1
+  WSManStackVersion              3.0
+  ```
+
+- Operating System Information
+  - Windows
+    - Your Windows version (e.g. 10)
+  - macOS
+    - Your macOS version (e.g. High Sierra 10.13.6)
+  - Linux
+    - `uname -a`
+    - Your distro and version (usually `lsb_release -a` is the best here)
 
 ### Note on Security
 
@@ -86,21 +206,28 @@ an issue on GitHub is appropriate.
 [PowerShell Editor Services]: https://github.com/PowerShell/PowerShellEditorServices
 [PowerShell Extension]: https:github.com/PowerShell/vscode-powershell
 
+[Command Palette]: https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
 [Coordinated Vulnerability Disclosure]: https://technet.microsoft.com/security/dn467923
 [custom host]: https://docs.microsoft.com/en-us/powershell/developer/hosting/custom-host-samples
 [dynamic scope]: http://ig2600.blogspot.com/2010/01/powershell-is-dynamically-scoped-and.html
 [existing issues]: https://github.com/PowerShell/vscode-powershell/issues
 [formally undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
-[GitHub issues page]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
 [lexical scope]: https://stackoverflow.com/questions/1047454/what-is-lexical-scope
 [look there]: https://github.com/PowerShell/PowerShellEditorServices/issues
+[more information]: #providing-information-about-your-environment
 [open an issue]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
 [open a new issue]: #opening-a-new-issue
 [open an issue there]: https://github.com/PowerShell/PSScriptAnalyzer/issues/new/choose
+[open an issue on us on GitHub]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
 [Reporting Problems]: ../README.md#reporting-problems
 [syntax highlighting issues there]: https://github.com/PowerShell/EditorSyntax/issues/new
+[tackling an issue]:./development.md
 [VSCode issue]: https://github.com/Microsoft/vscode/issues/42356
+[VSCode Settings]: https://code.visualstudio.com/docs/getstarted/settings
 [will break this compatibility]: https://github.com/PowerShell/vscode-powershell/issues/1310
+[Your installed PowerShell Extension version]: https://code.visualstudio.com/docs/editor/extension-gallery#_list-installed-extensions
+[Your PowerShell version table]: http://www.powertheshell.com/topic/learnpowershell/firststeps/psversion/
+[Your VSCode version]: https://code.visualstudio.com/docs/supporting/FAQ#_how-do-i-find-the-vs-code-version
 
 [#3]: https://github.com/PowerShell/vscode-powershell/issues/3
 [#25]: https://github.com/PowerShell/vscode-powershell/issues/25
