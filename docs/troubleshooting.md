@@ -23,6 +23,7 @@ provided by the [Editor Syntax] repository on GitHub. Please open any
   - The Integrated Console implements a [custom host]
     to work with VSCode, making it incompatible with
     [PSReadLine] (the module providing these features in regular PowerShell).
+    Resolving this incompatibility is being actively worked on.
 - Command history is not preserved when debugging in the Integrated Console -
   [#550]
   - This feature is also provided by [PSReadLine].
@@ -75,7 +76,7 @@ an existing issue for it, [open an issue on us on GitHub].
 
 You can also open an issue directly from VSCode by entering the
 [Command Palette] with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>
-(<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and running the
+(<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> on macOS) and running the
 `PowerShell: Upload Bug Report to GitHub` command.
 
 When opening an issue, keep in mind:
@@ -87,7 +88,7 @@ When opening an issue, keep in mind:
 - As Free and Open Source Software, the [PowerShell Extension] thrives on
   the contributions of community members &mdash; if you're interested in
   [tackling an issue], we always accept contributions and will help you
-  through the entire process.
+  at every step.
 
 ## Providing Information About Your Environment
 
@@ -204,7 +205,7 @@ an issue on GitHub is appropriate.
 [PSScriptAnalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
 [PSReadLine]: https://github.com/lzybkr/PSReadLine
 [PowerShell Editor Services]: https://github.com/PowerShell/PowerShellEditorServices
-[PowerShell Extension]: https:github.com/PowerShell/vscode-powershell
+[PowerShell Extension]: https:github.com/PowerShell/vscode-powershell/
 
 [Command Palette]: https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
 [Coordinated Vulnerability Disclosure]: https://technet.microsoft.com/security/dn467923
