@@ -254,10 +254,10 @@ secure@microsoft.com to allow for [Coordinated Vulnerability Disclosure].
 an issue on GitHub is appropriate.
 
 [Editor Syntax]: https://github.com/PowerShell/EditorSyntax
-[PSScriptAnalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
-[PSReadLine]: https://github.com/lzybkr/PSReadLine
 [PowerShell Editor Services]: https://github.com/PowerShell/PowerShellEditorServices
 [PowerShell Extension]: https:github.com/PowerShell/vscode-powershell/
+[PSScriptAnalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
+[PSReadLine]: https://github.com/lzybkr/PSReadLine
 
 [Command Palette]: https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
 [Coordinated Vulnerability Disclosure]: https://technet.microsoft.com/security/dn467923
