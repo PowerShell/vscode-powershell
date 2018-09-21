@@ -71,45 +71,12 @@ iex (iwr https://git.io/vbxjj)
 
 ## Reporting Problems
 
-If you're having trouble with the PowerShell extension, please follow these instructions
-to file an issue on our GitHub repository:
+If you experience any problems with the PowerShell Extension, see
+[the troubleshooting docs](./docs/troubleshooting.md) for information
+on diagnosing and reporting issues.
 
-### 1. File an issue on our [Issues Page](https://github.com/PowerShell/vscode-powershell/issues)
-
-Make sure to fill in the information that is requested in the issue template as it
-will help us investigate the problem more quickly.
-
-To automatically create a bug report from within the extension, open the Command pallet (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and run the *"Report a problem on GitHub"* command. Some basic information about your instance and powershell versions will be collected and inserted into a new GitHub issue.
-
-NOTE: If you believe that there is a security vulnerability in the PowerShell extension for VSCode,
-it **must** be reported to [secure@microsoft.com](https://technet.microsoft.com/security/ff852094.aspx) to allow for [Coordinated Vulnerability Disclosure](https://technet.microsoft.com/security/dn467923).
-**Only** file an issue, if secure@microsoft.com has confirmed filing an issue is appropriate.
-
-### 2. Capture verbose logs and send them to us
-
-If you're having an issue with crashing or other erratic behavior, add the following
-line to your User Settings in Visual Studio Code:
-
-```json
-    "powershell.developer.editorServicesLogLevel": "Verbose"
-```
-
-Restart Visual Studio Code and try to reproduce the problem.  Once you are done with
-that, zip up the logs in the corresponding folder for your operating system:
-
-- **Windows**: `$HOME\.vscode\extensions\ms-vscode.PowerShell-<CURRENT VERSION>\logs`
-- **Linux and macOS**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
-
-Alternatively, you can open the log folder using the Command pallet (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and running the *"Open powerShell Extension Logs Folder"* command.
-
-You have two options for sending us the logs:
-
-  1. If you are editing scripts that contain sensitive information (intellectual property,
-     deployment or administrative information, etc), e-mail the logs directly to
-     *vscode-powershell@microsoft.com*.
-
-  2. If you are editing scripts that don't contain sensitive information, you can drag and
-     drop your logs ZIP file into the GitHub issue that you are creating.
+#### Security Note
+For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
 
 ## Example Scripts
 
