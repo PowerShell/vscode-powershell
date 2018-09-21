@@ -6,9 +6,6 @@ import vscode = require("vscode");
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
-// TODO: remove ShowOnlineHelpRequest in v2
-export const ShowOnlineHelpRequestType =
-    new RequestType<string, void, void, void>("powerShell/showOnlineHelp");
 export const ShowHelpRequestType =
     new RequestType<string, void, void, void>("powerShell/showHelp");
 
@@ -32,6 +29,7 @@ export class ShowHelpFeature implements IFeature {
 
             this.languageClient.sendRequest(ShowHelpRequestType, text);
         });
+
         this.deprecatedCommand = vscode.commands.registerCommand("PowerShell.OnlineHelp", () => {
             const warnText = "PowerShell.OnlineHelp is being deprecated. Use PowerShell.ShowHelp instead.";
             vscode.window.showWarningMessage(warnText);

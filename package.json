@@ -88,7 +88,7 @@
       },
       {
         "command": "PowerShell.OnlineHelp",
-        "title": "Get Online Help for Command(Deprecated)",
+        "title": "Get Online Help for Command (Deprecated)",
         "category": "PowerShell"
       },
       {
