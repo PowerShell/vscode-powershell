@@ -94,104 +94,156 @@ When opening an issue, keep in mind:
 
 For solving most issues, the following information is important to provide:
 
-- Logs, which provide context for what was happening when the issue occurred
-  - Before sending through logs, try and reproduce the issue with
-    **log level set to Verbose** or **Diagnostic**. You can set this
-    in the [VSCode Settings] (<kbd>Ctrl</kbd>+<kbd>,</kbd>) with:
-    ```json
-    "powershell.developer.editorServicesLogLevel": "Verbose"
-    ```
-    or for diagnostic logging:
-    ```json
-    "powershell.developer.editorServicesLogLevel": "Diagnostic"
-    ```
-    After you have captured the issue with the log level turned up,
-    you may want to return it (since verbose logging can use disk space):
-    ```json
-    "powershell.developer.editorServicesLogLevel": "Normal"
-    ```
-  - Logs are located at
-    ```powershell
-    $HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-<version>/logs/
-    ```
-    For example:
+### Logs
 
-    ```powershell
-    $HOME/vscode/extensions/ms-vscode.powershell-1.8.4/logs
-    ```
-  - In VSCode you can open and read the logs directly from the [Command Palette]
-    (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
-    with `PowerShell: Open PowerShell Extension Logs Folder`.
-  - You can attach your logs to an issue by zipping them and drag/dropping
-    them onto your open issue description in the browser.
-  - If you prefer to share your logs privately, you can send them to
-    vscode-powershell@microsoft.com. Please still open an issue though
-    so we can track the work &mdash; other users may have the same issue.
+Logs provide context for what was happening when the issue occurred
 
-- [Your VSCode version], obtained from the Integrated Console
-  or PowerShell like this:
+- Before sending through logs, try and reproduce the issue with
+  **log level set to Verbose** or **Diagnostic**. You can set this
+  in the [VSCode Settings] (<kbd>Ctrl</kbd>+<kbd>,</kbd>) with:
 
-  ```shell
-  code -v
+  ```json
+  "powershell.developer.editorServicesLogLevel": "Verbose"
   ```
 
-  If you are using VSCode Insiders, use this command:
+  or for diagnostic logging:
 
-  ```shell
-  code-insiders -v
+  ```json
+  "powershell.developer.editorServicesLogLevel": "Diagnostic"
   ```
 
-  If VSCode is not on your path, you will get a message like
+  After you have captured the issue with the log level turned up,
+  you may want to return it (since verbose logging can use disk space):
 
-  ```text
-  code: The term 'code' is not recognized as the name of a cmdlet, ...
+  ```json
+  "powershell.developer.editorServicesLogLevel": "Normal"
   ```
 
-  in this case, use the file menu in VSCode and choose `Help`>`About`
-  (or `Code`>`About Visual Studio Code` on macOS) to get version information.
-
-- [Your installed PowerShell Extension version]:
-
-  ```shell
-  code --list-extensions --show-versions
-  ```
-
-  With VSCode Insiders:
-
-  ```shell
-  code-insiders --list-extensions --show-versions
-  ```
-
-  If VSCode isn't on your path use the [Command Palette]
-  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) to enter
-  `Extensions: Show Installed Extensions` and list your extensions.
-
-- [Your PowerShell version table], which you can get
-  from the Integrated Console:
+  Logs are located at
 
   ```powershell
-  > $PSVersionTable
-  Name                           Value
-  ----                           -----
-  PSVersion                      6.1.0
-  PSEdition                      Core
-  GitCommitId                    6.1.0
-  OS                             Microsoft Windows 10.0.18242
-  Platform                       Win32NT
-  PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}
-  PSRemotingProtocolVersion      2.3
-  SerializationVersion           1.1.0.1
-  WSManStackVersion              3.0
+  $HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-<version>/logs/
   ```
 
-- Operating System Information
-  - Windows
-    - Your Windows version (e.g. 10)
-  - macOS
-    - Your macOS version (e.g. High Sierra 10.13.6)
-  - Linux
-    - `uname -a`
-    - Your distro and version (usually `lsb_release -a` is the best here)
+  For example:
+
+  ```powershell
+  $HOME/vscode/extensions/ms-vscode.powershell-1.8.4/logs
+  ```
+
+- In VSCode you can open and read the logs directly from the [Command Palette]
+  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
+  with `PowerShell: Open PowerShell Extension Logs Folder`.
+
+- You can attach your logs to an issue by zipping them and drag/dropping
+  them onto your open issue description in the browser.
+
+- If you prefer to share your logs privately, you can send them to
+  vscode-powershell@microsoft.com. Please still open an issue though
+  so we can track the work &mdash; other users may have the same issue.
+
+### Visual Studio Code Version
+
+[Your VSCode version] can be obtained from the Integrated Console
+or PowerShell like this:
+
+```shell
+code -v
+```
+
+If you are using VSCode Insiders, use this command:
+
+```shell
+code-insiders -v
+```
+
+You should get an output like:
+
+```text
+1.27.0
+493869ee8e8a846b0855873886fc79d480d342de
+x64
+```
+
+If VSCode is not on your path, you will get a message like
+
+```text
+code: The term 'code' is not recognized as the name of a cmdlet, ...
+```
+
+in this case, use the file menu in VSCode and choose `Help`>`About`
+(or `Code`>`About Visual Studio Code` on macOS) to get version information.
+
+### PowerShell Extension Version
+
+[Your installed PowerShell Extension version] can similarly be found with:
+
+```shell
+code --list-extensions --show-versions
+```
+
+With VSCode Insiders:
+
+```shell
+code-insiders --list-extensions --show-versions
+```
+
+You should get an output like:
+
+```text
+DavidAnson.vscode-markdownlint@0.20.0
+eamodio.gitlens@8.5.6
+EditorConfig.EditorConfig@0.12.4
+jchannon.csharpextensions@1.3.0
+k--kato.docomment@0.1.2
+ms-vscode.cpptools@0.18.1
+ms-vscode.csharp@1.16.1
+ms-vscode.PowerShell@2.0.0
+twxs.cmake@0.0.17
+vscodevim.vim@0.16.5
+```
+
+If VSCode isn't on your path use the [Command Palette]
+(<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) to enter
+`Extensions: Show Installed Extensions` and list your extensions.
+
+### Editor Services Version
+To get the [PowerShell Editor Services] version, in the Integrated
+Console, enter:
+
+```powershell
+> $psEditor.EditorServicesVersion
+Major  Minor  Build  Revision
+-----  -----  -----  --------
+1      8      4      0
+```
+
+### PowerShell Version Table
+You can get [your PowerShell version table] from the Integrated Console:
+
+```powershell
+> $PSVersionTable
+Name                           Value
+----                           -----
+PSVersion                      6.1.0
+PSEdition                      Core
+GitCommitId                    6.1.0
+OS                             Microsoft Windows 10.0.18242
+Platform                       Win32NT
+PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}
+PSRemotingProtocolVersion      2.3
+SerializationVersion           1.1.0.1
+WSManStackVersion              3.0
+```
+
+### Operating System Information
+
+- Windows - all needed information should already be in the `$PSVersionTable`
+- macOS
+  - Your macOS version (e.g. High Sierra 10.13.6)
+- Linux
+  - `uname -a`
+  - Your distro and version (usually `lsb_release -a` is the best here)
 
 ### Note on Security
 
@@ -227,7 +279,7 @@ an issue on GitHub is appropriate.
 [VSCode Settings]: https://code.visualstudio.com/docs/getstarted/settings
 [will break this compatibility]: https://github.com/PowerShell/vscode-powershell/issues/1310
 [Your installed PowerShell Extension version]: https://code.visualstudio.com/docs/editor/extension-gallery#_list-installed-extensions
-[Your PowerShell version table]: http://www.powertheshell.com/topic/learnpowershell/firststeps/psversion/
+[your PowerShell version table]: http://www.powertheshell.com/topic/learnpowershell/firststeps/psversion/
 [Your VSCode version]: https://code.visualstudio.com/docs/supporting/FAQ#_how-do-i-find-the-vs-code-version
 
 [#3]: https://github.com/PowerShell/vscode-powershell/issues/3

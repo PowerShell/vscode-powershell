@@ -6,11 +6,8 @@ about: Report errors or unexpected behavior 🤔
 
 <!--
 
-BEFORE SUBMITTING A NEW ISSUE, PLEASE READ THE FAQ!!
-https://github.com/PowerShell/vscode-powershell/wiki/FAQ
-
-If your issue is not addressed by the FAQ, please
-fill in the following details so that we can help you!
+BEFORE SUBMITTING A NEW ISSUE, PLEASE READ THE TROUBLESHOOTING DOCS!
+https://github.com/PowerShell/vscode-powershell/tree/master/docs/troubleshooting.md
 
 IMPORTANT: you can generate a bug report directly from the
 PowerShell extension in Visual Studio Code by selecting
@@ -27,20 +24,31 @@ are for a quick resolution.
 - Operating system name and version:
 - VS Code version:
 - PowerShell extension version:
-- Output from `$PSVersionTable`:
+- Output from `$PSVersionTable`
 
 ```
 Copy / paste the following commands into the PowerShell Integrated Console, and paste the output here:
 
-code -v
-$pseditor.EditorServicesVersion
-code --list-extensions --show-versions
-$PSVersionTable
+> code -v
+
+> $pseditor.EditorServicesVersion
+
+> code --list-extensions --show-versions
+
+> $PSVersionTable
 ```
 
 ### Issue Description
 
 I am experiencing a problem with...
+
+#### Expected Behaviour
+
+-- Description of what *should* be happening --
+
+#### Actual Behaviour
+
+-- Description of what actually happens --
 
 ### Attached Logs
 
