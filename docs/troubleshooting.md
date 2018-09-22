@@ -255,7 +255,7 @@ an issue on GitHub is appropriate.
 
 [Editor Syntax]: https://github.com/PowerShell/EditorSyntax
 [PowerShell Editor Services]: https://github.com/PowerShell/PowerShellEditorServices
-[PowerShell Extension]: https:github.com/PowerShell/vscode-powershell/
+[PowerShell Extension]: https://github.com/PowerShell/vscode-powershell/
 [PSScriptAnalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
 [PSReadLine]: https://github.com/lzybkr/PSReadLine
 
