@@ -17,6 +17,9 @@ The more repro details you can provide, along with a zip
 of the log files from your session, the better the chances
 are for a quick resolution.
 
+You may also want to record a GIF of the bug occurring and
+attach it here by dropping the file into the description body.
+
 -->
 
 ### System Details
