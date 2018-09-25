@@ -24,21 +24,34 @@ attach it here by dropping the file into the description body.
 
 ### System Details
 
-- Operating system name and version:
-- VS Code version:
-- PowerShell extension version:
+<!--
+To help diagnose your issue, the following details are helpful:
+- Operating system name and version
+- VS Code version
+- PowerShell extension version
 - Output from `$PSVersionTable`
 
+To get this information, run the following expression in your Integrated Console and paste the output here inside the backticks below:
+
+& {"### VSCode version: $(code -v)"
+"`n### VSCode extensions:`n$(code --list-extensions --show-versions | Out-String)"
+"`n### PSES version: $($pseditor.EditorServicesVersion)"
+"`n### PowerShell version:`n$($PSVersionTable | Out-String)"}
+
+
+If you are running VSCode Insiders, use this expression instead (and paste the result inside the backticks):
+
+& {"### VSCode version: $(code-insiders -v)"
+"`n### VSCode extensions:`n$(code-insiders --list-extensions --show-versions | Out-String)"
+"`n### PSES version: $($pseditor.EditorServicesVersion)"
+"`n### PowerShell version:`n$($PSVersionTable | Out-String)"}
+
+-->
+
+<!-- PowerShell output from above goes here -->
+System Details Output
 ```
-Copy / paste the following commands into the PowerShell Integrated Console, and paste the output here:
 
-> code -v
-
-> $pseditor.EditorServicesVersion
-
-> code --list-extensions --show-versions
-
-> $PSVersionTable
 ```
 
 ### Issue Description
