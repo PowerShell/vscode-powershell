@@ -8,9 +8,9 @@ that Visual Studio Code provides.
 
 ## Platform support
 
-- **Windows 7 through 10** with PowerShell v3 and higher
-- **Linux** with PowerShell v6 (all PowerShell-supported distributions)
-- **macOS and OS X** with PowerShell v6
+- **Windows 7 through 10** with Windows PowerShell v3 and higher, and PowerShell Core
+- **Linux** with PowerShell Core (all PowerShell-supported distributions)
+- **macOS and OS X** with PowerShell Core
 
 Read the [installation instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/learning-powershell/using-vscode.md)
 to get more details on how to use the extension on these platforms.
@@ -26,11 +26,28 @@ Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for ans
 - Go to Definition of cmdlets and variables
 - Find References of cmdlets and variables
 - Document and workspace symbol discovery
-- Run selected selection of PowerShell code using `F8`
-- Launch online help for the symbol under the cursor using `Ctrl+F1`
+- Run selected selection of PowerShell code using <kbd>F8</kbd>
+- Launch online help for the symbol under the cursor using <kbd>Ctrl</kbd>+<kbd>F1</kbd>
 - Local script debugging and basic interactive console support!
 
-## Quick Installation
+## Installing the Extension
+
+You can install the official release of the PowerShell extension by following the steps
+in the [Visual Studio Code documentation](https://code.visualstudio.com/docs/editor/extension-gallery).
+In the Extensions pane, search for "PowerShell" extension and install it there.  You will
+get notified automatically about any future extension updates!
+
+You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
+[Install from a VSIX](https://code.visualstudio.com/docs/extensions/install-extension#_install-from-a-vsix)
+instructions.  The easiest way is through the command line:
+
+```
+code --install-extension PowerShell-<version>.vsix
+```
+
+> NOTE: If you are using VS Code Insiders, the command will be `code-insiders`.
+
+## Script-based Installation
 
 If you're on Windows 7 or greater with the [PowerShellGet](https://msdn.microsoft.com/powershell/gallery/readme)
 module installed, you can easily install both Visual Studio Code and the PowerShell
@@ -52,22 +69,14 @@ first before running it in this way!
 iex (iwr https://git.io/vbxjj)
 ```
 
-## Installing the Extension
+## Reporting Problems
 
-You can install the official release of the PowerShell extension by following the steps
-in the [Visual Studio Code documentation](https://code.visualstudio.com/docs/editor/extension-gallery).
-In the Extensions pane, search for "PowerShell" extension and install it there.  You will
-get notified automatically about any future extension updates!
+If you experience any problems with the PowerShell Extension, see
+[the troubleshooting docs](./docs/troubleshooting.md) for information
+on diagnosing and reporting issues.
 
-You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
-[Install from a VSIX](https://code.visualstudio.com/docs/extensions/install-extension#_install-from-a-vsix)
-instructions.  The easiest way is through the command line:
-
-```
-code --install-extension PowerShell-<version>.vsix
-```
-
-> NOTE: If you are using VS Code Insiders, the command will be `code-insiders`.
+#### Security Note
+For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
 
 ## Example Scripts
 
@@ -88,48 +97,6 @@ To open/view the extension's examples in Visual Studio Code, run the following f
 code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
 
-## Reporting Problems
-
-If you're having trouble with the PowerShell extension, please follow these instructions
-to file an issue on our GitHub repository:
-
-### 1. File an issue on our [Issues Page](https://github.com/PowerShell/vscode-powershell/issues)
-
-Make sure to fill in the information that is requested in the issue template as it
-will help us investigate the problem more quickly.
-
-To automatically create a bug report from within the extension, open the Command pallet (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and run the *"Report a problem on GitHub"* command. Some basic information about your instance and powershell versions will be collected and inserted into a new GitHub issue.
-
-NOTE: If you believe that there is a security vulnerability in the PowerShell extension for VSCode,
-it **must** be reported to [secure@microsoft.com](https://technet.microsoft.com/security/ff852094.aspx) to allow for [Coordinated Vulnerability Disclosure](https://technet.microsoft.com/security/dn467923).
-**Only** file an issue, if secure@microsoft.com has confirmed filing an issue is appropriate.
-
-### 2. Capture verbose logs and send them to us
-
-If you're having an issue with crashing or other erratic behavior, add the following
-line to your User Settings in Visual Studio Code:
-
-```json
-    "powershell.developer.editorServicesLogLevel": "Verbose"
-```
-
-Restart Visual Studio Code and try to reproduce the problem.  Once you are done with
-that, zip up the logs in the corresponding folder for your operating system:
-
-- **Windows**: `$HOME\.vscode\extensions\ms-vscode.PowerShell-<CURRENT VERSION>\logs`
-- **Linux and macOS**: `~/.vscode/extensions/ms-vscode.PowerShell-<CURRENT VERSION>/logs`
-
-Alternatively, you can open the log folder using the Command pallet (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) and running the *"Open powerShell Extension Logs Folder"* command.
-
-You have two options for sending us the logs:
-
-  1. If you are editing scripts that contain sensitive information (intellectual property,
-     deployment or administrative information, etc), e-mail the logs directly to
-     *vscode-powershell@microsoft.com*.
-
-  2. If you are editing scripts that don't contain sensitive information, you can drag and
-     drop your logs ZIP file into the GitHub issue that you are creating.
-
 ## Contributing to the Code
 
 Check out the [development documentation](docs/development.md) for more details
@@ -139,7 +106,7 @@ on how to contribute to this extension!
 
 - [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
 - [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
-- [David Wilson](https://github.com/daviwil) - [@daviwil](http://twitter.com/daviwil)
+- [Rob Holt](https://github.com/rjmholt)
 
 ## License
 
