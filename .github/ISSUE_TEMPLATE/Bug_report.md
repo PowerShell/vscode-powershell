@@ -33,18 +33,12 @@ To help diagnose your issue, the following details are helpful:
 
 To get this information, run the following expression in your Integrated Console and paste the output here inside the backticks below:
 
-& {"### VSCode version: $(code -v)"
-"`n### VSCode extensions:`n$(code --list-extensions --show-versions | Out-String)"
-"`n### PSES version: $($pseditor.EditorServicesVersion)"
-"`n### PowerShell version:`n$($PSVersionTable | Out-String)"}
+& {"### VSCode version: $(code -v)"; "`n### VSCode extensions:`n$(code --list-extensions --show-versions | Out-String)"; "`n### PSES version: $($pseditor.EditorServicesVersion)"; "`n### PowerShell version:`n$($PSVersionTable | Out-String)"}
 
 
 If you are running VSCode Insiders, use this expression instead (and paste the result inside the backticks):
 
-& {"### VSCode version: $(code-insiders -v)"
-"`n### VSCode extensions:`n$(code-insiders --list-extensions --show-versions | Out-String)"
-"`n### PSES version: $($pseditor.EditorServicesVersion)"
-"`n### PowerShell version:`n$($PSVersionTable | Out-String)"}
+& {"### VSCode version: $(code-insiders -v)"; "`n### VSCode extensions:`n$(code-insiders --list-extensions --show-versions | Out-String)"; "`n### PSES version: $($pseditor.EditorServicesVersion)"; "`n### PowerShell version:`n$($PSVersionTable | Out-String)"}
 
 -->
 
