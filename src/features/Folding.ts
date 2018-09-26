@@ -125,7 +125,7 @@ class LineNumberRange {
         this.startline = document.positionAt(start.startIndex).line;
         this.endline = document.positionAt(end.startIndex).line;
         if (this.settings.codeFolding && this.settings.codeFolding.showLastLine) {
-            this.endline--
+            this.endline--;
         }
         return this;
     }
