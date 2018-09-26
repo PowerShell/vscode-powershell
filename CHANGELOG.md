@@ -1,8 +1,5 @@
 # vscode-powershell Release History
 
-- [vscode-PowerShell #????](https://github.com/PowerShell/vscode-PowerShell/pull/????) -
-  New code folding option - 'powershell.codeFolding.showLastLine' - Set true to show the last line of a folded section similar to the default VSCode folding style
-
 ## v1.8.4
 ### Friday, August 31, 2018
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
