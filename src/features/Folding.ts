@@ -101,10 +101,13 @@ class LineNumberRange {
      */
     public rangeKind: vscode.FoldingRangeKind;
 
+    private settings: Settings.ISettings;
+
     constructor(
         rangeKind: vscode.FoldingRangeKind,
     ) {
         this.rangeKind = rangeKind;
+        this.settings = Settings.load();
     }
 
     /**
@@ -121,6 +124,9 @@ class LineNumberRange {
     ): LineNumberRange {
         this.startline = document.positionAt(start.startIndex).line;
         this.endline = document.positionAt(end.startIndex).line;
+        if (this.settings.codeFolding && this.settings.codeFolding.showLastLine) {
+            this.endline--;
+        }
         return this;
     }
 

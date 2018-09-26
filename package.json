@@ -478,6 +478,11 @@
           "default": true,
           "description": "Enables syntax based code folding. When disabled, the default indentation based code folding is used."
         },
+        "powershell.codeFolding.showLastLine": {
+          "type": "boolean",
+          "default": false,
+          "description": "Shows the last line of a folded section similar to the default VSCode folding style. When disabled, the entire folded region is hidden."
+        },
         "powershell.codeFormatting.preset": {
           "type": "string",
           "enum": [
