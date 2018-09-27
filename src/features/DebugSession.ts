@@ -53,7 +53,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             const msg = "Cannot debug or run a PowerShell script until the PowerShell session has started. " +
                 "Wait for the PowerShell session to finish starting and try again.";
             vscode.window.showWarningMessage(msg);
-            return;
+            return undefined;
         }
 
         // Starting a debug session can be done when there is no document open e.g. attach to PS host process
