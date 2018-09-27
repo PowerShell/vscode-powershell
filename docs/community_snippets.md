@@ -32,6 +32,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
 | [Region Block](#region-block) | _Region Block for organizing and folding of your code_ |
 | [Send-MailMessage](#send-mailmessage) | _Send an mail message with the most common parameters by @fullenw1_ |
+| [New Azure Resource Group](#new-azure-resource-group) | _Create an Azure Resource group by @vmsilvamolina_ |
 
 ## Snippets
 
@@ -341,6 +342,23 @@ Add the Send-MailMessage cmdlet with the most common parameters in a hashtable f
 		"Send-MailMessage @Params" 
 	], 
 	"description": "Send a mail message" 
+}
+```
+
+### New Azure Resource Group
+
+Create a Resource Group on Azure, by @vmsilvamolina.
+
+#### Snippet
+
+```json
+"New Azure Resource Group": {
+    "prefix": "rg",
+    "body": [
+        "#New Resource Group",
+        "New-AzureRmResourceGroup -ResourceGroupName \"${1:ResourceGroup}\" -Location \"${2:EastUS}\""
+    ],
+    "description": "Create an Azure Resource Group"
 }
 ```
 
