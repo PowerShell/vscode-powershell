@@ -26,13 +26,13 @@ _To contribute, check out our [guide here](#contributing)._
 | [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
 | [IfShouldProcess](#ifshouldprocess) | _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
+| [New Azure Resource Group](#new-azure-resource-group) | _Create an Azure Resource group by @vmsilvamolina_ |
 | [Parameter-Credential](#parameter-credential) | _Add a standard credential parameter to your function by @omniomi_ |
 | [PesterTestForMandatoryParameter](#pestertestformandatoryparameter) | _Create Pester test for a mandatory parameter_ |
 | [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
 | [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
 | [Region Block](#region-block) | _Region Block for organizing and folding of your code_ |
 | [Send-MailMessage](#send-mailmessage) | _Send an mail message with the most common parameters by @fullenw1_ |
-| [New Azure Resource Group](#new-azure-resource-group) | _Create an Azure Resource group by @vmsilvamolina_ |
 
 ## Snippets
 
@@ -220,6 +220,23 @@ Takes a datatable object and iterates through it to get the max length of the st
 }
 ```
 
+### New Azure Resource Group
+
+Create a Resource Group on Azure, by @vmsilvamolina.
+
+#### Snippet
+
+```json
+"New Azure Resource Group": {
+    "prefix": "ex-New-AzureRmResourceGroup",
+    "body": [
+        "#New Resource Group",
+        "New-AzureRmResourceGroup -ResourceGroupName \"${1:ResourceGroup}\" -Location \"${2:EastUS}\""
+    ],
+    "description": "Create an Azure Resource Group"
+}
+```
+
 ### Parameter-Credential
 
 Add a `-Credential` parameter that supports a PSCredential object in a variable, `-Credential (Get-Credential)`, or `-Credential Username` (will prompt). Includes an empty PSCredential object as the default value but this is the first tabstop so pressing backspace after inserting the snippet removes it. by @omniomi
@@ -342,23 +359,6 @@ Add the Send-MailMessage cmdlet with the most common parameters in a hashtable f
 		"Send-MailMessage @Params" 
 	], 
 	"description": "Send a mail message" 
-}
-```
-
-### New Azure Resource Group
-
-Create a Resource Group on Azure, by @vmsilvamolina.
-
-#### Snippet
-
-```json
-"New Azure Resource Group": {
-    "prefix": "ex-New-AzureRmResourceGroup",
-    "body": [
-        "#New Resource Group",
-        "New-AzureRmResourceGroup -ResourceGroupName \"${1:ResourceGroup}\" -Location \"${2:EastUS}\""
-    ],
-    "description": "Create an Azure Resource Group"
 }
 ```
 
