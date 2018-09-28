@@ -62,5 +62,5 @@ I am experiencing a problem with...
 
 ### Attached Logs
 
-Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell#reporting-problems)
+Follow the instructions in the [troubleshooting docs](https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md#logs)
 about capturing and sending logs.
