@@ -353,7 +353,7 @@ Create a Resource Group on Azure, by @vmsilvamolina.
 
 ```json
 "New Azure Resource Group": {
-    "prefix": "rg",
+    "prefix": "ex-New-AzureRmResourceGroup",
     "body": [
         "#New Resource Group",
         "New-AzureRmResourceGroup -ResourceGroupName \"${1:ResourceGroup}\" -Location \"${2:EastUS}\""
