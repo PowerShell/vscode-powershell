@@ -480,7 +480,7 @@
         },
         "powershell.codeFolding.showLastLine": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Shows the last line of a folded section similar to the default VSCode folding style. When disabled, the entire folded region is hidden."
         },
         "powershell.codeFormatting.preset": {

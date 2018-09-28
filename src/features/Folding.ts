@@ -101,13 +101,10 @@ class LineNumberRange {
      */
     public rangeKind: vscode.FoldingRangeKind;
 
-    private settings: Settings.ISettings;
-
     constructor(
         rangeKind: vscode.FoldingRangeKind,
     ) {
         this.rangeKind = rangeKind;
-        this.settings = Settings.load();
     }
 
     /**
@@ -124,9 +121,6 @@ class LineNumberRange {
     ): LineNumberRange {
         this.startline = document.positionAt(start.startIndex).line;
         this.endline = document.positionAt(end.startIndex).line;
-        if (this.settings.codeFolding && this.settings.codeFolding.showLastLine) {
-            this.endline--;
-        }
         return this;
     }
 
@@ -163,8 +157,12 @@ class LineNumberRange {
      * Creates a vscode.FoldingRange object based on this object
      * @returns A Folding Range object for use with the Folding Provider
      */
-    public toFoldingRange(): vscode.FoldingRange {
-        return new vscode.FoldingRange(this.startline, this.endline, this.rangeKind);
+    public toFoldingRange(settings: Settings.ISettings): vscode.FoldingRange {
+        if (settings.codeFolding && settings.codeFolding.showLastLine) {
+            return new vscode.FoldingRange(this.startline, this.endline - 1, this.rangeKind);
+        } else {
+            return new vscode.FoldingRange(this.startline, this.endline, this.rangeKind);
+        }
     }
 }
 
@@ -258,14 +256,20 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             return 0;
         });
 
+        const settings = this.currentSettings();
         return foldableRegions
             // It's possible to have duplicate or overlapping ranges, that is, regions which have the same starting
             // line number as the previous region. Therefore only emit ranges which have a different starting line
             // than the previous range.
             .filter((item, index, src) => index === 0 || item.startline !== src[index - 1].startline)
             // Convert the internal representation into the VSCode expected type
-            .map((item) => item.toFoldingRange());
+            .map((item) => item.toFoldingRange(settings));
     }
+
+    /**
+     * A helper to return the current extension settings
+     */
+    public currentSettings(): Settings.ISettings { return Settings.load(); }
 
     /**
      * Given a start and end textmate scope name, find matching grammar tokens
