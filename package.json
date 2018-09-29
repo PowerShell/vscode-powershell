@@ -216,7 +216,7 @@
       ],
       "view/item/context": [
         {
-          "command": "PowerShell.OnlineHelp",
+          "command": "PowerShell.ShowHelp",
           "when": "view == PowerShellCommands"
         },
         {
