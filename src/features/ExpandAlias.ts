@@ -6,6 +6,7 @@ import vscode = require("vscode");
 import Window = vscode.window;
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export const ExpandAliasRequestType = new RequestType<string, any, void, void>("powerShell/expandAlias");
 
@@ -13,10 +14,11 @@ export class ExpandAliasFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
 
-    constructor() {
+    constructor(private log: Logger) {
         this.command = vscode.commands.registerCommand("PowerShell.ExpandAlias", () => {
             if (this.languageClient === undefined) {
-                // TODO: Log error message
+                this.log.writeAndShowError(`<${ExpandAliasFeature.name}>: ` +
+                    "Unable to instantiate; language client undefined.");
                 return;
             }
 

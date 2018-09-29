@@ -5,6 +5,7 @@
 import vscode = require("vscode");
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export const ShowHelpRequestType =
     new RequestType<string, void, void, void>("powerShell/showHelp");
@@ -14,10 +15,11 @@ export class ShowHelpFeature implements IFeature {
     private deprecatedCommand: vscode.Disposable;
     private languageClient: LanguageClient;
 
-    constructor() {
+    constructor(private log: Logger) {
         this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", () => {
             if (this.languageClient === undefined) {
-                // TODO: Log error message
+                this.log.writeAndShowError(`<${ShowHelpFeature.name}>: ` +
+                    "Unable to instantiate; language client undefined.");
                 return;
             }
 
