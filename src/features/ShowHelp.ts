@@ -31,9 +31,9 @@ export class ShowHelpFeature implements IFeature {
                 const cwr = doc.getWordRangeAtPosition(selection.active);
                 const text = doc.getText(cwr);
 
-	            this.languageClient.sendRequest(ShowHelpRequestType, text);
+                this.languageClient.sendRequest(ShowHelpRequestType, text);
             } else {
-                this.languageClient.sendRequest(ShowOnlineHelpRequestType, item.Name);
+                this.languageClient.sendRequest(ShowHelpRequestType, item.Name);
             }
         });
 

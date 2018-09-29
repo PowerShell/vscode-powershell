@@ -124,7 +124,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new OpenInISEFeature(),
         new GenerateBugReportFeature(sessionManager),
         new ExpandAliasFeature(logger),
-        new GetCommandsFeature(),
+        new GetCommandsFeature(logger),
         new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
@@ -141,6 +141,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new CustomViewsFeature(),
         new FoldingFeature(logger, documentSelector),
     ];
+
     sessionManager.setExtensionFeatures(extensionFeatures);
 
     if (extensionSettings.startAutomatically) {
