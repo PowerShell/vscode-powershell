@@ -169,9 +169,9 @@ export class SessionManager implements Middleware {
             this.editorServicesArgs =
                 `-HostName 'Visual Studio Code Host' ` +
                 `-HostProfileId 'Microsoft.VSCode' ` +
-                `-HostVersion '${this.hostVersion}'` +
+                `-HostVersion '${this.hostVersion}' ` +
                 `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
-                `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}'` +
+                `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
                 `-EnableConsoleRepl `;
 
             if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
