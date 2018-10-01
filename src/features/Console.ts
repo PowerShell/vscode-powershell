@@ -206,7 +206,7 @@ export class ConsoleFeature implements IFeature {
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
                 if (this.languageClient === undefined) {
                     this.log.writeAndShowError(`<${ConsoleFeature.name}>: ` +
-                    "Unable to instantiate; language client undefined.");
+                        "Unable to instantiate; language client undefined.");
                     return;
                 }
 
