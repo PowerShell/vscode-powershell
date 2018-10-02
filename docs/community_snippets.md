@@ -26,6 +26,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
 | [IfShouldProcess](#ifshouldprocess) | _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
+| [New Azure Resource Group](#new-azure-resource-group) | _Create an Azure Resource group by @vmsilvamolina_ |
 | [Parameter-Credential](#parameter-credential) | _Add a standard credential parameter to your function by @omniomi_ |
 | [PesterTestForMandatoryParameter](#pestertestformandatoryparameter) | _Create Pester test for a mandatory parameter_ |
 | [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
@@ -216,6 +217,23 @@ Takes a datatable object and iterates through it to get the max length of the st
         "}"
     ],
     "description": "Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads"
+}
+```
+
+### New Azure Resource Group
+
+Create a Resource Group on Azure, by @vmsilvamolina.
+
+#### Snippet
+
+```json
+"New Azure Resource Group": {
+    "prefix": "ex-New-AzureRmResourceGroup",
+    "body": [
+        "#New Resource Group",
+        "New-AzureRmResourceGroup -ResourceGroupName \"${1:ResourceGroup}\" -Location \"${2:EastUS}\""
+    ],
+    "description": "Create an Azure Resource Group"
 }
 ```
 
