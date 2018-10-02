@@ -157,7 +157,10 @@ class LineNumberRange {
      * Creates a vscode.FoldingRange object based on this object
      * @returns A Folding Range object for use with the Folding Provider
      */
-    public toFoldingRange(): vscode.FoldingRange {
+    public toFoldingRange(settings: Settings.ISettings): vscode.FoldingRange {
+        if (settings.codeFolding && settings.codeFolding.showLastLine) {
+            return new vscode.FoldingRange(this.startline, this.endline - 1, this.rangeKind);
+        }
         return new vscode.FoldingRange(this.startline, this.endline, this.rangeKind);
     }
 }
@@ -252,14 +255,25 @@ export class FoldingProvider implements vscode.FoldingRangeProvider {
             return 0;
         });
 
+        const settings = this.currentSettings();
         return foldableRegions
             // It's possible to have duplicate or overlapping ranges, that is, regions which have the same starting
             // line number as the previous region. Therefore only emit ranges which have a different starting line
             // than the previous range.
             .filter((item, index, src) => index === 0 || item.startline !== src[index - 1].startline)
             // Convert the internal representation into the VSCode expected type
-            .map((item) => item.toFoldingRange());
+            .map((item) => item.toFoldingRange(settings));
     }
+
+    /**
+     * A helper to return the current extension settings.  This helper is primarily for use by unit testing so
+     * that extension settings can be mocked.
+     * - The settings cannot be set in the constructor as the settings should be evalauted on each folding request
+     *   so that setting changes are immediate, i.e. they do not require an extension reload
+     * - The method signature for provideFoldingRanges can not be changed as it is explicitly set in the VSCode API,
+     *   therefore the settings can not be passed in the method call, which would be preferred
+     */
+    public currentSettings(): Settings.ISettings { return Settings.load(); }
 
     /**
      * Given a start and end textmate scope name, find matching grammar tokens
