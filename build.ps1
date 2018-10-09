@@ -2,6 +2,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+[CmdletBinding(DefaultParameterSetName = "Build")]
 param(
     [Parameter(ParameterSetName="Bootstrap")]
     [switch]
