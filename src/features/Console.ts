@@ -6,6 +6,7 @@ import vscode = require("vscode");
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody, void>("output");
@@ -200,11 +201,12 @@ export class ConsoleFeature implements IFeature {
     private languageClient: LanguageClient;
     private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 
-    constructor() {
+    constructor(private log: Logger) {
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
                 if (this.languageClient === undefined) {
-                    // TODO: Log error message
+                    this.log.writeAndShowError(`<${ConsoleFeature.name}>: ` +
+                        "Unable to instantiate; language client undefined.");
                     return;
                 }
 
