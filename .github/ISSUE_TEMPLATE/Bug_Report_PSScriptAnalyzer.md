@@ -1,8 +1,8 @@
 ---
-name: PSScriptAnalyzer bug report 🚦
-about: PSScriptAnalyzer bugs are tracked in a separate GitHub repo.
+name: Script analysis or formatting bug report 🚦🖌️
+about: Script analysis and formatting are provided by PSScriptAnalyzer, whose issues are tracked in a different GitHub repository.
 
 ---
 
-* Please submit PSScriptAnalyzer issues to the
+* Please submit script analysis and formatting issues to the
   [PSScriptAnalyzer](https://github.com/powershell/PSScriptAnalyzer/issues) repo on GitHub.
