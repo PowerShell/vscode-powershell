@@ -36,12 +36,6 @@ export class ShowHelpFeature implements IFeature {
                 this.languageClient.sendRequest(ShowHelpRequestType, item.Name);
             }
         });
-
-        this.deprecatedCommand = vscode.commands.registerCommand("PowerShell.OnlineHelp", () => {
-            const warnText = "PowerShell.OnlineHelp is being deprecated. Use PowerShell.ShowHelp instead.";
-            vscode.window.showWarningMessage(warnText);
-            vscode.commands.executeCommand("PowerShell.ShowHelp");
-        });
     }
 
     public dispose() {
