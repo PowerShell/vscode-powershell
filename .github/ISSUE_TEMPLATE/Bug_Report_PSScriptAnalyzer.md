@@ -1,6 +1,6 @@
 ---
 name: Script analysis or formatting bug report 🚦🖌️
-about: Script analysis and formatting are provided by PSScriptAnalyzer. Before submitting a script analysis or formatting issue, check to see if the issue lies with PSScriptAnalyzer or with the VSCode PowerShell extension.
+about: Script analysis and formatting are provided by PSScriptAnalyzer. Before submitting a script analysis or formatting issue, check to see whether the issue lies with PSScriptAnalyzer or with the VSCode PowerShell extension.
 
 ---
 
