@@ -6,6 +6,7 @@ import vscode = require("vscode");
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
 import { IFeature } from "../feature";
+import { Logger } from "../logging";
 
 export const GetPSSARulesRequestType = new RequestType<any, any, void, void>("powerShell/getPSSARules");
 export const SetPSSARulesRequestType = new RequestType<any, any, void, void>("powerShell/setPSSARules");
@@ -20,9 +21,11 @@ export class SelectPSSARulesFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
 
-    constructor() {
+    constructor(private log: Logger) {
         this.command = vscode.commands.registerCommand("PowerShell.SelectPSSARules", () => {
             if (this.languageClient === undefined) {
+                this.log.writeAndShowError(`<${SelectPSSARulesFeature.name}>: ` +
+                    "Unable to instantiate; language client undefined.");
                 return;
             }
 

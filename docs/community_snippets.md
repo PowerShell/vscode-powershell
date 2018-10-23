@@ -24,6 +24,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [DataTable](#datatable) | _Creates a DataTable_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose) | _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
+| [Exchange Online Connection](exchange-online-connection) | _Create a connection to Exchange Online by @vmsilvamolina_ | 
 | [HTML header](#html-header) | _Add HTML header with the style tag by @vmsilvamolina_ |
 | [IfShouldProcess](#ifshouldprocess) | _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
@@ -175,6 +176,29 @@ Quickly add a fully defined error record and throw. by @omniomi
         "\\$PSCmdlet.ThrowTerminatingError(\\$ErrorRecord)"
     ],
     "description": "Throw a full terminating error."
+}
+```
+
+
+### Exchange Online Connection
+
+Connect to Exchange Online, by @vmsilvamolina
+
+#### Snippet
+
+```json
+"Exchange Online Connection": {
+    "prefix": "ex-ExchangeOnlineConnection",
+    "body": [
+        "#Set Execution Policy",
+	"Set-ExecutionPolicy RemoteSigned -Scope Process",
+	"#Define credential",
+	"\\$UserCredential = Get-Credential",
+	"# Create the session",
+	"\\$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential \\$UserCredential -Authentication Basic -AllowRedirection",
+	"Import-PSSession \\$Session -DisableNameChecking"
+    ],
+    "description": "Connect to Exchange Online"
 }
 ```
 

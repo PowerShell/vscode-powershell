@@ -118,16 +118,16 @@ export function activate(context: vscode.ExtensionContext): void {
 
     // Create features
     extensionFeatures = [
-        new ConsoleFeature(),
+        new ConsoleFeature(logger),
         new ExamplesFeature(),
         new OpenInISEFeature(),
         new GenerateBugReportFeature(sessionManager),
-        new ExpandAliasFeature(),
-        new ShowHelpFeature(),
+        new ExpandAliasFeature(logger),
+        new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
         new ExtensionCommandsFeature(logger),
-        new SelectPSSARulesFeature(),
+        new SelectPSSARulesFeature(logger),
         new CodeActionsFeature(),
         new NewFileOrProjectFeature(),
         new DocumentFormatterFeature(logger, documentSelector),
