@@ -31,6 +31,7 @@ export interface IBugReportingSettings {
 
 export interface ICodeFoldingSettings {
     enable?: boolean;
+    showLastLine?: boolean;
 }
 
 export interface ICodeFormattingSettings {
@@ -116,6 +117,7 @@ export function load(): ISettings {
 
     const defaultCodeFoldingSettings: ICodeFoldingSettings = {
         enable: true,
+        showLastLine: false,
     };
 
     const defaultCodeFormattingSettings: ICodeFormattingSettings = {
