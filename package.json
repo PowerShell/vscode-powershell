@@ -594,11 +594,76 @@
       }
     },
     "themes": [
-      {
-        "label": "PowerShell ISE",
-        "uiTheme": "vs",
-        "path": "./themes/theme-psise/theme.json"
-      }
+        {
+            "label": "PowerShell ISE",
+            "uiTheme": "vs",
+            "path": "./themes/ps-ise.json"
+        },
+        {
+            "label": "PowerShell Quiet Light",
+            "uiTheme": "vs",
+            "path": "./themes/ps-quietlight.json"
+        },
+        {
+            "label": "PowerShell Dark+ (default dark)",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-dark_plus.json"
+        },
+        {
+            "label": "PowerShell Dark (Visual Studio)",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-dark_vs.json"
+        },
+        {
+            "label": "PowerShell Light+ (default light)",
+            "uiTheme": "vs",
+            "path": "./themes/ps-light_plus.json"
+        },
+        {
+            "label": "PowerShell Light (Visual Studio)",
+            "uiTheme": "vs",
+            "path": "./themes/ps-light_vs.json"
+        },
+        {
+            "label": "PowerShell Abyss",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-abyss.json"
+        },
+        {
+            "label": "PowerShell Kimbie Dark",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-kimbie_dark.json"
+        },
+        {
+            "label": "PowerShell Monokai",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-monokai.json"
+        },
+        {
+            "label": "PowerShell Monokai Dimmed",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-monokai_dimmed.json"
+        },
+        {
+            "label": "PowerShell Red",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-red.json"
+        },
+        {
+            "label": "PowerShell Solarized Dark",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-solarized_dark.json"
+        },
+        {
+            "label": "PowerShell Solarized Light",
+            "uiTheme": "vs",
+            "path": "./themes/ps-solarized_light.json"
+        },
+        {
+            "label": "PowerShell Tomorrow Night Blue",
+            "uiTheme": "vs-dark",
+            "path": "./themes/ps-tomorrow_night_blue.json"
+        }
     ]
   },
   "private": true

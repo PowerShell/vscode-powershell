@@ -1,9 +1,14 @@
 {
-	"name": "PowerShell ISE",
+    "$schema": "vscode://schemas/color-theme",
+    "name": "PowerShell ISE",
+    "include": "./ps-light_defaults.json",
 	"tokenColors": [
 		{
+            "scope": [
+                "meta.embedded", "source.groovy.embedded"
+            ],
 			"settings": {
-				"background": "#FFFFFF",
+				//"background": "#FFFFFF",
 				"foreground": "#000000"
 			}
 		},
@@ -40,14 +45,14 @@
 			"name": "Invalid - Deprecated",
 			"scope": "invalid.deprecated",
 			"settings": {
-				"background": "#96000014"
+				//"background": "#96000014"
 			}
 		},
 		{
 			"name": "Invalid - Illegal",
 			"scope": "invalid.illegal",
 			"settings": {
-				"background": "#96000014",
+				//"background": "#96000014",
 				"foreground": "#660000"
 			}
 		},
