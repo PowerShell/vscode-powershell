@@ -24,6 +24,8 @@ export const InvokeExtensionCommandRequestType =
         "powerShell/invokeExtensionCommand");
 
 export interface IEditorContext {
+    currentFileContent: string;
+    currentFileLanguage: string;
     currentFilePath: string;
     cursorPosition: Position;
     selectionRange: Range;
@@ -344,6 +346,8 @@ export class ExtensionCommandsFeature implements IFeature {
 
     private getEditorContext(): IEditorContext {
         return {
+            currentFileContent: vscode.window.activeTextEditor.document.getText(),
+            currentFileLanguage: vscode.window.activeTextEditor.document.languageId,
             currentFilePath: vscode.window.activeTextEditor.document.uri.toString(),
             cursorPosition: asPosition(vscode.window.activeTextEditor.selection.active),
             selectionRange:
