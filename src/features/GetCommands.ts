@@ -8,7 +8,7 @@ import { Logger } from "../logging";
 
 // TODO: Document this export: https://github.com/PowerShell/vscode-powershell/pull/1406#discussion_r209325655
 // TODO: Also use something other than any if possible... We may have already addressed this with a previous attempt.
-export const GetAllCommandsRequestType = new RequestType<any, any, void, void>("powerShell/getCommand");
+export const GetCommandRequestType = new RequestType<any, any, void, void>("powerShell/getCommand");
 
 export class GetCommandsFeature implements IFeature {
     private command: vscode.Disposable;
@@ -16,28 +16,11 @@ export class GetCommandsFeature implements IFeature {
     private commandsExplorerProvider: CommandsExplorerProvider;
 
     constructor(private log: Logger) {
-        this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer", () => {
-            if (this.languageClient === undefined) {
-                this.log.writeAndShowError(`<${GetCommandsFeature.name}>: ` +
-                    "Unable to instantiate; language client undefined.");
-                return;
-            }
-            this.languageClient.sendRequest(GetAllCommandsRequestType, "").then((result) => {
-                this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
-                this.commandsExplorerProvider.refresh();
-            });
-        });
+        this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
+            () => this.CommandExplorerRefresh());
         this.commandsExplorerProvider = new CommandsExplorerProvider();
         vscode.window.registerTreeDataProvider("PowerShellCommands", this.commandsExplorerProvider);
-        vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => {
-            const editor = vscode.window.activeTextEditor;
-            const sls = editor.selection.start;
-            const sle = editor.selection.end;
-            const range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
-            editor.edit((editBuilder) => {
-                editBuilder.replace(range, item.Name);
-            });
-        });
+        vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => this.InsertCommand(item));
     }
 
     public dispose() {
@@ -47,6 +30,28 @@ export class GetCommandsFeature implements IFeature {
     public setLanguageClient(languageclient: LanguageClient) {
         this.languageClient = languageclient;
         vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
+    }
+
+    private CommandExplorerRefresh() {
+        if (this.languageClient === undefined) {
+            this.log.writeAndShowError(`<${GetCommandsFeature.name}>: ` +
+                "Unable to instantiate; language client undefined.");
+            return;
+        }
+        this.languageClient.sendRequest(GetCommandRequestType, "").then((result) => {
+            this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
+            this.commandsExplorerProvider.refresh();
+        });
+    }
+
+    private InsertCommand(item) {
+        const editor = vscode.window.activeTextEditor;
+        const sls = editor.selection.start;
+        const sle = editor.selection.end;
+        const range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
+        editor.edit((editBuilder) => {
+            editBuilder.replace(range, item.Name);
+        });
     }
 }
 
@@ -70,7 +75,6 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     public getChildren(element?: Command): Thenable<Command[]> {
         return Promise.resolve(this.powerShellCommands || []);
     }
-
 }
 
 // TODO: Define and export an ICommand interface to describe the properties we require.
