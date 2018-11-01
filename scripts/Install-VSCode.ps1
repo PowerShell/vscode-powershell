@@ -144,7 +144,17 @@ param(
     [switch]$WhatIf
 )
 
-function Test-IsOsX64 {
+# Taken from https://code.visualstudio.com/docs/setup/linux#_installation
+$script:VSCodeYumRepoEntry = @"
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+"@
+
+function Test-IsOsArchX64 {
     if ($PSVersionTable.PSVersion.Major -lt 6) {
         return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit"
     }
@@ -152,14 +162,19 @@ function Test-IsOsX64 {
     return [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::X64
 }
 
-function Get-LinuxReleaseInfo {
-    if (-not (Test-Path '/etc/*-release')) {
-        return $null
+function Get-AvailablePackageManager
+{
+    if (Get-Command 'apt' -ErrorAction SilentlyContinue) {
+        return 'apt'
     }
 
-    return Get-Content -Raw '/etc/*-release' -ErrorAction SilentlyContinue `
-        | ConvertFrom-Csv -Delimiter '=' -Header 'Key','Value' `
-        | ForEach-Object { $obj = @{} } { $obj[$_.Key] = $_.Value } { [pscustomobject]$obj }
+    if (Get-Command 'dnf' -ErrorAction SilentlyContinue) {
+        return 'dnf'
+    }
+
+    if (Get-Command 'yum' -ErrorAction SilentlyContinue) {
+        return 'yum'
+    }
 }
 
 function Get-CodePlatformInformation {
@@ -215,18 +230,18 @@ function Get-CodePlatformInformation {
 
     switch ($os) {
         'Linux' {
-            $releaseInfo = Get-LinuxReleaseInfo
+            $pacMan = Get-AvailablePackageManager
 
-            switch ($releaseInfo.NAME) {
-                { 'Ubuntu','Debian' -contains $_ } {
+            switch ($pacMan) {
+                'apt' {
                     $platform = 'linux-deb-x64'
                     $ext = 'deb'
                     break
                 }
 
-                { 'Fedora','CentOS','RedHat' -contains $_ } {
+                { 'dnf','yum' -contains $_ } {
                     $platform = 'linux-rpm-x64'
-                    $ext = 'deb'
+                    $ext = 'rpm'
                     break
                 }
 
@@ -265,7 +280,7 @@ function Get-CodePlatformInformation {
                 '32-bit' {
                     $platform = 'win32'
 
-                    if (Test-IsOsX64) {
+                    if (Test-IsOsArchX64) {
                         $installBase = ${env:ProgramFiles(x86)}
                         break
                     }
@@ -322,7 +337,7 @@ function Get-CodePlatformInformation {
         }
     }
 
-    return @{
+    $info = @{
         AppName = $appName
         ExePath = $exePath
         Platform = $platform
@@ -330,6 +345,12 @@ function Get-CodePlatformInformation {
         FileUri = "https://vscode-update.azurewebsites.net/latest/$platform/$channel"
         Extension = $ext
     }
+
+    if ($pacMan) {
+        $info['PackageManager'] = $pacMan
+    }
+
+    return $info
 }
 
 function Save-WithBitsTransfer {
@@ -437,17 +458,27 @@ try {
                 Write-Host "WhatIf: apt install $installerPath"
                 break
             }
+
+            # The deb file contains the information to install its own repository,
+            # so we just need to install it
             apt install $installerPath
             break
         }
 
         # On RedHat-list Linux distros
         'rpm' {
+            $pacMan = $codePlatformInfo.PackageManager
             if ($WhatIfPreference) {
-                Write-Host "WhatIf: rpm -ivh $installerPath"
+                Write-Host "WhatIf: $pacMan install $installerPath"
                 break
             }
-            rpm -ivh $installerPath
+
+            # Install the VSCode repo with the package manager
+            rpm --import https://packages.microsoft.com/keys/microsoft.asc
+            $script:VSCodeYumRepoEntry > /etc/yum.repos.d/vscode.repo
+
+            # Use dnf or yum depending on the detected package manager
+            & $pacMan install $installerPath
             break
         }
 
