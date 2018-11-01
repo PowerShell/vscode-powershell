@@ -293,11 +293,11 @@ function Get-CodePlatformInformation {
                     $exePath = "$installBase\Microsoft VS Code\bin\code.cmd"
                 }
 
-                'Insiders-System' {
+                'Insider-System' {
                     $exePath = "$installBase\Microsoft VS Code Insiders\bin\code-insiders.cmd"
                 }
 
-                'Insiders-User' {
+                'Insider-User' {
                     $exePath = "${env:LocalAppData}\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
                 }
             }
@@ -310,12 +310,12 @@ function Get-CodePlatformInformation {
             break
         }
 
-        'Insiders-System' {
+        'Insider-System' {
             $channel = 'insider'
             break
         }
 
-        'Insiders-User' {
+        'Insider-User' {
             $channel = 'insider'
             $platform += '-user'
             break
@@ -419,6 +419,7 @@ try {
     # Download the installer
     $tmpdir = [System.IO.Path]::GetTempPath()
 
+    $ext = $codePlatformInfo.Extension
     $installerName = "vscode-install.$ext"
 
     $installerPath = [System.IO.Path]::Combine($tmpdir, $installerName)
@@ -427,7 +428,7 @@ try {
         Save-WithBitsTransfer -FileUri $codePlatformInfo.FileUri -Destination $installerPath -AppName $codePlatformInfo.AppName
     }
     else {
-        Invoke-WebRequest -Uri $FileUri -OutFile $installerPath
+        Invoke-WebRequest -Uri $codePlatformInfo.FileUri -OutFile $installerPath
     }
 
     # Install VSCode
@@ -517,6 +518,7 @@ try {
 
         if ($WhatIfPreference) {
             Write-Host "Launching $appName from $codeExePath"
+            return
         }
 
         Write-Host "`nInstallation complete, starting $appName...`n`n" -ForegroundColor Green
