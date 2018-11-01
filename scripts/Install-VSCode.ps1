@@ -434,29 +434,47 @@ try
     switch ($codePlatformInfo.Extension) {
         # On Debian-like Linux distros
         'deb' {
+            if ($WhatIfPreference) {
+                Write-Host "WhatIf: apt install $installerPath"
+                break
+            }
             apt install $installerPath
             break
         }
 
         # On RedHat-list Linux distros
         'rpm' {
+            if ($WhatIfPreference) {
+                Write-Host "WhatIf: rpm -ivh $installerPath"
+                break
+            }
             rpm -ivh $installerPath
             break
         }
 
         # On Windows
         'exe' {
+            $exeArgs = '/verysilent /tasks=addtopath'
             if ($EnableContextMenus) {
-                Start-Process -Wait $installerPath -ArgumentList "/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath"
+                $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath'
+            }
+
+            if ($WhatIfPreference) {
+                Write-Host "WhatIf: Running $installerPath with args '$exeArgs'"
                 break
             }
 
-            Start-Process -Wait $installerPath -ArgumentList "/verysilent /tasks=addtopath"
+            Start-Process -Wait $installerPath -ArgumentList $exeArgs
             break
         }
 
         # On Mac
         'zip' {
+            if ($WhatIfPreference) {
+                Write-Host "Expanding zip $installerPath and moving to /Applications/"
+                break
+            }
+
             $zipDirPath = [System.IO.Path]::Combine($tmpdir, 'VSCode')
             Expand-Archive -LiteralPath $installerPath -DestinationPath $zipDirPath -Force
             Move-Item "$zipDirPath/*.app" '/Applications/'
@@ -465,6 +483,11 @@ try
 
         # Remaining Linux distros using tar - more complicated
         'tar.gz' {
+            if ($WhatIfPreference) {
+                Write-Host "Expanding tar $installerPath, moving to /opt/ and symlinking"
+                break
+            }
+
             Install-VSCodeFromTar -TarPath $installerPath -Insiders:($BuildEdition -ne 'Stable')
             break
         }
@@ -478,14 +501,24 @@ try
 
     # Install any extensions
     $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
-    foreach ($extension in $extensions) {
-        Write-Host "`nInstalling extension $extension..." -ForegroundColor Yellow
-        & $codeExePath --install-extension $extension
+    if ($WhatIfPreference) {
+        Write-Host ("Installing extensions: " + ($extensions -join ','))
+    }
+    else {
+        foreach ($extension in $extensions) {
+            Write-Host "`nInstalling extension $extension..." -ForegroundColor Yellow
+            & $codeExePath --install-extension $extension
+        }
     }
 
     # Launch if requested
     if ($LaunchWhenDone) {
         $appName = $codePlatformInfo.AppName
+
+        if ($WhatIfPreference) {
+            Write-Host "Launching $appName from $codeExePath"
+        }
+
         Write-Host "`nInstallation complete, starting $appName...`n`n" -ForegroundColor Green
         & $codeExePath
         return
