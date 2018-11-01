@@ -481,7 +481,7 @@ try {
 
             # The deb file contains the information to install its own repository,
             # so we just need to install it
-            apt install $installerPath
+            apt install -y $installerPath
             break
         }
 
@@ -501,22 +501,22 @@ try {
             switch ($pacMan) {
                 'zypper' {
                     $script:VSCodeZypperRepoEntry > /etc/zypp/repos.d/vscode.repo
-                    zypper refresh
+                    zypper refresh -y
                 }
 
                 default {
                     $script:VSCodeYumRepoEntry > /etc/yum.repos.d/vscode.repo
-                    & $pacMan check-update
+                    & $pacMan check-update -y
                 }
             }
 
             switch ($BuildEdition) {
                 'Stable' {
-                    & $pacMan install code
+                    & $pacMan install -y code
                 }
 
                 default {
-                    & $pacMan install code-insiders
+                    & $pacMan install -y code-insiders
                 }
             }
             break
