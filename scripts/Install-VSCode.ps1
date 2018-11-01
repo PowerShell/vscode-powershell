@@ -175,6 +175,10 @@ function Get-AvailablePackageManager
     if (Get-Command 'yum' -ErrorAction SilentlyContinue) {
         return 'yum'
     }
+
+    if (Get-Command 'zypper' -ErrorAction SilentlyContinue) {
+        return 'zypper'
+    }
 }
 
 function Get-CodePlatformInformation {
@@ -239,7 +243,7 @@ function Get-CodePlatformInformation {
                     break
                 }
 
-                { 'dnf','yum' -contains $_ } {
+                { 'dnf','yum','zypper' -contains $_ } {
                     $platform = 'linux-rpm-x64'
                     $ext = 'rpm'
                     break
