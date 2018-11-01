@@ -142,20 +142,16 @@ param(
     [switch]$EnableContextMenus
 )
 
-function Test-IsOsX64
-{
-    if ($PSVersionTable.PSVersion.Major -lt 6)
-    {
+function Test-IsOsX64 {
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
         return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit"
     }
 
     return [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::X64
 }
 
-function Get-LinuxReleaseInfo
-{
-    if (-not (Test-Path '/etc/*-release'))
-    {
+function Get-LinuxReleaseInfo {
+    if (-not (Test-Path '/etc/*-release')) {
         return $null
     }
 
@@ -306,8 +302,7 @@ function Get-CodePlatformInformation {
         }
     }
 
-    switch ($BuildEdition)
-    {
+    switch ($BuildEdition) {
         'Stable' {
             $channel = 'stable'
             break
@@ -407,8 +402,7 @@ function Install-VSCodeFromTar {
     ln -s "$destDir/code" /usr/bin/code
 }
 
-try
-{
+try {
     $prevProgressPreference = $ProgressPreference
 
     $onWindows = $IsWindows -or $PSVersionTable.PSVersion.Major -lt 6
