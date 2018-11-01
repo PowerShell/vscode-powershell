@@ -154,6 +154,16 @@ gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 "@
 
+$script:VSCodeZypperRepoEntry = @"
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+type=rpm-md
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+"@
+
 function Test-IsOsArchX64 {
     if ($PSVersionTable.PSVersion.Major -lt 6) {
         return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit"
@@ -450,7 +460,8 @@ try {
     if ($onWindows) {
         Save-WithBitsTransfer -FileUri $codePlatformInfo.FileUri -Destination $installerPath -AppName $codePlatformInfo.AppName
     }
-    else {
+    # We don't want to use RPM packages -- see the installation step below
+    elseif ($codePlatformInfo.Extension -ne 'rpm') {
         Invoke-WebRequest -Uri $codePlatformInfo.FileUri -OutFile $installerPath
     }
 
@@ -469,7 +480,9 @@ try {
             break
         }
 
-        # On RedHat-list Linux distros
+        # On distros using rpm packages, the RPM package doesn't set up the repo.
+        # To install VSCode properly in way that the package manager tracks it,
+        # we have to do things the hard way - install the repo and install the package
         'rpm' {
             $pacMan = $codePlatformInfo.PackageManager
             if ($WhatIfPreference) {
@@ -479,10 +492,28 @@ try {
 
             # Install the VSCode repo with the package manager
             rpm --import https://packages.microsoft.com/keys/microsoft.asc
-            $script:VSCodeYumRepoEntry > /etc/yum.repos.d/vscode.repo
 
-            # Use dnf or yum depending on the detected package manager
-            & $pacMan install $installerPath
+            switch ($pacMan) {
+                'zypper' {
+                    $script:VSCodeZypperRepoEntry > /etc/zypp/repos.d/vscode.repo
+                    zypper refresh
+                }
+
+                default {
+                    $script:VSCodeYumRepoEntry > /etc/yum.repos.d/vscode.repo
+                    & $pacMan check-update
+                }
+            }
+
+            switch ($BuildEdition) {
+                'Stable' {
+                    & $pacMan install code
+                }
+
+                default {
+                    & $pacMan install code-insiders
+                }
+            }
             break
         }
 
