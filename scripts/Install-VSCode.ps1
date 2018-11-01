@@ -440,7 +440,7 @@ function Install-VSCodeFromTar {
 # We need to be running as elevated on *nix
 if ($IsLinux -or $IsMacOS) {
     if ((id -u) -ne 0) {
-        throw "Must be running as root to install VSCode"
+        throw "Must be running as root to install VSCode.`nInvoke this script with (for example):`n`tsudo pwsh -f Install-VSCode.ps1 -BuildEdition Stable"
     }
 }
 
