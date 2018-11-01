@@ -139,7 +139,9 @@ param(
 
     [switch]$LaunchWhenDone,
 
-    [switch]$EnableContextMenus
+    [switch]$EnableContextMenus,
+
+    [switch]$WhatIf
 )
 
 function Test-IsOsX64 {
@@ -404,6 +406,10 @@ function Install-VSCodeFromTar {
 
 try {
     $prevProgressPreference = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue'
+
+    $prevWhatIfPreference = $WhatIfPreference
+    $WhatIfPreference = $WhatIfPreference -or $WhatIf
 
     $onWindows = $IsWindows -or $PSVersionTable.PSVersion.Major -lt 6
 
@@ -522,4 +528,5 @@ try {
 }
 finally {
     $ProgressPreference = $prevProgressPreference
+    $WhatIfPreference = $prevWhatIfPreference
 }
