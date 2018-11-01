@@ -322,7 +322,7 @@ function Get-CodePlatformInformation {
         }
     }
 
-    $info = @{
+    return @{
         AppName = $appName
         ExePath = $exePath
         Platform = $platform
@@ -330,8 +330,6 @@ function Get-CodePlatformInformation {
         FileUri = "https://vscode-update.azurewebsites.net/latest/$platform/$channel"
         Extension = $ext
     }
-
-    return $info
 }
 
 function Save-WithBitsTransfer {
