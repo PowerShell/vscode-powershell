@@ -437,6 +437,13 @@ function Install-VSCodeFromTar {
     ln -s "$destDir/code" /usr/bin/code
 }
 
+# We need to be running as elevated on *nix
+if ($IsLinux -or $IsMacOS) {
+    if ((id -u) -ne 0) {
+        throw "Must be running as root to install VSCode"
+    }
+}
+
 try {
     $prevProgressPreference = $ProgressPreference
     $ProgressPreference = 'SilentlyContinue'
@@ -568,6 +575,11 @@ try {
     $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
     if ($WhatIfPreference) {
         Write-Host ("Installing extensions: " + ($extensions -join ','))
+    }
+    elseif ($IsLinux -or $IsMacOS) {
+        # On *nix we need to install extensions as the user -- VSCode refuses root
+        $extsSlashes = $extensions -join '/'
+        sudo -H -u $env:SUDO_USER pwsh -c "`$exts = $extsSlashes -split '/'; foreach (`$e in `$exts) { $codeExePath --install-extension `$e }"
     }
     else {
         foreach ($extension in $extensions) {
