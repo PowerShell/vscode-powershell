@@ -306,7 +306,7 @@ function Get-CodePlatformInformation {
                 '64-bit' {
                     $installBase = ${env:ProgramFiles}
 
-                    if (Test-IsOsX64) {
+                    if (Test-IsOsArchX64) {
                         $platform = 'win32-x64'
                         break
                     }
