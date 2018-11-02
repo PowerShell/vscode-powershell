@@ -449,8 +449,6 @@ try {
     $prevWhatIfPreference = $WhatIfPreference
     $WhatIfPreference = $WhatIfPreference -or $WhatIf
 
-    $onWindows = $IsWindows -or $PSVersionTable.PSVersion.Major -lt 6
-
     # Get information required for installation
     $codePlatformInfo = Get-CodePlatformInformation -Bitness $Architecture -BuildEdition $BuildEdition
 
@@ -462,7 +460,7 @@ try {
 
     $installerPath = [System.IO.Path]::Combine($tmpdir, $installerName)
 
-    if ($onWindows) {
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
         Save-WithBitsTransfer -FileUri $codePlatformInfo.FileUri -Destination $installerPath -AppName $codePlatformInfo.AppName
     }
     # We don't want to use RPM packages -- see the installation step below
