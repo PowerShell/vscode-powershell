@@ -123,7 +123,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [parameter()]
     [ValidateSet(, "64-bit", "32-bit")]
@@ -140,8 +140,6 @@ param(
     [switch]$LaunchWhenDone,
 
     [switch]$EnableContextMenus,
-
-    [switch]$WhatIf
 )
 
 # Taken from https://code.visualstudio.com/docs/setup/linux#_installation
@@ -446,9 +444,6 @@ try {
     $prevProgressPreference = $ProgressPreference
     $ProgressPreference = 'SilentlyContinue'
 
-    $prevWhatIfPreference = $WhatIfPreference
-    $WhatIfPreference = $WhatIfPreference -or $WhatIf
-
     # Get information required for installation
     $codePlatformInfo = Get-CodePlatformInformation -Bitness $Architecture -BuildEdition $BuildEdition
 
@@ -472,8 +467,7 @@ try {
     switch ($codePlatformInfo.Extension) {
         # On Debian-like Linux distros
         'deb' {
-            if ($WhatIfPreference) {
-                Write-Host "WhatIf: apt install $installerPath"
+            if (-not $PSCmdlet.ShouldProcess($installerPath, 'apt install -y')) {
                 break
             }
 
@@ -488,8 +482,7 @@ try {
         # we have to do things the hard way - install the repo and install the package
         'rpm' {
             $pacMan = $codePlatformInfo.PackageManager
-            if ($WhatIfPreference) {
-                Write-Host "WhatIf: $pacMan install $installerPath"
+            if (-not $PSCmdlet.ShouldProcess($installerPath, "$pacMan install -y")) {
                 break
             }
 
@@ -527,8 +520,7 @@ try {
                 $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath'
             }
 
-            if ($WhatIfPreference) {
-                Write-Host "WhatIf: Running $installerPath with args '$exeArgs'"
+            if (-not $PSCmdlet.ShouldProcess("$installerPath $exeArgs", 'Start-Process -Wait')) {
                 break
             }
 
@@ -538,8 +530,7 @@ try {
 
         # On Mac
         'zip' {
-            if ($WhatIfPreference) {
-                Write-Host "Expanding zip $installerPath and moving to /Applications/"
+            if (-not $PSCmdlet.ShouldProcess($installerPath, "Expand-Archive -DestinationPath $zipDirPath -Force; Move-Item $zipDirPath/*.app /Applications/")) {
                 break
             }
 
@@ -551,8 +542,7 @@ try {
 
         # Remaining Linux distros using tar - more complicated
         'tar.gz' {
-            if ($WhatIfPreference) {
-                Write-Host "Expanding tar $installerPath, moving to /opt/ and symlinking"
+            if (-not $PSCmdlet.ShouldProcess($installerPath, 'Install-VSCodeFromTar (expand, move to /opt/, symlink)')) {
                 break
             }
 
@@ -569,18 +559,17 @@ try {
 
     # Install any extensions
     $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
-    if ($WhatIfPreference) {
-        Write-Host ("Installing extensions: " + ($extensions -join ','))
-    }
-    elseif ($IsLinux -or $IsMacOS) {
-        # On *nix we need to install extensions as the user -- VSCode refuses root
-        $extsSlashes = $extensions -join '/'
-        sudo -H -u $env:SUDO_USER pwsh -c "`$exts = '$extsSlashes' -split '/'; foreach (`$e in `$exts) { $codeExePath --install-extension `$e }"
-    }
-    else {
-        foreach ($extension in $extensions) {
-            Write-Host "`nInstalling extension $extension..." -ForegroundColor Yellow
-            & $codeExePath --install-extension $extension
+    if ($PSCmdlet.ShouldProcess(($extensions -join ','), "$codeExePath --install-extension")) {
+        if ($IsLinux -or $IsMacOS) {
+            # On *nix we need to install extensions as the user -- VSCode refuses root
+            $extsSlashes = $extensions -join '/'
+            sudo -H -u $env:SUDO_USER pwsh -c "`$exts = '$extsSlashes' -split '/'; foreach (`$e in `$exts) { $codeExePath --install-extension `$e }"
+        }
+        else {
+            foreach ($extension in $extensions) {
+                Write-Host "`nInstalling extension $extension..." -ForegroundColor Yellow
+                & $codeExePath --install-extension $extension
+            }
         }
     }
 
@@ -588,8 +577,7 @@ try {
     if ($LaunchWhenDone) {
         $appName = $codePlatformInfo.AppName
 
-        if ($WhatIfPreference) {
-            Write-Host "Launching $appName from $codeExePath"
+        if (-not $PSCmdlet.ShouldProcess($appName, "Launch with $codeExePath")) {
             return
         }
 
@@ -602,5 +590,4 @@ try {
 }
 finally {
     $ProgressPreference = $prevProgressPreference
-    $WhatIfPreference = $prevWhatIfPreference
 }
