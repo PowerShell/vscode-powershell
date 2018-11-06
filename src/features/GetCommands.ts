@@ -6,10 +6,23 @@ import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
 
-// TODO: Document this export: https://github.com/PowerShell/vscode-powershell/pull/1406#discussion_r209325655
-// TODO: Also use something other than any if possible... We may have already addressed this with a previous attempt.
-export const GetCommandRequestType = new RequestType<any, any, void, void>("powerShell/getCommand");
+interface ICommand {
+    name: string;
+    moduleName: string;
+    defaultParameterSet: string;
+    parameterSets: object;
+    parameters: object;
+}
 
+/**
+ * RequestType sent over to PSES.
+ * Expects: ICommand to be returned
+ */
+export const GetCommandRequestType = new RequestType<string, any, void, void>("powerShell/getCommand");
+
+/**
+ * A PowerShell Command listing feature. Implements a treeview control.
+ */
 export class GetCommandsFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
@@ -77,8 +90,7 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     }
 }
 
-// TODO: Define and export an ICommand interface to describe the properties we require.
-function toCommand(command: any): Command {
+function toCommand(command: ICommand): Command {
     return new Command(
         command.name,
         command.moduleName,
@@ -111,4 +123,5 @@ class Command extends vscode.TreeItem {
         return [];
         // Returning an empty array because we need to return something.
     }
+
 }
