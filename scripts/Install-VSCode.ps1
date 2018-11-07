@@ -460,7 +460,7 @@ try {
     }
     # We don't want to use RPM packages -- see the installation step below
     elseif ($codePlatformInfo.Extension -ne 'rpm') {
-        if ($PSCmdlet.ShouldProcess($codePlatformInfo.FileUri, "Invoke-WebRequest -OutFile $installerPath") {
+        if ($PSCmdlet.ShouldProcess($codePlatformInfo.FileUri, "Invoke-WebRequest -OutFile $installerPath")) {
             Invoke-WebRequest -Uri $codePlatformInfo.FileUri -OutFile $installerPath
         }
     }
