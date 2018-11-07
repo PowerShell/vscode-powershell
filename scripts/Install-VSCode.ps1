@@ -139,7 +139,7 @@ param(
 
     [switch]$LaunchWhenDone,
 
-    [switch]$EnableContextMenus,
+    [switch]$EnableContextMenus
 )
 
 # Taken from https://code.visualstudio.com/docs/setup/linux#_installation
