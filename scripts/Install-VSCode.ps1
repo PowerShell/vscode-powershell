@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.2
+.VERSION 1.3
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -123,7 +123,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 #>
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [parameter()]
     [ValidateSet(, "64-bit", "32-bit")]
@@ -134,9 +134,6 @@ param(
     [string]$BuildEdition = "Stable",
 
     [Parameter()]
-    [switch]$User,
-
-    [Parameter()]
     [ValidateNotNull()]
     [string[]]$AdditionalExtensions = @(),
 
@@ -145,106 +142,456 @@ param(
     [switch]$EnableContextMenus
 )
 
-if (($PSVersionTable.PSVersion.Major -le 5) -or $IsWindows) {
-    switch ($Architecture) {
-        "64-bit" {
-            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit") {
-                $codePath = $env:ProgramFiles
-                $bitVersion = "win32-x64"
-            }
-            else {
-                $codePath = $env:ProgramFiles
-                $bitVersion = "win32"
-                $Architecture = "32-bit"
-            }
-            break;
-        }
-        "32-bit" {
-            if ((Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "32-bit") {
-                $codePath = $env:ProgramFiles
-                $bitVersion = "win32"
-            }
-            else {
-                $codePath = ${env:ProgramFiles(x86)}
-                $bitVersion = "win32"
-            }
-            break;
-        }
+# Taken from https://code.visualstudio.com/docs/setup/linux#_installation
+$script:VSCodeYumRepoEntry = @"
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+"@
+
+$script:VSCodeZypperRepoEntry = @"
+[code]
+name=Visual Studio Code
+baseurl=https://packages.microsoft.com/yumrepos/vscode
+enabled=1
+type=rpm-md
+gpgcheck=1
+gpgkey=https://packages.microsoft.com/keys/microsoft.asc
+"@
+
+function Test-IsOsArchX64 {
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+        return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit"
     }
-    switch ($BuildEdition) {
-        "Stable" {
-            $codeCmdPath = "$codePath\Microsoft VS Code\bin\code.cmd"
-            $appName = "Visual Studio Code ($($Architecture))"
-            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/stable"
 
-            break;
-        }
-        "Insider-System" {
-            $codeCmdPath = "$codePath\Microsoft VS Code Insiders\bin\code-insiders.cmd"
-            $appName = "Visual Studio Code - Insiders Edition ($($Architecture))"
-            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)/insider"
+    return [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::X64
+}
 
-            break;
-        }
-        "Insider-User" {
-            $codeCmdPath = "$env:LocalAppData\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
-            $appName = "Visual Studio Code - Insiders Edition ($($Architecture) - User)"
-            $fileUri = "https://vscode-update.azurewebsites.net/latest/$($bitVersion)-user/insider"
-            break;
-        }
+function Get-AvailablePackageManager
+{
+    if (Get-Command 'apt' -ErrorAction SilentlyContinue) {
+        return 'apt'
     }
-    try {
-        $ProgressPreference = 'SilentlyContinue'
 
-        if (!(Test-Path $codeCmdPath)) {
-            Write-Host "`nDownloading latest $appName..." -ForegroundColor Yellow
-            Remove-Item -Force "$env:TEMP\vscode-$($BuildEdition).exe" -ErrorAction SilentlyContinue
-            $bitsDl = Start-BitsTransfer $fileUri -Destination "$env:TEMP\vscode-$($BuildEdition).exe" -Asynchronous
-            while (($bitsDL.JobState -eq "Transferring") -or ($bitsDL.JobState -eq "Connecting")) {
-                Write-Progress -Activity "Downloading: $AppName" -Status "$([math]::round($bitsDl.BytesTransferred / 1mb))mb / $([math]::round($bitsDl.BytesTotal / 1mb))mb" -PercentComplete ($($bitsDl.BytesTransferred) / $($bitsDl.BytesTotal) * 100 )
-            }
-            switch ($bitsDl.JobSTate) {
-                "Transferred" {
-                    Complete-BitsTransfer -BitsJob $bitsDl
-                    break;
-                }
-                "Error" {
-                    throw "Error downloading installation media."
-                    break;
-                }
-            }
-
-
-            Write-Host "`nInstalling $appName..." -ForegroundColor Yellow
-            if ($EnableContextMenus) {
-                Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList "/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath"
-            }
-            else {
-                Start-Process -Wait "$env:TEMP\vscode-$($BuildEdition).exe" -ArgumentList "/verysilent /tasks=addtopath"
-            }
-        }
-        else {
-            Write-Host "`n$appName is already installed." -ForegroundColor Yellow
-        }
-
-        $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
-        foreach ($extension in $extensions) {
-            Write-Host "`nInstalling extension $extension..." -ForegroundColor Yellow
-            & $codeCmdPath --install-extension $extension
-        }
-
-        if ($LaunchWhenDone) {
-            Write-Host "`nInstallation complete, starting $appName...`n`n" -ForegroundColor Green
-            & $codeCmdPath
-        }
-        else {
-            Write-Host "`nInstallation complete!`n`n" -ForegroundColor Green
-        }
+    if (Get-Command 'dnf' -ErrorAction SilentlyContinue) {
+        return 'dnf'
     }
-    finally {
-        $ProgressPreference = 'Continue'
+
+    if (Get-Command 'yum' -ErrorAction SilentlyContinue) {
+        return 'yum'
+    }
+
+    if (Get-Command 'zypper' -ErrorAction SilentlyContinue) {
+        return 'zypper'
     }
 }
-else {
-    Write-Error "This script is currently only supported on the Windows operating system."
+
+function Get-CodePlatformInformation {
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('32-bit', '64-bit')]
+        [string]
+        $Bitness,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateSet('Stable', 'Insider-System', 'Insider-User')]
+        [string]
+        $BuildEdition
+    )
+
+    if ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) {
+        $os = 'Windows'
+    }
+    elseif ($IsLinux) {
+        $os = 'Linux'
+    }
+    elseif ($IsMacOS) {
+        $os = 'MacOS'
+    }
+    else {
+        throw 'Could not identify operating system'
+    }
+
+    if ($Bitness -ne '64-bit' -and $os -ne 'Windows') {
+        throw "Non-64-bit *nix systems are not supported"
+    }
+
+    if ($BuildEdition.EndsWith('User') -and $os -ne 'Windows') {
+        throw 'User builds are not available for non-Windows systems'
+    }
+
+    switch ($BuildEdition) {
+        'Stable' {
+            $appName = "Visual Studio Code ($Bitness)"
+            break
+        }
+
+        'Insider-System' {
+            $appName = "Visual Studio Code - Insiders Edition ($Bitness)"
+            break
+        }
+
+        'Insider-User' {
+            $appName = "Visual Studio Code - Insiders Edition ($($Architecture) - User)"
+            break
+        }
+    }
+
+    switch ($os) {
+        'Linux' {
+            $pacMan = Get-AvailablePackageManager
+
+            switch ($pacMan) {
+                'apt' {
+                    $platform = 'linux-deb-x64'
+                    $ext = 'deb'
+                    break
+                }
+
+                { 'dnf','yum','zypper' -contains $_ } {
+                    $platform = 'linux-rpm-x64'
+                    $ext = 'rpm'
+                    break
+                }
+
+                default {
+                    $platform = 'linux-x64'
+                    $ext = 'tar.gz'
+                    break
+                }
+            }
+
+            if ($BuildEdition.StartsWith('Insider')) {
+                $exePath = '/usr/bin/code-insiders'
+                break
+            }
+
+            $exePath = '/usr/bin/code'
+            break
+        }
+
+        'MacOS' {
+            $platform = 'darwin'
+            $ext = 'zip'
+
+            if ($BuildEdition.StartsWith('Insider')) {
+                $exePath = '/usr/local/bin/code-insiders'
+                break
+            }
+
+            $exePath = '/usr/local/bin/code'
+            break
+        }
+
+        'Windows' {
+            $ext = 'exe'
+            switch ($Bitness) {
+                '32-bit' {
+                    $platform = 'win32'
+
+                    if (Test-IsOsArchX64) {
+                        $installBase = ${env:ProgramFiles(x86)}
+                        break
+                    }
+
+                    $installBase = ${env:ProgramFiles}
+                    break
+                }
+
+                '64-bit' {
+                    $installBase = ${env:ProgramFiles}
+
+                    if (Test-IsOsArchX64) {
+                        $platform = 'win32-x64'
+                        break
+                    }
+
+                    Write-Warning '64-bit install requested on 32-bit system. Installing 32-bit VSCode'
+                    $platform = 'win32'
+                    break
+                }
+            }
+
+            switch ($BuildEdition) {
+                'Stable' {
+                    $exePath = "$installBase\Microsoft VS Code\bin\code.cmd"
+                }
+
+                'Insider-System' {
+                    $exePath = "$installBase\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+                }
+
+                'Insider-User' {
+                    $exePath = "${env:LocalAppData}\Programs\Microsoft VS Code Insiders\bin\code-insiders.cmd"
+                }
+            }
+        }
+    }
+
+    switch ($BuildEdition) {
+        'Stable' {
+            $channel = 'stable'
+            break
+        }
+
+        'Insider-System' {
+            $channel = 'insider'
+            break
+        }
+
+        'Insider-User' {
+            $channel = 'insider'
+            $platform += '-user'
+            break
+        }
+    }
+
+    $info = @{
+        AppName = $appName
+        ExePath = $exePath
+        Platform = $platform
+        Channel = $channel
+        FileUri = "https://vscode-update.azurewebsites.net/latest/$platform/$channel"
+        Extension = $ext
+    }
+
+    if ($pacMan) {
+        $info['PackageManager'] = $pacMan
+    }
+
+    return $info
+}
+
+function Save-WithBitsTransfer {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        $FileUri,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Destination,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $AppName
+    )
+
+    Write-Host "`nDownloading latest $AppName..." -ForegroundColor Yellow
+
+    Remove-Item -Force $Destination -ErrorAction SilentlyContinue
+
+    $bitsDl = Start-BitsTransfer $FileUri -Destination $Destination -Asynchronous
+
+    while (($bitsDL.JobState -eq "Transferring") -or ($bitsDL.JobState -eq "Connecting")) {
+        Write-Progress -Activity "Downloading: $AppName" -Status "$([math]::round($bitsDl.BytesTransferred / 1mb))mb / $([math]::round($bitsDl.BytesTotal / 1mb))mb" -PercentComplete ($($bitsDl.BytesTransferred) / $($bitsDl.BytesTotal) * 100 )
+    }
+
+    switch ($bitsDl.JobState) {
+
+        "Transferred" {
+            Complete-BitsTransfer -BitsJob $bitsDl
+            break
+        }
+
+        "Error" {
+            throw "Error downloading installation media."
+        }
+    }
+}
+
+function Install-VSCodeFromTar {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        $TarPath,
+
+        [Parameter()]
+        [switch]
+        $Insiders
+    )
+
+    $tarDir = Join-Path ([System.IO.Path]::GetTempPath()) 'VSCodeTar'
+    $destDir = "/opt/VSCode-linux-x64"
+
+    New-Item -ItemType Directory -Force -Path $tarDir
+    try {
+        Push-Location $tarDir
+        tar xf $TarPath
+        Move-Item -LiteralPath "$tarDir/VSCode-linux-x64" $destDir
+    }
+    finally {
+        Pop-Location
+    }
+
+    if ($Insiders) {
+        ln -s "$destDir/code-insiders" /usr/bin/code-insiders
+        return
+    }
+
+    ln -s "$destDir/code" /usr/bin/code
+}
+
+# We need to be running as elevated on *nix
+if (($IsLinux -or $IsMacOS) -and (id -u) -ne 0) {
+    throw "Must be running as root to install VSCode.`nInvoke this script with (for example):`n`tsudo pwsh -f Install-VSCode.ps1 -BuildEdition Stable"
+}
+
+try {
+    $prevProgressPreference = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue'
+
+    # Get information required for installation
+    $codePlatformInfo = Get-CodePlatformInformation -Bitness $Architecture -BuildEdition $BuildEdition
+
+    # Download the installer
+    $tmpdir = [System.IO.Path]::GetTempPath()
+
+    $ext = $codePlatformInfo.Extension
+    $installerName = "vscode-install.$ext"
+
+    $installerPath = [System.IO.Path]::Combine($tmpdir, $installerName)
+
+    if ($PSVersionTable.PSVersion.Major -le 5) {
+        Save-WithBitsTransfer -FileUri $codePlatformInfo.FileUri -Destination $installerPath -AppName $codePlatformInfo.AppName
+    }
+    # We don't want to use RPM packages -- see the installation step below
+    elseif ($codePlatformInfo.Extension -ne 'rpm') {
+        if ($PSCmdlet.ShouldProcess($codePlatformInfo.FileUri, "Invoke-WebRequest -OutFile $installerPath")) {
+            Invoke-WebRequest -Uri $codePlatformInfo.FileUri -OutFile $installerPath
+        }
+    }
+
+    # Install VSCode
+    switch ($codePlatformInfo.Extension) {
+        # On Debian-like Linux distros
+        'deb' {
+            if (-not $PSCmdlet.ShouldProcess($installerPath, 'apt install -y')) {
+                break
+            }
+
+            # The deb file contains the information to install its own repository,
+            # so we just need to install it
+            apt install -y $installerPath
+            break
+        }
+
+        # On distros using rpm packages, the RPM package doesn't set up the repo.
+        # To install VSCode properly in way that the package manager tracks it,
+        # we have to do things the hard way - install the repo and install the package
+        'rpm' {
+            $pacMan = $codePlatformInfo.PackageManager
+            if (-not $PSCmdlet.ShouldProcess($installerPath, "$pacMan install -y")) {
+                break
+            }
+
+            # Install the VSCode repo with the package manager
+            rpm --import https://packages.microsoft.com/keys/microsoft.asc
+
+            switch ($pacMan) {
+                'zypper' {
+                    $script:VSCodeZypperRepoEntry > /etc/zypp/repos.d/vscode.repo
+                    zypper refresh -y
+                }
+
+                default {
+                    $script:VSCodeYumRepoEntry > /etc/yum.repos.d/vscode.repo
+                    & $pacMan check-update -y
+                }
+            }
+
+            switch ($BuildEdition) {
+                'Stable' {
+                    & $pacMan install -y code
+                }
+
+                default {
+                    & $pacMan install -y code-insiders
+                }
+            }
+            break
+        }
+
+        # On Windows
+        'exe' {
+            $exeArgs = '/verysilent /tasks=addtopath'
+            if ($EnableContextMenus) {
+                $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath'
+            }
+
+            if (-not $PSCmdlet.ShouldProcess("$installerPath $exeArgs", 'Start-Process -Wait')) {
+                break
+            }
+
+            Start-Process -Wait $installerPath -ArgumentList $exeArgs
+            break
+        }
+
+        # On Mac
+        'zip' {
+            if (-not $PSCmdlet.ShouldProcess($installerPath, "Expand-Archive -DestinationPath $zipDirPath -Force; Move-Item $zipDirPath/*.app /Applications/")) {
+                break
+            }
+
+            $zipDirPath = [System.IO.Path]::Combine($tmpdir, 'VSCode')
+            Expand-Archive -LiteralPath $installerPath -DestinationPath $zipDirPath -Force
+            Move-Item "$zipDirPath/*.app" '/Applications/'
+            break
+        }
+
+        # Remaining Linux distros using tar - more complicated
+        'tar.gz' {
+            if (-not $PSCmdlet.ShouldProcess($installerPath, 'Install-VSCodeFromTar (expand, move to /opt/, symlink)')) {
+                break
+            }
+
+            Install-VSCodeFromTar -TarPath $installerPath -Insiders:($BuildEdition -ne 'Stable')
+            break
+        }
+
+        default {
+            throw "Unkown package type: $($codePlatformInfo.Extension)"
+        }
+    }
+
+    $codeExePath = $codePlatformInfo.ExePath
+
+    # Install any extensions
+    $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
+    if ($PSCmdlet.ShouldProcess(($extensions -join ','), "$codeExePath --install-extension")) {
+        if ($IsLinux -or $IsMacOS) {
+            # On *nix we need to install extensions as the user -- VSCode refuses root
+            $extsSlashes = $extensions -join '/'
+            sudo -H -u $env:SUDO_USER pwsh -c "`$exts = '$extsSlashes' -split '/'; foreach (`$e in `$exts) { $codeExePath --install-extension `$e }"
+        }
+        else {
+            foreach ($extension in $extensions) {
+                Write-Host "`nInstalling extension $extension..." -ForegroundColor Yellow
+                & $codeExePath --install-extension $extension
+            }
+        }
+    }
+
+    # Launch if requested
+    if ($LaunchWhenDone) {
+        $appName = $codePlatformInfo.AppName
+
+        if (-not $PSCmdlet.ShouldProcess($appName, "Launch with $codeExePath")) {
+            return
+        }
+
+        Write-Host "`nInstallation complete, starting $appName...`n`n" -ForegroundColor Green
+        & $codeExePath
+        return
+    }
+
+    if ($PSCmdlet.ShouldProcess('Installation complete!', 'Write-Host')) {
+        Write-Host "`nInstallation complete!`n`n" -ForegroundColor Green
+    }
+}
+finally {
+    $ProgressPreference = $prevProgressPreference
 }
