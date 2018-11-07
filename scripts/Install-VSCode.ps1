@@ -455,12 +455,14 @@ try {
 
     $installerPath = [System.IO.Path]::Combine($tmpdir, $installerName)
 
-    if ($PSVersionTable.PSVersion.Major -lt 6) {
+    if ($PSVersionTable.PSVersion.Major -le 5) {
         Save-WithBitsTransfer -FileUri $codePlatformInfo.FileUri -Destination $installerPath -AppName $codePlatformInfo.AppName
     }
     # We don't want to use RPM packages -- see the installation step below
     elseif ($codePlatformInfo.Extension -ne 'rpm') {
-        Invoke-WebRequest -Uri $codePlatformInfo.FileUri -OutFile $installerPath
+        if ($PSCmdlet.ShouldProcess($codePlatformInfo.FileUri, "Invoke-WebRequest -OutFile $installerPath") {
+            Invoke-WebRequest -Uri $codePlatformInfo.FileUri -OutFile $installerPath
+        }
     }
 
     # Install VSCode
@@ -586,7 +588,9 @@ try {
         return
     }
 
-    Write-Host "`nInstallation complete!`n`n" -ForegroundColor Green
+    if ($PSCmdlet.ShouldProcess('Installation complete!', 'Write-Host') {
+        Write-Host "`nInstallation complete!`n`n" -ForegroundColor Green
+    }
 }
 finally {
     $ProgressPreference = $prevProgressPreference
