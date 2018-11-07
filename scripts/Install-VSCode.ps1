@@ -588,7 +588,7 @@ try {
         return
     }
 
-    if ($PSCmdlet.ShouldProcess('Installation complete!', 'Write-Host') {
+    if ($PSCmdlet.ShouldProcess('Installation complete!', 'Write-Host')) {
         Write-Host "`nInstallation complete!`n`n" -ForegroundColor Green
     }
 }
