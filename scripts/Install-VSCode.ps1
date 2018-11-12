@@ -25,6 +25,8 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    07/11/2018 - added support for PowerShell Core and macOS/Linux platforms.
+    --
     15/08/2018 - added functionality to install the new "User Install" variant of Insiders Edition.
     --
     21/03/2018 - added functionality to install the VSCode context menus. Also, VSCode is now always added to the search path
