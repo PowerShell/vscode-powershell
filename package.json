@@ -37,7 +37,6 @@
     "onCommand:PowerShell.RestartSession"
   ],
   "dependencies": {
-    "vscode": "~1.1.21",
     "vscode-languageclient": "~5.0.0"
   },
   "devDependencies": {
@@ -46,7 +45,8 @@
     "mocha": "^4.0.1",
     "tslint": "~5.11.0",
     "typescript": "~3.0.1",
-    "vsce": "~1.46.0"
+    "vsce": "~1.46.0",
+    "vscode": "~1.1.21"
   },
   "extensionDependencies": [
     "vscode.powershell"
