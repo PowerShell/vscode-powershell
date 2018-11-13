@@ -78,6 +78,13 @@
         "command": "PowerShell.RunSelection",
         "key": "f8",
         "when": "editorTextFocus && editorLangId == 'powershell'"
+      },
+      {
+        "command": "editor.action.insertSnippet",
+        "when": "editorTextFocus && editorLangId == 'powershell'",
+        "mac": "cmd+alt+j",
+        "win": "ctrl+alt+j",
+        "linux": "ctrl+alt+j"
       }
     ],
     "commands": [
