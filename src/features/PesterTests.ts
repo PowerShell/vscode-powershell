@@ -2,9 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import ChildProcess = require("child_process");
+import * as path from "path";
 import vscode = require("vscode");
-import Window = vscode.window;
 import { IFeature, LanguageClient } from "../feature";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
@@ -40,12 +39,11 @@ export class PesterTestsFeature implements IFeature {
             request: "launch",
             type: "PowerShell",
             name: "PowerShell Launch Pester Tests",
-            script: "Invoke-Pester",
+            script: `Invoke-Pester`,
             args: [
-                `-Script "${uri.fsPath}"`,
-                describeBlockName
-                    ? `-TestName '${describeBlockName}'`
-                    : "",
+                "-Script",
+                // Let PSES handle path quoting since it also handles escaping ' e.g. C:\temp\don't-use-this-path
+                `${uri.fsPath}`,
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: !runInDebugger,
@@ -53,8 +51,13 @@ export class PesterTestsFeature implements IFeature {
             cwd:
                 currentDocument.isUntitled
                     ? vscode.workspace.rootPath
-                    : currentDocument.fileName,
+                    : path.dirname(currentDocument.fileName),
         };
+
+        if (describeBlockName) {
+            launchConfig.args.push("-TestName");
+            launchConfig.args.push(`'${describeBlockName}'`);
+        }
 
         // Create or show the interactive console
         // TODO #367: Check if "newSession" mode is configured
