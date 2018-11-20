@@ -35,6 +35,10 @@ export class PesterTestsFeature implements IFeature {
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
 
+        // Since we pass the script path to PSES in single quotes to avoid issues with PowerShell
+        // special chars like & $ @ () [], we do have to double up the interior single quotes.
+        const scriptPath = uri.fsPath.replace(/'/g, "''");
+
         const launchConfig = {
             request: "launch",
             type: "PowerShell",
@@ -42,8 +46,9 @@ export class PesterTestsFeature implements IFeature {
             script: `Invoke-Pester`,
             args: [
                 "-Script",
-                // Let PSES handle path quoting since it also handles escaping ' e.g. C:\temp\don't-use-this-path
-                `${uri.fsPath}`,
+                `'${scriptPath}'`,
+                "-PesterOption",
+                "@{IncludeVSCodeMarker=$true}",
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: !runInDebugger,
