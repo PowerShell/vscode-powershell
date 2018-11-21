@@ -43,7 +43,7 @@ export class PesterTestsFeature implements IFeature {
             request: "launch",
             type: "PowerShell",
             name: "PowerShell Launch Pester Tests",
-            script: `Invoke-Pester`,
+            script: "Invoke-Pester",
             args: [
                 "-Script",
                 `'${scriptPath}'`,
