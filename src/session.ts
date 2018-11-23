@@ -747,6 +747,15 @@ export class SessionManager implements Middleware {
                     `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
                     `[${this.versionDetails.version}]`;
 
+            const powerShellItems =
+                availablePowerShellExes
+                    .filter((item) => item.exePath.toLowerCase() !== currentExePath)
+                    .map((item) => {
+                        return new SessionMenuItem(
+                            `Switch to ${item.versionName}`,
+                            () => { this.changePowerShellExePath(item.exePath); });
+                    });
+
             menuItems = [
                 new SessionMenuItem(
                     `Current session: ${powerShellSessionName}`,
@@ -755,25 +764,21 @@ export class SessionManager implements Middleware {
                 new SessionMenuItem(
                     "Restart Current Session",
                     () => { this.restartSession(); }),
+
+                ...powerShellItems,
             ];
+
         } else if (this.sessionStatus === SessionStatus.Failed) {
             menuItems = [
                 new SessionMenuItem(
                     `Session initialization failed, click here to show PowerShell extension logs`,
                     () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
+
+                new SessionMenuItem(
+                    "Restart Current Session",
+                    () => { this.restartSession(); }),
             ];
         }
-
-        const powerShellItems =
-            availablePowerShellExes
-                .filter((item) => item.exePath.toLowerCase() !== currentExePath)
-                .map((item) => {
-                    return new SessionMenuItem(
-                        `Switch to ${item.versionName}`,
-                        () => { this.changePowerShellExePath(item.exePath); });
-                });
-
-        menuItems = menuItems.concat(powerShellItems);
 
         menuItems.push(
             new SessionMenuItem(
