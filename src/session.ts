@@ -734,22 +734,33 @@ export class SessionManager implements Middleware {
             getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
 
         let sessionText: string;
-        if (this.sessionStatus === SessionStatus.Running) {
-            const currentPowerShellExe =
+
+        switch (this.sessionStatus) {
+            case SessionStatus.Running:
+            case SessionStatus.Initializing:
+            case SessionStatus.NotStarted:
+            case SessionStatus.NeverStarted:
+            case SessionStatus.Stopping:
+                const currentPowerShellExe =
                 availablePowerShellExes
                     .find((item) => item.exePath.toLowerCase() === currentExePath);
 
-            const powerShellSessionName =
-                currentPowerShellExe ?
-                    currentPowerShellExe.versionName :
-                    `PowerShell ${this.versionDetails.displayVersion} ` +
-                    `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
-                    `[${this.versionDetails.version}]`;
+                const powerShellSessionName =
+                    currentPowerShellExe ?
+                        currentPowerShellExe.versionName :
+                        `PowerShell ${this.versionDetails.displayVersion} ` +
+                        `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
+                        `[${this.versionDetails.version}]`;
 
-            sessionText = `Current session: ${powerShellSessionName}`;
+                sessionText = `Current session: ${powerShellSessionName}`;
+                break;
 
-        } else if (this.sessionStatus === SessionStatus.Failed) {
-            sessionText = "Session initialization failed, click here to show PowerShell extension logs";
+            case SessionStatus.Failed:
+                sessionText = "Session initialization failed, click here to show PowerShell extension logs";
+                break;
+
+            default:
+                throw new TypeError("Not a valid value for the enum 'SessionStatus'");
         }
 
         const powerShellItems =
