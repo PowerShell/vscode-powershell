@@ -16,20 +16,25 @@ export class ShowHelpFeature implements IFeature {
     private languageClient: LanguageClient;
 
     constructor(private log: Logger) {
-        this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", () => {
+        this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", (item?) => {
             if (this.languageClient === undefined) {
                 this.log.writeAndShowError(`<${ShowHelpFeature.name}>: ` +
                     "Unable to instantiate; language client undefined.");
                 return;
             }
+            if (item === undefined) {
 
-            const editor = vscode.window.activeTextEditor;
-            const selection = editor.selection;
-            const doc = editor.document;
-            const cwr = doc.getWordRangeAtPosition(selection.active);
-            const text = doc.getText(cwr);
+                const editor = vscode.window.activeTextEditor;
 
-            this.languageClient.sendRequest(ShowHelpRequestType, text);
+                const selection = editor.selection;
+                const doc = editor.document;
+                const cwr = doc.getWordRangeAtPosition(selection.active);
+                const text = doc.getText(cwr);
+
+                this.languageClient.sendRequest(ShowHelpRequestType, text);
+            } else {
+                this.languageClient.sendRequest(ShowHelpRequestType, item.Name);
+            }
         });
 
         this.deprecatedCommand = vscode.commands.registerCommand("PowerShell.OnlineHelp", () => {
