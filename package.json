@@ -38,16 +38,16 @@
     "onView:PowerShellCommands"
   ],
   "dependencies": {
-    "vscode-languageclient": "~5.0.0"
+    "vscode-languageclient": "~5.1.1"
   },
   "devDependencies": {
-    "@types/mocha": "^2.2.32",
-    "@types/node": "~10.7.1",
-    "mocha": "^4.0.1",
+    "@types/mocha": "~2.2.32",
+    "@types/node": "~10.12.11",
+    "mocha": "~4.0.1",
     "tslint": "~5.11.0",
-    "typescript": "~3.0.1",
+    "typescript": "~3.2.1",
     "vsce": "~1.46.0",
-    "vscode": "~1.1.21"
+    "vscode": "~1.1.22"
   },
   "extensionDependencies": [
     "vscode.powershell"
