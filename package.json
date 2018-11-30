@@ -112,7 +112,6 @@
         "category": "PowerShell"
       },
       {
-<<<<<<< HEAD
         "command": "PowerShell.RefreshCommandsExplorer",
         "title": "Refresh",
         "icon": {
@@ -132,8 +131,6 @@
         "category": "PowerShell"
       },
       {
-=======
->>>>>>> Removed ShowOnlineHelp Command (#1587)
         "command": "PowerShell.ShowHelp",
         "title": "Get Help for Command",
         "category": "PowerShell"
