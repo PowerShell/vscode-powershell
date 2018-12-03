@@ -1,7 +1,7 @@
 {
   "name": "PowerShell",
   "displayName": "PowerShell",
-  "version": "1.9.1",
+  "version": "1.10.0",
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/mocha": "~2.2.32",
-    "@types/node": "~10.12.11",
+    "@types/node": "~10.12.12",
     "mocha": "~4.0.1",
     "tslint": "~5.11.0",
     "typescript": "~3.2.1",
