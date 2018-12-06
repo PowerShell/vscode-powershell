@@ -16,9 +16,9 @@ to make the user experience a bit more familiar compared to the ISE.
 | Execute current line/highlighted text | <kbd>F8</kbd>                | <kbd>F8</kbd>                               |
 | List available snippets               |                              | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> |
 
-## Tab-completion
+## Tab completion
 
-To enable more ISE-like tab-completion, add this setting:
+To enable more ISE-like tab completion, add this setting:
 
 ```json
 "editor.tabCompletion": "on"
