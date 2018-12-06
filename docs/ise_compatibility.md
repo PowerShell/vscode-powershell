@@ -57,7 +57,7 @@ To make new/untitled files register as PowerShell by default:
 "files.defaultLanguage": "powershell"
 ```
 
-## Colorscheme
+## Color scheme
 
 There are a number of ISE themes available for VSCode
 to make the editor look much more like the ISE.
