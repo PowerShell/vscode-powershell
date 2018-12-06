@@ -1,7 +1,7 @@
 # ISE Compatibility
 
 While the PowerShell extension for VSCode does not seek
-100% compatibility/reproduction of features in the PowerShell ISE,
+complete feature parity with the PowerShell ISE,
 there are features in place to make the VSCode experience more natural
 for users of the ISE.
 
