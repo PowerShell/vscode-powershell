@@ -58,6 +58,14 @@ In the Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
 type `theme` to get `Preferences: Color Theme` and press <kbd>Enter</kbd>.
 In the drop down list, select `PowerShell ISE`.
 
+## Show-Command
+
+Thanks to the work of [@corbob](https://github.com/corbob),
+the PowerShell extension has its own command explorer.
+
+In the Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>),
+enter `PowerShell Command Explorer` and press <kbd>Enter<kbd>.
+
 ## Open in the ISE
 
 If, after everything, you want to open a file in the ISE,
