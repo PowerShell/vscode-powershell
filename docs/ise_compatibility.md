@@ -45,7 +45,7 @@ To stop the integrated console on startup, set:
 "powershell.integratedConsole.showOnStartup": false
 ```
 
-Note that the background PowerShell process will still start,
+**Note:** The background PowerShell process will still start,
 since that provides intellisense, script analysis, symbol navigation, etc.
 But the console will not be shown.
 
