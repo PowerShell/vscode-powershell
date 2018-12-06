@@ -101,6 +101,11 @@ To do that, we need:
 
 In some cases, a GIF of the issue occuring is also very helpful.
 
+When you open a new issue,
+the GitHub issue template will have sections
+to guide you through providing all of this information
+as well as environment information discussed below.
+
 ## Providing Information About Your Environment
 
 For solving most issues, the following information is important to provide:
