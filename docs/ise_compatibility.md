@@ -10,7 +10,11 @@ to make the user experience a bit more familiar compared to the ISE.
 
 ## Key bindings
 
-- <kbd>Ctrl</kbd>+<kbd>B</kbd> Interrupt and break debugger &mdash; <kbd>F6</kbd>
+| Function                     | ISE Binding                  | VSCode Binding                              |
+| ----------------             | -----------                  | --------------                              |
+| Interrupt and break debugger | <kbd>Ctrl</kbd>+<kbd>B</kbd> | <kbd>F6</kbd>                               |
+| Execute current line         |                              | <kbd>F8</kbd>                               |
+| List available snippets      |                              | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> |
 
 ## Tab-completion
 
