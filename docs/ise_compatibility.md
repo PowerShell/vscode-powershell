@@ -64,7 +64,7 @@ Thanks to the work of [@corbob](https://github.com/corbob),
 the PowerShell extension has its own command explorer.
 
 In the Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>),
-enter `PowerShell Command Explorer` and press <kbd>Enter<kbd>.
+enter `PowerShell Command Explorer` and press <kbd>Enter</kbd>.
 
 ## Open in the ISE
 
