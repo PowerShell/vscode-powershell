@@ -115,14 +115,18 @@
         "command": "PowerShell.RefreshCommandsExplorer",
         "title": "Refresh",
         "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
+          "light": "resources/light/sync.svg",
+          "dark": "resources/dark/sync.svg"
         },
         "category": "PowerShell"
       },
       {
         "command": "PowerShell.InsertCommand",
         "title": "Insert Command",
+        "icon": {
+          "light": "resources/light/pencil.svg",
+          "dark": "resources/dark/pencil.svg"
+        },
         "category": "PowerShell"
       },
       {
@@ -133,6 +137,10 @@
       {
         "command": "PowerShell.ShowHelp",
         "title": "Get Help for Command",
+        "icon": {
+          "light": "resources/light/question.svg",
+          "dark": "resources/dark/question.svg"
+        },
         "category": "PowerShell"
       },
       {
@@ -224,11 +232,13 @@
       "view/item/context": [
         {
           "command": "PowerShell.ShowHelp",
-          "when": "view == PowerShellCommands"
+          "when": "view == PowerShellCommands",
+          "group": "inline@1"
         },
         {
           "command": "PowerShell.InsertCommand",
-          "when": "view == PowerShellCommands"
+          "when": "view == PowerShellCommands",
+          "group": "inline@2"
         }
       ]
     },
