@@ -113,7 +113,7 @@
       },
       {
         "command": "PowerShell.RefreshCommandsExplorer",
-        "title": "Refresh",
+        "title": "Refresh Command Explorer",
         "icon": {
           "light": "resources/light/sync.svg",
           "dark": "resources/dark/sync.svg"
@@ -210,6 +210,12 @@
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "PowerShell.InsertCommand",
+          "when": "false"
+        }
+      ],
       "editor/context": [
         {
           "when": "editorLangId == powershell",
