@@ -23,7 +23,7 @@ COPY build.ps1 containerFiles/build.ps1
 
 # Add an environment variable for build versioning
 ENV VSTS_BUILD=1
-ENV VSTS_BUILD_VERSION=1.10.0
+ENV VSTS_BUILD_VERSION=1.10.1
 
 # Uncomment to debug locally
 # RUN Import-Module ./containerFiles/dockerInstall.psm1; `

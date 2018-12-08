@@ -1,5 +1,15 @@
 # vscode-powershell Release History
 
+## v1.10.1
+### Friday, December 7, 2018
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #808](https://github.com/PowerShell/PowerShellEditorServices/pull/808) -
+  Fix startup crash on Windows 7
+- [PowerShellEditorServices #807](https://github.com/PowerShell/PowerShellEditorServices/pull/807) -
+  Fix deadlock occurring while connecting to named pipes
+
 ## v1.10.0
 ### Monday, December 3, 2018
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
