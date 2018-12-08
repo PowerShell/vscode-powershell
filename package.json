@@ -72,7 +72,8 @@
       "PowerShellCommandExplorer": [
         {
           "id": "PowerShellCommands",
-          "name": "PowerShell Commands"
+          "name": "PowerShell Commands",
+          "when": "config.powershell.sideBar.CommandExplorerVisibility"
         }
       ]
     },
@@ -214,6 +215,10 @@
         {
           "command": "PowerShell.InsertCommand",
           "when": "false"
+        },
+        {
+          "command": "PowerShell.RefreshCommandsExplorer",
+          "when": "config.powershell.sideBar.CommandExplorerVisibility"
         }
       ],
       "editor/context": [
@@ -472,6 +477,11 @@
       "type": "object",
       "title": "PowerShell Configuration",
       "properties": {
+        "powershell.sideBar.CommandExplorerVisibility": {
+          "type": "boolean",
+          "default":true,
+          "description": "Specifies the visibility of the Command Explorer in the PowerShell sidebar."
+        },
         "powershell.powerShellExePath": {
           "type": "string",
           "default": "",
