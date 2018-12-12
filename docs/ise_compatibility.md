@@ -72,10 +72,10 @@ You can set this in the settings with:
 "workbench.colorTheme": "PowerShell ISE"
 ```
 
-## Show-Command
+## PowerShell Command Explorer
 
 Thanks to the work of [@corbob](https://github.com/corbob),
-the PowerShell extension has its own command explorer.
+the PowerShell extension has the beginnings of its own command explorer.
 
 In the [Command Palette]
 enter `PowerShell Command Explorer` and press <kbd>Enter</kbd>.
