@@ -23,6 +23,11 @@ the experience of the PowerShell ISE.
 However, we do want to support compatibility whenever possible
 to do so without breaking existing functionality.
 
+Bear in mind that many of the UI/UX aspects of VSCode are driven by
+VSCode itself and can't be changed by the extension.
+The VSCode maintainers are quite reasonable though,
+and you can ask for new features [in their repository](https://github.com/Microsoft/vscode).
+
 Please also see [the ISE compatibility doc](./ise_compatibility.md)
 for ways to configure VSCode to be closer to the ISE.
 
