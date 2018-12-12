@@ -14,7 +14,7 @@ to make the user experience a bit more familiar compared to the ISE.
 | ----------------                      | -----------                  | --------------                              |
 | Interrupt and break debugger          | <kbd>Ctrl</kbd>+<kbd>B</kbd> | <kbd>F6</kbd>                               |
 | Execute current line/highlighted text | <kbd>F8</kbd>                | <kbd>F8</kbd>                               |
-| List available snippets               |                              | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> |
+| List available snippets               | <kbd>Ctrl</kbd>+<kbd>J</kbd> | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> |
 
 ## Tab completion
 
