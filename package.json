@@ -1,7 +1,7 @@
 {
   "name": "PowerShell",
   "displayName": "PowerShell",
-  "version": "1.9.1",
+  "version": "1.10.1",
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
@@ -34,19 +34,20 @@
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
-    "onCommand:PowerShell.RestartSession"
+    "onCommand:PowerShell.RestartSession",
+    "onView:PowerShellCommands"
   ],
   "dependencies": {
-    "vscode": "~1.1.21",
-    "vscode-languageclient": "~5.0.0"
+    "vscode-languageclient": "~5.1.1"
   },
   "devDependencies": {
-    "@types/mocha": "^2.2.32",
-    "@types/node": "~10.7.1",
-    "mocha": "^4.0.1",
+    "@types/mocha": "~2.2.32",
+    "@types/node": "~10.12.12",
+    "mocha": "~4.0.1",
     "tslint": "~5.11.0",
-    "typescript": "~3.0.1",
-    "vsce": "~1.46.0"
+    "typescript": "~3.2.1",
+    "vsce": "~1.46.0",
+    "vscode": "~1.1.22"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -58,6 +59,23 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "PowerShellCommandExplorer",
+          "title": "PowerShell Command Explorer",
+          "icon": "media/pwsh.svg"
+        }
+      ]
+    },
+    "views": {
+      "PowerShellCommandExplorer": [
+        {
+          "id": "PowerShellCommands",
+          "name": "PowerShell Commands"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "PowerShell.ShowHelp",
@@ -78,12 +96,33 @@
         "command": "PowerShell.RunSelection",
         "key": "f8",
         "when": "editorTextFocus && editorLangId == 'powershell'"
+      },
+      {
+        "command": "editor.action.insertSnippet",
+        "when": "editorTextFocus && editorLangId == 'powershell'",
+        "mac": "cmd+alt+j",
+        "win": "ctrl+alt+j",
+        "linux": "ctrl+alt+j"
       }
     ],
     "commands": [
       {
         "command": "PowerShell.ExpandAlias",
         "title": "Expand Alias",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.RefreshCommandsExplorer",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        },
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.InsertCommand",
+        "title": "Insert Command",
         "category": "PowerShell"
       },
       {
@@ -173,6 +212,23 @@
           "when": "editorLangId == powershell",
           "command": "PowerShell.ShowHelp",
           "group": "2_powershell"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "PowerShell.RefreshCommandsExplorer",
+          "when": "view == PowerShellCommands",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "PowerShell.ShowHelp",
+          "when": "view == PowerShellCommands"
+        },
+        {
+          "command": "PowerShell.InsertCommand",
+          "when": "view == PowerShellCommands"
         }
       ]
     },

@@ -19,8 +19,8 @@ import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
 import { FindModuleFeature } from "./features/FindModule";
-import { FoldingFeature } from "./features/Folding";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
+import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
@@ -36,7 +36,7 @@ import utils = require("./utils");
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-const requiredEditorServicesVersion = "1.9.1";
+const requiredEditorServicesVersion = "1.10.1";
 
 let logger: Logger;
 let sessionManager: SessionManager;
@@ -123,12 +123,13 @@ export function activate(context: vscode.ExtensionContext): void {
         new OpenInISEFeature(),
         new GenerateBugReportFeature(sessionManager),
         new ExpandAliasFeature(logger),
+        new GetCommandsFeature(logger),
         new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
         new ExtensionCommandsFeature(logger),
         new SelectPSSARulesFeature(logger),
-        new CodeActionsFeature(),
+        new CodeActionsFeature(logger),
         new NewFileOrProjectFeature(),
         new DocumentFormatterFeature(logger, documentSelector),
         new RemoteFilesFeature(),
@@ -137,7 +138,6 @@ export function activate(context: vscode.ExtensionContext): void {
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
-        new FoldingFeature(logger, documentSelector),
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);

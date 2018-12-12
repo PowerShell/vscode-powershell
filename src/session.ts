@@ -729,39 +729,38 @@ export class SessionManager implements Middleware {
     }
 
     private showSessionMenu() {
-        let menuItems: SessionMenuItem[] = [];
-
         const currentExePath = (this.powerShellExePath || "").toLowerCase();
         const availablePowerShellExes =
             getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
 
-        if (this.sessionStatus === SessionStatus.Running) {
-            const currentPowerShellExe =
+        let sessionText: string;
+
+        switch (this.sessionStatus) {
+            case SessionStatus.Running:
+            case SessionStatus.Initializing:
+            case SessionStatus.NotStarted:
+            case SessionStatus.NeverStarted:
+            case SessionStatus.Stopping:
+                const currentPowerShellExe =
                 availablePowerShellExes
                     .find((item) => item.exePath.toLowerCase() === currentExePath);
 
-            const powerShellSessionName =
-                currentPowerShellExe ?
-                    currentPowerShellExe.versionName :
-                    `PowerShell ${this.versionDetails.displayVersion} ` +
-                    `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
-                    `[${this.versionDetails.version}]`;
+                const powerShellSessionName =
+                    currentPowerShellExe ?
+                        currentPowerShellExe.versionName :
+                        `PowerShell ${this.versionDetails.displayVersion} ` +
+                        `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
+                        `[${this.versionDetails.version}]`;
 
-            menuItems = [
-                new SessionMenuItem(
-                    `Current session: ${powerShellSessionName}`,
-                    () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
+                sessionText = `Current session: ${powerShellSessionName}`;
+                break;
 
-                new SessionMenuItem(
-                    "Restart Current Session",
-                    () => { this.restartSession(); }),
-            ];
-        } else if (this.sessionStatus === SessionStatus.Failed) {
-            menuItems = [
-                new SessionMenuItem(
-                    `Session initialization failed, click here to show PowerShell extension logs`,
-                    () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
-            ];
+            case SessionStatus.Failed:
+                sessionText = "Session initialization failed, click here to show PowerShell extension logs";
+                break;
+
+            default:
+                throw new TypeError("Not a valid value for the enum 'SessionStatus'");
         }
 
         const powerShellItems =
@@ -773,12 +772,22 @@ export class SessionManager implements Middleware {
                         () => { this.changePowerShellExePath(item.exePath); });
                 });
 
-        menuItems = menuItems.concat(powerShellItems);
+        const menuItems: SessionMenuItem[] = [
+            new SessionMenuItem(
+                sessionText,
+                () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
 
-        menuItems.push(
+            new SessionMenuItem(
+                "Restart Current Session",
+                () => { this.restartSession(); }),
+
+            // Add all of the different PowerShell options
+            ...powerShellItems,
+
             new SessionMenuItem(
                 "Open Session Logs Folder",
-                () => { vscode.commands.executeCommand("PowerShell.OpenLogFolder"); }));
+                () => { vscode.commands.executeCommand("PowerShell.OpenLogFolder"); }),
+        ];
 
         vscode
             .window

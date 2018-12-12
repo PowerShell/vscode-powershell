@@ -1,5 +1,93 @@
 # vscode-powershell Release History
 
+## v1.10.1
+### Friday, December 7, 2018
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #808](https://github.com/PowerShell/PowerShellEditorServices/pull/808) -
+  Fix startup crash on Windows 7
+- [PowerShellEditorServices #807](https://github.com/PowerShell/PowerShellEditorServices/pull/807) -
+  Fix deadlock occurring while connecting to named pipes
+
+## v1.10.0
+### Monday, December 3, 2018
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- [vscode-PowerShell #1610](https://github.com/PowerShell/vscode-powershell/pull/1610) -
+  Remove client-side syntax folding provider in favor of server-side provider (thanks @glennsarti!)
+- [vscode-PowerShell #1616](https://github.com/PowerShell/vscode-powershell/pull/1616) -
+  Make `Restart Current Session` always available in the session quick pick
+- [vscode-PowerShell #1406](https://github.com/PowerShell/vscode-powershell/pull/1406) -
+  Add a Show-Command explorer (thanks @corbob!)
+- [vscode-PowerShell #1615](https://github.com/PowerShell/vscode-powershell/pull/1615) -
+  Fix Pester CodeLens not working for running/debugging tests (thanks @rkeithhill!)
+- [vscode-PowerShell #1600](https://github.com/PowerShell/vscode-powershell/pull/1608) -
+  Add CodeAction support to show PSSA rule documentation (thanks @rkeithhill!)
+- [vscode-PowerShell #1606](https://github.com/PowerShell/vscode-powershell/pull/1606) -
+  Add <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> (<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> on macOS)
+  keybinding to open up list of available snippets
+- [vscode-PowerShell #1597](https://github.com/PowerShell/vscode-powershell/pull/1597) -
+  Make `Install-VSCode.ps1` work on macOS and Linux. Get the script [here](https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1)
+- [vscode-PowerShell #1580](https://github.com/PowerShell/vscode-powershell/pull/1580) -
+  `New-EditorFile` works on non-PowerShell untitled files
+- [vscode-PowerShell #1557](https://github.com/PowerShell/vscode-powershell/pull/1557) -
+  Default to showing the last line in folded regions. Unset with `"powershell.codeFolding.showLastLine": false`
+  (thanks @glennsarti!)
+- [vscode-PowerShell #1567](https://github.com/PowerShell/vscode-powershell/pull/1567) -
+  New snippet: Exchange Online connection (thanks @vmsilvamolina!)
+- [vscode-PowerShell #1567](https://github.com/PowerShell/vscode-powershell/pull/1567) -
+  New snippet: HTML header (thanks @vmsilvamolina!)
+- [vscode-PowerShell #1555](https://github.com/PowerShell/vscode-powershell/pull/1555) -
+  Log when language client not loaded during initialization (thanks @corbob!)
+- [vscode-PowerShell #1554](https://github.com/PowerShell/vscode-powershell/pull/1554) -
+  Fix spacing in parameters when starting the extension (thanks @rkeithhill!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #786](https://github.com/PowerShell/PowerShellEditorServices/pull/786) -
+  Fix #17: Add go to definition support for dot sourced file paths  (Thanks @dee-see!)
+- [PowerShellEditorServices #767](https://github.com/PowerShell/PowerShellEditorServices/pull/767) -
+  Change unhandled messages to warnings instead of errors
+- [PowerShellEditorServices #765](https://github.com/PowerShell/PowerShellEditorServices/pull/765) -
+  Fix PowerShell wildcard escaping in debug paths
+- [PowerShellEditorServices #778](https://github.com/PowerShell/PowerShellEditorServices/pull/778) -
+  Fix multiple occurrences of the same typo  (Thanks @dee-see!)
+- [PowerShellEditorServices #782](https://github.com/PowerShell/PowerShellEditorServices/pull/782) -
+  Fix #779: NRE on Dispose in ExecutionTimer  (Thanks @dee-see!)
+- [PowerShellEditorServices #772](https://github.com/PowerShell/PowerShellEditorServices/pull/772) -
+  Log build info
+- [PowerShellEditorServices #774](https://github.com/PowerShell/PowerShellEditorServices/pull/774) -
+  New-EditorFile works on non-powershell untitled files
+- [PowerShellEditorServices #787](https://github.com/PowerShell/PowerShellEditorServices/pull/787) -
+  Fix descion/decision typo in visitors  (Thanks @dee-see!)
+- [PowerShellEditorServices #784](https://github.com/PowerShell/PowerShellEditorServices/pull/784) -
+  Replace bad StringReader usage with String.Split()
+- [PowerShellEditorServices #768](https://github.com/PowerShell/PowerShellEditorServices/pull/768) -
+  Make pipeline runtime exceptions warnings in log
+- [PowerShellEditorServices #790](https://github.com/PowerShell/PowerShellEditorServices/pull/790) -
+  Add managed thread id to log output to add debugging threading issues  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #794](https://github.com/PowerShell/PowerShellEditorServices/pull/794) -
+  Fix Pester CodeLens run/debug by not quoting params/already quoted args  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #785](https://github.com/PowerShell/PowerShellEditorServices/pull/785) -
+  Adds ability to use separate pipes for reading and writing  (Thanks @ant-druha!)
+- [PowerShellEditorServices #796](https://github.com/PowerShell/PowerShellEditorServices/pull/796) -
+  Code cleanup of the  start script and ESHost.cs file  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #795](https://github.com/PowerShell/PowerShellEditorServices/pull/795) -
+  Fix file recursion overflow problems
+- [PowerShellEditorServices #697](https://github.com/PowerShell/PowerShellEditorServices/pull/697) -
+  Add functionality to allow a Show-Command like panel in VS Code  (Thanks @corbob!)
+- [PowerShellEditorServices #777](https://github.com/PowerShell/PowerShellEditorServices/pull/777) -
+  Add syntax folding  (Thanks @glennsarti!)
+- [PowerShellEditorServices #801](https://github.com/PowerShell/PowerShellEditorServices/pull/801) -
+  Fix local remoting
+- [PowerShellEditorServices #797](https://github.com/PowerShell/PowerShellEditorServices/pull/797) -
+  Start of a PSES log file analyzer  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #789](https://github.com/PowerShell/PowerShellEditorServices/pull/789) -
+  Add support for a "Show Documentation" quick fix menu entry  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #760](https://github.com/PowerShell/PowerShellEditorServices/pull/760) -
+  Fix exception when remoting from Windows to non-Windows  (Thanks @SeeminglyScience!)
+
 ## v1.9.0
 ### Thursday, September 27, 2018
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
