@@ -16,6 +16,11 @@ to make the user experience a bit more familiar compared to the ISE.
 | Execute current line/highlighted text | <kbd>F8</kbd>                | <kbd>F8</kbd>                               |
 | List available snippets               | <kbd>Ctrl</kbd>+<kbd>J</kbd> | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> |
 
+### Custom Keybindings
+
+You can [configure your own keybindings](https://code.visualstudio.com/docs/getstarted/keybindings#_custom-keybindings-for-refactorings)
+in VSCode as well.
+
 ## Tab completion
 
 To enable more ISE-like tab completion, add this setting:
@@ -82,14 +87,14 @@ enter `PowerShell Command Explorer` and press <kbd>Enter</kbd>.
 
 ## Open in the ISE
 
-If, after everything, you want to open a file in the ISE,
+If you end up wanting to open a file in the ISE anyway,
 you can use <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>P</kbd>.
 
 ## Other resources
 
 - 4sysops has [a great article](https://4sysops.com/archives/make-visual-studio-code-look-and-behave-like-powershell-ise/)
   on configuring VSCode to be more like the ISE.
-- Mike F Robbins has [a great post](https://mikefrobbins.com/2017/08/24/how-to-install-visual-studio-code-and-configure-it-as-a-replacement-for-the-powershell-ise/) on setting up VSCode.
+- Mike F Robbins has [a really good post](https://mikefrobbins.com/2017/08/24/how-to-install-visual-studio-code-and-configure-it-as-a-replacement-for-the-powershell-ise/) on setting up VSCode.
 - Learn PowerShell has [an excellent write up](https://www.learnpwsh.com/setup-vs-code-for-powershell/)
   on getting VSCode setup for PowerShell.
 
