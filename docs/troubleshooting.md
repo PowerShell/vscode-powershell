@@ -106,6 +106,22 @@ When opening an issue, keep in mind:
   [tackling an issue], we always accept contributions and will help you
   at every step.
 
+## Reproducing the Issue
+
+To fix the issue, we need to be able to reproduce it.
+To do that, we need:
+
+- A small/minimal script or sequence of user steps that result in the problem occurring.
+- A description of the behavior you are expecting.
+- A description of the actual behavior that occurs.
+
+In some cases, a GIF of the issue occuring is also very helpful.
+
+When you open a new issue,
+the GitHub issue template will have sections
+to guide you through providing all of this information
+as well as environment information discussed below.
+
 ## Providing Information About Your Environment
 
 For solving most issues, the following information is important to provide:
