@@ -12,7 +12,7 @@
     "linux": {
         "options": {
             "shell": {
-                "executable": "/usr/bin/pwsh",
+                "executable": "pwsh",
                 "args": [ "-NoProfile", "-Command" ]
             }
         }
