@@ -20,6 +20,12 @@ export enum HelpCompletion {
     LineComment = "LineComment",
 }
 
+export enum TerminalColorTheme {
+    None = "None",
+    Core = "Core",
+    Desktop = "Desktop",
+}
+
 export interface IPowerShellAdditionalExePathSettings {
     versionName: string;
     exePath: string;
@@ -81,6 +87,7 @@ export interface ISettings {
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
     bugReporting?: IBugReportingSettings;
+    terminalColorTheme: string;
 }
 
 export interface IIntegratedConsoleSettings {
@@ -169,6 +176,8 @@ export function load(): ISettings {
             configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
         bugReporting:
             configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
+        terminalColorTheme:
+            configuration.get<string>("terminalColorTheme", TerminalColorTheme.None),
     };
 }
 

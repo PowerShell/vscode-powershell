@@ -28,6 +28,7 @@ import { PesterTestsFeature } from "./features/PesterTests";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { SelectPSSARulesFeature } from "./features/SelectPSSARules";
 import { ShowHelpFeature } from "./features/ShowHelp";
+import { TerminalColorsFeature } from "./features/TerminalColors";
 import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
@@ -138,6 +139,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
+        new TerminalColorsFeature(),
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);

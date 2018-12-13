@@ -646,6 +646,16 @@
           "default": "",
           "isExecutable": true,
           "description": "Deprecated. Please use the 'powershell.powerShellExePath' setting instead"
+        },
+        "powershell.terminalColorTheme": {
+          "type": "string",
+          "enum": [
+          "None",
+          "Core",
+          "Desktop"
+          ],
+          "default": "None",
+          "description": "Configures the colors of the Integrated Terminal to feel more familiar to PowerShell users."
         }
       }
     },
