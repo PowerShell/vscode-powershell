@@ -43,6 +43,8 @@ export interface ICodeFormattingSettings {
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
+    WhitespaceInsideBrace: true;
+    WhitespaceAroundPipe: true;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
 }
@@ -129,6 +131,8 @@ export function load(): ISettings {
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
+        WhitespaceInsideBrace: true,
+        WhitespaceAroundPipe: true,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
     };
