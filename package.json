@@ -480,7 +480,7 @@
         "powershell.sideBar.CommandExplorerVisibility": {
           "type": "boolean",
           "default":true,
-          "description": "Specifies the visibility of the Command Explorer in the PowerShell sidebar."
+          "description": "Specifies the visibility of the Command Explorer in the PowerShell Side Bar."
         },
         "powershell.powerShellExePath": {
           "type": "string",
