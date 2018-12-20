@@ -565,6 +565,16 @@
           "default": true,
           "description": "Adds a newline (line break) after a closing brace."
         },
+        "powershell.codeFormatting.pipelineIndentationStyle": {
+            "type": "string",
+            "enum": [
+                "IncreaseIndentationForFirstPipeline",
+                "IncreaseIndentationAfterEveryPipeline",
+                "NoIndentation"
+            ],
+            "default": "IncreaseIndentationForFirstPipeline",
+            "description": "Multi-line pipeline style settings."
+          },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
           "default": true,
