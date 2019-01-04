@@ -12,7 +12,7 @@ that Visual Studio Code provides.
 - **Linux** with PowerShell Core (all PowerShell-supported distributions)
 - **macOS and OS X** with PowerShell Core
 
-Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode?view=powershell-6)
+Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
 
 Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for answers to common questions.
