@@ -38,7 +38,7 @@ In the Extensions pane, search for "PowerShell" extension and install it there. 
 get notified automatically about any future extension updates!
 
 You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
-[Install from a VSIX](https://code.visualstudio.com/docs/extensions/install-extension#_install-from-a-vsix)
+[Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions.  The easiest way is through the command line:
 
 ```
