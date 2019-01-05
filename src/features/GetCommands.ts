@@ -42,7 +42,10 @@ export class GetCommandsFeature implements IFeature {
 
     public setLanguageClient(languageclient: LanguageClient) {
         this.languageClient = languageclient;
-        vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
+        const SideBarConfiguration = vscode.workspace.getConfiguration("powershell.sideBar");
+        if (SideBarConfiguration.CommandExplorerInitialRefresh) {
+            vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
+        }
     }
 
     private CommandExplorerRefresh() {

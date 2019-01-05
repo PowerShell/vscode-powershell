@@ -482,6 +482,11 @@
           "default":true,
           "description": "Specifies the visibility of the Command Explorer in the PowerShell Side Bar."
         },
+        "powershell.sideBar.CommandExplorerInitialRefresh": {
+          "type":"boolean",
+          "default":true,
+          "description": "Toggle the initial refresh of the command explorer."
+        },
         "powershell.powerShellExePath": {
           "type": "string",
           "default": "",
