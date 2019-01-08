@@ -16,7 +16,7 @@ to before you can proceed.
     Insiders means the extension can be developed ready for new features
     and changes in the next VSCode release.
 
-5. Install [Node.js](https://nodejs.org/en/) 6.0.0 or higher.
+5. Install [Node.js](https://nodejs.org/en/) 8.x or higher.
 
 ## Building the Code
 

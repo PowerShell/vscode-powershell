@@ -12,7 +12,7 @@ that Visual Studio Code provides.
 - **Linux** with PowerShell Core (all PowerShell-supported distributions)
 - **macOS and OS X** with PowerShell Core
 
-Read the [installation instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/learning-powershell/using-vscode.md)
+Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
 
 Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for answers to common questions.
@@ -38,7 +38,7 @@ In the Extensions pane, search for "PowerShell" extension and install it there. 
 get notified automatically about any future extension updates!
 
 You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
-[Install from a VSIX](https://code.visualstudio.com/docs/extensions/install-extension#_install-from-a-vsix)
+[Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions.  The easiest way is through the command line:
 
 ```
