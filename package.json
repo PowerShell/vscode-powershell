@@ -479,7 +479,7 @@
       "properties": {
         "powershell.sideBar.CommandExplorerVisibility": {
           "type": "boolean",
-          "default":true,
+          "default": true,
           "description": "Specifies the visibility of the Command Explorer in the PowerShell Side Bar."
         },
         "powershell.powerShellExePath": {
@@ -612,14 +612,14 @@
           "description": "Adds a space after a separator (',' and ';')."
         },
         "powershell.codeFormatting.WhitespaceInsideBrace": {
-            "type": "boolean",
-            "default": true,
-            "description": "Adds a space after an opening brace ('}') and before a closing brace ('}')."
+          "type": "boolean",
+          "default": true,
+          "description": "Adds a space after an opening brace ('}') and before a closing brace ('}')."
         },
         "powershell.codeFormatting.WhitespaceAroundPipe": {
-            "type": "boolean",
-            "default": true,
-            "description": "Adds a space before and after a pipeline ('|')."
+          "type": "boolean",
+          "default": true,
+          "description": "Adds a space before and after a pipeline ('|')."
         },
         "powershell.codeFormatting.ignoreOneLineBlock": {
           "type": "boolean",
