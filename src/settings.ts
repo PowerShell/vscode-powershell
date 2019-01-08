@@ -52,6 +52,7 @@ export interface ICodeFormattingSettings {
     whitespaceAfterSeparator: boolean;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
+    useCorrectCasing: boolean;
 }
 
 export interface IScriptAnalysisSettings {
@@ -139,6 +140,7 @@ export function load(): ISettings {
         whitespaceAfterSeparator: true,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
+        useCorrectCasing: true
     };
 
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
