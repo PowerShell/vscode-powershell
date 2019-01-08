@@ -14,12 +14,6 @@ enum CodeFormattingPreset {
     Stroustrup,
 }
 
-enum PipelineIndentationStyle {
-    IncreaseIndentationForFirstPipeline,
-    IncreaseIndentationAfterEveryPipeline,
-    NoIndentation,
-}
-
 export enum HelpCompletion {
     Disabled = "Disabled",
     BlockComment = "BlockComment",
@@ -45,7 +39,6 @@ export interface ICodeFormattingSettings {
     openBraceOnSameLine: boolean;
     newLineAfterOpenBrace: boolean;
     newLineAfterCloseBrace: boolean;
-    pipelineIndentationStyle: PipelineIndentationStyle;
     whitespaceBeforeOpenBrace: boolean;
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
@@ -133,7 +126,6 @@ export function load(): ISettings {
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
         newLineAfterCloseBrace: true,
-        pipelineIndentationStyle: PipelineIndentationStyle.IncreaseIndentationForFirstPipeline,
         whitespaceBeforeOpenBrace: true,
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
