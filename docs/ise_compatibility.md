@@ -1,5 +1,13 @@
 # ISE Compatibility
 
+# ATTENTION! THIS DOC HAS MOVED
+
+[THIS DOC IS NOW HOSTED ON DOCS.MICROSOFT.COM.](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/how-to-replicate-the-ise-experience-in-vscode)
+
+PLEASE REFER TO THE DOC THERE FOR FUTURE REFERENCE AS ANY CHANGES WILL BE MADE TO THAT DOC.
+
+## Summary
+
 While the PowerShell extension for VSCode does not seek
 complete feature parity with the PowerShell ISE,
 there are features in place to make the VSCode experience more natural
