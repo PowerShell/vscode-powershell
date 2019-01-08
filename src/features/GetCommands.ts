@@ -64,7 +64,13 @@ export class GetCommandsFeature implements IFeature {
             return;
         }
         this.languageClient.sendRequest(GetCommandRequestType, "").then((result) => {
-            this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
+            const SidebarConfig = vscode.workspace.getConfiguration("powershell.sideBar");
+            let output: Array<any>;
+            if (SidebarConfig.CommandExplorerExcludeFilter !== "") {
+                // tslint:disable-next-line:max-line-length
+                output = result.filter((command) => command.moduleName.includes(SidebarConfig.CommandExplorerExcludeFilter)); // .where({$_.moduleName -ne SidebarConfig.CommandExplorerExcludeFilter})
+            }
+            this.commandsExplorerProvider.powerShellCommands = output.map(toCommand);
             this.commandsExplorerProvider.refresh();
         });
     }

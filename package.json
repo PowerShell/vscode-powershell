@@ -482,6 +482,11 @@
           "default": true,
           "description": "Specifies the visibility of the Command Explorer in the PowerShell Side Bar."
         },
+        "powershell.sideBar.CommandExplorerExcludeFilter": {
+          "type":"string",
+          "default":"",
+          "description": ""
+        },
         "powershell.powerShellExePath": {
           "type": "string",
           "default": "",
