@@ -27,12 +27,23 @@ export class GetCommandsFeature implements IFeature {
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
     private commandsExplorerProvider: CommandsExplorerProvider;
+    private commandsExplorerTreeView: vscode.TreeView<Command>;
 
     constructor(private log: Logger) {
         this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
             () => this.CommandExplorerRefresh());
         this.commandsExplorerProvider = new CommandsExplorerProvider();
-        vscode.window.registerTreeDataProvider("PowerShellCommands", this.commandsExplorerProvider);
+
+        this.commandsExplorerTreeView = vscode.window.createTreeView<Command>("PowerShellCommands",
+            { treeDataProvider: this.commandsExplorerProvider });
+
+        // Refresh the command explorer when the view is visible
+        this.commandsExplorerTreeView.onDidChangeVisibility( (e) => {
+            if (e.visible) {
+                this.CommandExplorerRefresh();
+            }
+        });
+
         vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => this.InsertCommand(item));
     }
 
@@ -42,13 +53,14 @@ export class GetCommandsFeature implements IFeature {
 
     public setLanguageClient(languageclient: LanguageClient) {
         this.languageClient = languageclient;
-        vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
+        if (this.commandsExplorerTreeView.visible) {
+            vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
+        }
     }
 
     private CommandExplorerRefresh() {
         if (this.languageClient === undefined) {
-            this.log.writeAndShowError(`<${GetCommandsFeature.name}>: ` +
-                "Unable to instantiate; language client undefined.");
+            this.log.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
             return;
         }
         this.languageClient.sendRequest(GetCommandRequestType, "").then((result) => {
