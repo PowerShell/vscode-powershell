@@ -60,8 +60,7 @@ export class GetCommandsFeature implements IFeature {
 
     private CommandExplorerRefresh() {
         if (this.languageClient === undefined) {
-            this.log.writeVerbose(`<${GetCommandsFeature.name}>: ` +
-                "Unable to instantiate; language client undefined.");
+            this.log.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
             return;
         }
         this.languageClient.sendRequest(GetCommandRequestType, "").then((result) => {
