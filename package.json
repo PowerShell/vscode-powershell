@@ -205,6 +205,11 @@
         "category": "PowerShell"
       },
       {
+        "command": "PowerShell.RunPesterTests",
+        "title": "Run Pester tests",
+        "category": "PowerShell"
+      },
+      {
         "command": "PowerShell.OpenExamplesFolder",
         "title": "Open Examples Folder",
         "category": "PowerShell"
@@ -231,6 +236,12 @@
           "when": "editorLangId == powershell",
           "command": "PowerShell.ShowHelp",
           "group": "2_powershell"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "when": "resourceExtname  == .ps1",
+          "command": "PowerShell.RunPesterTests"
         }
       ],
       "view/title": [
