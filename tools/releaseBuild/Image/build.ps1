@@ -10,4 +10,4 @@ else {
 }
 push-location C:/vscode-powershell
 Invoke-Build GetExtensionVersion,Clean,Build,Test,Package
-Copy-Item -Verbose -Recurse "C:/vscode-powershell/PowerShell-insiders.vsix" "${target}/PowerShell-insiders.vsix"
+Copy-Item -Verbose -Recurse "C:/vscode-powershell/PowerShell-CI.vsix" "${target}/PowerShell-CI.vsix"

@@ -135,15 +135,15 @@ task Package {
         throw "Unable to find PowerShell EditorServices"
     }
 
-    Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
+    Write-Host "`n### Packaging PowerShell-CI.vsix`n" -ForegroundColor Green
     exec { & node ./node_modules/vsce/out/vsce package }
 
     # Change the package to have a static name for automation purposes
-    Move-Item -Force .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
+    Move-Item -Force .\powershell-preview-$($script:ExtensionVersion).vsix .\PowerShell-CI.vsix
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
-    Push-AppveyorArtifact .\PowerShell-insiders.vsix
+    Push-AppveyorArtifact .\PowerShell-CI.vsix
 }
 
 # The default task is to run the entire CI build
