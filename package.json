@@ -240,7 +240,7 @@
       ],
       "editor/title/context": [
         {
-          "when": "resourceFilename =~ /\\.[Tt]ests\\.ps1$/",
+          "when": "resourceFilename =~ /\\.tests\\.ps1$/i",
           "command": "PowerShell.RunPesterTests"
         }
       ],
