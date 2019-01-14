@@ -109,7 +109,7 @@ task Test Build, {
     }
 }
 
-task UpdateReadme If { $env:PSES_BRANCH -contains "preview" } {
+task UpdateReadme -If { $env:PSES_BRANCH -like "*preview*" } {
     $newReadmeTop = '# PowerShell Language Support for Visual Studio Code
 
 > ## ATTENTION: This is the PREVIEW version of the PowerShell extension for VSCode which contains features that are being evaluated for stable
