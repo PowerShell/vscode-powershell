@@ -109,6 +109,19 @@ task Test Build, {
     }
 }
 
+task UpdateReadme If { $env:PSES_BRANCH -contains "preview" } {
+    $newReadmeTop = '# PowerShell Language Support for Visual Studio Code
+
+> ## ATTENTION: This is the PREVIEW version of the PowerShell extension for VSCode which contains features that are being evaluated for stable
+> ### If you are looking for the stable version, please [go here](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) or install the extension called "PowerShell" (not "PowerShell Preview")
+> ## NOTE: If you have both stable (aka "PowerShell") and preview (aka "PowerShell Preview") installed, you MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance. Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)'
+    $readmePath = (Join-Path $PSScriptRoot README.md)
+
+    $readmeContent = Get-Content -Path $readmePath
+    $readmeContent[0] = $newReadmeTop
+    $readmeContent > $readmePath
+}
+
 task Package {
 
     if ($script:psesBuildScriptPath) {
@@ -134,4 +147,4 @@ task UploadArtifacts -If { $env:AppVeyor } {
 }
 
 # The default task is to run the entire CI build
-task . GetExtensionVersion, CleanAll, BuildAll, Test, Package, UploadArtifacts
+task . GetExtensionVersion, CleanAll, BuildAll, Test, UpdateReadme, Package, UploadArtifacts

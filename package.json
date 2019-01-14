@@ -1,9 +1,9 @@
 {
-  "name": "PowerShell",
-  "displayName": "PowerShell",
-  "version": "2.0.0",
+  "name": "powershell-preview",
+  "displayName": "PowerShell Preview",
+  "version": "2.0.0-preview.1",
   "publisher": "ms-vscode",
-  "description": "Develop PowerShell scripts in Visual Studio Code!",
+  "description": "(PREVIEW) Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
     "vscode": "^1.25.0"
   },
