@@ -87,8 +87,14 @@ how to use them.
 
 This folder can be found at the following path:
 
+```powershell
+$HOME/.vscode[-insiders]/extensions/ms-vscode.PowerShell-<version>/examples
 ```
-C:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
+
+or if you're using the preview version of the extension
+
+```powershell
+$HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-preview-<version>/examples
 ```
 
 To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:

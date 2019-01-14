@@ -130,6 +130,12 @@ Logs provide context for what was happening when the issue occurred
   $HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-<version>/logs/
   ```
 
+  or if you're using the preview version of the extension
+
+  ```powershell
+  $HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-preview-<version>/logs/
+  ```
+
   For example:
 
   ```powershell

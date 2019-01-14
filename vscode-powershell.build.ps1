@@ -13,8 +13,9 @@ $script:IsPullRequestBuild =
     $env:APPVEYOR_PULL_REQUEST_NUMBER -and
     $env:APPVEYOR_REPO_BRANCH -eq "develop"
 
-task GetExtensionVersion -Before Package {
+task GetExtensionData -Before Package {
 
+    $packagJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json -AsHashtable
     $updateVersion = $false
     $script:ExtensionVersion = `
         if ($env:AppVeyor) {
@@ -26,14 +27,15 @@ task GetExtensionVersion -Before Package {
             $env:VSTS_BUILD_VERSION
         }
         else {
-            exec { & npm version | ConvertFrom-Json | ForEach-Object { $_.PowerShell } }
+            $packagJson.version
         }
-
-    Write-Host "`n### Extension Version: $script:ExtensionVersion`n" -ForegroundColor Green
 
     if ($updateVersion) {
         exec { & npm version $script:ExtensionVersion --no-git-tag-version --allow-same-version }
     }
+
+    $script:ExtensionName = $packagJson.name
+    Write-Host "`n### Extension Version: $script:ExtensionVersion Extension Name: $script:ExtensionName`n" -ForegroundColor Green
 }
 
 task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices, Package {
@@ -139,7 +141,7 @@ task Package {
     exec { & node ./node_modules/vsce/out/vsce package }
 
     # Change the package to have a static name for automation purposes
-    Move-Item -Force .\powershell-preview-$($script:ExtensionVersion).vsix .\PowerShell-CI.vsix
+    Move-Item -Force .\$($script:ExtensionName)-$($script:ExtensionVersion).vsix .\PowerShell-CI.vsix
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
@@ -147,4 +149,4 @@ task UploadArtifacts -If { $env:AppVeyor } {
 }
 
 # The default task is to run the entire CI build
-task . GetExtensionVersion, CleanAll, BuildAll, Test, UpdateReadme, Package, UploadArtifacts
+task . GetExtensionData, CleanAll, BuildAll, Test, UpdateReadme, Package, UploadArtifacts
