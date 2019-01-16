@@ -1,4 +1,4 @@
- /*---------------------------------------------------------
+/*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
@@ -17,13 +17,13 @@ export class PesterTestsFeature implements IFeature {
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTestsFromFile",
-            (uriString, runInDebugger, describeBlockName?) => {
-                this.launchTests(vscode.window.activeTextEditor.document.uri, false, describeBlockName);
+            () => {
+                this.launchTests(vscode.window.activeTextEditor.document.uri, false);
             });
         this.command = vscode.commands.registerCommand(
             "PowerShell.DebugPesterTestsFromFile",
-            (uriString, runInDebugger, describeBlockName?) => {
-                this.launchTests(vscode.window.activeTextEditor.document.uri, true, describeBlockName);
+            () => {
+                this.launchTests(vscode.window.activeTextEditor.document.uri, true);
             });
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
