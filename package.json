@@ -205,8 +205,13 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.RunPesterTests",
+        "command": "PowerShell.RunPesterTestsFromFile",
         "title": "Run Pester tests",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.DebugPesterTestsFromFile",
+        "title": "Debug Pester tests",
         "category": "PowerShell"
       },
       {
@@ -241,7 +246,11 @@
       "editor/title/context": [
         {
           "when": "resourceFilename =~ /\\.tests\\.ps1$/i",
-          "command": "PowerShell.RunPesterTests"
+          "command": "PowerShell.RunPesterTestsFromFile"
+        },
+        {
+          "when": "resourceFilename =~ /\\.tests\\.ps1$/i",
+          "command": "PowerShell.DebugPesterTestsFromFile"
         }
       ],
       "view/title": [
