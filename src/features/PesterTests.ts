@@ -18,12 +18,12 @@ export class PesterTestsFeature implements IFeature {
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTestsFromFile",
             () => {
-                this.launchTests(vscode.window.activeTextEditor.document.uri, false);
+                this.launchTests(vscode.window.activeTextEditor.document.uri, false, undefined);
             });
         this.command = vscode.commands.registerCommand(
             "PowerShell.DebugPesterTestsFromFile",
             () => {
-                this.launchTests(vscode.window.activeTextEditor.document.uri, true);
+                this.launchTests(vscode.window.activeTextEditor.document.uri, true, undefined);
             });
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
@@ -41,7 +41,21 @@ export class PesterTestsFeature implements IFeature {
         this.languageClient = languageClient;
     }
 
-    private launchTests(uriString, runInDebugger, describeBlockName?) {
+    private async launchTests(uriString, runInDebugger, describeBlockName?) {
+        // PSES passes null for the describeBlockName to signal that it can't evaluate the TestName.
+        if (describeBlockName === null) {
+            const answer = await vscode.window.showErrorMessage(
+                "This Describe block's TestName parameter cannot be evaluated. " +
+                `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
+                "Yes", "No");
+
+            if (answer === "Yes") {
+                describeBlockName = undefined;
+            } else {
+                return;
+            }
+        }
+
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
