@@ -16,6 +16,17 @@ export class PesterTestsFeature implements IFeature {
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand(
+            "PowerShell.RunPesterTestsFromFile",
+            () => {
+                this.launchTests(vscode.window.activeTextEditor.document.uri, false);
+            });
+        this.command = vscode.commands.registerCommand(
+            "PowerShell.DebugPesterTestsFromFile",
+            () => {
+                this.launchTests(vscode.window.activeTextEditor.document.uri, true);
+            });
+        // This command is provided for usage by PowerShellEditorServices (PSES) only
+        this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTests",
             (uriString, runInDebugger, describeBlockName?) => {
                 this.launchTests(uriString, runInDebugger, describeBlockName);

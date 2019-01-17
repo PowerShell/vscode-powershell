@@ -205,6 +205,16 @@
         "category": "PowerShell"
       },
       {
+        "command": "PowerShell.RunPesterTestsFromFile",
+        "title": "Run Pester tests",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.DebugPesterTestsFromFile",
+        "title": "Debug Pester tests",
+        "category": "PowerShell"
+      },
+      {
         "command": "PowerShell.OpenExamplesFolder",
         "title": "Open Examples Folder",
         "category": "PowerShell"
@@ -231,6 +241,16 @@
           "when": "editorLangId == powershell",
           "command": "PowerShell.ShowHelp",
           "group": "2_powershell"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "when": "resourceFilename =~ /\\.tests\\.ps1$/i",
+          "command": "PowerShell.RunPesterTestsFromFile"
+        },
+        {
+          "when": "resourceFilename =~ /\\.tests\\.ps1$/i",
+          "command": "PowerShell.DebugPesterTestsFromFile"
         }
       ],
       "view/title": [
