@@ -483,9 +483,9 @@
           "description": "Specifies the visibility of the Command Explorer in the PowerShell Side Bar."
         },
         "powershell.sideBar.CommandExplorerExcludeFilter": {
-          "type":"string",
+          "type":"array",
           "default":"",
-          "description": ""
+          "description": "Specify array of Modules to exclude from Command Explorer listing."
         },
         "powershell.powerShellExePath": {
           "type": "string",
