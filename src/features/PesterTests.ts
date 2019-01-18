@@ -9,21 +9,28 @@ import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
 
+enum LaunchType {
+    Debug,
+    Run,
+}
+
 export class PesterTestsFeature implements IFeature {
 
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
 
     constructor(private sessionManager: SessionManager) {
+        // File context-menu command - Run Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTestsFromFile",
             () => {
-                this.launchTests(vscode.window.activeTextEditor.document.uri, false);
+                this.launchAllTestsInActiveEditor(LaunchType.Run);
             });
+        // File context-menu command - Debug Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.DebugPesterTestsFromFile",
             () => {
-                this.launchTests(vscode.window.activeTextEditor.document.uri, true);
+                this.launchAllTestsInActiveEditor(LaunchType.Debug);
             });
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
@@ -41,7 +48,37 @@ export class PesterTestsFeature implements IFeature {
         this.languageClient = languageClient;
     }
 
-    private launchTests(uriString, runInDebugger, describeBlockName?) {
+    private launchAllTestsInActiveEditor(launchType: LaunchType) {
+        const uriString = vscode.window.activeTextEditor.document.uri.toString();
+        const launchConfig = this.createLaunchConfig(uriString, launchType);
+        this.launch(launchConfig);
+    }
+
+    private async launchTests(uriString: string, runInDebugger: boolean, describeBlockName?: string) {
+        // PSES passes null for the describeBlockName to signal that it can't evaluate the TestName.
+        if (!describeBlockName) {
+            const answer = await vscode.window.showErrorMessage(
+                "This Describe block's TestName parameter cannot be evaluated. " +
+                `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
+                "Yes", "No");
+
+            if (answer === "No") {
+                return;
+            }
+        }
+
+        const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
+        const launchConfig = this.createLaunchConfig(uriString, launchType);
+
+        if (describeBlockName) {
+            launchConfig.args.push("-TestName");
+            launchConfig.args.push(`'${describeBlockName}'`);
+        }
+
+        this.launch(launchConfig);
+    }
+
+    private createLaunchConfig(uriString: string, launchType: LaunchType) {
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
@@ -62,7 +99,7 @@ export class PesterTestsFeature implements IFeature {
                 "@{IncludeVSCodeMarker=$true}",
             ],
             internalConsoleOptions: "neverOpen",
-            noDebug: !runInDebugger,
+            noDebug: (launchType === LaunchType.Run),
             createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
             cwd:
                 currentDocument.isUntitled
@@ -70,11 +107,10 @@ export class PesterTestsFeature implements IFeature {
                     : path.dirname(currentDocument.fileName),
         };
 
-        if (describeBlockName) {
-            launchConfig.args.push("-TestName");
-            launchConfig.args.push(`'${describeBlockName}'`);
-        }
+        return launchConfig;
+    }
 
+    private launch(launchConfig) {
         // Create or show the interactive console
         // TODO #367: Check if "newSession" mode is configured
         vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
