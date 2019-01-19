@@ -9,8 +9,6 @@ import { IFeature, LanguageClient } from "../feature";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 
-const extensionId: string = "ms-vscode.PowerShell";
-const extensionVersion: string = vscode.extensions.getExtension(extensionId).packageJSON.version;
 const queryStringPrefix: string = "?";
 
 const settings = Settings.load();
@@ -54,7 +52,7 @@ capturing and sending logs.
 | --- | --- |
 | Operating System | ${os.type()} ${os.arch()} ${os.release()} |
 | VSCode | ${vscode.version}|
-| PowerShell Extension Version | ${extensionVersion} |
+| PowerShell Extension Version | ${sessionManager.HostVersion} |
 
 ### PowerShell Information ###
 

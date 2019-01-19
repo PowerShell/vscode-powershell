@@ -114,7 +114,9 @@ export function activate(context: vscode.ExtensionContext): void {
     sessionManager =
         new SessionManager(
             requiredEditorServicesVersion,
-            logger, documentSelector);
+            logger,
+            documentSelector,
+            context);
 
     // Create features
     extensionFeatures = [
@@ -152,10 +154,13 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext) {
     const showReleaseNotes = "Show Release Notes";
     const powerShellExtensionVersionKey = "powerShellExtensionVersion";
 
+    const extensionName = context.storagePath.toLowerCase().includes("ms-vscode.powershell-preview") ?
+        "ms-vscode.PowerShell-Preview" : "ms-vscode.PowerShell";
+
     const extensionVersion: string =
         vscode
             .extensions
-            .getExtension("ms-vscode.PowerShell")
+            .getExtension(extensionName)
             .packageJSON
             .version;
 

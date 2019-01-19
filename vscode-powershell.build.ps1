@@ -13,8 +13,9 @@ $script:IsPullRequestBuild =
     $env:APPVEYOR_PULL_REQUEST_NUMBER -and
     $env:APPVEYOR_REPO_BRANCH -eq "develop"
 
-task GetExtensionVersion -Before Package {
+task GetExtensionData -Before Package {
 
+    $script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
     $updateVersion = $false
     $script:ExtensionVersion = `
         if ($env:AppVeyor) {
@@ -26,14 +27,15 @@ task GetExtensionVersion -Before Package {
             $env:VSTS_BUILD_VERSION
         }
         else {
-            exec { & npm version | ConvertFrom-Json | ForEach-Object { $_.PowerShell } }
+            $script:PackageJson.version
         }
-
-    Write-Host "`n### Extension Version: $script:ExtensionVersion`n" -ForegroundColor Green
 
     if ($updateVersion) {
         exec { & npm version $script:ExtensionVersion --no-git-tag-version --allow-same-version }
     }
+
+    $script:ExtensionName = $script:PackageJson.name
+    Write-Host "`n### Extension Version: $script:ExtensionVersion Extension Name: $script:ExtensionName`n" -ForegroundColor Green
 }
 
 task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices, Package {
@@ -109,6 +111,30 @@ task Test Build, {
     }
 }
 
+task CheckPreview -If { $script:ExtensionVersion -like "*preview*" } `
+    UpdateReadme, UpdatePackageJson
+
+task UpdateReadme {
+    $newReadmeTop = '# PowerShell Language Support for Visual Studio Code
+
+> ## ATTENTION: This is the PREVIEW version of the PowerShell extension for VSCode which contains features that are being evaluated for stable
+> ### If you are looking for the stable version, please [go here](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) or install the extension called "PowerShell" (not "PowerShell Preview")
+> ## NOTE: If you have both stable (aka "PowerShell") and preview (aka "PowerShell Preview") installed, you MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance. Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)'
+    $readmePath = (Join-Path $PSScriptRoot README.md)
+
+    $readmeContent = Get-Content -Path $readmePath
+    $readmeContent[0] = $newReadmeTop
+    $readmeContent > $readmePath
+}
+
+task UpdatePackageJson {
+    $script:PackageJson.name = "PowerShell-Preview"
+    $script:PackageJson.displayName = "PowerShell Preview"
+    $script:PackageJson.description = "(Preview) Develop PowerShell scripts in Visual Studio Code!"
+    $script:ExtensionName = $script:PackageJson.name
+    Set-Content -Path $PSScriptRoot/package.json ($script:PackageJson | ConvertTo-Json -Depth 100)
+}
+
 task Package {
 
     if ($script:psesBuildScriptPath) {
@@ -126,7 +152,7 @@ task Package {
     exec { & node ./node_modules/vsce/out/vsce package }
 
     # Change the package to have a static name for automation purposes
-    Move-Item -Force .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
+    Move-Item -Force .\$($script:ExtensionName)-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
@@ -134,4 +160,4 @@ task UploadArtifacts -If { $env:AppVeyor } {
 }
 
 # The default task is to run the entire CI build
-task . GetExtensionVersion, CleanAll, BuildAll, Test, Package, UploadArtifacts
+task . GetExtensionData, CleanAll, BuildAll, Test, CheckPreview, Package, UploadArtifacts

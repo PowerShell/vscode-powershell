@@ -36,10 +36,9 @@ export enum SessionStatus {
 }
 
 export class SessionManager implements Middleware {
+    public HostVersion: string;
 
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
-
-    private hostVersion: string;
     private editorServicesArgs: string;
     private powerShellExePath: string = "";
     private sessionStatus: SessionStatus = SessionStatus.NeverStarted;
@@ -66,15 +65,18 @@ export class SessionManager implements Middleware {
     constructor(
         private requiredEditorServicesVersion: string,
         private log: Logger,
-        private documentSelector: DocumentSelector) {
+        private documentSelector: DocumentSelector,
+        private context: vscode.ExtensionContext) {
 
         this.platformDetails = getPlatformDetails();
+        const extensionName = context.storagePath.toLowerCase().includes("ms-vscode.powershell-preview") ?
+            "ms-vscode.PowerShell-Preview" : "ms-vscode.PowerShell";
 
         // Get the current version of this extension
-        this.hostVersion =
+        this.HostVersion =
             vscode
                 .extensions
-                .getExtension("ms-vscode.PowerShell")
+                .getExtension(extensionName)
                 .packageJSON
                 .version;
 
@@ -83,13 +85,13 @@ export class SessionManager implements Middleware {
 
         this.log.write(
             `Visual Studio Code v${vscode.version} ${procBitness}`,
-            `PowerShell Extension v${this.hostVersion}`,
+            `PowerShell Extension v${this.HostVersion}`,
             `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`);
 
         // Fix the host version so that PowerShell can consume it.
         // This is needed when the extension uses a prerelease
         // version string like 0.9.1-insiders-1234.
-        this.hostVersion = this.hostVersion.split("-")[0];
+        this.HostVersion = this.HostVersion.split("-")[0];
 
         this.registerCommands();
     }
@@ -169,7 +171,7 @@ export class SessionManager implements Middleware {
             this.editorServicesArgs =
                 `-HostName 'Visual Studio Code Host' ` +
                 `-HostProfileId 'Microsoft.VSCode' ` +
-                `-HostVersion '${this.hostVersion}' ` +
+                `-HostVersion '${this.HostVersion}' ` +
                 `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
                 `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
                 `-EnableConsoleRepl `;

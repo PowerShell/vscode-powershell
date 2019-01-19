@@ -13,6 +13,11 @@ IMPORTANT: you can generate a bug report directly from the
 PowerShell extension in Visual Studio Code by selecting
 "PowerShell: Upload Bug Report to GitHub" from the command palette.
 
+NOTE: If you have both stable (aka "PowerShell") and preview (aka "PowerShell Preview") installed,
+you MUST DISABLE one of them for the best performance.
+Docs on how to disable an extension can be found here:
+https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension
+
 The more repro details you can provide, along with a zip
 of the log files from your session, the better the chances
 are for a quick resolution.
