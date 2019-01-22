@@ -35,9 +35,8 @@ export class PesterTestsFeature implements IFeature {
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTests",
-            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?, pesterSupportsLineNumber?) => {
-                this.launchTests(uriString, runInDebugger, describeBlockName,
-                                 describeBlockLineNumber, pesterSupportsLineNumber);
+            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?) => {
+                this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber);
             });
     }
 
@@ -56,11 +55,11 @@ export class PesterTestsFeature implements IFeature {
     }
 
     private async launchTests(uriString: string, runInDebugger: boolean, describeBlockName?: string,
-                              describeBlockLineNumber?: number, pesterSupportsLineNumber = false) {
+                              describeBlockLineNumber?: number) {
         // PSES passes null for the describeBlockName to signal that it can't evaluate the TestName.
-        if (!describeBlockName && !pesterSupportsLineNumber) {
+        if (!describeBlockName && !describeBlockLineNumber) {
             const answer = await vscode.window.showErrorMessage(
-                "This Describe block's TestName parameter cannot be evaluated in versions of Pester before 4.6.0." +
+                "This Describe block's TestName parameter cannot be evaluated in versions of Pester before 4.6.0. " +
                 `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
                 "Yes", "No");
 
@@ -70,10 +69,9 @@ export class PesterTestsFeature implements IFeature {
         }
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(uriString, launchType,
-                                                     describeBlockLineNumber, pesterSupportsLineNumber);
+        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockLineNumber);
 
-        if (describeBlockName && !pesterSupportsLineNumber) {
+        if (describeBlockName && !describeBlockLineNumber) {
             launchConfig.args.push("-TestName");
             launchConfig.args.push(`'${describeBlockName}'`);
         }
