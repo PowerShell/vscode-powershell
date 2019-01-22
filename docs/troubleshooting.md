@@ -34,6 +34,11 @@ and you can ask for new features [in their repository](https://github.com/Micros
 
 ## Known Issues in the Extension
 
+- If you are running the Preview version "PowerShell Preview" side-by-side with the stable version "PowerShell"
+  you will experience performance and debug issues.
+  This is expected until VSCode offers extension channels - [vscode#15756](https://github.com/Microsoft/vscode/issues/15756)
+  - You MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance.
+    Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)
 - Highlighting/completions/command history don't work as I expect in the
   Integrated Console - [#535]
   - The Integrated Console implements a [custom host]
@@ -155,6 +160,12 @@ Logs provide context for what was happening when the issue occurred
 
   ```powershell
   $HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-<version>/logs/
+  ```
+
+  or if you're using the preview version of the extension
+
+  ```powershell
+  $HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-preview-<version>/logs/
   ```
 
   For example:

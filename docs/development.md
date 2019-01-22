@@ -44,3 +44,15 @@ press <kbd>Ctrl</kbd>+<kbd>F5</kbd> or <kbd>Cmd</kbd>+<kbd>F5</kbd> on macOS.
 ```
 code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
 ```
+
+## Building a "Preview" version
+
+To build a preview version of the extension, that is to say,
+a version of the extension named "PowerShell Preview",
+You can simply change the version in the package.json to include `-preview` at the end.
+When you build, this will:
+
+- Add a warning to the top of the README.md to warn users not to have the stable and preview version enabled at the same time
+- Adds "Preview" in a few places in the package.json
+
+This mechanism is mostly used for releases.
