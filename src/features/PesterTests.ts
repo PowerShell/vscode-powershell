@@ -62,7 +62,7 @@ export class PesterTestsFeature implements IFeature {
                 `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
                 "Yes", "No");
 
-            if (answer === "No") {
+            if (answer !== "Yes") {
                 return;
             }
         }
