@@ -35,8 +35,9 @@ export class PesterTestsFeature implements IFeature {
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTests",
-            (uriString, runInDebugger, describeBlockName?) => {
-                this.launchTests(uriString, runInDebugger, describeBlockName);
+            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?, pesterSupportsLineNumber?) => {
+                this.launchTests(uriString, runInDebugger, describeBlockName,
+                                 describeBlockLineNumber, pesterSupportsLineNumber);
             });
     }
 
@@ -54,9 +55,10 @@ export class PesterTestsFeature implements IFeature {
         this.launch(launchConfig);
     }
 
-    private async launchTests(uriString: string, runInDebugger: boolean, describeBlockName?: string) {
+    private async launchTests(uriString: string, runInDebugger: boolean, describeBlockName?: string,
+                              describeBlockLineNumber?: number, pesterSupportsLineNumber = false) {
         // PSES passes null for the describeBlockName to signal that it can't evaluate the TestName.
-        if (!describeBlockName) {
+        if (!describeBlockName && !pesterSupportsLineNumber) {
             const answer = await vscode.window.showErrorMessage(
                 "This Describe block's TestName parameter cannot be evaluated. " +
                 `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
@@ -68,9 +70,10 @@ export class PesterTestsFeature implements IFeature {
         }
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(uriString, launchType);
+        const launchConfig = this.createLaunchConfig(uriString, launchType,
+                                                     describeBlockLineNumber, pesterSupportsLineNumber);
 
-        if (describeBlockName) {
+        if (describeBlockName && !pesterSupportsLineNumber) {
             launchConfig.args.push("-TestName");
             launchConfig.args.push(`'${describeBlockName}'`);
         }
@@ -78,7 +81,8 @@ export class PesterTestsFeature implements IFeature {
         this.launch(launchConfig);
     }
 
-    private createLaunchConfig(uriString: string, launchType: LaunchType) {
+    private createLaunchConfig(uriString: string, launchType: LaunchType,
+                               describeBlockLineNumber?: number, pesterSupportsLineNumber = false) {
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
@@ -86,6 +90,14 @@ export class PesterTestsFeature implements IFeature {
         // Since we pass the script path to PSES in single quotes to avoid issues with PowerShell
         // special chars like & $ @ () [], we do have to double up the interior single quotes.
         const scriptPath = uri.fsPath.replace(/'/g, "''");
+
+        let pesterOption: string;
+        if (pesterSupportsLineNumber) {
+            pesterOption = "(New-PesterOption -ScriptBlockFilter " +
+                `@( @{ IncludeVSCodeMarker=$true; Line=${describeBlockLineNumber}; Path='${scriptPath}' } ) )`;
+        } else {
+            pesterOption = "@{IncludeVSCodeMarker=$true}";
+        }
 
         const launchConfig = {
             request: "launch",
@@ -96,7 +108,7 @@ export class PesterTestsFeature implements IFeature {
                 "-Script",
                 `'${scriptPath}'`,
                 "-PesterOption",
-                "@{IncludeVSCodeMarker=$true}",
+                pesterOption,
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: (launchType === LaunchType.Run),
