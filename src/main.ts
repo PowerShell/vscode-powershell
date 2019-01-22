@@ -157,6 +157,12 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext) {
     const extensionName = context.storagePath.toLowerCase().includes("ms-vscode.powershell-preview") ?
         "ms-vscode.PowerShell-Preview" : "ms-vscode.PowerShell";
 
+    if (extensionName === "ms-vscode.PowerShell-Preview"
+        && vscode.extensions.getExtension("ms-vscode.PowerShell")) {
+        vscode.window.showWarningMessage(
+            "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
+    }
+
     const extensionVersion: string =
         vscode
             .extensions
