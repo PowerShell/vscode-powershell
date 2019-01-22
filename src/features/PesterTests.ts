@@ -79,8 +79,7 @@ export class PesterTestsFeature implements IFeature {
         this.launch(launchConfig);
     }
 
-    private createLaunchConfig(uriString: string, launchType: LaunchType,
-                               describeBlockLineNumber?: number, pesterSupportsLineNumber = false) {
+    private createLaunchConfig(uriString: string, launchType: LaunchType, describeBlockLineNumber?: number) {
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
@@ -90,7 +89,7 @@ export class PesterTestsFeature implements IFeature {
         const scriptPath = uri.fsPath.replace(/'/g, "''");
 
         let pesterOption: string;
-        if (pesterSupportsLineNumber) {
+        if (describeBlockLineNumber) {
             pesterOption = "(New-PesterOption -ScriptBlockFilter " +
                 `@( @{ IncludeVSCodeMarker=$true; Line=${describeBlockLineNumber}; Path='${scriptPath}' } ) )`;
         } else {
