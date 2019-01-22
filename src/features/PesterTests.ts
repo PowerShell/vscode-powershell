@@ -60,7 +60,7 @@ export class PesterTestsFeature implements IFeature {
         // PSES passes null for the describeBlockName to signal that it can't evaluate the TestName.
         if (!describeBlockName && !pesterSupportsLineNumber) {
             const answer = await vscode.window.showErrorMessage(
-                "This Describe block's TestName parameter cannot be evaluated. " +
+                "This Describe block's TestName parameter cannot be evaluated in versions of Pester before 4.6.0." +
                 `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
                 "Yes", "No");
 
