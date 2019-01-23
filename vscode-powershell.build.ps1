@@ -32,6 +32,7 @@ task GetExtensionData -Before Package {
 
     if ($updateVersion) {
         exec { & npm version $script:ExtensionVersion --no-git-tag-version --allow-same-version }
+        $script:PackageJson.version = $script:ExtensionVersion
     }
 
     $script:ExtensionName = $script:PackageJson.name
@@ -111,7 +112,7 @@ task Test Build, {
     }
 }
 
-task CheckPreview -If { $script:ExtensionVersion -like "*preview*" } `
+task CheckPreview -If { $script:ExtensionName -like "*Preview*" } `
     UpdateReadme, UpdatePackageJson
 
 task UpdateReadme {
