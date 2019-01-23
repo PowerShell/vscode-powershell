@@ -111,7 +111,7 @@ task Test Build, {
     }
 }
 
-task CheckPreview -If { $script:ExtensionVersion -like "*preview*" } `
+task CheckPreview -If { $script:ExtensionName -like "*Preview*" } `
     UpdateReadme, UpdatePackageJson
 
 task UpdateReadme {
