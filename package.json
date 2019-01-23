@@ -2,6 +2,7 @@
   "name": "PowerShell",
   "displayName": "PowerShell",
   "version": "2.0.0-preview.1",
+  "preview": false,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {

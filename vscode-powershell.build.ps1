@@ -133,6 +133,7 @@ task UpdatePackageJson {
     $script:PackageJson.name = "PowerShell-Preview"
     $script:PackageJson.displayName = "PowerShell Preview"
     $script:PackageJson.description = "(Preview) Develop PowerShell scripts in Visual Studio Code!"
+    $script:PackageJson.preview = $true
     $script:ExtensionName = $script:PackageJson.name
     Set-Content -Path $PSScriptRoot/package.json ($script:PackageJson | ConvertTo-Json -Depth 100)
 }
