@@ -6,20 +6,20 @@
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
 - [vscode-PowerShell #1587](https://github.com/PowerShell/vscode-PowerShell/pull/1587) -
-  Removed ShowOnlineHelp Command  (Thanks @corbob!)
+  Removed ShowOnlineHelp Command (Thanks @corbob!)
 
 #### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
 
 - [PowerShellEditorServices #792](https://github.com/PowerShell/PowerShellEditorServices/pull/792) -
-  Add Async suffix to async methods  (Thanks @dee-see!)
+  Add Async suffix to async methods (Thanks @dee-see!)
 - [PowerShellEditorServices #775](https://github.com/PowerShell/PowerShellEditorServices/pull/775) -
-  Removed ShowOnlineHelp Message  (Thanks @corbob!)
+  Removed ShowOnlineHelp Message (Thanks @corbob!)
 - [PowerShellEditorServices #769](https://github.com/PowerShell/PowerShellEditorServices/pull/769) -
   Set Runspaces to use STA when running in Windows PowerShell
 - [PowerShellEditorServices #741](https://github.com/PowerShell/PowerShellEditorServices/pull/741) -
   Migrate to netstandard2.0 and PSStandard
 - [PowerShellEditorServices #672](https://github.com/PowerShell/PowerShellEditorServices/pull/672) -
-  PSReadLine integration  (Thanks @SeeminglyScience!)
+  PSReadLine integration (Thanks @SeeminglyScience!)
 
 ## v1.10.2
 ### Tuesday, December 18, 2018
