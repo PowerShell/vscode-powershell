@@ -12,8 +12,7 @@ to the PowerShell extension and comes with some exciting features.
 The PowerShell Preview extension is a substitute for the PowerShell extension so
 both the PowerShell extension and the PowerShell Preview extension should not be enabled at the same time.
 
-By having a preview channel, which only supports Windows Powershell 5.1 and PowerShell Core 6,
-in addition to our existing stable channel, we can get new features out faster.
+By having a preview channel, in addition to our existing stable channel, we can get new features out faster and get feedback faster from you, the users.
 
 ##### How to Get/Use the PowerShell Preview extension
 
