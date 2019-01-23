@@ -32,6 +32,7 @@ task GetExtensionData -Before Package {
 
     if ($updateVersion) {
         exec { & npm version $script:ExtensionVersion --no-git-tag-version --allow-same-version }
+        $script:PackageJson.version = $script:ExtensionVersion
     }
 
     $script:ExtensionName = $script:PackageJson.name
