@@ -1,5 +1,75 @@
 # vscode-powershell Release History
 
+## v2.0.0-preview.1
+### Wednesday, January 23, 2019
+
+#### Preview builds of the PowerShell extension are now available in VSCode
+
+We are excited to announce the PowerShell Preview extension in the VSCode marketplace!
+The PowerShell Preview extension allows users on Windows PowerShell 5.1 and PowerShell Core 6 to get and test the latest updates
+to the PowerShell extension and comes with some exciting features.
+
+The PowerShell Preview extension is a substitute for the PowerShell extension so
+both the PowerShell extension and the PowerShell Preview extension should not be enabled at the same time.
+
+By having a preview channel, in addition to our existing stable channel, we can get new features out faster and get feedback faster from you, the users.
+
+##### How to Get/Use the PowerShell Preview extension
+
+If you dont already have VSCode, start [here](https://code.visualstudio.com/Docs/setup/setup-overview).
+
+Once you have VSCode open, click `Clt+Shift+X` to open the extensions marketplace.
+Next, type `PowerShell Preview` in the search bar.
+Click `Install` on the `PowerShell Preview` page.
+Finally, click `Reload` in order to refresh VSCode.
+
+If you already have the PowerShell extension, please disable it to use the Powershell Preview extension.
+To disable the PowerShell extension, find it in the Extensions sidebar view, specifically under the list of Enabled extensions,
+Right-click on the PowerShell extension and select `Disable`.
+Please note that it is important to only have either the PowerShell extension or the PowerShell Preview extension enabled at one time.
+![How to Disable](https://github.com/PowerShell/powershell.github.io/blob/master/PowerShell-Blog/Images/disable-extension.jpg)
+
+#### What the first preview contains
+
+The v2.0.0-preview.1 version of the extension is built on .NET Standard
+(enabling support for both Windows PowerShell and PowerShell Core from one assembly)
+
+It also contains PSReadLine support in the integrated console for Windows behind a feature flag.
+PSReadLine provides a consistent and rich interactive experience,
+including syntax coloring and multi-line editing and history, in the PowerShell console, in Cloud Shell,
+and now in VSCode terminal. For more information on the benefits of PSReadLine,
+check out their [documentation](https://docs.microsoft.com/en-us/powershell/module/psreadline/about/about_psreadline?view=powershell-6).
+
+To enable PSReadLine support in the Preview version on Windows, please add the following to your user settings:
+
+```
+"powershell.developer.featureFlags": [ "PSReadLine" ]
+```
+
+HUGE thanks to @SeeminglyScience for all his amazing work getting PSReadLine working in PowerShell Editor Services!
+
+#### Breaking Changes
+
+As stated above, this version of the PowerShell extension only works with Windows PowerShell versions 5.1 and PowerShell Core 6.
+
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [vscode-PowerShell #1587](https://github.com/PowerShell/vscode-PowerShell/pull/1587) -
+  Removed ShowOnlineHelp Command (Thanks @corbob!)
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #792](https://github.com/PowerShell/PowerShellEditorServices/pull/792) -
+  Add Async suffix to async methods (Thanks @dee-see!)
+- [PowerShellEditorServices #775](https://github.com/PowerShell/PowerShellEditorServices/pull/775) -
+  Removed ShowOnlineHelp Message (Thanks @corbob!)
+- [PowerShellEditorServices #769](https://github.com/PowerShell/PowerShellEditorServices/pull/769) -
+  Set Runspaces to use STA when running in Windows PowerShell
+- [PowerShellEditorServices #741](https://github.com/PowerShell/PowerShellEditorServices/pull/741) -
+  Migrate to netstandard2.0 and PSStandard
+- [PowerShellEditorServices #672](https://github.com/PowerShell/PowerShellEditorServices/pull/672) -
+  PSReadLine integration (Thanks @SeeminglyScience!)
+
 ## v1.10.2
 ### Tuesday, December 18, 2018
 
