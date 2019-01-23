@@ -6,13 +6,13 @@
 #### Preview builds of the PowerShell extension are now available in VSCode
 
 We are excited to announce the PowerShell Preview extension in the VSCode marketplace!
-The PowerShell Preview extension allows users on Windows PowerShell 5.1 and newer to get and test the latest updates
+The PowerShell Preview extension allows users on Windows PowerShell 5.1 and PowerShell Core 6 to get and test the latest updates
 to the PowerShell extension and comes with some exciting features.
 
 The PowerShell Preview extension is a substitute for the PowerShell extension so
 both the PowerShell extension and the PowerShell Preview extension should not be enabled at the same time.
 
-By having a preview channel, which only supports Windows Powershell 5.1 and newer,
+By having a preview channel, which only supports Windows Powershell 5.1 and PowerShell Core 6,
 in addition to our existing stable channel, we can get new features out faster.
 
 ##### How to Get/Use the PowerShell Preview extension
@@ -51,7 +51,7 @@ HUGE thanks to @SeeminglyScience for all his amazing work getting PSReadLine wor
 
 #### Breaking Changes
 
-As stated above, this version of the PowerShell extension only works with PowerShell versions 5.1 and higher.
+As stated above, this version of the PowerShell extension only works with Windows PowerShell versions 5.1 and PowerShell Core 6.
 
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
