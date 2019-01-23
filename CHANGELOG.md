@@ -1,5 +1,57 @@
 # vscode-powershell Release History
 
+## v1.11.0
+### Wednesday, January 23, 2019
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [vscode-PowerShell #1714](https://github.com/PowerShell/vscode-PowerShell/pull/1714) -
+  Do not run pester tests when user cancels questions using the x button  (Thanks @bergmeister!)
+- [vscode-PowerShell #1701](https://github.com/PowerShell/vscode-PowerShell/pull/1701) -
+  Interpret null Describe TestName to mean value can't be eval'd  (Thanks @rkeithhill!)
+- [vscode-PowerShell #1698](https://github.com/PowerShell/vscode-PowerShell/pull/1698) -
+  Add 'Run/Debug Pester tests' command and file tab menu  (Thanks @bergmeister!)
+- [vscode-PowerShell #1697](https://github.com/PowerShell/vscode-PowerShell/pull/1697) -
+  Remove Region Block snippet  (Thanks @fullenw1!)
+- [vscode-PowerShell #1690](https://github.com/PowerShell/vscode-PowerShell/pull/1690) -
+  Refresh CommandExplorer on visible
+- [vscode-PowerShell #1688](https://github.com/PowerShell/vscode-PowerShell/pull/1688) -
+  Fix spacing of package.json after running Invoke-Build to not end up with local changes  (Thanks @bergmeister!)
+- [vscode-PowerShell #1638](https://github.com/PowerShell/vscode-PowerShell/pull/1638) -
+  Add icons and enable setting for Command Explorer  (Thanks @corbob!)
+- [vscode-PowerShell #1679](https://github.com/PowerShell/vscode-PowerShell/pull/1679) -
+  Update broken links in README  (Thanks @josh-!)
+- [vscode-PowerShell #1670](https://github.com/PowerShell/vscode-PowerShell/pull/1670) -
+  Update recommended NodeJS version to 8.x since 6.x will go out of support in April 2019  (Thanks @bergmeister!)
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #851](https://github.com/PowerShell/PowerShellEditorServices/pull/851) -
+  Fix #827 Pester TestName w/expandable str returns nothing  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #842](https://github.com/PowerShell/PowerShellEditorServices/pull/842) -
+  Fix typos  (Thanks @alexandair!)
+- [PowerShellEditorServices #838](https://github.com/PowerShell/PowerShellEditorServices/pull/838) -
+  Fix NullRefEx bug when accessing scriptFile.ReferencedFiles  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #839](https://github.com/PowerShell/PowerShellEditorServices/pull/839) -
+  Fix FileNotFoundEx crash when Fold happens on untitled: scheme doc  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #843](https://github.com/PowerShell/PowerShellEditorServices/pull/843) -
+  Simplify the parameter descriptions and fix typos  (Thanks @alexandair!)
+- [PowerShellEditorServices #844](https://github.com/PowerShell/PowerShellEditorServices/pull/844) -
+  Fix an empty verbose message when importing an editor command  (Thanks @alexandair!)
+- [PowerShellEditorServices #828](https://github.com/PowerShell/PowerShellEditorServices/pull/828) -
+  Compile against net452 because net451 is not supported any more  (Thanks @bergmeister!)
+- [PowerShellEditorServices #848](https://github.com/PowerShell/PowerShellEditorServices/pull/848) -
+  switch an instance of GetFile to TryGetFile to fix #1689
+- [PowerShellEditorServices #846](https://github.com/PowerShell/PowerShellEditorServices/pull/846) -
+  Workaround "attach to process" hang
+- [PowerShellEditorServices #829](https://github.com/PowerShell/PowerShellEditorServices/pull/829) -
+  Update various NuGet packages  (Thanks @bergmeister!)
+- [PowerShellEditorServices #825](https://github.com/PowerShell/PowerShellEditorServices/pull/825) -
+  (GH-824)(GH-812) Improve code folding speed  (Thanks @glennsarti!)
+- [PowerShellEditorServices #850](https://github.com/PowerShell/PowerShellEditorServices/pull/850) -
+  Fix VSCODE 1683 - HelpCommentReqHdlr crash on GetFile  (Thanks @rkeithhill!)
+- [PowerShellEditorServices #837](https://github.com/PowerShell/PowerShellEditorServices/pull/837) -
+  (maint) Add traits for folding tests  (Thanks @glennsarti!)
+
 ## v1.10.2
 ### Tuesday, December 18, 2018
 
