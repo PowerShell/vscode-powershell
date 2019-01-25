@@ -66,19 +66,10 @@ export class SessionManager implements Middleware {
         private requiredEditorServicesVersion: string,
         private log: Logger,
         private documentSelector: DocumentSelector,
-        private context: vscode.ExtensionContext) {
+        private version: string) {
 
         this.platformDetails = getPlatformDetails();
-        const extensionName = context.storagePath.toLowerCase().includes("ms-vscode.powershell-preview") ?
-            "ms-vscode.PowerShell-Preview" : "ms-vscode.PowerShell";
-
-        // Get the current version of this extension
-        this.HostVersion =
-            vscode
-                .extensions
-                .getExtension(extensionName)
-                .packageJSON
-                .version;
+        this.HostVersion = version;
 
         const osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
