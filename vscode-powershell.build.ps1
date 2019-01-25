@@ -103,8 +103,13 @@ task BuildEditorServices {
 task BuildAll BuildEditorServices, Build
 
 task Test Build, {
-    Write-Host "`n### Running extension tests" -ForegroundColor Green
-    exec { & npm run test }
+    if (!$global:IsLinux) {
+        Write-Host "`n### Running extension tests" -ForegroundColor Green
+        exec { & npm run test }
+    }
+    else {
+        Write-Host "`n### Skipping extension tests on Linux platform" -ForegroundColor Yellow
+    }
 }
 
 task CheckPreview -If { $script:ExtensionName -like "*Preview*" } `
