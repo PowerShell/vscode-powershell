@@ -505,7 +505,7 @@
         },
         "powershell.sideBar.CommandExplorerExcludeFilter": {
           "type":"array",
-          "default":"",
+          "default":[],
           "description": "Specify array of Modules to exclude from Command Explorer listing."
         },
         "powershell.powerShellExePath": {
