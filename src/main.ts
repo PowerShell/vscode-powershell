@@ -155,9 +155,13 @@ export function activate(context: vscode.ExtensionContext): void {
 // we have this function as a workaround to grab the version
 function getCurrentVersion(context: vscode.ExtensionContext) {
     // sometimes storagePath is null. This happens when an Untitled workspace is opened
-    let pathToCheck = context.storagePath;
-    if (pathToCheck === undefined) {
+    let pathToCheck: string;
+    if (context.storagePath) {
+        pathToCheck = context.storagePath;
+    } else if (context.extensionPath) {
         pathToCheck = context.extensionPath;
+    } else {
+        pathToCheck = __dirname;
     }
 
     const extensionName = pathToCheck.toLowerCase().includes("ms-vscode.powershell-preview") ?

@@ -24,6 +24,10 @@ suite("Main tests", () => {
                 description: "Testing supplying 'extensionPath'",
                 data: { extensionPath: "/my/path/to/ms-vscode.powershell-preview/foo" },
             },
+            {
+                description: "Testing supplying 'nothing'",
+                data: {},
+            },
         ];
         for (const testCase of testCases) {
             test(testCase.description, () => {
