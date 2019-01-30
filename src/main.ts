@@ -49,7 +49,9 @@ const documentSelector: DocumentSelector = [
 
 export function activate(context: vscode.ExtensionContext): void {
 
-    checkForUpdatedVersion(context);
+    const version = getCurrentVersion(context);
+
+    checkForUpdatedVersion(context, version);
 
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -116,7 +118,7 @@ export function activate(context: vscode.ExtensionContext): void {
             requiredEditorServicesVersion,
             logger,
             documentSelector,
-            context);
+            version);
 
     // Create features
     extensionFeatures = [
@@ -149,36 +151,50 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 }
 
-function checkForUpdatedVersion(context: vscode.ExtensionContext) {
+// Until VSCode offers an easier way to grab the extension name,
+// we have this function as a workaround to grab the version
+function getCurrentVersion(context: vscode.ExtensionContext) {
+    // sometimes storagePath is null. This happens when an Untitled workspace is opened
+    let pathToCheck: string;
+    if (context.storagePath) {
+        pathToCheck = context.storagePath;
+    } else if (context.extensionPath) {
+        pathToCheck = context.extensionPath;
+    } else {
+        pathToCheck = __dirname;
+    }
 
-    const showReleaseNotes = "Show Release Notes";
-    const powerShellExtensionVersionKey = "powerShellExtensionVersion";
-
-    const extensionName = context.storagePath.toLowerCase().includes("ms-vscode.powershell-preview") ?
+    const extensionName = pathToCheck.toLowerCase().includes("ms-vscode.powershell-preview") ?
         "ms-vscode.PowerShell-Preview" : "ms-vscode.PowerShell";
 
+    // If both extensions are enabled, this will cause unexpected behavior since both register the same commands
     if (extensionName === "ms-vscode.PowerShell-Preview"
         && vscode.extensions.getExtension("ms-vscode.PowerShell")) {
         vscode.window.showWarningMessage(
             "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
     }
 
-    const extensionVersion: string =
-        vscode
-            .extensions
-            .getExtension(extensionName)
-            .packageJSON
-            .version;
+    return vscode
+        .extensions
+        .getExtension(extensionName)
+        .packageJSON
+        .version;
+}
+
+function checkForUpdatedVersion(context: vscode.ExtensionContext, version: string) {
+
+    const showReleaseNotes = "Show Release Notes";
+    const powerShellExtensionVersionKey = "powerShellExtensionVersion";
 
     const storedVersion = context.globalState.get(powerShellExtensionVersionKey);
 
     if (!storedVersion) {
         // TODO: Prompt to show User Guide for first-time install
-    } else if (extensionVersion !== storedVersion) {
+    } else if (version !== storedVersion) {
         vscode
             .window
             .showInformationMessage(
-                `The PowerShell extension has been updated to version ${extensionVersion}!`,
+                `The PowerShell extension has been updated to version ${version}!`,
                 showReleaseNotes)
             .then((choice) => {
                 if (choice === showReleaseNotes) {
@@ -191,7 +207,7 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext) {
 
     context.globalState.update(
         powerShellExtensionVersionKey,
-        extensionVersion);
+        version);
 }
 
 export function deactivate(): void {

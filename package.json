@@ -44,7 +44,11 @@
   "devDependencies": {
     "@types/mocha": "~2.2.32",
     "@types/node": "~10.12.12",
+    "@types/rewire": "^2.5.28",
+    "@types/sinon": "^7.0.5",
     "mocha": "~4.0.1",
+    "rewire": "^4.0.1",
+    "sinon": "^7.2.3",
     "tslint": "~5.11.0",
     "typescript": "~3.2.1",
     "vsce": "~1.46.0",

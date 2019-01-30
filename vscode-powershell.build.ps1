@@ -103,12 +103,12 @@ task BuildEditorServices {
 task BuildAll BuildEditorServices, Build
 
 task Test Build, {
-    if (!$global:IsLinux -and !$global:IsMacOS) {
+    if (!$global:IsLinux) {
         Write-Host "`n### Running extension tests" -ForegroundColor Green
         exec { & npm run test }
     }
     else {
-        Write-Host "`n### Skipping extension tests on non-Windows platform" -ForegroundColor Yellow
+        Write-Host "`n### Skipping extension tests on Linux platform" -ForegroundColor Yellow
     }
 }
 
