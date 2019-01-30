@@ -68,8 +68,10 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             const platformDetails = getPlatformDetails();
             const versionDetails = this.sessionManager.getPowerShellVersionDetails();
 
-            if (platformDetails.operatingSystem !== OperatingSystem.Windows) {
-                const msg = "Attaching to a PowerShell Host Process is supported only on Windows.";
+            // Cross-platform attach to process was added in 6.2.0-preview.4
+            if (versionDetails.version < "6.2.0" && platformDetails.operatingSystem !== OperatingSystem.Windows) {
+                const msg = `Attaching to a PowerShell Host Process on ${
+                    OperatingSystem[platformDetails.operatingSystem] } requires PowerShell 6.2 or higher.`;
                 return vscode.window.showErrorMessage(msg).then((_) => {
                     return undefined;
                 });
