@@ -27,6 +27,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;
+    private currentPanel: vscode.WebviewPanel | undefined;
 
     constructor(private log: Logger) {
         super();
@@ -44,7 +45,11 @@ export class GetCommandsFeature extends LanguageClientConsumer {
             }
         });
 
-        vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => this.InsertCommand(item));
+        vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => {
+            this.languageClient.sendRequest(GetCommandRequestType, item.Name).then((result) => {
+                this.BuildCommand(result);
+            });
+        });
     }
 
     public dispose() {
@@ -73,13 +78,106 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     }
 
     private InsertCommand(item) {
-        const editor = vscode.window.activeTextEditor;
-        const sls = editor.selection.start;
-        const sle = editor.selection.end;
+        // TODO: Figure out how we can insert this....
+        let insertCommand: string = item.name;
+        if (item.filledParameters !== {}) {
+            // tslint:disable-next-line:forin
+            for (const element in item.filledParameters) {
+                insertCommand += " -" + element + " " + item.filledParameters[element];
+            }
+        }
+        const edi = vscode.window.activeTextEditor;
+        // TODO: Determine what we need that's not any...
+        const editor = vscode.window.visibleTextEditors.filter((ed: any) => (ed._id === item.editor._id));
+        if (editor.length !== 1) {
+            vscode.window.showErrorMessage("The previously active editor has gone away.");
+            return;
+        }
+        const sls = editor[0].selection.start;
+        const sle = editor[0].selection.end;
         const range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
-        editor.edit((editBuilder) => {
-            editBuilder.replace(range, item.Name);
+        editor[0].edit((editBuilder) => {
+            editBuilder.replace(range, insertCommand);
         });
+    }
+
+    private BuildCommand(item) {
+        if (vscode.window.activeTextEditor.document.languageId !== "powershell"){
+            vscode.window.showErrorMessage("Active editor is not a PowerShell window.");
+            return;
+        }
+        item[0].editor = vscode.window.activeTextEditor;
+        if (this.currentPanel) {
+            this.currentPanel.reveal();
+        } else {
+            this.currentPanel = vscode.window.createWebviewPanel(
+                "powerShellCommandInput",
+                "PowerShell Command Input",
+                vscode.ViewColumn.Beside,
+                {
+                    enableScripts: true,
+                },
+            );
+            this.currentPanel.webview.html = this.makeMyContent();
+            this.currentPanel.webview.onDidReceiveMessage((message) => {
+                this.InsertCommand(message);
+                this.currentPanel.dispose();
+            });
+            this.currentPanel.onDidDispose(() => {
+                this.currentPanel = undefined;
+            });
+        }
+        this.currentPanel.webview.postMessage(item);
+    }
+
+    private makeMyContent() {
+        return `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Cat Coding</title>
+        </head>
+        <body>
+            <form id="Command" onsubmit="mySubmit()">
+            <div id="CommandDiv"></div>
+            <input type="submit" />
+            </form>
+            <script>
+                const vscode = acquireVsCodeApi();
+                const command = document.getElementById('CommandDiv');
+                var message;
+                window.addEventListener('message', event => {
+                    message = undefined;
+                    // Remove previous nodes if there are any.
+                    while(command.hasChildNodes()) {
+                        command.removeChild(command.childNodes[0])
+                    }
+                    message = event.data[0];
+                    for(var parameter in message.parameters) {
+                        let parameterLabel = document.createElement('label');
+                        parameterLabel.htmlFor = parameter;
+                        parameterLabel.innerText = parameter;
+                        command.appendChild(parameterLabel);
+                        let parameterInput = document.createElement('input');
+                        parameterInput.id = parameter;
+                        command.appendChild(parameterInput);
+                        command.appendChild(document.createElement('br'));
+                    }
+                });
+                function mySubmit() {
+                    let myMessage = message;
+                    myMessage.filledParameters = {};
+                    command.childNodes.forEach((node) => {
+                        if(node.tagName === "INPUT" && node.value !== ""){
+                        myMessage.filledParameters[node.id] = node.value
+                    }
+                    });
+                    vscode.postMessage(myMessage);
+                }
+            </script>
+        </body>
+        </html>`;
     }
 }
 
