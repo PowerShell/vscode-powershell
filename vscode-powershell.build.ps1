@@ -60,9 +60,9 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices,
     }
 }
 
-task Restore RestoreNodeModules -Before Build
+task Restore RestoreNodeModules -Before Build -If { -not (Test-Path "$PSScriptRoot/node_modules") }
 
-task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
+task RestoreNodeModules {
 
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
 
@@ -75,6 +75,7 @@ task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
 task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
     Remove-Item .\modules\* -Exclude "README.md" -Recurse -Force -ErrorAction Ignore
+    Remove-Item .\node_modules -Recurse -Force -ErrorAction Ignore
     Remove-Item .\out -Recurse -Force -ErrorAction Ignore
 }
 
