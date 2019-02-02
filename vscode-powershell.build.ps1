@@ -75,8 +75,8 @@ task RestoreNodeModules {
 task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
     Remove-Item .\modules\* -Exclude "README.md" -Recurse -Force -ErrorAction Ignore
-    Remove-Item .\node_modules -Recurse -Force -ErrorAction Ignore
     Remove-Item .\out -Recurse -Force -ErrorAction Ignore
+    exec { & npm prune }
 }
 
 task CleanEditorServices {
