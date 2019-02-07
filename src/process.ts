@@ -69,9 +69,10 @@ export class PowerShellProcess {
                         powerShellArgs.push("-ExecutionPolicy", "Bypass");
                     }
 
+                    this.startArgs = this.startArgs.replace(/'/g, '"');
                     powerShellArgs.push(
                         "-Command",
-                        "& '" + PowerShellProcess.escapeSingleQuotes(startScriptPath) + "' " + this.startArgs);
+                        "'& \"" + PowerShellProcess.escapeSingleQuotes(startScriptPath) + "\" " + this.startArgs + "'");
 
                     let powerShellExePath = this.exePath;
 
