@@ -1,5 +1,5 @@
 {
-  "name": "PowerShell",
+  "name": "powershell",
   "displayName": "PowerShell",
   "version": "2.0.0",
   "preview": true,
@@ -307,7 +307,8 @@
     ],
     "debuggers": [
       {
-        "type": "PowerShell",
+        "type": "powershell",
+        "label": "PowerShell",
         "enableBreakpointsFor": {
           "languageIds": [
             "powershell"
@@ -327,9 +328,9 @@
             "label": "PowerShell: Launch Current File",
             "description": "Launch current file (in active editor window) under debugger",
             "body": {
-              "type": "PowerShell",
-              "request": "launch",
               "name": "PowerShell Launch Current File",
+              "type": "powershell",
+              "request": "launch",
               "script": "^\"\\${file}\"",
               "args": [],
               "cwd": "^\"\\${file}\""
@@ -339,9 +340,9 @@
             "label": "PowerShell: Launch Current File in Temporary Console",
             "description": "Launch current file (in active editor window) under debugger in a temporary Integrated Console.",
             "body": {
-              "type": "PowerShell",
-              "request": "launch",
               "name": "PowerShell Launch Current File in Temporary Console",
+              "type": "powershell",
+              "request": "launch",
               "script": "^\"\\${file}\"",
               "args": [],
               "cwd": "^\"\\${file}\"",
@@ -352,9 +353,9 @@
             "label": "PowerShell: Launch Current File w/Args Prompt",
             "description": "Launch current file (in active editor window) under debugger, prompting first for script arguments",
             "body": {
-              "type": "PowerShell",
-              "request": "launch",
               "name": "PowerShell Launch Current File w/Args Prompt",
+              "type": "powershell",
+              "request": "launch",
               "script": "^\"\\${file}\"",
               "args": [
                 "^\"\\${command:SpecifyScriptArgs}\""
@@ -366,9 +367,9 @@
             "label": "PowerShell: Launch Script",
             "description": "Launch specified script or path to script under debugger",
             "body": {
-              "type": "PowerShell",
-              "request": "launch",
               "name": "PowerShell Launch ${Script}",
+              "type": "powershell",
+              "request": "launch",
               "script": "^\"\\${workspaceFolder}/${Script}\"",
               "args": [],
               "cwd": "^\"\\${workspaceFolder}\""
@@ -378,9 +379,9 @@
             "label": "PowerShell: Pester Tests",
             "description": "Invokes Pester tests under debugger",
             "body": {
-              "type": "PowerShell",
-              "request": "launch",
               "name": "PowerShell Pester Tests",
+              "type": "powershell",
+              "request": "launch",
               "script": "Invoke-Pester",
               "args": [],
               "cwd": "^\"\\${workspaceFolder}\""
@@ -390,9 +391,9 @@
             "label": "PowerShell: Attach to PowerShell Host Process",
             "description": "Open host process picker to select process to attach debugger to",
             "body": {
-              "type": "PowerShell",
-              "request": "attach",
               "name": "PowerShell Attach to Host Process",
+              "type": "powershell",
+              "request": "attach",
               "processId": "^\"\\${command:PickPSHostProcess}\"",
               "runspaceId": 1
             }
@@ -401,9 +402,9 @@
             "label": "PowerShell: Interactive Session",
             "description": "Start interactive session (Debug Console) under debugger",
             "body": {
-              "type": "PowerShell",
-              "request": "launch",
               "name": "PowerShell Interactive Session",
+              "type": "powershell",
+              "request": "launch",
               "cwd": ""
             }
           }
@@ -456,26 +457,26 @@
         },
         "initialConfigurations": [
           {
-            "type": "PowerShell",
-            "request": "launch",
             "name": "PowerShell Launch Current File",
+            "type": "powershell",
+            "request": "launch",
             "script": "${file}",
             "args": [],
             "cwd": "${file}"
           },
           {
-            "type": "PowerShell",
-            "request": "launch",
             "name": "PowerShell Launch Current File in Temporary Console",
+            "type": "powershell",
+            "request": "launch",
             "script": "${file}",
             "args": [],
             "cwd": "${file}",
             "createTemporaryIntegratedConsole": true
           },
           {
-            "type": "PowerShell",
-            "request": "launch",
             "name": "PowerShell Launch Current File w/Args Prompt",
+            "type": "powershell",
+            "request": "launch",
             "script": "${file}",
             "args": [
               "${command:SpecifyScriptArgs}"
@@ -483,16 +484,16 @@
             "cwd": "${file}"
           },
           {
-            "type": "PowerShell",
-            "request": "attach",
             "name": "PowerShell Attach to Host Process",
+            "type": "powershell",
+            "request": "attach",
             "processId": "${command:PickPSHostProcess}",
             "runspaceId": 1
           },
           {
-            "type": "PowerShell",
-            "request": "launch",
             "name": "PowerShell Interactive Session",
+            "type": "powershell",
+            "request": "launch",
             "cwd": ""
           }
         ]
@@ -508,8 +509,8 @@
           "description": "Specifies the visibility of the Command Explorer in the PowerShell Side Bar."
         },
         "powershell.sideBar.CommandExplorerExcludeFilter": {
-          "type":"array",
-          "default":[],
+          "type": "array",
+          "default": [],
           "description": "Specify array of Modules to exclude from Command Explorer listing."
         },
         "powershell.powerShellExePath": {
