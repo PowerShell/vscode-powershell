@@ -543,7 +543,7 @@
         },
         "powershell.powerShellDefaultVersion": {
           "type": "string",
-          "description": "Specifies the name of the PowerShell version used in the startup session when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6.0.2 (x64)\"."
+          "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6 (x64)\"."
         },
         "powershell.startAutomatically": {
           "type": "boolean",

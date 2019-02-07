@@ -761,7 +761,7 @@ export class SessionManager implements Middleware {
                 .filter((item) => item.exePath.toLowerCase() !== currentExePath)
                 .map((item) => {
                     return new SessionMenuItem(
-                        `Switch to ${item.versionName}`,
+                        `Switch to: ${item.versionName}`,
                         () => { this.changePowerShellExePath(item.exePath); });
                 });
 
