@@ -3,5 +3,7 @@
   <job platform="" configuration="" dest="__OUTPATHROOT__\signed" jobname="vscode powershell" approvers="vigarg;gstolt">
     <file src="__INPATHROOT__\release\out\PowerShell-insiders.vsix" signType="Vsix"
       dest="__OUTPATHROOT__\PowerShell-insiders.vsix" />
+    <file src="__INPATHROOT__\release\out\Install-VSCode.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Install-VSCode.ps1" />
   </job>
 </SignConfigXML>
