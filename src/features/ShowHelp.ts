@@ -22,7 +22,7 @@ export class ShowHelpFeature implements IFeature {
                     "Unable to instantiate; language client undefined.");
                 return;
             }
-            if (item === undefined) {
+            if (!item || !item.Name) {
 
                 const editor = vscode.window.activeTextEditor;
 
