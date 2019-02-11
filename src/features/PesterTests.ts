@@ -72,6 +72,10 @@ export class PesterTestsFeature implements IFeature {
 
         if (describeBlockName) {
             launchConfig.args.push("-TestName");
+            // Escape single quotes inside double quotes by doubling them up
+            if (describeBlockName.includes("'")) {
+                describeBlockName = describeBlockName.replace(/'/g, "''");
+            }
             launchConfig.args.push(`'${describeBlockName}'`);
         }
 
