@@ -142,6 +142,8 @@ a number do not, leading to artifacts in text manipulated with those application
 - If you work mainly in Linux-associated contexts, you should prefer UTF-8 without BOM.
 - Windows-1252 and latin-1 are essentially legacy encodings that you should avoid if possible.
   However, some older Windows applications may depend on them.
+- It's also worth noting that script signing [is encoding-dependent](https://github.com/PowerShell/PowerShell/issues/3466),
+  meaning a change of encoding on a signed script will require resigning.
 
 ## Configuring VSCode
 
@@ -272,9 +274,10 @@ and configuring encoding in PowerShell that are worth a read:
   - [#1680](https://github.com/PowerShell/vscode-powershell/issues/1680)
   - [#1744](https://github.com/PowerShell/vscode-powershell/issues/1744)
   - [#1751](https://github.com/PowerShell/vscode-powershell/issues/1751)
+- [The classic Joel on Software writeup about Unicode](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
 
 [@mklement0]: https://github.com/mklement0
-[rkeithhill]: https://github.com/rkeithhill
+[@rkeithhill]: https://github.com/rkeithhill
 [Windows-1252]: https://en.wikipedia.org/wiki/Byte_order_mark
 [latin-1]: https://en.wikipedia.org/wiki/ISO/IEC_8859-1
 [UTF-8]: https://en.wikipedia.org/wiki/UTF-8
