@@ -2,7 +2,7 @@
 
 ## TL;DR - I have weird `â€“` characters in my script and just want to fix it
 
-Your VSCode is set to encode files as UTF-8 with no BOM,
+It's likely that your VSCode is set to encode files as UTF-8 with no BOM,
 but your PowerShell is set to read them as Windows-1252.
 
 In your VSCode configuration (<kbd>Ctrl</kbd>+<kbd>,</kbd>), set:
