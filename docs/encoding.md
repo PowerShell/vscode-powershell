@@ -11,7 +11,7 @@ In your VSCode configuration (<kbd>Ctrl</kbd>+<kbd>,</kbd>), set:
 "files.encoding": "utf8bom"
 ```
 
-Then make sure that any files you are working on are encoded in UTF-8 with a BOM.
+[Then make sure that any files you are working on are encoded in UTF-8 with a BOM.](#scripts)
 
 If you want more information, read on.
 
