@@ -71,7 +71,7 @@ Common reasons for encoding issues are:
 - Another editor has opened and overwritten the file in a new encoding.
   This often happens with the ISE.
 - The file is checked into source control (like git) in a different encoding
-  to what VSCode or PowerShell expects. This can happen when coworkers edit
+  to what VSCode or PowerShell expects. This can happen when collaborators edit
   files with an editor with a different encoding configuration.
 
 ### Tell-tale signs of encoding issues
