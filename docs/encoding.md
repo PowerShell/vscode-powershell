@@ -76,13 +76,13 @@ Common reasons for encoding issues are:
 
 ### Tell-tale signs of encoding issues
 
-Often encoding errors present themselves are parse errors in scripts.
+Often encoding errors present themselves as parse errors in scripts.
 
 If you find strange character sequences occurring in your script,
 you can look them up in [this handy reference](https://www.i18nqa.com/debug/utf8-debug.html),
 which often confirms a UTF-8/Windows-1252 encoding problem.
 
-In the example below, an en-dash (&ndash;) appears as the characters `â€“`:
+In the example below, an en-dash (`–`) appears as the characters `â€“`:
 
 ```text
 Send-MailMessage : A positional parameter cannot be found that accepts argument 'Testing FuseMail SMTP...'.
@@ -93,7 +93,7 @@ At C:\Users\<User>\<OneDrive>\Development\PowerShell\Scripts\Send-EmailUsingSmtp
     + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.SendMailMessage
 ```
 
-This is because VSCode encodes the character '&ndash;' in UTF-8 as the bytes `0xE2 0x80 0x93`.
+This is because VSCode encodes the character `–` in UTF-8 as the bytes `0xE2 0x80 0x93`.
 When these bytes are decoded as Windows-1252, they are interpreted as the characters `â€“`.
 
 Some character sequences that might be evidence of an encoding configuration problem are:
@@ -101,7 +101,7 @@ Some character sequences that might be evidence of an encoding configuration pro
 - `â€“` instead of `–`
 - `â€”` instead of `—`
 - `Ã„2` instead of `Ä`
-- `Â` instead of ` `  (a space)
+- `Â` instead of ` `  (a non-breaking space)
 - `Ã©` instead of `é`
 
 ## The PowerShell extension and encodings
@@ -128,7 +128,7 @@ The problem occurs when assuming the encoding of BOM-less formats (like [UTF-8] 
 In these cases, the extension has to settle on an encoding,
 and currently just assumes UTF-8 rather than more complex logic.
 
-The extension [does not have access (read or write) to VSCode' encoding settings](https://github.com/Microsoft/vscode/issues/824),
+The extension [does not have access (read or write) to VSCode's encoding settings](https://github.com/Microsoft/vscode/issues/824),
 and instead tries to have a sane default - the same as VSCode's.
 
 However, despite being loaded into PowerShell, the extension also can't control PowerShell's encoding
@@ -151,7 +151,8 @@ On Windows, many applications have long used [Windows-1252],
 although many .NET applications use [UTF-16]
 (the Windows world often calls this "Unicode", a term that now [refers to a broader standard](https://en.wikipedia.org/wiki/Unicode)).
 
-In the Linux world and on the web, [UTF-8] is now the dominant encoding.
+In the Linux world, on the web, and [where .NET is heading](https://github.com/dotnet/standard/issues/260#issuecomment-289549508)
+[UTF-8] is now the dominant encoding.
 
 Unicode encodings (the "UTF"s) also have the concept of a [byte-order mark] (BOM),
 which may occur at the beginning of text to
@@ -222,7 +223,7 @@ In PowerShell 5+ you can find your default encoding with this:
 ```
 
 It's not strictly possible to force PowerShell to use an input encoding,
-and PowerShell 5.1 and below always default to [Windows-1252] when there is no BOM.
+and PowerShell 5.1 and below default to [Windows-1252] when there is no BOM.
 For interoperability reasons then, it's best to save scripts you wish to
 evaluate in PowerShell 5.1 and below in a Unicode format with a BOM.
 
@@ -242,7 +243,7 @@ Any other tools you have that touch PowerShell scripts may:
 
 ### Scripts
 
-Scripts on the file system may need re-encoding to your new chosen encoding.
+Scripts already on the file system may need to be re-encoded to your new chosen encoding.
 To do this with VSCode, you can open the file and [save it again with the new encoding](https://stackoverflow.com/a/40365121).
 
 If you need to re-encode multiple files, [this PowerShell snippet on StackOverflow may help](https://stackoverflow.com/a/1681610).
@@ -265,7 +266,7 @@ When this is the case, make sure you:
 - Configure the text encoding in your source control to match VSCode's.
 - Ensure all your files are checked into source control in the relevant encoding.
 - Be wary of changes to the encoding received through source control.
-  A key sign of this is a diff where nothing seems to have changed
+  A key sign of this is a diff indicating changes but where nothing seems to have changed
   (because bytes have but characters have not).
 
 ### Collaborators' environments
