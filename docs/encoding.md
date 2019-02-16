@@ -101,7 +101,7 @@ Some character sequences that might be evidence of an encoding configuration pro
 - `â€“` instead of `–`
 - `â€”` instead of `—`
 - `Ã„2` instead of `Ä`
-- `Â` instead of ` ` (a space)
+- `Â` instead of ` `  (a space)
 - `Ã©` instead of `é`
 
 ## The PowerShell extension and encodings
