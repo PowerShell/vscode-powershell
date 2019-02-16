@@ -1,4 +1,4 @@
-# Text encoding with PowerShell and VSCode
+# Configuring VSCode and PowerShell to prevent encoding bugs
 
 ## TL;DR - I have weird `â€“` characters in my script and just want to fix it
 
@@ -62,7 +62,7 @@ and there is no way for Powershell to determine the encoding of the file automat
 You're much more likely to hit encoding problems if you're using characters
 not in the [7-bit ASCII character set](https://ascii.cl/),
 such as accented latin characters (e.g. `É`, `ü`),
-or non-latin characters like Cyrillic (`Д`, `Ц`) or Hanzi (`脚本`).
+or non-latin characters like Cyrillic (`Д`, `Ц`) or Han Chinese (`脚`, `本`).
 
 Common reasons for encoding issues are:
 
@@ -70,11 +70,11 @@ Common reasons for encoding issues are:
   For PowerShell 5.1 and below, the default encoding is different from VSCode's.
 - Another editor has opened and overwritten the file in a new encoding.
   This often happens with the ISE.
-- The file is checked into source control (like `git`) in a different encoding
+- The file is checked into source control (like git) in a different encoding
   to what VSCode or PowerShell expects. This can happen when coworkers edit
   files with an editor with a different encoding configuration.
 
-### Tell tale signs of encoding issues
+### Tell-tale signs of encoding issues
 
 Often encoding errors present themselves are parse errors in scripts.
 
@@ -103,6 +103,38 @@ Some character sequences that might be evidence of an encoding configuration pro
 - `Ã„2` instead of `Ä`
 - `Â` instead of ` ` (a space)
 - `Ã©` instead of `é`
+
+## The PowerShell extension and encodings
+
+The PowerShell extension interacts with scripts in a number of ways:
+
+1. When scripts are executed directly in the Integrated Console,
+   they are read off the filesystem by PowerShell directly.
+   This means that if PowerShell's encoding differs from VSCode's, something may go wrong here.
+2. When scripts are edited in VSCode, the contents are sent by VSCode to the extension,
+   meaning it's not possible for the extension to get the wrong encoding of a file
+   (the [Language Server Protocol] mandates this file content be transferred in UTF-8).
+3. When a script being edited in VSCode references another script that is not also open in VSCode,
+   the extension falls back to loading that script's content from the file system.
+   This load will detect a BOM, but defaults to UTF-8.
+
+It's only in the 1st and 3rd scenarios that a problem may arise.
+
+### Why can't the extension detect encodings and do the right thing?
+
+The extension will perform BOM detection, and in those cases does do the right thing.
+
+The problem occurs when assuming the encoding of BOM-less formats (like [UTF-8] with no BOM and [Windows-1252]).
+In these cases, the extension has to settle on an encoding,
+and currently just assumes UTF-8 rather than more complex logic.
+
+The extension [does not have access (read or write) to VSCode' encoding settings](https://github.com/Microsoft/vscode/issues/824),
+and instead tries to have a sane default - the same as VSCode's.
+
+However, despite being loaded into PowerShell, the extension also can't control PowerShell's encoding
+easily (PowerShell's encoding settings are fragmented, and can be changed back at any time in the Integrated Console).
+
+These factors mean the PowerShell extension relies on the user to configure the encoding instead.
 
 ## Choosing the right encoding
 
@@ -168,6 +200,12 @@ Some possible values are:
 You should get a dropdown for this in the GUI view,
 or completions for it in the JSON view.
 
+You can also add the following to autodetect encoding when possible:
+
+```json
+"files.autoGuessEncoding": true
+```
+
 ## Configuring PowerShell
 
 PowerShell's default encoding varies depending on version:
@@ -183,7 +221,7 @@ In PowerShell 5+ you can find your default encoding with this:
 [psobject].Assembly.GetTypes() | ? { $_.Name -eq 'ClrFacade'} | % { $_.GetMethod('GetDefaultEncoding', [System.Reflection.BindingFlags]'nonpublic,static').Invoke($null, @()) }
 ```
 
-It's not strictly possible to set PowerShell's input encoding,
+It's not strictly possible to force PowerShell to use an input encoding,
 and PowerShell 5.1 and below always default to [Windows-1252] when there is no BOM.
 For interoperability reasons then, it's best to save scripts you wish to
 evaluate in PowerShell 5.1 and below in a Unicode format with a BOM.
@@ -219,8 +257,8 @@ Note that this would not be persisted between startups.
 
 ### Source control software
 
-While some source control tools (like `git`) ignore encodings (`git` just tracks the bytes),
-others (like TFS or Mercurial) may not, and even `git`-based tools rely on decoding text.
+While some source control tools (like git) ignore encodings (git just tracks the bytes),
+others (like TFS or Mercurial) may not, and even some git-based tools rely on decoding text.
 
 When this is the case, make sure you:
 
@@ -249,9 +287,11 @@ Some examples are:
   - Copying a script into or out of an MS Word or PowerPoint document
 - Other text editors, such as:
   - Notepad
-  - `vim`
+  - vim
+  - Any other PowerShell script editor
 - Text editing utilities, like:
-  - `Get-Content`/`Set-Content`
+  - `Get-Content`/`Set-Content`/`Out-File`
+  - PowerShell redirection operators like `>` and `>>`
   - `sed`/`awk`
 - File transfer programs, like:
   - A web browser, when downloading scripts
@@ -274,7 +314,7 @@ and configuring encoding in PowerShell that are worth a read:
   - [#1680](https://github.com/PowerShell/vscode-powershell/issues/1680)
   - [#1744](https://github.com/PowerShell/vscode-powershell/issues/1744)
   - [#1751](https://github.com/PowerShell/vscode-powershell/issues/1751)
-- [The classic Joel on Software writeup about Unicode](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
+- [The classic *Joel on Software* writeup about Unicode](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
 
 [@mklement0]: https://github.com/mklement0
 [@rkeithhill]: https://github.com/rkeithhill
@@ -283,3 +323,4 @@ and configuring encoding in PowerShell that are worth a read:
 [UTF-8]: https://en.wikipedia.org/wiki/UTF-8
 [byte-order mark]: https://en.wikipedia.org/wiki/Byte_order_mark
 [UTF-16]: https://en.wikipedia.org/wiki/UTF-16
+[Language Server Protocol]: https://microsoft.github.io/language-server-protocol/
