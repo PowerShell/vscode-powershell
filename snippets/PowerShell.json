@@ -960,14 +960,14 @@
                 "\t$0",
             "}"
         ],
-        "description": "Adds ShouldProcess block"
+        "description": "Creates ShouldProcess block"
     },
     "CalculatedProperty": {
         "prefix": "Calculated-Property",
         "body": [
             "@{name='${1:PropertyName}';expression={\\$_.${2:PropertyValue}}}$0"
         ],
-        "description": "Creates a PSCustomObject"
+        "description": "Creates a Calculated Property"
     },
     "PesterDescribeContextIt": {
         "prefix": "Describe-Context-It-Pester",
