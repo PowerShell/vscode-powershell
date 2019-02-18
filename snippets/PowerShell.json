@@ -952,5 +952,21 @@
             "#endregion"
         ],
         "description": "Region Block for organizing and folding of your code"
+    },
+    "IfShouldProcess": {
+        "prefix": "IfShouldProcess",
+        "body": [
+            "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
+            "\t# Place Code here",
+            "}"
+        ],
+        "description": "Creates an if should process"
+    },
+    "CalculatedProperty": {
+        "prefix": "Calculated-Property",
+        "body": [
+            "@{name='${1:PropertyName}';expression={\\$_.${2:PropertyValue}}}$0"
+        ],
+        "description": "Creates a PSCustomObject"
     }
 }
