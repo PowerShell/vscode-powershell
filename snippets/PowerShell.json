@@ -956,11 +956,11 @@
     "IfShouldProcess": {
         "prefix": "IfShouldProcess",
         "body": [
-            "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
-            "\t# Place Code here",
+            "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
+                "\t$0",
             "}"
         ],
-        "description": "Creates an if should process"
+        "description": "Adds ShouldProcess block"
     },
     "CalculatedProperty": {
         "prefix": "Calculated-Property",
