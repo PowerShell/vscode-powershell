@@ -11,6 +11,13 @@ In your VSCode configuration (<kbd>Ctrl</kbd>+<kbd>,</kbd>), set:
 "files.encoding": "utf8bom"
 ```
 
+You can set this for just PowerShell with:
+```json
+"[powershell]": {
+    "files.encoding": "utf8bom"
+}
+```
+
 [Then make sure that any files you are working on are encoded in UTF-8 with a BOM.](#scripts)
 
 If you want more information, read on.
@@ -205,6 +212,19 @@ You can also add the following to autodetect encoding when possible:
 
 ```json
 "files.autoGuessEncoding": true
+```
+
+If you don't want these settings to affect other kinds of files you open,
+VSCode also allows per-language configurations
+(e.g. ones that only affect PowerShell files)
+by putting those settings under a field like `[<language-name>]`.
+For example:
+
+```json
+"[powershell]": {
+    "files.encoding": "utf8bom",
+    "files.autoGuessEncoding": true
+}
 ```
 
 ## Configuring PowerShell
