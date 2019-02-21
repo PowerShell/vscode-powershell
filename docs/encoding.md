@@ -339,7 +339,7 @@ and configuring encoding in PowerShell that are worth a read:
 
 [@mklement0]: https://github.com/mklement0
 [@rkeithhill]: https://github.com/rkeithhill
-[Windows-1252]: https://en.wikipedia.org/wiki/Byte_order_mark
+[Windows-1252]: https://en.wikipedia.org/wiki/Windows-1252
 [latin-1]: https://en.wikipedia.org/wiki/ISO/IEC_8859-1
 [UTF-8]: https://en.wikipedia.org/wiki/UTF-8
 [byte-order mark]: https://en.wikipedia.org/wiki/Byte_order_mark
