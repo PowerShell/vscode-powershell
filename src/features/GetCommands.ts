@@ -102,7 +102,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     }
 
     private BuildCommand(item) {
-        if (vscode.window.activeTextEditor.document.languageId !== "powershell"){
+        if (vscode.window.activeTextEditor.document.languageId !== "powershell") {
             vscode.window.showErrorMessage("Active editor is not a PowerShell window.");
             return;
         }
@@ -153,14 +153,20 @@ export class GetCommandsFeature extends LanguageClientConsumer {
                     while(command.hasChildNodes()) {
                         command.removeChild(command.childNodes[0])
                     }
+                    window.myMessage = event.data[0];
                     message = event.data[0];
+                    console.log(message);
                     for(var parameter in message.parameters) {
+                        console.log(parameter);
                         let parameterLabel = document.createElement('label');
-                        parameterLabel.htmlFor = parameter;
-                        parameterLabel.innerText = parameter;
+                        parameterLabel.htmlFor = message.parameters[parameter].name;
+                        parameterLabel.innerText = message.parameters[parameter].name;
+                        if(message.parameters[parameter].attributes[0].mandatory) {
+                            parameterLabel.innerText += ' *';
+                        }
                         command.appendChild(parameterLabel);
                         let parameterInput = document.createElement('input');
-                        parameterInput.id = parameter;
+                        parameterInput.id = message.parameters[parameter].name;
                         command.appendChild(parameterInput);
                         command.appendChild(document.createElement('br'));
                     }
