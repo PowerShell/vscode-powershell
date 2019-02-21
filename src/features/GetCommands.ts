@@ -116,6 +116,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
                 vscode.ViewColumn.Beside,
                 {
                     enableScripts: true,
+                    retainContextWhenHidden: true,
                 },
             );
             this.currentPanel.webview.html = this.makeMyContent();
