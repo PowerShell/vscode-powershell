@@ -302,7 +302,7 @@
     ],
     "debuggers": [
       {
-        "type": "powershell",
+        "type": "PowerShell",
         "label": "PowerShell",
         "enableBreakpointsFor": {
           "languageIds": [
@@ -324,7 +324,7 @@
             "description": "Launch current file (in active editor window) under debugger",
             "body": {
               "name": "PowerShell Launch Current File",
-              "type": "powershell",
+              "type": "PowerShell",
               "request": "launch",
               "script": "^\"\\${file}\"",
               "args": [],
@@ -336,7 +336,7 @@
             "description": "Launch current file (in active editor window) under debugger in a temporary Integrated Console.",
             "body": {
               "name": "PowerShell Launch Current File in Temporary Console",
-              "type": "powershell",
+              "type": "PowerShell",
               "request": "launch",
               "script": "^\"\\${file}\"",
               "args": [],
@@ -349,7 +349,7 @@
             "description": "Launch current file (in active editor window) under debugger, prompting first for script arguments",
             "body": {
               "name": "PowerShell Launch Current File w/Args Prompt",
-              "type": "powershell",
+              "type": "PowerShell",
               "request": "launch",
               "script": "^\"\\${file}\"",
               "args": [
@@ -363,7 +363,7 @@
             "description": "Launch specified script or path to script under debugger",
             "body": {
               "name": "PowerShell Launch ${Script}",
-              "type": "powershell",
+              "type": "PowerShell",
               "request": "launch",
               "script": "^\"\\${workspaceFolder}/${Script}\"",
               "args": [],
@@ -375,7 +375,7 @@
             "description": "Invokes Pester tests under debugger",
             "body": {
               "name": "PowerShell Pester Tests",
-              "type": "powershell",
+              "type": "PowerShell",
               "request": "launch",
               "script": "Invoke-Pester",
               "args": [],
@@ -387,7 +387,7 @@
             "description": "Open host process picker to select process to attach debugger to",
             "body": {
               "name": "PowerShell Attach to Host Process",
-              "type": "powershell",
+              "type": "PowerShell",
               "request": "attach",
               "processId": "^\"\\${command:PickPSHostProcess}\"",
               "runspaceId": 1
@@ -398,7 +398,7 @@
             "description": "Start interactive session (Debug Console) under debugger",
             "body": {
               "name": "PowerShell Interactive Session",
-              "type": "powershell",
+              "type": "PowerShell",
               "request": "launch",
               "cwd": ""
             }
