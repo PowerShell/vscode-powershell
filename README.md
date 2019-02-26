@@ -63,11 +63,11 @@ the `Install-Script` command.
 
 **Alternatively** you can download and execute the script directly from the web
 without the use of `Install-Script`.  However we **highly recommend** that you
-[read the script](https://git.io/vbxjj)
+[read the script](https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/scripts/Install-VSCode.ps1)
 first before running it in this way!
 
 ```powershell
-iex (iwr https://git.io/vbxjj)
+iex (iwr https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/scripts/Install-VSCode.ps1)
 ```
 
 ## Reporting Problems
