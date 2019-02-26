@@ -394,7 +394,6 @@
               "name": "PowerShell Attach to Host Process",
               "type": "PowerShell",
               "request": "attach",
-              "processId": "^\"\\${command:PickPSHostProcess}\"",
               "runspaceId": 1
             }
           },
@@ -445,12 +444,17 @@
               "processId": {
                 "type": "string",
                 "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
-                "default": "${command:PickPSHostProcess}"
+                "default": null
               },
               "runspaceId": {
                 "type": "number",
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
                 "default": 1
+              },
+              "customPipeName": {
+                "type": "string",
+                "description": "The custom pipe name of the PowerShell host process to attach to.  Works only on PowerShell 6.2 and above.",
+                "default": null
               }
             }
           }
@@ -487,7 +491,6 @@
             "name": "PowerShell Attach to Host Process",
             "type": "powershell",
             "request": "attach",
-            "processId": "${command:PickPSHostProcess}",
             "runspaceId": 1
           },
           {
