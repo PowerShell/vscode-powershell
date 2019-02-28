@@ -151,7 +151,8 @@ export function activate(context: vscode.ExtensionContext): void {
     languageClientConsumers = [
         new ConsoleFeature(logger),
         new ExpandAliasFeature(logger),
-        new GetCommandsFeature(logger),
+        new GetCommandsFeature(logger, context),
+        new ISECompatibilityFeature(),
         new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new ExtensionCommandsFeature(logger),

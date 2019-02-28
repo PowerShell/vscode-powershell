@@ -1,6 +1,8 @@
 /*---------------------------------------------------------
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
+import * as fs from "fs";
+import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, RequestType0 } from "vscode-languageclient";
 import { Logger } from "../logging";
@@ -28,9 +30,13 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;
     private currentPanel: vscode.WebviewPanel | undefined;
+    private onDiskPath: vscode.Uri;
+    private htmlUri: any;
 
-    constructor(private log: Logger) {
+constructor(private log: Logger, private extensionContext: vscode.ExtensionContext) {
         super();
+        this.onDiskPath = vscode.Uri.file(path.join(this.extensionContext.extensionPath, "media", "insert.html"));
+        this.htmlUri = this.onDiskPath.with({ scheme: "vscode-resource" });
         this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
             () => this.CommandExplorerRefresh());
         this.commandsExplorerProvider = new CommandsExplorerProvider();
@@ -117,9 +123,11 @@ export class GetCommandsFeature extends LanguageClientConsumer {
                 {
                     enableScripts: true,
                     retainContextWhenHidden: true,
+                    localResourceRoots: [vscode.Uri.file(this.extensionContext.extensionPath)],
                 },
             );
-            this.currentPanel.webview.html = this.makeMyContent();
+
+            this.currentPanel.webview.html = fs.readFileSync(this.htmlUri.fsPath, "utf8");
             this.currentPanel.webview.onDidReceiveMessage((message) => {
                 this.InsertCommand(message);
                 this.currentPanel.dispose();
@@ -132,59 +140,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     }
 
     private makeMyContent() {
-        return `<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Cat Coding</title>
-        </head>
-        <body>
-            <form id="Command" onsubmit="mySubmit()">
-            <div id="CommandDiv"></div>
-            <input type="submit" />
-            </form>
-            <script>
-                const vscode = acquireVsCodeApi();
-                const command = document.getElementById('CommandDiv');
-                var message;
-                window.addEventListener('message', event => {
-                    message = undefined;
-                    // Remove previous nodes if there are any.
-                    while(command.hasChildNodes()) {
-                        command.removeChild(command.childNodes[0])
-                    }
-                    window.myMessage = event.data[0];
-                    message = event.data[0];
-                    console.log(message);
-                    for(var parameter in message.parameters) {
-                        console.log(parameter);
-                        let parameterLabel = document.createElement('label');
-                        parameterLabel.htmlFor = message.parameters[parameter].name;
-                        parameterLabel.innerText = message.parameters[parameter].name;
-                        if(message.parameters[parameter].attributes[0].mandatory) {
-                            parameterLabel.innerText += ' *';
-                        }
-                        command.appendChild(parameterLabel);
-                        let parameterInput = document.createElement('input');
-                        parameterInput.id = message.parameters[parameter].name;
-                        command.appendChild(parameterInput);
-                        command.appendChild(document.createElement('br'));
-                    }
-                });
-                function mySubmit() {
-                    let myMessage = message;
-                    myMessage.filledParameters = {};
-                    command.childNodes.forEach((node) => {
-                        if(node.tagName === "INPUT" && node.value !== ""){
-                        myMessage.filledParameters[node.id] = node.value
-                    }
-                    });
-                    vscode.postMessage(myMessage);
-                }
-            </script>
-        </body>
-        </html>`;
+        return ``;
     }
 }
 

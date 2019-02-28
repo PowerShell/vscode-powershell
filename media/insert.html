@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; img-src vscode-resource:; script-src vscode-resource:; style-src vscode-resource:;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cat Coding</title>
+</head>
+
+<body>
+    <form id="CommandParameters" onsubmit="mySubmit()">
+        <h1>Parameter Sets</h1>
+        <div id="ParameterSets"></div>
+        <div id="CommonParameters"></div>
+        <input type="submit" />
+    </form>
+    <script>
+        const vscode = acquireVsCodeApi();
+        const parameterSets = document.getElementById('ParameterSets');
+        const commonParams = document.getElementById('CommonParameters');
+        var message;
+        var hasCommonParams = false;
+        const commonParameters = [
+            "Verbose",
+            "Debug",
+            "ErrorAction",
+            "WarningAction",
+            "InformationAction",
+            "ErrorVariable",
+            "WarningVariable",
+            "InformationVariable",
+            "OutVariable",
+            "OutBuffer",
+            "PipelineVariable"
+        ]
+        window.addEventListener('message', event => {
+            message = undefined;
+            // Remove previous nodes if there are any.
+            while (parameterSets.hasChildNodes()) {
+                parameterSets.removeChild(parameterSets.childNodes[0])
+            }
+            while (commonParams.hasChildNodes()) {
+                commonParams.removeChild(commonParams.childNodes[0])
+            }
+            window.myMessage = event.data[0];
+            message = event.data[0];
+            console.log(message);
+            for(var i = 0 ; i < message.parameterSets.length;i++) {
+                let pSetDiv = document.createElement('div');
+                pSetDiv.id = message.parameterSets[i].name;
+                let setHeader = document.createElement('h2');
+                setHeader.innerText = message.parameterSets[i].name;
+                pSetDiv.appendChild(setHeader)
+                for (var j = 0; j < message.parameterSets[i].parameters.length;j++) {
+                    let parameterLabel = document.createElement('label');
+                    parameterLabel.htmlFor = message.parameterSets[i].parameters[j].name;
+                    parameterLabel.innerText = message.parameterSets[i].parameters[j].name;
+                    if (message.parameterSets[i].parameters[j].attributes[0].mandatory) {
+                        parameterLabel.innerText += ' *';
+                        parameterLabel.style = 'font-weight: bold'
+                    }
+                    let parameterInput = document.createElement('input');
+                    parameterInput.id = message.parameterSets[i].parameters[j].name;
+                    parameterInput.type = message.parameterSets[i].parameters[j].parameterType.search('SwitchParameter') !== -1 ? 'checkbox' : 'text';
+                    // Test if It's a common parameter to add it to the Common Parameters section of code.
+                    if (commonParameters.findIndex((param) => param === message.parameterSets[i].parameters[j].name) !== -1) {
+                        hasCommonParams = true;
+                    } else {
+                        pSetDiv.appendChild(parameterLabel);
+                        pSetDiv.appendChild(parameterInput);
+                        pSetDiv.appendChild(document.createElement('br'));
+                    }
+                }
+                parameterSets.appendChild(pSetDiv);
+            }
+            if(hasCommonParams) {
+                var tmp = document.createElement('h1')
+                tmp.innerText = 'Common Parameters'
+                commonParams.appendChild(tmp);
+                var temp = document.createElement('h2');
+                temp.innerText = 'Need to add these back....'
+                commonParams.appendChild(temp);
+            }
+        });
+        function mySubmit() {
+            let myMessage = message;
+            myMessage.filledParameters = {};
+            command.childNodes.forEach((node) => {
+                if (node.tagName === "INPUT" && node.value !== "") {
+                    myMessage.filledParameters[node.id] = node.value
+                }
+            });
+            vscode.postMessage(myMessage);
+        }
+    </script>
+</body>
+
+</html>
