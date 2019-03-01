@@ -39,10 +39,20 @@ param(
     [Parameter()]
     [ValidatePattern('\d*')]
     [string]
-    $LineNumber
+    $LineNumber,
+
+    # If specified, executes all the tests in the specified test script.
+    [Parameter()]
+    [switch]
+    $All
 )
 
 try {
+    if ($All) {
+        Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+        return
+    }
+
     $pesterVersion = (Microsoft.PowerShell.Core\Get-Command Invoke-Pester -ErrorAction Stop).Version
     if (($pesterVersion -ge '4.6.0') -and ($LineNumber -match '\d+')) {
         $pesterOption = New-PesterOption -ScriptBlockFilter @(
@@ -53,6 +63,11 @@ try {
         Invoke-Pester -Script $ScriptPath -PesterOption @{ IncludeVSCodeMarker=$true } -TestName $TestName
     }
     else {
+        # We get here when PSES couldn't parse the TestName
+        Write-Warning "The Describe block's TestName cannot be evaluated. ALL TESTS will be executed."
+        Write-Warning "Either try again with Pester 4.6.0 or higher, or remove any variables or"
+        Write-Warning "sub-expressions in the Describe block's TestName."
+
         Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
     }
 }

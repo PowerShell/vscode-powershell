@@ -54,24 +54,18 @@ export class PesterTestsFeature implements IFeature {
     private launchAllTestsInActiveEditor(launchType: LaunchType) {
         const uriString = vscode.window.activeTextEditor.document.uri.toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
+        launchConfig.args.push("-All");
         this.launch(launchConfig);
     }
 
-    private async launchTests(uriString: string, runInDebugger: boolean, describeBlockName?: string, lineNum?: number) {
-        // PSES passes null for the describeBlockName to signal that it can't evaluate the TestName.
-        if (!describeBlockName) {
-            const answer = await vscode.window.showErrorMessage(
-                "This Describe block's TestName parameter cannot be evaluated. " +
-                `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
-                "Yes", "No");
-
-            if (answer !== "Yes") {
-                return;
-            }
-        }
+    private async launchTests(
+        uriString: string,
+        runInDebugger: boolean,
+        describeBlockName?: string,
+        describeBlockLineNumber?: number) {
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, lineNum);
+        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, describeBlockLineNumber);
         this.launch(launchConfig);
     }
 
