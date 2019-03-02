@@ -42,7 +42,7 @@ You can also install a VSIX package from our [Releases page](https://github.com/
 [Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions.  The easiest way is through the command line:
 
-```
+```powershell
 code --install-extension PowerShell-<version>.vsix
 ```
 
@@ -63,11 +63,11 @@ the `Install-Script` command.
 
 **Alternatively** you can download and execute the script directly from the web
 without the use of `Install-Script`.  However we **highly recommend** that you
-[read the script](https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1)
+[read the script](https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/scripts/Install-VSCode.ps1)
 first before running it in this way!
 
 ```powershell
-iex (iwr https://git.io/vbxjj)
+iex (iwr https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/scripts/Install-VSCode.ps1)
 ```
 
 ## Reporting Problems
