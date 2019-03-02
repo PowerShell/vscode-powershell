@@ -4,10 +4,13 @@
 .SYNOPSIS
     Stub around Invoke-Pester command used by VSCode PowerShell extension.
 .DESCRIPTION
-    Stub around Invoke-Pester command used by VSCode PowerShell extension.
     The stub checks the version of Pester and if >= 4.6.0, invokes Pester
     using the LineNumber parameter (if specified). Otherwise, it invokes
-    using the TestName parameter (if specified).
+    using the TestName parameter (if specified). If the All parameter
+    is specified, then all the tests are invoked in the specifed file.
+    Finally, if none of these three parameters are specified, all tests
+    are invoked and a warning is issued indicating what the user can do
+    to allow invocation of individual Describe blocks.
 .EXAMPLE
     PS C:\> .\InvokePesterStub.ps1 ~\project\test\foo.tests.ps1 -LineNumber 14
     Invokes a specific test by line number in the specified file.
@@ -15,7 +18,7 @@
     PS C:\> .\InvokePesterStub.ps1 ~\project\test\foo.tests.ps1 -TestName 'Foo Tests'
     Invokes a specific test by test name in the specified file.
 .EXAMPLE
-    PS C:\> .\InvokePesterStub.ps1 ~\project\test\foo.tests.ps1
+    PS C:\> .\InvokePesterStub.ps1 ~\project\test\foo.tests.ps1 -All
     Invokes all tests in the specified file.
 .INPUTS
     None
@@ -47,31 +50,34 @@ param(
     $All
 )
 
-try {
-    if ($All) {
-        Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+$pesterModule = Microsoft.PowerShell.Core\Get-Module Pester
+if (!$pesterModule) {
+    Write-Host "Importing Pester module..."
+    $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru
+    if (!$pesterModule) {
+        # If we still don't have an imported Pester module, that is (most likely) because Pester is not installed.
+        Write-Warning "Failed to import the Pester module. You must install Pester to run or debug Pester tests."
+        Write-Warning "You can install Pester by executing: Install-Module Pester -Scope CurrentUser -Force"
         return
     }
-
-    $pesterVersion = (Microsoft.PowerShell.Core\Get-Command Invoke-Pester -ErrorAction Stop).Version
-    if (($pesterVersion -ge '4.6.0') -and ($LineNumber -match '\d+')) {
-        $pesterOption = New-PesterOption -ScriptBlockFilter @(
-            @{ IncludeVSCodeMarker=$true; Line=$LineNumber; Path=$ScriptPath } )
-        Invoke-Pester -Script $ScriptPath -PesterOption $pesterOption
-    }
-    elseif ($TestName) {
-        Invoke-Pester -Script $ScriptPath -PesterOption @{ IncludeVSCodeMarker=$true } -TestName $TestName
-    }
-    else {
-        # We get here when PSES couldn't parse the TestName
-        Write-Warning "The Describe block's TestName cannot be evaluated. ALL TESTS will be executed."
-        Write-Warning "Either try again with Pester 4.6.0 or higher, or remove any variables or"
-        Write-Warning "sub-expressions in the Describe block's TestName."
-
-        Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
-    }
 }
-catch [System.Management.Automation.CommandNotFoundException] {
-    Write-Warning "You must install Pester to run or debug Pester Tests. You can install Pester by executing:"
-    Write-Warning "Install-Module Pester -Scope CurrentUser -Force"
+
+if ($All) {
+    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+}
+elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
+    Pester\Invoke-Pester -Script $ScriptPath -PesterOption (New-PesterOption -ScriptBlockFilter @{
+        IncludeVSCodeMarker=$true; Line=$LineNumber; Path=$ScriptPath})
+}
+elseif ($TestName) {
+    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName
+}
+else {
+    # We get here when the TestName expression is of type ExpandableStringExpressionAst.
+    # PSES will not attempt to "evaluate" the expression so it returns null for the TestName.
+    Write-Warning "The Describe block's TestName cannot be evaluated. EXECUTING ALL TESTS instead."
+    Write-Warning "To avoid this, either install Pester 4.6.0 or higher, or remove any variables or"
+    Write-Warning "sub-expressions in the Describe block's TestName."
+
+    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
 }
