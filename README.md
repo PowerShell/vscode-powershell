@@ -42,7 +42,7 @@ You can also install a VSIX package from our [Releases page](https://github.com/
 [Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions.  The easiest way is through the command line:
 
-```bash
+```powershell
 code --install-extension PowerShell-<version>.vsix
 ```
 
