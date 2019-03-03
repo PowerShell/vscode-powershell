@@ -52,7 +52,7 @@ param(
 
 $pesterModule = Microsoft.PowerShell.Core\Get-Module Pester
 if (!$pesterModule) {
-    Write-Host "Importing Pester module..."
+    Write-Output "Importing Pester module..."
     $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru
     if (!$pesterModule) {
         # If we still don't have an imported Pester module, that is (most likely) because Pester is not installed.
