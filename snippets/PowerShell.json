@@ -965,7 +965,7 @@
     "CalculatedProperty": {
         "prefix": "Calculated-Property",
         "body": [
-            "@{name='${1:PropertyName}';expression={\\$_.${2:PropertyValue}}}$0"
+            "@{name='${1:PropertyName}';expression={${2:\\$_.PropertyValue}}}$0"
         ],
         "description": "Creates a Calculated Property"
     },
