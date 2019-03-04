@@ -967,7 +967,7 @@
         "body": [
             "@{name='${1:PropertyName}';expression={${2:\\$_.PropertyValue}}}$0"
         ],
-        "description": "Creates a Calculated Property"
+        "description": "Creates a Calculated Property typically used with Select-Object."
     },
     "PesterDescribeContextIt": {
         "prefix": "Describe-Context-It-Pester",
