@@ -18,8 +18,11 @@ export class PesterTestsFeature implements IFeature {
 
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
+    private invokePesterStubScriptPath: string;
 
     constructor(private sessionManager: SessionManager) {
+        this.invokePesterStubScriptPath = path.resolve(__dirname, "../../../InvokePesterStub.ps1");
+
         // File context-menu command - Run Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTestsFromFile",
@@ -35,8 +38,8 @@ export class PesterTestsFeature implements IFeature {
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTests",
-            (uriString, runInDebugger, describeBlockName?) => {
-                this.launchTests(uriString, runInDebugger, describeBlockName);
+            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?) => {
+                this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber);
             });
     }
 
@@ -51,38 +54,22 @@ export class PesterTestsFeature implements IFeature {
     private launchAllTestsInActiveEditor(launchType: LaunchType) {
         const uriString = vscode.window.activeTextEditor.document.uri.toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
+        launchConfig.args.push("-All");
         this.launch(launchConfig);
     }
 
-    private async launchTests(uriString: string, runInDebugger: boolean, describeBlockName?: string) {
-        // PSES passes null for the describeBlockName to signal that it can't evaluate the TestName.
-        if (!describeBlockName) {
-            const answer = await vscode.window.showErrorMessage(
-                "This Describe block's TestName parameter cannot be evaluated. " +
-                `Would you like to ${runInDebugger ? "debug" : "run"} all the tests in this file?`,
-                "Yes", "No");
-
-            if (answer !== "Yes") {
-                return;
-            }
-        }
+    private async launchTests(
+        uriString: string,
+        runInDebugger: boolean,
+        describeBlockName?: string,
+        describeBlockLineNumber?: number) {
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(uriString, launchType);
-
-        if (describeBlockName) {
-            launchConfig.args.push("-TestName");
-            // Escape single quotes inside double quotes by doubling them up
-            if (describeBlockName.includes("'")) {
-                describeBlockName = describeBlockName.replace(/'/g, "''");
-            }
-            launchConfig.args.push(`'${describeBlockName}'`);
-        }
-
+        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, describeBlockLineNumber);
         this.launch(launchConfig);
     }
 
-    private createLaunchConfig(uriString: string, launchType: LaunchType) {
+    private createLaunchConfig(uriString: string, launchType: LaunchType, testName?: string, lineNum?: number) {
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
@@ -95,12 +82,10 @@ export class PesterTestsFeature implements IFeature {
             request: "launch",
             type: "PowerShell",
             name: "PowerShell Launch Pester Tests",
-            script: "Invoke-Pester",
+            script: this.invokePesterStubScriptPath,
             args: [
-                "-Script",
+                "-ScriptPath",
                 `'${scriptPath}'`,
-                "-PesterOption",
-                "@{IncludeVSCodeMarker=$true}",
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: (launchType === LaunchType.Run),
@@ -110,6 +95,19 @@ export class PesterTestsFeature implements IFeature {
                     ? vscode.workspace.rootPath
                     : path.dirname(currentDocument.fileName),
         };
+
+        if (lineNum) {
+            launchConfig.args.push("-LineNumber", `${lineNum}`);
+        }
+
+        if (testName) {
+            // Escape single quotes inside double quotes by doubling them up
+            if (testName.includes("'")) {
+                testName = testName.replace(/'/g, "''");
+            }
+
+            launchConfig.args.push("-TestName", `'${testName}'`);
+        }
 
         return launchConfig;
     }
