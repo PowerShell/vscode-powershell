@@ -69,9 +69,14 @@ export class PowerShellProcess {
                         powerShellArgs.push("-ExecutionPolicy", "Bypass");
                     }
 
+                    const stringToEncode = "& '" +
+                        PowerShellProcess.escapeSingleQuotes(startScriptPath) +
+                        "' " + this.startArgs;
+
+                    // Use -EncodedCommand because the command is complex and has quotes in it that need to work xplat.
                     powerShellArgs.push(
-                        "-Command",
-                        "& '" + PowerShellProcess.escapeSingleQuotes(startScriptPath) + "' " + this.startArgs);
+                        "-EncodedCommand",
+                        Buffer.from(stringToEncode, "utf16le").toString("base64"));
 
                     let powerShellExePath = this.exePath;
 
