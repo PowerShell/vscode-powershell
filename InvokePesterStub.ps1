@@ -76,8 +76,7 @@ else {
     # We get here when the TestName expression is of type ExpandableStringExpressionAst.
     # PSES will not attempt to "evaluate" the expression so it returns null for the TestName.
     Write-Warning "The Describe block's TestName cannot be evaluated. EXECUTING ALL TESTS instead."
-    Write-Warning "To avoid this, either install Pester 4.6.0 or higher, or remove any variables or"
-    Write-Warning "sub-expressions in the Describe block's TestName."
+    Write-Warning "To avoid this, install Pester >= 4.6.0 or remove any expressions in the TestName."
 
     Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
 }
