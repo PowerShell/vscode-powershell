@@ -65,12 +65,12 @@ if (!$pesterModule) {
 if ($All) {
     Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
 }
+elseif ($TestName) {
+    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName
+}
 elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
     Pester\Invoke-Pester -Script $ScriptPath -PesterOption (New-PesterOption -ScriptBlockFilter @{
         IncludeVSCodeMarker=$true; Line=$LineNumber; Path=$ScriptPath})
-}
-elseif ($TestName) {
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName
 }
 else {
     # We get here when the TestName expression is of type ExpandableStringExpressionAst.
