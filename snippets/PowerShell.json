@@ -952,5 +952,72 @@
             "#endregion"
         ],
         "description": "Region Block for organizing and folding of your code"
+    },
+    "IfShouldProcess": {
+        "prefix": "IfShouldProcess",
+        "body": [
+            "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
+                "\t$0",
+            "}"
+        ],
+        "description": "Creates ShouldProcess block"
+    },
+    "CalculatedProperty": {
+        "prefix": "Calculated-Property",
+        "body": [
+            "@{name='${1:PropertyName}';expression={${2:\\$_.PropertyValue}}}$0"
+        ],
+        "description": "Creates a Calculated Property typically used with Select-Object."
+    },
+    "PesterDescribeContextIt": {
+        "prefix": "Describe-Context-It-Pester",
+        "body": [
+            "Describe \"${1:DescribeName}\" {",
+                "\tContext \"${2:ContextName}\" {",
+                    "\t\tIt \"${3:ItName}\" {",
+                        "\t\t\t${4:Assertion}",
+                    "\t\t}$0",
+                "\t}",
+            "}"
+        ],
+        "description": "Pester Describe block with nested Context & It blocks"
+    },
+    "PesterDescribeBlock": {
+        "prefix": "Describe-Pester",
+        "body": [
+            "Describe \"${1:DescribeName}\" {",
+                "\t$0",
+            "}"
+        ],
+        "description": "Pester Describe block"
+    },
+    "PesterContextIt": {
+        "prefix": "Context-It-Pester",
+        "body": [
+            "Context \"${1:ContextName}\" {",
+                "\tIt \"${2:ItName}\" {",
+                    "\t\t${3:Assertion}",
+                "\t}$0",
+            "}"
+        ],
+        "description": "Pester - Context block with nested It block"
+    },
+    "PesterContext": {
+        "prefix": "Context-Pester",
+        "body": [
+            "Context \"${1:ContextName}\" {",
+                "\t$0",
+            "}"
+        ],
+        "description": "Pester - Context block"
+    },
+    "PesterIt": {
+        "prefix": "It-Pester",
+        "body": [
+            "It \"${1:ItName}\" {",
+                "\t${2:Assertion}",
+            "}$0"
+        ],
+        "description": "Pester - It block"
     }
 }
