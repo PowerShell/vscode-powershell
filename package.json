@@ -614,12 +614,12 @@
         "powershell.codeFormatting.WhitespaceInsideBrace": {
           "type": "boolean",
           "default": true,
-          "description": "Adds a space after an opening brace ('}') and before a closing brace ('}')."
+          "description": "Adds a space after an opening brace ('{') and before a closing brace ('}')."
         },
         "powershell.codeFormatting.WhitespaceAroundPipe": {
           "type": "boolean",
           "default": true,
-          "description": "Adds a space before and after a pipeline ('|')."
+          "description": "Adds a space before and after the pipeline operator ('|')."
         },
         "powershell.codeFormatting.ignoreOneLineBlock": {
           "type": "boolean",
