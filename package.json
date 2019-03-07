@@ -36,7 +36,8 @@
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
     "onCommand:PowerShell.RestartSession",
-    "onView:PowerShellCommands"
+    "onView:PowerShellCommands",
+    "onCommand:PowerShell.PickRunspace"
   ],
   "dependencies": {
     "vscode-languageclient": "~5.1.1"
@@ -318,6 +319,7 @@
         "runtime": "node",
         "variables": {
           "PickPSHostProcess": "PowerShell.PickPSHostProcess",
+          "PickRunspace": "PowerShell.PickRunspace",
           "SpecifyScriptArgs": "PowerShell.SpecifyScriptArgs"
         },
         "languages": [
@@ -407,6 +409,17 @@
               "request": "launch",
               "cwd": ""
             }
+          },
+          {
+            "label": "PowerShell: Debug Runspace",
+            "description": "Open runspace picker to select runspace to attach debugger to",
+            "body": {
+              "name": "PowerShell Debug Runspace",
+              "type": "PowerShell",
+              "request": "attach",
+              "processId": "current",
+              "localRunspaceId": "^\"\\${command:PickRunspace}\""
+            }
           }
         ],
         "configurationAttributes": {
@@ -451,6 +464,11 @@
                 "type": "number",
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
                 "default": 1
+              },
+              "localRunspaceId": {
+                "type": "string",
+                "description": "The ID of the runspace to debug.  Defaults to 1.  Works only on PowerShell 5 and above.",
+                "default": "${command:PickRunspace}"
               }
             }
           }
@@ -495,6 +513,13 @@
             "type": "powershell",
             "request": "launch",
             "cwd": ""
+          },
+          {
+            "name": "PowerShell Debug Runspace",
+            "type": "powershell",
+            "request": "attach",
+            "processId": "current",
+            "localRunspaceId": "${command:PickRunspace}"
           }
         ]
       }

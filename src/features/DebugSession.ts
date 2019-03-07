@@ -381,3 +381,130 @@ export class PickPSHostProcessFeature implements IFeature {
         }
     }
 }
+
+interface IRunspaceItem extends vscode.QuickPickItem {
+    id: string;	// payload for the QuickPick UI
+}
+
+interface IRunspace {
+    id: string;
+    name: string;
+    availability: string;
+}
+
+export const GetRunspaceRequestType =
+    new RequestType<any, IGetRunspaceResponseBody, string, void>("powerShell/getRunspace");
+
+interface IGetRunspaceResponseBody {
+    runspaces: IRunspace[];
+}
+
+export class PickRunspaceFeature implements IFeature {
+
+    private command: vscode.Disposable;
+    private languageClient: LanguageClient;
+    private waitingForClientToken: vscode.CancellationTokenSource;
+    private getLanguageClientResolve: (value?: LanguageClient | Thenable<LanguageClient>) => void;
+
+    constructor() {
+
+        this.command =
+            vscode.commands.registerCommand("PowerShell.PickRunspace", () => {
+                return this.getLanguageClient()
+                           .then((_) => this.pickRunspace(), (_) => undefined);
+            });
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
+        this.languageClient = languageClient;
+
+        if (this.waitingForClientToken) {
+            this.getLanguageClientResolve(this.languageClient);
+            this.clearWaitingToken();
+        }
+    }
+
+    public dispose() {
+        this.command.dispose();
+    }
+
+    private getLanguageClient(): Thenable<LanguageClient> {
+        if (this.languageClient) {
+            return Promise.resolve(this.languageClient);
+        } else {
+            // If PowerShell isn't finished loading yet, show a loading message
+            // until the LanguageClient is passed on to us
+            this.waitingForClientToken = new vscode.CancellationTokenSource();
+
+            return new Promise<LanguageClient>(
+                (resolve, reject) => {
+                    this.getLanguageClientResolve = resolve;
+
+                    vscode.window
+                        .showQuickPick(
+                            ["Cancel"],
+                            { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
+                            this.waitingForClientToken.token)
+                        .then((response) => {
+                            if (response === "Cancel") {
+                                this.clearWaitingToken();
+                                reject();
+                            }
+                        });
+
+                    // Cancel the loading prompt after 60 seconds
+                    setTimeout(() => {
+                        if (this.waitingForClientToken) {
+                            this.clearWaitingToken();
+                            reject();
+
+                            vscode.window.showErrorMessage(
+                                "Attach to PowerShell host process: PowerShell session took too long to start.");
+                        }
+                    }, 60000);
+                },
+            );
+        }
+    }
+
+    private pickRunspace(): Thenable<string> {
+        return this.languageClient.sendRequest(GetRunspaceRequestType, null).then((runspaces) => {
+            const items: IRunspaceItem[] = [];
+
+            for (const p in runspaces) {
+                if (runspaces.hasOwnProperty(p)) {
+
+                    // Skip default runspace
+                    if (runspaces[p].id === 1) {
+                        continue;
+                    }
+
+                    items.push({
+                        label: runspaces[p].name,
+                        description: `ID: ${runspaces[p].id} - ${runspaces[p].availability}`,
+                        id: runspaces[p].id,
+                    });
+                }
+            }
+
+            const options: vscode.QuickPickOptions = {
+                placeHolder: "Select PowerShell runspace to debug",
+                matchOnDescription: true,
+                matchOnDetail: true,
+            };
+
+            return vscode.window.showQuickPick(items, options).then((item) => {
+                // Return undefined when user presses Esc.
+                // This prevents VSCode from opening launch.json in this case which happens if we return "".
+                return item ? `${item.id}` : undefined;
+            });
+        });
+    }
+
+    private clearWaitingToken() {
+        if (this.waitingForClientToken) {
+            this.waitingForClientToken.dispose();
+            this.waitingForClientToken = undefined;
+        }
+    }
+}

@@ -13,6 +13,7 @@ import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
 import { PickPSHostProcessFeature } from "./features/DebugSession";
+import { PickRunspaceFeature } from "./features/DebugSession";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { DocumentFormatterFeature } from "./features/DocumentFormatter";
 import { ExamplesFeature } from "./features/Examples";
@@ -142,6 +143,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
+        new PickRunspaceFeature(),
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
