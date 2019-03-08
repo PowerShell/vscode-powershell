@@ -453,7 +453,7 @@
         "initialConfigurations": [
           {
             "name": "PowerShell Launch Current File",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
             "args": [],
@@ -461,7 +461,7 @@
           },
           {
             "name": "PowerShell Launch Current File in Temporary Console",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
             "args": [],
@@ -470,7 +470,7 @@
           },
           {
             "name": "PowerShell Launch Current File w/Args Prompt",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
             "args": [
@@ -480,14 +480,14 @@
           },
           {
             "name": "PowerShell Attach to Host Process",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "attach",
             "processId": "${command:PickPSHostProcess}",
             "runspaceId": 1
           },
           {
             "name": "PowerShell Interactive Session",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "cwd": ""
           }
