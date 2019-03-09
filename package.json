@@ -32,12 +32,12 @@
     "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.PickPSHostProcess",
+    "onCommand:PowerShell.PickRunspace",
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
     "onCommand:PowerShell.RestartSession",
-    "onView:PowerShellCommands",
-    "onCommand:PowerShell.PickRunspace"
+    "onView:PowerShellCommands"
   ],
   "dependencies": {
     "vscode-languageclient": "~5.1.1"
@@ -411,14 +411,14 @@
             }
           },
           {
-            "label": "PowerShell: Debug Runspace",
+            "label": "PowerShell: Attach Interactive Session Runspace",
             "description": "Open runspace picker to select runspace to attach debugger to",
             "body": {
-              "name": "PowerShell Debug Runspace",
+              "name": "PowerShell Attach Interactive Session Runspace",
               "type": "PowerShell",
               "request": "attach",
               "processId": "current",
-              "localRunspaceId": "^\"\\${command:PickRunspace}\""
+              "runspaceId": "^\"\\${command:PickRunspace}\""
             }
           }
         ],
@@ -461,14 +461,9 @@
                 "default": "${command:PickPSHostProcess}"
               },
               "runspaceId": {
-                "type": "number",
-                "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
-                "default": 1
-              },
-              "localRunspaceId": {
                 "type": "string",
-                "description": "The ID of the runspace to debug.  Defaults to 1.  Works only on PowerShell 5 and above.",
-                "default": "${command:PickRunspace}"
+                "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
+                "default": "1"
               }
             }
           }
@@ -506,7 +501,7 @@
             "type": "powershell",
             "request": "attach",
             "processId": "${command:PickPSHostProcess}",
-            "runspaceId": 1
+            "runspaceId": "1"
           },
           {
             "name": "PowerShell Interactive Session",
@@ -515,11 +510,11 @@
             "cwd": ""
           },
           {
-            "name": "PowerShell Debug Runspace",
+            "name": "PowerShell Attach Interactive Session Runspace",
             "type": "powershell",
             "request": "attach",
             "processId": "current",
-            "localRunspaceId": "${command:PickRunspace}"
+            "runspaceId": "${command:PickRunspace}"
           }
         ]
       }
