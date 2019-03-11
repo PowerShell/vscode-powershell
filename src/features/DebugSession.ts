@@ -43,10 +43,10 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     }
 
     // DebugConfigurationProvider method
-    public resolveDebugConfiguration(
+    public async resolveDebugConfiguration(
         folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
-        token?: CancellationToken): ProviderResult<DebugConfiguration> {
+        token?: CancellationToken): Promise<DebugConfiguration> {
 
         // Make sure there is a session running before attempting to debug/run a program
         if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
@@ -75,6 +75,11 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                 return vscode.window.showErrorMessage(msg).then((_) => {
                     return undefined;
                 });
+            }
+
+            // if nothing is set, prompt for the processId
+            if (!config.customPipeName && !config.processId) {
+                config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
             }
         }
 

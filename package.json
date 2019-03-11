@@ -396,7 +396,6 @@
               "name": "PowerShell Attach to Host Process",
               "type": "PowerShell",
               "request": "attach",
-              "processId": "^\"\\${command:PickPSHostProcess}\"",
               "runspaceId": 1
             }
           },
@@ -458,12 +457,17 @@
               "processId": {
                 "type": "string",
                 "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
-                "default": "${command:PickPSHostProcess}"
+                "default": null
               },
               "runspaceId": {
                 "type": "string",
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
                 "default": "1"
+              },
+              "customPipeName": {
+                "type": "string",
+                "description": "The custom pipe name of the PowerShell host process to attach to.  Works only on PowerShell 6.2 and above.",
+                "default": null
               }
             }
           }
@@ -471,7 +475,7 @@
         "initialConfigurations": [
           {
             "name": "PowerShell Launch Current File",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
             "args": [],
@@ -479,7 +483,7 @@
           },
           {
             "name": "PowerShell Launch Current File in Temporary Console",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
             "args": [],
@@ -488,7 +492,7 @@
           },
           {
             "name": "PowerShell Launch Current File w/Args Prompt",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
             "args": [
@@ -498,20 +502,19 @@
           },
           {
             "name": "PowerShell Attach to Host Process",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "attach",
-            "processId": "${command:PickPSHostProcess}",
             "runspaceId": "1"
           },
           {
             "name": "PowerShell Interactive Session",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "launch",
             "cwd": ""
           },
           {
             "name": "PowerShell Attach Interactive Session Runspace",
-            "type": "powershell",
+            "type": "PowerShell",
             "request": "attach",
             "processId": "current",
             "runspaceId": "${command:PickRunspace}"
