@@ -392,17 +392,13 @@ interface IRunspaceItem extends vscode.QuickPickItem {
 }
 
 interface IRunspace {
-    id: string;
+    id: number;
     name: string;
     availability: string;
 }
 
 export const GetRunspaceRequestType =
-    new RequestType<any, IGetRunspaceResponseBody, string, void>("powerShell/getRunspace");
-
-interface IGetRunspaceResponseBody {
-    runspaces: IRunspace[];
-}
+    new RequestType<any, IRunspace[], string, void>("powerShell/getRunspace");
 
 export class PickRunspaceFeature implements IFeature {
 
@@ -412,7 +408,6 @@ export class PickRunspaceFeature implements IFeature {
     private getLanguageClientResolve: (value?: LanguageClient | Thenable<LanguageClient>) => void;
 
     constructor() {
-
         this.command =
             vscode.commands.registerCommand("PowerShell.PickRunspace", () => {
                 return this.getLanguageClient()
@@ -473,23 +468,20 @@ export class PickRunspaceFeature implements IFeature {
     }
 
     private pickRunspace(): Thenable<string> {
-        return this.languageClient.sendRequest(GetRunspaceRequestType, null).then((runspaces) => {
+        return this.languageClient.sendRequest(GetRunspaceRequestType, null).then((response) => {
             const items: IRunspaceItem[] = [];
 
-            for (const p in runspaces) {
-                if (runspaces.hasOwnProperty(p)) {
-
-                    // Skip default runspace
-                    if (runspaces[p].id === 1) {
-                        continue;
-                    }
-
-                    items.push({
-                        label: runspaces[p].name,
-                        description: `ID: ${runspaces[p].id} - ${runspaces[p].availability}`,
-                        id: runspaces[p].id,
-                    });
+            for (const runspace of response) {
+                // Skip default runspace
+                if (runspace.id === 1) {
+                    continue;
                 }
+
+                items.push({
+                    label: runspace.name,
+                    description: `ID: ${runspace.id} - ${runspace.availability}`,
+                    id: runspace.id.toString(),
+                });
             }
 
             const options: vscode.QuickPickOptions = {
