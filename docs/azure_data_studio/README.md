@@ -1,6 +1,6 @@
 # Azure Data Studio Docs
 
-[Azure Data Studio](https://github.com/Microsoft/azuredatastudio) is a VSCode-like IDE primarily targeted at SQL DBAs and is a fork of VSCode. Since it's a fork of VSCode, many extensions "just work" including the PowerShell extension.
+[Azure Data Studio](https://github.com/Microsoft/azuredatastudio) is a VSCode-like IDE primarily targeted at database administrators and is a fork of VSCode. Since it's a fork of VSCode, many extensions "just work" including the PowerShell extension.
 
 This folder contains any docs for PowerShell extension support in Azure Data Studio.
 
