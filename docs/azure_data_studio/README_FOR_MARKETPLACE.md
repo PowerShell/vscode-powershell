@@ -130,7 +130,7 @@ Out-GridView -PassThru |
 Backup-SqlDatabase -CompressionOption On
 ```
 
-This example again gets list of all SQL Server instances listed in your Registered Servers file, then calls the `Get-SqlAgentJobHistory` which reports every failed SQL Agent Job since Midnight, for each SQL Server instances listed.
+This example, again, gets list of all SQL Server instances listed in your Registered Servers file, then calls the `Get-SqlAgentJobHistory` which reports every failed SQL Agent Job since Midnight, for each SQL Server instances listed.
 
 ```
 dir 'SQLSERVER:\SQLRegistration\Database Engine Server Group' -Recurse |
