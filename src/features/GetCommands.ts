@@ -45,7 +45,7 @@ constructor(private log: Logger, private extensionContext: vscode.ExtensionConte
             { treeDataProvider: this.commandsExplorerProvider });
 
         // Refresh the command explorer when the view is visible
-        this.commandsExplorerTreeView.onDidChangeVisibility( (e) => {
+        this.commandsExplorerTreeView.onDidChangeVisibility((e) => {
             if (e.visible) {
                 this.CommandExplorerRefresh();
             }
@@ -89,7 +89,15 @@ constructor(private log: Logger, private extensionContext: vscode.ExtensionConte
         if (item.filledParameters !== {}) {
             // tslint:disable-next-line:forin
             for (const element in item.filledParameters) {
-                insertCommand += " -" + element + " " + item.filledParameters[element];
+                if (item.filledParameters[element] === "$true") {
+                    insertCommand += ` -${element}`;
+                } else {
+                    if (item.filledParameters[element].indexOf(" ") !== -1) {
+                        insertCommand += ` -${element} "${item.filledParameters[element]}"`;
+                    } else {
+                        insertCommand += ` -${element} ${item.filledParameters[element]}`;
+                    }
+                }
             }
         }
         const edi = vscode.window.activeTextEditor;
@@ -137,10 +145,6 @@ constructor(private log: Logger, private extensionContext: vscode.ExtensionConte
             });
         }
         this.currentPanel.webview.postMessage(item);
-    }
-
-    private makeMyContent() {
-        return ``;
     }
 }
 

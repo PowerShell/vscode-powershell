@@ -6,25 +6,29 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; img-src vscode-resource:; script-src vscode-resource:; style-src vscode-resource:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cat Coding</title>
+
+    <title>PowerShell: Insert Command</title>
 </head>
 
 <body>
     <form id="CommandParameters" onsubmit="mySubmit()">
         <h1>Parameter Sets</h1>
         <div id="ParameterSets"></div>
-        <div id="CommonParameters"></div>
         <input type="submit" />
     </form>
     <script>
         const vscode = acquireVsCodeApi();
         const parameterSets = document.getElementById('ParameterSets');
-        const commonParams = document.getElementById('CommonParameters');
+        const commonParams = document.createElement('div');
+        commonParams.id = 'commonParameters';
         var message;
+        var myEvent; // TODO: This is for troubleshooting....
         var hasCommonParams = false;
-        const commonParameters = [
+        const switchCommonParameters = [
             "Verbose",
-            "Debug",
+            "Debug"
+        ];
+        const stringCommonParameters = [
             "ErrorAction",
             "WarningAction",
             "InformationAction",
@@ -37,62 +41,119 @@
         ]
         window.addEventListener('message', event => {
             message = undefined;
+            let defaultParamSet = '__AllParameterSets';
             // Remove previous nodes if there are any.
             while (parameterSets.hasChildNodes()) {
                 parameterSets.removeChild(parameterSets.childNodes[0])
             }
-            while (commonParams.hasChildNodes()) {
-                commonParams.removeChild(commonParams.childNodes[0])
-            }
-            window.myMessage = event.data[0];
+            myEvent = event.data[0];
             message = event.data[0];
             console.log(message);
-            for(var i = 0 ; i < message.parameterSets.length;i++) {
+            for (var i = 0; i < message.parameterSets.length; i++) {
+                let pSet = message.parameterSets[i];
+                if (pSet.isDefault) {
+                    defaultParamSet = pSet.name;
+                }
                 let pSetDiv = document.createElement('div');
-                pSetDiv.id = message.parameterSets[i].name;
+                pSetDiv.id = pSet.name;
                 let setHeader = document.createElement('h2');
-                setHeader.innerText = message.parameterSets[i].name;
-                pSetDiv.appendChild(setHeader)
-                for (var j = 0; j < message.parameterSets[i].parameters.length;j++) {
+                setHeader.innerText = pSet.name;
+                setHeader.onclick = (ev) => {
+                    console.log(ev);
+                    parameterSetToggle(ev.target.innerText);
+                };
+                parameterSets.appendChild(setHeader);
+                for (var j = 0; j < pSet.parameters.length; j++) {
+                    let currParameter = pSet.parameters[j];
+                    if ((switchCommonParameters.findIndex((param) => param === currParameter.name) !== -1) || (stringCommonParameters.findIndex((param) => param === currParameter.name) !== -1)) {
+                        hasCommonParams = true;
+                        continue;
+                    }
                     let parameterLabel = document.createElement('label');
-                    parameterLabel.htmlFor = message.parameterSets[i].parameters[j].name;
-                    parameterLabel.innerText = message.parameterSets[i].parameters[j].name;
-                    if (message.parameterSets[i].parameters[j].attributes[0].mandatory) {
+                    parameterLabel.htmlFor = pSet.name + '-' + currParameter.name;
+                    parameterLabel.innerText = currParameter.name;
+                    if (pSet.parameters[j].attributes[0].mandatory) {
                         parameterLabel.innerText += ' *';
-                        parameterLabel.style = 'font-weight: bold'
+                        parameterLabel.style = 'font-weight: bold';
                     }
                     let parameterInput = document.createElement('input');
-                    parameterInput.id = message.parameterSets[i].parameters[j].name;
-                    parameterInput.type = message.parameterSets[i].parameters[j].parameterType.search('SwitchParameter') !== -1 ? 'checkbox' : 'text';
-                    // Test if It's a common parameter to add it to the Common Parameters section of code.
-                    if (commonParameters.findIndex((param) => param === message.parameterSets[i].parameters[j].name) !== -1) {
-                        hasCommonParams = true;
-                    } else {
-                        pSetDiv.appendChild(parameterLabel);
-                        pSetDiv.appendChild(parameterInput);
-                        pSetDiv.appendChild(document.createElement('br'));
-                    }
+                    parameterInput.className = 'parameters'
+                    parameterInput.id = pSet.name + '-' + currParameter.name;
+                    parameterInput.type = currParameter.parameterType.search('SwitchParameter') !== -1 ? 'checkbox' : 'text';
+                    pSetDiv.appendChild(parameterLabel);
+                    pSetDiv.appendChild(parameterInput);
+                    pSetDiv.appendChild(document.createElement('br'));
                 }
                 parameterSets.appendChild(pSetDiv);
             }
-            if(hasCommonParams) {
-                var tmp = document.createElement('h1')
-                tmp.innerText = 'Common Parameters'
-                commonParams.appendChild(tmp);
-                var temp = document.createElement('h2');
-                temp.innerText = 'Need to add these back....'
-                commonParams.appendChild(temp);
+            if (hasCommonParams) {
+                let setHeader = document.createElement('h2');
+                setHeader.innerText = 'commonParameters';
+                setHeader.onclick = toggleCommonParameters;
+                parameterSets.appendChild(setHeader);
+                switchCommonParameters.forEach((param) => {
+                    let parameterLabel = document.createElement('label');
+                    parameterLabel.htmlFor = param;
+                    parameterLabel.innerText = param;
+                    let parameterInput = document.createElement('input');
+                    parameterInput.className = 'parameters'
+                    parameterInput.id = param;
+                    parameterInput.type = 'checkbox';
+                    commonParams.appendChild(parameterLabel);
+                    commonParams.appendChild(parameterInput);
+                    commonParams.appendChild(document.createElement('br'));
+                });
+                stringCommonParameters.forEach((param) => {
+                    let parameterLabel = document.createElement('label');
+                    parameterLabel.htmlFor = param;
+                    parameterLabel.innerText = param;
+                    let parameterInput = document.createElement('input');
+                    parameterInput.className = 'parameters'
+                    parameterInput.id = param;
+                    parameterInput.type = 'text';
+                    commonParams.appendChild(parameterLabel);
+                    commonParams.appendChild(parameterInput);
+                    commonParams.appendChild(document.createElement('br'));
+                });
+                parameterSets.appendChild(commonParams);
             }
+            parameterSetToggle(defaultParamSet);
         });
         function mySubmit() {
             let myMessage = message;
             myMessage.filledParameters = {};
-            command.childNodes.forEach((node) => {
-                if (node.tagName === "INPUT" && node.value !== "") {
-                    myMessage.filledParameters[node.id] = node.value
+            //parameterSets.getElementsByClassName('parameters').foreach((a) => { console.log(a) }); // foreach doesn't work though...
+            parameterSets.childNodes.forEach((node) => {
+                if (node.childElementCount > 0 && (node.style.display !== 'none' || node.id === 'commonParameters')) {
+                    node.childNodes.forEach((a) => {
+                        if (a.className === 'parameters' && a.value !== "") {
+                            let id = a.id.substring(a.id.lastIndexOf('-') + 1, a.id.length);
+                            if (a.type === 'checkbox') {
+                                if (a.checked) {
+                                    myMessage.filledParameters[id] = "$true"
+                                }
+                            } else {
+                                myMessage.filledParameters[id] = a.value
+                            }
+                        }
+                    })
                 }
             });
+            console.log(myMessage);
             vscode.postMessage(myMessage);
+        }
+
+        function parameterSetToggle(toggleParameterSet) {
+            var psetDivs = parameterSets.getElementsByTagName('div');
+            for (var index = 0; index < psetDivs.length; index++) {
+                psetDivs[index].style.display = 'none';
+            }
+            document.getElementById(toggleParameterSet).style.display = null;
+        }
+
+        function toggleCommonParameters() {
+            const commonParametersDiv = document.getElementById('commonParameters');
+            commonParametersDiv.style.display = commonParametersDiv.style.display === 'none' ? null : 'none'
         }
     </script>
 </body>
