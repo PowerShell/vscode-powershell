@@ -75,33 +75,6 @@ To open/view the extension's examples in Visual Studio Code, run the following f
 code (Get-ChildItem $Home\.azuredatastudio\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
 
-## Contributing to the Code
-
-Check out the [development documentation](docs/development.md) for more details
-on how to contribute to this extension!
-
-## Maintainers
-
-- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
-- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
-- [Rob Holt](https://github.com/rjmholt)
-
-## License
-
-This extension is [licensed under the MIT License](LICENSE.txt).  Please see the
-[third-party notices](Third%20Party%20Notices.txt) file for details on the third-party
-binaries that we include with releases of this project.
-
-## [Code of Conduct][conduct-md]
-
-This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
-For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
-
-[conduct-code]: http://opensource.microsoft.com/codeofconduct/
-[conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
-[conduct-email]: mailto:opencode@microsoft.com
-[conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/master/CODE_OF_CONDUCT.md
-
 ## SQL PowerShell Examples
 In order to use these examples (below), you need to install the SqlServer module from the [PowerShell Gallery](https://www.powershellgallery.com/packages/SqlServer).
 
@@ -166,3 +139,30 @@ FOREACH {
         Get-SqlAgentJobHistory -ServerInstance  $_.Name -Since Midnight -OutcomesType Failed
         }
 ```
+
+## Contributing to the Code
+
+Check out the [development documentation](docs/development.md) for more details
+on how to contribute to this extension!
+
+## Maintainers
+
+- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
+- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
+- [Rob Holt](https://github.com/rjmholt)
+
+## License
+
+This extension is [licensed under the MIT License](LICENSE.txt).  Please see the
+[third-party notices](Third%20Party%20Notices.txt) file for details on the third-party
+binaries that we include with releases of this project.
+
+## [Code of Conduct][conduct-md]
+
+This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
+For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
+
+[conduct-code]: http://opensource.microsoft.com/codeofconduct/
+[conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
+[conduct-email]: mailto:opencode@microsoft.com
+[conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/master/CODE_OF_CONDUCT.md
