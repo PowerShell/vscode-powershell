@@ -122,7 +122,7 @@ tempdb               Normal       72.00 MB   61.25 MB Simple       140 sa
 WideWorldImporters   Normal         3.2 GB     2.6 GB Simple       130 sa   
 ```
 
-This example uses the `Get-SqlDatabase` cmdlet to retireve a list of all databases on the ServerB instance, then presents a grid/table to select which databases should be backed up.  Once the user clicks on the "OK" button, only the highlighted databases will be backed up.
+This example uses the `Get-SqlDatabase` cmdlet to retrieve a list of all databases on the ServerB instance, then presents a grid/table (using the `Out-GridView` cmdlet) to select which databases should be backed up.  Once the user clicks on the "OK" button, only the highlighted databases will be backed up.
 
 ```
 Get-SqlDatabase -ServerInstance ServerB |
