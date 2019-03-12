@@ -101,3 +101,56 @@ For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [open
 [conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
 [conduct-email]: mailto:opencode@microsoft.com
 [conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/master/CODE_OF_CONDUCT.md
+
+## SQL PowerShell Examples
+In order to use these examples (below), you need to install the SqlServer module from the [PowerShell Gallery](https://www.powershellgallery.com/packages/SqlServer).
+
+<pre><code>Install-Module -Name SqlServer -AllowPrerelease</code></pre>
+
+In this example, we use the Get-SqlInstance cmdlet to Get the Server SMO objects for ServerA & ServerB.  The default output for this command will include the Instance name, version, Service Pack, & CU Update Level of the instances.
+
+<pre><code>Get-SqlInstance -ServerInstance ServerA, ServerB</code></pre>
+Here is a sample of what that output will look like:
+<pre><code><# Sample Output #>
+Instance Name             Version    ProductLevel UpdateLevel
+-------------             -------    ------------ -----------
+ServerA                   13.0.5233  SP2          CU4
+ServerB                   14.0.3045  RTM          CU12</code></pre>
+
+In this example, we will do a 'dir' (alias for Get-ChildItem) to get the list of all SQL Server instances listed in your Registered Servers file, and then use the Get-SqlDatabase cmdlet to get a list of Databases for each of those instances.
+
+<pre><code>dir 'SQLSERVER:\SQLRegistration\Database Engine Server Group' -Recurse |
+WHERE {$_.Mode -ne 'd' } |
+FOREACH {
+        Get-SqlDatabase -ServerInstance $_.Name
+        }
+</code></pre>
+Here is a sample of what that output will look like:
+<pre><code>
+Name                 Status           Size     Space  Recovery Compat. Owner
+                                            Available  Model     Level      
+----                 ------           ---- ---------- -------- ------- -----
+AdventureWorks2017   Normal      336.00 MB   57.01 MB Simple       140 sa   
+master               Normal        6.00 MB  368.00 KB Simple       140 sa   
+model                Normal       16.00 MB    5.53 MB Full         140 sa   
+msdb                 Normal       48.44 MB    1.70 MB Simple       140 sa   
+PBIRS                Normal      144.00 MB   55.95 MB Full         140 sa   
+PBIRSTempDB          Normal       16.00 MB    4.20 MB Simple       140 sa   
+SSISDB               Normal      325.06 MB   26.21 MB Full         140 sa   
+tempdb               Normal       72.00 MB   61.25 MB Simple       140 sa   
+WideWorldImporters   Normal         3.2 GB     2.6 GB Simple       130 sa   
+</code></pre>
+
+This example uses the Get-SqlDatabase cmdlet to retireve a list of all databases on the ServerB instance, then presents a grid/table to select which databases should be backed up.  Once the user clicks on the "OK" button, only the highlighted databases will be backed up.
+
+<pre><code>Get-SqlDatabase -ServerInstance ServerB |
+Out-GridView -PassThru |
+Backup-SqlDatabase -CompressionOption On</code></pre>
+
+This example again gets list of all SQL Server instances listed in your Registered Servers file, then reports every failed SQL Agent Job since Midnight, for each SQL Server instances listed.
+
+<pre><code>dir 'SQLSERVER:\SQLRegistration\Database Engine Server Group' -Recurse |
+WHERE {$_.Mode -ne 'd' } |
+FOREACH {
+        Get-SqlAgentJobHistory -ServerInstance  $_.Name -Since Midnight -OutcomesType Failed
+        }</code></pre>
