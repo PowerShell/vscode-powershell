@@ -80,6 +80,20 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             // if nothing is set, prompt for the processId
             if (!config.customPipeName && !config.processId) {
                 config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
+
+                // No process selected. Cancel attach.
+                if (!config.processId) {
+                    return null;
+                }
+            }
+
+            if (!config.runspaceId) {
+                config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
+
+                // No runspace selected. Cancel attach.
+                if (!config.runspaceId) {
+                    return null;
+                }
             }
         }
 
@@ -409,10 +423,10 @@ export class PickRunspaceFeature implements IFeature {
 
     constructor() {
         this.command =
-            vscode.commands.registerCommand("PowerShell.PickRunspace", () => {
+            vscode.commands.registerCommand("PowerShell.PickRunspace", (processId) => {
                 return this.getLanguageClient()
-                           .then((_) => this.pickRunspace(), (_) => undefined);
-            });
+                           .then((_) => this.pickRunspace(processId), (_) => undefined);
+            }, this);
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
@@ -467,13 +481,13 @@ export class PickRunspaceFeature implements IFeature {
         }
     }
 
-    private pickRunspace(): Thenable<string> {
-        return this.languageClient.sendRequest(GetRunspaceRequestType, null).then((response) => {
+    private pickRunspace(processId): Thenable<string> {
+        return this.languageClient.sendRequest(GetRunspaceRequestType, processId).then((response) => {
             const items: IRunspaceItem[] = [];
 
             for (const runspace of response) {
                 // Skip default runspace
-                if (runspace.id === 1) {
+                if (runspace.id === 1 || runspace.name === "PSAttachRunspace") {
                     continue;
                 }
 

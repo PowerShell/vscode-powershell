@@ -462,7 +462,7 @@
               "runspaceId": {
                 "type": "string",
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
-                "default": "1"
+                "default": null
               },
               "customPipeName": {
                 "type": "string",
@@ -503,8 +503,7 @@
           {
             "name": "PowerShell Attach to Host Process",
             "type": "PowerShell",
-            "request": "attach",
-            "runspaceId": "1"
+            "request": "attach"
           },
           {
             "name": "PowerShell Interactive Session",
@@ -516,8 +515,7 @@
             "name": "PowerShell Attach Interactive Session Runspace",
             "type": "PowerShell",
             "request": "attach",
-            "processId": "current",
-            "runspaceId": "${command:PickRunspace}"
+            "processId": "current"
           }
         ]
       }
