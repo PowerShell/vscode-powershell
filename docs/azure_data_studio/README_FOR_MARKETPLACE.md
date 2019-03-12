@@ -31,13 +31,11 @@ Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for ans
 ## Installing the Extension
 
 You can install the official release of the PowerShell extension by following the steps
-in the [Visual Studio Code documentation](docs.microsoft.com/en-us/sql/azure-data-studio/extensions).
+in the [Azure Data Studio documentation](docs.microsoft.com/en-us/sql/azure-data-studio/extensions).
 In the Extensions pane, search for "PowerShell" extension and install it there.  You will
 get notified automatically about any future extension updates!
 
-You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
-[Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
-instructions.  The easiest way is through the command line:
+You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) and install it through the command line:
 
 ```powershell
 azuredatastudio --install-extension PowerShell-<version>.vsix
