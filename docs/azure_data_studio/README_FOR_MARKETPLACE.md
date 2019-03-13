@@ -101,7 +101,7 @@ In this example, we will do a `dir` (alias for `Get-ChildItem`) to get the list 
 
 ```
 dir 'SQLSERVER:\SQLRegistration\Database Engine Server Group' -Recurse |
-WHERE {$_.Mode -ne 'd' } |
+WHERE { $_.Mode -ne 'd' } |
 FOREACH {
         Get-SqlDatabase -ServerInstance $_.Name
         }
