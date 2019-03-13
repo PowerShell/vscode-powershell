@@ -75,7 +75,7 @@ To open/view the extension's examples in Visual Studio Code, run the following f
 code (Get-ChildItem $Home\.azuredatastudio\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
 
-## SQL PowerShell Examples
+### SQL PowerShell Examples
 In order to use these examples (below), you need to install the SqlServer module from the [PowerShell Gallery](https://www.powershellgallery.com/packages/SqlServer).
 
 ```
