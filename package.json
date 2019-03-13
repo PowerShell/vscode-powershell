@@ -416,8 +416,7 @@
               "name": "PowerShell Attach Interactive Session Runspace",
               "type": "PowerShell",
               "request": "attach",
-              "processId": "current",
-              "runspaceId": "^\"\\${command:PickRunspace}\""
+              "processId": "current"
             }
           }
         ],
@@ -460,7 +459,7 @@
                 "default": null
               },
               "runspaceId": {
-                "type": "string",
+                "type":["string","number"],
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
                 "default": null
               },
