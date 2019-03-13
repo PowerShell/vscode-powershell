@@ -31,6 +31,7 @@
     "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.PickPSHostProcess",
+    "onCommand:PowerShell.PickRunspace",
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
@@ -313,6 +314,7 @@
         "runtime": "node",
         "variables": {
           "PickPSHostProcess": "PowerShell.PickPSHostProcess",
+          "PickRunspace": "PowerShell.PickRunspace",
           "SpecifyScriptArgs": "PowerShell.SpecifyScriptArgs"
         },
         "languages": [
@@ -401,6 +403,16 @@
               "request": "launch",
               "cwd": ""
             }
+          },
+          {
+            "label": "PowerShell: Attach Interactive Session Runspace",
+            "description": "Open runspace picker to select runspace to attach debugger to",
+            "body": {
+              "name": "PowerShell Attach Interactive Session Runspace",
+              "type": "PowerShell",
+              "request": "attach",
+              "processId": "current"
+            }
           }
         ],
         "configurationAttributes": {
@@ -442,9 +454,9 @@
                 "default": null
               },
               "runspaceId": {
-                "type": "number",
+                "type":["string","number"],
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
-                "default": 1
+                "default": null
               },
               "customPipeName": {
                 "type": "string",
@@ -485,14 +497,19 @@
           {
             "name": "PowerShell Attach to Host Process",
             "type": "PowerShell",
-            "request": "attach",
-            "runspaceId": 1
+            "request": "attach"
           },
           {
             "name": "PowerShell Interactive Session",
             "type": "PowerShell",
             "request": "launch",
             "cwd": ""
+          },
+          {
+            "name": "PowerShell Attach Interactive Session Runspace",
+            "type": "PowerShell",
+            "request": "attach",
+            "processId": "current"
           }
         ]
       }
