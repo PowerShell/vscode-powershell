@@ -106,7 +106,9 @@ FOREACH {
         Get-SqlDatabase -ServerInstance $_.Name
         }
 ```
+
 Here is a sample of what that output will look like:
+
 ```
 Name                 Status           Size     Space  Recovery Compat. Owner
                                             Available  Model     Level      
