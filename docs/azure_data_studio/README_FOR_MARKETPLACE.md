@@ -69,10 +69,10 @@ or if you're using the preview version of the extension
 $HOME/.azuredatastudio/extensions/ms-vscode.powershell-preview-<version>/examples
 ```
 
-To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
+To open/view the extension's examples in Azure Data Studio, run the following from your PowerShell command prompt:
 
 ```powershell
-code (Get-ChildItem $Home\.azuredatastudio\extensions\ms-vscode.PowerShell-*\examples)[-1]
+azuredatastudio (Get-ChildItem $Home\.azuredatastudio\extensions\ms-vscode.PowerShell-*\examples)[-1]
 ```
 
 ### SQL PowerShell Examples
@@ -81,6 +81,8 @@ In order to use these examples (below), you need to install the SqlServer module
 ```powershell
 Install-Module -Name SqlServer -AllowPrerelease
 ```
+
+> NOTE: With version `21.1.18095-preview` and up, the `SqlServer` module supports [PowerShell Core](https://github.com/PowerShell/PowerShell) 6.2 and up in addion to Windows PowerShell.
 
 In this example, we use the `Get-SqlInstance` cmdlet to Get the Server SMO objects for ServerA & ServerB.  The default output for this command will include the Instance name, version, Service Pack, & CU Update Level of the instances.
 
@@ -97,7 +99,7 @@ ServerA                   13.0.5233  SP2          CU4
 ServerB                   14.0.3045  RTM          CU12
 ```
 
-In this example, we will do a `dir` (alias for `Get-ChildItem`) to get the list of all SQL Server instances listed in your Registered Servers file, and then use the `Get-SqlDatabase` cmdlet to get a list of Databases for each of those instances.
+In the following example, we will do a `dir` (alias for `Get-ChildItem`) to get the list of all SQL Server instances listed in your Registered Servers file, and then use the `Get-SqlDatabase` cmdlet to get a list of Databases for each of those instances.
 
 ```powershell
 dir 'SQLSERVER:\SQLRegistration\Database Engine Server Group' -Recurse |
