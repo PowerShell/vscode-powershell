@@ -113,7 +113,7 @@ export function load(): ISettings {
     }
 
     const defaultDeveloperSettings: IDeveloperSettings = {
-        featureFlags: featureFlags,
+        featureFlags,
         powerShellExePath: undefined,
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
