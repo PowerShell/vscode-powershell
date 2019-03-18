@@ -358,7 +358,12 @@ export class PickPSHostProcessFeature implements IFeature {
 
     private pickPSHostProcess(): Thenable<string> {
         return this.languageClient.sendRequest(GetPSHostProcessesRequestType, null).then((hostProcesses) => {
-            const items: IProcessItem[] = [];
+            // Start with the current PowerShell process to the list.
+            const items: IProcessItem[] = [{
+                label: "Current",
+                description: "The current PowerShell process.",
+                pid: "current",
+            }];
 
             for (const p in hostProcesses) {
                 if (hostProcesses.hasOwnProperty(p)) {
@@ -487,7 +492,8 @@ export class PickRunspaceFeature implements IFeature {
 
             for (const runspace of response) {
                 // Skip default runspace
-                if (runspace.id === 1 || runspace.name === "PSAttachRunspace") {
+                if ((runspace.id === 1 || runspace.name === "PSAttachRunspace")
+                    && processId === "current") {
                     continue;
                 }
 
