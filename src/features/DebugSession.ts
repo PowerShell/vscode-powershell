@@ -358,7 +358,7 @@ export class PickPSHostProcessFeature implements IFeature {
 
     private pickPSHostProcess(): Thenable<string> {
         return this.languageClient.sendRequest(GetPSHostProcessesRequestType, null).then((hostProcesses) => {
-            // Start with the current PowerShell process to the list.
+            // Start with the current PowerShell process in the list.
             const items: IProcessItem[] = [{
                 label: "Current",
                 description: "The current PowerShell process.",
