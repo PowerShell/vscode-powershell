@@ -361,7 +361,7 @@ export class PickPSHostProcessFeature implements IFeature {
             // Start with the current PowerShell process in the list.
             const items: IProcessItem[] = [{
                 label: "Current",
-                description: "The current PowerShell process.",
+                description: "The current PowerShell Integrated Console process.",
                 pid: "current",
             }];
 
