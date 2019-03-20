@@ -116,8 +116,14 @@ export function load(): ISettings {
         createTemporaryIntegratedConsole: false,
     };
 
+    // TODO: Remove when PSReadLine is out of preview
+    const featureFlags = [];
+    if (utils.isWindowsOS()) {
+        featureFlags.push("PSReadLine");
+    }
+
     const defaultDeveloperSettings: IDeveloperSettings = {
-        featureFlags: [],
+        featureFlags,
         powerShellExePath: undefined,
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
