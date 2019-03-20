@@ -54,6 +54,7 @@ export interface ICodeFormattingSettings {
     WhitespaceAroundPipe: true;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
+    useCorrectCasing: boolean;
 }
 
 export interface IScriptAnalysisSettings {
@@ -143,6 +144,7 @@ export function load(): ISettings {
         WhitespaceAroundPipe: true,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
+        useCorrectCasing: true,
     };
 
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
