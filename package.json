@@ -637,6 +637,16 @@
           "default": true,
           "description": "Adds a newline (line break) after a closing brace."
         },
+        "powershell.codeFormatting.pipelineIndentationStyle": {
+          "type": "string",
+          "enum": [
+            "IncreaseIndentationForFirstPipeline",
+            "IncreaseIndentationAfterEveryPipeline",
+            "NoIndentation"
+          ],
+          "default": "IncreaseIndentationForFirstPipeline",
+          "description": "Multi-line pipeline style settings."
+        },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
           "default": true,
@@ -657,6 +667,16 @@
           "default": true,
           "description": "Adds a space after a separator (',' and ';')."
         },
+        "powershell.codeFormatting.WhitespaceInsideBrace": {
+          "type": "boolean",
+          "default": true,
+          "description": "Adds a space after an opening brace ('{') and before a closing brace ('}')."
+        },
+        "powershell.codeFormatting.WhitespaceAroundPipe": {
+          "type": "boolean",
+          "default": true,
+          "description": "Adds a space before and after the pipeline operator ('|')."
+        },
         "powershell.codeFormatting.ignoreOneLineBlock": {
           "type": "boolean",
           "default": true,
@@ -666,6 +686,11 @@
           "type": "boolean",
           "default": true,
           "description": "Align assignment statements in a hashtable or a DSC Configuration."
+        },
+        "powershell.codeFormatting.useCorrectCasing": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use correct casing for cmdlets."
         },
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
