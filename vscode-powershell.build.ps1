@@ -127,7 +127,7 @@ task Package {
     exec { & node ./node_modules/vsce/out/vsce package }
 
     # Change the package to have a static name for automation purposes
-    Move-Item -Force .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
+    Move-Item -Force .\powershell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
