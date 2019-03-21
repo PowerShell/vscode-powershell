@@ -1,7 +1,7 @@
 {
   "name": "powershell",
   "displayName": "PowerShell",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
@@ -454,7 +454,10 @@
                 "default": null
               },
               "runspaceId": {
-                "type":["string","number"],
+                "type": [
+                  "string",
+                  "number"
+                ],
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
                 "default": null
               },
