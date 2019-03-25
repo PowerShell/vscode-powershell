@@ -132,7 +132,7 @@ task UpdateReadme {
 }
 
 task UpdatePackageJson {
-    $script:PackageJson.name = "PowerShell-Preview"
+    $script:PackageJson.name = "powershell-preview"
     $script:PackageJson.displayName = "PowerShell Preview"
     $script:PackageJson.description = "(Preview) Develop PowerShell scripts in Visual Studio Code!"
     $script:PackageJson.preview = $true
