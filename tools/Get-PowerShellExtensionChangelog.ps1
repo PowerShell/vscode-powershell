@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#Requires -Version 6.0
+
 ##############################
 #.SYNOPSIS
 #Generate the draft change log of the PowerShell Extension for VSCode
