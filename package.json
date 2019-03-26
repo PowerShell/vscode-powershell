@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.29.0"
+    "vscode": "^1.31.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -40,20 +40,20 @@
     "onView:PowerShellCommands"
   ],
   "dependencies": {
-    "vscode-languageclient": "~5.1.1"
+    "vscode-languageclient": "~5.2.1"
   },
   "devDependencies": {
     "@types/mocha": "~2.2.32",
     "@types/node": "~10.12.12",
     "@types/rewire": "^2.5.28",
-    "@types/sinon": "^7.0.5",
+    "@types/sinon": "^7.0.10",
     "mocha": "~4.0.1",
-    "rewire": "^4.0.1",
-    "sinon": "^7.2.3",
-    "tslint": "~5.11.0",
-    "typescript": "~3.2.1",
-    "vsce": "~1.53.2",
-    "vscode": "~1.1.24"
+    "rewire": "~4.0.1",
+    "sinon": "~7.3.0",
+    "tslint": "~5.14.0",
+    "typescript": "~3.3.4000",
+    "vsce": "~1.59.0",
+    "vscode": "~1.1.33"
   },
   "extensionDependencies": [
     "vscode.powershell"
