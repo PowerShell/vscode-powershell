@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#Requires -Version 6.0
+
 ##############################
 #.SYNOPSIS
 #Generate the draft change log of the PowerShell Extension for VSCode
@@ -372,7 +374,7 @@ function Get-PowerShellExtensionChangeLog {
     )
 
     $vscodePowerShell = Get-ChangeLog -LastReleaseTag $LastReleaseTag -Token $Token -HasCherryPick:$HasCherryPick.IsPresent -RepoUri 'https://api.github.com/repos/PowerShell/vscode-powershell' -RepoName 'vscode-PowerShell'
-    Push-Location ../PowerShellEditorServices
+    Push-Location (Join-Path $PSScriptRoot .. .. PowerShellEditorServices)
     $pses = Get-ChangeLog -LastReleaseTag $LastReleaseTag -Token $Token -HasCherryPick:$HasCherryPick.IsPresent -RepoUri 'https://api.github.com/repos/PowerShell/PowerShellEditorServices' -RepoName 'PowerShellEditorServices'
     Pop-Location
 

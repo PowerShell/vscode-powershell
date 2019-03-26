@@ -1,10 +1,10 @@
 {
-  "name": "powershell",
-  "displayName": "PowerShell",
-  "version": "2.0.0",
+  "name": "powershell-preview",
+  "displayName": "PowerShell Preview",
+  "version": "2.0.1",
   "preview": true,
   "publisher": "ms-vscode",
-  "description": "Develop PowerShell scripts in Visual Studio Code!",
+  "description": "(Preview) Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
     "vscode": "^1.29.0"
   },
@@ -459,7 +459,10 @@
                 "default": null
               },
               "runspaceId": {
-                "type":["string","number"],
+                "type": [
+                  "string",
+                  "number"
+                ],
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
                 "default": null
               },
