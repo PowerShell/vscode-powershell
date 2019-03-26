@@ -9,7 +9,7 @@
 * Support for [PSScriptAnalyzer 1.18](https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.18.0) 📝
 * The ability to debug any runspace in any process 🔎
 * PSReadLine enabled by default on Windows 🎨
-* (Bug fix!) You can open untitled workspaces again! 🐛☠️
+* (Bug fix!) You can open untitled workspaces/folders again! 🐛☠️
 
 There are a lot more goodies in this version. Checkout the changelog below!
 
