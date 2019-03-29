@@ -647,7 +647,7 @@
             "IncreaseIndentationAfterEveryPipeline",
             "NoIndentation"
           ],
-          "default": "IncreaseIndentationForFirstPipeline",
+          "default": "NoIndentation",
           "description": "Multi-line pipeline style settings."
         },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
