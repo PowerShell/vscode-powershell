@@ -1,7 +1,7 @@
 # vscode-powershell Release History
 
 ## v1.12.0
-### Wednesday, March 27, 2019
+### Friday, March 29, 2019
 
 ### Highlights
 
