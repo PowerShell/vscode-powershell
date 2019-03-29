@@ -55,9 +55,15 @@ There are a lot more goodies in this version. Checkout the changelog below!
   Set CommandExplorer exclusion filter to be empty array by default (Thanks @adilio!)
 - [vscode-PowerShell #1686](https://github.com/PowerShell/vscode-PowerShell/pull/1686) -
   Add an exclusion filter to the Command Explorer (Thanks @corbob!)
+- [vscode-PowerShell #1816](https://github.com/PowerShell/vscode-PowerShell/pull/1816) -
+  Workaround PSSA #1187 by defaulting to NoIndentation
 
 #### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
 
+- [PowerShellEditorServices #895](https://github.com/PowerShell/PowerShellEditorServices/pull/895) -
+  Add warning to parameter validation set  (Thanks @Benny1007!)
+- [PowerShellEditorServices #896](https://github.com/PowerShell/PowerShellEditorServices/pull/896) -
+  Clean up and pop dead runspaces when using 'attach' debugging
 - [PowerShellEditorServices #888](https://github.com/PowerShell/PowerShellEditorServices/pull/888) -
   Add new ParseError level to ScriptFileMarkerLevel and filter out PSSA parse errors
 - [PowerShellEditorServices #866](https://github.com/PowerShell/PowerShellEditorServices/pull/866) -
