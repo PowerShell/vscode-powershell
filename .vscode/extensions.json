@@ -4,7 +4,7 @@
   "recommendations": [
     "msjsdiag.debugger-for-chrome",
     "ms-vscode.PowerShell",
-    "eg2.tslint",
+    "ms-vscode.vscode-typescript-tslint-plugin",
     "DavidAnson.vscode-markdownlint"
   ]
 }
