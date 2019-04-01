@@ -3,7 +3,7 @@
   // for the documentation about the extensions.json format
   "recommendations": [
     "msjsdiag.debugger-for-chrome",
-    "ms-vscode.powershell",
+    "ms-vscode.powershell-preview",
     "ms-vscode.vscode-typescript-tslint-plugin",
     "davidanson.vscode-markdownlint"
   ]
