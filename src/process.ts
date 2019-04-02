@@ -69,14 +69,20 @@ export class PowerShellProcess {
                         powerShellArgs.push("-ExecutionPolicy", "Bypass");
                     }
 
-                    const stringToEncode = "& '" +
+                    const startEditorServices = "& '" +
                         PowerShellProcess.escapeSingleQuotes(startScriptPath) +
                         "' " + this.startArgs;
 
-                    // Use -EncodedCommand because the command is complex and has quotes in it that need to work xplat.
-                    powerShellArgs.push(
-                        "-EncodedCommand",
-                        Buffer.from(stringToEncode, "utf16le").toString("base64"));
+                    if (utils.isWindowsOS()) {
+                        powerShellArgs.push(
+                            "-Command",
+                            startEditorServices);
+                    } else {
+                        // Use -EncodedCommand for better quote support on non-Windows
+                        powerShellArgs.push(
+                            "-EncodedCommand",
+                            Buffer.from(startEditorServices, "utf16le").toString("base64"));
+                    }
 
                     let powerShellExePath = this.exePath;
 
