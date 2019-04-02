@@ -1,0 +1,31 @@
+parameters:
+  pool: 'Hosted VS2017'
+  jobName: 'credscan'
+  displayName: Secret Scan
+
+jobs:
+- job: ${{ parameters.jobName }}
+  pool:
+    name: ${{ parameters.pool }}
+
+  displayName: ${{ parameters.displayName }}
+
+  steps:
+  - powershell:  Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
+    displayName: Set Build Name for Non-PR
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-credscan.CredScan@2
+    displayName: 'Scan for secrets'
+    inputs:
+      debugMode: false
+
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-publishsecurityanalysislogs.PublishSecurityAnalysisLogs@2
+    displayName: 'Publish Secret Scan Logs to Build Artifacts'
+    continueOnError: true
+
+  - task: securedevelopmentteam.vss-secure-development-tools.build-task-postanalysis.PostAnalysis@1
+    displayName: 'Check for failures'
+    inputs:
+      CredScan: true
+      ToolLogsNotFoundAction: Error
