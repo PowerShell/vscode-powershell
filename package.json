@@ -738,7 +738,7 @@
         },
         "powershell.developer.featureFlags": {
           "type": "array",
-          "default": [],
+          "default": null,
           "description": "An array of strings that enable experimental features in the PowerShell extension."
         },
         "powershell.developer.powerShellExeIsWindowsDevBuild": {
