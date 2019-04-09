@@ -144,7 +144,7 @@ export function load(): ISettings {
         WhitespaceAroundPipe: true,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
-        useCorrectCasing: true,
+        useCorrectCasing: false,
     };
 
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
