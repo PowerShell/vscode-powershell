@@ -43,10 +43,10 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     }
 
     // DebugConfigurationProvider method
-    public resolveDebugConfiguration(
+    public async resolveDebugConfiguration(
         folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
-        token?: CancellationToken): ProviderResult<DebugConfiguration> {
+        token?: CancellationToken): Promise<DebugConfiguration> {
 
         // Make sure there is a session running before attempting to debug/run a program
         if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
@@ -68,11 +68,32 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             const platformDetails = getPlatformDetails();
             const versionDetails = this.sessionManager.getPowerShellVersionDetails();
 
-            if (platformDetails.operatingSystem !== OperatingSystem.Windows) {
-                const msg = "Attaching to a PowerShell Host Process is supported only on Windows.";
+            // Cross-platform attach to process was added in 6.2.0-preview.4
+            if (versionDetails.version < "6.2.0" && platformDetails.operatingSystem !== OperatingSystem.Windows) {
+                const msg = `Attaching to a PowerShell Host Process on ${
+                    OperatingSystem[platformDetails.operatingSystem] } requires PowerShell 6.2 or higher.`;
                 return vscode.window.showErrorMessage(msg).then((_) => {
                     return undefined;
                 });
+            }
+
+            // if nothing is set, prompt for the processId
+            if (!config.customPipeName && !config.processId) {
+                config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
+
+                // No process selected. Cancel attach.
+                if (!config.processId) {
+                    return null;
+                }
+            }
+
+            if (!config.runspaceId) {
+                config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
+
+                // No runspace selected. Cancel attach.
+                if (!config.runspaceId) {
+                    return null;
+                }
             }
         }
 
@@ -337,7 +358,12 @@ export class PickPSHostProcessFeature implements IFeature {
 
     private pickPSHostProcess(): Thenable<string> {
         return this.languageClient.sendRequest(GetPSHostProcessesRequestType, null).then((hostProcesses) => {
-            const items: IProcessItem[] = [];
+            // Start with the current PowerShell process in the list.
+            const items: IProcessItem[] = [{
+                label: "Current",
+                description: "The current PowerShell Integrated Console process.",
+                pid: "current",
+            }];
 
             for (const p in hostProcesses) {
                 if (hostProcesses.hasOwnProperty(p)) {
@@ -368,6 +394,126 @@ export class PickPSHostProcessFeature implements IFeature {
                 // Return undefined when user presses Esc.
                 // This prevents VSCode from opening launch.json in this case which happens if we return "".
                 return item ? `${item.pid}` : undefined;
+            });
+        });
+    }
+
+    private clearWaitingToken() {
+        if (this.waitingForClientToken) {
+            this.waitingForClientToken.dispose();
+            this.waitingForClientToken = undefined;
+        }
+    }
+}
+
+interface IRunspaceItem extends vscode.QuickPickItem {
+    id: string;	// payload for the QuickPick UI
+}
+
+interface IRunspace {
+    id: number;
+    name: string;
+    availability: string;
+}
+
+export const GetRunspaceRequestType =
+    new RequestType<any, IRunspace[], string, void>("powerShell/getRunspace");
+
+export class PickRunspaceFeature implements IFeature {
+
+    private command: vscode.Disposable;
+    private languageClient: LanguageClient;
+    private waitingForClientToken: vscode.CancellationTokenSource;
+    private getLanguageClientResolve: (value?: LanguageClient | Thenable<LanguageClient>) => void;
+
+    constructor() {
+        this.command =
+            vscode.commands.registerCommand("PowerShell.PickRunspace", (processId) => {
+                return this.getLanguageClient()
+                           .then((_) => this.pickRunspace(processId), (_) => undefined);
+            }, this);
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
+        this.languageClient = languageClient;
+
+        if (this.waitingForClientToken) {
+            this.getLanguageClientResolve(this.languageClient);
+            this.clearWaitingToken();
+        }
+    }
+
+    public dispose() {
+        this.command.dispose();
+    }
+
+    private getLanguageClient(): Thenable<LanguageClient> {
+        if (this.languageClient) {
+            return Promise.resolve(this.languageClient);
+        } else {
+            // If PowerShell isn't finished loading yet, show a loading message
+            // until the LanguageClient is passed on to us
+            this.waitingForClientToken = new vscode.CancellationTokenSource();
+
+            return new Promise<LanguageClient>(
+                (resolve, reject) => {
+                    this.getLanguageClientResolve = resolve;
+
+                    vscode.window
+                        .showQuickPick(
+                            ["Cancel"],
+                            { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
+                            this.waitingForClientToken.token)
+                        .then((response) => {
+                            if (response === "Cancel") {
+                                this.clearWaitingToken();
+                                reject();
+                            }
+                        });
+
+                    // Cancel the loading prompt after 60 seconds
+                    setTimeout(() => {
+                        if (this.waitingForClientToken) {
+                            this.clearWaitingToken();
+                            reject();
+
+                            vscode.window.showErrorMessage(
+                                "Attach to PowerShell host process: PowerShell session took too long to start.");
+                        }
+                    }, 60000);
+                },
+            );
+        }
+    }
+
+    private pickRunspace(processId): Thenable<string> {
+        return this.languageClient.sendRequest(GetRunspaceRequestType, processId).then((response) => {
+            const items: IRunspaceItem[] = [];
+
+            for (const runspace of response) {
+                // Skip default runspace
+                if ((runspace.id === 1 || runspace.name === "PSAttachRunspace")
+                    && processId === "current") {
+                    continue;
+                }
+
+                items.push({
+                    label: runspace.name,
+                    description: `ID: ${runspace.id} - ${runspace.availability}`,
+                    id: runspace.id.toString(),
+                });
+            }
+
+            const options: vscode.QuickPickOptions = {
+                placeHolder: "Select PowerShell runspace to debug",
+                matchOnDescription: true,
+                matchOnDetail: true,
+            };
+
+            return vscode.window.showQuickPick(items, options).then((item) => {
+                // Return undefined when user presses Esc.
+                // This prevents VSCode from opening launch.json in this case which happens if we return "".
+                return item ? `${item.id}` : undefined;
             });
         });
     }

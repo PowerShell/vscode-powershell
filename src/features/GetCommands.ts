@@ -64,6 +64,9 @@ export class GetCommandsFeature implements IFeature {
             return;
         }
         this.languageClient.sendRequest(GetCommandRequestType, "").then((result) => {
+            const SidebarConfig = vscode.workspace.getConfiguration("powershell.sideBar");
+            const excludeFilter = (SidebarConfig.CommandExplorerExcludeFilter).map((filter) => filter.toLowerCase());
+            result = result.filter((command) => (excludeFilter.indexOf(command.moduleName.toLowerCase()) === -1));
             this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
             this.commandsExplorerProvider.refresh();
         });

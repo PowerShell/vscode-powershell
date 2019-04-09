@@ -13,6 +13,7 @@ import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
 import { PickPSHostProcessFeature } from "./features/DebugSession";
+import { PickRunspaceFeature } from "./features/DebugSession";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { DocumentFormatterFeature } from "./features/DocumentFormatter";
 import { ExamplesFeature } from "./features/Examples";
@@ -36,7 +37,7 @@ import utils = require("./utils");
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-const requiredEditorServicesVersion = "1.10.3";
+const requiredEditorServicesVersion = "1.12.0";
 
 let logger: Logger;
 let sessionManager: SessionManager;
@@ -138,6 +139,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
+        new PickRunspaceFeature(),
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
