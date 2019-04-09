@@ -641,6 +641,11 @@
           "default": true,
           "description": "Align assignment statements in a hashtable or a DSC Configuration."
         },
+        "powershell.codeFormatting.useCorrectCasing": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use correct casing for cmdlets."
+        },
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
           "default": true,
