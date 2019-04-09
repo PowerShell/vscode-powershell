@@ -697,7 +697,7 @@
         },
         "powershell.codeFormatting.useCorrectCasing": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Use correct casing for cmdlets."
         },
         "powershell.integratedConsole.showOnStartup": {
