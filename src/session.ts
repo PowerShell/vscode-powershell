@@ -418,8 +418,9 @@ export class SessionManager implements Middleware {
         if (!this.suppressRestartPrompt &&
             (settings.useX86Host !== this.sessionSettings.useX86Host ||
              settings.powerShellExePath.toLowerCase() !== this.sessionSettings.powerShellExePath.toLowerCase() ||
-             settings.developer.powerShellExePath.toLowerCase() !==
-                this.sessionSettings.developer.powerShellExePath.toLowerCase() ||
+             (settings.developer.powerShellExePath ? settings.developer.powerShellExePath.toLowerCase() : null) !==
+                (this.sessionSettings.developer.powerShellExePath
+                    ? this.sessionSettings.developer.powerShellExePath.toLowerCase() : null) ||
              settings.developer.editorServicesLogLevel.toLowerCase() !==
                 this.sessionSettings.developer.editorServicesLogLevel.toLowerCase() ||
              settings.developer.bundledModulesPath.toLowerCase() !==
@@ -768,7 +769,7 @@ export class SessionManager implements Middleware {
                 .filter((item) => item.exePath.toLowerCase() !== currentExePath)
                 .map((item) => {
                     return new SessionMenuItem(
-                        `Switch to ${item.versionName}`,
+                        `Switch to: ${item.versionName}`,
                         () => { this.changePowerShellExePath(item.exePath); });
                 });
 

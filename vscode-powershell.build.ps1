@@ -57,9 +57,9 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices 
     }
 }
 
-task Restore RestoreNodeModules -Before Build
+task Restore RestoreNodeModules -Before Build -If { -not (Test-Path "$PSScriptRoot/node_modules") }
 
-task RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") } {
+task RestoreNodeModules {
 
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
 
@@ -73,6 +73,7 @@ task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
     Remove-Item .\modules\* -Exclude "README.md" -Recurse -Force -ErrorAction Ignore
     Remove-Item .\out -Recurse -Force -ErrorAction Ignore
+    Remove-Item -Force -Recurse node_modules -ErrorAction Ignore
 }
 
 task CleanEditorServices {
@@ -126,7 +127,7 @@ task Package {
     exec { & node ./node_modules/vsce/out/vsce package }
 
     # Change the package to have a static name for automation purposes
-    Move-Item -Force .\PowerShell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
+    Move-Item -Force .\powershell-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
 }
 
 task UploadArtifacts -If { $env:AppVeyor } {
