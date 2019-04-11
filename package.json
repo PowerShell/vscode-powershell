@@ -675,12 +675,12 @@
           "default": true,
           "description": "Adds a space after a separator (',' and ';')."
         },
-        "powershell.codeFormatting.WhitespaceInsideBrace": {
+        "powershell.codeFormatting.whitespaceInsideBrace": {
           "type": "boolean",
           "default": true,
           "description": "Adds a space after an opening brace ('{') and before a closing brace ('}')."
         },
-        "powershell.codeFormatting.WhitespaceAroundPipe": {
+        "powershell.codeFormatting.whitespaceAroundPipe": {
           "type": "boolean",
           "default": true,
           "description": "Adds a space before and after the pipeline operator ('|')."
