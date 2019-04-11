@@ -5,6 +5,10 @@
 
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
+- [vscode-PowerShell #1865](https://github.com/PowerShell/vscode-powershell/pull/1867) -
+  Change casing of `powershell.codeformatting` settings for consistency:
+    - `powershell.codeformatting.WhitespaceInsideBrace` is now `powershell.codeformatting.whitespaceInsideBrace`
+    - `powershell.codeformatting.WhitespaceAroundPipe` is now `powershell.codeformatting.whitespaceAroundPipe`
 - [vscode-PowerShell #1852](https://github.com/PowerShell/vscode-PowerShell/pull/1852) -
   Turn `powershell.codeformatting.useCorrectCasing` setting off by default until PSSA issues are fixed (Thanks @bergmeister!)
 - [vscode-PowerShell #1837](https://github.com/PowerShell/vscode-PowerShell/pull/1837) -
