@@ -1,5 +1,35 @@
 # vscode-powershell Release History
 
+## v2.0.0-preview.3
+### Wednesday, April 10, 2019
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [vscode-PowerShell #1865](https://github.com/PowerShell/vscode-powershell/pull/1867) -
+  Change casing of `powershell.codeformatting` settings for consistency:
+    - `powershell.codeformatting.WhitespaceInsideBrace` is now `powershell.codeformatting.whitespaceInsideBrace`
+    - `powershell.codeformatting.WhitespaceAroundPipe` is now `powershell.codeformatting.whitespaceAroundPipe`
+- [vscode-PowerShell #1852](https://github.com/PowerShell/vscode-PowerShell/pull/1852) -
+  Turn `powershell.codeformatting.useCorrectCasing` setting off by default until PSSA issues are fixed (Thanks @bergmeister!)
+- [vscode-PowerShell #1838](https://github.com/PowerShell/vscode-PowerShell/pull/1838) -
+  Set PSReadLine featureFlag default to null so that it can be resolved by settings
+- [vscode-PowerShell #1837](https://github.com/PowerShell/vscode-PowerShell/pull/1837) -
+  Do not use -EncodedCommand on Windows
+- [vscode-PowerShell #1825](https://github.com/PowerShell/vscode-PowerShell/pull/1825) -
+  Switch to current lowercase names for powershell and mdlint recommended extensions (Thanks @rkeithhill!)
+- [vscode-PowerShell #1823](https://github.com/PowerShell/vscode-PowerShell/pull/1823) -
+  Update to official TSLint ext in extensions.json, old version deprecated (Thanks @rkeithhill!)
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #902](https://github.com/PowerShell/PowerShellEditorServices/pull/902) -
+  Improve path auto-completion (Thanks @rkeithhill!)
+- [PowerShellEditorServices #910](https://github.com/PowerShell/PowerShellEditorServices/pull/910) -
+  Fix UseCorrectCasing to be actually configurable via `powershell.codeFormatting.useCorrectCasing` (Thanks @bergmeister!)
+- [PowerShellEditorServices #909](https://github.com/PowerShell/PowerShellEditorServices/pull/909) -
+  Use global.json to pin .Net Core SDK version and update it from 2.1.402 to 2.1.602 (Thanks @bergmeister!)
+- [PowerShellEditorServices #903](https://github.com/PowerShell/PowerShellEditorServices/pull/903) -
+  Move temp folder into repo to avoid state that causes build errors from time to time when rebuilding locally (and packages have updated) (Thanks @bergmeister!)
+
 ## v2.0.0-preview.2
 ### Friday, March 29, 2019
 
