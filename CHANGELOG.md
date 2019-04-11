@@ -1,15 +1,32 @@
 # vscode-powershell Release History
 
+## v1.12.1
+### Wednesday, April 10, 2019
+
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [vscode-PowerShell #1865](https://github.com/PowerShell/vscode-powershell/pull/1867) -
+  Change casing of `powershell.codeformatting` settings for consistency:
+    - `powershell.codeformatting.WhitespaceInsideBrace` is now `powershell.codeformatting.whitespaceInsideBrace`
+    - `powershell.codeformatting.WhitespaceAroundPipe` is now `powershell.codeformatting.whitespaceAroundPipe`
+- [vscode-PowerShell #1852](https://github.com/PowerShell/vscode-PowerShell/pull/1852) -
+  Turn `powershell.codeformatting.useCorrectCasing` setting off by default until PSSA issues are fixed (Thanks @bergmeister!)
+- [vscode-PowerShell #1837](https://github.com/PowerShell/vscode-PowerShell/pull/1837) -
+  Do not use -EncodedCommand on Windows
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #906](https://github.com/PowerShell/PowerShellEditorServices/pull/906) -
+  Fix New-EditorFile with no folder or no files open
+- [PowerShellEditorServices #908](https://github.com/PowerShell/PowerShellEditorServices/pull/908) -
+  Fix crash in CodeLens with UNC paths on Windows (Thanks @rkeithhill!)
+- [PowerShellEditorServices #902](https://github.com/PowerShell/PowerShellEditorServices/pull/902) -
+  Improve path auto-completion (Thanks @rkeithhill!)
+- [PowerShellEditorServices #910](https://github.com/PowerShell/PowerShellEditorServices/pull/910) -
+  Fix UseCorrectCasing to be actually configurable via `powershell.codeFormatting.useCorrectCasing` (Thanks @bergmeister!)
+
 ## v1.12.0
 ### Friday, March 29, 2019
-
-### Highlights
-
-* Support for [PSScriptAnalyzer 1.18](https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.18.0) 📝
-* The ability to debug any runspace in any process 🔎
-* Enable attach to process on Linux and macOS 🔎
-
-There are a lot more goodies in this version. Checkout the changelog below!
 
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
