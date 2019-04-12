@@ -8,8 +8,8 @@ steps:
   - pwsh: Invoke-Build
   - task: PublishTestResults@2
     inputs:
-      testRunner: VSTest
-      testResultsFiles: '**/*.trx'
+      testRunner: JUnit
+      testResultsFiles: '**/test-results.xml'
     condition: succeededOrFailed()
   - task: PublishBuildArtifacts@1
     inputs:
