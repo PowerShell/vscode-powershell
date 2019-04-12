@@ -13,5 +13,5 @@ steps:
     condition: succeededOrFailed()
   - task: PublishBuildArtifacts@1
     inputs:
-      ArtifactName: PowerShellEditorServices
+      ArtifactName: vscode-powershell
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
