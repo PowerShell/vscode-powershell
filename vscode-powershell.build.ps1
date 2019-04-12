@@ -160,7 +160,7 @@ task UploadArtifacts {
     if ($env:AppVeyor) {
         Push-AppveyorArtifact .\PowerShell-insiders.vsix
     } elseif ($env:TF_BUILD) {
-        Copy-Item -Path PowerShell-insiders.vsix -Destination $env:BUILD_ARTIFACTSTAGINGDIRECTORY
+        Copy-Item -Path PowerShell-insiders.vsix -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$script:ExtensionName-$script:ExtensionVersion-$env:AGENT_OS.vsix"
     }
 }
 
