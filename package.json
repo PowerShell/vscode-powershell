@@ -1,5 +1,5 @@
 {
-  "name": "powershell",
+  "name": "powershell-preview",
   "displayName": "PowerShell",
   "version": "2.0.2",
   "preview": true,
