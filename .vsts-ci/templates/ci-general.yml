@@ -1,0 +1,17 @@
+steps:
+  # Setup
+  - pwsh: |
+      git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
+      Install-Module InvokeBuild -Scope CurrentUser -Force
+      Install-Module PlatyPS -Scope CurrentUser -Force
+  # Build
+  - pwsh: Invoke-Build
+  - task: PublishTestResults@2
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx'
+    condition: succeededOrFailed()
+  - task: PublishBuildArtifacts@1
+    inputs:
+      ArtifactName: PowerShellEditorServices
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
