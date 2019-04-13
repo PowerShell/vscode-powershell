@@ -9,20 +9,12 @@ param(
 
 #Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
 
-$script:IsPullRequestBuild =
-    $env:APPVEYOR_PULL_REQUEST_NUMBER -and
-    $env:APPVEYOR_REPO_BRANCH -eq "develop"
-
 task GetExtensionData -Before Package {
 
     $script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
     $updateVersion = $false
     $script:ExtensionVersion = `
-        if ($env:AppVeyor) {
-            $updateVersion = $true
-            $env:APPVEYOR_BUILD_VERSION
-        }
-        elseif ($env:VSTS_BUILD) {
+        if ($env:VSTS_BUILD) {
             $updateVersion = $true
             $env:VSTS_BUILD_VERSION
         }
@@ -68,7 +60,7 @@ task RestoreNodeModules {
 
     # When in a CI build use the --loglevel=error parameter so that
     # package install warnings don't cause PowerShell to throw up
-    $logLevelParam = if ($env:AppVeyor -or $env:VSTS_BUILD) { "--loglevel=error" } else { "" }
+    $logLevelParam = if ($env:TF_BUILD) { "--loglevel=error" } else { "" }
     exec { & npm install $logLevelParam }
 }
 
@@ -160,8 +152,12 @@ task Package {
     Move-Item -Force .\$($script:ExtensionName)-$($script:ExtensionVersion).vsix .\PowerShell-insiders.vsix
 }
 
-task UploadArtifacts -If { $env:AppVeyor } {
-    Push-AppveyorArtifact .\PowerShell-insiders.vsix
+task UploadArtifacts {
+    if ($env:TF_BUILD) {
+         # SYSTEM_PHASENAME is the Job name.
+        Copy-Item -Path PowerShell-insiders.vsix `
+            -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$script:ExtensionName-$script:ExtensionVersion-$env:SYSTEM_PHASENAME.vsix"
+    }
 }
 
 # The default task is to run the entire CI build
