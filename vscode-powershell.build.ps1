@@ -126,7 +126,7 @@ task UploadArtifacts {
     if ($env:TF_BUILD) {
          # SYSTEM_PHASENAME is the Job name.
         Copy-Item -Path PowerShell-insiders.vsix `
-            -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$script:ExtensionName-$script:ExtensionVersion-$env:SYSTEM_PHASENAME.vsix"
+            -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/powershell-$script:ExtensionVersion-$env:SYSTEM_PHASENAME.vsix"
     }
 }
 
