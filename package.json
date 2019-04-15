@@ -39,7 +39,7 @@
     "onView:PowerShellCommands"
   ],
   "dependencies": {
-    "vscode-languageclient": "~5.1.1"
+    "vscode-languageclient": "~5.2.1"
   },
   "devDependencies": {
     "@types/mocha": "~5.2.6",
