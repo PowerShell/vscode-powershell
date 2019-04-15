@@ -47,7 +47,7 @@
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~1.21.0",
     "mocha-multi-reporters": "~1.1.7",
-    "tslint": "~5.14.0",
+    "tslint": "~5.15.0",
     "typescript": "~3.3.4000",
     "vsce": "~1.59.0",
     "vscode": "~1.1.33"
