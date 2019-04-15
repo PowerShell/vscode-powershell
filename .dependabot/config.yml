@@ -1,0 +1,15 @@
+version: 1
+
+# update_schedule: live is only supported on javascript, ruby:bundler, python, php:composer, dotnet:nuget, rust:cargo, elixir:hex
+
+update_configs:
+  # Looks at the sln file in the root
+  - package_manager: "javascript"
+    directory: "/"
+    update_schedule: "live"
+
+  # Will also update legacy branch
+  - package_manager: "javascript"
+    directory: "/"
+    update_schedule: "live"
+    target_branch: "legacy/1.x"
