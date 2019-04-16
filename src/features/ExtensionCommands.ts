@@ -20,7 +20,7 @@ export interface IExtensionCommandQuickPickItem extends vscode.QuickPickItem {
 }
 
 export const InvokeExtensionCommandRequestType =
-    new RequestType<InvokeExtensionCommandRequestArguments, void, void, void>(
+    new RequestType<IInvokeExtensionCommandRequestArguments, void, void, void>(
         "powerShell/invokeExtensionCommand");
 
 export interface IEditorContext {
@@ -31,7 +31,7 @@ export interface IEditorContext {
     selectionRange: Range;
 }
 
-export interface InvokeExtensionCommandRequestArguments {
+export interface IInvokeExtensionCommandRequestArguments {
     name: string;
     context: IEditorContext;
 }
@@ -285,7 +285,7 @@ export class ExtensionCommandsFeature implements IFeature {
                 a.name.localeCompare(b.name));
     }
 
-    private showExtensionCommands(client: LanguageClient): Thenable<InvokeExtensionCommandRequestArguments> {
+    private showExtensionCommands(client: LanguageClient): Thenable<IInvokeExtensionCommandRequestArguments> {
 
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
