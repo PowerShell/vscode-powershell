@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@types/mocha": "~5.2.6",
-    "@types/node": "~11.13.4",
+    "@types/node": "~11.13.5",
     "@types/rewire": "~2.5.28",
     "@types/sinon": "~7.0.11",
     "mocha": "~5.2.0",
