@@ -1,0 +1,21 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+trigger:
+  # Batch merge builds together while a merge build is running
+  batch: true
+  branches:
+    include:
+    - master
+    - legacy/1.x
+
+pr:
+  branches:
+    include:
+    - master
+    - legacy/1.x
+
+resources:
+- repo: self
+  clean: true
+
+jobs:
+- template: templates/credscan.yml

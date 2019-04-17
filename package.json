@@ -1,12 +1,12 @@
 {
   "name": "powershell",
   "displayName": "PowerShell",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "preview": true,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.29.0"
+    "vscode": "^1.31.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -32,6 +32,7 @@
     "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.PickPSHostProcess",
+    "onCommand:PowerShell.PickRunspace",
     "onCommand:PowerShell.SpecifyScriptArgs",
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
@@ -39,20 +40,22 @@
     "onView:PowerShellCommands"
   ],
   "dependencies": {
-    "vscode-languageclient": "~5.1.1"
+    "vscode-languageclient": "~5.2.1"
   },
   "devDependencies": {
-    "@types/mocha": "~2.2.32",
-    "@types/node": "~10.12.12",
-    "@types/rewire": "^2.5.28",
-    "@types/sinon": "^7.0.5",
-    "mocha": "~4.0.1",
-    "rewire": "^4.0.1",
-    "sinon": "^7.2.3",
-    "tslint": "~5.11.0",
-    "typescript": "~3.2.1",
-    "vsce": "~1.53.2",
-    "vscode": "~1.1.24"
+    "@types/mocha": "~5.2.6",
+    "@types/node": "~11.13.4",
+    "@types/rewire": "~2.5.28",
+    "@types/sinon": "~7.0.11",
+    "mocha": "~5.2.0",
+    "mocha-junit-reporter": "~1.21.0",
+    "mocha-multi-reporters": "~1.1.7",
+    "rewire": "~4.0.1",
+    "sinon": "~7.3.1",
+    "tslint": "~5.15.0",
+    "typescript": "~3.4.3",
+    "vsce": "~1.59.0",
+    "vscode": "~1.1.33"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -318,6 +321,7 @@
         "runtime": "node",
         "variables": {
           "PickPSHostProcess": "PowerShell.PickPSHostProcess",
+          "PickRunspace": "PowerShell.PickRunspace",
           "SpecifyScriptArgs": "PowerShell.SpecifyScriptArgs"
         },
         "languages": [
@@ -406,6 +410,16 @@
               "request": "launch",
               "cwd": ""
             }
+          },
+          {
+            "label": "PowerShell: Attach Interactive Session Runspace",
+            "description": "Open runspace picker to select runspace to attach debugger to",
+            "body": {
+              "name": "PowerShell Attach Interactive Session Runspace",
+              "type": "PowerShell",
+              "request": "attach",
+              "processId": "current"
+            }
           }
         ],
         "configurationAttributes": {
@@ -447,9 +461,12 @@
                 "default": null
               },
               "runspaceId": {
-                "type": "number",
+                "type": [
+                  "string",
+                  "number"
+                ],
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
-                "default": 1
+                "default": null
               },
               "customPipeName": {
                 "type": "string",
@@ -490,14 +507,19 @@
           {
             "name": "PowerShell Attach to Host Process",
             "type": "PowerShell",
-            "request": "attach",
-            "runspaceId": 1
+            "request": "attach"
           },
           {
             "name": "PowerShell Interactive Session",
             "type": "PowerShell",
             "request": "launch",
             "cwd": ""
+          },
+          {
+            "name": "PowerShell Attach Interactive Session Runspace",
+            "type": "PowerShell",
+            "request": "attach",
+            "processId": "current"
           }
         ]
       }
@@ -625,6 +647,16 @@
           "default": true,
           "description": "Adds a newline (line break) after a closing brace."
         },
+        "powershell.codeFormatting.pipelineIndentationStyle": {
+          "type": "string",
+          "enum": [
+            "IncreaseIndentationForFirstPipeline",
+            "IncreaseIndentationAfterEveryPipeline",
+            "NoIndentation"
+          ],
+          "default": "NoIndentation",
+          "description": "Multi-line pipeline style settings."
+        },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
           "default": true,
@@ -645,6 +677,16 @@
           "default": true,
           "description": "Adds a space after a separator (',' and ';')."
         },
+        "powershell.codeFormatting.whitespaceInsideBrace": {
+          "type": "boolean",
+          "default": true,
+          "description": "Adds a space after an opening brace ('{') and before a closing brace ('}')."
+        },
+        "powershell.codeFormatting.whitespaceAroundPipe": {
+          "type": "boolean",
+          "default": true,
+          "description": "Adds a space before and after the pipeline operator ('|')."
+        },
         "powershell.codeFormatting.ignoreOneLineBlock": {
           "type": "boolean",
           "default": true,
@@ -654,6 +696,11 @@
           "type": "boolean",
           "default": true,
           "description": "Align assignment statements in a hashtable or a DSC Configuration."
+        },
+        "powershell.codeFormatting.useCorrectCasing": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use correct casing for cmdlets."
         },
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
@@ -693,7 +740,7 @@
         },
         "powershell.developer.featureFlags": {
           "type": "array",
-          "default": [],
+          "default": null,
           "description": "An array of strings that enable experimental features in the PowerShell extension."
         },
         "powershell.developer.powerShellExeIsWindowsDevBuild": {
