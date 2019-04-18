@@ -80,10 +80,10 @@ azuredatastudio (Get-ChildItem $Home\.azuredatastudio\extensions\ms-vscode.Power
 In order to use these examples (below), you need to install the SqlServer module from the [PowerShell Gallery](https://www.powershellgallery.com/packages/SqlServer).
 
 ```powershell
-Install-Module -Name SqlServer -AllowPrerelease
+Install-Module -Name SqlServer
 ```
 
-> NOTE: With version `21.1.18095-preview` and up, the `SqlServer` module supports [PowerShell Core](https://github.com/PowerShell/PowerShell) 6.2 and up in addion to Windows PowerShell.
+> NOTE: With version `21.1.18102` and up, the `SqlServer` module supports [PowerShell Core](https://github.com/PowerShell/PowerShell) 6.2 and up, in addion to Windows PowerShell.
 
 In this example, we use the `Get-SqlInstance` cmdlet to Get the Server SMO objects for ServerA & ServerB.  The default output for this command will include the Instance name, version, Service Pack, & CU Update Level of the instances.
 
@@ -94,10 +94,10 @@ Get-SqlInstance -ServerInstance ServerA, ServerB
 Here is a sample of what that output will look like:
 
 ```
-Instance Name             Version    ProductLevel UpdateLevel
--------------             -------    ------------ -----------
-ServerA                   13.0.5233  SP2          CU4
-ServerB                   14.0.3045  RTM          CU12
+Instance Name             Version    ProductLevel UpdateLevel  HostPlatform HostDistribution
+-------------             -------    ------------ -----------  ------------ ----------------
+ServerA                   13.0.5233  SP2          CU4          Windows      Windows Server 2016 Datacenter
+ServerB                   14.0.3045  RTM          CU12         Linux        Ubuntu
 ```
 
 In the following example, we will do a `dir` (alias for `Get-ChildItem`) to get the list of all SQL Server instances listed in your Registered Servers file, and then use the `Get-SqlDatabase` cmdlet to get a list of Databases for each of those instances.
