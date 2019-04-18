@@ -53,7 +53,7 @@
     "rewire": "~4.0.1",
     "sinon": "~7.3.2",
     "tslint": "~5.15.0",
-    "typescript": "~3.4.3",
+    "typescript": "~3.4.4",
     "vsce": "~1.59.0",
     "vscode": "~1.1.33"
   },
