@@ -44,7 +44,7 @@
   "devDependencies": {
     "@types/mocha": "~5.2.6",
     "@types/node": "~11.13.5",
-    "mocha": "~5.2.0",
+    "mocha": "~6.1.4",
     "mocha-junit-reporter": "~1.21.0",
     "mocha-multi-reporters": "~1.1.7",
     "tslint": "~5.15.0",
