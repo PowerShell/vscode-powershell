@@ -6,6 +6,7 @@
 
 import path = require("path");
 import vscode = require("vscode");
+import TelemetryReporter from "vscode-extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
 import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
@@ -35,13 +36,21 @@ import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
 import utils = require("./utils");
 
+// The most reliable way to get the name and version of the current extension.
+// tslint:disable-next-line: no-var-requires
+const PackageJSON: any = require("../../package.json");
+
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
 const requiredEditorServicesVersion = "2.0.0";
 
+// the application insights key (also known as instrumentation key) used for telemetry.
+const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
+
 let logger: Logger;
 let sessionManager: SessionManager;
 let extensionFeatures: IFeature[] = [];
+let telemetryReporter: TelemetryReporter;
 
 const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "file" },
@@ -49,10 +58,17 @@ const documentSelector: DocumentSelector = [
 ];
 
 export function activate(context: vscode.ExtensionContext): void {
+    // create telemetry reporter on extension activation
+    telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
 
-    const version = getCurrentVersion(context);
+    // If both extensions are enabled, this will cause unexpected behavior since both register the same commands
+    if (PackageJSON.name.toLowerCase() === "powerShell-preview"
+        && vscode.extensions.getExtension("ms-vscode.powershell")) {
+        vscode.window.showWarningMessage(
+            "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
+    }
 
-    checkForUpdatedVersion(context, version);
+    checkForUpdatedVersion(context, PackageJSON.version);
 
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -119,7 +135,8 @@ export function activate(context: vscode.ExtensionContext): void {
             requiredEditorServicesVersion,
             logger,
             documentSelector,
-            version);
+            PackageJSON.version,
+            telemetryReporter);
 
     // Create features
     extensionFeatures = [
@@ -151,36 +168,6 @@ export function activate(context: vscode.ExtensionContext): void {
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }
-}
-
-// Until VSCode offers an easier way to grab the extension name,
-// we have this function as a workaround to grab the version
-function getCurrentVersion(context: vscode.ExtensionContext) {
-    // sometimes storagePath is null. This happens when an Untitled workspace is opened
-    let pathToCheck: string;
-    if (context.storagePath) {
-        pathToCheck = context.storagePath;
-    } else if (context.extensionPath) {
-        pathToCheck = context.extensionPath;
-    } else {
-        pathToCheck = __dirname;
-    }
-
-    const extensionName = pathToCheck.toLowerCase().includes("ms-vscode.powershell-preview") ?
-        "ms-vscode.PowerShell-Preview" : "ms-vscode.PowerShell";
-
-    // If both extensions are enabled, this will cause unexpected behavior since both register the same commands
-    if (extensionName === "ms-vscode.PowerShell-Preview"
-        && vscode.extensions.getExtension("ms-vscode.PowerShell")) {
-        vscode.window.showWarningMessage(
-            "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
-    }
-
-    return vscode
-        .extensions
-        .getExtension(extensionName)
-        .packageJSON
-        .version;
 }
 
 function checkForUpdatedVersion(context: vscode.ExtensionContext, version: string) {
@@ -223,4 +210,7 @@ export function deactivate(): void {
 
     // Dispose of the logger
     logger.dispose();
+
+    // Dispose of telemetry reporter
+    telemetryReporter.dispose();
 }
