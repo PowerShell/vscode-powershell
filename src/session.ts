@@ -112,11 +112,6 @@ export class SessionManager implements Middleware {
         this.createStatusBarItem();
 
         this.powerShellExePath = this.getPowerShellExePath();
-        cp.exec(`${this.powerShellExePath} -v`, (error: cp.ExecException, stdout: string, stderr: string) => {
-            if (!error && !stderr) {
-                this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck", { powershellVersion: stdout });
-            }
-        });
 
         // Check for OpenSSL dependency on macOS when running PowerShell Core alpha. Look for the default
         // Homebrew installation path and if that fails check the system-wide library path.
@@ -593,6 +588,10 @@ export class SessionManager implements Middleware {
                         .then(
                             (versionDetails) => {
                                 this.versionDetails = versionDetails;
+
+                                this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
+                                    { powershellVersion: versionDetails.version });
+
                                 this.setSessionStatus(
                                     this.versionDetails.architecture === "x86"
                                         ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
