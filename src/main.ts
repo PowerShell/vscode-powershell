@@ -62,7 +62,7 @@ export function activate(context: vscode.ExtensionContext): void {
     telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
 
     // If both extensions are enabled, this will cause unexpected behavior since both register the same commands
-    if (PackageJSON.name.toLowerCase() === "powerShell-preview"
+    if (PackageJSON.name.toLowerCase() === "powershell-preview"
         && vscode.extensions.getExtension("ms-vscode.powershell")) {
         vscode.window.showWarningMessage(
             "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
