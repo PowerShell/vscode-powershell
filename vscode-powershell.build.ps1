@@ -151,7 +151,7 @@ task UpdatePackageJson {
         $script:PackageJson.preview = $false
     }
 
-    $revision = if ($env:VSTS_BUILD_VERSION) { $env:VSTS_BUILD_VERSION } else { 9999 }
+    $revision = if ($env:BUILD_BUILDID) { $env:BUILD_BUILDID } else { 9999 }
     $script:PackageJson.version = "$(Get-Date -Format 'yyyy.M').$revision"
 
     Set-Content -Path $PSScriptRoot/package.json ($script:PackageJson | ConvertTo-Json -Depth 100) -Encoding utf8
