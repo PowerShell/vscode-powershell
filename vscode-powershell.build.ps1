@@ -154,7 +154,11 @@ task UpdatePackageJson {
     $revision = if ($env:BUILD_BUILDID) { $env:BUILD_BUILDID } else { 9999 }
     $script:PackageJson.version = "$(Get-Date -Format 'yyyy.M').$revision"
 
-    Set-Content -Path $PSScriptRoot/package.json ($script:PackageJson | ConvertTo-Json -Depth 100) -Encoding utf8
+    $Utf8NoBomEncoding = [System.Text.UTF8Encoding]::new($false)
+    [System.IO.File]::WriteAllLines(
+        (Resolve-Path "$PSScriptRoot/package.json").Path,
+        ($script:PackageJson | ConvertTo-Json -Depth 100),
+        $Utf8NoBomEncoding)
 }
 
 task Package UpdateReadme, UpdatePackageJson, {
