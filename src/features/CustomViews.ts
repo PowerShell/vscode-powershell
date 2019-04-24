@@ -181,7 +181,7 @@ class HtmlContentView extends CustomView {
             this.htmlContent.styleSheetPaths.length > 0) {
             this.htmlContent.styleSheetPaths.forEach(
                 (p) => {
-                    styleTags += `<link rel="stylesheet" href="vscode-resource://${vscode.Uri.parse(p).fsPath}">\n`;
+                    styleTags += `<link rel="stylesheet" href="vscode-resource://${p.toString().substring(7)}">\n`;
                 });
         }
 
@@ -190,7 +190,7 @@ class HtmlContentView extends CustomView {
             this.htmlContent.javaScriptPaths.length > 0) {
             this.htmlContent.javaScriptPaths.forEach(
                 (p) => {
-                    scriptTags += `<script src="vscode-resource://${vscode.Uri.parse(p).fsPath}"></script>\n`;
+                    scriptTags += `<script src="vscode-resource://${p.toString().substring(7)}"></script>\n`;
                 });
         }
 
