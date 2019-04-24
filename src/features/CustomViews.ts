@@ -153,6 +153,7 @@ abstract class CustomView {
 
 class HtmlContentView extends CustomView {
 
+    private fileSchemeLength: number = 7;
     private htmlContent: IHtmlContent = {
         bodyContent: "",
         javaScriptPaths: [],
@@ -181,7 +182,9 @@ class HtmlContentView extends CustomView {
             this.htmlContent.styleSheetPaths.length > 0) {
             this.htmlContent.styleSheetPaths.forEach(
                 (p) => {
-                    styleTags += `<link rel="stylesheet" href="vscode-resource://${p.toString().substring(7)}">\n`;
+                    styleTags += `<link rel="stylesheet" href="${
+                        p.toString().replace("file://", "vscode-resource://")
+                    }">\n`;
                 });
         }
 
@@ -190,7 +193,9 @@ class HtmlContentView extends CustomView {
             this.htmlContent.javaScriptPaths.length > 0) {
             this.htmlContent.javaScriptPaths.forEach(
                 (p) => {
-                    scriptTags += `<script src="vscode-resource://${p.toString().substring(7)}"></script>\n`;
+                    scriptTags += `<script src="${
+                        p.toString().replace("file://", "vscode-resource://")
+                    }"></script>\n`;
                 });
         }
 
