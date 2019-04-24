@@ -6,10 +6,10 @@ update_configs:
   # Looks at the sln file in the root
   - package_manager: "javascript"
     directory: "/"
-    update_schedule: "live"
+    update_schedule: "weekly"
 
   # Will also update legacy branch
   - package_manager: "javascript"
     directory: "/"
-    update_schedule: "live"
+    update_schedule: "weekly"
     target_branch: "legacy/1.x"
