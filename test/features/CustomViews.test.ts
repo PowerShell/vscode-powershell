@@ -13,8 +13,23 @@ const customViews = rewire("../../src/features/CustomViews");
 const htmlContentViewClass = customViews.__get__("HtmlContentView");
 const HtmlContentView: typeof htmlContentViewClass = htmlContentViewClass;
 
+// interfaces for tests
+interface ITestFile {
+    fileName: string;
+    content: string;
+}
+
+interface IHtmlContentViewTestCase {
+    name: string;
+    htmlContent: string;
+    javaScriptFiles: ITestFile[];
+    cssFiles: ITestFile[];
+    expectedHtmlString: string;
+}
+
 suite("CustomViews tests", () => {
-    const testCases = [
+    const testCases: IHtmlContentViewTestCase[] = [
+        // Basic test that has no js or css.
         {
             name: "Basic",
             htmlContent: "hello",
@@ -24,6 +39,8 @@ suite("CustomViews tests", () => {
 hello
 </body></html>`,
         },
+
+        // A test that adds a js file.
         {
             name: "With JavaScript file",
             htmlContent: "hello",
@@ -47,6 +64,8 @@ function testFunction() {
 </script>
 </body></html>`,
         },
+
+        // A test that adds a js file and a css file.
         {
             name: "With JavaScript and CSS file",
             htmlContent: "hello",
@@ -85,6 +104,7 @@ function testFunction() {
 </body></html>`,
         },
     ];
+
     for (const testCase of testCases) {
         test(`Can create an HtmlContentView and get its content - ${testCase.name}`, () => {
             const htmlContentView = new HtmlContentView();
