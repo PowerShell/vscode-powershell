@@ -10,6 +10,7 @@ import os = require("os");
 import path = require("path");
 import { StringDecoder } from "string_decoder";
 import vscode = require("vscode");
+import TelemetryReporter from "vscode-extension-telemetry";
 import { Message } from "vscode-jsonrpc";
 import { IFeature } from "./feature";
 import { Logger } from "./logging";
@@ -55,6 +56,7 @@ export class SessionManager implements Middleware {
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
     private bundledModulesPath: string;
+    private telemetryReporter: TelemetryReporter;
 
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
@@ -66,10 +68,12 @@ export class SessionManager implements Middleware {
         private requiredEditorServicesVersion: string,
         private log: Logger,
         private documentSelector: DocumentSelector,
-        private version: string) {
+        private version: string,
+        private reporter: TelemetryReporter) {
 
         this.platformDetails = getPlatformDetails();
         this.HostVersion = version;
+        this.telemetryReporter = reporter;
 
         const osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
@@ -584,6 +588,12 @@ export class SessionManager implements Middleware {
                         .then(
                             (versionDetails) => {
                                 this.versionDetails = versionDetails;
+
+                                if (!this.inDevelopmentMode) {
+                                    this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
+                                        { powershellVersion: versionDetails.version });
+                                }
+
                                 this.setSessionStatus(
                                     this.versionDetails.architecture === "x86"
                                         ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
