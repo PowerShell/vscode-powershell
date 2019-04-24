@@ -4,7 +4,7 @@
 
 import fs = require("fs");
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
 export class CustomViewsFeature implements IFeature {
