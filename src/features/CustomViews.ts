@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import fs = require("fs");
+import path = require("path");
 import vscode = require("vscode");
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
@@ -181,8 +181,7 @@ class HtmlContentView extends CustomView {
             this.htmlContent.styleSheetPaths.length > 0) {
             this.htmlContent.styleSheetPaths.forEach(
                 (p) => {
-                    const path = vscode.Uri.parse(p).fsPath;
-                    styleTags += `<style>${fs.readFileSync(path, "utf8")}</style>\n`;
+                    styleTags += `<link rel="stylesheet" href="vscode-resource://${vscode.Uri.parse(p).fsPath}">\n`;
                 });
         }
 
@@ -191,8 +190,7 @@ class HtmlContentView extends CustomView {
             this.htmlContent.javaScriptPaths.length > 0) {
             this.htmlContent.javaScriptPaths.forEach(
                 (p) => {
-                    const path = vscode.Uri.parse(p).fsPath;
-                    scriptTags += `<script>${fs.readFileSync(path, "utf8")}</script>\n`;
+                    scriptTags += `<script src="vscode-resource://${vscode.Uri.parse(p).fsPath}"></script>\n`;
                 });
         }
 
@@ -201,18 +199,28 @@ class HtmlContentView extends CustomView {
     }
 
     public showContent(viewColumn: vscode.ViewColumn): void {
-        if (!this.webviewPanel) {
-            this.webviewPanel = vscode.window.createWebviewPanel(
-                this.id,
-                this.title,
-                viewColumn,
-                {
-                    enableScripts: true,
-                    enableFindWidget: true,
-                    enableCommandUris: true,
-                    retainContextWhenHidden: true,
-                });
+        if (this.webviewPanel) {
+            this.webviewPanel.dispose();
         }
+
+        let localResourceRoots: vscode.Uri[] = this.htmlContent.javaScriptPaths.map((p) => {
+            return vscode.Uri.parse(path.dirname(p));
+        });
+        localResourceRoots = localResourceRoots.concat(this.htmlContent.styleSheetPaths.map((p) => {
+            return vscode.Uri.parse(path.dirname(p));
+        }));
+
+        this.webviewPanel = vscode.window.createWebviewPanel(
+            this.id,
+            this.title,
+            viewColumn,
+            {
+                enableScripts: true,
+                enableFindWidget: true,
+                enableCommandUris: true,
+                retainContextWhenHidden: true,
+                localResourceRoots,
+            });
         this.webviewPanel.webview.html = this.getContent();
         this.webviewPanel.reveal(viewColumn);
     }

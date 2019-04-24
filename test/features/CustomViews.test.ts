@@ -47,21 +47,35 @@ hello
             javaScriptFiles: [
                 {
                     fileName: "testCustomViews.js",
-                    content: `
-function testFunction() {
-    // do stuff
-}
-`,
+                    content: "console.log('asdf');",
                 },
             ],
             cssFiles: [],
             expectedHtmlString: `<html><head></head><body>
 hello
-<script>
-function testFunction() {
-    // do stuff
-}
-</script>
+<script src="vscode-resource://${path.join(__dirname, "testCustomViews.js")}"></script>
+</body></html>`,
+        },
+
+        // A test that adds a js file in the current directory, and the parent directory.
+        {
+            name: "With 2 JavaScript files in two different locations",
+            htmlContent: "hello",
+            javaScriptFiles: [
+                {
+                    fileName: "testCustomViews.js",
+                    content: "console.log('asdf');",
+                },
+                {
+                    fileName: "../testCustomViews.js",
+                    content: "console.log('asdf');",
+                },
+            ],
+            cssFiles: [],
+            expectedHtmlString: `<html><head></head><body>
+hello
+<script src="vscode-resource://${path.join(__dirname, "testCustomViews.js")}"></script>
+<script src="vscode-resource://${path.join(__dirname, "../testCustomViews.js")}"></script>
 </body></html>`,
         },
 
@@ -72,35 +86,20 @@ function testFunction() {
             javaScriptFiles: [
                 {
                     fileName: "testCustomViews.js",
-                    content: `
-function testFunction() {
-    // do stuff
-}
-`,
+                    content: "console.log('asdf');",
                 },
             ],
             cssFiles: [
                 {
                     fileName: "testCustomViews.css",
-                    content: `
-body: {
-    background-color: green;
-}
-`,
+                    content: "body: { background-color: green; }",
                 },
             ],
-            expectedHtmlString: `<html><head><style>
-body: {
-    background-color: green;
-}
-</style>
+            expectedHtmlString: `<html><head><link rel="stylesheet" href="vscode-resource://${
+                    path.join(__dirname, "testCustomViews.css")}">
 </head><body>
 hello
-<script>
-function testFunction() {
-    // do stuff
-}
-</script>
+<script src="vscode-resource://${path.join(__dirname, "testCustomViews.js")}"></script>
 </body></html>`,
         },
     ];
