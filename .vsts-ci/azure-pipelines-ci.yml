@@ -1,13 +1,37 @@
-trigger:
-- master
-- legacy/1.x
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
 variables:
-   # Don't download unneeded packages
+  # Don't download unneeded packages
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
     value: 'true'
-    # Don't send telemetry
+  # Improve performance by not sending telemetry
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
     value: 'true'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - legacy/1.x
+  paths:
+    exclude:
+      - /.dependabot/*
+      - /.poshchan/*
+      - /.github/**/*
+      - /.vscode/**/*
+      - /.vsts-ci/misc-analysis.yml
+      - /tools/**/*
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - /docs/**/*
+      - /CHANGELOG.md
+      - /CONTRIBUTING.md
+      - /README.md
+      - /LICENSE
+      - /CODE_OF_CONDUCT.md
+
 jobs:
 - job: Windows
   pool:

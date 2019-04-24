@@ -1,5 +1,8 @@
 steps:
   # Setup
+  - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
+    displayName: Set Build Name for Non-PR
+    condition: ne(variables['Build.Reason'], 'PullRequest')
   - pwsh: |
       git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
       Install-Module InvokeBuild -Scope CurrentUser -Force
