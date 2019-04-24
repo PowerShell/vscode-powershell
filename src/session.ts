@@ -589,8 +589,10 @@ export class SessionManager implements Middleware {
                             (versionDetails) => {
                                 this.versionDetails = versionDetails;
 
-                                this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
-                                    { powershellVersion: versionDetails.version });
+                                if (!this.inDevelopmentMode) {
+                                    this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
+                                        { powershellVersion: versionDetails.version });
+                                }
 
                                 this.setSessionStatus(
                                     this.versionDetails.architecture === "x86"
