@@ -2,8 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import path = require("path");
-import vscode = require("vscode");
+import * as path from "path";
+import * as vscode from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
@@ -180,9 +180,9 @@ class HtmlContentView extends CustomView {
         if (this.htmlContent.styleSheetPaths &&
             this.htmlContent.styleSheetPaths.length > 0) {
             this.htmlContent.styleSheetPaths.forEach(
-                (p) => {
+                (styleSheetPath) => {
                     styleTags += `<link rel="stylesheet" href="${
-                        p.toString().replace("file://", "vscode-resource://")
+                        styleSheetPath.toString().replace("file://", "vscode-resource://")
                     }">\n`;
                 });
         }
@@ -191,9 +191,9 @@ class HtmlContentView extends CustomView {
         if (this.htmlContent.javaScriptPaths &&
             this.htmlContent.javaScriptPaths.length > 0) {
             this.htmlContent.javaScriptPaths.forEach(
-                (p) => {
+                (javaScriptPath) => {
                     scriptTags += `<script src="${
-                        p.toString().replace("file://", "vscode-resource://")
+                        javaScriptPath.toString().replace("file://", "vscode-resource://")
                     }"></script>\n`;
                 });
         }
