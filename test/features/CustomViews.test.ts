@@ -27,6 +27,10 @@ interface IHtmlContentViewTestCase {
     expectedHtmlString: string;
 }
 
+function convertToVSCodeResourceScheme(filePath: string): string {
+    return vscode.Uri.file(filePath).toString().replace("file://", "vscode-resource://");
+}
+
 suite("CustomViews tests", () => {
     const testCases: IHtmlContentViewTestCase[] = [
         // Basic test that has no js or css.
@@ -53,7 +57,7 @@ hello
             cssFiles: [],
             expectedHtmlString: `<html><head></head><body>
 hello
-<script src="vscode-resource://${path.join(__dirname, "testCustomViews.js")}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.js"))}"></script>
 </body></html>`,
         },
 
@@ -74,8 +78,8 @@ hello
             cssFiles: [],
             expectedHtmlString: `<html><head></head><body>
 hello
-<script src="vscode-resource://${path.join(__dirname, "testCustomViews.js")}"></script>
-<script src="vscode-resource://${path.join(__dirname, "../testCustomViews.js")}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.js"))}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "../testCustomViews.js"))}"></script>
 </body></html>`,
         },
 
@@ -95,11 +99,11 @@ hello
                     content: "body: { background-color: green; }",
                 },
             ],
-            expectedHtmlString: `<html><head><link rel="stylesheet" href="vscode-resource://${
-                    path.join(__dirname, "testCustomViews.css")}">
+            expectedHtmlString: `<html><head><link rel="stylesheet" href="${
+                convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.css"))}">
 </head><body>
 hello
-<script src="vscode-resource://${path.join(__dirname, "testCustomViews.js")}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.js"))}"></script>
 </body></html>`,
         },
     ];

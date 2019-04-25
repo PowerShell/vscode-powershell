@@ -153,7 +153,6 @@ abstract class CustomView {
 
 class HtmlContentView extends CustomView {
 
-    private fileSchemeLength: number = 7;
     private htmlContent: IHtmlContent = {
         bodyContent: "",
         javaScriptPaths: [],
