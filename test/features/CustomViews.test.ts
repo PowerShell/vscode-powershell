@@ -57,7 +57,7 @@ hello
             cssFiles: [],
             expectedHtmlString: `<html><head></head><body>
 hello
-<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.js"))}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.js"))}"></script>
 </body></html>`,
         },
 
@@ -78,8 +78,8 @@ hello
             cssFiles: [],
             expectedHtmlString: `<html><head></head><body>
 hello
-<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.js"))}"></script>
-<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "../testCustomViews.js"))}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.js"))}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "../testCustomViews.js"))}"></script>
 </body></html>`,
         },
 
@@ -100,10 +100,10 @@ hello
                 },
             ],
             expectedHtmlString: `<html><head><link rel="stylesheet" href="${
-                convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.css"))}">
+                convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.css"))}">
 </head><body>
 hello
-<script src="${convertToVSCodeResourceScheme(path.join(__dirname,  "testCustomViews.js"))}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.js"))}"></script>
 </body></html>`,
         },
     ];
