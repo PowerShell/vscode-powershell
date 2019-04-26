@@ -779,7 +779,7 @@
             "\t$0",
             "}"
         ],
-        "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other lanaguages"
+        "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other languages"
     },
     "if": {
         "prefix": "if",
