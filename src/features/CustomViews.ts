@@ -207,12 +207,18 @@ class HtmlContentView extends CustomView {
             this.webviewPanel.dispose();
         }
 
-        let localResourceRoots: vscode.Uri[] = this.htmlContent.javaScriptPaths.map((p) => {
-            return vscode.Uri.parse(path.dirname(p));
-        });
-        localResourceRoots = localResourceRoots.concat(this.htmlContent.styleSheetPaths.map((p) => {
-            return vscode.Uri.parse(path.dirname(p));
-        }));
+        let localResourceRoots: vscode.Uri[] = [];
+        if (this.htmlContent.javaScriptPaths) {
+            localResourceRoots = localResourceRoots.concat(this.htmlContent.javaScriptPaths.map((p) => {
+                return vscode.Uri.parse(path.dirname(p));
+            }));
+        }
+
+        if (this.htmlContent.styleSheetPaths) {
+            localResourceRoots = localResourceRoots.concat(this.htmlContent.styleSheetPaths.map((p) => {
+                return vscode.Uri.parse(path.dirname(p));
+            }));
+        }
 
         this.webviewPanel = vscode.window.createWebviewPanel(
             this.id,
