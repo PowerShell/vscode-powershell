@@ -19,4 +19,14 @@ suite("Settings module", () => {
             assert.deepEqual(settings.developer.featureFlags, []);
         }
     });
+
+    test("Settings update correctly", async () => {
+        // then syntax
+        Settings.change("powerShellExePath", "dummypath1", false).then(() =>
+            assert.strictEqual(Settings.load().powerShellExePath, "dummypath1"));
+
+        // async/await syntax
+        await Settings.change("powerShellExePath", "dummypath2", false);
+        assert.strictEqual(Settings.load().powerShellExePath, "dummypath2");
+    });
 });
