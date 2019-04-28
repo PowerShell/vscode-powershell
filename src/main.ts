@@ -28,6 +28,7 @@ import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
+import { RunCodeFeature } from "./features/RunCode";
 import { SelectPSSARulesFeature } from "./features/SelectPSSARules";
 import { ShowHelpFeature } from "./features/ShowHelp";
 import { Logger, LogLevel } from "./logging";
@@ -149,6 +150,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
+        new RunCodeFeature(sessionManager),
         new ExtensionCommandsFeature(logger),
         new SelectPSSARulesFeature(logger),
         new CodeActionsFeature(logger),
