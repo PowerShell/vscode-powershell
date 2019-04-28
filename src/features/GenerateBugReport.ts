@@ -19,7 +19,7 @@ const extensions =
     vscode.extensions.all.filter((element) => element.packageJSON.isBuiltin === false)
         .sort((leftside, rightside): number => {
             if (leftside.packageJSON.name.toLowerCase() < rightside.packageJSON.name.toLowerCase()) {
-                 return -1;
+                return -1;
             }
             if (leftside.packageJSON.name.toLowerCase() > rightside.packageJSON.name.toLowerCase()) {
                 return 1;
@@ -35,18 +35,22 @@ export class GenerateBugReportFeature implements IFeature {
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", () => {
 
-            const body = encodeURIComponent(`## Issue Description ##
+            const body = `Issue Description
+=====
 
 I am experiencing a problem with...
 
-## Attached Logs ##
+Attached Logs
+=====
 
 Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell#reporting-problems) about
 capturing and sending logs.
 
-## Environment Information ##
+Environment Information
+=====
 
-### Visual Studio Code ###
+Visual Studio Code
+-----
 
 | Name | Version |
 | --- | --- |
@@ -54,18 +58,20 @@ capturing and sending logs.
 | VSCode | ${vscode.version}|
 | PowerShell Extension Version | ${sessionManager.HostVersion} |
 
-### PowerShell Information ###
+PowerShell Information
+-----
 
 ${this.getRuntimeInfo()}
 
-### Visual Studio Code Extensions ###
+Visual Studio Code Extensions
+-----
 
 <details><summary>Visual Studio Code Extensions(Click to Expand)</summary>
 
 ${this.generateExtensionTable(extensions)}
 </details>
 
-`);
+`;
 
             const encodedBody = encodeURIComponent(body);
             const fullUrl = `${issuesUrl}${queryStringPrefix}body=${encodedBody}`;
@@ -78,7 +84,7 @@ ${this.generateExtensionTable(extensions)}
     }
 
     public setLanguageClient(languageclient: LanguageClient) {
-        // Elimiinate tslint warning.
+        // Eliminate tslint warning.
     }
 
     private generateExtensionTable(installedExtensions): string {
