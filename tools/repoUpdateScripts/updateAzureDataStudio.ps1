@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 param(
     [Parameter(Mandatory)]
     [string]
@@ -219,7 +222,7 @@ function UpdateGalleryFile
     $newGalleryFileContent = ReplaceStringSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex $endOffset
 
     # Write out the new entry
-    [System.IO.File]::WriteAllText($GalleryFilePath, $newGalleryFileContent, [System.Text.UTF8Encoding]::new(<# BOM #> $false))
+    SetFileContent $GalleryFilePath $newGalleryFileContent
 }
 
 $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'ads-temp-checkout'
