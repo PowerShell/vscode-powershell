@@ -2,8 +2,9 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import * as path from "path";
+import * as vscode from "vscode";
+import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
 export class CustomViewsFeature implements IFeature {
@@ -94,13 +95,7 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
 
     public showView(id: string, viewColumn: vscode.ViewColumn) {
         const uriString = this.getUri(id);
-        const view: CustomView = this.viewIndex[uriString];
-
-        vscode.commands.executeCommand(
-            "vscode.previewHtml",
-            uriString,
-            viewColumn,
-            view.title);
+        (this.viewIndex[uriString] as HtmlContentView).showContent(viewColumn);
     }
 
     public closeView(id: string) {
@@ -164,6 +159,8 @@ class HtmlContentView extends CustomView {
         styleSheetPaths: [],
     };
 
+    private webviewPanel: vscode.WebviewPanel;
+
     constructor(
         id: string,
         title: string) {
@@ -179,42 +176,63 @@ class HtmlContentView extends CustomView {
     }
 
     public getContent(): string {
-        let styleSrc = "none";
         let styleTags = "";
-
-        function getNonce(): number {
-            return Math.floor(Math.random() * 100000) + 100000;
-        }
-
         if (this.htmlContent.styleSheetPaths &&
             this.htmlContent.styleSheetPaths.length > 0) {
-            styleSrc = "";
             this.htmlContent.styleSheetPaths.forEach(
-                (p) => {
-                    const nonce = getNonce();
-                    styleSrc += `'nonce-${nonce}' `;
-                    styleTags += `<link nonce="${nonce}" href="${p}" rel="stylesheet" type="text/css" />\n`;
+                (styleSheetPath) => {
+                    styleTags += `<link rel="stylesheet" href="${
+                        styleSheetPath.toString().replace("file://", "vscode-resource://")
+                    }">\n`;
                 });
         }
 
-        let scriptSrc = "none";
         let scriptTags = "";
-
         if (this.htmlContent.javaScriptPaths &&
             this.htmlContent.javaScriptPaths.length > 0) {
-            scriptSrc = "";
             this.htmlContent.javaScriptPaths.forEach(
-                (p) => {
-                    const nonce = getNonce();
-                    scriptSrc += `'nonce-${nonce}' `;
-                    scriptTags += `<script nonce="${nonce}" src="${p}"></script>\n`;
+                (javaScriptPath) => {
+                    scriptTags += `<script src="${
+                        javaScriptPath.toString().replace("file://", "vscode-resource://")
+                    }"></script>\n`;
                 });
         }
 
         // Return an HTML page with the specified content
-        return `<html><head><meta http-equiv="Content-Security-Policy" ` +
-               `content="default-src 'none'; img-src *; style-src ${styleSrc}; script-src ${scriptSrc};">` +
-               `${styleTags}</head><body>\n${this.htmlContent.bodyContent}\n${scriptTags}</body></html>`;
+        return `<html><head>${styleTags}</head><body>\n${this.htmlContent.bodyContent}\n${scriptTags}</body></html>`;
+    }
+
+    public showContent(viewColumn: vscode.ViewColumn): void {
+        if (this.webviewPanel) {
+            this.webviewPanel.dispose();
+        }
+
+        let localResourceRoots: vscode.Uri[] = [];
+        if (this.htmlContent.javaScriptPaths) {
+            localResourceRoots = localResourceRoots.concat(this.htmlContent.javaScriptPaths.map((p) => {
+                return vscode.Uri.parse(path.dirname(p));
+            }));
+        }
+
+        if (this.htmlContent.styleSheetPaths) {
+            localResourceRoots = localResourceRoots.concat(this.htmlContent.styleSheetPaths.map((p) => {
+                return vscode.Uri.parse(path.dirname(p));
+            }));
+        }
+
+        this.webviewPanel = vscode.window.createWebviewPanel(
+            this.id,
+            this.title,
+            viewColumn,
+            {
+                enableScripts: true,
+                enableFindWidget: true,
+                enableCommandUris: true,
+                retainContextWhenHidden: true,
+                localResourceRoots,
+            });
+        this.webviewPanel.webview.html = this.getContent();
+        this.webviewPanel.reveal(viewColumn);
     }
 }
 
