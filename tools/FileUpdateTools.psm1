@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 function ReplaceStringSegment
 {
     [OutputType([string])]
@@ -164,4 +167,23 @@ function ConvertToIndentedJson
         $stringWriter.Dispose()
     }
     return $stringBuilder.ToString().Replace([System.Environment]::NewLine, "`r`n")
+}
+
+function SetFileContent
+{
+    param(
+        [Parameter(Mandatory, Position=0)]
+        [string]
+        $FilePath,
+
+        [Parameter(Mandatory, Position=1)]
+        [string]
+        $Value,
+
+        [Parameter()]
+        $Encoding = ([System.Text.UTF8Encoding]::new(<# BOM #> $false))
+    )
+
+    $FilePath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($FilePath)
+    [System.IO.File]::WriteAllText($FilePath, $Value, $Encoding)
 }
