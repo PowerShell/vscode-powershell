@@ -102,7 +102,18 @@ function CommitAndPushChanges
     Push-Location $RepoLocation
     try
     {
+        # Try to checkout the relevant branch
         git checkout $Branch
+        if (-not $?)
+        {
+            git checkout -b $Branch
+
+            if (-not $?)
+            {
+                throw "Unable to checkout branch '$Branch'"
+            }
+        }
+
         if ($File)
         {
             git add $File
@@ -137,14 +148,14 @@ function OpenGitHubPr
 
         [Parameter(Mandatory)]
         [string]
-        $TargetBranch,
-
-        [Parameter(Mandatory)]
-        [string]
         $Organization,
 
         [Parameter(Mandatory)]
         $Repository,
+
+        [Parameter()]
+        [string]
+        $TargetBranch = 'master',
 
         [Parameter()]
         [string]

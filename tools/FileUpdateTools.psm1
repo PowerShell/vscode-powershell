@@ -22,14 +22,10 @@ function ReplaceStringSegment
         $EndIndex,
 
         [switch]
-        $NoIndent
+        $AutoIndent
     )
 
-    if ($NoIndent)
-    {
-        $indent = ''
-    }
-    else
+    if ($AutoIndent)
     {
         $indentBuilder = [System.Text.StringBuilder]::new()
         $indentIdx = $StartIndex - 1
@@ -42,20 +38,23 @@ function ReplaceStringSegment
         }
         $indent = $indentBuilder.ToString()
     }
+    else
+    {
+        $indent = ''
+    }
 
     $newStringBuilder = [System.Text.StringBuilder]::new()
     $null = $newStringBuilder.Append($String.Substring(0, $StartIndex))
 
     $segmentLines = $NewSegment.Split("`n")
-    $null = $newStringBuilder.Append($segmentLines[0]).Append("`n")
-    $i = 1
-    for (; $i -lt $segmentLines.Length - 1; $i++)
-    {
-        $null = $newStringBuilder.Append($indent).Append($segmentLines[$i]).Append("`n")
-    }
-    $null = $newStringBuilder.Append($indent).Append($segmentLines[$i])
 
-    $null = $newStringBuilder.Append($String.Substring($EndIndex+1))
+    $null = $newStringBuilder.Append($segmentLines[0])
+    for ($i = 1; $i -lt $segmentLines.Length; $i++)
+    {
+        $null = $newStringBuilder.Append("`n").Append($indent).Append($segmentLines[$i])
+    }
+
+    $null = $newStringBuilder.Append($String.Substring($EndIndex))
 
     return $newStringBuilder.ToString()
 }
