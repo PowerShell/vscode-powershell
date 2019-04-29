@@ -186,3 +186,60 @@ function SetFileContent
     $FilePath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($FilePath)
     [System.IO.File]::WriteAllText($FilePath, $Value, $Encoding)
 }
+
+function IncrementVersion
+{
+    param(
+        [Parameter(Mandatory)]
+        [semver]
+        $CurrentVersion,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Major', 'Minor', 'Patch', 'Preview')]
+        [string]
+        $IncrementLevel
+    )
+
+    switch ($IncrementLevel)
+    {
+        'Major'
+        {
+            return [semver]::new($version.Major+1, $version.Minor, $version.Patch, $version.PreReleaseLabel)
+        }
+
+        'Minor'
+        {
+            return [semver]::new($version.Major, $version.Minor+1, $version.Patch, $version.PreReleaseLabel)
+        }
+
+        'Patch'
+        {
+            return [semver]::new($version.Major, $version.Minor, $version.Patch+1, $version.PreReleaseLabel)
+        }
+
+        'Preview'
+        {
+            $newPreviewNumber = [int]$version.PreReleaseLabel.Substring(8) + 1
+            return [semver]::new($version.Major, $version.Minor, $version.Patch, "preview.$newPreviewNumber")
+        }
+    }
+}
+
+function GetVersionFromSemVer
+{
+    [OutputType([version])]
+    param(
+        [Parameter(Mandatory)]
+        [semver]
+        $SemVer
+    )
+
+    $svStr = $SemVer.ToString()
+
+    if (-not $SemVer.PreReleaseLabel)
+    {
+        return [version]$svStr
+    }
+
+    return $svStr.Substring(0, $svStr.IndexOf('-'))
+}

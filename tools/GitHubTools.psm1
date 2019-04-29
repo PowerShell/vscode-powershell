@@ -61,7 +61,6 @@ function CloneRepo
         if ($remote['upstream'])
         {
             git pull upstream $CloneBranch
-            git push --force-with-lease $OriginRemote $CloneBranch
         }
 
         if ($CheckoutBranch)
