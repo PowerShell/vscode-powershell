@@ -219,7 +219,7 @@ function UpdateGalleryFile
     $endOffset = GetStringOffsetFromSpan -String $galleryFileContent -EndLine $span.End.Line -StartLine $span.Start.Line -Column $span.End.Column -InitialOffset $startOffset
 
     # Create the new file contents with the inserted segment
-    $newGalleryFileContent = ReplaceStringSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex $endOffset
+    $newGalleryFileContent = ReplaceStringSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex ($endOffset+1) -AutoIndent
 
     # Write out the new entry
     SetFileContent $GalleryFilePath $newGalleryFileContent
