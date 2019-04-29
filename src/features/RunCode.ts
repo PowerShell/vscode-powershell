@@ -63,24 +63,23 @@ export class RunCodeFeature implements IFeature {
 function createLaunchConfig(launchType: LaunchType, commandToRun: string, args: string[]) {
     const settings = Settings.load();
 
-    let currentDocument: vscode.TextDocument;
-    if (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document) {
-        currentDocument = vscode.window.activeTextEditor.document;
+    let cwd: string = vscode.workspace.rootPath;
+    if (vscode.window.activeTextEditor
+        && vscode.window.activeTextEditor.document
+        && !vscode.window.activeTextEditor.document.isUntitled) {
+        cwd = path.dirname(vscode.window.activeTextEditor.document.fileName);
     }
 
     const launchConfig = {
         request: "launch",
         type: "PowerShell",
         name: "PowerShell Run Code",
-        script: commandToRun,
-        args,
         internalConsoleOptions: "neverOpen",
         noDebug: (launchType === LaunchType.Run),
         createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
-        cwd:
-            !currentDocument || currentDocument.isUntitled
-                ? vscode.workspace.rootPath
-                : path.dirname(currentDocument.fileName),
+        script: commandToRun,
+        args,
+        cwd,
     };
 
     return launchConfig;
