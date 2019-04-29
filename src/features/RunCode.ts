@@ -41,33 +41,8 @@ export class RunCodeFeature implements IFeature {
         args: string[]) {
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(launchType, scriptToRun, args);
+        const launchConfig = createLaunchConfig(launchType, scriptToRun, args);
         this.launch(launchConfig);
-    }
-
-    private createLaunchConfig(launchType: LaunchType, scriptToRun: string, args: string[]) {
-        const currentDocument = vscode.window.activeTextEditor.document;
-        const settings = Settings.load();
-
-        // Since we pass the script path to PSES in single quotes to avoid issues with PowerShell
-        // special chars like & $ @ () [], we do have to double up the interior single quotes.
-
-        const launchConfig = {
-            request: "launch",
-            type: "PowerShell",
-            name: "PowerShell Launch Pester Tests",
-            script: scriptToRun,
-            args,
-            internalConsoleOptions: "neverOpen",
-            noDebug: (launchType === LaunchType.Run),
-            createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
-            cwd:
-                currentDocument.isUntitled
-                    ? vscode.workspace.rootPath
-                    : path.dirname(currentDocument.fileName),
-        };
-
-        return launchConfig;
     }
 
     private launch(launchConfig) {
@@ -83,4 +58,30 @@ export class RunCodeFeature implements IFeature {
         // TODO: Update to handle multiple root workspaces.
         vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
     }
+}
+
+function createLaunchConfig(launchType: LaunchType, commandToRun: string, args: string[]) {
+    const settings = Settings.load();
+
+    let currentDocument: vscode.TextDocument;
+    if (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document) {
+        currentDocument = vscode.window.activeTextEditor.document;
+    }
+
+    const launchConfig = {
+        request: "launch",
+        type: "PowerShell",
+        name: "PowerShell Run Code",
+        script: commandToRun,
+        args,
+        internalConsoleOptions: "neverOpen",
+        noDebug: (launchType === LaunchType.Run),
+        createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
+        cwd:
+            !currentDocument || currentDocument.isUntitled
+                ? vscode.workspace.rootPath
+                : path.dirname(currentDocument.fileName),
+    };
+
+    return launchConfig;
 }
