@@ -16,7 +16,15 @@ param(
 
     [Parameter()]
     [string]
-    $TargetFork = 'Microsoft'
+    $TargetFork = 'Microsoft',
+
+    [Parameter()]
+    [string]
+    $BranchName,
+
+    [Parameter()]
+    [string]
+    $PRDescription
 )
 
 Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
@@ -226,7 +234,16 @@ function UpdateGalleryFile
 }
 
 $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'ads-temp-checkout'
-$branchName = "update-psext-$ExtensionVersion"
+
+if (-not $BranchName)
+{
+    $BranchName = "update-psext-$ExtensionVersion"
+}
+
+if (-not $PRDescription)
+{
+    $PRDescription = "Updates the version of the PowerShell extension in ADS to $ExtensionVersion.`n**Note**: This is an automated PR."
+}
 
 $cloneParams = @{
     OriginRemote = 'https://github.com/rjmholt/AzureDataStudio'
@@ -250,7 +267,7 @@ $prParams = @{
     TargetBranch = 'release/extensions'
     Branch = $branchName
     Title = "Update PowerShell extension to v$ExtensionVersion"
-    Description = "Updates the version of the PowerShell extension in ADS to $ExtensionVersion.`n**Note**: This is an automated PR."
+    Description = $PRDescription
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'
 }
