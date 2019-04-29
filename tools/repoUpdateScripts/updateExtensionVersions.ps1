@@ -18,7 +18,15 @@ param(
 
     [Parameter()]
     [string]
-    $TargetFork = 'PowerShell'
+    $TargetFork = 'PowerShell',
+
+    [Parameter()]
+    [string]
+    $BranchName,
+
+    [Parameter()]
+    [string]
+    $PRDescription
 )
 
 Import-Module -Force "$PSScriptRoot/../FileUpdateTools.psm1"
@@ -138,42 +146,6 @@ function FindVstsBuildVersionSpan
     }
 }
 
-function IncrementVersion
-{
-    param(
-        [Parameter(Mandatory)]
-        [semver]
-        $CurrentVersion,
-
-        [Parameter(Mandatory)]
-        $IncrementLevel
-    )
-
-    switch ($IncrementLevel)
-    {
-        'Major'
-        {
-            return [semver]::new($version.Major+1, $version.Minor, $version.Patch, $version.PreReleaseLabel)
-        }
-
-        'Minor'
-        {
-            return [semver]::new($version.Major, $version.Minor+1, $version.Patch, $version.PreReleaseLabel)
-        }
-
-        'Patch'
-        {
-            return [semver]::new($version.Major, $version.Minor, $version.Patch+1, $version.PreReleaseLabel)
-        }
-
-        'Preview'
-        {
-            $newPreviewNumber = [int]$version.PreReleaseLabel.Substring(8) + 1
-            return [semver]::new($version.Major, $version.Minor, $version.Patch, "preview.$newPreviewNumber")
-        }
-    }
-}
-
 function UpdateMainTsPsesVersion
 {
     param(
@@ -213,6 +185,23 @@ function UpdateDockerFileVersion
     SetFileContent -FilePath $DockerFilePath -Value $newDockerFileContent
 }
 
+function GetMarketplaceVersionFromSemVer
+{
+    [OutputType([version])]
+    param(
+        [Parameter(Mandatory)]
+        [semver]
+        $SemVer
+    )
+
+    if (-not $SemVer.PreReleaseLabel)
+    {
+        return [version]($SemVer.ToString())
+    }
+
+    return [version]::new($NewVersion.Major, $NewVersion.Minor, $NewVersion.PreReleaseLabel.Substring(8)-1)
+}
+
 # Define locations/branch name
 $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'vscps-updateversion-temp'
 $paths = @{
@@ -245,18 +234,18 @@ if ($IncrementLevel)
 
 # Get the marketplace/non-semver versions for various files
 $newVersionStr = $NewVersion.ToString()
-if ($NewVersion.PreReleaseLabel)
+$psesVersion = GetVersionFromSemVer -SemVer $NewVersion
+$marketPlaceVersion = GetMarketplaceVersionFromSemVer -SemVer $NewVersion
+
+if (-not $BranchName)
 {
-    $psesVersion = $newVersionStr.Substring(0, $newVersionStr.IndexOf('-'))
-    $marketPlaceVersion = [version]::new($NewVersion.Major, $NewVersion.Minor, $NewVersion.PreReleaseLabel.Substring(8)-1)
-}
-else
-{
-    $psesVersion = $newVersionStr
-    $marketPlaceVersion = $newVersionStr
+    $BranchName = "update-version-$newVersionStr"
 }
 
-$branchName = "update-version-$newVersionStr"
+if (-not $PRDescription)
+{
+    $PRDescription = "Updates version strings in vscode-PowerShell to $newVersionStr.`n**Note**: This is an automated PR."
+}
 
 # Finally create the new package.json file
 $newPkgJsonContent = ReplaceStringSegment -String $packageJson -NewSegment $newVersionStr -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
@@ -287,7 +276,7 @@ $prParams = @{
     Repository = 'vscode-PowerShell'
     Branch = $branchName
     Title = "Update version to v$newVersionStr"
-    Description = "Updates version strings in vscode-PowerShell to $newVersionStr.`n**Note**: This is an automated PR."
+    Description = $PRDescription
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'
 }
