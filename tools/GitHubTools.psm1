@@ -37,7 +37,7 @@ function CloneRepo
             throw "Cannot clone repo to '$Destination'; path already exists."
         }
 
-        Remove-Item -Force -Recurse $Destination
+        Remove-Item -Force -Recurse $Destination -ErrorAction Stop
     }
 
     $containingDir = Split-Path $Destination
