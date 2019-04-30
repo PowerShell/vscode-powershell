@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-#requires -Version 6.0
-
 param(
     [Parameter(Mandatory)]
     [string]
@@ -255,13 +253,13 @@ $cloneParams = @{
         upstream = 'https://github.com/Microsoft/AzureDataStudio'
     }
 }
-Copy-GitRepository @cloneParams
+CloneRepo @cloneParams
 
 $GalleryFileName |
     ForEach-Object { "$repoLocation/$_" } |
     UpdateGalleryFile -ExtensionVersion $ExtensionVersion
 
-Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
+CommitAndPushChanges -RepoLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
 
 $prParams = @{
     Organization = $TargetFork
@@ -273,4 +271,4 @@ $prParams = @{
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'
 }
-New-GitHubPR @prParams
+OpenGitHubPr @prParams
