@@ -229,4 +229,107 @@ function New-GitHubPR
     Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
 }
 
+function Publish-GitHubRelease
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory)]
+        [string]
+        $Repository,
+
+        [Parameter(Mandatory)]
+        [string]
+        $Tag,
+
+        [Parameter(Mandatory)]
+        [string]
+        $ReleaseName,
+
+        [Parameter(Mandatory)]
+        [string]
+        $Description,
+
+        [Parameter(Mandatory)]
+        [string]
+        $GitHubToken,
+
+        [Parameter()]
+        [Alias('Branch', 'Commit')]
+        [string]
+        $Commitish,
+
+        [Parameter()]
+        [string[]]
+        $AssetPath,
+
+        [switch]
+        $Draft,
+
+        [switch]
+        $Prerelease
+    )
+
+    $restParams = @{
+        tag_name = $Tag
+        name = $ReleaseName
+        body = $Description
+        draft = [bool]$Draft
+        prerelease = [bool]$Prerelease
+    }
+
+    if ($Commitish)
+    {
+        $restParams.target_commitish = $Commitish
+    }
+
+    $restBody = ConvertTo-Json -InputObject $restParams
+    $uri = "https://api.github.com/repos/$Organization/$Repository/releases"
+    $headers = @{
+        Accept = 'application/vnd.github.v3+json'
+        Authorization = "token $GitHubToken"
+    }
+
+    $response = Invoke-RestMethod -Method Post -Uri $uri -Body $restBody -Headers $headers
+
+    $releaseId = $response.id
+    $assetBaseUri = "https://uploads.github.com/repos/$Organization/$Repository/releases/$releaseId/assets"
+    foreach ($asset in $AssetPath)
+    {
+        $extension = [System.IO.Path]::GetExtension($asset)
+        $fileName = [uri]::EscapeDataString([System.IO.Path]::GetFileName($asset))
+        $contentType = 'text/plain'
+        switch ($extension)
+        {
+            { $_ -in '.zip','.vsix' }
+            {
+                $contentType = 'application/zip'
+                break
+            }
+
+            '.json'
+            {
+                $contentType = 'application/json'
+                break
+            }
+
+            default
+            {
+                $contentType = 'text/plain'
+            }
+        }
+
+        $assetUri = "${assetBaseUri}?name=$fileName"
+        $headers = @{
+            Authorization = "token $GitHubToken"
+        }
+        # This can be very slow, but it does work
+        $null = Invoke-RestMethod -Method Post -Uri $assetUri -InFile $asset -ContentType $contentType -Headers $headers
+    }
+
+    return $response
+}
+
 Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR
