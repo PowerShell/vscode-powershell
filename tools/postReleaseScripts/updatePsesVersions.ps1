@@ -22,11 +22,11 @@ param(
 
     [Parameter()]
     [string]
-    $BranchName,
+    $BranchName = "update-pses-version-$NewVersion",
 
     [Parameter()]
     [string]
-    $PRDescription
+    $PRDescription = "Updates PSES to version $NewVersion.**Note**: This is an automated PR."
 )
 
 Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
@@ -156,16 +156,6 @@ $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'pses-update-temp'
 $paths = @{
     props = "$repoLocation/PowerShellEditorServices.Common.props"
     manifest = "$repoLocation/module/PowerShellEditorServices/PowerShellEditorServices.psd1"
-}
-
-if (-not $BranchName)
-{
-    $BranchName = "update-pses-version-$NewVersion"
-}
-
-if (-not $PRDescription)
-{
-    $PRDescription = "Updates PSES to version $NewVersion.**Note**: This is an automated PR."
 }
 
 # Clone the PSES repo

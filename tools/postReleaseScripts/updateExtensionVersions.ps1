@@ -22,11 +22,11 @@ param(
 
     [Parameter()]
     [string]
-    $BranchName,
+    $BranchName = "update-version-$newVersionStr",
 
     [Parameter()]
     [string]
-    $PRDescription
+    $PRDescription = "Updates version strings in vscode-PowerShell to $newVersionStr.`n**Note**: This is an automated PR."
 )
 
 Import-Module -Force "$PSScriptRoot/../FileUpdateTools.psm1"
@@ -236,16 +236,6 @@ if ($IncrementLevel)
 $newVersionStr = $NewVersion.ToString()
 $psesVersion = GetVersionFromSemVer -SemVer $NewVersion
 $marketPlaceVersion = GetMarketplaceVersionFromSemVer -SemVer $NewVersion
-
-if (-not $BranchName)
-{
-    $BranchName = "update-version-$newVersionStr"
-}
-
-if (-not $PRDescription)
-{
-    $PRDescription = "Updates version strings in vscode-PowerShell to $newVersionStr.`n**Note**: This is an automated PR."
-}
 
 # Finally create the new package.json file
 $newPkgJsonContent = ReplaceStringSegment -String $packageJson -NewSegment $newVersionStr -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
