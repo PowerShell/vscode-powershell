@@ -29,8 +29,8 @@ param(
     $PRDescription
 )
 
-Import-Module "$PSScriptRoot/../GitHubTools.psm1"
-Import-Module "$PSScriptRoot/../FileUpdateTools.psm1"
+Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
+Import-Module "$PSScriptRoot/../FileUpdateTools.psm1" -Force
 
 function FindPsesModuleSpan
 {
@@ -144,6 +144,7 @@ function UpdatePsesPropsXml
     try
     {
         $propsXml.Save($xmlWriter)
+        $xmlWriter.WriteWhitespace("`r`n")
     }
     finally
     {
@@ -183,7 +184,7 @@ CloneRepo @cloneParams
 if ($IncrementLevel)
 {
     $currVersion = GetPsesCurrentVersion -PsesPropsPath $paths.props
-    $NewVersion = IncrementVersion -CurrentVersion $currVersion -IncrementLevel $IncrementLevel
+    $NewVersion = IncrementVersion -Version $currVersion -IncrementLevel $IncrementLevel
 }
 
 # Update the Props XML file
