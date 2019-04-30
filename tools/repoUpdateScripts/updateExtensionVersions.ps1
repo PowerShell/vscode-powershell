@@ -229,7 +229,7 @@ $pkgJsonVersionOffsetSpan = FindPackageJsonVersionSpan -PackageJsonContent $pack
 if ($IncrementLevel)
 {
     $version = [semver]$packageJson.Substring($pkgJsonVersionOffsetSpan.Start, $pkgJsonVersionOffsetSpan.End - $pkgJsonVersionOffsetSpan.Start)
-    $NewVersion = IncrementVersion -CurrentVersion $version -IncrementLevel $IncrementLevel
+    $NewVersion = IncrementVersion -Version $version -IncrementLevel $IncrementLevel
 }
 
 # Get the marketplace/non-semver versions for various files

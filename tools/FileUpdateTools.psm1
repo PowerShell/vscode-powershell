@@ -192,7 +192,7 @@ function IncrementVersion
     param(
         [Parameter(Mandatory)]
         [semver]
-        $CurrentVersion,
+        $Version,
 
         [Parameter(Mandatory)]
         [ValidateSet('Major', 'Minor', 'Patch', 'Preview')]
