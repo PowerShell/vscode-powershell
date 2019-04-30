@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-#requires -Version 6.0
-
 [CmdletBinding(DefaultParameterSetName='Increment')]
 param(
     [Parameter(ParameterSetName='Increment')]
@@ -24,11 +22,11 @@ param(
 
     [Parameter()]
     [string]
-    $BranchName,
+    $BranchName = "update-pses-version-$NewVersion",
 
     [Parameter()]
     [string]
-    $PRDescription
+    $PRDescription = "Updates PSES to version $NewVersion.**Note**: This is an automated PR."
 )
 
 Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
@@ -65,7 +63,7 @@ function UpdatePsesModuleVersion
         $NewVersion
     )
 
-    $version = Get-VersionFromSemVer -SemVer $NewVersion
+    $version = GetVersionFromSemVer -SemVer $NewVersion
 
     $PsesModuleManifestPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PsesModuleManifestPath)
 
@@ -73,9 +71,9 @@ function UpdatePsesModuleVersion
 
     $span = FindPsesModuleSpan -ModuleManifestContent $manifestContent
 
-    $newContent = New-StringWithSegment -String $manifestContent -NewSegment $version -StartIndex $span.Start -EndIndex $span.End
+    $newContent = ReplaceStringSegment -String $manifestContent -NewSegment $version -StartIndex $span.Start -EndIndex $span.End
 
-    Set-Content -Path $PsesModuleManifestPath -Value $newContent -Encoding utf8NoBOM -NoNewline
+    SetFileContent -FilePath $PsesModuleManifestPath -Value $newContent
 }
 
 function GetPsesCurrentVersion
@@ -170,23 +168,13 @@ $cloneParams = @{
     }
     Clobber = $true
 }
-Copy-GitRepository @cloneParams
+CloneRepo @cloneParams
 
 # If we need to increment the version, do that
 if ($IncrementLevel)
 {
     $currVersion = GetPsesCurrentVersion -PsesPropsPath $paths.props
-    $NewVersion = Get-IncrementedVersion -Version $currVersion -IncrementLevel $IncrementLevel
-}
-
-if (-not $BranchName)
-{
-    $BranchName = "update-pses-version-$NewVersion"
-}
-
-if (-not $PRDescription)
-{
-    $PRDescription = "Updates PSES to version $NewVersion.**Note**: This is an automated PR."
+    $NewVersion = IncrementVersion -Version $currVersion -IncrementLevel $IncrementLevel
 }
 
 # Update the Props XML file
@@ -197,7 +185,7 @@ UpdatePsesModuleVersion -PsesModuleManifestPath $paths.manifest -NewVersion $New
 
 # Commit changes
 $commitParams = @{
-    RepositoryLocation = $repoLocation
+    RepoLocation = $repoLocation
     Message = "[Ignore] Update PSES version to $NewVersion"
     Branch = $BranchName
     File = @(
@@ -205,7 +193,7 @@ $commitParams = @{
         'module/PowerShellEditorServices/PowerShellEditorServices.psd1'
     )
 }
-Submit-GitChanges @commitParams
+CommitAndPushChanges @commitParams
 
 # Open a PR
 $prParams = @{
@@ -217,4 +205,4 @@ $prParams = @{
     Description = $PRDescription
     FromOrg = 'rjmholt'
 }
-New-GitHubPR @prParams
+OpenGitHubPr @prParams

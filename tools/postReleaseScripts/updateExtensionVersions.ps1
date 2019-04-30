@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-#requires -Version 6.0
-
 [CmdletBinding(DefaultParameterSetName='Increment')]
 param(
     [Parameter(ParameterSetName='Increment')]
@@ -24,13 +22,11 @@ param(
 
     [Parameter()]
     [string]
-    # Default set below, requires processing when $IncrementVersion is used
-    $BranchName,
+    $BranchName = "update-version-$newVersionStr",
 
     [Parameter()]
     [string]
-    # Default set below, requires processing when $IncrementVersion is used
-    $PRDescription
+    $PRDescription = "Updates version strings in vscode-PowerShell to $newVersionStr.`n**Note**: This is an automated PR."
 )
 
 Import-Module -Force "$PSScriptRoot/../FileUpdateTools.psm1"
@@ -83,7 +79,7 @@ function FindPackageJsonVersionSpan
                         continue
                     }
 
-                    $currIndex = Get-StringOffsetFromSpan -String $PackageJsonContent -EndLine $jsonReader.LineNumber -Column $jsonReader.LinePosition
+                    $currIndex = GetStringOffsetFromSpan -String $PackageJsonContent -EndLine $jsonReader.LineNumber -Column $jsonReader.LinePosition
                     $versionStartOffset = $PackageJsonContent.IndexOf('"', $currIndex) + 1
                     $versionStartColumn = $jsonReader.LinePosition + $versionStartOffset - $currIndex
 
@@ -164,10 +160,10 @@ function UpdateMainTsPsesVersion
 
     $mainTsContent = Get-Content -Raw $MainTsPath
     $mainTsVersionSpan = FindRequiredPsesVersionSpan $mainTsContent
-    $newMainTsContent = New-StringWithSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
+    $newMainTsContent = ReplaceStringSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
     if ($newMainTsContent -ne $mainTsContent)
     {
-        Set-Content -Path $MainTsPath -Value $newMainTsContent -Encoding utf8NoBOM -NoNewline
+        SetFileContent -FilePath $MainTsPath -Value $newMainTsContent
     }
 }
 
@@ -185,8 +181,8 @@ function UpdateDockerFileVersion
 
     $vstsDockerFileContent = Get-Content -Raw $DockerFilePath
     $vstsDockerFileVersionSpan = FindVstsBuildVersionSpan -DockerFileContent $vstsDockerFileContent
-    $newDockerFileContent = New-StringWithSegment -String $vstsDockerFileContent -NewSegment $Version -StartIndex $vstsDockerFileVersionSpan.Start -EndIndex $vstsDockerFileVersionSpan.End
-    Set-Content -Path $DockerFilePath -Value $newDockerFileContent -Encoding utf8NoBOM -NoNewline
+    $newDockerFileContent = ReplaceStringSegment -String $vstsDockerFileContent -NewSegment $Version -StartIndex $vstsDockerFileVersionSpan.Start -EndIndex $vstsDockerFileVersionSpan.End
+    SetFileContent -FilePath $DockerFilePath -Value $newDockerFileContent
 }
 
 function GetMarketplaceVersionFromSemVer
@@ -223,7 +219,7 @@ $cloneParams = @{
         upstream = 'https://github.com/PowerShell/vscode-powershell'
     }
 }
-Copy-GitRepository @cloneParams
+CloneRepo @cloneParams
 
 # We may need the version from the package.json, so get that first
 $packageJson = Get-Content -Raw $paths.packageJson
@@ -233,26 +229,17 @@ $pkgJsonVersionOffsetSpan = FindPackageJsonVersionSpan -PackageJsonContent $pack
 if ($IncrementLevel)
 {
     $version = [semver]$packageJson.Substring($pkgJsonVersionOffsetSpan.Start, $pkgJsonVersionOffsetSpan.End - $pkgJsonVersionOffsetSpan.Start)
-    $NewVersion = Get-IncrementedVersion -Version $version -IncrementLevel $IncrementLevel
-}
-
-if (-not $BranchName)
-{
-    $BranchName = "update-version-$NewVersion"
-}
-
-if (-not $PRDescription)
-{
-    $PRDescription = "Updates version strings in vscode-PowerShell to $NewVersion.`n**Note**: This is an automated PR."
+    $NewVersion = IncrementVersion -Version $version -IncrementLevel $IncrementLevel
 }
 
 # Get the marketplace/non-semver versions for various files
-$psesVersion = Get-VersionFromSemVer -SemVer $NewVersion
+$newVersionStr = $NewVersion.ToString()
+$psesVersion = GetVersionFromSemVer -SemVer $NewVersion
 $marketPlaceVersion = GetMarketplaceVersionFromSemVer -SemVer $NewVersion
 
 # Finally create the new package.json file
-$newPkgJsonContent = New-StringWithSegment -String $packageJson -NewSegment $NewVersion -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
-Set-Content -Path $paths.packageJson -Value $newPkgJsonContent -Encoding utf8NoBOM -NoNewline
+$newPkgJsonContent = ReplaceStringSegment -String $packageJson -NewSegment $newVersionStr -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
+SetFileContent -FilePath $paths.packageJson -Value $newPkgJsonContent
 
 # Create the new content for the main.ts required version file
 UpdateMainTsPsesVersion -MainTsPath $paths.mainTs -Version $psesVersion
@@ -262,25 +249,25 @@ UpdateDockerFileVersion -DockerFilePath $paths.vstsDockerFile -Version $marketPl
 
 # Commit and push the changes
 $commitParams = @{
-    Message = "[Ignore] Increment version to $NewVersion"
+    Message = "[Ignore] Increment version to $newVersionStr"
     Branch = $branchName
-    RepositoryLocation = $repoLocation
+    RepoLocation = $repoLocation
     File = @(
         'package.json'
         'src/main.ts'
         'tools/releaseBuild/Image/DockerFile'
     )
 }
-Submit-GitChanges @commitParams
+CommitAndPushChanges @commitParams
 
 # Open a new PR in GitHub
 $prParams = @{
     Organization = $TargetFork
     Repository = 'vscode-PowerShell'
     Branch = $branchName
-    Title = "Update version to v$NewVersion"
+    Title = "Update version to v$newVersionStr"
     Description = $PRDescription
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'
 }
-New-GitHubPR @prParams
+OpenGitHubPr @prParams

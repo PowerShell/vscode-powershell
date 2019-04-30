@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-#requires -Version 6.0
-
 param(
     [Parameter(Mandatory)]
     [string]
@@ -220,19 +218,19 @@ function UpdateGalleryFile
 
     # Create a new PowerShell extension entry
     $powershellEntry = NewPowerShellExtensionEntry -ExtensionVersion $ExtensionVersion
-    $entryStr = ConvertTo-IndentedJson $powershellEntry -IndentChar "`t" -IndentWidth 1
+    $entryStr = ConvertToIndentedJson $powershellEntry -IndentChar "`t" -IndentWidth 1
 
     # Find the position in the existing file where the PowerShell extension should go
     $galleryFileContent = Get-Content -Raw $GalleryFilePath
     $span = FindPSExtensionJsonSpan -GalleryExtensionFileContent $galleryFileContent
-    $startOffset = Get-StringOffsetFromSpan -String $galleryFileContent -EndLine $span.Start.Line -Column $span.Start.Column
-    $endOffset = Get-StringOffsetFromSpan -String $galleryFileContent -EndLine $span.End.Line -StartLine $span.Start.Line -Column $span.End.Column -InitialOffset $startOffset
+    $startOffset = GetStringOffsetFromSpan -String $galleryFileContent -EndLine $span.Start.Line -Column $span.Start.Column
+    $endOffset = GetStringOffsetFromSpan -String $galleryFileContent -EndLine $span.End.Line -StartLine $span.Start.Line -Column $span.End.Column -InitialOffset $startOffset
 
     # Create the new file contents with the inserted segment
-    $newGalleryFileContent = New-StringWithSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex ($endOffset+1) -AutoIndent
+    $newGalleryFileContent = ReplaceStringSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex ($endOffset+1) -AutoIndent
 
     # Write out the new entry
-    Set-Content -Path $GalleryFilePath -Value $newGalleryFileContent -Encoding utf8NoBOM -NoNewline
+    SetFileContent $GalleryFilePath $newGalleryFileContent
 }
 
 $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'ads-temp-checkout'
@@ -247,11 +245,11 @@ $cloneParams = @{
         upstream = 'https://github.com/Microsoft/AzureDataStudio'
     }
 }
-Copy-GitRepository @cloneParams
+CloneRepo @cloneParams
 
 UpdateGalleryFile -ExtensionVersion $ExtensionVersion -GalleryFilePath "$repoLocation/$GalleryFileName"
 
-Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
+CommitAndPushChanges -RepoLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
 
 $prParams = @{
     Organization = $TargetFork
@@ -263,4 +261,4 @@ $prParams = @{
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'
 }
-New-GitHubPR @prParams
+OpenGitHubPr @prParams
