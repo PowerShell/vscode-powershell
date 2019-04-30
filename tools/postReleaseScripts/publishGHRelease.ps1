@@ -10,6 +10,10 @@ param(
     [string]
     $GitHubToken,
 
+    [Parameter(Mandatory)]
+    [string]
+    $Repository,
+
     [Parameter()]
     [string]
     $TargetFork = 'PowerShell',
@@ -23,7 +27,7 @@ param(
     $AssetPath
 )
 
-Import-Module "$PSScriptRoot/../GitHubTools.psm1"
+Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
 
 function GetDescriptionFromChangelog
 {
@@ -45,17 +49,9 @@ function GetDescriptionFromChangelog
 
 $tag = "v$Version"
 
-if (-not $PSBoundParameters.ContainsKey('AssetPath'))
-{
-    $AssetPath = @(
-        "$PSScriptRoot/../../PowerShell-$Version.vsix"
-        "$PSScriptRoot/../../scripts/Install-VSCode.ps1"
-    )
-}
-
 $releaseParams = @{
     Organization = $TargetFork
-    Repository = 'vscode-PowerShell'
+    Repository = $Repository
     Tag = $tag
     ReleaseName = $tag
     Branch = "release/$Version"
