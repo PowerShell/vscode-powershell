@@ -162,7 +162,7 @@ function UpdateMainTsPsesVersion
 
     $mainTsContent = Get-Content -Raw $MainTsPath
     $mainTsVersionSpan = FindRequiredPsesVersionSpan $mainTsContent
-    $newMainTsContent = Format-StringWithSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
+    $newMainTsContent = New-StringWithSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
     if ($newMainTsContent -ne $mainTsContent)
     {
         Set-Content -Path $MainTsPath -Value $newMainTsContent -Encoding utf8NoBOM -NoNewline
@@ -183,7 +183,7 @@ function UpdateDockerFileVersion
 
     $vstsDockerFileContent = Get-Content -Raw $DockerFilePath
     $vstsDockerFileVersionSpan = FindVstsBuildVersionSpan -DockerFileContent $vstsDockerFileContent
-    $newDockerFileContent = Format-StringWithSegment -String $vstsDockerFileContent -NewSegment $Version -StartIndex $vstsDockerFileVersionSpan.Start -EndIndex $vstsDockerFileVersionSpan.End
+    $newDockerFileContent = New-StringWithSegment -String $vstsDockerFileContent -NewSegment $Version -StartIndex $vstsDockerFileVersionSpan.Start -EndIndex $vstsDockerFileVersionSpan.End
     Set-Content -Path $DockerFilePath -Value $newDockerFileContent -Encoding utf8NoBOM -NoNewline
 }
 
@@ -249,7 +249,7 @@ $psesVersion = Get-VersionFromSemVer -SemVer $NewVersion
 $marketPlaceVersion = GetMarketplaceVersionFromSemVer -SemVer $NewVersion
 
 # Finally create the new package.json file
-$newPkgJsonContent = Format-StringWithSegment -String $packageJson -NewSegment $NewVersion -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
+$newPkgJsonContent = New-StringWithSegment -String $packageJson -NewSegment $NewVersion -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
 Set-Content -Path $paths.packageJson -Value $newPkgJsonContent -Encoding utf8NoBOM -NoNewline
 
 # Create the new content for the main.ts required version file
