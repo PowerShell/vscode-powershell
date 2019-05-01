@@ -22,11 +22,13 @@ param(
 
     [Parameter()]
     [string]
-    $BranchName = "update-version-$newVersionStr",
+    # Default set below, requires processing when $IncrementVersion is used
+    $BranchName,
 
     [Parameter()]
     [string]
-    $PRDescription = "Updates version strings in vscode-PowerShell to $newVersionStr.`n**Note**: This is an automated PR."
+    # Default set below, requires processing when $IncrementVersion is used
+    $PRDescription
 )
 
 Import-Module -Force "$PSScriptRoot/../FileUpdateTools.psm1"
@@ -79,7 +81,7 @@ function FindPackageJsonVersionSpan
                         continue
                     }
 
-                    $currIndex = GetStringOffsetFromSpan -String $PackageJsonContent -EndLine $jsonReader.LineNumber -Column $jsonReader.LinePosition
+                    $currIndex = Get-StringOffsetFromSpan -String $PackageJsonContent -EndLine $jsonReader.LineNumber -Column $jsonReader.LinePosition
                     $versionStartOffset = $PackageJsonContent.IndexOf('"', $currIndex) + 1
                     $versionStartColumn = $jsonReader.LinePosition + $versionStartOffset - $currIndex
 
@@ -163,7 +165,7 @@ function UpdateMainTsPsesVersion
     $newMainTsContent = Format-StringWithSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
     if ($newMainTsContent -ne $mainTsContent)
     {
-        Set-Content -Path $MainTsPath -Value $newMainTsContent -Encoding utf8NoBOM
+        Set-Content -Path $MainTsPath -Value $newMainTsContent -Encoding utf8NoBOM -NoNewline
     }
 }
 
@@ -182,7 +184,7 @@ function UpdateDockerFileVersion
     $vstsDockerFileContent = Get-Content -Raw $DockerFilePath
     $vstsDockerFileVersionSpan = FindVstsBuildVersionSpan -DockerFileContent $vstsDockerFileContent
     $newDockerFileContent = Format-StringWithSegment -String $vstsDockerFileContent -NewSegment $Version -StartIndex $vstsDockerFileVersionSpan.Start -EndIndex $vstsDockerFileVersionSpan.End
-    Set-Content -Path $DockerFilePath -Value $newDockerFileContent -Encoding utf8NoBOM
+    Set-Content -Path $DockerFilePath -Value $newDockerFileContent -Encoding utf8NoBOM -NoNewline
 }
 
 function GetMarketplaceVersionFromSemVer
@@ -232,14 +234,23 @@ if ($IncrementLevel)
     $NewVersion = Get-IncrementedVersion -Version $version -IncrementLevel $IncrementLevel
 }
 
+if (-not $BranchName)
+{
+    $BranchName = "update-version-$NewVersion"
+}
+
+if (-not $PRDescription)
+{
+    $PRDescription = "Updates version strings in vscode-PowerShell to $NewVersion.`n**Note**: This is an automated PR."
+}
+
 # Get the marketplace/non-semver versions for various files
-$newVersionStr = $NewVersion.ToString()
-$psesVersion = GetVersionFromSemVer -SemVer $NewVersion
+$psesVersion = Get-VersionFromSemVer -SemVer $NewVersion
 $marketPlaceVersion = GetMarketplaceVersionFromSemVer -SemVer $NewVersion
 
 # Finally create the new package.json file
-$newPkgJsonContent = ReplaceStringSegment -String $packageJson -NewSegment $newVersionStr -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
-Set-Content -Path $paths.packageJson -Value $newPkgJsonContent -Encoding utf8NoBOM
+$newPkgJsonContent = Format-StringWithSegment -String $packageJson -NewSegment $NewVersion -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
+Set-Content -Path $paths.packageJson -Value $newPkgJsonContent -Encoding utf8NoBOM -NoNewline
 
 # Create the new content for the main.ts required version file
 UpdateMainTsPsesVersion -MainTsPath $paths.mainTs -Version $psesVersion
@@ -249,9 +260,9 @@ UpdateDockerFileVersion -DockerFilePath $paths.vstsDockerFile -Version $marketPl
 
 # Commit and push the changes
 $commitParams = @{
-    Message = "[Ignore] Increment version to $newVersionStr"
+    Message = "[Ignore] Increment version to $NewVersion"
     Branch = $branchName
-    RepoLocation = $repoLocation
+    RepositoryLocation = $repoLocation
     File = @(
         'package.json'
         'src/main.ts'
@@ -265,7 +276,7 @@ $prParams = @{
     Organization = $TargetFork
     Repository = 'vscode-PowerShell'
     Branch = $branchName
-    Title = "Update version to v$newVersionStr"
+    Title = "Update version to v$NewVersion"
     Description = $PRDescription
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'

@@ -259,7 +259,7 @@ $GalleryFileName |
     ForEach-Object { "$repoLocation/$_" } |
     UpdateGalleryFile -ExtensionVersion $ExtensionVersion
 
-Submit-GitChanges -RepoLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
+Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
 
 $prParams = @{
     Organization = $TargetFork

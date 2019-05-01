@@ -22,11 +22,11 @@ param(
 
     [Parameter()]
     [string]
-    $BranchName = "update-pses-version-$NewVersion",
+    $BranchName,
 
     [Parameter()]
     [string]
-    $PRDescription = "Updates PSES to version $NewVersion.**Note**: This is an automated PR."
+    $PRDescription
 )
 
 Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
@@ -73,7 +73,7 @@ function UpdatePsesModuleVersion
 
     $newContent = Format-StringWithSegment -String $manifestContent -NewSegment $version -StartIndex $span.Start -EndIndex $span.End
 
-    Set-Content -Path $PsesModuleManifestPath -Value $newContent -Encoding utf8NoBOM
+    Set-Content -Path $PsesModuleManifestPath -Value $newContent -Encoding utf8NoBOM -NoNewline
 }
 
 function GetPsesCurrentVersion
@@ -174,7 +174,17 @@ Copy-GitRepository @cloneParams
 if ($IncrementLevel)
 {
     $currVersion = GetPsesCurrentVersion -PsesPropsPath $paths.props
-    $NewVersion = IncrementVersion -Version $currVersion -IncrementLevel $IncrementLevel
+    $NewVersion = Get-IncrementedVersion -Version $currVersion -IncrementLevel $IncrementLevel
+}
+
+if (-not $BranchName)
+{
+    $BranchName = "update-pses-version-$NewVersion"
+}
+
+if (-not $PRDescription)
+{
+    $PRDescription = "Updates PSES to version $NewVersion.**Note**: This is an automated PR."
 }
 
 # Update the Props XML file
@@ -185,7 +195,7 @@ UpdatePsesModuleVersion -PsesModuleManifestPath $paths.manifest -NewVersion $New
 
 # Commit changes
 $commitParams = @{
-    RepoLocation = $repoLocation
+    RepositoryLocation = $repoLocation
     Message = "[Ignore] Update PSES version to $NewVersion"
     Branch = $BranchName
     File = @(
