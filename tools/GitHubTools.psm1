@@ -332,4 +332,4 @@ function Publish-GitHubRelease
     return $response
 }
 
-Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR
+Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR,Publish-GitHubRelease
