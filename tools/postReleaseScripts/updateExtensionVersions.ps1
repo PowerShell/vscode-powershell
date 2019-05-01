@@ -160,10 +160,10 @@ function UpdateMainTsPsesVersion
 
     $mainTsContent = Get-Content -Raw $MainTsPath
     $mainTsVersionSpan = FindRequiredPsesVersionSpan $mainTsContent
-    $newMainTsContent = ReplaceStringSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
+    $newMainTsContent = Format-StringWithSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
     if ($newMainTsContent -ne $mainTsContent)
     {
-        SetFileContent -FilePath $MainTsPath -Value $newMainTsContent
+        Set-Content -Path $MainTsPath -Value $newMainTsContent -Encoding utf8NoBOM
     }
 }
 
@@ -181,8 +181,8 @@ function UpdateDockerFileVersion
 
     $vstsDockerFileContent = Get-Content -Raw $DockerFilePath
     $vstsDockerFileVersionSpan = FindVstsBuildVersionSpan -DockerFileContent $vstsDockerFileContent
-    $newDockerFileContent = ReplaceStringSegment -String $vstsDockerFileContent -NewSegment $Version -StartIndex $vstsDockerFileVersionSpan.Start -EndIndex $vstsDockerFileVersionSpan.End
-    SetFileContent -FilePath $DockerFilePath -Value $newDockerFileContent
+    $newDockerFileContent = Format-StringWithSegment -String $vstsDockerFileContent -NewSegment $Version -StartIndex $vstsDockerFileVersionSpan.Start -EndIndex $vstsDockerFileVersionSpan.End
+    Set-Content -Path $DockerFilePath -Value $newDockerFileContent -Encoding utf8NoBOM
 }
 
 function GetMarketplaceVersionFromSemVer
@@ -219,7 +219,7 @@ $cloneParams = @{
         upstream = 'https://github.com/PowerShell/vscode-powershell'
     }
 }
-CloneRepo @cloneParams
+Copy-GitRepository @cloneParams
 
 # We may need the version from the package.json, so get that first
 $packageJson = Get-Content -Raw $paths.packageJson
@@ -229,7 +229,7 @@ $pkgJsonVersionOffsetSpan = FindPackageJsonVersionSpan -PackageJsonContent $pack
 if ($IncrementLevel)
 {
     $version = [semver]$packageJson.Substring($pkgJsonVersionOffsetSpan.Start, $pkgJsonVersionOffsetSpan.End - $pkgJsonVersionOffsetSpan.Start)
-    $NewVersion = IncrementVersion -Version $version -IncrementLevel $IncrementLevel
+    $NewVersion = Get-IncrementedVersion -Version $version -IncrementLevel $IncrementLevel
 }
 
 # Get the marketplace/non-semver versions for various files
@@ -239,7 +239,7 @@ $marketPlaceVersion = GetMarketplaceVersionFromSemVer -SemVer $NewVersion
 
 # Finally create the new package.json file
 $newPkgJsonContent = ReplaceStringSegment -String $packageJson -NewSegment $newVersionStr -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
-SetFileContent -FilePath $paths.packageJson -Value $newPkgJsonContent
+Set-Content -Path $paths.packageJson -Value $newPkgJsonContent -Encoding utf8NoBOM
 
 # Create the new content for the main.ts required version file
 UpdateMainTsPsesVersion -MainTsPath $paths.mainTs -Version $psesVersion
@@ -258,7 +258,7 @@ $commitParams = @{
         'tools/releaseBuild/Image/DockerFile'
     )
 }
-CommitAndPushChanges @commitParams
+Submit-GitChanges @commitParams
 
 # Open a new PR in GitHub
 $prParams = @{
@@ -270,4 +270,4 @@ $prParams = @{
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'
 }
-OpenGitHubPr @prParams
+New-GitHubPR @prParams
