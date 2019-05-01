@@ -253,13 +253,13 @@ $cloneParams = @{
         upstream = 'https://github.com/Microsoft/AzureDataStudio'
     }
 }
-CloneRepo @cloneParams
+Copy-GitRepository @cloneParams
 
 $GalleryFileName |
     ForEach-Object { "$repoLocation/$_" } |
     UpdateGalleryFile -ExtensionVersion $ExtensionVersion
 
-CommitAndPushChanges -RepoLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
+Submit-GitChanges -RepoLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
 
 $prParams = @{
     Organization = $TargetFork
@@ -271,4 +271,4 @@ $prParams = @{
     GitHubToken = $GitHubToken
     FromOrg = 'rjmholt'
 }
-OpenGitHubPr @prParams
+New-GitHubPR @prParams
