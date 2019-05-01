@@ -20,6 +20,29 @@ function GetHumanishRepositoryName
     return $Repository.Substring($Repository.LastIndexOf('/') + 1)
 }
 
+function Exec
+{
+    param([scriptblock]$Invocation)
+
+    & $Invocation
+
+    if ($LASTEXITCODE -ne 0)
+    {
+        # Get caller location for easier debugging
+        $caller = Get-PSCallStack -ErrorAction SilentlyContinue
+        if($caller)
+        {
+            $callerLocationParts = $caller[1].Location -split ":\s*line\s*"
+            $callerFile = $callerLocationParts[0]
+            $callerLine = $callerLocationParts[1]
+
+            $errorMessage = "Execution of {$Invocation} by ${callerFile}: line $callerLine failed with exit code $LASTEXITCODE"
+            throw $errorMessage
+        }
+        throw "Execution of {$Invocation} failed with exit code $LASTEXITCODE"
+    }
+}
+
 function Copy-GitRepository
 {
     param(
@@ -66,26 +89,26 @@ function Copy-GitRepository
         New-Item -Path $containingDir -ItemType Directory -ErrorAction Stop
     }
 
-    git clone --single-branch --branch $CloneBranch $OriginRemote $Destination
+    Exec { git clone --single-branch --branch $CloneBranch $OriginRemote $Destination }
 
     Push-Location $Destination
     try
     {
-        git config core.autocrlf true
+        Exec { git config core.autocrlf true }
 
         foreach ($remote in $Remotes.get_Keys())
         {
-            git remote add $remote $Remotes[$remote]
+            Exec { git remote add $remote $Remotes[$remote] }
         }
 
         if ($remote['upstream'])
         {
-            git pull upstream $CloneBranch
+            Exec { git pull upstream $CloneBranch }
         }
 
         if ($CheckoutBranch)
         {
-            git checkout -b $CheckoutBranch
+            Exec { git checkout -b $CheckoutBranch }
         }
     }
     finally
@@ -122,27 +145,25 @@ function Submit-GitChanges
     try
     {
         # Try to checkout the relevant branch
-        git checkout $Branch
-        if (-not $?)
+        try
         {
-            git checkout -b $Branch
-
-            if (-not $?)
-            {
-                throw "Unable to checkout branch '$Branch'"
-            }
+            Exec { git checkout $Branch }
+        }
+        catch
+        {
+            Exec { git checkout -b $Branch }
         }
 
         if ($File)
         {
-            git add $File
+            Exec { git add $File }
         }
         else
         {
-            git add -A
+            Exec { git add -A }
         }
-        git commit -m $Message
-        git push $Remote $Branch
+        Exec { git commit -m $Message }
+        Exec { git push $Remote $Branch }
     }
     finally
     {

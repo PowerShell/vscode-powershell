@@ -225,4 +225,4 @@ function Get-VersionFromSemVer
     return $svStr.Substring(0, $svStr.IndexOf('-'))
 }
 
-Export-ModuleMember Format-StringWithSegment,Get-StringOffsetFromSpan,ConvertTo-IndentedJson,Get-IncrementedVersion
+Export-ModuleMember -Function Format-StringWithSegment,Get-StringOffsetFromSpan,ConvertTo-IndentedJson,Get-IncrementedVersion,Get-VersionFromSemVer
