@@ -31,7 +31,7 @@ function ConvertToJToken
     return (,[Newtonsoft.Json.Linq.JToken]::FromObject($Object))
 }
 
-function Format-StringWithSegment
+function New-StringWithSegment
 {
     [OutputType([string])]
     param(
@@ -225,4 +225,4 @@ function Get-VersionFromSemVer
     return $svStr.Substring(0, $svStr.IndexOf('-'))
 }
 
-Export-ModuleMember -Function Format-StringWithSegment,Get-StringOffsetFromSpan,ConvertTo-IndentedJson,Get-IncrementedVersion,Get-VersionFromSemVer
+Export-ModuleMember -Function New-StringWithSegment,Get-StringOffsetFromSpan,ConvertTo-IndentedJson,Get-IncrementedVersion,Get-VersionFromSemVer
