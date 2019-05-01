@@ -1,6 +1,25 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+function GetHumanishRepoName
+{
+    param(
+        [string]
+        $Repository
+    )
+
+    if ($Repository.EndsWith('.git'))
+    {
+        $Repository = $Repository.Substring(0, $Repository.Length - 4)
+    }
+    else
+    {
+        $Repository = $Repository.Trim('/')
+    }
+
+    return $Repository.Substring($Repository.LastIndexOf('/') + 1)
+}
+
 function CloneRepo
 {
     param(
@@ -8,9 +27,10 @@ function CloneRepo
         [string]
         $OriginRemote,
 
-        [Parameter(Mandatory)]
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
         [string]
-        $Destination,
+        $Destination = (GetHumanishRepoName $OriginRemote),
 
         [Parameter()]
         [string]
