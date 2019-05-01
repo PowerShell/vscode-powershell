@@ -60,5 +60,4 @@ $releaseParams = @{
     Description = GetDescriptionFromChangelog -ChangelogPath $ChangelogPath
     GitHubToken = $GitHubToken
 }
-CreateNewRelease @releaseParams
-
+Publish-GitHubRelease @releaseParams
