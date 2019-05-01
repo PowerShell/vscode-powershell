@@ -71,7 +71,7 @@ function UpdatePsesModuleVersion
 
     $span = FindPsesModuleSpan -ModuleManifestContent $manifestContent
 
-    $newContent = Format-StringWithSegment -String $manifestContent -NewSegment $version -StartIndex $span.Start -EndIndex $span.End
+    $newContent = New-StringWithSegment -String $manifestContent -NewSegment $version -StartIndex $span.Start -EndIndex $span.End
 
     Set-Content -Path $PsesModuleManifestPath -Value $newContent -Encoding utf8NoBOM -NoNewline
 }
