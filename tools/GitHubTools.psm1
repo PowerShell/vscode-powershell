@@ -1,7 +1,134 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-function GetHumanishRepositoryName
+class GitHubIssueInfo
+{
+    [int]$Number
+    [string]$Organization
+    [string]$Repository
+
+    [uri]GetHtmlUri()
+    {
+        return [uri]"https://github.com/$($this.Organization)/$($this.Repository)/issues/$($this.Number)"
+    }
+
+    [uri]GetApiUri()
+    {
+        return [uri]"https://api.github.com/repos/$($this.Organization)/$($this.Repository)/issues/$($this.Number)"
+    }
+}
+
+class GitHubIssue : GitHubIssueInfo
+{
+    [pscustomobject]$RawResponse
+    [string]$Body
+    [string[]]$Labels
+}
+
+class GitHubPR : GitHubIssue
+{
+    hidden [GitHubIssueInfo[]]$ClosedIssues = $null
+
+    [GitHubIssueInfo[]]GetClosedIssueInfos()
+    {
+        if ($null -eq $this.ClosedIssues)
+        {
+            $this.ClosedIssues = $this.Body |
+                GetClosedIssueUrisInBodyText |
+                GetGitHubIssueFromUri
+        }
+
+        return $this.ClosedIssues
+    }
+}
+
+$script:CloseKeywords = @(
+    'close'
+    'closes'
+    'closed'
+    'fix'
+    'fixes'
+    'fixed'
+    'resolve'
+    'resolves'
+    'resolved'
+)
+$script:EndNonCharRegex = [regex]::new('[^0-9]*$', 'compiled')
+filter GetClosedIssueUrisInBodyText
+{
+    param(
+        [Parameter(ValueFromPipeline)]
+        [string]
+        $Text
+    )
+
+    $words = $Text.Split()
+
+    $expectIssue = $false
+    for ($i = 0; $i -lt $words.Length; $i++)
+    {
+        $currWord = $words[$i]
+
+        if ($script:CloseKeywords -contains $currWord)
+        {
+            $expectIssue = $true
+            continue
+        }
+
+        if (-not $expectIssue)
+        {
+            continue
+        }
+
+        $expectIssue = $false
+
+        $trimmedWord = $script:EndNonCharRegex.Replace($currWord, '')
+
+        if ([uri]::IsWellFormedUriString($trimmedWord, 'Absolute'))
+        {
+            # Yield
+            [uri]$trimmedWord
+        }
+    }
+}
+
+filter GetGitHubIssueFromUri
+{
+    param(
+        [Parameter(ValueFromPipeline)]
+        [uri]
+        $IssueUri
+    )
+
+    if ($IssueUri.Authority -ne 'github.com')
+    {
+        return
+    }
+
+    if ($IssueUri.Segments.Length -ne 5)
+    {
+        return
+    }
+
+    if ($IssueUri.Segments[3] -ne 'issues/')
+    {
+        return
+    }
+
+    $issueNum = -1
+    if (-not [int]::TryParse($IssueUri.Segments[4], [ref]$issueNum))
+    {
+        return
+    }
+
+    return [GitHubIssueInfo]@{
+        Organization = $IssueUri.Segments[1].TrimEnd('/')
+        Repository = $IssueUri.Segments[2].TrimEnd('/')
+        Number = $issueNum
+    }
+}
+
+filter GetHumanishRepositoryName
 {
     param(
         [string]
@@ -240,6 +367,113 @@ function New-GitHubPR
     Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
 }
 
+function Get-GitHubPR
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory)]
+        [string]
+        $Repository,
+
+        [Parameter(Mandatory)]
+        [int[]]
+        $PullNumber,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GitHubToken
+    )
+
+    return $PullNumber |
+        ForEach-Object {
+            $params = @{
+                Method = 'Get'
+                Uri = "https://api.github.com/repos/$Organization/$Repository/pulls/$_"
+            }
+
+            if ($GitHubToken)
+            {
+                $params.Headers = @{
+                    Authorization = "token $GitHubToken"
+                }
+            }
+
+            $prResponse = Invoke-RestMethod @params
+
+            [GitHubPR]@{
+                RawResponse = $prResponse
+                Number = $prResponse.Number
+                Organization = $Organization
+                Repository = $Repository
+                Body = $prResponse.body
+                Labels = $prResponse.labels.name
+            }
+        }
+}
+
+function Get-GitHubIssue
+{
+    [CmdletBinding(DefaultParameterSetName='IssueInfo')]
+    param(
+        [Parameter(Mandatory, Position=0, ParameterSetName='IssueInfo')]
+        [GitHubIssueInfo]
+        $IssueInfo,
+
+        [Parameter(Mandatory, ParameterSetName='Params')]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory, ParameterSetName='Params')]
+        [string]
+        $Repository,
+
+        [Parameter(Mandatory, ParameterSetName='Params')]
+        [int]
+        $Number,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GitHubToken
+    )
+
+    if (-not $IssueInfo)
+    {
+        $IssueInfo = [GitHubIssueInfo]@{
+            Organization = $Organization
+            Repository = $Repository
+            Number = $Number
+        }
+    }
+
+    $irmParams = @{
+        Method = 'Get'
+        Uri = $IssueInfo.GetApiUri()
+    }
+
+    if ($GitHubToken)
+    {
+        $irmParams.Headers = @{
+            Authorization = "token $GitHubToken"
+        }
+    }
+
+    $issueResponse = Invoke-RestMethod @irmParams
+
+    return [GitHubIssue]@{
+        Organization = $Organization
+        Repository = $Repository
+        Number = $Number
+        RawResponse = $issueResponse
+        Body = $issueResponse.body
+        Labels = $issueResponse.labels.name
+    }
+}
+
 function Publish-GitHubRelease
 {
     param(
@@ -338,4 +572,4 @@ function Publish-GitHubRelease
     return $response
 }
 
-Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR,Publish-GitHubRelease
+Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR,Get-GitHubPR,Get-GitHubIssue,Publish-GitHubRelease
