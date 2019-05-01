@@ -230,7 +230,7 @@ function UpdateGalleryFile
     $newGalleryFileContent = Format-StringWithSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex ($endOffset+1) -AutoIndent
 
     # Write out the new entry
-    Set-Content -Path $GalleryFilePath -Value $newGalleryFileContent -Encoding utf8NoBOM
+    Set-Content -Path $GalleryFilePath -Value $newGalleryFileContent -Encoding utf8NoBOM -NoNewline
 }
 
 $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'ads-temp-checkout'
@@ -249,7 +249,7 @@ Copy-GitRepository @cloneParams
 
 UpdateGalleryFile -ExtensionVersion $ExtensionVersion -GalleryFilePath "$repoLocation/$GalleryFileName"
 
-Submit-GitChanges -RepoLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
+Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
 
 $prParams = @{
     Organization = $TargetFork
