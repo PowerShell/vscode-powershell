@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-function GetHumanishRepoName
+function GetHumanishRepositoryName
 {
     param(
         [string]
@@ -20,7 +20,7 @@ function GetHumanishRepoName
     return $Repository.Substring($Repository.LastIndexOf('/') + 1)
 }
 
-function CloneRepo
+function Copy-GitRepository
 {
     param(
         [Parameter(Mandatory)]
@@ -30,7 +30,7 @@ function CloneRepo
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Destination = (GetHumanishRepoName $OriginRemote),
+        $Destination = (GetHumanishRepositoryName $OriginRemote),
 
         [Parameter()]
         [string]
@@ -94,7 +94,7 @@ function CloneRepo
     }
 }
 
-function CommitAndPushChanges
+function Submit-GitChanges
 {
     param(
         [Parameter(Mandatory)]
@@ -107,7 +107,7 @@ function CommitAndPushChanges
 
         [Parameter(Mandatory)]
         [string]
-        $RepoLocation,
+        $RepositoryLocation,
 
         [Parameter()]
         [string[]]
@@ -118,7 +118,7 @@ function CommitAndPushChanges
         $Remote = 'origin'
     )
 
-    Push-Location $RepoLocation
+    Push-Location $RepositoryLocation
     try
     {
         # Try to checkout the relevant branch
@@ -150,7 +150,7 @@ function CommitAndPushChanges
     }
 }
 
-function OpenGitHubPr
+function New-GitHubPR
 {
     param(
         [Parameter(Mandatory)]
@@ -207,3 +207,5 @@ function OpenGitHubPr
 
     Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
 }
+
+Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR

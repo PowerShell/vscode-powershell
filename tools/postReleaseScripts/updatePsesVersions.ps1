@@ -63,7 +63,7 @@ function UpdatePsesModuleVersion
         $NewVersion
     )
 
-    $version = GetVersionFromSemVer -SemVer $NewVersion
+    $version = Get-VersionFromSemVer -SemVer $NewVersion
 
     $PsesModuleManifestPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PsesModuleManifestPath)
 
@@ -71,9 +71,9 @@ function UpdatePsesModuleVersion
 
     $span = FindPsesModuleSpan -ModuleManifestContent $manifestContent
 
-    $newContent = ReplaceStringSegment -String $manifestContent -NewSegment $version -StartIndex $span.Start -EndIndex $span.End
+    $newContent = Format-StringWithSegment -String $manifestContent -NewSegment $version -StartIndex $span.Start -EndIndex $span.End
 
-    SetFileContent -FilePath $PsesModuleManifestPath -Value $newContent
+    Set-Content -Path $PsesModuleManifestPath -Value $newContent -Encoding utf8NoBOM
 }
 
 function GetPsesCurrentVersion
@@ -168,7 +168,7 @@ $cloneParams = @{
     }
     Clobber = $true
 }
-CloneRepo @cloneParams
+Copy-GitRepository @cloneParams
 
 # If we need to increment the version, do that
 if ($IncrementLevel)
@@ -193,7 +193,7 @@ $commitParams = @{
         'module/PowerShellEditorServices/PowerShellEditorServices.psd1'
     )
 }
-CommitAndPushChanges @commitParams
+Submit-GitChanges @commitParams
 
 # Open a PR
 $prParams = @{
@@ -205,4 +205,4 @@ $prParams = @{
     Description = $PRDescription
     FromOrg = 'rjmholt'
 }
-OpenGitHubPr @prParams
+New-GitHubPR @prParams

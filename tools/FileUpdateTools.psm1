@@ -1,7 +1,37 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-function ReplaceStringSegment
+function ConvertToJToken
+{
+    param(
+        [Parameter()]
+        $Object
+    )
+
+    if ($null -eq $Object)
+    {
+        return [Newtonsoft.Json.Linq.JValue]::CreateNull()
+    }
+
+    if ($Object -is [pscustomobject])
+    {
+        $jObject = [Newtonsoft.Json.Linq.JObject]::new()
+        foreach ($field in $Object)
+        {
+            $jObject.Add($field, $Object.$field)
+        }
+        return $jObject
+    }
+
+    if ($Object -is [version])
+    {
+        return [Newtonsoft.Json.Linq.JToken]::new($Object.ToString())
+    }
+
+    return (,[Newtonsoft.Json.Linq.JToken]::FromObject($Object))
+}
+
+function Format-StringWithSegment
 {
     [OutputType([string])]
     param(
@@ -17,9 +47,9 @@ function ReplaceStringSegment
         [int]
         $StartIndex,
 
-        [Parameter(Mandatory)]
+        [Parameter()]
         [int]
-        $EndIndex,
+        $EndIndex = $StartIndex,
 
         [switch]
         $AutoIndent
@@ -59,7 +89,7 @@ function ReplaceStringSegment
     return $newStringBuilder.ToString()
 }
 
-function GetStringOffsetFromSpan
+function Get-StringOffsetFromSpan
 {
     [OutputType([int])]
     param(
@@ -101,37 +131,7 @@ function GetStringOffsetFromSpan
     return $idx + $Column
 }
 
-function ConvertToJToken
-{
-    param(
-        [Parameter()]
-        $Object
-    )
-
-    if ($null -eq $Object)
-    {
-        return [Newtonsoft.Json.Linq.JValue]::CreateNull()
-    }
-
-    if ($Object -is [pscustomobject])
-    {
-        $jObject = [Newtonsoft.Json.Linq.JObject]::new()
-        foreach ($field in $Object)
-        {
-            $jObject.Add($field, $Object.$field)
-        }
-        return $jObject
-    }
-
-    if ($Object -is [version])
-    {
-        return [Newtonsoft.Json.Linq.JToken]::new($Object.ToString())
-    }
-
-    return (,[Newtonsoft.Json.Linq.JToken]::FromObject($Object))
-}
-
-function ConvertToIndentedJson
+function ConvertTo-IndentedJson
 {
     param(
         [Parameter(Position=0)]
@@ -168,26 +168,7 @@ function ConvertToIndentedJson
     return $stringBuilder.ToString().Replace([System.Environment]::NewLine, "`r`n")
 }
 
-function SetFileContent
-{
-    param(
-        [Parameter(Mandatory, Position=0)]
-        [string]
-        $FilePath,
-
-        [Parameter(Mandatory, Position=1)]
-        [string]
-        $Value,
-
-        [Parameter()]
-        $Encoding = ([System.Text.UTF8Encoding]::new(<# BOM #> $false))
-    )
-
-    $FilePath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($FilePath)
-    [System.IO.File]::WriteAllText($FilePath, $Value, $Encoding)
-}
-
-function IncrementVersion
+function Get-IncrementedVersion
 {
     param(
         [Parameter(Mandatory)]
@@ -225,7 +206,7 @@ function IncrementVersion
     }
 }
 
-function GetVersionFromSemVer
+function Get-VersionFromSemVer
 {
     [OutputType([version])]
     param(
@@ -243,3 +224,5 @@ function GetVersionFromSemVer
 
     return $svStr.Substring(0, $svStr.IndexOf('-'))
 }
+
+Export-ModuleMember Format-StringWithSegment,Get-StringOffsetFromSpan,ConvertTo-IndentedJson,Get-IncrementedVersion
