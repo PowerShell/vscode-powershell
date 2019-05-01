@@ -43,7 +43,7 @@ function CloneRepo
     $containingDir = Split-Path $Destination
     if (-not (Test-Path $containingDir))
     {
-        New-Item -Path $containingDir -ItemType Directory
+        New-Item -Path $containingDir -ItemType Directory -ErrorAction Stop
     }
 
     git clone --single-branch --branch $CloneBranch $OriginRemote $Destination
