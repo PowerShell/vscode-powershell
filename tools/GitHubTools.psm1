@@ -1,6 +1,24 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+class GitCommitInfo
+{
+    [string]$Hash
+    [string[]]$ParentHashes
+    [string]$Subject
+    [string]$Body
+    [string]$ContributorName
+    [string]$ContributorEmail
+    [string[]]$CommitLabels
+    [int]$PRNumber = -1
+}
+
+class GitHubCommitInfo : GitCommitInfo
+{
+    [string]$Organization
+    [string]$Repository
+}
+
 class GitHubIssueInfo
 {
     [int]$Number
@@ -40,6 +58,17 @@ class GitHubPR : GitHubIssue
 
         return $this.ClosedIssues
     }
+}
+
+class ChangelogItem
+{
+    [GitHubCommitInfo]$Commit
+    [GitHubPR]$PR
+    [GitHubIssue[]]$ClosedIssues
+    [string[]]$Labels
+    [int]$IssueNumber = -1
+    [int]$PRNumber = -1
+    [string]$BodyText
 }
 
 $script:CloseKeywords = @(
@@ -128,23 +157,31 @@ filter GetGitHubIssueFromUri
     }
 }
 
-filter GetHumanishRepositoryName
+filter GetHumanishRepositoryDetails
 {
     param(
         [string]
-        $Repository
+        $RemoteUrl
     )
 
-    if ($Repository.EndsWith('.git'))
+    if ($RemoteUrl.EndsWith('.git'))
     {
-        $Repository = $Repository.Substring(0, $Repository.Length - 4)
+        $RemoteUrl = $RemoteUrl.Substring(0, $RemoteUrl.Length - 4)
     }
     else
     {
-        $Repository = $Repository.Trim('/')
+        $RemoteUrl = $RemoteUrl.Trim('/')
     }
 
-    return $Repository.Substring($Repository.LastIndexOf('/') + 1)
+    $lastSlashIdx = $RemoteUrl.LastIndexOf('/')
+    $repository =  $RemoteUrl.Substring($lastSlashIdx + 1)
+    $secondLastSlashIdx = $RemoteUrl.LastIndexOfAny(('/', ':'), $lastSlashIdx - 1)
+    $organization = $RemoteUrl.Substring($secondLastSlashIdx + 1, $lastSlashIdx - $secondLastSlashIdx - 1)
+
+    return @{
+        Organization = $organization
+        Repository = $repository
+    }
 }
 
 function Exec
@@ -180,7 +217,7 @@ function Copy-GitRepository
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Destination = (GetHumanishRepositoryName $OriginRemote),
+        $Destination = ((GetHumanishRepositoryDetails $OriginRemote).Repository),
 
         [Parameter()]
         [string]
@@ -309,6 +346,76 @@ function Submit-GitChanges
     }
 }
 
+function Get-GitCommit
+{
+    [CmdletBinding(DefaultParameterSetName='SinceRef')]
+    param(
+       [Parameter(Mandatory, ParameterSetName='SinceRef')]
+       [Alias('SinceBranch', 'SinceTag')]
+       [string]
+       $SinceRef,
+
+       [Parameter(ParameterSetName='SinceRef')]
+       [Alias('UntilBranch', 'UntilTag')]
+       [string]
+       $UntilRef = 'HEAD',
+
+       [Parameter()]
+       [string]
+       $Remote
+    )
+
+    if (-not $Remote)
+    {
+        $Remote = 'upstream'
+        try
+        {
+            $null = Exec { git remote get-url $Remote }
+        }
+        catch
+        {
+            $Remote = 'origin'
+        }
+    }
+
+    $originDetails = GetHumanishRepositoryDetails -RemoteUrl (Exec { git remote get-url $Remote })
+
+    $format = '%H||%P||%aN||%aE||%s'
+    $commits = Exec { git --no-pager log "$SinceRef..$UntilRef" --format=$format }
+
+    return $commits |
+        ForEach-Object {
+            $hash,$parents,$name,$email,$subject = $_.Split('||')
+            $body = (Exec { git --no-pager show $hash -s --format=%b }) -join "`n"
+            $commitVal = [GitHubCommitInfo]@{
+               Hash = $hash
+               ParentHashes = $parents
+               ContributorName = $name
+               ContributorEmail = $email
+               Subject = $subject
+               Body = $body
+               Organization = $originDetails.Organization
+               Repository = $originDetails.Repository
+            }
+
+            # Look for something like 'This is a commit message (#1224)'
+            $pr = [regex]::Match($subject, '\(#(\d+)\)$').Groups[1].Value
+            if ($pr)
+            {
+                $commitVal.PRNumber = $pr
+            }
+
+            # Look for something like '[Ignore] [giraffe] Fix tests'
+            $commitLabels = [regex]::Matches($subject, '^(\[(.*?)\]\s*)*')
+            if ($commitLabels.Groups.Length -ge 3 -and $commitLabels.Groups[2].Captures.Value)
+            {
+                $commitVal.CommitLabels = $commitLabels.Groups[2].Captures.Value
+            }
+
+            $commitVal
+        }
+}
+
 function New-GitHubPR
 {
     param(
@@ -415,11 +522,11 @@ function Get-GitHubPR
         }
 }
 
-function Get-GitHubIssue
+filter Get-GitHubIssue
 {
     [CmdletBinding(DefaultParameterSetName='IssueInfo')]
     param(
-        [Parameter(Mandatory, Position=0, ParameterSetName='IssueInfo')]
+        [Parameter(Mandatory, ValueFromPipeline, Position=0, ParameterSetName='IssueInfo')]
         [GitHubIssueInfo]
         $IssueInfo,
 
@@ -572,4 +679,139 @@ function Publish-GitHubRelease
     return $response
 }
 
-Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR,Get-GitHubPR,Get-GitHubIssue,Publish-GitHubRelease
+filter New-ChangelogItem
+{
+    param(
+        [Parameter(Mandatory, ValueFromPipeline, Position=0)]
+        [GitHubCommitInfo[]]
+        $Commit,
+
+        [Parameter(Mandatory)]
+        [string]
+        $GitHubToken
+    )
+
+    foreach ($singleCommit in $Commit)
+    {
+        $changelogItem = [ChangelogItem]@{
+            Commit = $singleCommit
+            BodyText = $singleCommit.Body
+            Labels = $singleCommit.CommitLabels
+        }
+
+        if ($Commit.PRNumber -ge 0)
+        {
+            $getPrParams = @{
+                Organization = $singleCommit.Organization
+                Repository = $singleCommit.Repository
+                PullNumber = $singleCommit.PRNumber
+                GitHubToken = $GitHubToken
+            }
+            $pr = Get-GitHubPR @getPrParams
+
+            $changelogItem.PR = $pr
+            $changelogItem.PRNumber = $pr.Number
+
+            $closedIssueInfos = $pr.GetClosedIssueInfos()
+            if ($closedIssueInfos)
+            {
+                $changelogItem.ClosedIssues = $closedIssueInfos | Get-GitHubIssue
+                $changelogItem.IssueNumber = $closedIssueInfos[0].Number
+                $changelogItem.Labels += ($closedIssueInfos | ForEach-Object { $_.Labels })
+            }
+        }
+
+        $changelogItem
+    }
+}
+
+function New-ChangelogSection
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $ReleaseName,
+
+        [Parameter(Mandatory)]
+        [string]
+        $RepositoryUrl,
+
+        [Parameter(ValueFromPipeline)]
+        [ChangelogItem[]]
+        $ChangelogItem,
+
+        [Parameter()]
+        [string]
+        $DateFormat = 'dddd, dd MMMM yyyy',
+
+        [Parameter()]
+        [datetime]
+        $Date = ([datetime]::Now)
+    )
+
+    begin
+    {
+        $repoDetails = GetHumanishRepositoryDetails -RemoteUrl $RepositoryUrl
+        $repository = $repoDetails.Repository
+        $organization = $repoDetails.Organization
+
+        $clBuilder = [System.Text.StringBuilder]::new()
+        $null = $clBuilder.Append("##$ReleaseName`n")
+        $null = $clBuilder.Append("###$($Date.ToString($DateFormat))`n")
+        $null = $clBuilder.Append("####[$repository]($RepositoryUrl)`n`n")
+    }
+
+    process
+    {
+        foreach ($clItem in $ChangelogItem)
+        {
+            if ($clItem.Labels -contains 'ignore')
+            {
+                continue
+            }
+
+            if (-not $clItem.BodyText)
+            {
+                continue
+            }
+
+            if ($clItem.IssueNumber -gt 0)
+            {
+                $issueNumber = $clItem.IssueNumber
+            }
+            elseif ($clItem.PRNumber -gt 0)
+            {
+                $issueNumber = $clItem.PRNumber
+            }
+
+            if ($issueNumber)
+            {
+                $itemHeader = "$repository #$issueNumber"
+            }
+            else
+            {
+                $itemHeader = "$repository"
+            }
+
+            $itemLink = "https://github.com/$organization/$repository"
+            if ($clItem.PRNumber -ge 0)
+            {
+                $prNum = $clItem.PRNumber
+                $itemLink += "/pull/$prNum"
+            }
+
+            $indentedBody = ($clItem.BodyText.Split("`n") | Where-Object { $_ } | ForEach-Object { "  $_" }) -join "`n"
+
+            $itemText = "- [$itemHeader]($itemLink) -`n$indentedBody`n"
+
+            $null = $clBuilder.Append($itemText)
+        }
+    }
+
+    end
+    {
+        return $clBuilder.Append("`n").ToString()
+    }
+}
+
+Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR,Get-GitHubPR,Get-GitHubIssue,Publish-GitHubRelease,New-ChangelogItem,New-ChangelogSection
