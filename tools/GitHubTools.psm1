@@ -17,6 +17,7 @@ class GitHubCommitInfo : GitCommitInfo
 {
     [string]$Organization
     [string]$Repository
+    [pscustomobject]$GitHubCommitData
 }
 
 class GitHubIssueInfo
@@ -58,17 +59,6 @@ class GitHubPR : GitHubIssue
 
         return $this.ClosedIssues
     }
-}
-
-class ChangelogItem
-{
-    [GitHubCommitInfo]$Commit
-    [GitHubPR]$PR
-    [GitHubIssue[]]$ClosedIssues
-    [string[]]$Labels
-    [int]$IssueNumber = -1
-    [int]$PRNumber = -1
-    [string]$BodyText
 }
 
 $script:CloseKeywords = @(
@@ -379,6 +369,8 @@ function Get-GitCommit
     }
 
     $originDetails = GetHumanishRepositoryDetails -RemoteUrl (Exec { git remote get-url $Remote })
+    $organization = $originDetails.Organization
+    $repository = $originDetails.Repository
 
     $format = '%H||%P||%aN||%aE||%s'
     $commits = Exec { git --no-pager log "$SinceRef..$UntilRef" --format=$format }
@@ -394,9 +386,12 @@ function Get-GitCommit
                ContributorEmail = $email
                Subject = $subject
                Body = $body
-               Organization = $originDetails.Organization
-               Repository = $originDetails.Repository
+               Organization = $organization
+               Repository = $repository
             }
+
+            # Query the GitHub API for more commit information
+            $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash"
 
             # Look for something like 'This is a commit message (#1224)'
             $pr = [regex]::Match($subject, '\(#(\d+)\)$').Groups[1].Value
