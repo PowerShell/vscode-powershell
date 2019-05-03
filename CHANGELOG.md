@@ -1,5 +1,238 @@
 # vscode-powershell Release History
 
+## v2.0.0-preview.3
+### Wednesday, April 10, 2019
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [vscode-PowerShell #1865](https://github.com/PowerShell/vscode-powershell/pull/1867) -
+  Change casing of `powershell.codeformatting` settings for consistency:
+    - `powershell.codeformatting.WhitespaceInsideBrace` is now `powershell.codeformatting.whitespaceInsideBrace`
+    - `powershell.codeformatting.WhitespaceAroundPipe` is now `powershell.codeformatting.whitespaceAroundPipe`
+- [vscode-PowerShell #1852](https://github.com/PowerShell/vscode-PowerShell/pull/1852) -
+  Turn `powershell.codeformatting.useCorrectCasing` setting off by default until PSSA issues are fixed (Thanks @bergmeister!)
+- [vscode-PowerShell #1838](https://github.com/PowerShell/vscode-PowerShell/pull/1838) -
+  Set PSReadLine featureFlag default to null so that it can be resolved by settings
+- [vscode-PowerShell #1837](https://github.com/PowerShell/vscode-PowerShell/pull/1837) -
+  Do not use -EncodedCommand on Windows
+- [vscode-PowerShell #1825](https://github.com/PowerShell/vscode-PowerShell/pull/1825) -
+  Switch to current lowercase names for powershell and mdlint recommended extensions (Thanks @rkeithhill!)
+- [vscode-PowerShell #1823](https://github.com/PowerShell/vscode-PowerShell/pull/1823) -
+  Update to official TSLint ext in extensions.json, old version deprecated (Thanks @rkeithhill!)
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #902](https://github.com/PowerShell/PowerShellEditorServices/pull/902) -
+  Improve path auto-completion (Thanks @rkeithhill!)
+- [PowerShellEditorServices #910](https://github.com/PowerShell/PowerShellEditorServices/pull/910) -
+  Fix UseCorrectCasing to be actually configurable via `powershell.codeFormatting.useCorrectCasing` (Thanks @bergmeister!)
+- [PowerShellEditorServices #909](https://github.com/PowerShell/PowerShellEditorServices/pull/909) -
+  Use global.json to pin .Net Core SDK version and update it from 2.1.402 to 2.1.602 (Thanks @bergmeister!)
+- [PowerShellEditorServices #903](https://github.com/PowerShell/PowerShellEditorServices/pull/903) -
+  Move temp folder into repo to avoid state that causes build errors from time to time when rebuilding locally (and packages have updated) (Thanks @bergmeister!)
+
+## v2.0.0-preview.2
+### Friday, March 29, 2019
+
+### Highlights
+
+* `Write-Progress` work in the integrated console ⏰
+* Support for [PSScriptAnalyzer 1.18](https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.18.0) 📝
+* The ability to debug any runspace in any process 🔎
+* PSReadLine enabled by default on Windows 🎨
+* (Bug fix!) You can open untitled workspaces/folders again! 🐛☠️
+
+There are a lot more goodies in this version. Checkout the changelog below!
+
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [vscode-PowerShell #1794](https://github.com/PowerShell/vscode-PowerShell/pull/1794) -
+  Make PSReadLine default on Windows
+- [vscode-PowerShell #1736](https://github.com/PowerShell/vscode-PowerShell/pull/1736) -
+  Enable attach to process on Linux and macOS
+- [vscode-PowerShell #1729](https://github.com/PowerShell/vscode-PowerShell/pull/1729) -
+  Handle Pester Describe block strings with single quotes inside it (Thanks @bergmeister!)
+- [vscode-PowerShell #1741](https://github.com/PowerShell/vscode-PowerShell/pull/1741) -
+  Update build to clear node modules directory (Thanks @corbob!)
+- [vscode-PowerShell #1743](https://github.com/PowerShell/vscode-PowerShell/pull/1743) -
+  Fix right-click help lookup not always working (Thanks @corbob!)
+- [vscode-PowerShell #1746](https://github.com/PowerShell/vscode-PowerShell/pull/1746) -
+  Add label property to debug config, change pkg name to lowercase (Thanks @rkeithhill!)
+- [vscode-PowerShell #1749](https://github.com/PowerShell/vscode-PowerShell/pull/1749) -
+  Add the Install-VSCode.ps1 script to signing
+- [vscode-PowerShell #1747](https://github.com/PowerShell/vscode-PowerShell/pull/1747) -
+  Modify `powerShellDefaultVersion` description to make clearer  (Thanks @rkeithhill!)
+- [vscode-PowerShell #1755](https://github.com/PowerShell/vscode-PowerShell/pull/1755) -
+  Speed up Travis builds by skipping the .NET Core initialization  (Thanks @bergmeister!)
+- [vscode-PowerShell #1773](https://github.com/PowerShell/vscode-PowerShell/pull/1773) -
+  Change debugger type field back to `PowerShell` from `powershell`  (Thanks @rkeithhill!)
+- [vscode-PowerShell #1757](https://github.com/PowerShell/vscode-PowerShell/pull/1757) -
+  Match Install-VSCode.ps1 script url with the one from master branch (Thanks @rafaltra!)
+- [vscode-PowerShell #1774](https://github.com/PowerShell/vscode-PowerShell/pull/1774) -
+  Switch to `EncodedCommand` for script execution
+- [vscode-PowerShell #1764](https://github.com/PowerShell/vscode-PowerShell/pull/1764) -
+  Added Pester, ShouldProcess and Calculated Property PS Snippets (Thanks @brettmillerb!)
+- [vscode-PowerShell #1776](https://github.com/PowerShell/vscode-PowerShell/pull/1776) -
+  Migrate Pester version detection into an InovkePester stub script (Thanks @rkeithhill!)
+- [vscode-PowerShell #1781](https://github.com/PowerShell/vscode-PowerShell/pull/1781) -
+  Fix initial launch config casing
+- [vscode-PowerShell #1775](https://github.com/PowerShell/vscode-PowerShell/pull/1775) -
+  Support `-CustomPipeName`, allowing configuration of custom namedpipes for LSP transport
+- [vscode-PowerShell #1787](https://github.com/PowerShell/vscode-PowerShell/pull/1787) -
+  Added SQL PowerShell Examples (Thanks @SQLvariant!)
+- [vscode-PowerShell #1782](https://github.com/PowerShell/vscode-PowerShell/pull/1782) -
+  Add Debug Runspace command (Thanks @adamdriscoll!)
+- [vscode-PowerShell #1800](https://github.com/PowerShell/vscode-PowerShell/pull/1800) -
+  Include current runspace and runspace ID 1 in the PSHostProcess picker dialog
+- [vscode-PowerShell #1687](https://github.com/PowerShell/vscode-PowerShell/pull/1687) -
+  Add new `powershell.useCorrectCasingsettings` for new rule in PSSA 1.18: PSUseCorrectCasing (Thanks @bergmeister!)
+- [vscode-PowerShell #1668](https://github.com/PowerShell/vscode-PowerShell/pull/1668) -
+  Add new `powershell.codeFormatting` settings for new options in PSSA 1.18: WhitespaceInsideBrace and WhitespaceAroundPipe (Thanks @bergmeister!)
+- [vscode-PowerShell #1669](https://github.com/PowerShell/vscode-PowerShell/pull/1669) -
+  Add new `powershell.codeFormatting` settings for new options in PSSA 1.18: PipelineIndentationStyle (Thanks @bergmeister!)
+- [vscode-PowerShell #1738](https://github.com/PowerShell/vscode-PowerShell/pull/1738) -
+  Set CommandExplorer exclusion filter to be empty array by default (Thanks @adilio!)
+- [vscode-PowerShell #1686](https://github.com/PowerShell/vscode-PowerShell/pull/1686) -
+  Add an exclusion filter to the Command Explorer (Thanks @corbob!)
+- [vscode-PowerShell #1816](https://github.com/PowerShell/vscode-PowerShell/pull/1816) -
+  Workaround PSSA #1187 by defaulting to NoIndentation
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #895](https://github.com/PowerShell/PowerShellEditorServices/pull/895) -
+  Add warning to parameter validation set  (Thanks @Benny1007!)
+- [PowerShellEditorServices #897](https://github.com/PowerShell/PowerShellEditorServices/pull/897) -
+  Clean up and pop dead runspaces when using 'attach' debugging
+- [PowerShellEditorServices #888](https://github.com/PowerShell/PowerShellEditorServices/pull/888) -
+  Add new ParseError level to ScriptFileMarkerLevel and filter out PSSA parse errors
+- [PowerShellEditorServices #858](https://github.com/PowerShell/PowerShellEditorServices/pull/858) -
+  Fix XUnit warnings that better assertion operators should be used. (Thanks @bergmeister!)
+- [PowerShellEditorServices #854](https://github.com/PowerShell/PowerShellEditorServices/pull/854) -
+  Reinstate test filtering (Thanks @glennsarti!)
+- [PowerShellEditorServices #866](https://github.com/PowerShell/PowerShellEditorServices/pull/866) -
+  Catch NotSupportedException which can be thrown by FileStream constructor (Thanks @rkeithhill!)
+- [PowerShellEditorServices #868](https://github.com/PowerShell/PowerShellEditorServices/pull/868) -
+  Speed up Travis builds by skipping the .NET Core initialization (Thanks @bergmeister!)
+- [PowerShellEditorServices #869](https://github.com/PowerShell/PowerShellEditorServices/pull/869) -
+  Added `AsNewFile` switch to Out-CurrentFile (Thanks @dfinke!)
+- [PowerShellEditorServices #873](https://github.com/PowerShell/PowerShellEditorServices/pull/873) -
+  Return the start line number for Describe block (Thanks @rkeithhill!)
+- [PowerShellEditorServices #876](https://github.com/PowerShell/PowerShellEditorServices/pull/876) -
+  Temporarily disable deemphasized stack frames to fix VSCode issue 1750 (Thanks @rkeithhill!)
+- [PowerShellEditorServices #871](https://github.com/PowerShell/PowerShellEditorServices/pull/871) -
+  Support -CustomPipeName, allowing configuration of custom namedpipes for LSP transport
+- [PowerShellEditorServices #872](https://github.com/PowerShell/PowerShellEditorServices/pull/872) -
+  Fix unable to open files in problems/peek windows issue (Thanks @rkeithhill!)
+- [PowerShellEditorServices #875](https://github.com/PowerShell/PowerShellEditorServices/pull/875) -
+  Add attach to local runspace. (Thanks @adamdriscoll!)
+- [PowerShellEditorServices #881](https://github.com/PowerShell/PowerShellEditorServices/pull/881) -
+  Use `NamedPipeConnectionInfo` to connect to remote runspaces instead of Enter-PSHostProcess
+- [PowerShellEditorServices #845](https://github.com/PowerShell/PowerShellEditorServices/pull/845) -
+  Enable UseCorrectCasing as a default rule (Thanks @bergmeister!)
+- [PowerShellEditorServices #835](https://github.com/PowerShell/PowerShellEditorServices/pull/835) -
+  Map new `powershell.codeformatting` settings WhitespaceInsideBrace and WhitespaceAroundPipe to PSSA settings hashtable (Thanks @bergmeister!)
+- [PowerShellEditorServices #836](https://github.com/PowerShell/PowerShellEditorServices/pull/836) -
+  Add PipelineIndentationStyle configuration mapping (Thanks @bergmeister!)
+- [PowerShellEditorServices #887](https://github.com/PowerShell/PowerShellEditorServices/pull/887) -
+  Cherry pick PR 1750 merge commit to legacy/v1.x, has additional fixes (Thanks @rkeithhill!)
+- [PowerShellEditorServices #874](https://github.com/PowerShell/PowerShellEditorServices/pull/874) -
+  Use public `InternalHost` from origin runspace (Thanks @SeeminglyScience!)
+- [PowerShellEditorServices #889](https://github.com/PowerShell/PowerShellEditorServices/pull/889) -
+  Enhance Get-PsesRpcNotificationMessage/MessageResponseTimes to allow filtering by message name (Thanks @rkeithhill!)
+- [PowerShellEditorServices #859](https://github.com/PowerShell/PowerShellEditorServices/pull/859) -
+  Upgrade PowerShellStandard.Library, PowerShell.SDK, NET.Test.SDK and Serilog NuGet packages to latest released version and enable AppVeyor build on any branch (Thanks @bergmeister!)
+- [PowerShellEditorServices #862](https://github.com/PowerShell/PowerShellEditorServices/pull/862) -
+  Handle arbitrary exceptions when recursing workspace
+
+## v2.0.0-preview.1
+### Wednesday, January 23, 2019
+
+#### Preview builds of the PowerShell extension are now available in VSCode
+
+We are excited to announce the PowerShell Preview extension in the VSCode marketplace!
+The PowerShell Preview extension allows users on Windows PowerShell 5.1 and PowerShell Core 6 to get and test the latest updates
+to the PowerShell extension and comes with some exciting features.
+
+The PowerShell Preview extension is a substitute for the PowerShell extension so
+both the PowerShell extension and the PowerShell Preview extension should not be enabled at the same time.
+
+By having a preview channel, in addition to our existing stable channel, we can get new features out faster and get feedback faster from you, the users.
+
+##### How to Get/Use the PowerShell Preview extension
+
+If you dont already have VSCode, start [here](https://code.visualstudio.com/Docs/setup/setup-overview).
+
+Once you have VSCode open, click `Clt+Shift+X` to open the extensions marketplace.
+Next, type `PowerShell Preview` in the search bar.
+Click `Install` on the `PowerShell Preview` page.
+Finally, click `Reload` in order to refresh VSCode.
+
+If you already have the PowerShell extension, please disable it to use the Powershell Preview extension.
+To disable the PowerShell extension, find it in the Extensions sidebar view, specifically under the list of Enabled extensions,
+Right-click on the PowerShell extension and select `Disable`.
+Please note that it is important to only have either the PowerShell extension or the PowerShell Preview extension enabled at one time.
+![How to Disable](https://github.com/PowerShell/powershell.github.io/blob/master/PowerShell-Blog/Images/disable-extension.jpg)
+
+#### What the first preview contains
+
+The v2.0.0-preview.1 version of the extension is built on .NET Standard
+(enabling support for both Windows PowerShell and PowerShell Core from one assembly)
+
+It also contains PSReadLine support in the integrated console for Windows behind a feature flag.
+PSReadLine provides a consistent and rich interactive experience,
+including syntax coloring and multi-line editing and history, in the PowerShell console, in Cloud Shell,
+and now in VSCode terminal. For more information on the benefits of PSReadLine,
+check out their [documentation](https://docs.microsoft.com/en-us/powershell/module/psreadline/about/about_psreadline?view=powershell-6).
+
+To enable PSReadLine support in the Preview version on Windows, please add the following to your user settings:
+
+```
+"powershell.developer.featureFlags": [ "PSReadLine" ]
+```
+
+HUGE thanks to @SeeminglyScience for all his amazing work getting PSReadLine working in PowerShell Editor Services!
+
+#### Breaking Changes
+
+As stated above, this version of the PowerShell extension only works with Windows PowerShell versions 5.1 and PowerShell Core 6.
+
+#### [vscode-powershell](https://github.com/powershell/vscode-powershell)
+
+- [vscode-PowerShell #1587](https://github.com/PowerShell/vscode-PowerShell/pull/1587) -
+  Removed ShowOnlineHelp Command (Thanks @corbob!)
+
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #792](https://github.com/PowerShell/PowerShellEditorServices/pull/792) -
+  Add Async suffix to async methods (Thanks @dee-see!)
+- [PowerShellEditorServices #775](https://github.com/PowerShell/PowerShellEditorServices/pull/775) -
+  Removed ShowOnlineHelp Message (Thanks @corbob!)
+- [PowerShellEditorServices #769](https://github.com/PowerShell/PowerShellEditorServices/pull/769) -
+  Set Runspaces to use STA when running in Windows PowerShell
+- [PowerShellEditorServices #741](https://github.com/PowerShell/PowerShellEditorServices/pull/741) -
+  Migrate to netstandard2.0 and PSStandard
+- [PowerShellEditorServices #672](https://github.com/PowerShell/PowerShellEditorServices/pull/672) -
+  PSReadLine integration (Thanks @SeeminglyScience!)
+
+## v1.10.2
+### Tuesday, December 18, 2018
+
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- [vscode-PowerShell #1632](https://github.com/PowerShell/vscode-powershell/pull/1632) -
+  Started [a document for ISE-like configuration of VSCode](https://github.com/PowerShell/vscode-powershell/blob/master/docs/ise_compatibility.md).
+  Please help us build it out by [contirbuting an edit](https://github.com/PowerShell/vscode-powershell/edit/master/docs/ise_compatibility.md).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #811](https://github.com/PowerShell/PowerShellEditorServices/pull/805) -
+  Fix token-based folding (thanks @glennsarti!)
+- [PowerShellEditorServices #823](https://github.com/PowerShell/PowerShellEditorServices/pull/823) -
+  Fix case-sensitivity of Pester CodeLens (thanks @bergmeister!)
+- [PowerShellEditorServices #815](https://github.com/PowerShell/PowerShellEditorServices/pull/815) -
+  Fix crash when untitled files opened as PowerShell
+- [PowerShellEditorServices #826](https://github.com/PowerShell/PowerShellEditorServices/pull/826) -
+  Fix crash when duplicate references are present in the same file
+
 ## v1.10.1
 ### Friday, December 7, 2018
 

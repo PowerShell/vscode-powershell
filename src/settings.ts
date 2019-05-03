@@ -14,6 +14,12 @@ enum CodeFormattingPreset {
     Stroustrup,
 }
 
+enum PipelineIndentationStyle {
+    IncreaseIndentationForFirstPipeline,
+    IncreaseIndentationAfterEveryPipeline,
+    NoIndentation,
+}
+
 export enum HelpCompletion {
     Disabled = "Disabled",
     BlockComment = "BlockComment",
@@ -45,12 +51,16 @@ export interface ICodeFormattingSettings {
     openBraceOnSameLine: boolean;
     newLineAfterOpenBrace: boolean;
     newLineAfterCloseBrace: boolean;
+    pipelineIndentationStyle: PipelineIndentationStyle;
     whitespaceBeforeOpenBrace: boolean;
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
+    whitespaceInsideBrace: true;
+    whitespaceAroundPipe: true;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
+    useCorrectCasing: boolean;
 }
 
 export interface IScriptAnalysisSettings {
@@ -113,8 +123,14 @@ export function load(): ISettings {
         createTemporaryIntegratedConsole: false,
     };
 
+    // TODO: Remove when PSReadLine is out of preview
+    const featureFlags = [];
+    if (utils.isWindowsOS()) {
+        featureFlags.push("PSReadLine");
+    }
+
     const defaultDeveloperSettings: IDeveloperSettings = {
-        featureFlags: [],
+        featureFlags,
         powerShellExePath: undefined,
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
@@ -132,12 +148,16 @@ export function load(): ISettings {
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
         newLineAfterCloseBrace: true,
+        pipelineIndentationStyle: PipelineIndentationStyle.NoIndentation,
         whitespaceBeforeOpenBrace: true,
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
+        whitespaceInsideBrace: true,
+        whitespaceAroundPipe: true,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
+        useCorrectCasing: false,
     };
 
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
@@ -181,12 +201,12 @@ export function load(): ISettings {
     };
 }
 
-export function change(settingName: string, newValue: any, global: boolean = false): Thenable<void> {
+export async function change(settingName: string, newValue: any, global: boolean = false): Promise<void> {
     const configuration: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration(
             utils.PowerShellLanguageId);
 
-    return configuration.update(settingName, newValue, global);
+    await configuration.update(settingName, newValue, global);
 }
 
 function getWorkspaceSettingsWithDefaults<TSettings>(

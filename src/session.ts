@@ -10,6 +10,7 @@ import os = require("os");
 import path = require("path");
 import { StringDecoder } from "string_decoder";
 import vscode = require("vscode");
+import TelemetryReporter from "vscode-extension-telemetry";
 import { Message } from "vscode-jsonrpc";
 import { IFeature } from "./feature";
 import { Logger } from "./logging";
@@ -36,10 +37,9 @@ export enum SessionStatus {
 }
 
 export class SessionManager implements Middleware {
+    public HostVersion: string;
 
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
-
-    private hostVersion: string;
     private editorServicesArgs: string;
     private powerShellExePath: string = "";
     private sessionStatus: SessionStatus = SessionStatus.NeverStarted;
@@ -56,6 +56,7 @@ export class SessionManager implements Middleware {
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
     private bundledModulesPath: string;
+    private telemetryReporter: TelemetryReporter;
 
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
@@ -66,30 +67,26 @@ export class SessionManager implements Middleware {
     constructor(
         private requiredEditorServicesVersion: string,
         private log: Logger,
-        private documentSelector: DocumentSelector) {
+        private documentSelector: DocumentSelector,
+        private version: string,
+        private reporter: TelemetryReporter) {
 
         this.platformDetails = getPlatformDetails();
-
-        // Get the current version of this extension
-        this.hostVersion =
-            vscode
-                .extensions
-                .getExtension("ms-vscode.PowerShell")
-                .packageJSON
-                .version;
+        this.HostVersion = version;
+        this.telemetryReporter = reporter;
 
         const osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
 
         this.log.write(
             `Visual Studio Code v${vscode.version} ${procBitness}`,
-            `PowerShell Extension v${this.hostVersion}`,
+            `PowerShell Extension v${this.HostVersion}`,
             `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`);
 
         // Fix the host version so that PowerShell can consume it.
         // This is needed when the extension uses a prerelease
         // version string like 0.9.1-insiders-1234.
-        this.hostVersion = this.hostVersion.split("-")[0];
+        this.HostVersion = this.HostVersion.split("-")[0];
 
         this.registerCommands();
     }
@@ -169,7 +166,7 @@ export class SessionManager implements Middleware {
             this.editorServicesArgs =
                 `-HostName 'Visual Studio Code Host' ` +
                 `-HostProfileId 'Microsoft.VSCode' ` +
-                `-HostVersion '${this.hostVersion}' ` +
+                `-HostVersion '${this.HostVersion}' ` +
                 `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
                 `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
                 `-EnableConsoleRepl `;
@@ -418,8 +415,9 @@ export class SessionManager implements Middleware {
         if (!this.suppressRestartPrompt &&
             (settings.useX86Host !== this.sessionSettings.useX86Host ||
              settings.powerShellExePath.toLowerCase() !== this.sessionSettings.powerShellExePath.toLowerCase() ||
-             settings.developer.powerShellExePath.toLowerCase() !==
-                this.sessionSettings.developer.powerShellExePath.toLowerCase() ||
+             (settings.developer.powerShellExePath ? settings.developer.powerShellExePath.toLowerCase() : null) !==
+                (this.sessionSettings.developer.powerShellExePath
+                    ? this.sessionSettings.developer.powerShellExePath.toLowerCase() : null) ||
              settings.developer.editorServicesLogLevel.toLowerCase() !==
                 this.sessionSettings.developer.editorServicesLogLevel.toLowerCase() ||
              settings.developer.bundledModulesPath.toLowerCase() !==
@@ -590,6 +588,12 @@ export class SessionManager implements Middleware {
                         .then(
                             (versionDetails) => {
                                 this.versionDetails = versionDetails;
+
+                                if (!this.inDevelopmentMode) {
+                                    this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
+                                        { powershellVersion: versionDetails.version });
+                                }
+
                                 this.setSessionStatus(
                                     this.versionDetails.architecture === "x86"
                                         ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
@@ -768,7 +772,7 @@ export class SessionManager implements Middleware {
                 .filter((item) => item.exePath.toLowerCase() !== currentExePath)
                 .map((item) => {
                     return new SessionMenuItem(
-                        `Switch to ${item.versionName}`,
+                        `Switch to: ${item.versionName}`,
                         () => { this.changePowerShellExePath(item.exePath); });
                 });
 

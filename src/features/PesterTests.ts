@@ -9,16 +9,37 @@ import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
 
+enum LaunchType {
+    Debug,
+    Run,
+}
+
 export class PesterTestsFeature implements IFeature {
 
     private command: vscode.Disposable;
     private languageClient: LanguageClient;
+    private invokePesterStubScriptPath: string;
 
     constructor(private sessionManager: SessionManager) {
+        this.invokePesterStubScriptPath = path.resolve(__dirname, "../../../InvokePesterStub.ps1");
+
+        // File context-menu command - Run Pester Tests
+        this.command = vscode.commands.registerCommand(
+            "PowerShell.RunPesterTestsFromFile",
+            () => {
+                this.launchAllTestsInActiveEditor(LaunchType.Run);
+            });
+        // File context-menu command - Debug Pester Tests
+        this.command = vscode.commands.registerCommand(
+            "PowerShell.DebugPesterTestsFromFile",
+            () => {
+                this.launchAllTestsInActiveEditor(LaunchType.Debug);
+            });
+        // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTests",
-            (uriString, runInDebugger, describeBlockName?) => {
-                this.launchTests(uriString, runInDebugger, describeBlockName);
+            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?) => {
+                this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber);
             });
     }
 
@@ -30,7 +51,25 @@ export class PesterTestsFeature implements IFeature {
         this.languageClient = languageClient;
     }
 
-    private launchTests(uriString, runInDebugger, describeBlockName?) {
+    private launchAllTestsInActiveEditor(launchType: LaunchType) {
+        const uriString = vscode.window.activeTextEditor.document.uri.toString();
+        const launchConfig = this.createLaunchConfig(uriString, launchType);
+        launchConfig.args.push("-All");
+        this.launch(launchConfig);
+    }
+
+    private async launchTests(
+        uriString: string,
+        runInDebugger: boolean,
+        describeBlockName?: string,
+        describeBlockLineNumber?: number) {
+
+        const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
+        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, describeBlockLineNumber);
+        this.launch(launchConfig);
+    }
+
+    private createLaunchConfig(uriString: string, launchType: LaunchType, testName?: string, lineNum?: number) {
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
@@ -43,15 +82,13 @@ export class PesterTestsFeature implements IFeature {
             request: "launch",
             type: "PowerShell",
             name: "PowerShell Launch Pester Tests",
-            script: "Invoke-Pester",
+            script: this.invokePesterStubScriptPath,
             args: [
-                "-Script",
+                "-ScriptPath",
                 `'${scriptPath}'`,
-                "-PesterOption",
-                "@{IncludeVSCodeMarker=$true}",
             ],
             internalConsoleOptions: "neverOpen",
-            noDebug: !runInDebugger,
+            noDebug: (launchType === LaunchType.Run),
             createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
             cwd:
                 currentDocument.isUntitled
@@ -59,11 +96,23 @@ export class PesterTestsFeature implements IFeature {
                     : path.dirname(currentDocument.fileName),
         };
 
-        if (describeBlockName) {
-            launchConfig.args.push("-TestName");
-            launchConfig.args.push(`'${describeBlockName}'`);
+        if (lineNum) {
+            launchConfig.args.push("-LineNumber", `${lineNum}`);
         }
 
+        if (testName) {
+            // Escape single quotes inside double quotes by doubling them up
+            if (testName.includes("'")) {
+                testName = testName.replace(/'/g, "''");
+            }
+
+            launchConfig.args.push("-TestName", `'${testName}'`);
+        }
+
+        return launchConfig;
+    }
+
+    private launch(launchConfig) {
         // Create or show the interactive console
         // TODO #367: Check if "newSession" mode is configured
         vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);

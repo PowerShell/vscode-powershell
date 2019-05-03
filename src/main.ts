@@ -6,6 +6,7 @@
 
 import path = require("path");
 import vscode = require("vscode");
+import TelemetryReporter from "vscode-extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
 import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
@@ -13,6 +14,7 @@ import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
 import { PickPSHostProcessFeature } from "./features/DebugSession";
+import { PickRunspaceFeature } from "./features/DebugSession";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { DocumentFormatterFeature } from "./features/DocumentFormatter";
 import { ExamplesFeature } from "./features/Examples";
@@ -26,6 +28,7 @@ import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
+import { RunCodeFeature } from "./features/RunCode";
 import { SelectPSSARulesFeature } from "./features/SelectPSSARules";
 import { ShowHelpFeature } from "./features/ShowHelp";
 import { TerminalColorsFeature } from "./features/TerminalColors";
@@ -35,13 +38,21 @@ import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
 import utils = require("./utils");
 
+// The most reliable way to get the name and version of the current extension.
+// tslint:disable-next-line: no-var-requires
+const PackageJSON: any = require("../../package.json");
+
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-const requiredEditorServicesVersion = "1.10.2";
+const requiredEditorServicesVersion = "2.0.0";
+
+// the application insights key (also known as instrumentation key) used for telemetry.
+const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
 let logger: Logger;
 let sessionManager: SessionManager;
 let extensionFeatures: IFeature[] = [];
+let telemetryReporter: TelemetryReporter;
 
 const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "file" },
@@ -49,8 +60,17 @@ const documentSelector: DocumentSelector = [
 ];
 
 export function activate(context: vscode.ExtensionContext): void {
+    // create telemetry reporter on extension activation
+    telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
 
-    checkForUpdatedVersion(context);
+    // If both extensions are enabled, this will cause unexpected behavior since both register the same commands
+    if (PackageJSON.name.toLowerCase() === "powershell-preview"
+        && vscode.extensions.getExtension("ms-vscode.powershell")) {
+        vscode.window.showWarningMessage(
+            "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
+    }
+
+    checkForUpdatedVersion(context, PackageJSON.version);
 
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -115,7 +135,10 @@ export function activate(context: vscode.ExtensionContext): void {
     sessionManager =
         new SessionManager(
             requiredEditorServicesVersion,
-            logger, documentSelector);
+            logger,
+            documentSelector,
+            PackageJSON.version,
+            telemetryReporter);
 
     // Create features
     extensionFeatures = [
@@ -128,6 +151,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
+        new RunCodeFeature(sessionManager),
         new ExtensionCommandsFeature(logger),
         new SelectPSSARulesFeature(logger),
         new CodeActionsFeature(logger),
@@ -140,6 +164,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new TerminalColorsFeature(),
+        new PickRunspaceFeature()
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
@@ -149,27 +174,20 @@ export function activate(context: vscode.ExtensionContext): void {
     }
 }
 
-function checkForUpdatedVersion(context: vscode.ExtensionContext) {
+function checkForUpdatedVersion(context: vscode.ExtensionContext, version: string) {
 
     const showReleaseNotes = "Show Release Notes";
     const powerShellExtensionVersionKey = "powerShellExtensionVersion";
-
-    const extensionVersion: string =
-        vscode
-            .extensions
-            .getExtension("ms-vscode.PowerShell")
-            .packageJSON
-            .version;
 
     const storedVersion = context.globalState.get(powerShellExtensionVersionKey);
 
     if (!storedVersion) {
         // TODO: Prompt to show User Guide for first-time install
-    } else if (extensionVersion !== storedVersion) {
+    } else if (version !== storedVersion) {
         vscode
             .window
             .showInformationMessage(
-                `The PowerShell extension has been updated to version ${extensionVersion}!`,
+                `The PowerShell extension has been updated to version ${version}!`,
                 showReleaseNotes)
             .then((choice) => {
                 if (choice === showReleaseNotes) {
@@ -182,7 +200,7 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext) {
 
     context.globalState.update(
         powerShellExtensionVersionKey,
-        extensionVersion);
+        version);
 }
 
 export function deactivate(): void {
@@ -196,4 +214,7 @@ export function deactivate(): void {
 
     // Dispose of the logger
     logger.dispose();
+
+    // Dispose of telemetry reporter
+    telemetryReporter.dispose();
 }

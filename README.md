@@ -1,6 +1,12 @@
 # PowerShell Language Support for Visual Studio Code
 
-[![Version](https://vsmarketplacebadge.apphb.com/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) [![windows build](https://img.shields.io/appveyor/ci/PowerShell/vscode-powershell/master.svg?label=windows+build)](https://ci.appveyor.com/project/PowerShell/vscode-powershell) [![linux/macos build](https://img.shields.io/travis/PowerShell/vscode-powershell/master.svg?label=linux/macos+build)](https://travis-ci.org/PowerShell/vscode-powershell) [![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://powershell.visualstudio.com/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=master)](https://powershell.visualstudio.com/vscode-powershell/_build/latest?definitionId=51&branchName=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/df06b9909e7442cebc1132bda0b8c0e3)](https://app.codacy.com/app/TylerLeonhardt/vscode-powershell?utm_source=github.com&utm_medium=referral&utm_content=PowerShell/vscode-powershell&utm_campaign=Badge_Grade_Dashboard)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=PowerShell/vscode-powershell)](https://dependabot.com)
+[![Version](https://vsmarketplacebadge.apphb.com/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
+[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
+[![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/psdiscord)
+[![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
@@ -12,7 +18,7 @@ that Visual Studio Code provides.
 - **Linux** with PowerShell Core (all PowerShell-supported distributions)
 - **macOS and OS X** with PowerShell Core
 
-Read the [installation instructions](https://github.com/PowerShell/PowerShell/blob/master/docs/learning-powershell/using-vscode.md)
+Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
 
 Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for answers to common questions.
@@ -38,10 +44,10 @@ In the Extensions pane, search for "PowerShell" extension and install it there. 
 get notified automatically about any future extension updates!
 
 You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
-[Install from a VSIX](https://code.visualstudio.com/docs/extensions/install-extension#_install-from-a-vsix)
+[Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions.  The easiest way is through the command line:
 
-```
+```powershell
 code --install-extension PowerShell-<version>.vsix
 ```
 
@@ -62,11 +68,11 @@ the `Install-Script` command.
 
 **Alternatively** you can download and execute the script directly from the web
 without the use of `Install-Script`.  However we **highly recommend** that you
-[read the script](https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1)
+[read the script](https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/scripts/Install-VSCode.ps1)
 first before running it in this way!
 
 ```powershell
-iex (iwr https://git.io/vbxjj)
+iex (iwr https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/scripts/Install-VSCode.ps1)
 ```
 
 ## Reporting Problems
@@ -87,8 +93,14 @@ how to use them.
 
 This folder can be found at the following path:
 
+```powershell
+$HOME/.vscode[-insiders]/extensions/ms-vscode.PowerShell-<version>/examples
 ```
-C:\Users\<yourusername>\.vscode\extensions\ms-vscode.PowerShell-<version>\examples
+
+or if you're using the preview version of the extension
+
+ ```powershell
+$HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-preview-<version>/examples
 ```
 
 To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:

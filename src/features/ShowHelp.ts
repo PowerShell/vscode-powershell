@@ -22,7 +22,7 @@ export class ShowHelpFeature implements IFeature {
                     "Unable to instantiate; language client undefined.");
                 return;
             }
-            if (item === undefined) {
+            if (!item || !item.Name) {
 
                 const editor = vscode.window.activeTextEditor;
 
@@ -35,12 +35,6 @@ export class ShowHelpFeature implements IFeature {
             } else {
                 this.languageClient.sendRequest(ShowHelpRequestType, item.Name);
             }
-        });
-
-        this.deprecatedCommand = vscode.commands.registerCommand("PowerShell.OnlineHelp", () => {
-            const warnText = "PowerShell.OnlineHelp is being deprecated. Use PowerShell.ShowHelp instead.";
-            vscode.window.showWarningMessage(warnText);
-            vscode.commands.executeCommand("PowerShell.ShowHelp");
         });
     }
 
