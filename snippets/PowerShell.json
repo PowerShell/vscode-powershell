@@ -1038,6 +1038,24 @@
         ],
         "description": "ArgumentCompleter parameter attribute with script block definition"
     },
+    "ArgumentCompleterAttribute ScriptBlock": {
+        "prefix": "completer-scriptblock",
+        "body": [
+            "{",
+            "\t[OutputType([System.Management.Automation.CompletionResult])]  # zero to many",
+            "\tparam(",
+            "\t\t[string] \\$CommandName,",
+            "\t\t[string] \\$ParameterName,",
+            "\t\t[string] \\$WordToComplete,",
+            "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
+            "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
+            "\t)",
+            "\t",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+        ],
+        "description": "ArgumentCompleter parameter attribute script block definition"
+    },
     "IArgumentCompleter Class": {
         "prefix": "completer-class",
         "body": [
