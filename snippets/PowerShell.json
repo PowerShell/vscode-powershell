@@ -1037,5 +1037,26 @@
             "})]"
         ],
         "description": "ArgumentCompleter parameter attribute with script block definition"
+    },
+    "IArgumentCompleter Class": {
+        "prefix": "completer-class",
+        "body": [
+            "class ${1:ArgumentCompleter} : System.Management.Automation.IArgumentCompleter {",
+            "\t[System.Collections.Generic.IEnumerable[System.Management.Automation.CompletionResult]] CompleteArgument(",
+            "\t\t[string] \\$CommandName,",
+            "\t\t[string] \\$ParameterName,",
+            "\t\t[string] \\$WordToComplete,",
+            "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
+            "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
+            "\t) {",
+            "\t\t\\$CompletionResults = [System.Collections.Generic.List[System.Management.Automation.CompletionResult]]::new()",
+            "\t\t",
+            "\t\t${0:$TM_SELECTED_TEXT}",
+            "\t\t",
+            "\t\treturn \\$CompletionResults",
+            "\t}",
+            "}"
+        ],
+        "description": "IArgumentCompleter implementation class definition"
     }
 }
