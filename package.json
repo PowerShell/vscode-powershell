@@ -467,6 +467,11 @@
                 "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
                 "default": null
               },
+              "runspaceName": {
+                "type": "string",
+                "description": "Optional: The Name of the runspace to debug in the attached process.  Works only on PowerShell 5 and above.",
+                "default": null
+              },
               "customPipeName": {
                 "type": "string",
                 "description": "The custom pipe name of the PowerShell host process to attach to.  Works only on PowerShell 6.2 and above.",
