@@ -504,8 +504,8 @@ export class SessionManager implements Middleware {
                     } else if (sessionDetails.status === "failed") {
                         if (sessionDetails.reason === "unsupported") {
                             this.setSessionFailure(
-                                "PowerShell language features are only supported on PowerShell version 3 and above.  " +
-                                `The current version is ${sessionDetails.powerShellVersion}.`);
+                                "PowerShell language features are only supported on PowerShell version 5.1 and 6.1" +
+                                ` and above. The current version is ${sessionDetails.powerShellVersion}.`);
                         } else if (sessionDetails.reason === "languageMode") {
                             this.setSessionFailure(
                                 "PowerShell language features are disabled due to an unsupported LanguageMode: " +
