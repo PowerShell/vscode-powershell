@@ -466,7 +466,7 @@
         "prefix": "class",
         "body": [
             "class ${1:ClassName} {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Class definition snippet"
@@ -475,7 +475,7 @@
         "prefix": "ctor",
         "body": [
             "${1:ClassName}(${2:OptionalParameters}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Class constructor definition snippet"
@@ -498,7 +498,7 @@
         "prefix": "method",
         "body": [
             "[${1:void}] ${2:MethodName}($${3:OptionalParameters}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Class method definition snippet"
@@ -507,7 +507,7 @@
         "prefix": "enum",
         "body": [
             "enum ${1:EnumName} {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Enum definition snippet"
@@ -522,12 +522,15 @@
             "\t)",
             "\t",
             "\tbegin {",
+            "\t\t",
             "\t}",
             "\t",
             "\tprocess {",
+            "\t\t$TM_SELECTED_TEXT",
             "\t}",
             "\t",
             "\tend {",
+            "\t\t",
             "\t}",
             "}"
         ],
@@ -543,12 +546,15 @@
             "\t)",
             "\t",
             "\tbegin {",
+            "\t\t",
             "\t}",
             "\t",
             "\tprocess {",
+            "\t\t$TM_SELECTED_TEXT",
             "\t}",
             "\t",
             "\tend {",
+            "\t\t",
             "\t}",
             "}"
         ],
@@ -658,7 +664,7 @@
             "\t",
             "\t# Gets the resource's current state.",
             "\t[${ResourceName:NameOfResource}] Get() {",
-            "\t\t$0",
+            "\t\t${0:$TM_SELECTED_TEXT}",
             "\t\treturn \\$this",
             "\t}",
             "\t",
@@ -682,7 +688,7 @@
             "\tparam (",
             "\t)",
             "\t",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}",
             "function Set-TargetResource {",
             "\tparam (",
@@ -701,7 +707,7 @@
         "prefix": "comment",
         "body": [
             "<#",
-            " # $0",
+            " # ${0:$TM_SELECTED_TEXT}",
             " #>"
         ],
         "description": "Comment block snippet"
@@ -710,7 +716,7 @@
         "prefix": "do-until",
         "body": [
             "do {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "} until (${1:condition})"
         ],
         "description": "do-until loop snippet"
@@ -719,7 +725,7 @@
         "prefix": "do-while",
         "body": [
             "do {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "} while (${1:condition})"
         ],
         "description": "do-while loop snippet"
@@ -728,7 +734,7 @@
         "prefix": "while",
         "body": [
             "while (${1:condition}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "while loop snippet"
@@ -737,7 +743,7 @@
         "prefix": "for",
         "body": [
             "for ($${1:i} = 0; $${1:i} -lt $${2:array}.Count; $${1:i}++) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "for loop snippet"
@@ -746,7 +752,7 @@
         "prefix": "forr",
         "body": [
             "for ($${1:i} = $${2:array}.Count - 1; $${1:i} -ge 0 ; $${1:i}--) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "reversed for loop snippet"
@@ -755,7 +761,7 @@
         "prefix": "foreach",
         "body": [
             "foreach ($${1:item} in $${2:collection}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "foreach loop snippet"
@@ -767,7 +773,7 @@
             "\tparam (",
             "\t\t${2:OptionalParameters}",
             "\t)",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Function definition snippet that contains a param block"
@@ -776,7 +782,7 @@
         "prefix": "Function-Inline",
         "body": [
             "function ${1:FunctionName} (${2:OptionalParameters}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other languages"
@@ -785,7 +791,7 @@
         "prefix": "if",
         "body": [
             "if (${1:condition}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "if statement snippet"
@@ -794,7 +800,7 @@
         "prefix": "elseif",
         "body": [
             "elseif (${1:condition}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "elseif statement snippet"
@@ -803,7 +809,7 @@
         "prefix": "else",
         "body": [
             "else {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "else statement snippet"
@@ -812,7 +818,7 @@
         "prefix": "switch",
         "body": [
             "switch (${1:\\$x}) {",
-            "\t${2:condition} { $0 }",
+            "\t${2:condition} { ${0:$TM_SELECTED_TEXT} }",
             "\tDefault {}",
             "}"
         ],
@@ -822,7 +828,7 @@
         "prefix": "try",
         "body": [
             "try {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}",
             "catch {",
             "\t",
@@ -834,7 +840,7 @@
         "prefix": "trycf",
         "body": [
             "try {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}",
             "catch {",
             "\t",
@@ -849,7 +855,7 @@
         "prefix": "tryf",
         "body": [
             "try {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}",
             "finally {",
             "\t",
@@ -864,7 +870,7 @@
             "\tparam (",
             "\t)",
             "",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "workflow snippet"
@@ -873,7 +879,7 @@
         "prefix": "workflow foreach-parallel",
         "body": [
             "foreach -parallel ($${variable:item} in $${collection:collection}) {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "foreach-parallel snippet (for use inside a workflow)"
@@ -882,7 +888,7 @@
         "prefix": "workflow inlinescript",
         "body": [
             "inlineScript {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "inlinescript snippet (for use inside a workflow)"
@@ -891,7 +897,7 @@
         "prefix": "workflow parallel",
         "body": [
             "parallel {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "parallel snippet (for use inside a workflow)"
@@ -900,7 +906,7 @@
         "prefix": "workflow sequence",
         "body": [
             "sequence {",
-            "\t$0",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "sequence snippet (for use inside a workflow)"
@@ -948,7 +954,7 @@
         "prefix": "#region",
         "body": [
             "#region ${1}",
-            "$0",
+            "${0:$TM_SELECTED_TEXT}",
             "#endregion"
         ],
         "description": "Region Block for organizing and folding of your code"
@@ -957,7 +963,7 @@
         "prefix": "IfShouldProcess",
         "body": [
             "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
-                "\t$0",
+                "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Creates ShouldProcess block"
@@ -965,7 +971,7 @@
     "CalculatedProperty": {
         "prefix": "Calculated-Property",
         "body": [
-            "@{name='${1:PropertyName}';expression={${2:\\$_.PropertyValue}}}$0"
+            "@{name='${1:PropertyName}';expression={${2:${TM_SELECTED_TEXT:\\$_.PropertyValue}}}}$0"
         ],
         "description": "Creates a Calculated Property typically used with Select-Object."
     },
@@ -975,7 +981,7 @@
             "Describe \"${1:DescribeName}\" {",
                 "\tContext \"${2:ContextName}\" {",
                     "\t\tIt \"${3:ItName}\" {",
-                        "\t\t\t${4:Assertion}",
+                        "\t\t\t${4:${TM_SELECTED_TEXT:Assertion}}",
                     "\t\t}$0",
                 "\t}",
             "}"
@@ -986,7 +992,7 @@
         "prefix": "Describe-Pester",
         "body": [
             "Describe \"${1:DescribeName}\" {",
-                "\t$0",
+                "\t${0:TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Pester Describe block"
@@ -996,7 +1002,7 @@
         "body": [
             "Context \"${1:ContextName}\" {",
                 "\tIt \"${2:ItName}\" {",
-                    "\t\t${3:Assertion}",
+                    "\t\t${3:${TM_SELECTED_TEXT:Assertion}}",
                 "\t}$0",
             "}"
         ],
@@ -1006,7 +1012,7 @@
         "prefix": "Context-Pester",
         "body": [
             "Context \"${1:ContextName}\" {",
-                "\t$0",
+                "\t${0:$TM_SELECTED_TEXT}",
             "}"
         ],
         "description": "Pester - Context block"
@@ -1015,7 +1021,7 @@
         "prefix": "It-Pester",
         "body": [
             "It \"${1:ItName}\" {",
-                "\t${2:Assertion}",
+                "\t${2:${TM_SELECTED_TEXT:Assertion}}",
             "}$0"
         ],
         "description": "Pester - It block"
