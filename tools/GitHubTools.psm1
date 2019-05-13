@@ -314,11 +314,6 @@ function Publish-GitHubRelease
                 $contentType = 'application/json'
                 break
             }
-
-            default
-            {
-                $contentType = 'text/plain'
-            }
         }
 
         $assetUri = "${assetBaseUri}?name=$fileName"
