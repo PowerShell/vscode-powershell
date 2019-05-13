@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#requires -Version 6.0
+
 [CmdletBinding(DefaultParameterSetName='Increment')]
 param(
     [Parameter(ParameterSetName='Increment')]
