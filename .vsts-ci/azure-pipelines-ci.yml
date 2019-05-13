@@ -38,15 +38,6 @@ jobs:
     vmImage: 'VS2017-Win2016'
   steps:
   - template: templates/ci-general.yml
-  # Note, this task should only be run once and on Windows only.
-  - task: RichCodeNavIndexer@0
-    continueOnError: true
-    inputs:
-      serviceConnection: 'rich-nav'
-      nugetServiceConnection: 'rich-nav-nuget'
-      githubServiceConnection: 'PowerShell'
-      languages: 'typescript,csharp'
-      serviceEndpoint: 'https://prod.richnav.vsengsaas.visualstudio.com'
 
 - job: macOS
   pool:
