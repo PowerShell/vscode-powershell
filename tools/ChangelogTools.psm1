@@ -1,15 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-using module ./GitHubTools.psm1
+#requires -Version 6.0
 
-$script:NoThanks = @(
-    'rjmholt'
-    'TylerLeonhardt'
-    'daxian-dbw'
-    'SteveL-MSFT'
-    'PaulHigin'
-)
+using module ./GitHubTools.psm1
 
 class ChangelogItem
 {

@@ -1,6 +1,8 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
+#requires -Version 6.0
+
 class GitCommitInfo
 {
     [string]$Hash
@@ -59,6 +61,33 @@ class GitHubPR : GitHubIssue
 
         return $this.ClosedIssues
     }
+}
+
+function GetGitHubHeaders
+{
+    param(
+        [Parameter()]
+        [string]
+        $GitHubToken,
+
+        [Parameter()]
+        [string]
+        $Accept
+    )
+
+    $headers = @{}
+
+    if ($GitHubToken)
+    {
+        $headers.Authorization = "token $GitHubToken"
+    }
+
+    if ($Accept)
+    {
+        $headers.Accept = $Accept
+    }
+
+    return $headers
 }
 
 $script:CloseKeywords = @(
@@ -352,7 +381,11 @@ function Get-GitCommit
 
        [Parameter()]
        [string]
-       $Remote
+       $Remote,
+
+       [Parameter()]
+       [string]
+       $GitHubToken
     )
 
     if (-not $Remote)
@@ -375,6 +408,15 @@ function Get-GitCommit
     $format = '%H||%P||%aN||%aE||%s'
     $commits = Exec { git --no-pager log "$SinceRef..$UntilRef" --format=$format }
 
+    $irmParams = if ($GitHubToken)
+    {
+        @{ Headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json' }
+    }
+    else
+    {
+        @{ Headers = GetGitHubHeaders -Accept 'application/vnd.github.v3+json' }
+    }
+
     return $commits |
         ForEach-Object {
             $hash,$parents,$name,$email,$subject = $_.Split('||')
@@ -391,7 +433,7 @@ function Get-GitCommit
             }
 
             # Query the GitHub API for more commit information
-            $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash"
+            $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash" @irmParams
 
             # Look for something like 'This is a commit message (#1224)'
             $pr = [regex]::Match($subject, '\(#(\d+)\)$').Groups[1].Value
@@ -461,10 +503,7 @@ function New-GitHubPR
         maintainer_can_modify = $true
     } | ConvertTo-Json
 
-    $headers = @{
-        Accept = 'application/vnd.github.v3+json'
-        Authorization = "token $GitHubToken"
-    }
+    $headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json'
 
     Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
 }
@@ -499,9 +538,7 @@ function Get-GitHubPR
 
             if ($GitHubToken)
             {
-                $params.Headers = @{
-                    Authorization = "token $GitHubToken"
-                }
+                $params.Headers = GetGitHubHeaders -GitHubToken $GitHubToken
             }
 
             $prResponse = Invoke-RestMethod @params
@@ -559,9 +596,7 @@ filter Get-GitHubIssue
 
     if ($GitHubToken)
     {
-        $irmParams.Headers = @{
-            Authorization = "token $GitHubToken"
-        }
+        $irmParams.Headers = GetGitHubHeaders -GitHubToken $GitHubToken
     }
 
     $issueResponse = Invoke-RestMethod @irmParams
@@ -634,10 +669,7 @@ function Publish-GitHubRelease
 
     $restBody = ConvertTo-Json -InputObject $restParams
     $uri = "https://api.github.com/repos/$Organization/$Repository/releases"
-    $headers = @{
-        Accept = 'application/vnd.github.v3+json'
-        Authorization = "token $GitHubToken"
-    }
+    $headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json'
 
     $response = Invoke-RestMethod -Method Post -Uri $uri -Body $restBody -Headers $headers
 
@@ -664,9 +696,7 @@ function Publish-GitHubRelease
         }
 
         $assetUri = "${assetBaseUri}?name=$fileName"
-        $headers = @{
-            Authorization = "token $GitHubToken"
-        }
+        $headers = GetGitHubHeaders -GitHubToken $GitHubToken
         # This can be very slow, but it does work
         $null = Invoke-RestMethod -Method Post -Uri $assetUri -InFile $asset -ContentType $contentType -Headers $headers
     }
