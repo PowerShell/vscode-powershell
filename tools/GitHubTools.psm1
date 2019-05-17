@@ -61,6 +61,16 @@ class GitHubPR : GitHubIssue
 
         return $this.ClosedIssues
     }
+
+    [uri]GetHtmlUri()
+    {
+        return [uri]"https://github.com/$($this.Organization)/$($this.Repository)/pull/$($this.Number)"
+    }
+
+    [uri]GetApiUri()
+    {
+        return [uri]"https://api.github.com/repos/$($this.Organization)/$($this.Repository)/pulls/$($this.Number)"
+    }
 }
 
 function GetGitHubHeaders
@@ -385,72 +395,90 @@ function Get-GitCommit
 
        [Parameter()]
        [string]
-       $GitHubToken
+       $GitHubToken,
+
+       [Parameter()]
+       [string]
+       $RepositoryPath
     )
 
-    if (-not $Remote)
+    if ($RepositoryPath)
     {
-        $Remote = 'upstream'
-        try
+        Push-Location $RepositoryPath
+    }
+    try
+    {
+        if (-not $Remote)
         {
-            $null = Exec { git remote get-url $Remote }
+            $Remote = 'upstream'
+            try
+            {
+                $null = Exec { git remote get-url $Remote }
+            }
+            catch
+            {
+                $Remote = 'origin'
+            }
         }
-        catch
+
+        $originDetails = GetHumanishRepositoryDetails -RemoteUrl (Exec { git remote get-url $Remote })
+        $organization = $originDetails.Organization
+        $repository = $originDetails.Repository
+
+        $format = '%H||%P||%aN||%aE||%s'
+        $commits = Exec { git --no-pager log "$SinceRef..$UntilRef" --format=$format }
+
+        $irmParams = if ($GitHubToken)
         {
-            $Remote = 'origin'
+            @{ Headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json' }
+        }
+        else
+        {
+            @{ Headers = GetGitHubHeaders -Accept 'application/vnd.github.v3+json' }
+        }
+
+        return $commits |
+            ForEach-Object {
+                $hash,$parents,$name,$email,$subject = $_.Split('||')
+                $body = (Exec { git --no-pager show $hash -s --format=%b }) -join "`n"
+                $commitVal = [GitHubCommitInfo]@{
+                Hash = $hash
+                ParentHashes = $parents
+                ContributorName = $name
+                ContributorEmail = $email
+                Subject = $subject
+                Body = $body
+                Organization = $organization
+                Repository = $repository
+                }
+
+                # Query the GitHub API for more commit information
+                $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash" @irmParams
+
+                # Look for something like 'This is a commit message (#1224)'
+                $pr = [regex]::Match($subject, '\(#(\d+)\)$').Groups[1].Value
+                if ($pr)
+                {
+                    $commitVal.PRNumber = $pr
+                }
+
+                # Look for something like '[Ignore] [giraffe] Fix tests'
+                $commitLabels = [regex]::Matches($subject, '^(\[(.*?)\]\s*)*')
+                if ($commitLabels.Groups.Length -ge 3 -and $commitLabels.Groups[2].Captures.Value)
+                {
+                    $commitVal.CommitLabels = $commitLabels.Groups[2].Captures.Value
+                }
+
+                $commitVal
+            }
+    }
+    finally
+    {
+        if ($RepositoryPath)
+        {
+            Pop-Location
         }
     }
-
-    $originDetails = GetHumanishRepositoryDetails -RemoteUrl (Exec { git remote get-url $Remote })
-    $organization = $originDetails.Organization
-    $repository = $originDetails.Repository
-
-    $format = '%H||%P||%aN||%aE||%s'
-    $commits = Exec { git --no-pager log "$SinceRef..$UntilRef" --format=$format }
-
-    $irmParams = if ($GitHubToken)
-    {
-        @{ Headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json' }
-    }
-    else
-    {
-        @{ Headers = GetGitHubHeaders -Accept 'application/vnd.github.v3+json' }
-    }
-
-    return $commits |
-        ForEach-Object {
-            $hash,$parents,$name,$email,$subject = $_.Split('||')
-            $body = (Exec { git --no-pager show $hash -s --format=%b }) -join "`n"
-            $commitVal = [GitHubCommitInfo]@{
-               Hash = $hash
-               ParentHashes = $parents
-               ContributorName = $name
-               ContributorEmail = $email
-               Subject = $subject
-               Body = $body
-               Organization = $organization
-               Repository = $repository
-            }
-
-            # Query the GitHub API for more commit information
-            $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash" @irmParams
-
-            # Look for something like 'This is a commit message (#1224)'
-            $pr = [regex]::Match($subject, '\(#(\d+)\)$').Groups[1].Value
-            if ($pr)
-            {
-                $commitVal.PRNumber = $pr
-            }
-
-            # Look for something like '[Ignore] [giraffe] Fix tests'
-            $commitLabels = [regex]::Matches($subject, '^(\[(.*?)\]\s*)*')
-            if ($commitLabels.Groups.Length -ge 3 -and $commitLabels.Groups[2].Captures.Value)
-            {
-                $commitVal.CommitLabels = $commitLabels.Groups[2].Captures.Value
-            }
-
-            $commitVal
-        }
 }
 
 function New-GitHubPR

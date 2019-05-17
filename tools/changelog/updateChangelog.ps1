@@ -3,13 +3,17 @@
 
 #requires -Version 6.0
 
-using module ../ChangelogTools.psm1
-using module ../GitHubTools.psm1
+using module ..\GitHubTools.psm1
+using module ..\ChangelogTools.psm1
 
 param(
     [Parameter(Mandatory)]
     [string]
     $GitHubToken,
+
+    [Parameter(Mandatory)]
+    [string]
+    $ReleaseName,
 
     [Parameter(Mandatory)]
     [string]
@@ -21,35 +25,80 @@ param(
 
     [Parameter()]
     [string]
-    $RepositoryLocation = (Resolve-Path "$PSScriptRoot/../../")
+    $Organization = 'PowerShell',
+
+    [Parameter()]
+    [string]
+    $Repository = 'vscode-powershell',
+
+    [Parameter()]
+    [string]
+    $TargetFork = $Organization,
+
+    [Parameter()]
+    [string]
+    $FromForm = 'rjmholt',
+
+    [Parameter()]
+    [string]
+    $Preamble = "#### [$Repository](https://github.com/$Organization/$Repository)",
+
+    [Parameter()]
+    [string]
+    $Postamble,
+
+    [Parameter()]
+    [string]
+    $RepositoryPath
 )
 
-class ChangelogEntry
-{
-    [uri]$IssueLink
-    [uri]$PRLink
-    [string]$Category
-    [string[]]$Tags
-    [string]$Text
-    [string]$Thanks
-    [ChangelogItem]$CLItem
-}
+$dateFormat = 'dddd, MMMM dd yyyy'
 
-class ChangeLog
-{
-    ChangeLog()
-    {
-        $this.Sections = [System.Collections.Generic.Dictionary[string, ChangelogEntry]]::new()
+$ignore = @{
+    Users = 'dependabot[bot]'
+    Labels = @{
+        Commit = 'Ignore'
     }
-
-    [string]$ReleaseName
-    [datetime]$Date
-    [string]$Preamble
-    [System.Collections.Generic.Dictionary[string, ChangelogEntry]]$Sections
 }
 
-$script:ChangelogConfig = @{
-    DateFormat = 'dddd, dd MMMM yyyy'
+$categories = [ordered]@{
+    Debugging  = @{
+        Issue = 'Area-Debugging'
+    }
+    CodeLens = @{
+        Issue = 'Area-CodeLens'
+    }
+    'Script Analysis' = @{
+        Issue = 'Area-Script Analysis'
+    }
+    Formatting = @{
+        Issue = 'Area-Formatting'
+    }
+    'Integrated Console' = @{
+        Issue = 'Area-Integrated Console','Area-PSReadLine'
+    }
+    Intellisense = @{
+        Issue = 'Area-Intellisense'
+    }
+    General = @{
+        Issue = 'Area-General'
+    }
+}
+
+$defaultCategory = 'General'
+
+$clEntryParams = @{
+    Organization = $Organization
+    Repository = $Repository
+    EntryCategories = $categories
+    DefaultCategory = @{
+        Name = $defaultCategory
+        Issue = $categories[$defaultCategory].Issue
+    }
+    TagLabels = @{
+        'Issue-Enhancement' = 'Feature'
+        'Issue-Bug' = 'BugFix'
+    }
     NoThanks = @(
         'rjmholt'
         'TylerLeonhardt'
@@ -57,140 +106,44 @@ $script:ChangelogConfig = @{
         'SteveL-MSFT'
         'PaulHigin'
     )
-    Ignore = @{
-        Users = 'dependabot[bot]'
-        Labels = @{
-            Commit = 'Ignore'
-        }
-    }
-    TagLabels = @{
-        'Issue-Enhancement' = 'Feature'
-        'Issue-Bug' = 'BugFix'
-    }
-    ChangeCategories = @{
-        Default = @{
-            Name = 'General'
-            Issue = 'Area-General'
-        }
-        Categories = [ordered]@{
-            Debugging  = @{
-                Issue = 'Area-Debugging'
-            }
-            CodeLens = @{
-                Issue = 'Area-CodeLens'
-            }
-            'Script Analysis' = @{
-                Issue = 'Area-Script Analysis'
-            }
-            Formatting = @{
-                Issue = 'Area-Formatting'
-            }
-            'Integrated Console' = @{
-                Issue = 'Area-Integrated Console','Area-PSReadLine'
-            }
-            'Intellisense' = @{
-                Issue = 'Area-Intellisense'
-            }
-        }
-    }
 }
 
-filter FilterIgnoredCommits
-{
-    param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [ChangelogItem]
-        $CLItem,
-
-        [Parameter]
-        [string[]]
-        $IgnoreUser,
-
-        [Parameter()]
-        [string[]]
-        $IgnoreCommitLabel
-    )
-
-    if ($CLItem.ContributingUser -in $IgnoreUser)
-    {
-        return
-    }
-
-    foreach ($commitLabel in $CLItem.Commit.CommitLabels)
-    {
-        if ($commitLabel -in $IgnoreCommitLabel)
-        {
-            return
-        }
-    }
-
-    return $CLItem
+$clSectionParams = @{
+    Categories = $categories.Keys
+    DefaultCategory = $defaultCategory
+    ReleaseName = $ReleaseName
+    Preamble = $Preamble
+    Postamble = $Postamble
+    DateFormat = $dateFormat
 }
 
-filter AssembleCLEntry
-{
-    param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [ChangelogItem]
-        $CLItem,
+$newChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $RepositoryPath |
+    Get-ChangeInfoFromCommit -GitHubToken $GitHubToken |
+    Skip-IgnoredChanges -IgnoreUser $ignore.Users -IgnoreCommitLabel $ignore.Labels.Commit |
+    New-ChangelogEntry @clEntryParams |
+    New-ChangelogSection @clSectionParams
 
-        [Parameter()]
-        [string]
-        $Organization = 'PowerShell',
+$repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${Repository}_changelogupdate"
+$branchName = "changelog-$ReleaseName"
 
-        [Parameter()]
-        [string]
-        $Repository = 'vscode-powershell'
-    )
-
-    [string[]]$tags = @()
-    :labelLoop foreach ($issueLabel in $CLItem.ClosedIssues.Labels)
-    {
-        if (-not $entryCategory)
-        {
-            foreach ($category in $script:ChangelogConfig.ChangeCategories.Categories.GetEnumerator())
-            {
-                if ($issueLabel -in $category.Value.Issue)
-                {
-                    $entryCategory = $category.Key
-                    continue :labelLoop
-                }
-            }
-        }
-
-        $tag = $script:ChangelogConfig.TagLabels[$issueLabel]
-        if ($tag)
-        {
-            $tags += $tag
-        }
-    }
-
-    if (-not $entryCategory)
-    {
-        $entryCategory = $script:ChangelogConfig.ChangeCategories.Default.Name
-    }
-
-    return [ChangelogEntry]@{
-        IssueLink = if ($CLItem.IssueNumber -ge 0) { "https://github.com/$Organization/$Repository/issues/$($CLItem.IssueNumber)" }
-        PRLink = if ($CLItem.PRNumber -ge 0) { "https://github.com/$Organization/$Repository/$($CLItem.PRNumber)" }
-        Thanks = if ($CLItem.ContributingUser -notin $script:NoThanks) { $CLItem.ContributingUser }
-        Category = $entryCategory
-        Tags = $tags
-        CLItem = $CLItem
-    }
+$cloneParams = @{
+    OriginRemote = "https://github.com/$TargetFork/$Repository"
+    Destination = $repoLocation
+    CheckoutBranch = $branchName
+    Clobber = $true
 }
+Copy-GitRepository @cloneParams
 
-function AssembleCLObject
-{
+#UpdateGalleryFile -ExtensionVersion $ExtensionVersion -GalleryFilePath "$repoLocation/$GalleryFileName"
 
+Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
+
+$prParams = @{
+    Organization = $TargetFork
+    Repository = $Repository
+    Branch = $branchName
+    Title = "Update CHANGELOG for $ReleaseName"
+    GitHubToken = $GitHubToken
+    FromOrg = 'rjmholt'
 }
-
-function BuildChangelog
-{
-
-}
-
-$changeLog = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken |
-    Get-ChangelogItemFromCommit -GitHubToken $GitHubToken |
-    FilterIgnoredCommits -IgnoreUser $ignore.Users -IgnoreCommitLabel $ignore.Labels.Commit |
-    AssembleCLEntry
+New-GitHubPR @prParams
