@@ -5,6 +5,14 @@
 
 using module .\GitHubTools.psm1
 
+class IgnoreConfiguration
+{
+    [string[]]$User
+    [string[]]$IssueLabel
+    [string[]]$PRLabel
+    [string[]]$CommitLabel
+}
+
 class ChangeInfo
 {
     [GitHubCommitInfo]$Commit
@@ -180,25 +188,47 @@ filter Skip-IgnoredChanges
 
         [Parameter()]
         [string[]]
-        $IgnoreUser,
+        $User,
 
         [Parameter()]
         [string[]]
-        $IgnoreCommitLabel
+        $CommitLabel,
+
+        [Parameter()]
+        [string[]]
+        $IssueLabel,
+
+        [Parameter()]
+        [string[]]
+        $PRLabel
     )
 
-    if ($Change.ContributingUser -in $IgnoreUser)
+    if ($Change.ContributingUser -in $User)
     {
         return
     }
 
-    foreach ($commitLabel in $Change.Commit.CommitLabels)
+    foreach ($changeCommitLabel in $Change.Commit.CommitLabels)
     {
-        if ($commitLabel -in $IgnoreCommitLabel)
+        if ($changeCommitLabel -in $CommitLabel)
         {
             return
         }
     }
+
+    foreach ($changeIssueLabel in $Change.Commit.IssueLabels)
+    {
+        if ($changeIssueLabel -in $IssueLabel)
+        {
+            return
+        }
+    }
+
+    foreach ($changePRLabel in $Change.Commit.PRLabels)
+    {
+        if ()
+    }
+
 
     return $Change
 }
@@ -288,19 +318,40 @@ function New-ChangeLogSection
 
             foreach ($item in $category.Value)
             {
-                $project= $item.Change.Commit.Repository
-                $issueNumber = if ($item.Change.IssueNumber -ge 0) { $item.Change.IssueNumber } else { $null }
+                # Set up the pieces needed for a changelog entry
+                $project = $item.Change.Commit.Repository
                 $link = if ($item.PRLink) { $item.PRLink } else { $org = $item.Change.Commit.Organization; "https://github.com/$org/$project" }
                 $thanks = $item.Thanks
 
-                [void]$sb.Append("- [$project")
+                $issueNumber = if ($item.Change.IssueNumber -ge 0)
+                {
+                    $item.Change.IssueNumber
+                }
+                elseif ($item.Change.PRNumber -ge 0)
+                {
+                    $item.Change.PRNumber
+                }
+                else
+                {
+                    $null
+                }
+
+                # Add the list bullet
+                [void]$sb.Append('- ')
+
+                # Start with the tags
+                if ($item.Tags)
+                {
+                    [void]$sb.Append(($item.Tags -join ' ')).Append(' ')
+                }
+
+                # Create a header for the change if there is an issue number
                 if ($issueNumber)
                 {
-                    [void]$sb.Append(" #$issueNumber")
+                    [void]$sb.AppendLine("[$project #$issueNumber]($link) -").Append($Indent)
                 }
-                [void]$sb.AppendLine("]($link) -")
 
-                [void]$sb.Append($Indent).Append($item.Subject)
+                [void]$sb.Append($item.Subject)
                 if ($thanks)
                 {
                     [void]$sb.Append(" (Thanks @$thanks!)")
@@ -311,12 +362,38 @@ function New-ChangeLogSection
 
         if ($Postamble)
         {
-            [void]$sb.AppendLine($Postamble).AppendLine()
+            [void]$sb.AppendLine().AppendLine($Postamble)
         }
+
+        [void]$sb.AppendLine()
 
         return $sb.ToString()
     }
 }
 
+function New-ChangelogRelease
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $GitHubToken,
+
+        [Parameter(Mandatory)]
+        [string]
+        $RepositoryPath,
+
+        [Parameter(Mandatory)]
+        [string]
+        $SinceRef,
+
+        [Parameter()]
+        [string]
+        $UntilRef = 'HEAD',
+
+        [Parameter()]
+        [IgnoreConfiguration]
+        $Ignore
+    )
+}
 
 Export-ModuleMember -Function Get-ChangeInfoFromCommit,New-ChangelogEntry,Skip-IgnoredChanges,New-ChangeLogSection

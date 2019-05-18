@@ -295,18 +295,21 @@ function Copy-GitRepository
     {
         Exec { git config core.autocrlf true }
 
-        foreach ($remote in $Remotes.get_Keys())
+        if ($Remotes)
         {
-            Exec { git remote add $remote $Remotes[$remote] }
-        }
-
-        if ($PullUpstream -and $remote['upstream'])
-        {
-            Exec { git pull upstream $CloneBranch }
-
-            if ($UpdateOrigin)
+            foreach ($remote in $Remotes.get_Keys())
             {
-                Exec { git push origin "+$CloneBranch"}
+                Exec { git remote add $remote $Remotes[$remote] }
+            }
+
+            if ($PullUpstream -and $Remotes['upstream'])
+            {
+                Exec { git pull upstream $CloneBranch }
+
+                if ($UpdateOrigin)
+                {
+                    Exec { git push origin "+$CloneBranch"}
+                }
             }
         }
 

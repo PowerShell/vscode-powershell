@@ -37,7 +37,11 @@ param(
 
     [Parameter()]
     [string]
-    $FromForm = 'rjmholt',
+    $FromFork = 'rjmholt',
+
+    [Parameter()]
+    [string]
+    $ChangelogName = 'CHANGELOG.md',
 
     [Parameter()]
     [string]
@@ -96,8 +100,8 @@ $clEntryParams = @{
         Issue = $categories[$defaultCategory].Issue
     }
     TagLabels = @{
-        'Issue-Enhancement' = 'Feature'
-        'Issue-Bug' = 'BugFix'
+        'Issue-Enhancement' = '✨'
+        'Issue-Bug' = '🐛'
     }
     NoThanks = @(
         'rjmholt'
@@ -106,6 +110,23 @@ $clEntryParams = @{
         'SteveL-MSFT'
         'PaulHigin'
     )
+}
+
+function UpdateChangelogFile
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $NewSection,
+
+        [Parameter(Mandatory)]
+        [string]
+        $Path
+    )
+
+    $changelogLines = Get-Content -Path $Path
+    $newContent = ($changelogLines[0..1] -join "`n`n") + $NewSection + ($changelogLines[2..$changelogLines.Length] -join "`n")
+    Set-Content -Encoding utf8NoBOM -Value $newContent -Path $Path
 }
 
 $clSectionParams = @{
@@ -134,9 +155,9 @@ $cloneParams = @{
 }
 Copy-GitRepository @cloneParams
 
-#UpdateGalleryFile -ExtensionVersion $ExtensionVersion -GalleryFilePath "$repoLocation/$GalleryFileName"
+UpdateChangelogFile -NewSection $newChangelogSection -Path "$repoLocation/$ChangelogName"
 
-Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
+Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName"
 
 $prParams = @{
     Organization = $TargetFork
@@ -144,6 +165,6 @@ $prParams = @{
     Branch = $branchName
     Title = "Update CHANGELOG for $ReleaseName"
     GitHubToken = $GitHubToken
-    FromOrg = 'rjmholt'
+    FromOrg = $FromFork
 }
 New-GitHubPR @prParams
