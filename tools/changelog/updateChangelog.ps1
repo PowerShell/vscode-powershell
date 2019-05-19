@@ -29,10 +29,6 @@ param(
 
     [Parameter()]
     [string]
-    $Repository = 'vscode-powershell',
-
-    [Parameter()]
-    [string]
     $TargetFork = $Organization,
 
     [Parameter()]
@@ -45,25 +41,49 @@ param(
 
     [Parameter()]
     [string]
-    $Preamble = "#### [$Repository](https://github.com/$Organization/$Repository)",
+    $PSExtensionRepositoryPath = (Resolve-Path "$PSScriptRoot/../../"),
 
     [Parameter()]
     [string]
-    $Postamble,
-
-    [Parameter()]
-    [string]
-    $RepositoryPath
+    $PsesRepositoryPath = (Resolve-Path "$PSExtensionRepositoryPath/../PowerShellEditorServices")
 )
+
+function UpdateChangelogFile
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $NewSection,
+
+        [Parameter(Mandatory)]
+        [string]
+        $Path
+    )
+
+    $changelogLines = Get-Content -Path $Path
+    $newContent = ($changelogLines[0..1] -join "`n`n") + $NewSection + ($changelogLines[2..$changelogLines.Length] -join "`n")
+    Set-Content -Encoding utf8NoBOM -Value $newContent -Path $Path
+}
+
+#region Configuration
+
+$vscodeRepoName = 'vscode-PowerShell'
+$psesRepoName = 'PowerShellEditorServices'
 
 $dateFormat = 'dddd, MMMM dd yyyy'
 
 $ignore = @{
-    Users = 'dependabot[bot]'
-    Labels = @{
-        Commit = 'Ignore'
-    }
+    User = 'dependabot[bot]'
+    CommitLabel = 'Ignore'
 }
+
+$noThanks = @(
+    'rjmholt'
+    'TylerLeonhardt'
+    'daxian-dbw'
+    'SteveL-MSFT'
+    'PaulHigin'
+)
 
 $categories = [ordered]@{
     Debugging  = @{
@@ -91,80 +111,103 @@ $categories = [ordered]@{
 
 $defaultCategory = 'General'
 
+$branchName = "changelog-$ReleaseName"
+
+#endregion Configuration
+
+#region PSES Changelog
+
 $clEntryParams = @{
-    Organization = $Organization
-    Repository = $Repository
     EntryCategories = $categories
-    DefaultCategory = @{
-        Name = $defaultCategory
-        Issue = $categories[$defaultCategory].Issue
-    }
+    DefaultCategory = $defaultCategory
     TagLabels = @{
         'Issue-Enhancement' = '✨'
         'Issue-Bug' = '🐛'
     }
-    NoThanks = @(
-        'rjmholt'
-        'TylerLeonhardt'
-        'daxian-dbw'
-        'SteveL-MSFT'
-        'PaulHigin'
-    )
-}
-
-function UpdateChangelogFile
-{
-    param(
-        [Parameter(Mandatory)]
-        [string]
-        $NewSection,
-
-        [Parameter(Mandatory)]
-        [string]
-        $Path
-    )
-
-    $changelogLines = Get-Content -Path $Path
-    $newContent = ($changelogLines[0..1] -join "`n`n") + $NewSection + ($changelogLines[2..$changelogLines.Length] -join "`n")
-    Set-Content -Encoding utf8NoBOM -Value $newContent -Path $Path
+    NoThanks = $noThanks
 }
 
 $clSectionParams = @{
     Categories = $categories.Keys
     DefaultCategory = $defaultCategory
     ReleaseName = $ReleaseName
-    Preamble = $Preamble
-    Postamble = $Postamble
     DateFormat = $dateFormat
 }
 
-$newChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $RepositoryPath |
+$psesChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PsesRepositoryPath |
     Get-ChangeInfoFromCommit -GitHubToken $GitHubToken |
-    Skip-IgnoredChanges -IgnoreUser $ignore.Users -IgnoreCommitLabel $ignore.Labels.Commit |
+    Skip-IgnoredChange @ignore |
     New-ChangelogEntry @clEntryParams |
-    New-ChangelogSection @clSectionParams
+    New-ChangelogSection @clSectionParams -Preamble "#### [$psesRepoName](https://github.com/$Organization/$psesRepoName)"
 
-$repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${Repository}_changelogupdate"
-$branchName = "changelog-$ReleaseName"
+$cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${psesRepoName}_changelogupdate"
 
 $cloneParams = @{
-    OriginRemote = "https://github.com/$TargetFork/$Repository"
-    Destination = $repoLocation
+    OriginRemote = "https://github.com/$TargetFork/$psesRepoName"
+    Destination = $cloneLocation
     CheckoutBranch = $branchName
     Clobber = $true
 }
 Copy-GitRepository @cloneParams
 
-UpdateChangelogFile -NewSection $newChangelogSection -Path "$repoLocation/$ChangelogName"
+UpdateChangelogFile -NewSection $psesChangelogSection -Path "$cloneLocation/$ChangelogName"
 
-Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName"
+Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName"
 
+#endregion
+
+#region vscode-PowerShell Changelog
+
+Wait-Debugger
+
+$psesChangelogPostamble = ($psesChangelogSection -split "`n")
+$psesChangelogPostamble = $psesChangelogPostamble[2..$psesChangelogPostamble.Length]
+$psesChangelogPostamble = $psesChangelogPostamble -join "`n"
+
+$psextChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PSExtensionRepositoryPath |
+    Get-ChangeInfoFromCommit -GitHubToken $GitHubToken |
+    Skip-IgnoredChange @ignore |
+    New-ChangelogEntry @clEntryParams |
+    New-ChangelogSection @clSectionParams -Preamble "#### [$vscodeRepoName](https://github.com/$Organization/$vscodeRepoName)" -Postamble $psesChangelogPostamble
+
+$cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${vscodeRepoName}_changelogupdate"
+
+$cloneParams = @{
+    OriginRemote = "https://github.com/$TargetFork/$vscodeRepoName"
+    Destination = $cloneLocation
+    CheckoutBranch = $branchName
+    Clobber = $true
+}
+Copy-GitRepository @cloneParams
+
+UpdateChangelogFile -NewSection $psextChangelogSection -Path "$cloneLocation/$ChangelogName"
+
+Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName"
+
+#endregion vscode-PowerShell Changelog
+
+#region PRs
+
+# PSES PR
 $prParams = @{
     Organization = $TargetFork
-    Repository = $Repository
+    Repository = $psesRepoName
     Branch = $branchName
     Title = "Update CHANGELOG for $ReleaseName"
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
 }
 New-GitHubPR @prParams
+
+# vscode-PowerShell PR
+$prParams = @{
+    Organization = $TargetFork
+    Repository = $vscodeRepoName
+    Branch = $branchName
+    Title = "Update CHANGELOG for $ReleaseName"
+    GitHubToken = $GitHubToken
+    FromOrg = $FromFork
+}
+New-GitHubPR @prParams
+
+#endregion PRs

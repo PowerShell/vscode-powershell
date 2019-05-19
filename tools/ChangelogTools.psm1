@@ -53,6 +53,7 @@ class ChangeLog
 
 filter Get-ChangeInfoFromCommit
 {
+    [OutputType([ChangeInfo])]
     param(
         [Parameter(Mandatory, ValueFromPipeline, Position=0)]
         [GitHubCommitInfo[]]
@@ -99,6 +100,7 @@ filter Get-ChangeInfoFromCommit
 
 filter New-ChangelogEntry
 {
+    [OutputType([ChangelogEntry])]
     param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [ChangeInfo]
@@ -109,7 +111,7 @@ filter New-ChangelogEntry
         $EntryCategories,
 
         [Parameter(Mandatory)]
-        [hashtable]
+        [string]
         $DefaultCategory,
 
         [Parameter(Mandatory)]
@@ -118,15 +120,7 @@ filter New-ChangelogEntry
 
         [Parameter()]
         [string[]]
-        $NoThanks = @(),
-
-        [Parameter()]
-        [string]
-        $Organization = 'PowerShell',
-
-        [Parameter()]
-        [string]
-        $Repository = 'vscode-powershell'
+        $NoThanks = @()
     )
 
     [string[]]$tags = @()
@@ -153,11 +147,14 @@ filter New-ChangelogEntry
 
     if (-not $entryCategory)
     {
-        $entryCategory = $DefaultCategory.Name
+        $entryCategory = $DefaultCategory
     }
 
-    $issueLink = if ($Change.IssueNumber -ge 0) { "https://github.com/$Organization/$Repository/issues/$($Change.IssueNumber)" } else { $null }
-    $prLink = if ($Change.PRNumber -ge 0) { "https://github.com/$Organization/$Repository/$($Change.PRNumber)" } else { $null }
+    $organization = $Change.Commit.Organization
+    $repository = $Change.Commit.Repository
+
+    $issueLink = if ($Change.IssueNumber -ge 0) { $Change.ClosedIssues[0].GetHtmlUri() } else { $null }
+    $prLink = if ($Change.PRNumber -ge 0) { "https://github.com/$organization/$repository/$($Change.PRNumber)" } else { $null }
     $thanks = if ($Change.ContributingUser -notin $NoThanks) { $Change.ContributingUser } else { $null }
 
     $subject = $Change.Subject
@@ -173,68 +170,15 @@ filter New-ChangelogEntry
         Category = $entryCategory
         Tags = $tags
         Change = $Change
-        RepositoryName = "$Organization/$Repository"
+        RepositoryName = "$organization/$repository"
         BodyText = $Change.BodyText
         Subject = $subject
     }
 }
 
-filter Skip-IgnoredChanges
-{
-    param(
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [ChangeInfo]
-        $Change,
-
-        [Parameter()]
-        [string[]]
-        $User,
-
-        [Parameter()]
-        [string[]]
-        $CommitLabel,
-
-        [Parameter()]
-        [string[]]
-        $IssueLabel,
-
-        [Parameter()]
-        [string[]]
-        $PRLabel
-    )
-
-    if ($Change.ContributingUser -in $User)
-    {
-        return
-    }
-
-    foreach ($changeCommitLabel in $Change.Commit.CommitLabels)
-    {
-        if ($changeCommitLabel -in $CommitLabel)
-        {
-            return
-        }
-    }
-
-    foreach ($changeIssueLabel in $Change.Commit.IssueLabels)
-    {
-        if ($changeIssueLabel -in $IssueLabel)
-        {
-            return
-        }
-    }
-
-    foreach ($changePRLabel in $Change.Commit.PRLabels)
-    {
-        if ()
-    }
-
-
-    return $Change
-}
-
 function New-ChangeLogSection
 {
+    [OutputType([string])]
     param(
         [Parameter(Mandatory, ValueFromPipeline)]
         [ChangelogEntry[]]
@@ -371,29 +315,65 @@ function New-ChangeLogSection
     }
 }
 
-function New-ChangelogRelease
+filter Skip-IgnoredChange
 {
     param(
-        [Parameter(Mandatory)]
-        [string]
-        $GitHubToken,
-
-        [Parameter(Mandatory)]
-        [string]
-        $RepositoryPath,
-
-        [Parameter(Mandatory)]
-        [string]
-        $SinceRef,
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [ChangeInfo[]]
+        $Change,
 
         [Parameter()]
         [string]
-        $UntilRef = 'HEAD',
+        $User,
 
         [Parameter()]
-        [IgnoreConfiguration]
-        $Ignore
+        [string]
+        $CommitLabel,
+
+        [Parameter()]
+        [string[]]
+        $IssueLabel,
+
+        [Parameter()]
+        [string[]]
+        $PRLabel
     )
+
+    :outer foreach ($chg in $Change)
+    {
+        if ($chg.ContributingUser -in $User)
+        {
+            continue
+        }
+
+        foreach ($chgCommitLabel in $chg.Commit.CommitLabels)
+        {
+            if ($chgCommitLabel -in $CommitLabel)
+            {
+                continue :outer
+            }
+        }
+
+        foreach ($chgIssueLabel in $chg.ClosedIssues.Labels)
+        {
+            if ($chgIssueLabel -in $IssueLabel)
+            {
+                continue :outer
+            }
+        }
+
+        foreach ($chgPRLabel in $chg.PR.Labels)
+        {
+            if ($chgPRLabel -in $PRLabel)
+            {
+                continue :outer
+            }
+        }
+
+        # Yield the change
+        $chg
+    }
 }
 
-Export-ModuleMember -Function Get-ChangeInfoFromCommit,New-ChangelogEntry,Skip-IgnoredChanges,New-ChangeLogSection
+
+Export-ModuleMember -Function Get-ChangeInfoFromCommit,New-ChangelogEntry,New-ChangelogSection,Skip-IgnoredChange

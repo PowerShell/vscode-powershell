@@ -380,6 +380,7 @@ function Submit-GitChanges
 
 function Get-GitCommit
 {
+    [OutputType([GitHubCommitInfo])]
     [CmdletBinding(DefaultParameterSetName='SinceRef')]
     param(
        [Parameter(Mandatory, ParameterSetName='SinceRef')]
