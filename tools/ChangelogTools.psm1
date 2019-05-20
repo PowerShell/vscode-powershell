@@ -273,7 +273,7 @@ function New-ChangeLogSection
                 }
                 elseif ($item.Change.PRNumber -ge 0)
                 {
-                    $project = $item.PR.Repository
+                    $project = $item.Change.PR.Repository
                     $issueNumber = $item.Change.PRNumber
                 }
 
