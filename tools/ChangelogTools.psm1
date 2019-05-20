@@ -350,7 +350,7 @@ filter Skip-IgnoredChange
         {
             if ($chgCommitLabel -in $CommitLabel)
             {
-                continue :outer
+                continue outer
             }
         }
 
@@ -358,7 +358,7 @@ filter Skip-IgnoredChange
         {
             if ($chgIssueLabel -in $IssueLabel)
             {
-                continue :outer
+                continue outer
             }
         }
 
@@ -366,7 +366,7 @@ filter Skip-IgnoredChange
         {
             if ($chgPRLabel -in $PRLabel)
             {
-                continue :outer
+                continue outer
             }
         }
 
