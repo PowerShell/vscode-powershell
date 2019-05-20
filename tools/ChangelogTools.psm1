@@ -263,21 +263,18 @@ function New-ChangeLogSection
             foreach ($item in $category.Value)
             {
                 # Set up the pieces needed for a changelog entry
-                $project = $item.Change.Commit.Repository
                 $link = if ($item.PRLink) { $item.PRLink } else { $org = $item.Change.Commit.Organization; "https://github.com/$org/$project" }
                 $thanks = $item.Thanks
 
-                $issueNumber = if ($item.Change.IssueNumber -ge 0)
+                if ($item.Change.IssueNumber -ge 0)
                 {
-                    $item.Change.IssueNumber
+                    $project = $item.Change.ClosedIssues[0].Repository
+                    $issueNumber = $item.Change.IssueNumber
                 }
                 elseif ($item.Change.PRNumber -ge 0)
                 {
-                    $item.Change.PRNumber
-                }
-                else
-                {
-                    $null
+                    $project = $item.PR.Repository
+                    $issueNumber = $item.Change.PRNumber
                 }
 
                 # Add the list bullet

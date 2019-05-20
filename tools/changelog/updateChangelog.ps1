@@ -158,8 +158,6 @@ Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Bra
 
 #region vscode-PowerShell Changelog
 
-Wait-Debugger
-
 $psesChangelogPostamble = ($psesChangelogSection -split "`n")
 $psesChangelogPostamble = $psesChangelogPostamble[2..$psesChangelogPostamble.Length]
 $psesChangelogPostamble = $psesChangelogPostamble -join "`n"

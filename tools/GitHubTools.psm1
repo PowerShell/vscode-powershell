@@ -634,9 +634,9 @@ filter Get-GitHubIssue
     $issueResponse = Invoke-RestMethod @irmParams
 
     return [GitHubIssue]@{
-        Organization = $Organization
-        Repository = $Repository
-        Number = $Number
+        Organization = $IssueInfo.Organization
+        Repository = $IssueInfo.Repository
+        Number = $IssueInfo.Number
         RawResponse = $issueResponse
         Body = $issueResponse.body
         Labels = $issueResponse.labels.name
