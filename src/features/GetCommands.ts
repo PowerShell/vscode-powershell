@@ -30,13 +30,15 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;
     private currentPanel: vscode.WebviewPanel | undefined;
-    private onDiskPath: vscode.Uri;
     private htmlUri: any;
+    private scriptUri: any;
 
-constructor(private log: Logger, private extensionContext: vscode.ExtensionContext) {
+    constructor(private log: Logger, private extensionContext: vscode.ExtensionContext) {
         super();
-        this.onDiskPath = vscode.Uri.file(path.join(this.extensionContext.extensionPath, "media", "insert.html"));
-        this.htmlUri = this.onDiskPath.with({ scheme: "vscode-resource" });
+        const htmlDiskPath = vscode.Uri.file(path.join(this.extensionContext.extensionPath, "media", "insert.html"));
+        const jsDiskPath = vscode.Uri.file(path.join(this.extensionContext.extensionPath, "media", "script.js"));
+        this.htmlUri = htmlDiskPath.with({ scheme: "vscode-resource" });
+        this.scriptUri = jsDiskPath.with({ scheme: "vscode-resource" });
         this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
             () => this.CommandExplorerRefresh());
         this.commandsExplorerProvider = new CommandsExplorerProvider();
@@ -135,7 +137,8 @@ constructor(private log: Logger, private extensionContext: vscode.ExtensionConte
                 },
             );
 
-            this.currentPanel.webview.html = fs.readFileSync(this.htmlUri.fsPath, "utf8");
+            this.currentPanel.webview.html = fs.readFileSync(this.htmlUri.fsPath, "utf8")
+                .replace("%SCRIPTSRC%", this.scriptUri);
             this.currentPanel.webview.onDidReceiveMessage((message) => {
                 this.InsertCommand(message);
                 this.currentPanel.dispose();
