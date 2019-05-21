@@ -138,7 +138,7 @@ $psesChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -G
     Get-ChangeInfoFromCommit -GitHubToken $GitHubToken |
     Skip-IgnoredChange @ignore |
     New-ChangelogEntry @clEntryParams |
-    New-ChangelogSection @clSectionParams -Preamble "#### [$psesRepoName](https://github.com/$Organization/$psesRepoName)"
+    New-ChangelogSection @clSectionParams
 
 $cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${psesRepoName}_changelogupdate"
 
@@ -157,9 +157,8 @@ Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Bra
 #endregion
 
 #region vscode-PowerShell Changelog
-
-$psesChangelogPostamble = ($psesChangelogSection -split "`n")
-$psesChangelogPostamble = $psesChangelogPostamble[2..$psesChangelogPostamble.Length]
+$psesChangelogPostamble = $psesChangelogSection -split "`n"
+$psesChangelogPostamble = @("#### [$psesRepoName](https://github.com/$Organization/$psesRepoName)") + $psesChangelogPostamble[2..$psesChangelogPostamble.Length-1]
 $psesChangelogPostamble = $psesChangelogPostamble -join "`n"
 
 $psextChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PSExtensionRepositoryPath |

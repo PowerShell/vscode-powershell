@@ -154,7 +154,7 @@ filter New-ChangelogEntry
     $repository = $Change.Commit.Repository
 
     $issueLink = if ($Change.IssueNumber -ge 0) { $Change.ClosedIssues[0].GetHtmlUri() } else { $null }
-    $prLink = if ($Change.PRNumber -ge 0) { "https://github.com/$organization/$repository/$($Change.PRNumber)" } else { $null }
+    $prLink = if ($Change.PRNumber -ge 0) { "https://github.com/$organization/$repository/pull/$($Change.PRNumber)" } else { $null }
     $thanks = if ($Change.ContributingUser -notin $NoThanks) { $Change.ContributingUser } else { $null }
 
     $subject = $Change.Subject
@@ -371,6 +371,5 @@ filter Skip-IgnoredChange
         $chg
     }
 }
-
 
 Export-ModuleMember -Function Get-ChangeInfoFromCommit,New-ChangelogEntry,New-ChangelogSection,Skip-IgnoredChange
