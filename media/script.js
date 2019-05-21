@@ -4,10 +4,12 @@ const commonParams = document.createElement("div");
 commonParams.id = "commonParameters";
 var message;
 var hasCommonParams = false;
+
 const switchCommonParameters = [
     "Verbose",
     "Debug"
 ];
+
 const stringCommonParameters = [
     "ErrorAction",
     "WarningAction",
@@ -18,15 +20,52 @@ const stringCommonParameters = [
     "OutVariable",
     "OutBuffer",
     "PipelineVariable"
-]
+];
+
+function mySubmit() {
+    let myMessage = message;
+    myMessage.filledParameters = {};
+    parameterSets.childNodes.forEach((node) => {
+        if (node.childElementCount > 0 && (node.style.display !== "none" || node.id === "commonParameters")) {
+            node.childNodes.forEach((a) => {
+                if (a.className === "parameters" && a.value !== "") {
+                    let id = a.id.substring(a.id.lastIndexOf("-") + 1, a.id.length);
+                    if (a.type === "checkbox") {
+                        if (a.checked) {
+                            myMessage.filledParameters[id] = "$true";
+                        }
+                    } else {
+                        myMessage.filledParameters[id] = a.value.trim();
+                    }
+                }
+            });
+        }
+    });
+    vscode.postMessage(myMessage);
+}
+
+function parameterSetToggle(toggleParameterSet) {
+    var psetDivs = parameterSets.getElementsByTagName("div");
+    for (var index = 0; index < psetDivs.length; index++) {
+        psetDivs[index].style.display = "none";
+    }
+    document.getElementById(toggleParameterSet).style.display = null;
+}
+
+function toggleCommonParameters() {
+    const commonParametersDiv = document.getElementById("commonParameters");
+    commonParametersDiv.style.display = commonParametersDiv.style.display === "none" ? null : "none";
+}
+
+
 
 document.getElementById("CommandParameters").onsubmit = mySubmit;
-window.addEventListener("message", event => {
-    message = undefined;
+window.addEventListener("message", (event) => {
+    message = null;
     let defaultParamSet = "__AllParameterSets";
     // Remove previous nodes if there are any.
     while (parameterSets.hasChildNodes()) {
-        parameterSets.removeChild(parameterSets.childNodes[0])
+        parameterSets.removeChild(parameterSets.childNodes[0]);
     }
     message = event.data[0];
     document.getElementById("CommandName").innerText = message.name;
@@ -88,7 +127,7 @@ window.addEventListener("message", event => {
             parameterLabel.htmlFor = param;
             parameterLabel.innerText = param;
             let parameterInput = document.createElement("input");
-            parameterInput.className = "parameters"
+            parameterInput.className = "parameters";
             parameterInput.id = param;
             parameterInput.type = "text";
             commonParams.appendChild(parameterLabel);
@@ -99,37 +138,3 @@ window.addEventListener("message", event => {
     }
     parameterSetToggle(defaultParamSet);
 });
-function mySubmit() {
-    let myMessage = message;
-    myMessage.filledParameters = {};
-    parameterSets.childNodes.forEach((node) => {
-        if (node.childElementCount > 0 && (node.style.display !== "none" || node.id === "commonParameters")) {
-            node.childNodes.forEach((a) => {
-                if (a.className === "parameters" && a.value !== "") {
-                    let id = a.id.substring(a.id.lastIndexOf("-") + 1, a.id.length);
-                    if (a.type === "checkbox") {
-                        if (a.checked) {
-                            myMessage.filledParameters[id] = "$true";
-                        }
-                    } else {
-                        myMessage.filledParameters[id] = a.value.trim();
-                    }
-                }
-            })
-        }
-    });
-    vscode.postMessage(myMessage);
-}
-
-function parameterSetToggle(toggleParameterSet) {
-    var psetDivs = parameterSets.getElementsByTagName("div");
-    for (var index = 0; index < psetDivs.length; index++) {
-        psetDivs[index].style.display = "none";
-    }
-    document.getElementById(toggleParameterSet).style.display = null;
-}
-
-function toggleCommonParameters() {
-    const commonParametersDiv = document.getElementById("commonParameters");
-    commonParametersDiv.style.display = commonParametersDiv.style.display === "none" ? null : "none"
-}
