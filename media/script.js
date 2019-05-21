@@ -96,7 +96,7 @@ window.addEventListener("message", (event) => {
                 parameterLabel.style = "font-weight: bold";
             }
             let parameterInput = document.createElement("input");
-            parameterInput.className = "parameters"
+            parameterInput.className = "parameters";
             parameterInput.id = pSet.name + "-" + currParameter.name;
             parameterInput.type = currParameter.parameterType.search("SwitchParameter") !== -1 ? "checkbox" : "text";
             pSetDiv.appendChild(parameterLabel);
