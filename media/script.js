@@ -1,7 +1,7 @@
 ﻿const vscode = acquireVsCodeApi();
-const parameterSets = document.getElementById('ParameterSets');
-const commonParams = document.createElement('div');
-commonParams.id = 'commonParameters';
+const parameterSets = document.getElementById("ParameterSets");
+const commonParams = document.createElement("div");
+commonParams.id = "commonParameters";
 var message;
 var hasCommonParams = false;
 const switchCommonParameters = [
@@ -21,9 +21,9 @@ const stringCommonParameters = [
 ]
 
 document.getElementById("CommandParameters").onsubmit = mySubmit;
-window.addEventListener('message', event => {
+window.addEventListener("message", event => {
     message = undefined;
-    let defaultParamSet = '__AllParameterSets';
+    let defaultParamSet = "__AllParameterSets";
     // Remove previous nodes if there are any.
     while (parameterSets.hasChildNodes()) {
         parameterSets.removeChild(parameterSets.childNodes[0])
@@ -35,9 +35,9 @@ window.addEventListener('message', event => {
         if (pSet.isDefault) {
             defaultParamSet = pSet.name;
         }
-        let pSetDiv = document.createElement('div');
+        let pSetDiv = document.createElement("div");
         pSetDiv.id = pSet.name;
-        let setHeader = document.createElement('h3');
+        let setHeader = document.createElement("h3");
         setHeader.innerText = pSet.name;
         setHeader.onclick = (ev) => {
             parameterSetToggle(ev.target.innerText);
@@ -49,51 +49,51 @@ window.addEventListener('message', event => {
                 hasCommonParams = true;
                 continue;
             }
-            let parameterLabel = document.createElement('label');
-            parameterLabel.htmlFor = pSet.name + '-' + currParameter.name;
+            let parameterLabel = document.createElement("label");
+            parameterLabel.htmlFor = pSet.name + "-" + currParameter.name;
             parameterLabel.innerText = currParameter.name;
             if (pSet.parameters[j].attributes[0].mandatory) {
-                parameterLabel.innerText += ' *';
-                parameterLabel.style = 'font-weight: bold';
+                parameterLabel.innerText += " *";
+                parameterLabel.style = "font-weight: bold";
             }
-            let parameterInput = document.createElement('input');
-            parameterInput.className = 'parameters'
-            parameterInput.id = pSet.name + '-' + currParameter.name;
-            parameterInput.type = currParameter.parameterType.search('SwitchParameter') !== -1 ? 'checkbox' : 'text';
+            let parameterInput = document.createElement("input");
+            parameterInput.className = "parameters"
+            parameterInput.id = pSet.name + "-" + currParameter.name;
+            parameterInput.type = currParameter.parameterType.search("SwitchParameter") !== -1 ? "checkbox" : "text";
             pSetDiv.appendChild(parameterLabel);
             pSetDiv.appendChild(parameterInput);
-            pSetDiv.appendChild(document.createElement('br'));
+            pSetDiv.appendChild(document.createElement("br"));
         }
         parameterSets.appendChild(pSetDiv);
     }
     if (hasCommonParams) {
-        let setHeader = document.createElement('h3');
-        setHeader.innerText = 'commonParameters';
+        let setHeader = document.createElement("h3");
+        setHeader.innerText = "commonParameters";
         setHeader.onclick = toggleCommonParameters;
         parameterSets.appendChild(setHeader);
         switchCommonParameters.forEach((param) => {
-            let parameterLabel = document.createElement('label');
+            let parameterLabel = document.createElement("label");
             parameterLabel.htmlFor = param;
             parameterLabel.innerText = param;
-            let parameterInput = document.createElement('input');
-            parameterInput.className = 'parameters'
+            let parameterInput = document.createElement("input");
+            parameterInput.className = "parameters"
             parameterInput.id = param;
-            parameterInput.type = 'checkbox';
+            parameterInput.type = "checkbox";
             commonParams.appendChild(parameterLabel);
             commonParams.appendChild(parameterInput);
-            commonParams.appendChild(document.createElement('br'));
+            commonParams.appendChild(document.createElement("br"));
         });
         stringCommonParameters.forEach((param) => {
-            let parameterLabel = document.createElement('label');
+            let parameterLabel = document.createElement("label");
             parameterLabel.htmlFor = param;
             parameterLabel.innerText = param;
-            let parameterInput = document.createElement('input');
-            parameterInput.className = 'parameters'
+            let parameterInput = document.createElement("input");
+            parameterInput.className = "parameters"
             parameterInput.id = param;
-            parameterInput.type = 'text';
+            parameterInput.type = "text";
             commonParams.appendChild(parameterLabel);
             commonParams.appendChild(parameterInput);
-            commonParams.appendChild(document.createElement('br'));
+            commonParams.appendChild(document.createElement("br"));
         });
         parameterSets.appendChild(commonParams);
     }
@@ -103,11 +103,11 @@ function mySubmit() {
     let myMessage = message;
     myMessage.filledParameters = {};
     parameterSets.childNodes.forEach((node) => {
-        if (node.childElementCount > 0 && (node.style.display !== 'none' || node.id === 'commonParameters')) {
+        if (node.childElementCount > 0 && (node.style.display !== "none" || node.id === "commonParameters")) {
             node.childNodes.forEach((a) => {
-                if (a.className === 'parameters' && a.value !== "") {
-                    let id = a.id.substring(a.id.lastIndexOf('-') + 1, a.id.length);
-                    if (a.type === 'checkbox') {
+                if (a.className === "parameters" && a.value !== "") {
+                    let id = a.id.substring(a.id.lastIndexOf("-") + 1, a.id.length);
+                    if (a.type === "checkbox") {
                         if (a.checked) {
                             myMessage.filledParameters[id] = "$true";
                         }
@@ -122,14 +122,14 @@ function mySubmit() {
 }
 
 function parameterSetToggle(toggleParameterSet) {
-    var psetDivs = parameterSets.getElementsByTagName('div');
+    var psetDivs = parameterSets.getElementsByTagName("div");
     for (var index = 0; index < psetDivs.length; index++) {
-        psetDivs[index].style.display = 'none';
+        psetDivs[index].style.display = "none";
     }
     document.getElementById(toggleParameterSet).style.display = null;
 }
 
 function toggleCommonParameters() {
-    const commonParametersDiv = document.getElementById('commonParameters');
-    commonParametersDiv.style.display = commonParametersDiv.style.display === 'none' ? null : 'none'
+    const commonParametersDiv = document.getElementById("commonParameters");
+    commonParametersDiv.style.display = commonParametersDiv.style.display === "none" ? null : "none"
 }
