@@ -86,10 +86,8 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     }
 
     private InsertCommand(item) {
-        // TODO: Figure out how we can insert this....
         let insertCommand: string = item.name;
         if (item.filledParameters !== {}) {
-            // tslint:disable-next-line:forin
             for (const element in item.filledParameters) {
                 if (item.filledParameters[element] === "$true") {
                     insertCommand += ` -${element}`;

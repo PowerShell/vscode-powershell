@@ -109,10 +109,10 @@ function mySubmit() {
                     let id = a.id.substring(a.id.lastIndexOf('-') + 1, a.id.length);
                     if (a.type === 'checkbox') {
                         if (a.checked) {
-                            myMessage.filledParameters[id] = "$true"
+                            myMessage.filledParameters[id] = "$true";
                         }
                     } else {
-                        myMessage.filledParameters[id] = a.value
+                        myMessage.filledParameters[id] = a.value.trim();
                     }
                 }
             })
