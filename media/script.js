@@ -115,7 +115,7 @@ window.addEventListener("message", (event) => {
             parameterLabel.htmlFor = param;
             parameterLabel.innerText = param;
             let parameterInput = document.createElement("input");
-            parameterInput.className = "parameters"
+            parameterInput.className = "parameters";
             parameterInput.id = param;
             parameterInput.type = "checkbox";
             commonParams.appendChild(parameterLabel);
