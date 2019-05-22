@@ -1,7 +1,7 @@
 # vscode-powershell Release History
 
 ## v2.0.0-preview.3
-### Wednesday, May 22 2019
+### Wednesday, May 22, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
 - [vscode-PowerShell #1954](https://github.com/PowerShell/vscode-PowerShell/pull/1954) -
@@ -88,7 +88,8 @@
 - [PowerShellEditorServices #904](https://github.com/PowerShell/PowerShellEditorServices/pull/904) -
   add initial credscan ymls 
 - [PowerShellEditorServices #901](https://github.com/PowerShell/PowerShellEditorServices/pull/901) -
-  Switch to current lowercase names for powershell and mdlint exts  (Thanks @rkeithhill!)
+  Switch to current lowercase names for powershell and mdlint exts  (Thanks @rkeithhill!)
+
 
 ## v2.0.0-preview.3
 ### Wednesday, April 10, 2019
