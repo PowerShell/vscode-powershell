@@ -14,11 +14,23 @@ param(
 
     [Parameter(Mandatory)]
     [string]
-    $ReleaseName,
-
-    [Parameter(Mandatory)]
-    [string]
     $SinceRef,
+
+    [Parameter()]
+    [version]
+    $PSExtensionVersion,
+
+    [Parameter()]
+    [semver]
+    $PsesVersion,
+
+    [Parameter()]
+    [string]
+    $PSExtensionReleaseName,
+
+    [Parameter()]
+    [string]
+    $PsesReleaseName,
 
     [Parameter()]
     [string]
@@ -51,6 +63,30 @@ param(
 
 $PSExtensionRepositoryPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PSExtensionRepositoryPath)
 $PsesRepositoryPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PsesRepositoryPath)
+
+if (-not $PSExtensionVersion)
+{
+    $PSExtensionVersion = (Get-Content -Raw "$PSExtensionRepositoryPath/package.json" | ConvertFrom-Json).version
+}
+
+if (-not $PsesVersion)
+{
+    $psesProps = [xml](Get-Content -Raw "$PsesRepositoryPath/PowerShellEditorServices.Common.props")
+    $psesVersionPrefix = $psesProps.Project.PropertyData.VersionPrefix
+    $psesVersionSuffix = $psesProps.Project.PropertyData.VersionSuffix
+
+    $PsesVersion = [semver]"$psesVersionPrefix-$psesVersionSuffix"
+}
+
+if (-not $PSExtensionReleaseName)
+{
+    $PSExtensionReleaseName = "v$PSExtensionVersion"
+}
+
+if (-not $PsesReleaseName)
+{
+    $PsesReleaseName = "v$PsesVersion"
+}
 
 function UpdateChangelogFile
 {
