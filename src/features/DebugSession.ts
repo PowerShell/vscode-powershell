@@ -87,7 +87,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                 }
             }
 
-            if (!config.runspaceId) {
+            if (!config.runspaceId && !config.runspaceName) {
                 config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
 
                 // No runspace selected. Cancel attach.
