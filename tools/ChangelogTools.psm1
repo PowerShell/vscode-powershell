@@ -51,6 +51,22 @@ class ChangeLog
     [System.Collections.Generic.Dictionary[string, ChangelogEntry]]$Sections
 }
 
+function NormalizeSubject
+{
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Subject
+    )
+
+    $Subject = $Subject.Trim()
+    if ([char]::IsLower($Subject[0])) { $Subject = [char]::ToUpper($Subject[0]) + $Subject.Substring(1) }
+    if ($Subject[$Subject.Length] -ne '.') { $Subject += '.' }
+
+    return $Subject
+}
+
 filter Get-ChangeInfoFromCommit
 {
     [OutputType([ChangeInfo])]
@@ -296,7 +312,7 @@ function New-ChangeLogSection
                     [void]$sb.AppendLine("[$project #$issueNumber]($link) -").Append($Indent)
                 }
 
-                [void]$sb.Append($item.Subject)
+                [void]$sb.Append((NormalizeSubject -Subject $item.Subject))
                 if ($thanks)
                 {
                     [void]$sb.Append(" (Thanks @$thanks!)")

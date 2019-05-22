@@ -78,7 +78,7 @@ Write-Verbose "Configuring settings"
 $vscodeRepoName = 'vscode-PowerShell'
 $psesRepoName = 'PowerShellEditorServices'
 
-$dateFormat = 'dddd, MMMM dd yyyy'
+$dateFormat = 'dddd, MMMM dd, yyyy'
 
 $ignore = @{
     User = 'dependabot[bot]'
