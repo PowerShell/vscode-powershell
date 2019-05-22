@@ -1,4 +1,4 @@
-# vscode-powershell Release History
+# PowerShell Preview Extension Release History
 
 ## v2019.5.0
 ### Wednesday, May 22, 2019
