@@ -162,6 +162,10 @@ task UpdatePackageJson {
 
     $script:PackageJson.version = "$($currentDate.ToString('yyyy.M')).$revision"
 
+    if ($env:TF_BUILD) {
+        $script:PackageJson.version += "-CI.$env:BUILD_BUILDID"
+    }
+
     $Utf8NoBomEncoding = [System.Text.UTF8Encoding]::new($false)
     [System.IO.File]::WriteAllLines(
         (Resolve-Path "$PSScriptRoot/package.json").Path,
