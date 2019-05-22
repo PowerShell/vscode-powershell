@@ -4,6 +4,8 @@
 ### Wednesday, May 22, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
+- ✨ [vscode-PowerShell #1880](https://github.com/PowerShell/vscode-powershell/pull/1911) -
+  Move to date-based versioning
 - ✨ [vscode-PowerShell #1954](https://github.com/PowerShell/vscode-PowerShell/pull/1954) -
   Allow passing runspace name
 - ✨ [vscode-PowerShell #1945](https://github.com/PowerShell/vscode-PowerShell/pull/1945) -
