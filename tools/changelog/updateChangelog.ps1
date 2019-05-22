@@ -49,6 +49,9 @@ param(
     $PsesRepositoryPath = (Resolve-Path "$PSExtensionRepositoryPath/../PowerShellEditorServices")
 )
 
+$PSExtensionRepositoryPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PSExtensionRepositoryPath)
+$PsesRepositoryPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PsesRepositoryPath)
+
 function UpdateChangelogFile
 {
     param(
@@ -152,10 +155,11 @@ Write-Host "PSES CHANGELOG:`n`n$psesChangelogSection`n`n"
 $cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${psesRepoName}_changelogupdate"
 
 $cloneParams = @{
-    OriginRemote = "https://github.com/$TargetFork/$psesRepoName"
+    OriginRemote = "https://github.com/$FromFork/$psesRepoName"
     Destination = $cloneLocation
     CheckoutBranch = $branchName
     Clobber = $true
+    Remotes = @{ 'upstream' = "https://github.com/$TargetFork/$vscodeRepoName" }
 }
 Copy-GitRepository @cloneParams -Verbose:$VerbosePreference
 
@@ -181,10 +185,12 @@ Write-Host "vscode-PowerShell CHANGELOG:`n`n$psextChangelogSection`n`n"
 $cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${vscodeRepoName}_changelogupdate"
 
 $cloneParams = @{
-    OriginRemote = "https://github.com/$TargetFork/$vscodeRepoName"
+    OriginRemote = "https://github.com/$FromFork/$vscodeRepoName"
     Destination = $cloneLocation
     CheckoutBranch = $branchName
     Clobber = $true
+    Remotes = @{ 'upstream' = "https://github.com/$TargetFork/$vscodeRepoName" }
+    PullUpstream = $true
 }
 Copy-GitRepository @cloneParams -Verbose:$VerbosePreference
 
