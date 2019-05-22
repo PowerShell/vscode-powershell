@@ -18,19 +18,19 @@ param(
 
     [Parameter()]
     [version]
-    $PSExtensionVersion,
+    $PSExtensionVersion, # Default from package.json
 
     [Parameter()]
     [semver]
-    $PsesVersion,
+    $PsesVersion, # Default from PowerShellEditorServices.Common.props
 
     [Parameter()]
     [string]
-    $PSExtensionReleaseName,
+    $PSExtensionReleaseName, # Default from $PSExtensionVersion
 
     [Parameter()]
     [string]
-    $PsesReleaseName,
+    $PsesReleaseName, # Default from $PsesVersion
 
     [Parameter()]
     [string]
@@ -64,9 +64,11 @@ param(
 $PSExtensionRepositoryPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PSExtensionRepositoryPath)
 $PsesRepositoryPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($PsesRepositoryPath)
 
+$packageJson = Get-Content -Raw "$PSExtensionRepositoryPath/package.json" | ConvertFrom-Json
+$extensionName = $packageJson.name
 if (-not $PSExtensionVersion)
 {
-    $PSExtensionVersion = (Get-Content -Raw "$PSExtensionRepositoryPath/package.json" | ConvertFrom-Json).version
+    $PSExtensionVersion = $packageJson.version
 }
 
 if (-not $PsesVersion)
@@ -254,7 +256,7 @@ $prParams = @{
     Organization = $TargetFork
     Repository = $vscodeRepoName
     Branch = $branchName
-    Title = "Update CHANGELOG for $ReleaseName"
+    Title = "Update $extensionName CHANGELOG for $ReleaseName"
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
 }
