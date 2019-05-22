@@ -6,6 +6,7 @@
 using module ..\GitHubTools.psm1
 using module ..\ChangelogTools.psm1
 
+[CmdletBinding()]
 param(
     [Parameter(Mandatory)]
     [string]
@@ -60,12 +61,16 @@ function UpdateChangelogFile
         $Path
     )
 
+    Write-Verbose "Writing new changelog section to '$Path'"
+
     $changelogLines = Get-Content -Path $Path
     $newContent = ($changelogLines[0..1] -join "`n`n") + $NewSection + ($changelogLines[2..$changelogLines.Length] -join "`n")
     Set-Content -Encoding utf8NoBOM -Value $newContent -Path $Path
 }
 
 #region Configuration
+
+Write-Verbose "Configuring settings"
 
 $vscodeRepoName = 'vscode-PowerShell'
 $psesRepoName = 'PowerShellEditorServices'
@@ -134,11 +139,15 @@ $clSectionParams = @{
     DateFormat = $dateFormat
 }
 
-$psesChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PsesRepositoryPath |
-    Get-ChangeInfoFromCommit -GitHubToken $GitHubToken |
-    Skip-IgnoredChange @ignore |
-    New-ChangelogEntry @clEntryParams |
-    New-ChangelogSection @clSectionParams
+Write-Verbose "Creating PSES changelog"
+
+$psesChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PsesRepositoryPath -Verbose:$VerbosePreference |
+    Get-ChangeInfoFromCommit -GitHubToken $GitHubToken -Verbose:$VerbosePreference |
+    Skip-IgnoredChange @ignore -Verbose:$VerbosePreference |
+    New-ChangelogEntry @clEntryParams -Verbose:$VerbosePreference |
+    New-ChangelogSection @clSectionParams -Verbose:$VerbosePreference
+
+Write-Host "PSES CHANGELOG:`n`n$psesChangelogSection`n`n"
 
 $cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${psesRepoName}_changelogupdate"
 
@@ -148,24 +157,26 @@ $cloneParams = @{
     CheckoutBranch = $branchName
     Clobber = $true
 }
-Copy-GitRepository @cloneParams
+Copy-GitRepository @cloneParams -Verbose:$VerbosePreference
 
 UpdateChangelogFile -NewSection $psesChangelogSection -Path "$cloneLocation/$ChangelogName"
 
-Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName"
+Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName" -Verbose:$VerbosePreference
 
 #endregion
 
 #region vscode-PowerShell Changelog
 $psesChangelogPostamble = $psesChangelogSection -split "`n"
-$psesChangelogPostamble = @("#### [$psesRepoName](https://github.com/$Organization/$psesRepoName)") + $psesChangelogPostamble[2..$psesChangelogPostamble.Length-1]
+$psesChangelogPostamble = @("#### [$psesRepoName](https://github.com/$Organization/$psesRepoName)") + $psesChangelogPostamble[2..($psesChangelogPostamble.Length-3)]
 $psesChangelogPostamble = $psesChangelogPostamble -join "`n"
 
-$psextChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PSExtensionRepositoryPath |
-    Get-ChangeInfoFromCommit -GitHubToken $GitHubToken |
-    Skip-IgnoredChange @ignore |
-    New-ChangelogEntry @clEntryParams |
-    New-ChangelogSection @clSectionParams -Preamble "#### [$vscodeRepoName](https://github.com/$Organization/$vscodeRepoName)" -Postamble $psesChangelogPostamble
+$psextChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PSExtensionRepositoryPath -Verbose:$VerbosePreference |
+    Get-ChangeInfoFromCommit -GitHubToken $GitHubToken -Verbose:$VerbosePreference |
+    Skip-IgnoredChange @ignore -Verbose:$VerbosePreference |
+    New-ChangelogEntry @clEntryParams -Verbose:$VerbosePreference |
+    New-ChangelogSection @clSectionParams -Preamble "#### [$vscodeRepoName](https://github.com/$Organization/$vscodeRepoName)" -Postamble $psesChangelogPostamble -Verbose:$VerbosePreference
+
+Write-Host "vscode-PowerShell CHANGELOG:`n`n$psextChangelogSection`n`n"
 
 $cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${vscodeRepoName}_changelogupdate"
 
@@ -175,11 +186,11 @@ $cloneParams = @{
     CheckoutBranch = $branchName
     Clobber = $true
 }
-Copy-GitRepository @cloneParams
+Copy-GitRepository @cloneParams -Verbose:$VerbosePreference
 
 UpdateChangelogFile -NewSection $psextChangelogSection -Path "$cloneLocation/$ChangelogName"
 
-Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName"
+Submit-GitChanges -RepositoryLocation $cloneLocation -File $GalleryFileName -Branch $branchName -Message "Update CHANGELOG for $ReleaseName" -Verbose:$VerbosePreference
 
 #endregion vscode-PowerShell Changelog
 
@@ -194,7 +205,7 @@ $prParams = @{
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
 }
-New-GitHubPR @prParams
+New-GitHubPR @prParams -Verbose:$VerbosePreference
 
 # vscode-PowerShell PR
 $prParams = @{
@@ -205,6 +216,6 @@ $prParams = @{
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
 }
-New-GitHubPR @prParams
+New-GitHubPR @prParams -Verbose:$VerbosePreference
 
 #endregion PRs

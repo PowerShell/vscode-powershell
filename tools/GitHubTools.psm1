@@ -288,6 +288,8 @@ function Copy-GitRepository
         New-Item -Path $containingDir -ItemType Directory -ErrorAction Stop
     }
 
+    Write-Verbose "Cloning git repository '$OriginRemote' to path '$Destination'"
+
     Exec { git clone --single-branch --branch $CloneBranch $OriginRemote $Destination }
 
     Push-Location $Destination
@@ -335,9 +337,9 @@ function Submit-GitChanges
         [string]
         $Branch,
 
-        [Parameter(Mandatory)]
+        [Parameter()]
         [string]
-        $RepositoryLocation,
+        $RepositoryLocation = (Get-Location),
 
         [Parameter()]
         [string[]]
@@ -369,6 +371,9 @@ function Submit-GitChanges
         {
             Exec { git add -A }
         }
+
+        Write-Verbose "Commiting and pushing changes in '$RepositoryLocation' to '$Remote/$Branch'"
+
         Exec { git commit -m $Message }
         Exec { git push $Remote $Branch }
     }
@@ -429,6 +434,8 @@ function Get-GitCommit
         $organization = $originDetails.Organization
         $repository = $originDetails.Repository
 
+        Write-Verbose "Getting local git commit data"
+
         $format = '%H||%P||%aN||%aE||%s'
         $commits = Exec { git --no-pager log "$SinceRef..$UntilRef" --format=$format }
 
@@ -457,6 +464,7 @@ function Get-GitCommit
                 }
 
                 # Query the GitHub API for more commit information
+                Write-Verbose "Querying GitHub api for data on commit $hash"
                 $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash" @irmParams
 
                 # Look for something like 'This is a commit message (#1224)'
@@ -537,6 +545,7 @@ function New-GitHubPR
 
     $headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json'
 
+    Write-Verbose "Opening new GitHub pull request on '$Organization/$Repository' with title '$Title'"
     Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
 }
 
@@ -573,6 +582,8 @@ function Get-GitHubPR
                 $params.Headers = GetGitHubHeaders -GitHubToken $GitHubToken
             }
 
+            Write-Verbose "Retrieving GitHub pull request #$_"
+
             $prResponse = Invoke-RestMethod @params
 
             [GitHubPR]@{
@@ -591,7 +602,7 @@ filter Get-GitHubIssue
     [CmdletBinding(DefaultParameterSetName='IssueInfo')]
     param(
         [Parameter(Mandatory, ValueFromPipeline, Position=0, ParameterSetName='IssueInfo')]
-        [GitHubIssueInfo]
+        [GitHubIssueInfo[]]
         $IssueInfo,
 
         [Parameter(Mandatory, ParameterSetName='Params')]
@@ -612,34 +623,38 @@ filter Get-GitHubIssue
         $GitHubToken
     )
 
-    if (-not $IssueInfo)
+    foreach ($issue in $IssueInfo)
     {
-        $IssueInfo = [GitHubIssueInfo]@{
-            Organization = $Organization
-            Repository = $Repository
-            Number = $Number
+        if (-not $issue)
+        {
+            $issue = [GitHubIssueInfo]@{
+                Organization = $Organization
+                Repository = $Repository
+                Number = $Number
+            }
         }
-    }
 
-    $irmParams = @{
-        Method = 'Get'
-        Uri = $IssueInfo.GetApiUri()
-    }
+        $irmParams = @{
+            Method = 'Get'
+            Uri = $IssueInfo.GetApiUri()
+        }
 
-    if ($GitHubToken)
-    {
-        $irmParams.Headers = GetGitHubHeaders -GitHubToken $GitHubToken
-    }
+        if ($GitHubToken)
+        {
+            $irmParams.Headers = GetGitHubHeaders -GitHubToken $GitHubToken
+        }
 
-    $issueResponse = Invoke-RestMethod @irmParams
+        Write-Verbose "Retrieving GitHub issue #$($issue.Number)"
+        $issueResponse = Invoke-RestMethod @irmParams
 
-    return [GitHubIssue]@{
-        Organization = $IssueInfo.Organization
-        Repository = $IssueInfo.Repository
-        Number = $IssueInfo.Number
-        RawResponse = $issueResponse
-        Body = $issueResponse.body
-        Labels = $issueResponse.labels.name
+        return [GitHubIssue]@{
+            Organization = $issue.Organization
+            Repository = $issue.Repository
+            Number = $issue.Number
+            RawResponse = $issueResponse
+            Body = $issueResponse.body
+            Labels = $issueResponse.labels.name
+        }
     }
 }
 
@@ -703,6 +718,8 @@ function Publish-GitHubRelease
     $uri = "https://api.github.com/repos/$Organization/$Repository/releases"
     $headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json'
 
+    Write-Verbose "Publishing GitHub release '$ReleaseName' to $Organization/$Repository"
+
     $response = Invoke-RestMethod -Method Post -Uri $uri -Body $restBody -Headers $headers
 
     $releaseId = $response.id
@@ -729,6 +746,9 @@ function Publish-GitHubRelease
 
         $assetUri = "${assetBaseUri}?name=$fileName"
         $headers = GetGitHubHeaders -GitHubToken $GitHubToken
+
+        Write-Verbose "Uploading release asset '$fileName' to release '$ReleaseName' in $Organization/$Repository"
+
         # This can be very slow, but it does work
         $null = Invoke-RestMethod -Method Post -Uri $assetUri -InFile $asset -ContentType $contentType -Headers $headers
     }

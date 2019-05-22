@@ -66,6 +66,8 @@ filter Get-ChangeInfoFromCommit
 
     foreach ($singleCommit in $Commit)
     {
+        Write-Verbose "Getting change information for commit $($Commit.Hash)"
+
         $changelogItem = [ChangeInfo]@{
             Commit = $singleCommit
             BodyText = $singleCommit.Body
@@ -162,6 +164,8 @@ filter New-ChangelogEntry
     {
         $subject = $Matches[1]
     }
+
+    Write-Verbose "Assembled changelog entry for commit $($Change.Commit.Hash)"
 
     return [ChangelogEntry]@{
         IssueLink = $issueLink
@@ -338,8 +342,11 @@ filter Skip-IgnoredChange
 
     :outer foreach ($chg in $Change)
     {
+        $msg = $chg.Subject
         if ($chg.ContributingUser -in $User)
         {
+            $u = $chg.ContributingUser
+            Write-Verbose "Skipping change from user '$u': '$msg'"
             continue
         }
 
@@ -347,6 +354,7 @@ filter Skip-IgnoredChange
         {
             if ($chgCommitLabel -in $CommitLabel)
             {
+                Write-Verbose "Skipping change with commit label '$chgCommitLabel': '$msg'"
                 continue outer
             }
         }
@@ -355,6 +363,7 @@ filter Skip-IgnoredChange
         {
             if ($chgIssueLabel -in $IssueLabel)
             {
+                Write-Verbose "Skipping change with issue label '$chgIssueLabel': '$msg'"
                 continue outer
             }
         }
@@ -363,6 +372,7 @@ filter Skip-IgnoredChange
         {
             if ($chgPRLabel -in $PRLabel)
             {
+                Write-Verbose "Skipping change with PR label '$chgPRLabel': '$msg'"
                 continue outer
             }
         }
