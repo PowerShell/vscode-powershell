@@ -1,6 +1,6 @@
 # vscode-powershell Release History
 
-## v2.0.0-preview.3
+## v2019.5.0
 ### Wednesday, May 22, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
