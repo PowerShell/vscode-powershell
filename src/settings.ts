@@ -186,12 +186,12 @@ export function load(): ISettings {
     };
 }
 
-export function change(settingName: string, newValue: any, global: boolean = false): Thenable<void> {
+export async function change(settingName: string, newValue: any, global: boolean = false): Promise<void> {
     const configuration: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration(
             utils.PowerShellLanguageId);
 
-    return configuration.update(settingName, newValue, global);
+    await configuration.update(settingName, newValue, global);
 }
 
 function getWorkspaceSettingsWithDefaults<TSettings>(
