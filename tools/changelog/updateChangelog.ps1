@@ -240,7 +240,7 @@ $psExtGetCommitParams = @{
 $psextChangelogSection = Get-GitCommit @psExtGetCommitParams |
     Get-ChangeInfoFromCommit -GitHubToken $GitHubToken -Verbose:$VerbosePreference |
     Skip-IgnoredChange @ignore -Verbose:$VerbosePreference |
-    New-ChangelogEntry @clEntryParams -Verbose:$VerbosePreference |
+    New-ChangelogEntry @clEntryParams |
     New-ChangelogSection @clSectionParams -Preamble "#### [$vscodeRepoName](https://github.com/$Organization/$vscodeRepoName)" -Postamble $psesChangelogPostamble
 
 Write-Host "vscode-PowerShell CHANGELOG:`n`n$psextChangelogSection`n`n"
