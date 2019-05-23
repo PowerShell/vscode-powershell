@@ -14,7 +14,11 @@ param(
 
     [Parameter(Mandatory)]
     [string]
-    $SinceRef,
+    $PSExtensionSinceRef,
+
+    [Parameter(Mandatory)]
+    [string]
+    $PsesSinceRef,
 
     [Parameter()]
     [version]
@@ -34,7 +38,11 @@ param(
 
     [Parameter()]
     [string]
-    $UntilRef = 'HEAD',
+    $PSExtensionUntilRef = 'HEAD',
+
+    [Parameter()]
+    [string]
+    $PsesUntilRef = 'HEAD',
 
     [Parameter()]
     [string]
@@ -163,6 +171,14 @@ $branchName = "changelog-$ReleaseName"
 
 #region PSES Changelog
 
+$psesGetCommitParams = @{
+    SinceRef = $PsesSinceRef
+    UntilRef = $PsesUntilRef
+    GitHubToken = $GitHubToken
+    RepositoryPath = $PsesRepositoryPath
+    Verbose = $VerbosePreference
+}
+
 $clEntryParams = @{
     EntryCategories = $categories
     DefaultCategory = $defaultCategory
@@ -171,22 +187,23 @@ $clEntryParams = @{
         'Issue-Bug' = '🐛'
     }
     NoThanks = $noThanks
+    Verbose = $VerbosePreference
 }
 
 $clSectionParams = @{
     Categories = $categories.Keys
     DefaultCategory = $defaultCategory
-    ReleaseName = $ReleaseName
     DateFormat = $dateFormat
+    Verbose = $VerbosePreference
 }
 
 Write-Verbose "Creating PSES changelog"
 
-$psesChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PsesRepositoryPath -Verbose:$VerbosePreference |
+$psesChangelogSection = Get-GitCommit @psesGetCommitParams |
     Get-ChangeInfoFromCommit -GitHubToken $GitHubToken -Verbose:$VerbosePreference |
     Skip-IgnoredChange @ignore -Verbose:$VerbosePreference |
-    New-ChangelogEntry @clEntryParams -Verbose:$VerbosePreference |
-    New-ChangelogSection @clSectionParams -Verbose:$VerbosePreference
+    New-ChangelogEntry @clEntryParams |
+    New-ChangelogSection @clSectionParams -ReleaseName $PsesReleaseName
 
 Write-Host "PSES CHANGELOG:`n`n$psesChangelogSection`n`n"
 
@@ -212,7 +229,15 @@ $psesChangelogPostamble = $psesChangelogSection -split "`n"
 $psesChangelogPostamble = @("#### [$psesRepoName](https://github.com/$Organization/$psesRepoName)") + $psesChangelogPostamble[2..($psesChangelogPostamble.Length-3)]
 $psesChangelogPostamble = $psesChangelogPostamble -join "`n"
 
-$psextChangelogSection = Get-GitCommit -SinceRef $SinceRef -UntilRef $UntilRef -GitHubToken $GitHubToken -RepositoryPath $PSExtensionRepositoryPath -Verbose:$VerbosePreference |
+$psExtGetCommitParams = @{
+    SinceRef = $PSExtensionSinceRef
+    UntilRef = $PSExtensionUntilRef
+    GitHubToken = $GitHubToken
+    RepositoryPath = $PSExtensionRepositoryPath
+    Verbose = $VerbosePreference
+}
+
+$psextChangelogSection = Get-GitCommit @psExtGetCommitParams |
     Get-ChangeInfoFromCommit -GitHubToken $GitHubToken -Verbose:$VerbosePreference |
     Skip-IgnoredChange @ignore -Verbose:$VerbosePreference |
     New-ChangelogEntry @clEntryParams -Verbose:$VerbosePreference |
