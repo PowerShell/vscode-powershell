@@ -11,6 +11,7 @@ param(
 
 # Grab package.json data which is used throughout the build.
 $script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
+$script:IsPreviewExtension = $script:PackageJson.name -like "*preview*" -or $script:PackageJson.displayName -like "*preview*"
 Write-Host "`n### Extension Version: $($script:PackageJson.version) Extension Name: $($script:PackageJson.name)`n" -ForegroundColor Green
 
 #region Utility tasks
@@ -120,7 +121,7 @@ task TestAll TestEditorServices, Test
 #endregion
 #region Package tasks
 
-task UpdateReadme -If { $script:PackageJson.version -like "*preview*" } {
+task UpdateReadme -If { $script:IsPreviewExtension } {
     # Add the preview text
     $newReadmeTop = '# PowerShell Language Support for Visual Studio Code
 > ## ATTENTION: This is the PREVIEW version of the PowerShell extension for VSCode which contains features that are being evaluated for stable. It works with PowerShell 5.1 and up.
@@ -135,7 +136,7 @@ task UpdateReadme -If { $script:PackageJson.version -like "*preview*" } {
 }
 
 task UpdatePackageJson {
-    if ($script:PackageJson.name -like "*preview*" -or $script:PackageJson.displayName -like "*preview*") {
+    if ($script:IsPreviewExtension) {
         $script:PackageJson.name = "powershell-preview"
         $script:PackageJson.displayName = "PowerShell Preview"
         $script:PackageJson.description = "(Preview) Develop PowerShell scripts in Visual Studio Code!"
