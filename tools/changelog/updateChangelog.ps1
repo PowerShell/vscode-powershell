@@ -165,7 +165,7 @@ $categories = [ordered]@{
 
 $defaultCategory = 'General'
 
-$branchName = "changelog-$ReleaseName"
+$branchName = "changelog-$PSExtensionReleaseName"
 
 #endregion Configuration
 
@@ -270,7 +270,7 @@ $prParams = @{
     Organization = $TargetFork
     Repository = $psesRepoName
     Branch = $branchName
-    Title = "Update CHANGELOG for $ReleaseName"
+    Title = "Update CHANGELOG for $PsesReleaseName"
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
 }
@@ -281,7 +281,7 @@ $prParams = @{
     Organization = $TargetFork
     Repository = $vscodeRepoName
     Branch = $branchName
-    Title = "Update $extensionName CHANGELOG for $ReleaseName"
+    Title = "Update $extensionName CHANGELOG for $PSExtensionReleaseName"
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
 }
