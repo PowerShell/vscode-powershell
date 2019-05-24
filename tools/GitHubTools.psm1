@@ -439,10 +439,16 @@ function Get-GitCommit
         $organization = $originDetails.Organization
         $repository = $originDetails.Repository
 
+        Wait-Debugger
+
         Write-Verbose "Getting local git commit data"
 
+        $null = Exec { git fetch --all }
+
+        $lastCommonCommit = Exec { git merge-base $SinceRef $UntilRef }
+
         $format = '%H||%P||%aN||%aE||%s'
-        $commits = Exec { git --no-pager log "$SinceRef..$UntilRef" --format=$format }
+        $commits = Exec { git --no-pager log "$lastCommonCommit..$UntilRef" --format=$format }
 
         $irmParams = if ($GitHubToken)
         {
