@@ -6,6 +6,10 @@
 using module ..\GitHubTools.psm1
 using module ..\ChangelogTools.psm1
 
+<#
+.EXAMPLE
+.\updateChangelog.ps1 -GitHubToken $ghTok -PSExtensionSinceRef v2.0.0-preview.3 -PsesSinceRef v2.0.0-preview.3 -PSExtensionVersion 2019.5.0 -PsesVersion 1.12.2 -PSExtensionUntilRef legacy/1.x -PsesUntilRef legacy/1.x -Verbose
+#>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
@@ -43,6 +47,14 @@ param(
     [Parameter()]
     [string]
     $PsesUntilRef = 'HEAD',
+
+    [Parameter()]
+    [string]
+    $PSExtensionBaseBranch, # Default is master if HEAD, otherwise $PSExtensionSinceRef
+
+    [Parameter()]
+    [string]
+    $PsesBaseBranch, # Default is master if HEAD, otherwise $PsesSinceRef
 
     [Parameter()]
     [string]
@@ -96,6 +108,30 @@ if (-not $PSExtensionReleaseName)
 if (-not $PsesReleaseName)
 {
     $PsesReleaseName = "v$PsesVersion"
+}
+
+if (-not $PSExtensionBaseBranch)
+{
+    $PSExtensionBaseBranch = if ($PSExtensionUntilRef -eq 'HEAD')
+    {
+        'master'
+    }
+    else
+    {
+        $PSExtensionUntilRef
+    }
+}
+
+if (-not $PsesBaseBranch)
+{
+    $PsesBaseBranch = if ($PsesUntilRef -eq 'HEAD')
+    {
+        'master'
+    }
+    else
+    {
+        $PsesUntilRef
+    }
 }
 
 function UpdateChangelogFile
@@ -213,6 +249,7 @@ $cloneParams = @{
     OriginRemote = "https://github.com/$FromFork/$psesRepoName"
     Destination = $cloneLocation
     CheckoutBranch = $branchName
+    CloneBranch = $PsesBaseBranch
     Clobber = $true
     Remotes = @{ 'upstream' = "https://github.com/$TargetFork/$vscodeRepoName" }
 }
@@ -241,7 +278,7 @@ $psextChangelogSection = Get-GitCommit @psExtGetCommitParams |
     Get-ChangeInfoFromCommit -GitHubToken $GitHubToken -Verbose:$VerbosePreference |
     Skip-IgnoredChange @ignore -Verbose:$VerbosePreference |
     New-ChangelogEntry @clEntryParams |
-    New-ChangelogSection @clSectionParams -Preamble "#### [$vscodeRepoName](https://github.com/$Organization/$vscodeRepoName)" -Postamble $psesChangelogPostamble
+    New-ChangelogSection @clSectionParams -Preamble "#### [$vscodeRepoName](https://github.com/$Organization/$vscodeRepoName)" -Postamble $psesChangelogPostamble -ReleaseName $PSExtensionReleaseName
 
 Write-Host "vscode-PowerShell CHANGELOG:`n`n$psextChangelogSection`n`n"
 
@@ -251,6 +288,7 @@ $cloneParams = @{
     OriginRemote = "https://github.com/$FromFork/$vscodeRepoName"
     Destination = $cloneLocation
     CheckoutBranch = $branchName
+    CloneBranch = $PSExtensionBaseBranch
     Clobber = $true
     Remotes = @{ 'upstream' = "https://github.com/$TargetFork/$vscodeRepoName" }
     PullUpstream = $true
@@ -273,6 +311,7 @@ $prParams = @{
     Title = "Update CHANGELOG for $PsesReleaseName"
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
+    TargetBranch = $PsesBaseBranch
 }
 New-GitHubPR @prParams -Verbose:$VerbosePreference
 
@@ -284,6 +323,7 @@ $prParams = @{
     Title = "Update $extensionName CHANGELOG for $PSExtensionReleaseName"
     GitHubToken = $GitHubToken
     FromOrg = $FromFork
+    TargetBranch = $PSExtensionBaseBranch
 }
 New-GitHubPR @prParams -Verbose:$VerbosePreference
 
