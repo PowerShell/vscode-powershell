@@ -2061,3 +2061,4 @@ Initial release with the following features:
 - Find References of cmdlets and variables
 - Document and workspace symbol discovery
 - Local script debugging and basic interactive console support
+
