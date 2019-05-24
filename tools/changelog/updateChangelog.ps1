@@ -269,8 +269,6 @@ Write-Host "vscode-PowerShell CHANGELOG:`n`n$psextChangelogSection`n`n"
 
 #region PRs
 
-return
-
 # PSES PR
 $cloneLocation = Join-Path ([System.IO.Path]::GetTempPath()) "${psesRepoName}_changelogupdate"
 

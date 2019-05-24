@@ -439,8 +439,6 @@ function Get-GitCommit
         $organization = $originDetails.Organization
         $repository = $originDetails.Repository
 
-        Wait-Debugger
-
         Write-Verbose "Getting local git commit data"
 
         $null = Exec { git fetch --all }
