@@ -42,7 +42,7 @@ const PackageJSON: any = require("../../package.json");
 
 // NOTE: We will need to find a better way to deal with the required
 //       PS Editor Services version...
-const requiredEditorServicesVersion = "1.12.1";
+const requiredEditorServicesVersion = "1.12.2";
 
 // the application insights key (also known as instrumentation key) used for telemetry.
 const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
