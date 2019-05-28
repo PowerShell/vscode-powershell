@@ -1,5 +1,39 @@
 # vscode-powershell Release History
 
+## v2019.5.0
+### Friday, May 24, 2019
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- ✨ [vscode-PowerShell #1973](https://github.com/PowerShell/vscode-PowerShell/pull/1973) -
+  Allow passing runspace name.
+- ✨ [vscode-PowerShell #1959](https://github.com/PowerShell/vscode-PowerShell/pull/1959) -
+  Add rich nav.
+- ✨ [vscode-PowerShell #1924](https://github.com/PowerShell/vscode-PowerShell/pull/1924) -
+  Add telemetry for PowerShell Version.
+- 🐛 [vscode-PowerShell #1940](https://github.com/PowerShell/vscode-PowerShell/pull/1940) -
+  Fix change session by moving to async/await promise.
+- 🐛 [vscode-PowerShell #1931](https://github.com/PowerShell/vscode-PowerShell/pull/1931) -
+  Fix upload bug report.
+- ✨ [vscode-PowerShell #1938](https://github.com/PowerShell/vscode-PowerShell/pull/1938) -
+  Move to date-based versions.
+- 🐛 [vscode-PowerShell #1923](https://github.com/PowerShell/vscode-PowerShell/pull/1923) -
+  Fix CustomViews by switching to WebViews.
+- 🐛 [vscode-PowerShell #1922](https://github.com/PowerShell/vscode-PowerShell/pull/1922) -
+  Fix small typo in Function-Inline description. (Thanks @V-ed!)
+- 💻 [vscode-PowerShell #1873](https://github.com/PowerShell/vscode-PowerShell/pull/1873) -
+  Switch to Azure DevOps for CI.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ [PowerShellEditorServices #957](https://github.com/PowerShell/PowerShellEditorServices/pull/957) -
+  Allow passing RunspaceName.
+- 🐛 [PowerShellEditorServices #956](https://github.com/PowerShell/PowerShellEditorServices/pull/956) -
+  Add check for workspace path.
+- 🐛 [PowerShellEditorServices #947](https://github.com/PowerShell/PowerShellEditorServices/pull/947) -
+  Fix silent failure by using Id for dictionary since multiple pages could have the same title.
+- 💻 [PowerShellEditorServices #923](https://github.com/PowerShell/PowerShellEditorServices/pull/923) -
+  Moved to Azure DevOps for CI.
+
 ## v1.12.1
 ### Wednesday, April 10, 2019
 
@@ -2027,3 +2061,4 @@ Initial release with the following features:
 - Find References of cmdlets and variables
 - Document and workspace symbol discovery
 - Local script debugging and basic interactive console support
+
