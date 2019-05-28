@@ -32,13 +32,16 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private currentPanel: vscode.WebviewPanel | undefined;
     private htmlUri: any;
     private scriptUri: any;
+    private styleUri: any;
 
     constructor(private log: Logger, private extensionContext: vscode.ExtensionContext) {
         super();
         const htmlDiskPath = vscode.Uri.file(path.join(this.extensionContext.extensionPath, "media", "insert.html"));
         const jsDiskPath = vscode.Uri.file(path.join(this.extensionContext.extensionPath, "media", "script.js"));
+        const cssDiskPath = vscode.Uri.file(path.join(this.extensionContext.extensionPath, "media", "style.css"));
         this.htmlUri = htmlDiskPath.with({ scheme: "vscode-resource" });
         this.scriptUri = jsDiskPath.with({ scheme: "vscode-resource" });
+        this.styleUri = cssDiskPath.with({ scheme: "vscode-resource" });
         this.command = vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
             () => this.CommandExplorerRefresh());
         this.commandsExplorerProvider = new CommandsExplorerProvider();
@@ -136,7 +139,8 @@ export class GetCommandsFeature extends LanguageClientConsumer {
             );
 
             this.currentPanel.webview.html = fs.readFileSync(this.htmlUri.fsPath, "utf8")
-                .replace("%SCRIPTSRC%", this.scriptUri);
+                .replace("%SCRIPTSRC%", this.scriptUri)
+                .replace("%STYLESRC%", this.styleUri);
             this.currentPanel.webview.onDidReceiveMessage((message) => {
                 this.InsertCommand(message);
                 this.currentPanel.dispose();
