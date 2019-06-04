@@ -98,7 +98,7 @@ window.addEventListener("message", (event) => {
             let validateSet = false;
             let validValues = null;
             for (const currAttribute of currParameter.attributes) {
-                if (currAttribute.validValues !== undefined) {
+                if (currAttribute.hasOwnProperty("validValues")) {
                     validateSet = true;
                     validValues = currAttribute.validValues;
                 }
