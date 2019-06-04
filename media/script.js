@@ -50,8 +50,8 @@ function mySubmit() {
 
 function parameterSetToggle(toggleParameterSet) {
     const psetDivs = parameterSets.getElementsByTagName("div");
-    for (let index = 0; index < psetDivs.length; index++) {
-        psetDivs[index].style.display = "none";
+    for (const iterator of psetDivs) {
+        iterator.style.display = "none";
     }
     document.getElementById(toggleParameterSet).style.display = null;
 }
@@ -71,8 +71,7 @@ window.addEventListener("message", (event) => {
     }
     message = event.data[0];
     document.getElementById("CommandName").innerText = message.name;
-    for (let i = 0; i < message.parameterSets.length; i++) {
-        const pSet = message.parameterSets[i];
+    for (const pSet of message.parameterSets) {
         if (pSet.isDefault) {
             defaultParamSet = pSet.name;
         }
@@ -84,8 +83,7 @@ window.addEventListener("message", (event) => {
             parameterSetToggle(ev.target.innerText);
         };
         parameterSets.appendChild(setHeader);
-        for (let j = 0; j < pSet.parameters.length; j++) {
-            const currParameter = pSet.parameters[j];
+        for (const currParameter of pSet.parameters) {
             if (
                 (switchCommonParameters.findIndex((param) => param === currParameter.name) !== -1)
                 || (stringCommonParameters.findIndex((param) => param === currParameter.name) !== -1)
@@ -97,20 +95,28 @@ window.addEventListener("message", (event) => {
             parameterLabel.htmlFor = pSet.name + "-" + currParameter.name;
             parameterLabel.innerText = currParameter.name;
             let parameterInput = null;
-            if (currParameter.attributes[1] === undefined || currParameter.attributes[1].validValues === undefined) {
+            let validateSet = false;
+            let validValues = null;
+            for (const currAttribute of currParameter.attributes) {
+                if (currAttribute.validValues !== undefined) {
+                    validateSet = true;
+                    validValues = currAttribute.validValues;
+                }
+            }
+            if (!validateSet) {
                 parameterInput = document.createElement("input");
                 parameterInput.type = currParameter.parameterType.search("SwitchParameter") !== -1 ? "checkbox" : "text";
             } else {
                 parameterInput = document.createElement("select");
                 parameterInput.appendChild(document.createElement("option"));
-                currParameter.attributes[1].validValues.forEach((value) => {
+                for (const value of validValues) {
                     const valueElement = document.createElement("option");
                     valueElement.value = value;
                     valueElement.innerText = value;
                     parameterInput.appendChild(valueElement);
-                });
+                }
             }
-            if (pSet.parameters[j].attributes[0].mandatory) {
+            if (currParameter.isMandatory) {
                 parameterLabel.innerText += " *";
                 parameterLabel.style = "font-weight: bold";
                 parameterInput.required = true;
