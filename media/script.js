@@ -29,22 +29,22 @@ const stringCommonParameters = [
 function mySubmit() {
     const myMessage = message;
     myMessage.filledParameters = {};
-    parameterSets.childNodes.forEach((node) => {
+    for (const node of parameterSets.childNodes) {
         if (node.childElementCount > 0 && (node.style.display !== "none" || node.id === "commonParameters")) {
-            node.childNodes.forEach((a) => {
-                if (a.className === "parameters" && a.value !== "") {
-                    const id = a.id.substring(a.id.lastIndexOf("-") + 1, a.id.length);
-                    if (a.type === "checkbox") {
-                        if (a.checked) {
+            for (const currNode of node.childNodes) {
+                if (currNode.className === "parameters" && currNode.value !== "") {
+                    const id = currNode.id.substring(currNode.id.lastIndexOf("-") + 1, currNode.id.length);
+                    if (currNode.type === "checkbox") {
+                        if (currNode.checked) {
                             myMessage.filledParameters[id] = "$true";
                         }
                     } else {
-                        myMessage.filledParameters[id] = a.value.trim();
+                        myMessage.filledParameters[id] = currNode.value.trim();
                     }
                 }
-            });
+            }
         }
-    });
+    }
     vscode.postMessage(myMessage);
 }
 
