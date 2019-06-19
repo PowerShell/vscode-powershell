@@ -42,7 +42,7 @@ export class CodeActionsFeature implements IFeature {
     }
 
     public showRuleDocumentation(ruleId: string) {
-        const pssaDocBaseURL = "https://github.com/PowerShell/PSScriptAnalyzer/blob/development/RuleDocumentation";
+        const pssaDocBaseURL = "https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation";
 
         if (!ruleId) {
             this.log.writeWarning("Cannot show documentation for code action, no ruleName was supplied.");
