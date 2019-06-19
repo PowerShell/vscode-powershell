@@ -13,8 +13,8 @@ param(
     $ExtensionVersion,
 
     [Parameter()]
-    [string]
-    $GalleryFileName = 'extensionsGallery.json',
+    [string[]]
+    $GalleryFileName = ('extensionsGallery.json','extensionsGallery-insider.json'),
 
     [Parameter()]
     [string]
@@ -213,26 +213,32 @@ function UpdateGalleryFile
         [version]
         $ExtensionVersion,
 
-        [Parameter()]
-        [string]
-        $GalleryFilePath = './extensionsGallery-insider.json'
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [string[]]
+        $GalleryFilePath
     )
 
-    # Create a new PowerShell extension entry
-    $powershellEntry = NewPowerShellExtensionEntry -ExtensionVersion $ExtensionVersion
-    $entryStr = ConvertTo-IndentedJson $powershellEntry -IndentChar "`t" -IndentWidth 1
+    process
+    {
+        foreach ($galleryFile in $GalleryFilePath)
+        {
+            # Create a new PowerShell extension entry
+            $powershellEntry = NewPowerShellExtensionEntry -ExtensionVersion $ExtensionVersion
+            $entryStr = ConvertTo-IndentedJson $powershellEntry -IndentChar "`t" -IndentWidth 1
 
-    # Find the position in the existing file where the PowerShell extension should go
-    $galleryFileContent = Get-Content -Raw $GalleryFilePath
-    $span = FindPSExtensionJsonSpan -GalleryExtensionFileContent $galleryFileContent
-    $startOffset = Get-StringOffsetFromSpan -String $galleryFileContent -EndLine $span.Start.Line -Column $span.Start.Column
-    $endOffset = Get-StringOffsetFromSpan -String $galleryFileContent -EndLine $span.End.Line -StartLine $span.Start.Line -Column $span.End.Column -InitialOffset $startOffset
+            # Find the position in the existing file where the PowerShell extension should go
+            $galleryFileContent = Get-Content -Raw $GalleryFilePath
+            $span = FindPSExtensionJsonSpan -GalleryExtensionFileContent $galleryFileContent
+            $startOffset = Get-StringOffsetFromSpan -String $galleryFileContent -EndLine $span.Start.Line -Column $span.Start.Column
+            $endOffset = Get-StringOffsetFromSpan -String $galleryFileContent -EndLine $span.End.Line -StartLine $span.Start.Line -Column $span.End.Column -InitialOffset $startOffset
 
-    # Create the new file contents with the inserted segment
-    $newGalleryFileContent = New-StringWithSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex ($endOffset+1) -AutoIndent
+            # Create the new file contents with the inserted segment
+            $newGalleryFileContent = New-StringWithSegment -String $galleryFileContent -NewSegment $entryStr -StartIndex $startOffset -EndIndex ($endOffset+1) -AutoIndent
 
-    # Write out the new entry
-    Set-Content -Path $GalleryFilePath -Value $newGalleryFileContent -Encoding utf8NoBOM -NoNewline
+            # Write out the new entry
+            Set-Content -Path $GalleryFilePath -Value $newGalleryFileContent -Encoding utf8NoBOM -NoNewline
+        }
+    }
 }
 
 $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'ads-temp-checkout'
@@ -243,13 +249,17 @@ $cloneParams = @{
     CloneBranch = 'release/extensions'
     CheckoutBranch = $branchName
     Clobber = $true
+    PullUpstream = $true
+    UpdateOrigin = $true
     Remotes = @{
         upstream = 'https://github.com/Microsoft/AzureDataStudio'
     }
 }
 Copy-GitRepository @cloneParams
 
-UpdateGalleryFile -ExtensionVersion $ExtensionVersion -GalleryFilePath "$repoLocation/$GalleryFileName"
+$GalleryFileName |
+    ForEach-Object { "$repoLocation/$_" } |
+    UpdateGalleryFile -ExtensionVersion $ExtensionVersion
 
 Submit-GitChanges -RepositoryLocation $repoLocation -File $GalleryFileName -Branch $branchName -Message "Update PS extension to v$ExtensionVersion"
 
