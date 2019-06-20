@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.31.0"
+    "vscode": "^1.34.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -545,12 +545,14 @@
         "powershell.powerShellExePath": {
           "type": "string",
           "default": "",
+          "scope": "machine",
           "isExecutable": true,
           "description": "Specifies the full path to a PowerShell executable. Changes the installation of PowerShell used for language and debugging services."
         },
         "powershell.powerShellAdditionalExePaths": {
           "type": "array",
           "description": "Specifies an array of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
+          "scope": "machine",
           "isExecutable": true,
           "uniqueItems": true,
           "items": {
@@ -755,6 +757,7 @@
         "powershell.developer.powerShellExePath": {
           "type": "string",
           "default": "",
+          "scope": "machine",
           "isExecutable": true,
           "description": "Deprecated. Please use the 'powershell.powerShellExePath' setting instead"
         }
