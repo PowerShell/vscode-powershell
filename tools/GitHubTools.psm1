@@ -68,7 +68,13 @@ function Copy-GitRepository
         $Remotes,
 
         [switch]
-        $Clobber
+        $Clobber,
+
+        [switch]
+        $PullUpstream,
+
+        [switch]
+        $UpdateOrigin
     )
 
     $Destination = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($Destination)
@@ -101,9 +107,14 @@ function Copy-GitRepository
             Exec { git remote add $remote $Remotes[$remote] }
         }
 
-        if ($remote['upstream'])
+        if ($PullUpstream -and $remote['upstream'])
         {
             Exec { git pull upstream $CloneBranch }
+
+            if ($UpdateOrigin)
+            {
+                Exec { git push origin "+$CloneBranch"}
+            }
         }
 
         if ($CheckoutBranch)
