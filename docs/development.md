@@ -55,4 +55,8 @@ When you build, this will:
 - Add a warning to the top of the README.md to warn users not to have the stable and preview version enabled at the same time
 - Adds "Preview" in a few places in the package.json
 
-This mechanism is mostly used for releases.
+This mechanism is mostly used for releases
+
+## Contributing Snippets
+
+For more information on contributing snippets please read our [snippet requirements](https://github.com/PowerShell/vscode-powershell/blob/master/docs/community_snippets.md#contributing). 
