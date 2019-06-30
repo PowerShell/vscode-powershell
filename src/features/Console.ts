@@ -2,6 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
+import * as path from "path";
 import vscode = require("vscode");
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
@@ -224,6 +225,9 @@ export class ConsoleFeature implements IFeature {
                     return;
                 }
 
+                // For the Integrated Console, we'll try to replace $PSScriptRoot. In the future, this should
+                // be the default behavior.
+
                 const editor = vscode.window.activeTextEditor;
                 let selectionRange: vscode.Range;
 
@@ -236,13 +240,15 @@ export class ConsoleFeature implements IFeature {
                     selectionRange = editor.document.lineAt(editor.selection.start.line).range;
                 }
 
-                this.languageClient.sendRequest(EvaluateRequestType, {
-                    expression: editor.document.getText(selectionRange),
-                });
+                const rawText = vscode.window.activeTextEditor.document.getText(selectionRange);
 
-                // Show the integrated console if it isn't already visible and
-                // scroll terminal to bottom so new output is visible
-                await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+                // Replace $PSScriptRoot with the file path.
+                // TODO: Handle inside quotes.
+                const psScriptRootValue = path.resolve(vscode.window.activeTextEditor.document.uri.fsPath, "..");
+                const formattedText = rawText.replace(/\$PSScriptRoot/i, psScriptRootValue);
+
+                // Send the formatted text and scroll the terminal to the bottom.
+                await vscode.window.activeTerminal.sendText(formattedText, true);
                 await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
             }),
         ];
