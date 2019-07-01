@@ -42,9 +42,9 @@ and you can ask for new features [in their repository](https://github.com/Micros
 - Highlighting/completions/command history don't work as I expect in the
   Integrated Console - [#535]
   - The Integrated Console implements a [custom host]
-    to work with VSCode, making it incompatible with
-    [PSReadLine] (the module providing these features in regular PowerShell).
-    Resolving this incompatibility is being actively worked on.
+    to work with VSCode, meaning that functionality could be different than that of the regular host in the PowerShell Console
+  - [PSReadLine] (the module providing these features in regular PowerShell) is available in the PowerShell Preview Extension, helping to bridge this gap
+  - Making PSReadline fully available is being actively worked on.
 - Command history is not preserved when debugging in the Integrated Console -
   [#550]
   - This feature is also provided by [PSReadLine].
@@ -61,8 +61,7 @@ and you can ask for new features [in their repository](https://github.com/Micros
 - "Go to Definition" doesn't work through module imports - [#499]
   - Again this is a best-effort task.
 - Completions don't cycle when <kbd>Tab</kbd> is pressed like in the ISE - [#25]
-  - VSCode itself provides the user experience for completions, and they
-    currently don't allow us to customize this.
+  - [Use the tab comletion settings in VSCode](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/how-to-replicate-the-ise-experience-in-vscode?view=powershell-6#tab-completion)
 - My command that opens a dialog does nothing - [#410 (comment)]
   - Check that the dialog hasn't opened behind VSCode. This is a known
     [VSCode issue].
@@ -76,6 +75,7 @@ and you can ask for new features [in their repository](https://github.com/Micros
     may be opportunities to improve our integration with it in the
     [PowerShell Extension] too.
 - `Write-Progress` doesn't output to the console - [#140]
+  - `Write-Progress` is available in the PowerShell Preview Extension
 
 ## Reporting an Issue
 
@@ -133,7 +133,8 @@ For solving most issues, the following information is important to provide:
 
 ### Logs
 
-Logs provide context for what was happening when the issue occurred
+Logs provide context for what was happening when the issue occurred.
+**Note: You should skim through your logs for any sensitive information you would not like to share online**
 
 - Before sending through logs, try and reproduce the issue with
   **log level set to Verbose** or **Diagnostic**. You can set this
@@ -148,7 +149,6 @@ Logs provide context for what was happening when the issue occurred
   ```json
   "powershell.developer.editorServicesLogLevel": "Diagnostic"
   ```
-
   After you have captured the issue with the log level turned up,
   you may want to return it (since verbose logging can use disk space):
 
@@ -171,7 +171,7 @@ Logs provide context for what was happening when the issue occurred
   For example:
 
   ```powershell
-  $HOME/vscode/extensions/ms-vscode.powershell-1.8.4/logs
+  $HOME/vscode/extensions/ms-vscode.powershell-2019.5.1/logs
   ```
 
 - In VSCode you can open and read the logs directly from the [Command Palette]
