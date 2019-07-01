@@ -5,7 +5,7 @@
 [![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This extension provides rich PowerShell language support for [Azure Data Studio](github.com/Microsoft/azuredatastudio).
-Now you can write and debug PowerShell scripts using the excellent IDE-like interface
+Now you can write and run PowerShell scripts using the excellent IDE-like interface
 that Azure Data Studio provides.
 
 ## Platform support
