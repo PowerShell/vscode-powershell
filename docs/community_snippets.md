@@ -20,19 +20,16 @@ _To contribute, check out our [guide here](#contributing)._
 | --------- | ---------|
 | [AssertMock](#assert-mock) | _Creates assert mock Pester test_ |
 | [AWSRegionDynamicParameter](#awsregiondynamicparameter) | _Creates a dynamic parameter of current AWS regions by @jbruett_ |
-| [CalculatedProperty](#calculatedproperty) | _Create a calculated property for use in a select-object call by @corbob_ |
 | [DataTable](#datatable) | _Creates a DataTable_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose) | _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
 | [Exchange Online Connection](exchange-online-connection) | _Create a connection to Exchange Online by @vmsilvamolina_ | 
 | [HTML header](#html-header) | _Add HTML header with the style tag by @vmsilvamolina_ |
-| [IfShouldProcess](#ifshouldprocess) | _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
 | [New Azure Resource Group](#new-azure-resource-group) | _Create an Azure Resource group by @vmsilvamolina_ |
 | [Parameter-Credential](#parameter-credential) | _Add a standard credential parameter to your function by @omniomi_ |
 | [PesterTestForMandatoryParameter](#pestertestformandatoryparameter) | _Create Pester test for a mandatory parameter_ |
 | [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
-| [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
 | [Send-MailMessage](#send-mailmessage) | _Send an mail message with the most common parameters by @fullenw1_ |
 
 ## Snippets
