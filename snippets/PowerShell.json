@@ -512,30 +512,6 @@
         ],
         "description": "Enum definition snippet"
     },
-    "Cmdlet": {
-        "prefix": "cmdlet",
-        "body": [
-            "function ${1:Verb-Noun} {",
-            "\t[CmdletBinding()]",
-            "\tparam (",
-            "\t\t$0",
-            "\t)",
-            "\t",
-            "\tbegin {",
-            "\t\t",
-            "\t}",
-            "\t",
-            "\tprocess {",
-            "\t\t$TM_SELECTED_TEXT",
-            "\t}",
-            "\t",
-            "\tend {",
-            "\t\t",
-            "\t}",
-            "}"
-        ],
-        "description": "Script cmdlet definition snippet"
-    },
     "Function-Advanced": {
         "prefix": "function-advanced",
         "body": [
@@ -931,7 +907,7 @@
 		"body": [
 			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '', Scope='Function', Target='${2:*}')]"
 		]
-	},
+    },
     "PSCustomObject": {
         "prefix": "PSCustomObject",
         "body": [
