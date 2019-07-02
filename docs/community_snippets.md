@@ -91,22 +91,6 @@ Creates a dynamic parameter of the current AWS regions.  Includes parameter vali
 }
 ```
 
-### CalculatedProperty
-
-Create calculated property for use in Select Statements
-
-#### Snippet
-
-```json
-"Add Calculated Property": {
-    "prefix": "cf",
-    "body": [
-        "@{'Name' = '$1' ; 'Expression' = {$2}}",
-    ],
-    "description": "Create calculated property for use in Select Statements"
-}
-```
-
 ### DataTable
 
 Quickly create a Data Table object by @SQLDBAWithABeard.
