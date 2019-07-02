@@ -312,27 +312,6 @@ Quickly create a Pester Test for existence of a parameter by @SQLDBAWithABeard
 }
 ```
 
-### PSCustomObject
-
-A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
-
-#### Snippet
-
-```json
-"PSCustomObject": {
-    "prefix": "PSCustomObject",
-    "body": [
-        "[PSCustomObject]@{\r",
-            "\t${item1} = ${Property1}\r",
-            "\t${item2} = ${Property2}\r",
-            "\t${item3} = ${Property3}\r",
-            "\t${item4} = ${Property4}\r",
-        "}"
-    ],
-    "description": "Creates a PSCustomObject"
-}
-```
-
 ### Send-MailMessage
 
 Add the Send-MailMessage cmdlet with the most common parameters in a hashtable for splatting, by @fullenw1.
