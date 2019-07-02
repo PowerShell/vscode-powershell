@@ -213,24 +213,6 @@ Add HTML header to a variable with the style tag (for css).
 }
 ```
 
-### IfShouldProcess
-
-Add If Should Process with easy tab inputs
-
-#### Snippet
-
-```json
-"IfShouldProcess": {
-    "prefix": "IfShouldProcess",
-    "body": [
-        "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
-        "\t# Place Code here",
-        "}"
-    ],
-    "description": "Creates an if should process"
-}
-```
-
 ### MaxColumnLengthinDataTable
 
 Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads into a SQL Server table with fixed column widths by @SQLDBAWithABeard
