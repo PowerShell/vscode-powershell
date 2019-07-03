@@ -539,7 +539,7 @@
         ],
         "description": "Script advanced function definition snippet"
     },
-    "Cmdlet-Comment-Help": {
+    "Comment-Help": {
         "prefix": "comment-help",
         "body": [
             "<#",
@@ -558,7 +558,7 @@
             "\tGeneral notes",
             "#>"
         ],
-        "description": "Comment-based help snippet"
+        "description": "Comment-based help for an advanced function snippet"
     },
     "Parameter": {
         "prefix": "parameter",
