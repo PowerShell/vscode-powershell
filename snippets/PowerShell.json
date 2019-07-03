@@ -1082,5 +1082,65 @@
             "}"
         ],
         "description": "IArgumentCompleter implementation class definition"
+    },
+    "Requires Assembly": {
+        "prefix": "requires-assembly",
+        "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'",
+        "description": "Requires an assembly (by name) in order to execute the containing script file."
+    },
+    "Requires Assembly Path": {
+        "prefix": "requires-assembly-path",
+        "body": "#Requires -Assembly ${0:${TM_SELECTED_TEXT:path/to/assembly.dll}}",
+        "description": "Requires an assembly (by relative or absolute path) in order to execute the containing script file."
+    },
+    "Requires Assembly Version": {
+        "prefix": "requires-assembly-version",
+        "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}, Version=${2:1.0.0.0}'",
+        "description": "Requires an assembly (by name and minimum version) in order to execute the containing script file."
+    },
+    "Requires Module": {
+        "prefix": "requires-module",
+        "body": "#Requires -Module ${0:${TM_SELECTED_TEXT:fully-qualified-name}}",
+        "description": "Requires a module (by name) in order to execute the containing script file."
+    },
+    "Requires Module RequiredVersion": {
+        "prefix": "requires-module-required-version",
+        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; ModuleVersion = '${2:minimum-acceptable-version}' }",
+        "description": "Requires a module (by name and minimum version) in order to execute the containing script file."
+    },
+    "Requires Module Version": {
+        "prefix": "requires-module-version",
+        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; RequiredVersion = '${2:exact-required-version}' }",
+        "description": "Requires a module (by name and exact version) in order to execute the containing script file."
+    },
+    "Requires PSEdition": {
+        "prefix": "requires-ps-edition",
+        "body": "#Requires -PSEdition ${1|Core,Desktop|}",
+        "description": "Requires a specific edition of PowerShell in order to execute the containing script file."
+    },
+    "Requires PSSnapin": {
+        "prefix": "requires-ps-snapin",
+        "body": "#Requires -PSSnapin ${0:${TM_SELECTED_TEXT:fully-qualified-name}}",
+        "description": "Requires a PowerShell snap-in (by name) in order to execute the containing script file."
+    },
+    "Requires PSSnapin Version": {
+        "prefix": "requires-ps-snapin-version",
+        "body": "#Requires -PSSnapin ${1:${TM_SELECTED_TEXT:fully-qualified-name}} -Version ${2:minimum-acceptable-version}",
+        "description": "Requires a PowerShell snap-in (by name and minimum version) in order to execute the containing script file."
+    },
+    "Requires RunAsAdministrator": {
+        "prefix": "requires-run-as-administrator",
+        "body": "#Requires -RunAsAdministrator",
+        "description": "Requires elevated user rights in order to execute the containing script file. Ignored on non-Windows systems. On Windows systems, it requires that the PowerShell session in which the containing script file is run must have been started with elevated user rights (\"Run as Administrator\")."
+    },
+    "Requires ShellId": {
+        "prefix": "requires-shell-id",
+        "body": "#Requires -ShellId ${0:${TM_SELECTED_TEXT:shell-id}}",
+        "description": "Requires a specific shell id in order to execute the containing script file. The current shell id may be determined by querying the $ShellId automatic variable."
+    },
+    "Requires Version": {
+        "prefix": "requires-version",
+        "body": "#Requires -Version ${0:${TM_SELECTED_TEXT:minimum-acceptable-version}}",
+        "description": "Requires a minimum version of PowerShell in order to execute the containing script file."
     }
 }
