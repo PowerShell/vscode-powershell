@@ -6,6 +6,11 @@
     // Add a visual ruler for the typescript linting line length
     "editor.rulers": [120],
 
+    "files.associations": {
+        // Use JSONC instead of JSON because (1) that's how VS Code interprets snippet files, and (2) it enables better source documentation.
+        "**/snippets/*.json": "jsonc"
+    },
+
     "search.exclude": {
         "**/node_modules": true,
         "**/bower_components": true,
