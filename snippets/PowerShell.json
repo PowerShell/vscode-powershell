@@ -513,7 +513,10 @@
         "description": "Enum definition snippet"
     },
     "Function-Advanced": {
-        "prefix": "function-advanced",
+        "prefix": [
+            "function-advanced",
+            "cmdlet"
+        ],
         "body": [
             "function ${1:Verb-Noun} {",
             "\t[CmdletBinding()]",
