@@ -1,3 +1,4 @@
+// The "Requires *" snippets should be removed if-and-when intellisense is implemented for the script requirement directive syntax.
 {
     "ModuleManifest": {
         "prefix": "manifest",
