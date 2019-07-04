@@ -1105,13 +1105,13 @@
     },
     "Requires Module RequiredVersion": {
         "prefix": "requires-module-required-version",
-        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; ModuleVersion = '${2:minimum-acceptable-version}' }",
-        "description": "Requires a module (by name and minimum version) in order to execute the containing script file."
+        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; RequiredVersion = '${2:exact-required-version}' }",
+        "description": "Requires a module (by name and exact version) in order to execute the containing script file."
     },
     "Requires Module Version": {
         "prefix": "requires-module-version",
-        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; RequiredVersion = '${2:exact-required-version}' }",
-        "description": "Requires a module (by name and exact version) in order to execute the containing script file."
+        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; ModuleVersion = '${2:minimum-acceptable-version}' }",
+        "description": "Requires a module (by name and minimum version) in order to execute the containing script file."
     },
     "Requires PSEdition": {
         "prefix": "requires-ps-edition",
