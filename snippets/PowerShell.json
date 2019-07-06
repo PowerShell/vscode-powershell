@@ -766,6 +766,17 @@
         ],
         "description": "foreach loop snippet"
     },
+    "foreach-indexed": {
+        "prefix": "foreach-indexed",
+        "body": [
+            "\\$private:_index = 0",
+            "foreach ($${1:item} in $${2:collection}) {",
+            "\t\\$index = (\\$_index++)",  // Instead of incrementing the index at the end of the loop body, incrementing it at the beginning (and therefore also assigning a proxy variable) defends against naive invocations of the `continue` statement in the middle of the loop body.
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+        ],
+        "description": "indexed foreach loop snippet"
+    },
     "function": {
         "prefix": "function",
         "body": [
