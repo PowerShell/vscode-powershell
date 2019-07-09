@@ -20,19 +20,16 @@ _To contribute, check out our [guide here](#contributing)._
 | --------- | ---------|
 | [AssertMock](#assert-mock) | _Creates assert mock Pester test_ |
 | [AWSRegionDynamicParameter](#awsregiondynamicparameter) | _Creates a dynamic parameter of current AWS regions by @jbruett_ |
-| [CalculatedProperty](#calculatedproperty) | _Create a calculated property for use in a select-object call by @corbob_ |
 | [DataTable](#datatable) | _Creates a DataTable_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose) | _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
 | [Exchange Online Connection](exchange-online-connection) | _Create a connection to Exchange Online by @vmsilvamolina_ | 
 | [HTML header](#html-header) | _Add HTML header with the style tag by @vmsilvamolina_ |
-| [IfShouldProcess](#ifshouldprocess) | _Added If Should Process_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
 | [New Azure Resource Group](#new-azure-resource-group) | _Create an Azure Resource group by @vmsilvamolina_ |
 | [Parameter-Credential](#parameter-credential) | _Add a standard credential parameter to your function by @omniomi_ |
 | [PesterTestForMandatoryParameter](#pestertestformandatoryparameter) | _Create Pester test for a mandatory parameter_ |
 | [PesterTestForParameter](#pestertestforparameter) | _Create Pester test for parameter_ |
-| [PSCustomObject](#pscustomobject) | _A simple PSCustomObject by @brettmillerb_ |
 | [Send-MailMessage](#send-mailmessage) | _Send an mail message with the most common parameters by @fullenw1_ |
 
 ## Snippets
@@ -88,22 +85,6 @@ Creates a dynamic parameter of the current AWS regions.  Includes parameter vali
         "\t}"
     ],
     "description": "A dynamic parameter that builds a list of AWS regions"
-}
-```
-
-### CalculatedProperty
-
-Create calculated property for use in Select Statements
-
-#### Snippet
-
-```json
-"Add Calculated Property": {
-    "prefix": "cf",
-    "body": [
-        "@{'Name' = '$1' ; 'Expression' = {$2}}",
-    ],
-    "description": "Create calculated property for use in Select Statements"
 }
 ```
 
@@ -229,24 +210,6 @@ Add HTML header to a variable with the style tag (for css).
 }
 ```
 
-### IfShouldProcess
-
-Add If Should Process with easy tab inputs
-
-#### Snippet
-
-```json
-"IfShouldProcess": {
-    "prefix": "IfShouldProcess",
-    "body": [
-        "if ($$PSCmdlet.ShouldProcess(\"${1:The Item}\" , \"${2:The Change}\")) {",
-        "\t# Place Code here",
-        "}"
-    ],
-    "description": "Creates an if should process"
-}
-```
-
 ### MaxColumnLengthinDataTable
 
 Takes a datatable object and iterates through it to get the max length of the string columns - useful for data loads into a SQL Server table with fixed column widths by @SQLDBAWithABeard
@@ -343,27 +306,6 @@ Quickly create a Pester Test for existence of a parameter by @SQLDBAWithABeard
         "}"
     ],
     "description": "Pester Test for Parameter"
-}
-```
-
-### PSCustomObject
-
-A simple PSCustomObject by @brettmillerb. It has 4 properties that you can tab through to quickly fill in.
-
-#### Snippet
-
-```json
-"PSCustomObject": {
-    "prefix": "PSCustomObject",
-    "body": [
-        "[PSCustomObject]@{\r",
-            "\t${item1} = ${Property1}\r",
-            "\t${item2} = ${Property2}\r",
-            "\t${item3} = ${Property3}\r",
-            "\t${item4} = ${Property4}\r",
-        "}"
-    ],
-    "description": "Creates a PSCustomObject"
 }
 ```
 
