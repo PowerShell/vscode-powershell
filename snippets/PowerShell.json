@@ -513,32 +513,11 @@
         ],
         "description": "Enum definition snippet"
     },
-    "Cmdlet": {
-        "prefix": "cmdlet",
-        "body": [
-            "function ${1:Verb-Noun} {",
-            "\t[CmdletBinding()]",
-            "\tparam (",
-            "\t\t$0",
-            "\t)",
-            "\t",
-            "\tbegin {",
-            "\t\t",
-            "\t}",
-            "\t",
-            "\tprocess {",
-            "\t\t$TM_SELECTED_TEXT",
-            "\t}",
-            "\t",
-            "\tend {",
-            "\t\t",
-            "\t}",
-            "}"
-        ],
-        "description": "Script cmdlet definition snippet"
-    },
     "Function-Advanced": {
-        "prefix": "function-advanced",
+        "prefix": [
+            "function-advanced",
+            "cmdlet"
+        ],
         "body": [
             "function ${1:Verb-Noun} {",
             "\t[CmdletBinding()]",
@@ -561,7 +540,7 @@
         ],
         "description": "Script advanced function definition snippet"
     },
-    "Cmdlet-Comment-Help": {
+    "Comment-Help": {
         "prefix": "comment-help",
         "body": [
             "<#",
@@ -580,7 +559,7 @@
             "\tGeneral notes",
             "#>"
         ],
-        "description": "Comment-based help snippet"
+        "description": "Comment-based help for an advanced function snippet"
     },
     "Parameter": {
         "prefix": "parameter",
@@ -932,7 +911,7 @@
 		"body": [
 			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '', Scope='Function', Target='${2:*}')]"
 		]
-	},
+    },
     "PSCustomObject": {
         "prefix": "PSCustomObject",
         "body": [
