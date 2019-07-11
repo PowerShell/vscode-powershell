@@ -571,6 +571,17 @@
         ],
         "description": "Parameter declaration snippet"
     },
+    "Parameter_Block" : {
+        "prefix": "param-block",
+        "body": ["[CmdletBinding()]",
+            "param (",
+            "    [parameter()]",
+            "    [${1:TypeName}]",
+            "    $${2:ParameterName}$0",
+            ")"
+	],
+        "description": "A Parameter block to get you started."
+    },
     "Parameter-Path": {
         "prefix": "parameter-path",
         "body": [
