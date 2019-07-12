@@ -575,7 +575,7 @@
         "prefix": "param-block",
         "body": ["[CmdletBinding()]",
             "param (",
-            "    [parameter()]",
+            "    [Parameter()]",
             "    [${1:TypeName}]",
             "    $${2:ParameterName}$0",
             ")"
