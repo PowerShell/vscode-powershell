@@ -27,6 +27,7 @@
   },
   "main": "./out/src/main",
   "activationEvents": [
+    "onDebugInitialConfigurations",
     "onDebugResolve:powershell",
     "onLanguage:powershell",
     "onCommand:PowerShell.NewProjectFromTemplate",
@@ -66,6 +67,11 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "contributes": {
+    "breakpoints": [
+      {
+        "language": "powershell"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -311,11 +317,6 @@
       {
         "type": "PowerShell",
         "label": "PowerShell",
-        "enableBreakpointsFor": {
-          "languageIds": [
-            "powershell"
-          ]
-        },
         "program": "./out/src/debugAdapter.js",
         "runtime": "node",
         "variables": {
@@ -337,19 +338,6 @@
               "script": "^\"\\${file}\"",
               "args": [],
               "cwd": "^\"\\${file}\""
-            }
-          },
-          {
-            "label": "PowerShell: Launch Current File in Temporary Console",
-            "description": "Launch current file (in active editor window) under debugger in a temporary Integrated Console.",
-            "body": {
-              "name": "PowerShell Launch Current File in Temporary Console",
-              "type": "PowerShell",
-              "request": "launch",
-              "script": "^\"\\${file}\"",
-              "args": [],
-              "cwd": "^\"\\${file}\"",
-              "createTemporaryIntegratedConsole": true
             }
           },
           {
@@ -430,7 +418,7 @@
               },
               "args": {
                 "type": "array",
-                "description": "Command line arguments to pass to the PowerShell script.",
+                "description": "Command line arguments to pass to the PowerShell script. Specify ${command:SpecifyScriptArgs} if you want to be prompted for the args.",
                 "items": {
                   "type": "string"
                 },
@@ -480,52 +468,7 @@
             }
           }
         },
-        "initialConfigurations": [
-          {
-            "name": "PowerShell Launch Current File",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${file}",
-            "args": [],
-            "cwd": "${file}"
-          },
-          {
-            "name": "PowerShell Launch Current File in Temporary Console",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${file}",
-            "args": [],
-            "cwd": "${file}",
-            "createTemporaryIntegratedConsole": true
-          },
-          {
-            "name": "PowerShell Launch Current File w/Args Prompt",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${file}",
-            "args": [
-              "${command:SpecifyScriptArgs}"
-            ],
-            "cwd": "${file}"
-          },
-          {
-            "name": "PowerShell Attach to Host Process",
-            "type": "PowerShell",
-            "request": "attach"
-          },
-          {
-            "name": "PowerShell Interactive Session",
-            "type": "PowerShell",
-            "request": "launch",
-            "cwd": ""
-          },
-          {
-            "name": "PowerShell Attach Interactive Session Runspace",
-            "type": "PowerShell",
-            "request": "attach",
-            "processId": "current"
-          }
-        ]
+        "initialConfigurations": []
       }
     ],
     "configuration": {
