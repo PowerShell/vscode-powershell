@@ -12,11 +12,20 @@ suite("Settings module", () => {
 
     test("Settings update correctly", async () => {
         // then syntax
-        Settings.change("powerShellExePath", "dummypath1", false).then(() =>
-            assert.strictEqual(Settings.load().powerShellExePath, "dummypath1"));
+        Settings.change("helpCompletion", "BlockComment", false).then(() =>
+            assert.strictEqual(Settings.load().helpCompletion, "BlockComment"));
 
         // async/await syntax
-        await Settings.change("powerShellExePath", "dummypath2", false);
-        assert.strictEqual(Settings.load().powerShellExePath, "dummypath2");
+        await Settings.change("helpCompletion", "LineComment", false);
+        assert.strictEqual(Settings.load().helpCompletion, "LineComment");
+    });
+
+    test("Settings that can only be user settings update correctly", async () => {
+        // set to false means it's set as a workspace-level setting so this should throw.
+        assert.rejects(async () => await Settings.change("powerShellExePath", "dummyPath", false));
+
+        // set to true means it's a user-level setting so this should not throw.
+        await Settings.change("powerShellExePath", "dummyPath", true);
+        assert.strictEqual(Settings.load().powerShellExePath, "dummyPath");
     });
 });
