@@ -69,7 +69,7 @@ export function getDefaultPowerShellPath(
 
     // Find the path to powershell.exe based on the current platform
     // and the user's desire to run the x86 version of PowerShell
-        if (platformDetails.operatingSystem === OperatingSystem.Windows) {
+    if (platformDetails.operatingSystem === OperatingSystem.Windows) {
         const psCoreInstallPath =
         (!platformDetails.isProcess64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + "\\PowerShell";
         if (fs.existsSync(psCoreInstallPath)) {
