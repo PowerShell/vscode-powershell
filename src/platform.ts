@@ -69,17 +69,39 @@ export function getDefaultPowerShellPath(
 
     // Find the path to powershell.exe based on the current platform
     // and the user's desire to run the x86 version of PowerShell
-    if (platformDetails.operatingSystem === OperatingSystem.Windows) {
-        if (use32Bit) {
-            powerShellExePath =
-                platformDetails.isOS64Bit && platformDetails.isProcess64Bit
-                    ? SysWow64PowerShellPath
-                    : System32PowerShellPath;
+        if (platformDetails.operatingSystem === OperatingSystem.Windows) {
+        const psCoreInstallPath =
+        (!platformDetails.isProcess64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + "\\PowerShell";
+        if (fs.existsSync(psCoreInstallPath)) {
+            const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
+            const psCorePaths =
+                fs.readdirSync(psCoreInstallPath)
+                .map((item) => path.join(psCoreInstallPath, item))
+                .filter((item) => {
+                    const exePath = path.join(item, "pwsh.exe");
+                    return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
+                })
+                .map((item) => ({
+                    versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
+                    exePath: path.join(item, "pwsh.exe"),
+                }));
+
+            if (psCorePaths) {
+                powerShellExePath = psCorePaths[0].exePath;
+            }
+
         } else {
-            powerShellExePath =
-                !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
-                    ? System32PowerShellPath
-                    : SysnativePowerShellPath;
+            if (use32Bit) {
+                powerShellExePath =
+                    platformDetails.isOS64Bit && platformDetails.isProcess64Bit
+                        ? SysWow64PowerShellPath
+                        : System32PowerShellPath;
+            } else {
+                powerShellExePath =
+                    !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
+                        ? System32PowerShellPath
+                        : SysnativePowerShellPath;
+            }
         }
     } else if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
