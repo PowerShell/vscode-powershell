@@ -66,12 +66,18 @@ export function getDefaultPowerShellPath(
     use32Bit: boolean = false): string | null {
 
     let powerShellExePath;
+    let psCoreInstallPath;
 
     // Find the path to powershell.exe based on the current platform
     // and the user's desire to run the x86 version of PowerShell
     if (platformDetails.operatingSystem === OperatingSystem.Windows) {
-        const psCoreInstallPath =
-        (platformDetails.isProcess64Bit ? process.env.ProgramFiles : process.env.ProgramW6432) + "\\PowerShell";
+        if (use32Bit) {
+            psCoreInstallPath =
+            (platformDetails.isProcess64Bit ? process.env.ProgramW6432 : process.env.ProgramFiles) + "\\PowerShell";
+        } else {
+
+            psCoreInstallPath = psCoreInstallPath = process.env.ProgramFiles + "\\PowerShell";
+        }
         if (fs.existsSync(psCoreInstallPath)) {
             const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
             const psCorePaths =
@@ -87,22 +93,20 @@ export function getDefaultPowerShellPath(
                 }));
 
             if (psCorePaths) {
-                powerShellExePath = psCorePaths[0].exePath;
+                return powerShellExePath = psCorePaths[0].exePath;
             }
-
-        } else {
-            if (use32Bit) {
+        }
+        if (use32Bit) {
                 powerShellExePath =
                     platformDetails.isOS64Bit && platformDetails.isProcess64Bit
                         ? SysWow64PowerShellPath
                         : System32PowerShellPath;
-            } else {
+        } else {
                 powerShellExePath =
                     !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
                         ? System32PowerShellPath
                         : SysnativePowerShellPath;
             }
-        }
     } else if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
         powerShellExePath = macOSExePath;
