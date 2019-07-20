@@ -47,82 +47,74 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         folder: WorkspaceFolder | undefined,
         token?: CancellationToken): Promise<DebugConfiguration[]> {
 
-        const launchAttachItems = [
-            { label: "Launch",
-              description: "Launch the debugger with a specified script or for the interactive session" },
-            { label: "Attach",
-              description: "Attach the debugger to a running PowerShell Host Process" },
+        const launchCurrentFileLabel  = "Launch Current File";
+        const launchScriptLabel       = "Launch Script";
+        const interactiveSessionLabel = "Interactive Session";
+
+        const debugConfigPickItems = [
+            {
+                label: launchCurrentFileLabel,
+                description: "Launch and debug the file in the currently active editor window",
+            },
+            {
+                label: launchScriptLabel,
+                description: "Launch and debug the specified file or command",
+            },
+            {
+                label: interactiveSessionLabel,
+                description: "Debug commands executed from the Integrated Console",
+            },
+            {
+                label: "Attach",
+                description: "Attach the debugger to a running PowerShell Host Process",
+            },
         ];
 
-        const debugTypeSelection =
+        const launchSelection =
             await vscode.window.showQuickPick(
-                launchAttachItems,
-                { placeHolder: "Would you like to launch or attach the PowerShell debugger?" });
+                debugConfigPickItems,
+                { placeHolder: "Select a PowerShell debug configuration" });
 
-        let debugConfiguration = [];
-
-        if (debugTypeSelection.label === "Launch") {
-            const launchCurrentFileLabel = "Launch Current File";
-            const launchScriptLabel = "Launch Script";
-            const interactiveSessionLabel = "Interactive Session";
-
-            const launchItems = [
-                { label: launchCurrentFileLabel,
-                  description: "Debugs whichever script is in the active editor window" },
-                { label: launchScriptLabel,
-                  description: "Debugs the specified script" },
-                { label: interactiveSessionLabel,
-                  description: "Debugs scripts or modules executed from the Integrated Console" },
-            ];
-
-            const launchSelection =
-                await vscode.window.showQuickPick(
-                    launchItems,
-                    { placeHolder: "Select a launch option" });
-
-            if (launchSelection.label === launchCurrentFileLabel) {
-                debugConfiguration = [
-                    {
-                        name: "PowerShell: Launch Current File",
-                        type: "PowerShell",
-                        request: "launch",
-                        script: "${file}",
-                        cwd: "${file}",
-                    },
-                ];
-            } else if (launchSelection.label === launchScriptLabel) {
-                debugConfiguration = [
-                    {
-                        name: "PowerShell: Launch Script",
-                        type: "PowerShell",
-                        request: "launch",
-                        script: "enter path or script to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
-                        cwd: "${workspaceFolder}",
-                    },
-                ];
-            } else {
-                debugConfiguration = [
-                    {
-                        name: "PowerShell: Interactive Session",
-                        type: "PowerShell",
-                        request: "launch",
-                        cwd: "",
-                    },
-                ];
-            }
-        } else {
-            // Return the "Attach to PowerShell Host Process" debug configuration
-            debugConfiguration =  [
+        if (launchSelection.label === launchCurrentFileLabel) {
+            return [
                 {
-                    name: "PowerShell: Attach to PowerShell Host Process",
+                    name: "PowerShell: Launch Current File",
                     type: "PowerShell",
-                    request: "attach",
-                    runspaceId: 1,
+                    request: "launch",
+                    script: "${file}",
+                    cwd: "${file}",
+                },
+            ];
+        } else if (launchSelection.label === launchScriptLabel) {
+            return [
+                {
+                    name: "PowerShell: Launch Script",
+                    type: "PowerShell",
+                    request: "launch",
+                    script: "enter path or command to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
+                    cwd: "${workspaceFolder}",
+                },
+            ];
+        } else if (launchSelection.label === interactiveSessionLabel) {
+            return [
+                {
+                    name: "PowerShell: Interactive Session",
+                    type: "PowerShell",
+                    request: "launch",
+                    cwd: "",
                 },
             ];
         }
 
-        return debugConfiguration;
+        // Return the "Attach to PowerShell Host Process" debug configuration
+        return [
+            {
+                name: "PowerShell: Attach to PowerShell Host Process",
+                type: "PowerShell",
+                request: "attach",
+                runspaceId: 1,
+            },
+        ];
     }
 
     // DebugConfigurationProvider method
