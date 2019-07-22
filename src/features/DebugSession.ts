@@ -47,24 +47,29 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         folder: WorkspaceFolder | undefined,
         token?: CancellationToken): Promise<DebugConfiguration[]> {
 
-        const launchCurrentFileLabel  = "Launch Current File";
-        const launchScriptLabel       = "Launch Script";
-        const interactiveSessionLabel = "Interactive Session";
+        const launchCurrentFileId  = 0;
+        const launchScriptId       = 1;
+        const interactiveSessionId = 2;
+        const attachHostProcessId  = 3;
 
         const debugConfigPickItems = [
             {
-                label: launchCurrentFileLabel,
+                id: launchCurrentFileId,
+                label: "Launch Current File",
                 description: "Launch and debug the file in the currently active editor window",
             },
             {
-                label: launchScriptLabel,
+                id: launchScriptId,
+                label: "Launch Script",
                 description: "Launch and debug the specified file or command",
             },
             {
-                label: interactiveSessionLabel,
+                id: interactiveSessionId,
+                label: "Interactive Session",
                 description: "Debug commands executed from the Integrated Console",
             },
             {
+                id: attachHostProcessId,
                 label: "Attach",
                 description: "Attach the debugger to a running PowerShell Host Process",
             },
@@ -75,7 +80,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                 debugConfigPickItems,
                 { placeHolder: "Select a PowerShell debug configuration" });
 
-        if (launchSelection.label === launchCurrentFileLabel) {
+        if (launchSelection.id === launchCurrentFileId) {
             return [
                 {
                     name: "PowerShell: Launch Current File",
@@ -85,7 +90,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     cwd: "${file}",
                 },
             ];
-        } else if (launchSelection.label === launchScriptLabel) {
+        } else if (launchSelection.id === launchScriptId) {
             return [
                 {
                     name: "PowerShell: Launch Script",
@@ -95,7 +100,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     cwd: "${workspaceFolder}",
                 },
             ];
-        } else if (launchSelection.label === interactiveSessionLabel) {
+        } else if (launchSelection.id === interactiveSessionId) {
             return [
                 {
                     name: "PowerShell: Interactive Session",

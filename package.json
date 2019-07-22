@@ -340,20 +340,6 @@
             }
           },
           {
-            "label": "PowerShell: Launch Current File w/Args Prompt",
-            "description": "Launch and debug the file in the currently active editor window, prompting first for arguments",
-            "body": {
-              "name": "PowerShell Launch Current File w/Args Prompt",
-              "type": "PowerShell",
-              "request": "launch",
-              "script": "^\"\\${file}\"",
-              "args": [
-                "^\"\\${command:SpecifyScriptArgs}\""
-              ],
-              "cwd": "^\"\\${file}\""
-            }
-          },
-          {
             "label": "PowerShell: Launch Script",
             "description": "Launch and debug the specified file or command",
             "body": {
