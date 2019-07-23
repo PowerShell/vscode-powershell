@@ -27,6 +27,9 @@ const stringCommonParameters = [
 ];
 
 function submitCommand() {
+    const myMessage = message;
+    myMessage.filledParameters = {};
+
     function processParameter(currNode) {
         const id = currNode.id.substring(currNode.id.lastIndexOf("-") + 1, currNode.id.length);
         if (currNode.type === "checkbox") {
@@ -47,8 +50,6 @@ function submitCommand() {
         }
     }
 
-    const myMessage = message;
-    myMessage.filledParameters = {};
     for (const node of parameterSets.childNodes) {
         if (node.childElementCount > 0 && (node.style.display !== "none" || node.id === "commonParameters")) {
             processParameterSet(node);
