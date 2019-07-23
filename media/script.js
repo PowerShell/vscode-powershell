@@ -4,8 +4,8 @@
 
 const vscode = acquireVsCodeApi();
 const parameterSets = document.getElementById("ParameterSets");
-const commonParams = document.createElement("div");
-commonParams.id = "commonParameters";
+const commonParameters = document.createElement("div");
+commonParameters.id = "commonParameters";
 let message;
 let hasCommonParams = false;
 
@@ -38,9 +38,9 @@ function processParameter(parameter) {
 }
 
 function processParameterSet(parameterSet) {
-    for (const currNode of parameterSet.childNodes) {
-        if (currNode.className === "parameters" && currNode.value !== "") {
-            processParameter(currNode);
+    for (const currentParameter of parameterSet.childNodes) {
+        if (currentParameter.className === "parameters" && currentParameter.value !== "") {
+            processParameter(currentParameter);
         }
     }
 }
@@ -73,102 +73,101 @@ function toggleCommonParameters() {
 
 function processMessage(event) {
 
-    message = null;
+    message = event.data[0];
     let defaultParamSet = "__AllParameterSets";
     // Remove previous nodes if there are any.
     while (parameterSets.hasChildNodes()) {
         parameterSets.removeChild(parameterSets.childNodes[0]);
     }
-    message = event.data[0];
     document.getElementById("CommandName").innerText = message.name;
-    for (const pSet of message.parameterSets) {
-        if (pSet.isDefault) {
-            defaultParamSet = pSet.name;
+    for (const currentParameterSet of message.parameterSets) {
+        if (currentParameterSet.isDefault) {
+            defaultParamSet = currentParameterSet.name;
         }
-        const pSetDiv = document.createElement("div");
-        pSetDiv.id = pSet.name;
-        const setHeader = document.createElement("h3");
-        setHeader.innerText = pSet.name;
-        setHeader.onclick = (ev) => {
+        const currentParameterSetDiv = document.createElement("div");
+        currentParameterSetDiv.id = currentParameterSet.name;
+        const currentParameterSetHeader = document.createElement("h3");
+        currentParameterSetHeader.innerText = currentParameterSet.name;
+        currentParameterSetHeader.onclick = (ev) => {
             parameterSetToggle(ev.target.innerText);
         };
-        parameterSets.appendChild(setHeader);
-        for (const currParameter of pSet.parameters) {
+        parameterSets.appendChild(currentParameterSetHeader);
+        for (const currentParameter of currentParameterSet.parameters) {
             if (
-                (switchCommonParameters.findIndex((param) => param === currParameter.name) !== -1)
-                || (stringCommonParameters.findIndex((param) => param === currParameter.name) !== -1)
+                (switchCommonParameters.findIndex((param) => param === currentParameter.name) !== -1)
+                || (stringCommonParameters.findIndex((param) => param === currentParameter.name) !== -1)
             ) {
                 hasCommonParams = true;
                 continue;
             }
-            const parameterLabel = document.createElement("label");
-            parameterLabel.htmlFor = pSet.name + "-" + currParameter.name;
-            parameterLabel.innerText = currParameter.name;
-            let parameterInput = null;
-            let validateSet = false;
-            let validValues = null;
-            for (const currAttribute of currParameter.attributes) {
+            const currentParameterLabel = document.createElement("label");
+            currentParameterLabel.htmlFor = currentParameterSet.name + "-" + currentParameter.name;
+            currentParameterLabel.innerText = currentParameter.name;
+            let currentParameterInput = null;
+            let currentParameterValidateSet = false;
+            let currentParameterValidValues = null;
+            for (const currAttribute of currentParameter.attributes) {
                 if (currAttribute.hasOwnProperty("validValues")) {
-                    validateSet = true;
-                    validValues = currAttribute.validValues;
+                    currentParameterValidateSet = true;
+                    currentParameterValidValues = currAttribute.validValues;
                 }
             }
-            if (!validateSet) {
-                parameterInput = document.createElement("input");
-                parameterInput.type = currParameter.parameterType.search("SwitchParameter") !== -1 ? "checkbox" : "text";
+            if (!currentParameterValidateSet) {
+                currentParameterInput = document.createElement("input");
+                currentParameterInput.type = currentParameter.parameterType.search("SwitchParameter") !== -1 ? "checkbox" : "text";
             } else {
-                parameterInput = document.createElement("select");
-                parameterInput.appendChild(document.createElement("option"));
-                for (const value of validValues) {
-                    const valueElement = document.createElement("option");
-                    valueElement.value = value;
-                    valueElement.innerText = value;
-                    parameterInput.appendChild(valueElement);
+                currentParameterInput = document.createElement("select");
+                currentParameterInput.appendChild(document.createElement("option"));
+                for (const currentValidValue of currentParameterValidValues) {
+                    const currentValidValueElement = document.createElement("option");
+                    currentValidValueElement.value = currentValidValue;
+                    currentValidValueElement.innerText = currentValidValue;
+                    currentParameterInput.appendChild(currentValidValueElement);
                 }
             }
-            if (currParameter.isMandatory) {
-                parameterLabel.innerText += " *";
-                parameterLabel.style = "font-weight: bold";
-                parameterInput.required = true;
+            if (currentParameter.isMandatory) {
+                currentParameterLabel.innerText += " *";
+                currentParameterLabel.style = "font-weight: bold";
+                currentParameterInput.required = true;
             }
-            parameterInput.className = "parameters";
-            parameterInput.id = pSet.name + "-" + currParameter.name;
-            pSetDiv.appendChild(parameterLabel);
-            pSetDiv.appendChild(parameterInput);
-            pSetDiv.appendChild(document.createElement("br"));
+            currentParameterInput.className = "parameters";
+            currentParameterInput.id = currentParameterSet.name + "-" + currentParameter.name;
+            currentParameterSetDiv.appendChild(currentParameterLabel);
+            currentParameterSetDiv.appendChild(currentParameterInput);
+            currentParameterSetDiv.appendChild(document.createElement("br"));
         }
-        parameterSets.appendChild(pSetDiv);
+        parameterSets.appendChild(currentParameterSetDiv);
     }
     if (hasCommonParams) {
-        const setHeader = document.createElement("h3");
-        setHeader.innerText = "commonParameters";
-        setHeader.onclick = toggleCommonParameters;
-        parameterSets.appendChild(setHeader);
+        const commonParameterSetHeader = document.createElement("h3");
+        commonParameterSetHeader.innerText = "commonParameters";
+        commonParameterSetHeader.onclick = toggleCommonParameters;
+        parameterSets.appendChild(commonParameterSetHeader);
         switchCommonParameters.forEach((param) => {
-            const parameterLabel = document.createElement("label");
-            parameterLabel.htmlFor = param;
-            parameterLabel.innerText = param;
+            const currentParameterLabel = document.createElement("label");
+            currentParameterLabel.htmlFor = param;
+            currentParameterLabel.innerText = param;
             const parameterInput = document.createElement("input");
             parameterInput.className = "parameters";
             parameterInput.id = param;
             parameterInput.type = "checkbox";
-            commonParams.appendChild(parameterLabel);
-            commonParams.appendChild(parameterInput);
-            commonParams.appendChild(document.createElement("br"));
+            commonParameters.appendChild(currentParameterLabel);
+            commonParameters.appendChild(parameterInput);
+            commonParameters.appendChild(document.createElement("br"));
         });
         stringCommonParameters.forEach((param) => {
-            const parameterLabel = document.createElement("label");
-            parameterLabel.htmlFor = param;
-            parameterLabel.innerText = param;
-            const parameterInput = document.createElement("input");
-            parameterInput.className = "parameters";
-            parameterInput.id = param;
-            parameterInput.type = "text";
-            commonParams.appendChild(parameterLabel);
-            commonParams.appendChild(parameterInput);
-            commonParams.appendChild(document.createElement("br"));
+            const currentParameterLabel = document.createElement("label");
+            currentParameterLabel.htmlFor = param;
+            currentParameterLabel.innerText = param;
+            const currentParameterInput = document.createElement("input");
+            currentParameterInput.className = "parameters";
+            currentParameterInput.id = param;
+            currentParameterInput.type = "text";
+            commonParameters.appendChild(currentParameterLabel);
+            commonParameters.appendChild(currentParameterInput);
+            commonParameters.appendChild(document.createElement("br"));
         });
-        parameterSets.appendChild(commonParams);
+        parameterSets.appendChild(commonParameters);
     }
     parameterSetToggle(defaultParamSet);
 
