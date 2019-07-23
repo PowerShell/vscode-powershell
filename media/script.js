@@ -27,30 +27,36 @@ const stringCommonParameters = [
 ];
 
 function submitCommand() {
+    function processParameter(currNode) {
+        const id = currNode.id.substring(currNode.id.lastIndexOf("-") + 1, currNode.id.length);
+        if (currNode.type === "checkbox") {
+            if (currNode.checked) {
+                myMessage.filledParameters[id] = "$true";
+            }
+        }
+        else {
+            myMessage.filledParameters[id] = currNode.value.trim();
+        }
+    }
+
+    function processParameterSet(node) {
+        for (const currNode of node.childNodes) {
+            if (currNode.className === "parameters" && currNode.value !== "") {
+                processParameter(currNode);
+            }
+        }
+    }
+
     const myMessage = message;
     myMessage.filledParameters = {};
     for (const node of parameterSets.childNodes) {
         if (node.childElementCount > 0 && (node.style.display !== "none" || node.id === "commonParameters")) {
-            processParameters(node);
+            processParameterSet(node);
         }
     }
     vscode.postMessage(myMessage);
 
-    function processParameters(node) {
-        for (const currNode of node.childNodes) {
-            if (currNode.className === "parameters" && currNode.value !== "") {
-                const id = currNode.id.substring(currNode.id.lastIndexOf("-") + 1, currNode.id.length);
-                if (currNode.type === "checkbox") {
-                    if (currNode.checked) {
-                        myMessage.filledParameters[id] = "$true";
-                    }
-                }
-                else {
-                    myMessage.filledParameters[id] = currNode.value.trim();
-                }
-            }
-        }
-    }
+
 }
 
 function parameterSetToggle(toggleParameterSet) {
