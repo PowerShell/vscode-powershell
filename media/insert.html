@@ -6,12 +6,12 @@
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; script-src vscode-resource:; style-src vscode-resource:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css"href="%STYLESRC%">
+    <link rel="stylesheet" type="text/css" href="%STYLESRC%">
     <title>PowerShell: Insert Command</title>
 </head>
 
 <body>
-    <form id="CommandParameters" onsubmit="mySubmit()">
+    <form id="CommandParameters" onsubmit="submitCommand()">
         <h1 id="CommandName"></h1>
         <h2>Parameter Sets</h2>
         <div id="ParameterSets"></div>

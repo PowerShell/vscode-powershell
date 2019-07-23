@@ -26,7 +26,7 @@ const stringCommonParameters = [
     "PipelineVariable",
 ];
 
-function mySubmit() {
+function submitCommand() {
     const myMessage = message;
     myMessage.filledParameters = {};
     for (const node of parameterSets.childNodes) {
@@ -61,8 +61,8 @@ function toggleCommonParameters() {
     commonParametersDiv.style.display = commonParametersDiv.style.display === "none" ? null : "none";
 }
 
-document.getElementById("CommandParameters").onsubmit = mySubmit;
-window.addEventListener("message", (event) => {
+function processMessage(event) {
+
     message = null;
     let defaultParamSet = "__AllParameterSets";
     // Remove previous nodes if there are any.
@@ -161,4 +161,9 @@ window.addEventListener("message", (event) => {
         parameterSets.appendChild(commonParams);
     }
     parameterSetToggle(defaultParamSet);
-});
+
+}
+
+document.getElementById("CommandParameters").onsubmit = submitCommand;
+
+window.addEventListener("message", processMessage);
