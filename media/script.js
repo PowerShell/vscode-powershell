@@ -25,25 +25,37 @@ const stringCommonParameters = [
     "OutBuffer",
     "PipelineVariable",
 ];
-
-function submitCommand() {
-    const myMessage = message;
-    myMessage.filledParameters = {};
-    for (const currentParameterSet of parameterSets.childNodes) {
-        if (currentParameterSet.childElementCount > 0 && (currentParameterSet.style.display !== "none" || currentParameterSet.id === "commonParameters")) {
-            for (const parameter of currentParameterSet.childNodes) {
-                if (parameter.className === "parameters" && parameter.value !== "") {
-                    const id = parameter.id.substring(parameter.id.lastIndexOf("-") + 1, parameter.id.length);
-                    if (parameter.type === "checkbox" && parameter.checked) {
-                        myMessage.filledParameters[id] = "$true";
-                    } else {
-                        myMessage.filledParameters[id] = parameter.value.trim();
-                    }
-                }
-            }
+function processParameter(parameter) {
+    const id = parameter.id.substring(parameter.id.lastIndexOf("-") + 1, parameter.id.length);
+    if (parameter.type === "checkbox") {
+        if (parameter.checked) {
+            message.filledParameters[id] = "$true";
         }
     }
-    vscode.postMessage(myMessage);
+    else {
+        message.filledParameters[id] = parameter.value.trim();
+    }
+}
+
+function processParameterSet(parameterSet) {
+    for (const currNode of parameterSet.childNodes) {
+        if (currNode.className === "parameters" && currNode.value !== "") {
+            processParameter(currNode);
+        }
+    }
+}
+
+function submitCommand() {
+    message.filledParameters = {};
+
+    for (const currentParameterSet of parameterSets.childNodes) {
+        if (currentParameterSet.childElementCount > 0 && (currentParameterSet.style.display !== "none" || currentParameterSet.id === "commonParameters")) {
+            processParameterSet(currentParameterSet);
+        }
+    }
+    vscode.postMessage(message);
+
+
 }
 
 function parameterSetToggle(toggleParameterSet) {
