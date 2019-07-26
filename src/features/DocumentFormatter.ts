@@ -246,7 +246,7 @@ class PSDocumentFormattingEditProvider implements
         const requestParams: DocumentRangeFormattingParams = {
             textDocument: TextDocumentIdentifier.create(document.uri.toString()),
             range: rangeParam,
-            options: this.getEditorSettings(),
+            options: this.getEditorSettings(editor),
         };
 
         const formattingStartTime = new Date().valueOf();
@@ -309,11 +309,12 @@ class PSDocumentFormattingEditProvider implements
         PSDocumentFormattingEditProvider.documentLocker.lock(document, unlockWhenDone);
     }
 
-    private getEditorSettings(): { insertSpaces: boolean, tabSize: number } {
-        const editorConfiguration = vscode.workspace.getConfiguration("editor");
+    private getEditorSettings(editor: TextEditor): { insertSpaces: boolean, tabSize: number } {
+        // Writing the editor options allows string or strong types going in, but always
+        // resolves to an appropriate value on read.
         return {
-            insertSpaces: editorConfiguration.get<boolean>("insertSpaces"),
-            tabSize: editorConfiguration.get<number>("tabSize"),
+            insertSpaces: editor.options.insertSpaces as boolean,
+            tabSize: editor.options.tabSize as number,
         };
     }
 }

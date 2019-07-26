@@ -45,12 +45,17 @@ function needsVSCode () {
 
 function needsNodeJS () {
     try {
-        $nodeJSVersion = (node -v)
-
+        $nodeJSVersion = node -v
     } catch {
         return $true
     }
-    return ($nodeJSVersion.Substring(1,1) -lt 6)
+
+    if ($nodeJSVersion -notmatch 'v(\d+\.\d+\.\d+)') {
+        return $true
+    }
+
+    $nodeVer = [System.Version]$matches[1]
+    return ($nodeVer.Major -lt 6)
 }
 
 function needsPowerShellGet () {
