@@ -106,7 +106,7 @@ suite("Platform module", () => {
 
             checkDefaultPowerShellPath(
                 platformDetails,
-                platform.getAvailablePowerShellExes(platformDetails, undefined)[0].exePath);
+                platform.getAvailablePowerShellExes(platformDetails, undefined)[1].exePath);
 
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
