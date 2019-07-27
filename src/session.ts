@@ -3,12 +3,11 @@
  *--------------------------------------------------------*/
 
 import cp = require("child_process");
-import crypto = require("crypto");
 import fs = require("fs");
 import net = require("net");
 import os = require("os");
 import path = require("path");
-import { StringDecoder } from "string_decoder";
+import * as semver from "semver";
 import vscode = require("vscode");
 import TelemetryReporter from "vscode-extension-telemetry";
 import { Message } from "vscode-jsonrpc";
@@ -23,6 +22,7 @@ import {
     Middleware, NotificationType, RequestType, RequestType0,
     ResolveCodeLensSignature, RevealOutputChannelOn, StreamInfo } from "vscode-languageclient";
 
+import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./features/UpdatePowerShell";
 import {
     fixWindowsPowerShellPath, getAvailablePowerShellExes, getDefaultPowerShellPath,
     getPlatformDetails, IPlatformDetails, OperatingSystem } from "./platform";
@@ -37,8 +37,11 @@ export enum SessionStatus {
 }
 
 export class SessionManager implements Middleware {
+    private static PowerShellGitHubReleasesUrl =
+        "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
+    private static PowerShellGitHubRPrereleasesUrl =
+        "https://api.github.com/repos/PowerShell/PowerShell/releases";
     public HostVersion: string;
-
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
     private editorServicesArgs: string;
     private powerShellExePath: string = "";
@@ -586,7 +589,7 @@ export class SessionManager implements Middleware {
                     this.languageServerClient
                         .sendRequest(PowerShellVersionRequestType)
                         .then(
-                            (versionDetails) => {
+                            async (versionDetails) => {
                                 this.versionDetails = versionDetails;
 
                                 if (!this.inDevelopmentMode) {
@@ -599,6 +602,32 @@ export class SessionManager implements Middleware {
                                         ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
                                         : this.versionDetails.displayVersion,
                                     SessionStatus.Running);
+
+                                // If the user opted to not check for updates, then don't.
+                                if (!this.sessionSettings.promptToUpdatePowerShell) { return; }
+
+                                try {
+                                    const localVersion = semver.parse(this.versionDetails.version);
+                                    if (semver.lt(localVersion, "6.0.0")) {
+                                        // Skip prompting when using Windows PowerShell for now.
+                                        return;
+                                    }
+
+                                    // Fetch the latest PowerShell releases from GitHub.
+                                    let release: GitHubReleaseInformation;
+                                    if (semver.prerelease(localVersion)) {
+                                        // This gets all releases and the first one is the latest prerelease if
+                                        // there is a prerelease version.
+                                        release = await GitHubReleaseInformation.FetchLatestRelease(true);
+                                    } else {
+                                        release = await GitHubReleaseInformation.FetchLatestRelease(false);
+                                    }
+
+                                    await InvokePowerShellUpdateCheck(
+                                        localVersion, this.versionDetails.architecture, release);
+                                } catch (e) {
+                                    // best effort. This probably failed to fetch the data from GitHub.
+                                }
                             });
 
                     // Send the new LanguageClient to extension features
