@@ -2,7 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import path = require("path");
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, WorkspaceFolder } from "vscode";
@@ -90,7 +89,9 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     cwd: "${file}",
                 },
             ];
-        } else if (launchSelection.id === launchScriptId) {
+        }
+
+        if (launchSelection.id === launchScriptId) {
             return [
                 {
                     name: "PowerShell: Launch Script",
@@ -100,7 +101,9 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     cwd: "${workspaceFolder}",
                 },
             ];
-        } else if (launchSelection.id === interactiveSessionId) {
+        }
+
+        if (launchSelection.id === interactiveSessionId) {
             return [
                 {
                     name: "PowerShell: Interactive Session",
@@ -111,7 +114,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             ];
         }
 
-        // Return the "Attach to PowerShell Host Process" debug configuration
+        // Last remaining possibility is attach to host process
         return [
             {
                 name: "PowerShell: Attach to PowerShell Host Process",
