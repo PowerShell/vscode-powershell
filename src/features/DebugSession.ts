@@ -4,7 +4,7 @@
 
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
-    ExtensionContext, ProviderResult, WorkspaceFolder } from "vscode";
+    ExtensionContext, WorkspaceFolder } from "vscode";
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { getPlatformDetails, OperatingSystem } from "../platform";
@@ -40,6 +40,89 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     type: "PowerShell",
                     name: "PowerShell Interactive Session",
         }));
+    }
+
+    public async provideDebugConfigurations(
+        folder: WorkspaceFolder | undefined,
+        token?: CancellationToken): Promise<DebugConfiguration[]> {
+
+        const launchCurrentFileId  = 0;
+        const launchScriptId       = 1;
+        const interactiveSessionId = 2;
+        const attachHostProcessId  = 3;
+
+        const debugConfigPickItems = [
+            {
+                id: launchCurrentFileId,
+                label: "Launch Current File",
+                description: "Launch and debug the file in the currently active editor window",
+            },
+            {
+                id: launchScriptId,
+                label: "Launch Script",
+                description: "Launch and debug the specified file or command",
+            },
+            {
+                id: interactiveSessionId,
+                label: "Interactive Session",
+                description: "Debug commands executed from the Integrated Console",
+            },
+            {
+                id: attachHostProcessId,
+                label: "Attach",
+                description: "Attach the debugger to a running PowerShell Host Process",
+            },
+        ];
+
+        const launchSelection =
+            await vscode.window.showQuickPick(
+                debugConfigPickItems,
+                { placeHolder: "Select a PowerShell debug configuration" });
+
+        if (launchSelection.id === launchCurrentFileId) {
+            return [
+                {
+                    name: "PowerShell: Launch Current File",
+                    type: "PowerShell",
+                    request: "launch",
+                    script: "${file}",
+                    cwd: "${file}",
+                },
+            ];
+        }
+
+        if (launchSelection.id === launchScriptId) {
+            return [
+                {
+                    name: "PowerShell: Launch Script",
+                    type: "PowerShell",
+                    request: "launch",
+                    script: "enter path or command to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
+                    cwd: "${workspaceFolder}",
+                },
+            ];
+        }
+
+        if (launchSelection.id === interactiveSessionId) {
+            return [
+                {
+                    name: "PowerShell: Interactive Session",
+                    type: "PowerShell",
+                    request: "launch",
+                    cwd: "",
+                },
+            ];
+        }
+
+        // Last remaining possibility is attach to host process
+        return [
+            {
+                name: "PowerShell: Attach to PowerShell Host Process",
+                type: "PowerShell",
+                request: "attach",
+                runspaceId: 1,
+            },
+        ];
     }
 
     // DebugConfigurationProvider method
@@ -161,13 +244,13 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     }
 
                     if ((currentDocument.languageId !== "powershell") || !isValidExtension) {
-                        let path = currentDocument.fileName;
+                        let docPath = currentDocument.fileName;
                         const workspaceRootPath = vscode.workspace.rootPath;
                         if (currentDocument.fileName.startsWith(workspaceRootPath)) {
-                            path = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
+                            docPath = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
                         }
 
-                        const msg = "PowerShell does not support debugging this file type: '" + path + "'.";
+                        const msg = "PowerShell does not support debugging this file type: '" + docPath + "'.";
                         vscode.window.showErrorMessage(msg);
                         return;
                     }
