@@ -76,10 +76,10 @@ export function getDefaultPowerShellPath(
                 (platformDetails.isProcess64Bit ? process.env["ProgramFiles(x86)"] : process.env.ProgramFiles)
             + "\\PowerShell";
         } else {
-
             psCoreInstallPath =
                 (platformDetails.isProcess64Bit ? process.env.ProgramFiles : process.env.ProgramW6432) + "\\PowerShell";
         }
+        
         if (fs.existsSync(psCoreInstallPath)) {
             const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
             const psCorePaths =
@@ -98,6 +98,7 @@ export function getDefaultPowerShellPath(
                 return powerShellExePath = psCorePaths[0].exePath;
             }
         }
+        
         if (use32Bit) {
                 powerShellExePath =
                     platformDetails.isOS64Bit && platformDetails.isProcess64Bit
