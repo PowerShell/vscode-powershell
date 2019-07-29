@@ -68,7 +68,7 @@ export function getDefaultPowerShellPath(
     let powerShellExePath;
     let psCoreInstallPath;
 
-    // Find the path to powershell.exe based on the current platform
+     // Find the path to the powershell executable based on the current platform
     // and the user's desire to run the x86 version of PowerShell
     if (platformDetails.operatingSystem === OperatingSystem.Windows) {
         if (use32Bit) {
