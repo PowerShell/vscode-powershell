@@ -98,7 +98,7 @@ export function getDefaultPowerShellPath(
                 return powerShellExePath = psCorePaths[0].exePath;
             }
         }
-        
+
         if (use32Bit) {
                 powerShellExePath =
                     platformDetails.isOS64Bit && platformDetails.isProcess64Bit
