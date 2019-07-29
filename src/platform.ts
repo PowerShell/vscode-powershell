@@ -109,7 +109,7 @@ export function getDefaultPowerShellPath(
                     !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
                         ? System32PowerShellPath
                         : SysnativePowerShellPath;
-            }
+        }
     } else if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
         powerShellExePath = macOSExePath;
