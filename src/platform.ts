@@ -79,7 +79,7 @@ export function getDefaultPowerShellPath(
             psCoreInstallPath =
                 (platformDetails.isProcess64Bit ? process.env.ProgramFiles : process.env.ProgramW6432) + "\\PowerShell";
         }
-        
+
         if (fs.existsSync(psCoreInstallPath)) {
             const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
             const psCorePaths =
