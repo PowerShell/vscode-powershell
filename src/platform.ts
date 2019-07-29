@@ -73,12 +73,12 @@ export function getDefaultPowerShellPath(
     if (platformDetails.operatingSystem === OperatingSystem.Windows) {
         if (use32Bit) {
             psCoreInstallPath =
-            (platformDetails.isProcess64Bit ? process.env["ProgramFiles(x86)"] : process.env.ProgramFiles)
+                (platformDetails.isProcess64Bit ? process.env["ProgramFiles(x86)"] : process.env.ProgramFiles)
             + "\\PowerShell";
         } else {
 
             psCoreInstallPath =
-            (platformDetails.isProcess64Bit ? process.env.ProgramFiles : process.env.ProgramW6432) + "\\PowerShell";
+                (platformDetails.isProcess64Bit ? process.env.ProgramFiles : process.env.ProgramW6432) + "\\PowerShell";
         }
         if (fs.existsSync(psCoreInstallPath)) {
             const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
