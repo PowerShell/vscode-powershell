@@ -76,7 +76,8 @@ suite("Platform module", () => {
 
             checkDefaultPowerShellPath(
                 platformDetails,
-                "C:\\Program Files\\PowerShell\\6\\pwsh.exe");
+                platform.getAvailablePowerShellExes(platformDetails, undefined).filter((psPath) => (psPath.versionName)
+                === "PowerShell Core 6"));
 
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
