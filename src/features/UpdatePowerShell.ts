@@ -67,7 +67,7 @@ export async function InvokePowerShellUpdateCheck(
         },
         {
             id: 2,
-            title: "Never...",
+            title: "Don't show me this notification again...",
         },
     ];
 
@@ -88,8 +88,11 @@ export async function InvokePowerShellUpdateCheck(
         return;
     }
 
+    const isMacOS: boolean = process.platform === "darwin";
     const result = await window.showInformationMessage(
-        `${commonText} Would you like to update the version?`, ...options);
+        `${commonText} Would you like to update the version? ${
+            isMacOS ? "(Homebrew is required on macOS)" : ""
+        }`, ...options);
 
     // If the user cancels the notification.
     if (!result) { return; }
@@ -121,7 +124,7 @@ finally
     Microsoft.PowerShell.Management\\Remove-Item $tmpMsiPath
 }`;
 
-            } else if (process.platform === "darwin") {
+            } else if (isMacOS) {
                 script = "brew cask upgrade powershell";
                 if (release.isPreview) {
                     script = "brew cask upgrade powershell-preview";
