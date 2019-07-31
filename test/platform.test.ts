@@ -46,7 +46,7 @@ suite("Platform module", () => {
 
             checkDefaultPowerShellPath(
                 platformDetails,
-                platform.SysWow64PowerShellPath);
+                platform.System32PowerShellPath);
 
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
