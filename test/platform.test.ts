@@ -77,7 +77,7 @@ suite("Platform module", () => {
             checkDefaultPowerShellPath(
                 platformDetails,
                 platform.getAvailablePowerShellExes(platformDetails, undefined).filter((psPath) => (psPath.versionName)
-                === "PowerShell Core 6"));
+                === "PowerShell Core 6")[0].exePath);
 
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
