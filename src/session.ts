@@ -37,10 +37,6 @@ export enum SessionStatus {
 }
 
 export class SessionManager implements Middleware {
-    private static PowerShellGitHubReleasesUrl =
-        "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
-    private static PowerShellGitHubRPrereleasesUrl =
-        "https://api.github.com/repos/PowerShell/PowerShell/releases";
     public HostVersion: string;
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
     private editorServicesArgs: string;
@@ -614,18 +610,16 @@ export class SessionManager implements Middleware {
                                     }
 
                                     // Fetch the latest PowerShell releases from GitHub.
-                                    let release: GitHubReleaseInformation;
-                                    if (semver.prerelease(localVersion)) {
-                                        // This gets all releases and the first one is the latest prerelease if
-                                        // there is a prerelease version.
-                                        release = await GitHubReleaseInformation.FetchLatestRelease(true);
-                                    } else {
-                                        release = await GitHubReleaseInformation.FetchLatestRelease(false);
-                                    }
+                                    const isPreRelease = !!semver.prerelease(localVersion);
+                                    const release: GitHubReleaseInformation =
+                                        await GitHubReleaseInformation.FetchLatestRelease(isPreRelease);
 
                                     await InvokePowerShellUpdateCheck(
-                                        localVersion, this.versionDetails.architecture, release);
-                                } catch (e) {
+                                        this.languageServerClient,
+                                        localVersion,
+                                        this.versionDetails.architecture,
+                                        release);
+                                } catch {
                                     // best effort. This probably failed to fetch the data from GitHub.
                                 }
                             });

@@ -5,12 +5,13 @@
 import fetch from "node-fetch";
 import { compare, parse, prerelease, SemVer } from "semver";
 import { MessageItem, window } from "vscode";
+import { LanguageClient } from "vscode-languageclient";
 import Settings = require("../settings");
 import { EvaluateRequestType } from "./Console";
 
 const PowerShellGitHubReleasesUrl =
         "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
-const PowerShellGitHubRPrereleasesUrl =
+const PowerShellGitHubPrereleasesUrl =
     "https://api.github.com/repos/PowerShell/PowerShell/releases";
 
 export class GitHubReleaseInformation {
@@ -20,8 +21,8 @@ export class GitHubReleaseInformation {
         if (preview) {
             // This gets all releases and the first one is the latest prerelease if
             // there is a prerelease version.
-            releaseJson = (await fetch(PowerShellGitHubRPrereleasesUrl)
-                .then((res) => res.json()))[0];
+            releaseJson = (await fetch(PowerShellGitHubPrereleasesUrl)
+                .then((res) => res.json())).find((release: any) => release.prerelease);
         } else {
             releaseJson = await fetch(PowerShellGitHubReleasesUrl)
                 .then((res) => res.json());
@@ -51,7 +52,10 @@ interface IUpdateMessageItem extends MessageItem {
 }
 
 export async function InvokePowerShellUpdateCheck(
-    localVersion: SemVer, arch: string, release: GitHubReleaseInformation) {
+    languageServerClient: LanguageClient,
+    localVersion: SemVer,
+    arch: string,
+    release: GitHubReleaseInformation) {
     const options: IUpdateMessageItem[] = [
         {
             id: 0,
@@ -59,7 +63,7 @@ export async function InvokePowerShellUpdateCheck(
         },
         {
             id: 1,
-            title: "Not now.",
+            title: "Not now",
         },
         {
             id: 2,
@@ -67,16 +71,33 @@ export async function InvokePowerShellUpdateCheck(
         },
     ];
 
-    if (compare(release.version, localVersion) > 0) {
-        const result = await window.showInformationMessage(
-            `You have an old version of PowerShell (${
-            localVersion.raw
-        }). The current latest release is ${
-            release.version.raw
-        }. Would you like to update the version?`, ...options);
+    // If our local version is up-to-date, we can return early.
+    if (compare(localVersion, release.version) >= 0) {
+        return;
+    }
 
+    const commonText: string = `You have an old version of PowerShell (${
+        localVersion.raw
+    }). The current latest release is ${
+        release.version.raw
+    }.`;
+
+    if (process.platform === "linux") {
+        await window.showInformationMessage(
+            `${commonText} We recommend updating to the latest version.`);
+        return;
+    }
+
+    const result = await window.showInformationMessage(
+        `${commonText} Would you like to update the version?`, ...options);
+
+    // If the user cancels the notification.
+    if (!result) { return; }
+
+    // Yes choice.
+    switch (result.id) {
         // Yes choice.
-        if (result.id === 0) {
+        case 0:
             let script: string;
             if (process.platform === "win32") {
                 const msiMatcher = arch === "x86" ?
@@ -87,26 +108,36 @@ export async function InvokePowerShellUpdateCheck(
 
                 // Grab MSI and run it.
                 // tslint:disable-next-line: max-line-length
-                script = `$tmpMsiPath = Microsoft.PowerShell.Management\\Join-Path ([System.IO.Path]::GetTempPath()) "pwsh.msi";
-Microsoft.PowerShell.Utility\\Invoke-RestMethod -Uri ${assetUrl} -OutFile $tmpMsiPath;
-Microsoft.PowerShell.Management\\Invoke-Item $tmpMsiPath;`;
+                script = `
+$randomFileName = [System.IO.Path]::GetRandomFileName()
+$tmpMsiPath = Microsoft.PowerShell.Management\\Join-Path ([System.IO.Path]::GetTempPath()) "$randomFileName.msi"
+Microsoft.PowerShell.Utility\\Invoke-RestMethod -Uri ${assetUrl} -OutFile $tmpMsiPath
+try
+{
+    Microsoft.PowerShell.Management\\Start-Process -Wait -Path $tmpMsiPath
+}
+finally
+{
+    Microsoft.PowerShell.Management\\Remove-Item $tmpMsiPath
+}`;
 
             } else if (process.platform === "darwin") {
                 script = "brew cask upgrade powershell";
                 if (release.isPreview) {
                     script = "brew cask upgrade powershell-preview";
                 }
-            } else if (process.platform === "linux") {
-                window.showWarningMessage(
-                    "Update through VS Code not supported on Linux.");
-                return;
             }
-            await this.languageServerClient.sendRequest(EvaluateRequestType, {
+
+            await languageServerClient.sendRequest(EvaluateRequestType, {
                 expression: script,
             });
+            break;
+
         // Never choice.
-        } else if (result.id === 2) {
+        case 2:
             await Settings.change("promptToUpdatePowerShell", false, true);
-        }
+            break;
+        default:
+            break;
     }
 }
