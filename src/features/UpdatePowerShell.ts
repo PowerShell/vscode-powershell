@@ -67,7 +67,7 @@ export async function InvokePowerShellUpdateCheck(
         },
         {
             id: 2,
-            title: "Don't show me this notification again...",
+            title: "Do not show this notification again",
         },
     ];
 
