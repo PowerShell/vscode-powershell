@@ -59,7 +59,7 @@ export async function InvokePowerShellUpdateCheck(
     const options: IUpdateMessageItem[] = [
         {
             id: 0,
-            title: "Yes!",
+            title: "Yes",
         },
         {
             id: 1,
