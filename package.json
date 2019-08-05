@@ -55,7 +55,7 @@
     "tslint": "~5.18.0",
     "typescript": "~3.5.3",
     "vsce": "~1.66.0",
-    "vscode": "~1.1.35"
+    "vscode": "~1.1.36"
   },
   "extensionDependencies": [
     "vscode.powershell"
