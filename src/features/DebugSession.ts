@@ -570,7 +570,7 @@ export class PickRunspaceFeature implements IFeature {
     }
 
     private pickRunspace(processId): Thenable<string> {
-        return this.languageClient.sendRequest(GetRunspaceRequestType, processId).then((response) => {
+        return this.languageClient.sendRequest(GetRunspaceRequestType, { processId }).then((response) => {
             const items: IRunspaceItem[] = [];
 
             for (const runspace of response) {
