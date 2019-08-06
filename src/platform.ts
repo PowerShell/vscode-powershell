@@ -90,7 +90,7 @@ export function getDefaultPowerShellPath(
                     return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
                 })
                 .map((item) => ({
-                    versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
+                    versionName: `PowerShell ${path.parse(item).base} ${arch}`,
                     exePath: path.join(item, "pwsh.exe"),
                 }));
 
@@ -208,7 +208,7 @@ export function getAvailablePowerShellExes(
                     return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
                 })
                 .map((item) => ({
-                    versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
+                    versionName: `PowerShell ${path.parse(item).base} ${arch}`,
                     exePath: path.join(item, "pwsh.exe"),
                 }));
 
@@ -229,7 +229,7 @@ export function getAvailablePowerShellExes(
         exePaths.forEach((exePath) => {
             if (fs.existsSync(exePath)) {
                 paths.push({
-                    versionName: "PowerShell Core" + (/-preview/.test(exePath) ? " Preview" : ""),
+                    versionName: "PowerShell " + (/-preview/.test(exePath) ? " Preview" : ""),
                     exePath,
                 });
             }
