@@ -3,10 +3,10 @@
  *--------------------------------------------------------*/
 
 import fetch from "node-fetch";
-import { compare, parse, prerelease, SemVer } from "semver";
+import * as semver from "semver";
 import { MessageItem, window } from "vscode";
 import { LanguageClient } from "vscode-languageclient";
-import Settings = require("../settings");
+import * as Settings from "../settings";
 import { EvaluateRequestType } from "./Console";
 
 const PowerShellGitHubReleasesUrl =
@@ -32,14 +32,14 @@ export class GitHubReleaseInformation {
             releaseJson.tag_name, releaseJson.assets);
     }
 
-    public version: SemVer;
+    public version: semver.SemVer;
     public isPreview: boolean = false;
     public assets: any[];
 
-    public constructor(version: string | SemVer, assets: any[] = []) {
-        this.version = parse(version);
+    public constructor(version: string | semver.SemVer, assets: any[] = []) {
+        this.version = semver.parse(version);
 
-        if (prerelease(this.version)) {
+        if (semver.prerelease(this.version)) {
             this.isPreview = true;
         }
 
@@ -53,7 +53,7 @@ interface IUpdateMessageItem extends MessageItem {
 
 export async function InvokePowerShellUpdateCheck(
     languageServerClient: LanguageClient,
-    localVersion: SemVer,
+    localVersion: semver.SemVer,
     arch: string,
     release: GitHubReleaseInformation) {
     const options: IUpdateMessageItem[] = [
@@ -72,7 +72,7 @@ export async function InvokePowerShellUpdateCheck(
     ];
 
     // If our local version is up-to-date, we can return early.
-    if (compare(localVersion, release.version) >= 0) {
+    if (semver.compare(localVersion, release.version) >= 0) {
         return;
     }
 
