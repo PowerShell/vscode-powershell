@@ -59,7 +59,7 @@ export async function InvokePowerShellUpdateCheck(
     const options: IUpdateMessageItem[] = [
         {
             id: 0,
-            title: "Yes!",
+            title: "Yes",
         },
         {
             id: 1,
@@ -67,7 +67,7 @@ export async function InvokePowerShellUpdateCheck(
         },
         {
             id: 2,
-            title: "Don't show me this notification again...",
+            title: "Do not show this notification again",
         },
     ];
 
