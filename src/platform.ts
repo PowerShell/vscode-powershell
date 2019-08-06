@@ -229,7 +229,7 @@ export function getAvailablePowerShellExes(
         exePaths.forEach((exePath) => {
             if (fs.existsSync(exePath)) {
                 paths.push({
-                    versionName: "PowerShell " + (/-preview/.test(exePath) ? " Preview" : ""),
+                    versionName: "PowerShell" + (/-preview/.test(exePath) ? " Preview" : ""),
                     exePath,
                 });
             }
