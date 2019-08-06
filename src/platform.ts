@@ -101,7 +101,7 @@ export function getDefaultPowerShellPath(
 
         if (use32Bit) {
                 powerShellExePath =
-                    platformDetails.isOS64Bit && platformDetails.isProcess64Bit
+                return platformDetails.isOS64Bit && platformDetails.isProcess64Bit
                         ? SysWow64PowerShellPath
                         : System32PowerShellPath;
         } else {
