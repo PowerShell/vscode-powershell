@@ -211,7 +211,8 @@ export class ConsoleFeature implements IFeature {
                     return;
                 }
 
-                if (vscode.window.activeTerminal && vscode.window.activeTerminal.name !== "PowerShell Integrated Console") {
+                if (vscode.window.activeTerminal &&
+                    vscode.window.activeTerminal.name !== "PowerShell Integrated Console") {
                     this.log.write("PSIC is not active terminal. Running in active terminal using 'runSelectedText'");
                     await vscode.commands.executeCommand("workbench.action.terminal.runSelectedText");
 
