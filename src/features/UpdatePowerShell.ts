@@ -107,7 +107,7 @@ export async function InvokePowerShellUpdateCheck(
                     "win-x86.msi" : "win-x64.msi";
 
                 const assetUrl = release.assets.filter((asset: any) =>
-                    asset.name.indexOf(msiMatcher) >= 0)[0].url;
+                    asset.name.indexOf(msiMatcher) >= 0)[0].browser_download_url;
 
                 // Grab MSI and run it.
                 // tslint:disable-next-line: max-line-length
