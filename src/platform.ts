@@ -108,12 +108,13 @@ export function getDefaultPowerShellPath(
         return !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
                  ? System32PowerShellPath
                  : SysnativePowerShellPath;
-    }   if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
+    } 
+    if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
-            powerShellExePath = macOSExePath;
-            if (!fs.existsSync(macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
-                powerShellExePath = macOSPreviewExePath;
-        }
+        powerShellExePath = macOSExePath;
+        if (!fs.existsSync(macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
+            powerShellExePath = macOSPreviewExePath;
+    }
     } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
         // as well as the Snaps case - https://snapcraft.io/
