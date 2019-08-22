@@ -99,6 +99,7 @@ export function getDefaultPowerShellPath(
             }
         }
 
+        // No PowerShell 6+ detected so use Windows PowerShell.
         if (use32Bit) {
                 return platformDetails.isOS64Bit && platformDetails.isProcess64Bit
                         ? SysWow64PowerShellPath
