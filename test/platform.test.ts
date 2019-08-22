@@ -77,7 +77,7 @@ suite("Platform module", () => {
 
         checkDefaultPowerShellPath(
             platformDetails,
-            platform.SysnativePowerShellPath);
+            "C:\\Program Files\\PowerShell\\6\\pwsh.exe");
 
         checkAvailableWindowsPowerShellPaths(
             platformDetails,
@@ -107,7 +107,7 @@ suite("Platform module", () => {
 
         checkDefaultPowerShellPath(
             platformDetails,
-            platform.System32PowerShellPath);
+            "C:\\Program Files\\PowerShell\\6\\pwsh.exe");
 
         checkAvailableWindowsPowerShellPaths(
             platformDetails,
