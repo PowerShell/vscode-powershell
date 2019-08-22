@@ -114,7 +114,7 @@ export function getDefaultPowerShellPath(
         powerShellExePath = macOSExePath;
         if (!fs.existsSync(macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
             powerShellExePath = macOSPreviewExePath;
-    }
+        }
     } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
         // as well as the Snaps case - https://snapcraft.io/
