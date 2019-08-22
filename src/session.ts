@@ -119,34 +119,6 @@ export class SessionManager implements Middleware {
 
         this.powerShellExePath = this.getPowerShellExePath();
 
-        // Check for OpenSSL dependency on macOS when running PowerShell Core alpha. Look for the default
-        // Homebrew installation path and if that fails check the system-wide library path.
-        if (os.platform() === "darwin" && this.getPowerShellVersionLabel() === "alpha") {
-            if (!(utils.checkIfFileExists("/usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib") &&
-                    utils.checkIfFileExists("/usr/local/opt/openssl/lib/libssl.1.0.0.dylib")) &&
-                !(utils.checkIfFileExists("/usr/local/lib/libcrypto.1.0.0.dylib") &&
-                    utils.checkIfFileExists("/usr/local/lib/libssl.1.0.0.dylib"))) {
-                    const thenable =
-                        vscode.window.showWarningMessage(
-                            "The PowerShell extension will not work without OpenSSL on macOS and OS X when using " +
-                            "PowerShell Core alpha",
-                            "Show Documentation");
-
-                    thenable.then(
-                        (s) => {
-                            if (s === "Show Documentation") {
-                                cp.exec("open https://github.com/PowerShell/vscode-powershell/blob/master/docs/" +
-                                    "troubleshooting.md#1-powershell-intellisense-does-not-work-cant-debug-scripts");
-                            }
-                        });
-
-                    // Don't continue initializing since Editor Services will not load successfully
-                    this.setSessionFailure(
-                        "Cannot start PowerShell Editor Services due to missing OpenSSL dependency.");
-                    return;
-            }
-        }
-
         this.suppressRestartPrompt = false;
 
         if (this.powerShellExePath) {
