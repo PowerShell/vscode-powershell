@@ -66,27 +66,55 @@ export function getDefaultPowerShellPath(
     use32Bit: boolean = false): string | null {
 
     let powerShellExePath;
+    let psCoreInstallPath;
 
-    // Find the path to powershell.exe based on the current platform
+     // Find the path to the powershell executable based on the current platform
     // and the user's desire to run the x86 version of PowerShell
     if (platformDetails.operatingSystem === OperatingSystem.Windows) {
         if (use32Bit) {
-            powerShellExePath =
-                platformDetails.isOS64Bit && platformDetails.isProcess64Bit
-                    ? SysWow64PowerShellPath
-                    : System32PowerShellPath;
+            psCoreInstallPath =
+                (platformDetails.isProcess64Bit ? process.env["ProgramFiles(x86)"] : process.env.ProgramFiles)
+            + "\\PowerShell";
         } else {
-            powerShellExePath =
-                !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
-                    ? System32PowerShellPath
-                    : SysnativePowerShellPath;
+            psCoreInstallPath =
+                (platformDetails.isProcess64Bit ? process.env.ProgramFiles : process.env.ProgramW6432) + "\\PowerShell";
         }
-    } else if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
+
+        if (fs.existsSync(psCoreInstallPath)) {
+            const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
+            const psCorePaths =
+                fs.readdirSync(psCoreInstallPath)
+                .map((item) => path.join(psCoreInstallPath, item))
+                .filter((item) => {
+                    const exePath = path.join(item, "pwsh.exe");
+                    return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
+                })
+                .map((item) => ({
+                    versionName: `PowerShell ${path.parse(item).base} ${arch}`,
+                    exePath: path.join(item, "pwsh.exe"),
+                }));
+
+            if (psCorePaths) {
+                return powerShellExePath = psCorePaths[0].exePath;
+            }
+        }
+
+        // No PowerShell 6+ detected so use Windows PowerShell.
+        if (use32Bit) {
+                return platformDetails.isOS64Bit && platformDetails.isProcess64Bit
+                        ? SysWow64PowerShellPath
+                        : System32PowerShellPath;
+        }
+        return !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
+                 ? System32PowerShellPath
+                 : SysnativePowerShellPath;
+    }
+    if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
         powerShellExePath = macOSExePath;
         if (!fs.existsSync(macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
             powerShellExePath = macOSPreviewExePath;
-        }
+    }
     } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
         // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
         // as well as the Snaps case - https://snapcraft.io/
@@ -179,7 +207,7 @@ export function getAvailablePowerShellExes(
                     return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
                 })
                 .map((item) => ({
-                    versionName: `PowerShell Core ${path.parse(item).base} ${arch}`,
+                    versionName: `PowerShell ${path.parse(item).base} ${arch}`,
                     exePath: path.join(item, "pwsh.exe"),
                 }));
 
@@ -200,7 +228,7 @@ export function getAvailablePowerShellExes(
         exePaths.forEach((exePath) => {
             if (fs.existsSync(exePath)) {
                 paths.push({
-                    versionName: "PowerShell Core" + (/-preview/.test(exePath) ? " Preview" : ""),
+                    versionName: "PowerShell" + (/-preview/.test(exePath) ? " Preview" : ""),
                     exePath,
                 });
             }
