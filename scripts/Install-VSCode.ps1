@@ -134,8 +134,8 @@ param(
     [string]$Architecture = "64-bit",
 
     [parameter()]
-    [ValidateSet("Stable","Stable-User", "Insider-System", "Insider-User")]
-    [string]$BuildEdition = "Stable",
+    [ValidateSet("Stable-System","Stable-User", "Insider-System", "Insider-User")]
+    [string]$BuildEdition = "Stable-System",
 
     [Parameter()]
     [ValidateNotNull()]
@@ -201,7 +201,7 @@ function Get-CodePlatformInformation {
         $Bitness,
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet('Stable', 'Stable-User', 'Insider-System', 'Insider-User')]
+        [ValidateSet('Stable-System', 'Stable-User', 'Insider-System', 'Insider-User')]
         [string]
         $BuildEdition
     )
@@ -228,7 +228,7 @@ function Get-CodePlatformInformation {
     }
 
     switch ($BuildEdition) {
-        'Stable' {
+        'Stable-System' {
             $appName = "Visual Studio Code ($Bitness)"
             break
         }
@@ -325,7 +325,7 @@ function Get-CodePlatformInformation {
             }
 
             switch ($BuildEdition) {
-                'Stable' {
+                'Stable-System' {
                     $exePath = "$installBase\Microsoft VS Code\bin\code.cmd"
                 }
                 'Stable-User' {
@@ -344,7 +344,7 @@ function Get-CodePlatformInformation {
     }
 
     switch ($BuildEdition) {
-        'Stable' {
+        'Stable-System' {
             $channel = 'stable'
             break
         }
@@ -455,7 +455,7 @@ function Install-VSCodeFromTar {
 
 # We need to be running as elevated on *nix
 if (($IsLinux -or $IsMacOS) -and (id -u) -ne 0) {
-    throw "Must be running as root to install VSCode.`nInvoke this script with (for example):`n`tsudo pwsh -f Install-VSCode.ps1 -BuildEdition Stable"
+    throw "Must be running as root to install VSCode.`nInvoke this script with (for example):`n`tsudo pwsh -f Install-VSCode.ps1 -BuildEdition Stable-System"
 }
 
 try {
@@ -522,7 +522,7 @@ try {
             }
 
             switch ($BuildEdition) {
-                'Stable' {
+                'Stable-System' {
                     & $pacMan install -y code
                 }
 
@@ -566,7 +566,7 @@ try {
                 break
             }
 
-            Install-VSCodeFromTar -TarPath $installerPath -Insiders:($BuildEdition -ne 'Stable')
+            Install-VSCodeFromTar -TarPath $installerPath -Insiders:($BuildEdition -ne 'Stable-System')
             break
         }
 
