@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.4.0
+.VERSION 1.4.1
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -130,11 +130,11 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [parameter()]
-    [ValidateSet(, "64-bit", "32-bit")]
-    [string]$Architecture = "64-bit",
+    [ValidateSet('64-bit', '32-bit')]
+    [string]$Architecture = '64-bit',
 
     [parameter()]
-    [ValidateSet("Stable-System","Stable-User", "Insider-System", "Insider-User")]
+    [ValidateSet('Stable-System', 'Stable-User', 'Insider-System', 'Insider-User')]
     [string]$BuildEdition = "Stable-System",
 
     [Parameter()]
@@ -168,7 +168,7 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 
 function Test-IsOsArchX64 {
     if ($PSVersionTable.PSVersion.Major -lt 6) {
-        return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit"
+        return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq '64-bit'
     }
 
     return [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::X64
@@ -404,19 +404,19 @@ function Save-WithBitsTransfer {
 
     $bitsDl = Start-BitsTransfer $FileUri -Destination $Destination -Asynchronous
 
-    while (($bitsDL.JobState -eq "Transferring") -or ($bitsDL.JobState -eq "Connecting")) {
+    while (($bitsDL.JobState -eq 'Transferring') -or ($bitsDL.JobState -eq 'Connecting')) {
         Write-Progress -Activity "Downloading: $AppName" -Status "$([math]::round($bitsDl.BytesTransferred / 1mb))mb / $([math]::round($bitsDl.BytesTotal / 1mb))mb" -PercentComplete ($($bitsDl.BytesTransferred) / $($bitsDl.BytesTotal) * 100 )
     }
 
     switch ($bitsDl.JobState) {
 
-        "Transferred" {
+        'Transferred' {
             Complete-BitsTransfer -BitsJob $bitsDl
             break
         }
 
-        "Error" {
-            throw "Error downloading installation media."
+        'Error' {
+            throw 'Error downloading installation media.'
         }
     }
 }
@@ -433,7 +433,7 @@ function Install-VSCodeFromTar {
     )
 
     $tarDir = Join-Path ([System.IO.Path]::GetTempPath()) 'VSCodeTar'
-    $destDir = "/opt/VSCode-linux-x64"
+    $destDir = '/opt/VSCode-linux-x64'
 
     New-Item -ItemType Directory -Force -Path $tarDir
     try {
