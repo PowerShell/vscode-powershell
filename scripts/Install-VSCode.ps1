@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.3
+.VERSION 1.3.1
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -25,6 +25,8 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    30/08/2019 - added functionality to install the "User Install" variant of Stable Edition.
+    --
     07/11/2018 - added support for PowerShell Core and macOS/Linux platforms.
     --
     15/08/2018 - added functionality to install the new "User Install" variant of Insiders Edition.
@@ -132,7 +134,7 @@ param(
     [string]$Architecture = "64-bit",
 
     [parameter()]
-    [ValidateSet("Stable", "Insider-System", "Insider-User")]
+    [ValidateSet("Stable","Stable-User", "Insider-System", "Insider-User")]
     [string]$BuildEdition = "Stable",
 
     [Parameter()]
@@ -199,7 +201,7 @@ function Get-CodePlatformInformation {
         $Bitness,
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet('Stable', 'Insider-System', 'Insider-User')]
+        [ValidateSet('Stable', 'Stable-User', 'Insider-System', 'Insider-User')]
         [string]
         $BuildEdition
     )
@@ -228,6 +230,11 @@ function Get-CodePlatformInformation {
     switch ($BuildEdition) {
         'Stable' {
             $appName = "Visual Studio Code ($Bitness)"
+            break
+        }
+
+        'Stable-User' {
+            $appName = "Visual Studio Code ($($Architecture) - User)"
             break
         }
 
@@ -321,6 +328,9 @@ function Get-CodePlatformInformation {
                 'Stable' {
                     $exePath = "$installBase\Microsoft VS Code\bin\code.cmd"
                 }
+                'Stable-User' {
+                    $exePath = "${env:LocalAppData}\Programs\Microsoft VS Code\bin\code.cmd"
+                }
 
                 'Insider-System' {
                     $exePath = "$installBase\Microsoft VS Code Insiders\bin\code-insiders.cmd"
@@ -336,6 +346,12 @@ function Get-CodePlatformInformation {
     switch ($BuildEdition) {
         'Stable' {
             $channel = 'stable'
+            break
+        }
+
+        'Stable-User' {
+            $channel = 'stable'
+            $platform += '-user'
             break
         }
 
