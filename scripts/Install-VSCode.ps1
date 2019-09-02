@@ -458,6 +458,11 @@ if (($IsLinux -or $IsMacOS) -and (id -u) -ne 0) {
     throw "Must be running as root to install VSCode.`nInvoke this script with (for example):`n`tsudo pwsh -f Install-VSCode.ps1 -BuildEdition Stable-System"
 }
 
+# User builds can only be installed on Windows systems
+if ($BuildEdition.EndsWith('User') -and -not ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 5)) {
+    throw 'User builds are not available for non-Windows systems'
+}
+
 try {
     $prevProgressPreference = $ProgressPreference
     $ProgressPreference = 'SilentlyContinue'
