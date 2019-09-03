@@ -328,6 +328,7 @@ function Get-CodePlatformInformation {
                 'Stable-System' {
                     $exePath = "$installBase\Microsoft VS Code\bin\code.cmd"
                 }
+
                 'Stable-User' {
                     $exePath = "${env:LocalAppData}\Programs\Microsoft VS Code\bin\code.cmd"
                 }
