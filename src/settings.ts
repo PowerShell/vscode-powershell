@@ -80,6 +80,7 @@ export interface ISettings {
     powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
     powerShellDefaultVersion?: string;
     powerShellExePath?: string;
+    promptToUpdatePowerShell?: boolean;
     bundledModulesPath?: string;
     startAutomatically?: boolean;
     useX86Host?: boolean;
@@ -169,6 +170,8 @@ export function load(): ISettings {
             configuration.get<string>("powerShellDefaultVersion", undefined),
         powerShellExePath:
             configuration.get<string>("powerShellExePath", undefined),
+        promptToUpdatePowerShell:
+            configuration.get<boolean>("promptToUpdatePowerShell", true),
         bundledModulesPath:
             "../../modules",
         useX86Host:

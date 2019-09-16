@@ -41,13 +41,17 @@
     "onView:PowerShellCommands"
   ],
   "dependencies": {
+    "node-fetch": "^2.6.0",
+    "semver": "^6.3.0",
     "vscode-extension-telemetry": "~0.1.2",
     "vscode-languageclient": "~5.2.1"
   },
   "devDependencies": {
     "@types/mocha": "~5.2.7",
     "@types/node": "~10.11.0",
+    "@types/node-fetch": "^2.5.0",
     "@types/rewire": "^2.5.28",
+    "@types/semver": "^6.0.1",
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~1.23.1",
     "mocha-multi-reporters": "~1.1.7",
@@ -489,6 +493,11 @@
         "powershell.powerShellDefaultVersion": {
           "type": "string",
           "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6 (x64)\"."
+        },
+        "powershell.promptToUpdatePowerShell": {
+          "type": "boolean",
+          "description": "Specifies whether you should be prompted to update your version of PowerShell.",
+          "default": true
         },
         "powershell.startAutomatically": {
           "type": "boolean",
