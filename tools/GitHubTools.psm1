@@ -290,12 +290,12 @@ function Copy-GitRepository
 
     Write-Verbose "Cloning git repository '$OriginRemote' to path '$Destination'"
 
+    Exec { git clone $OriginRemote --branch $CloneBranch --single-branch $Destination }
+
     if ($CloneBranch)
     {
         Write-Verbose "Cloned branch: $CloneBranch"
     }
-
-    Exec { git clone $OriginRemote --branch $CloneBranch --single-branch $Destination }
 
     Push-Location $Destination
     try

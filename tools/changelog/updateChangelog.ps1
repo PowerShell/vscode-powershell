@@ -8,7 +8,7 @@ using module ..\ChangelogTools.psm1
 
 <#
 .EXAMPLE
-.\updateChangelog.ps1 -GitHubToken $ghTok -PSExtensionSinceRef v2.0.0-preview.3 -PsesSinceRef v2.0.0-preview.3 -PSExtensionVersion 2019.5.0 -PsesVersion 1.12.2 -PSExtensionUntilRef legacy/1.x -PsesUntilRef legacy/1.x -Verbose
+.\updateChangelog.ps1 -GitHubToken $ghTok -PSExtensionSinceRef v2019.5.0 -PsesSinceRef v2.0.0-preview.4 -PSExtensionVersion 2019.9.0 -PsesVersion 2.0.0-preview.5 -PSExtensionUntilRef master -PsesUntilRef master -Verbose
 #>
 [CmdletBinding()]
 param(
