@@ -7,6 +7,7 @@ import { LanguageClient, NotificationType, RequestType } from "vscode-languagecl
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
+import Settings = require("../settings");
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody, void>("output");
@@ -207,6 +208,20 @@ export class ConsoleFeature implements IFeature {
                 if (this.languageClient === undefined) {
                     this.log.writeAndShowError(`<${ConsoleFeature.name}>: ` +
                         "Unable to instantiate; language client undefined.");
+                    return;
+                }
+
+                if (vscode.window.activeTerminal &&
+                    vscode.window.activeTerminal.name !== "PowerShell Integrated Console") {
+                    this.log.write("PSIC is not active terminal. Running in active terminal using 'runSelectedText'");
+                    await vscode.commands.executeCommand("workbench.action.terminal.runSelectedText");
+
+                    // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
+                    // takes is called `preserveFocus` which when `true` the terminal will not take focus.
+                    // This is the inverse of focusConsoleOnExecute so we have to inverse the boolean.
+                    vscode.window.activeTerminal.show(!Settings.load().integratedConsole.focusConsoleOnExecute);
+                    await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
+
                     return;
                 }
 
