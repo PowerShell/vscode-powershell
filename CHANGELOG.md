@@ -1,5 +1,227 @@
 # PowerShell Preview Extension Release History
 
+## v2019.9.0
+### Tuesday, September 17, 2019
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- [vscode-powershell #1961](https://github.com/PowerShell/vscode-powershell/pull/1961) -
+  Changelog tools.
+- [vscode-powershell #2181](https://github.com/PowerShell/vscode-powershell/pull/2181) -
+  Bump @types/semver from 6.0.1 to 6.0.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2180](https://github.com/PowerShell/vscode-powershell/pull/2180) -
+  Bump tslint from 5.19.0 to 5.20.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2141](https://github.com/PowerShell/vscode-powershell/pull/2141) -
+  Null check on activeTerminal to workaround vscode behavior.
+- [vscode-powershell #2105](https://github.com/PowerShell/vscode-powershell/pull/2105) -
+  Prompt to update PowerShell version.
+- [vscode-powershell #2165](https://github.com/PowerShell/vscode-powershell/pull/2165) -
+  Add powershell.codeFormatting.autoCorrectAliases setting to add support for optionally correcting aliases as well (added in PSSA 1.18.2). Disabled by default.. (Thanks @bergmeister!)
+- [vscode-powershell #2160](https://github.com/PowerShell/vscode-powershell/pull/2160) -
+  Added functionality to install the User variant of Stable Edition. (Thanks @Lothindir!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell/pull/2156) -
+  Bump tslint from 5.18.0 to 5.19.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #2094 from SydneyhSmith/master. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update src/platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update src/platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Update src/platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2123](https://github.com/PowerShell/vscode-powershell/pull/2123) -
+  Bump vscode from 1.1.35 to 1.1.36. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell/pull/2090) -
+  Bump typescript from 3.5.2 to 3.5.3. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2090](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell/pull/2107) -
+  Bump vsce from 1.65.0 to 1.66.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2107](https://github.com/PowerShell/vscode-powershell) -
+  Update src/platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2084](https://github.com/PowerShell/vscode-powershell/pull/2084) -
+  Implement #1611 - provide dynamic debug config. (Thanks @rkeithhill!)
+- [vscode-powershell #2084](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2084](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2084](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell/pull/2095) -
+  Bump mocha-junit-reporter from 1.23.0 to 1.23.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.test.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update src/platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #1 from SydneyhSmith/WindowsCoreCheck. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update session.ts. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2095](https://github.com/PowerShell/vscode-powershell) -
+  Update platform.ts. (Thanks @SydneyhSmith!)
+- 📁 ✨ [vscode-powershell #2024](https://github.com/PowerShell/vscode-powershell/pull/2039) -
+  Add machine scope.
+- [vscode-powershell #2091](https://github.com/PowerShell/vscode-powershell/pull/2091) -
+  Bump vsce from 1.64.0 to 1.65.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2081](https://github.com/PowerShell/vscode-powershell/pull/2081) -
+  Add param-block snippet. (Thanks @AspenForester!)
+- [vscode-powershell #2079](https://github.com/PowerShell/vscode-powershell/pull/2079) -
+  [Security] Bump lodash from 4.17.11 to 4.17.14. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2062](https://github.com/PowerShell/vscode-powershell/pull/2062) -
+  Remove redundant snippets. (Thanks @travis-c-lagrone!)
+- [vscode-powershell #1974](https://github.com/PowerShell/vscode-powershell/pull/1974) -
+  Add #Requires snippets. (Thanks @travis-c-lagrone!)
+- [vscode-powershell #2063](https://github.com/PowerShell/vscode-powershell/pull/2063) -
+  Remove redundant community snippets. (Thanks @travis-c-lagrone!)
+- [vscode-powershell #2063](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #2075 from PowerShell/ADS-Server-creation. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2063](https://github.com/PowerShell/vscode-powershell) -
+  Update docs/azure_data_studio/Server-Creation-With-Docker-Notebook.ipynb. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2074](https://github.com/PowerShell/vscode-powershell/pull/2074) -
+  Bump vscode-extension-telemetry from 0.1.1 to 0.1.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2074](https://github.com/PowerShell/vscode-powershell) -
+  Add files via upload. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell/pull/2065) -
+  Update '.vscode/settings.json' to identify snippet files as 'JSON with Comments'. (Thanks @travis-c-lagrone!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #2061 from PowerShell/Doc-Updates. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Update development.md. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Update troubleshooting.md. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Delete ise_compatibility.md. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Delete remoting.md. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Update README_FOR_MARKETPLACE.md. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #2059 from PowerShell/SnippetReq. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Update development.md. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Update community_snippets.md. (Thanks @SydneyhSmith!)
+- [vscode-powershell #2056](https://github.com/PowerShell/vscode-powershell/pull/2056) -
+  Update package lock.
+- [vscode-powershell #2054](https://github.com/PowerShell/vscode-powershell/pull/2054) -
+  Bump vscode from 1.1.34 to 1.1.35. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2038](https://github.com/PowerShell/vscode-powershell/pull/2038) -
+  Add ADS insiders gallery file to update script.
+- [vscode-powershell #2037](https://github.com/PowerShell/vscode-powershell/pull/2037) -
+  Update PSSA docs Url to point to master branch because master is now the default branch. (Thanks @bergmeister!)
+- [vscode-powershell #2035](https://github.com/PowerShell/vscode-powershell/pull/2035) -
+  #1019: Get format settings from document editor instead of global.. (Thanks @tillig!)
+- [vscode-powershell #2025](https://github.com/PowerShell/vscode-powershell/pull/2025) -
+  Fix node version detect logic to handle node v10. (Thanks @rkeithhill!)
+- [vscode-powershell #1946](https://github.com/PowerShell/vscode-powershell/pull/1946) -
+  Add ArgumentCompleter snippets. (Thanks @travis-c-lagrone!)
+- [vscode-powershell #2020](https://github.com/PowerShell/vscode-powershell/pull/2020) -
+  Bump mocha-junit-reporter from 1.22.0 to 1.23.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #1999](https://github.com/PowerShell/vscode-powershell/pull/1999) -
+  Bump @types/mocha from 5.2.6 to 5.2.7. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2047](https://github.com/PowerShell/vscode-powershell/pull/2047) -
+  Bump tslint from 5.16.0 to 5.18.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2044](https://github.com/PowerShell/vscode-powershell/pull/2044) -
+  Bump vsce from 1.63.0 to 1.64.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2028](https://github.com/PowerShell/vscode-powershell/pull/2028) -
+  Bump typescript from 3.4.5 to 3.5.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2029](https://github.com/PowerShell/vscode-powershell/pull/2029) -
+  Bump vsce from 1.62.0 to 1.63.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2015](https://github.com/PowerShell/vscode-powershell/pull/2015) -
+  Fix node types version.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #1023](https://github.com/PowerShell/PowerShellEditorServices/pull/1023) -
+  Update PSSA version.
+- [PowerShellEditorServices #1022](https://github.com/PowerShell/PowerShellEditorServices/pull/1022) -
+  Catch stream exceptions for some Debug Adapter stability..
+- [PowerShellEditorServices #1021](https://github.com/PowerShell/PowerShellEditorServices/pull/1021) -
+  Add AutoCorrectAliases setting (PR to be made in VS-Code repo as well) to add support for optionally correcting aliases as well (added in PSSA 1.18.2). (Thanks @bergmeister!)
+- 📁 🐛 [vscode-powershell #1994](https://github.com/PowerShell/PowerShellEditorServices/pull/1000) -
+  Fix crash when setBreakpoint from VSCode sends a git:/ URI....
+- [PowerShellEditorServices #975](https://github.com/PowerShell/PowerShellEditorServices/pull/975) -
+  Bump Serilog.Sinks.Async from 1.3.0 to 1.4.0. (Thanks @dependabot-preview[bot]!)
+- [PowerShellEditorServices #988](https://github.com/PowerShell/PowerShellEditorServices/pull/988) -
+  Testing removing consoleecho.
+- [PowerShellEditorServices #986](https://github.com/PowerShell/PowerShellEditorServices/pull/986) -
+  Bump Microsoft.NET.Test.Sdk from 16.1.1 to 16.2.0. (Thanks @dependabot-preview[bot]!)
+- [PowerShellEditorServices #986](https://github.com/PowerShell/PowerShellEditorServices) -
+  Merge pull request #985 from PowerShell/DocUpdates. (Thanks @SydneyhSmith!)
+- [PowerShellEditorServices #986](https://github.com/PowerShell/PowerShellEditorServices) -
+  Delete using_the_dotnet_api.md. (Thanks @SydneyhSmith!)
+- [PowerShellEditorServices #986](https://github.com/PowerShell/PowerShellEditorServices) -
+  Update README.md. (Thanks @SydneyhSmith!)
+- [PowerShellEditorServices #972](https://github.com/PowerShell/PowerShellEditorServices/pull/972) -
+  Bump Microsoft.NET.Test.Sdk from 16.1.0 to 16.1.1. (Thanks @dependabot-preview[bot]!)
+- [PowerShellEditorServices #981](https://github.com/PowerShell/PowerShellEditorServices/pull/981) -
+  Update NewtonSoft.Json dependency from 10.0.3 to 11.02 since PS 6.0 has been deprecated. (Thanks @bergmeister!)
+- 🐛 [vscode-powershell #2007](https://github.com/PowerShell/PowerShellEditorServices/pull/974) -
+  Defend against crash when no PSSA.
+- [PowerShellEditorServices #982](https://github.com/PowerShell/PowerShellEditorServices/pull/982) -
+  Mention lsp-powershell, an Emacs lsp-mode client that leverage PowerShellEditorServices. (Thanks @kiennq!)
+- 👷 [PowerShellEditorServices #978](https://github.com/PowerShell/PowerShellEditorServices/pull/977) -
+  Delete stale WebSocket code.
+
 ## v2019.5.0
 ### Wednesday, May 22, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
