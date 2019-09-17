@@ -1,5 +1,69 @@
 # PowerShell Preview Extension Release History
 
+## v2019.9.0
+### Wednesday, September 18, 2019
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 👷 [vscode-powershell #1961](https://github.com/PowerShell/vscode-powershell/pull/1961) -
+  Changelog tools.
+- 🐛 [vscode-powershell #2141](https://github.com/PowerShell/vscode-powershell/pull/2141) -
+  Null check on activeTerminal to workaround vscode behavior.
+- ✨ [vscode-powershell #2105](https://github.com/PowerShell/vscode-powershell/pull/2105) -
+  Prompt to update PowerShell version.
+- 🔎 [vscode-powershell #2165](https://github.com/PowerShell/vscode-powershell/pull/2165) -
+  Add powershell.codeFormatting.autoCorrectAliases setting to add support for optionally correcting aliases as well (added in PSSA 1.18.2). Disabled by default.. (Thanks @bergmeister!)
+- ✨ [vscode-powershell #2160](https://github.com/PowerShell/vscode-powershell/pull/2160) -
+  Added functionality to install the User variant of Stable Edition. (Thanks @Lothindir!)
+- ✨ [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Default to PowerShell Core on Windows if it's installed. (Thanks @SydneyhSmith!)
+- ✨ [vscode-powershell #2084](https://github.com/PowerShell/vscode-powershell/pull/2084) -
+  Implement #1611 - provide dynamic debug config. (Thanks @rkeithhill!)
+- ✨ [vscode-powershell #2024](https://github.com/PowerShell/vscode-powershell/pull/2039) -
+  Add machine scope per VS Code team request.
+- ✨ [vscode-powershell #2081](https://github.com/PowerShell/vscode-powershell/pull/2081) -
+  Add param-block snippet. (Thanks @AspenForester!)
+- 🧹 [vscode-powershell #2062](https://github.com/PowerShell/vscode-powershell/pull/2062) -
+  Remove redundant snippets. (Thanks @travis-c-lagrone!)
+- ✨ [vscode-powershell #1974](https://github.com/PowerShell/vscode-powershell/pull/1974) -
+  Add #Requires snippets. (Thanks @travis-c-lagrone!)
+- 🧹 [vscode-powershell #2063](https://github.com/PowerShell/vscode-powershell/pull/2063) -
+  Remove redundant community snippets. (Thanks @travis-c-lagrone!)
+- 👷 [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell/pull/2065) -
+  Update '.vscode/settings.json' to identify snippet files as 'JSON with Comments'. (Thanks @travis-c-lagrone!)
+- 📔 [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Docs updates. (Thanks @SydneyhSmith!)
+- 👷 [vscode-powershell #2038](https://github.com/PowerShell/vscode-powershell/pull/2038) -
+  Add ADS insiders gallery file to update script.
+- 🔎 [vscode-powershell #2037](https://github.com/PowerShell/vscode-powershell/pull/2037) -
+  Update PSScriptAnalyzer docs Url to point to master branch because master is now the default branch. (Thanks @bergmeister!)
+- 🐛 [vscode-powershell #2035](https://github.com/PowerShell/vscode-powershell/pull/2035) -
+  #1019: Get format settings from document editor instead of global. (Thanks @tillig!)
+- 👷 [vscode-powershell #2025](https://github.com/PowerShell/vscode-powershell/pull/2025) -
+  Fix node version detect logic to handle node v10. (Thanks @rkeithhill!)
+- ✨ [vscode-powershell #1946](https://github.com/PowerShell/vscode-powershell/pull/1946) -
+  Add ArgumentCompleter snippets. (Thanks @travis-c-lagrone!)
+- 🧹 [vscode-powershell #2015](https://github.com/PowerShell/vscode-powershell/pull/2015) -
+  Fix node types version.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 [PowerShellEditorServices #1022](https://github.com/PowerShell/PowerShellEditorServices/pull/1022) -
+  Catch stream exceptions for some Debug Adapter stability.
+- 🔎 [PowerShellEditorServices #1021](https://github.com/PowerShell/PowerShellEditorServices/pull/1021) -
+  Add AutoCorrectAliases setting (PR to be made in VS-Code repo as well) to add support for optionally correcting aliases as well (added in PSSA 1.18.2). (Thanks @bergmeister!).
+- 🐛 [vscode-powershell #1994](https://github.com/PowerShell/PowerShellEditorServices/pull/1000) -
+  Fix crash when setBreakpoint from VSCode sends a git:/ URI.
+- 🧹 [PowerShellEditorServices #988](https://github.com/PowerShell/PowerShellEditorServices/pull/988) -
+  Remove consoleecho lib for PowerShell 7.
+- 📔 [PowerShellEditorServices #986](https://github.com/PowerShell/PowerShellEditorServices) -
+  Documentation updates. (Thanks @SydneyhSmith!)
+- ⚙️ [PowerShellEditorServices #981](https://github.com/PowerShell/PowerShellEditorServices/pull/981) -
+  Update NewtonSoft.Json dependency from 10.0.3 to 11.02 since PS 6.0 has been deprecated. (Thanks @bergmeister!)
+- 🐛 [vscode-powershell #2007](https://github.com/PowerShell/PowerShellEditorServices/pull/974) -
+  Defend against crash when no PSScriptAnalyzer is found.
+- 👷 [PowerShellEditorServices #978](https://github.com/PowerShell/PowerShellEditorServices/pull/977) -
+  Delete stale WebSocket code.
+
 ## v2019.5.0
 ### Wednesday, May 22, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
