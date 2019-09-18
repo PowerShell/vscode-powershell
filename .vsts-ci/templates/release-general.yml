@@ -17,6 +17,8 @@ steps:
 
 - task: PowerShell@2
   displayName: 'Find PowerShellEditorServices build'
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   inputs:
     targetType: filePath
     filePath: ./tools/releaseBuild/findPsesBuild.ps1
