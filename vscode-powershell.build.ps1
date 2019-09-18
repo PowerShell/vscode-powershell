@@ -33,6 +33,7 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices,
     }
     else {
         $script:psesRepoPath = Resolve-Path $script:psesRepoPath
+        gci $script:psesRepoPath
         $script:psesBuildScriptPath = Resolve-Path "$script:psesRepoPath/PowerShellEditorServices.build.ps1"
     }
 }
