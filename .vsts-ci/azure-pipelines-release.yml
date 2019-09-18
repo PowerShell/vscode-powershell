@@ -37,6 +37,7 @@ jobs:
 - job: 'ReleaseBuild'
   displayName: 'Build release'
   pool:
-    vmImage: 'Package ES CodeHub Lab E'
+    name: 'Package ES CodeHub Lab E'
+    demands: DotNetFramework
   steps:
   - template: templates/release-general.yml
