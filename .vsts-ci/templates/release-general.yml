@@ -40,8 +40,6 @@ steps:
 
 - pwsh: |
     Install-Module InvokeBuild -Force
-    # Not sure why there's an instance of PowerShell Editor Services here... it needs to be deleted.
-    Remove-Item -Force -Recurse ../PowerShellEditorServices
     Invoke-Build Release
 
 - task: PublishTestResults@2
