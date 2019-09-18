@@ -36,7 +36,7 @@ steps:
     buildVersionToDownload: specific
     buildId: '$(PSES_BUILDID)'
     downloadType: specific
-    downloadPath: '$(Build.ArtifactStagingDirectory)'
+    downloadPath: '$(Agent.BuildDirectory)'
 
 - pwsh: Install-Module InvokeBuild -Force; Invoke-Build Release
 
