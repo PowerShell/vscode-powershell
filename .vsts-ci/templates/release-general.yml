@@ -34,7 +34,7 @@ steps:
     downloadType: specific
     downloadPath: '$(Build.ArtifactStagingDirectory)'
 
-- pwsh: Invoke-Build Release
+- pwsh: Install-Module InvokeBuild; Invoke-Build Release
 
 - task: PublishTestResults@2
   inputs:
