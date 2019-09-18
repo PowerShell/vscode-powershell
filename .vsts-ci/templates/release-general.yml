@@ -1,4 +1,8 @@
 steps:
+- pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
+    displayName: Set Build Name for Non-PR
+    condition: ne(variables['Build.Reason'], 'PullRequest')
+
 - pwsh: |
     Get-ChildItem -Path env:
   displayName: Capture environment

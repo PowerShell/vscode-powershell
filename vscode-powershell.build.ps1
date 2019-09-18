@@ -197,6 +197,6 @@ task Package UpdateReadme, {
 #endregion
 
 # The set of tasks for a release
-task Release Clean, Build, Test, Package
+task Release Clean, Build, Package
 # The default task is to run the entire CI build
 task . CleanAll, BuildAll, Test, UpdatePackageJson, Package, UploadArtifacts
