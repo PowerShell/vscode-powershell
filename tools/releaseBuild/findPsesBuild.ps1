@@ -17,5 +17,5 @@ $builds = @(
     ) | Sort-Object finishTime -Descending
 
 Write-Host "Got PSES_BRANCH: ${env:PSES_BRANCH}"
-Write-Host "setting PSES_BUILDID to $($builds.value[0].Id)"
-Write-Host "##vso[task.setvariable variable=PSES_BUILDID]$($builds.value[0].Id)"
+Write-Host "setting PSES_BUILDID to $($builds[0].Id)"
+Write-Host "##vso[task.setvariable variable=PSES_BUILDID]$($builds[0].Id)"
