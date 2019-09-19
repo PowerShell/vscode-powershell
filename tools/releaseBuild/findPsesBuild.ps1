@@ -4,12 +4,12 @@ $headers = @{Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN"}
 $buildsUrl = $env:VSTS_PSES_URL_TEMPLATE -f $branch, "succeeded"
 $succeededBuilds = Invoke-RestMethod -ContentType application/json -Uri $buildsUrl -Headers $headers
 Write-Host "Requested URL: $buildsUrl"
-Write-Host "Got response:`n$(ConvertTo-Json $builds)"
+Write-Host "Got response:`n$(ConvertTo-Json $succeededBuilds)"
 
 $buildsUrl = $env:VSTS_PSES_URL_TEMPLATE -f $branch, "partiallySucceeded"
 $partiallySucceededBuilds = Invoke-RestMethod -ContentType application/json -Uri $buildsUrl -Headers $headers
 Write-Host "Requested URL: $buildsUrl"
-Write-Host "Got response:`n$(ConvertTo-Json $builds)"
+Write-Host "Got response:`n$(ConvertTo-Json $partiallySucceededBuilds)"
 
 $builds = @(
     $succeededBuilds.value
