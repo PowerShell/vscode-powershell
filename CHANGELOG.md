@@ -1,5 +1,44 @@
 # vscode-powershell Release History
 
+## v2019.9.0
+### Monday, September 23, 2019
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 🐛 [vscode-powershell #2141](https://github.com/PowerShell/vscode-powershell/pull/2141) -
+  Null check on activeTerminal to workaround vscode behavior.
+- ✨ [vscode-powershell #2105](https://github.com/PowerShell/vscode-powershell/pull/2105) -
+  Prompt to update PowerShell version.
+- 🔎 [vscode-powershell #2165](https://github.com/PowerShell/vscode-powershell/pull/2165) -
+  Add powershell.codeFormatting.autoCorrectAliases setting to add support for optionally correcting aliases as well (added in PSSA 1.18.2). Disabled by default.. (Thanks @bergmeister!)
+- ✨ [vscode-powershell #2160](https://github.com/PowerShell/vscode-powershell/pull/2160) -
+  Added functionality to install the User variant of Stable Edition. (Thanks @Lothindir!)
+- ✨ [vscode-powershell #2156](https://github.com/PowerShell/vscode-powershell) -
+  Default to PowerShell Core on Windows if it's installed. (Thanks @SydneyhSmith!)
+- ✨ [vscode-powershell #2084](https://github.com/PowerShell/vscode-powershell/pull/2084) -
+  Implement #1611 - provide dynamic debug config. (Thanks @rkeithhill!)
+- ✨ [vscode-powershell #2024](https://github.com/PowerShell/vscode-powershell/pull/2039) -
+  Add machine scope per VS Code team request.
+- ✨ [vscode-powershell #2081](https://github.com/PowerShell/vscode-powershell/pull/2081) -
+  Add param-block snippet. (Thanks @AspenForester!)
+- ✨ [vscode-powershell #1974](https://github.com/PowerShell/vscode-powershell/pull/1974) -
+  Add #Requires snippets. (Thanks @travis-c-lagrone!)
+- 👷 [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell/pull/2065) -
+  Update '.vscode/settings.json' to identify snippet files as 'JSON with Comments'. (Thanks @travis-c-lagrone!)
+- 📔 [vscode-powershell #2065](https://github.com/PowerShell/vscode-powershell) -
+  Docs updates. (Thanks @SydneyhSmith!)
+- 👷 [vscode-powershell #2038](https://github.com/PowerShell/vscode-powershell/pull/2038) -
+  Add ADS insiders gallery file to update script.
+- 🔎 [vscode-powershell #2037](https://github.com/PowerShell/vscode-powershell/pull/2037) -
+  Update PSScriptAnalyzer docs Url to point to master branch because master is now the default branch. (Thanks @bergmeister!)
+- 🐛 [vscode-powershell #2035](https://github.com/PowerShell/vscode-powershell/pull/2035) -
+  #1019: Get format settings from document editor instead of global. (Thanks @tillig!)
+- 👷 [vscode-powershell #2025](https://github.com/PowerShell/vscode-powershell/pull/2025) -
+  Fix node version detect logic to handle node v10. (Thanks @rkeithhill!)
+- ✨ [vscode-powershell #1946](https://github.com/PowerShell/vscode-powershell/pull/1946) -
+  Add ArgumentCompleter snippets. (Thanks @travis-c-lagrone!)
+- 🧹 [vscode-powershell #2015](https://github.com/PowerShell/vscode-powershell/pull/2015) -
+  Fix node types version.
+
 ## v2019.5.0
 ### Friday, May 24, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
