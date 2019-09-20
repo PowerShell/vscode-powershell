@@ -188,11 +188,15 @@ task Package UpdateReadme, {
 
     # Change the package to have a static name for automation purposes
     Move-Item -Force .\$($script:PackageJson.name)-$($script:PackageJson.version).vsix .\PowerShell-insiders.vsix
+
+    if ($env:TF_BUILD) {
+        Copy-Item -Path PowerShell-insiders.vsix -Destination $env:BUILD_ARTIFACTSTAGINGDIRECTORY
+    }
 }
 
 #endregion
 
 # The set of tasks for a release
-task Release Clean, Build, Test, Package
+task Release Clean, Build, Package
 # The default task is to run the entire CI build
 task . Clean, BuildAll, Test, UpdatePackageJson, Package, UploadArtifacts
