@@ -35,7 +35,8 @@ steps:
     pipeline: 1056
     buildVersionToDownload: specific
     buildId: '$(PSES_BUILDID)'
-    downloadType: specific
+    downloadType: single
+    artifactName: 'PowerShellEditorServices'
     downloadPath: '$(Build.SourcesDirectory)'
 
 - pwsh: |
