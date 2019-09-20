@@ -37,6 +37,7 @@ steps:
     buildId: '$(PSES_BUILDID)'
     downloadType: specific
     downloadPath: '$(Build.SourcesDirectory)'
+    artifactName: 'PowerShellEditorServices'
 
 - pwsh: |
     Install-Module InvokeBuild -Force
