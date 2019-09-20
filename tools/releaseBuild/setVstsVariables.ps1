@@ -1,5 +1,5 @@
 $vstsVariables = @{
-    PSES_BRANCH = 'move-to-yml'
+    PSES_BRANCH = 'master'
 }
 
 # Use VSTS's API to set an env vars
