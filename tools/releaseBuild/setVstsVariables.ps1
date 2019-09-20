@@ -1,5 +1,5 @@
 $vstsVariables = @{
-    PSES_BRANCH = 'legacy/1.x'
+    PSES_BRANCH = 'move-to-yml-legacy'
 }
 
 # Use VSTS's API to set an env vars
