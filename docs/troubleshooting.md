@@ -23,7 +23,7 @@ the experience of the PowerShell ISE.
 However, we do want to support compatibility whenever possible
 to do so without breaking existing functionality.
 
-Please see [the ISE compatibility doc](./ise_compatibility.md)
+Please see [the ISE compatibility doc](https://docs.microsoft.com/powershell/scripting/components/vscode/how-to-replicate-the-ise-experience-in-vscode)
 for ways to configure VSCode to be closer to the ISE.
 
 Bear in mind that many of the UI/UX aspects of VSCode are driven by
