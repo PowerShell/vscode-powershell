@@ -299,7 +299,7 @@ $cloneParams = @{
     CheckoutBranch = $branchName
     CloneBranch = $PsesBaseBranch
     Clobber = $true
-    Remotes = @{ 'upstream' = "https://github.com/$TargetFork/$vscodeRepoName" }
+    Remotes = @{ 'upstream' = "https://github.com/$TargetFork/$psesRepoName" }
 }
 Copy-GitRepository @cloneParams -Verbose:$VerbosePreference
 

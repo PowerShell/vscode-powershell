@@ -18,6 +18,10 @@ param(
 
     [Parameter()]
     [string]
+    $SourceFork = 'rjmholt',
+
+    [Parameter()]
+    [string]
     $TargetFork = 'Microsoft',
 
     [Parameter()]
@@ -52,7 +56,7 @@ function NewReleaseVersionEntry
         files = @(
             [ordered]@{
                 assetType = 'Microsoft.VisualStudio.Services.VSIXPackage'
-                source = "https://sqlopsextensions.blob.core.windows.net/extensions/powershell/PowerShell-$Version.vsix"
+                source = "https://sqlopsextensions.blob.core.windows.net/extensions/powershell/ms-vscode.PowerShell-$Version.vsix"
             }
             [ordered]@{
                 assetType = 'Microsoft.VisualStudio.Services.Icons.Default'
@@ -244,7 +248,7 @@ function UpdateGalleryFile
 $repoLocation = Join-Path ([System.IO.Path]::GetTempPath()) 'ads-temp-checkout'
 
 $cloneParams = @{
-    OriginRemote = 'https://github.com/rjmholt/AzureDataStudio'
+    OriginRemote = "https://github.com/$SourceFork/AzureDataStudio"
     Destination = $repoLocation
     CloneBranch = 'release/extensions'
     CheckoutBranch = $branchName
@@ -271,6 +275,6 @@ $prParams = @{
     Title = "Update PowerShell extension to v$ExtensionVersion"
     Description = $PRDescription
     GitHubToken = $GitHubToken
-    FromOrg = 'rjmholt'
+    FromOrg = $SourceFork
 }
 New-GitHubPR @prParams
