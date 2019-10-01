@@ -35,9 +35,9 @@ function startDebugging() {
     // the connection details for the debug service
     const sessionDetails = utils.readSessionFile(debugSessionFilePath);
 
-    // Delete the session file after it has been read so that
-    // it isn't used mistakenly by another debug session
-    utils.deleteSessionFile(debugSessionFilePath);
+    // TODO: store session details into an in-memory store that can be shared between
+    // the debug adapter and client extension
+    // and then clean up the session details file.
 
     // Establish connection before setting up the session
     debugAdapterLogWriter.write("Connecting to pipe: " + sessionDetails.debugServicePipeName + "\r\n");
