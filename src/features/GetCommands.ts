@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 import * as vscode from "vscode";
-import { LanguageClient, RequestType } from "vscode-languageclient";
+import { LanguageClient, RequestType0 } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
 
@@ -18,7 +18,7 @@ interface ICommand {
  * RequestType sent over to PSES.
  * Expects: ICommand to be returned
  */
-export const GetCommandRequestType = new RequestType<string, ICommand[], void, void>("powerShell/getCommand");
+export const GetCommandRequestType = new RequestType0<ICommand[], void, void>("powerShell/getCommand");
 
 /**
  * A PowerShell Command listing feature. Implements a treeview control.
@@ -63,7 +63,7 @@ export class GetCommandsFeature implements IFeature {
             this.log.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
             return;
         }
-        this.languageClient.sendRequest(GetCommandRequestType, "").then((result) => {
+        this.languageClient.sendRequest(GetCommandRequestType).then((result) => {
             const SidebarConfig = vscode.workspace.getConfiguration("powershell.sideBar");
             const excludeFilter = (SidebarConfig.CommandExplorerExcludeFilter).map((filter) => filter.toLowerCase());
             result = result.filter((command) => (excludeFilter.indexOf(command.moduleName.toLowerCase()) === -1));
