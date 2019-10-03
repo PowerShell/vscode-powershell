@@ -164,7 +164,11 @@
       {
         "command": "PowerShell.RunSelection",
         "title": "Run Selection",
-        "category": "PowerShell"
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/play.svg",
+          "dark": "resources/dark/play.svg"
+        }
       },
       {
         "command": "PowerShell.RestartSession",
@@ -258,6 +262,13 @@
           "when": "editorLangId == powershell",
           "command": "PowerShell.ShowHelp",
           "group": "2_powershell"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceLangId == powershell",
+          "command": "PowerShell.RunSelection",
+          "group": "navigation@100"
         }
       ],
       "editor/title/context": [
