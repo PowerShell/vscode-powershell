@@ -162,6 +162,15 @@
         "category": "PowerShell"
       },
       {
+        "command": "workbench.action.debug.start",
+        "title": "Run",
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/run.svg",
+          "dark": "resources/dark/run.svg"
+        }
+      },
+      {
         "command": "PowerShell.RunSelection",
         "title": "Run Selection",
         "category": "PowerShell",
@@ -267,8 +276,13 @@
       "editor/title": [
         {
           "when": "resourceLangId == powershell",
-          "command": "PowerShell.RunSelection",
+          "command": "workbench.action.debug.start",
           "group": "navigation@100"
+        },
+        {
+          "when": "resourceLangId == powershell",
+          "command": "PowerShell.RunSelection",
+          "group": "navigation@101"
         }
       ],
       "editor/title/context": [
