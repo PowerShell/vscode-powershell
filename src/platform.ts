@@ -2,10 +2,24 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import fs = require("fs");
-import path = require("path");
-import process = require("process");
-import Settings = require("./settings");
+import * as child_process from "child_process";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
+import * as process from "process";
+import * as Settings from "./settings";
+
+export const System32PowerShellPath = getWindowsSystemPowerShellPath("System32");
+export const SysnativePowerShellPath = getWindowsSystemPowerShellPath("Sysnative");
+export const SysWow64PowerShellPath = getWindowsSystemPowerShellPath("SysWow64");
+
+export const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
+export const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
+
+const powerShell64BitPathOn32Bit = SysnativePowerShellPath.toLocaleLowerCase();
+const powerShell32BitPathOn64Bit = SysWow64PowerShellPath.toLocaleLowerCase();
+
+const dotnetGlobalToolExePath = path.join(os.homedir(), ".dotnet", "tools", "pwsh.exe");
 
 const linuxExePath        = "/usr/bin/pwsh";
 const linuxPreviewExePath = "/usr/bin/pwsh-preview";
@@ -54,9 +68,19 @@ export function getPlatformDetails(): IPlatformDetails {
     };
 }
 
+export class PowerShellNotFoundError extends Error {
+    public readonly powershellPath: string;
+
+    constructor(powershellPath: string) {
+        super(`Unable to find PowerShell installation at path '${powershellPath}'`);
+        this.powershellPath = powershellPath;
+    }
+}
+
 /**
- * Gets the default instance of PowerShell for the specified platform.
- * On Windows, the default version of PowerShell is "Windows PowerShell".
+ * Gets the default instance of PowerShell for the specified platform,
+ * depending on the operating system and the bitness required.
+ * If a stable PowerShell Core installation can be found, this will be preferred.
  * @param platformDetails Specifies information about the platform - primarily the operating system.
  * @param use32Bit On Windows, this boolean determines whether the 32-bit version of Windows PowerShell is returned.
  * @returns A string containing the path of the default version of PowerShell.
@@ -65,85 +89,20 @@ export function getDefaultPowerShellPath(
     platformDetails: IPlatformDetails,
     use32Bit: boolean = false): string | null {
 
-    let powerShellExePath;
-    let psCoreInstallPath;
-
-     // Find the path to the powershell executable based on the current platform
-    // and the user's desire to run the x86 version of PowerShell
-    if (platformDetails.operatingSystem === OperatingSystem.Windows) {
-        if (use32Bit) {
-            psCoreInstallPath =
-                (platformDetails.isProcess64Bit ? process.env["ProgramFiles(x86)"] : process.env.ProgramFiles)
-            + "\\PowerShell";
-        } else {
-            psCoreInstallPath =
-                (platformDetails.isProcess64Bit ? process.env.ProgramFiles : process.env.ProgramW6432) + "\\PowerShell";
-        }
-
-        if (fs.existsSync(psCoreInstallPath)) {
-            const arch = platformDetails.isProcess64Bit ? "(x64)" : "(x86)";
-            const psCorePaths =
-                fs.readdirSync(psCoreInstallPath)
-                .map((item) => path.join(psCoreInstallPath, item))
-                .filter((item) => {
-                    const exePath = path.join(item, "pwsh.exe");
-                    return fs.lstatSync(item).isDirectory() && fs.existsSync(exePath);
-                })
-                .map((item) => ({
-                    versionName: `PowerShell ${path.parse(item).base} ${arch}`,
-                    exePath: path.join(item, "pwsh.exe"),
-                }));
-
-            if (psCorePaths) {
-                return powerShellExePath = psCorePaths[0].exePath;
-            }
-        }
-
-        // No PowerShell 6+ detected so use Windows PowerShell.
-        if (use32Bit) {
-                return platformDetails.isOS64Bit && platformDetails.isProcess64Bit
-                        ? SysWow64PowerShellPath
-                        : System32PowerShellPath;
-        }
-        return !platformDetails.isOS64Bit || platformDetails.isProcess64Bit
-                 ? System32PowerShellPath
-                 : SysnativePowerShellPath;
-    }
-    if (platformDetails.operatingSystem === OperatingSystem.MacOS) {
-        // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
-        powerShellExePath = macOSExePath;
-        if (!fs.existsSync(macOSExePath) && fs.existsSync(macOSPreviewExePath)) {
-            powerShellExePath = macOSPreviewExePath;
-    }
-    } else if (platformDetails.operatingSystem === OperatingSystem.Linux) {
-        // Always default to the stable version of PowerShell (if installed) but handle case of only Preview installed
-        // as well as the Snaps case - https://snapcraft.io/
-        powerShellExePath = linuxExePath;
-        if (!fs.existsSync(linuxExePath) && fs.existsSync(linuxPreviewExePath)) {
-            powerShellExePath = linuxPreviewExePath;
-        } else if (fs.existsSync(snapExePath)) {
-            powerShellExePath = snapExePath;
-        } else if (fs.existsSync(snapPreviewExePath)) {
-            powerShellExePath = snapPreviewExePath;
+    let pwshPath: string;
+    for (pwshPath of enumeratePowerShellInstallationPaths(platformDetails, use32Bit)) {
+        // TODO: check if the file is executable (complicated stat logic...)
+        if (fs.existsSync(pwshPath)) {
+            return pwshPath;
         }
     }
 
-    return powerShellExePath;
+    throw new PowerShellNotFoundError(pwshPath);
 }
 
 export function getWindowsSystemPowerShellPath(systemFolderName: string) {
     return `${process.env.windir}\\${systemFolderName}\\WindowsPowerShell\\v1.0\\powershell.exe`;
 }
-
-export const System32PowerShellPath = getWindowsSystemPowerShellPath("System32");
-export const SysnativePowerShellPath = getWindowsSystemPowerShellPath("Sysnative");
-export const SysWow64PowerShellPath = getWindowsSystemPowerShellPath("SysWow64");
-
-export const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
-export const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
-
-const powerShell64BitPathOn32Bit = SysnativePowerShellPath.toLocaleLowerCase();
-const powerShell32BitPathOn64Bit = SysWow64PowerShellPath.toLocaleLowerCase();
 
 export function fixWindowsPowerShellPath(powerShellExePath: string, platformDetails: IPlatformDetails): string {
     const lowerCasedPath = powerShellExePath.toLocaleLowerCase();
@@ -247,4 +206,95 @@ export function getAvailablePowerShellExes(
     }
 
     return paths;
+}
+
+function enumeratePowerShellInstallationPaths(
+    platformDetails: IPlatformDetails,
+    use32Bit: boolean): Iterable<string> {
+
+    switch (platformDetails.operatingSystem) {
+        case OperatingSystem.Windows:
+            return enumeratePowerShellInstallationPathsForWindows(platformDetails, use32Bit);
+
+        case OperatingSystem.MacOS:
+            return enumeratePowerShellInstallationPathsForMacOS();
+
+        case OperatingSystem.Linux:
+            return enumeratePowerShellInstallationPathsForLinux();
+
+        default:
+            return [];
+    }
+}
+
+function *enumeratePowerShellInstallationPathsForWindows(
+    platformDetails: IPlatformDetails,
+    use32Bit: boolean): Iterable<string> {
+        let psCoreInstallDirPath: string;
+
+        if (use32Bit) {
+            psCoreInstallDirPath = platformDetails.isProcess64Bit
+                ? process.env["ProgramFiles(x86)"]
+                : process.env.ProgramFiles;
+        } else {
+            psCoreInstallDirPath = platformDetails.isProcess64Bit
+                ? process.env.ProgramFiles
+                : process.env.ProgramW6432;
+        }
+
+        psCoreInstallDirPath = path.join(psCoreInstallDirPath, "PowerShell");
+
+        // Search for PS 6/7 paths
+        // These look like "%ProgramFiles%\PowerShell\<major-version>\pwsh.exe"
+        if (fs.existsSync(psCoreInstallDirPath) && fs.lstatSync(psCoreInstallDirPath).isDirectory()) {
+            for (const item of fs.readdirSync(psCoreInstallDirPath)) {
+                if (parseInt(item, 10)) {
+                    yield path.join(psCoreInstallDirPath, item, "pwsh.exe");
+                }
+            }
+        }
+
+        // Now try the MSIX path
+        yield getPowerShellMsixPath(platformDetails, use32Bit);
+
+        // Now try the .NET global tool pwsh.exe
+        yield dotnetGlobalToolExePath;
+
+        // Finally find Windows PowerShell, which should always succeed (so don't look for pwsh-preview.exe)
+        yield getWindowsPowerShellPath(platformDetails, use32Bit);
+}
+
+function *enumeratePowerShellInstallationPathsForMacOS(): Iterable<string> {
+    yield macOSExePath;
+    yield dotnetGlobalToolExePath;
+    yield macOSPreviewExePath;
+}
+
+function *enumeratePowerShellInstallationPathsForLinux(): Iterable<string> {
+    yield linuxExePath;
+    yield snapExePath;
+    yield dotnetGlobalToolExePath;
+    yield linuxPreviewExePath;
+    yield snapPreviewExePath;
+}
+
+function getWindowsPowerShellPath(platformDetails: IPlatformDetails, use32Bit: boolean): string {
+    if (use32Bit) {
+        return platformDetails.isProcess64Bit && platformDetails.isOS64Bit
+            ? powerShell32BitPathOn64Bit
+            : System32PowerShellPath;
+    }
+
+    return platformDetails.isProcess64Bit && platformDetails.isOS64Bit
+        ? System32PowerShellPath
+        : powerShell64BitPathOn32Bit;
+}
+
+function getPowerShellMsixPath(platformDetails: IPlatformDetails, use32Bit: boolean): string {
+    const winPSPath = getWindowsPowerShellPath(platformDetails, use32Bit);
+    const msixDir = child_process.execSync(`"${winPSPath}" -Command "(Get-AppxPackage -Name Microsoft.PowerShell).InstallLocation"`)
+        .toString("utf8")
+        .trim();
+
+    return path.join(msixDir, "pwsh.exe");
 }

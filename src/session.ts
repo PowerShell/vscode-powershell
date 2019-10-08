@@ -110,7 +110,12 @@ export class SessionManager implements Middleware {
 
         this.createStatusBarItem();
 
-        this.powerShellExePath = this.getPowerShellExePath();
+        try {
+            this.powerShellExePath = this.getPowerShellExePath();
+        } catch (e) {
+            vscode.window.showErrorMessage("Unable to find PowerShell. Do you have PowerShell installed? See logs for more details.");
+            this.log.writeError(`Unable to find PowerShell executable:\n${e}`);
+        }
 
         this.suppressRestartPrompt = false;
 
