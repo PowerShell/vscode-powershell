@@ -58,7 +58,7 @@
     "rewire": "~4.0.1",
     "tslint": "~5.20.0",
     "typescript": "~3.5.3",
-    "vsce": "~1.66.0",
+    "vsce": "~1.67.1",
     "vscode": "~1.1.36"
   },
   "extensionDependencies": [
