@@ -6,23 +6,31 @@ import * as assert from "assert";
 import * as platform from "../src/platform";
 
 function checkDefaultPowerShellPath(platformDetails, expectedPath) {
+    const powerShellExeFinder = new platform.PowerShellExeFinder(platformDetails);
     test("returns correct default path", () => {
-        assert.equal(
-            platform.getDefaultPowerShellPath(platformDetails),
-            expectedPath);
+        let defaultPath: string;
+        for (const pwshExe of powerShellExeFinder.enumeratePowerShellInstallations()) {
+            defaultPath = pwshExe.exePath;
+            break;
+        }
+        assert.equal(defaultPath, expectedPath);
     });
 }
 
 function checkAvailableWindowsPowerShellPaths(
     platformDetails: platform.IPlatformDetails,
     expectedPaths: platform.IPowerShellExeDetails[]) {
+
+    const pwshExeFinder = new platform.PowerShellExeFinder(platformDetails);
+
     test("correctly enumerates available Windows PowerShell paths", () => {
 
         // The system may return PowerShell Core paths so only
         // enumerate the first list items.
-        const enumeratedPaths = platform.getAvailablePowerShellExes(platformDetails, undefined);
-        for (let i; i < expectedPaths.length; i++) {
-            assert.equal(enumeratedPaths[i], expectedPaths[i]);
+        let i = 0;
+        for (const pwshExe of pwshExeFinder.enumeratePowerShellInstallations()) {
+            assert.equal(pwshExe.exePath, expectedPaths[i]);
+            i++;
         }
     });
 }

@@ -24,8 +24,8 @@ import {
 
 import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./features/UpdatePowerShell";
 import {
-    fixWindowsPowerShellPath, getAvailablePowerShellExes, getDefaultPowerShellPath,
-    getPlatformDetails, IPlatformDetails, OperatingSystem } from "./platform";
+    fixWindowsPowerShellPath, getPlatformDetails, IPlatformDetails,
+    OperatingSystem, PowerShellExeFinder } from "./platform";
 
 export enum SessionStatus {
     NeverStarted,
@@ -57,6 +57,9 @@ export class SessionManager implements Middleware {
     private bundledModulesPath: string;
     private telemetryReporter: TelemetryReporter;
 
+    // Initialized by the start() method, since this requires settings
+    private powershellExeFinder: PowerShellExeFinder;
+
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
     // mode for now until Microsoft/vscode#10272 gets implemented.
@@ -71,6 +74,7 @@ export class SessionManager implements Middleware {
         private reporter: TelemetryReporter) {
 
         this.platformDetails = getPlatformDetails();
+
         this.HostVersion = version;
         this.telemetryReporter = reporter;
 
@@ -104,7 +108,13 @@ export class SessionManager implements Middleware {
 
     public start() {
         this.sessionSettings = Settings.load();
+
         this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
+
+        // Create the PowerShell executable finder now
+        this.powershellExeFinder = new PowerShellExeFinder(
+            this.platformDetails,
+            this.sessionSettings.powerShellAdditionalExePaths);
 
         this.focusConsoleOnExecute = this.sessionSettings.integratedConsole.focusConsoleOnExecute;
 
@@ -221,62 +231,16 @@ export class SessionManager implements Middleware {
     }
 
     public getPowerShellExePath(): string {
-        let powerShellExePath: string;
-
         if (!this.sessionSettings.powerShellExePath &&
             this.sessionSettings.developer.powerShellExePath) {
             // Show deprecation message with fix action.
             // We don't need to wait on this to complete
             // because we can finish gathering the configured
             // PowerShell path without the fix
-            vscode
-                .window
-                .showWarningMessage(
-                    "The 'powershell.developer.powerShellExePath' setting is deprecated, use " +
-                    "'powershell.powerShellExePath' instead.",
-                    "Fix Automatically")
-                .then((choice) => {
-                    if (choice) {
-                        this.suppressRestartPrompt = true;
-                        Settings
-                            .change(
-                                "powerShellExePath",
-                                this.sessionSettings.developer.powerShellExePath,
-                                true)
-                            .then(() => {
-                                return Settings.change(
-                                    "developer.powerShellExePath",
-                                    undefined,
-                                    true);
-                            })
-                            .then(() => {
-                                this.suppressRestartPrompt = false;
-                            });
-                    }
-                });
+            this.showExePathSettingDeprecationWarning();
         }
 
-        // If powershell.powerShellDefaultVersion specified, attempt to find the PowerShell exe path
-        // of the version specified by the setting.
-        if ((this.sessionStatus === SessionStatus.NeverStarted) && this.sessionSettings.powerShellDefaultVersion) {
-            const powerShellExePaths = getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
-            const powerShellDefaultVersion =
-                powerShellExePaths.find((item) => item.displayName === this.sessionSettings.powerShellDefaultVersion);
-
-            if (powerShellDefaultVersion) {
-                powerShellExePath = powerShellDefaultVersion.exePath;
-            } else {
-                this.log.writeWarning(
-                    `Could not find powerShellDefaultVersion: '${this.sessionSettings.powerShellDefaultVersion}'`);
-            }
-        }
-
-        // Is there a setting override for the PowerShell path?
-        powerShellExePath =
-            (powerShellExePath ||
-             this.sessionSettings.powerShellExePath ||
-             this.sessionSettings.developer.powerShellExePath ||
-             "").trim();
+        let powerShellExePath: string = this.getConfiguredPowerShellExePath().trim();
 
         // New versions of PS Core uninstall the previous version
         // so make sure the path stored in the settings exists.
@@ -287,54 +251,33 @@ export class SessionManager implements Middleware {
             powerShellExePath = "";
         }
 
-        if (this.platformDetails.operatingSystem === OperatingSystem.Windows &&
-            powerShellExePath.length > 0) {
-
-            // Check the path bitness
-            const fixedPath =
-                fixWindowsPowerShellPath(
+        if (powerShellExePath) {
+            if (this.platformDetails.operatingSystem === OperatingSystem.Windows) {
+                // Check the path bitness
+                const fixedPath = fixWindowsPowerShellPath(
                     powerShellExePath,
                     this.platformDetails);
 
-            if (fixedPath !== powerShellExePath) {
-                const bitness = this.platformDetails.isOS64Bit ? 64 : 32;
-                // Show deprecation message with fix action.
-                // We don't need to wait on this to complete
-                // because we can finish gathering the configured
-                // PowerShell path without the fix
-                vscode
-                    .window
-                    .showWarningMessage(
-                        `The specified PowerShell path is incorrect for ${bitness}-bit VS Code, using '${fixedPath}' ` +
-                        "instead.",
-                        "Fix Setting Automatically")
-                    .then((choice) => {
-                        if (choice) {
-                            this.suppressRestartPrompt = true;
-                            Settings
-                                .change(
-                                    "powerShellExePath",
-                                    this.sessionSettings.developer.powerShellExePath,
-                                    true)
-                                .then(() => {
-                                    return Settings.change(
-                                        "developer.powerShellExePath",
-                                        undefined,
-                                        true);
-                                })
-                                .then(() => {
-                                    this.suppressRestartPrompt = false;
-                                });
-                        }
-                    });
-
-                powerShellExePath = fixedPath;
+                if (fixedPath !== powerShellExePath) {
+                    // Show deprecation message with fix action.
+                    // We don't need to wait on this to complete
+                    // because we can finish gathering the configured
+                    // PowerShell path without the fix
+                    this.showBitnessPathFixWarning(fixedPath);
+                    powerShellExePath = fixedPath;
+                }
             }
+
+            return this.resolvePowerShellPath(powerShellExePath);
         }
 
-        return powerShellExePath.length > 0
-            ? this.resolvePowerShellPath(powerShellExePath)
-            : getDefaultPowerShellPath(this.platformDetails, this.sessionSettings.useX86Host);
+        for (const powerShellExe of this.powershellExeFinder.enumeratePowerShellInstallations()) {
+            // No need to resolve these paths, since the enumeration checks for existence
+            return powerShellExe.exePath;
+        }
+
+        this.setSessionFailure("Unable to find PowerShell installation, see logs for more details");
+        return null;
     }
 
     // ----- LanguageClient middleware methods -----
@@ -380,6 +323,66 @@ export class SessionManager implements Middleware {
             }
 
             return resolvedCodeLens;
+    }
+
+    private async showExePathSettingDeprecationWarning(): Promise<void> {
+        const choice: string = await vscode.window.showWarningMessage(
+            "The 'powershell.developer.powerShellExePath' setting is deprecated, use " +
+            "'powershell.powerShellExePath' instead.",
+            "Fix Automatically");
+
+        if (!choice) {
+            return;
+        }
+
+        this.suppressRestartPrompt = true;
+        await Settings.change("powerShellExePath", this.sessionSettings.developer.powerShellExePath, true);
+        await Settings.change("developer,powerShellExePath", undefined, true);
+        this.suppressRestartPrompt = false;
+    }
+
+    private async showBitnessPathFixWarning(fixedPath: string): Promise<void> {
+        const bitness = this.platformDetails.isOS64Bit ? 64 : 32;
+
+        const choice = await vscode.window.showWarningMessage(
+            `The specified PowerShell path is incorrect for ${bitness}-bit VS Code, using '${fixedPath}' ` +
+            "instead.",
+            "Fix Setting Automatically");
+
+        if (!choice) {
+            return;
+        }
+
+        this.suppressRestartPrompt = true;
+        await Settings.change("powerShellExePath", this.sessionSettings.developer.powerShellExePath, true);
+        await Settings.change("developer.powerShellExePath", undefined, true);
+        this.suppressRestartPrompt = false;
+    }
+
+    private getConfiguredPowerShellExePath(): string {
+        // If powershell.powerShellDefaultVersion specified, attempt to find the PowerShell exe path
+        // of the version specified by the setting.
+        if (this.sessionSettings.powerShellDefaultVersion && this.sessionStatus === SessionStatus.NeverStarted) {
+            for (const pwshExe of this.powershellExeFinder.enumeratePowerShellInstallations()) {
+                if (pwshExe.displayName === this.sessionSettings.powerShellDefaultVersion) {
+                    return pwshExe.exePath;
+                }
+            }
+
+            // Default PowerShell version was configured but we didn't find it
+            this.log.writeWarning(`Could not find powerShellDefaultVersion: '${this.sessionSettings.powerShellDefaultVersion}'`);
+        }
+
+        if (this.sessionSettings.powerShellExePath) {
+            return this.sessionSettings.powerShellExePath;
+        }
+
+        if (this.sessionSettings.developer.powerShellExePath) {
+            this.showExePathSettingDeprecationWarning();
+            return this.sessionSettings.developer.powerShellExePath;
+        }
+
+        return "";
     }
 
     private onConfigurationUpdated() {
@@ -691,8 +694,10 @@ export class SessionManager implements Middleware {
 
         // If the path does not exist, show an error
         if (!utils.checkIfFileExists(resolvedPath)) {
-            this.setSessionFailure(
-                "powershell.exe cannot be found or is not accessible at path " + resolvedPath);
+            const pwshPath = resolvedPath || powerShellExePath;
+            const pwshExeName = path.basename(pwshPath) || "PowerShell executable";
+
+            this.setSessionFailure(`${pwshExeName} cannot be found or is not accessible at path '${pwshPath}'`);
 
             return null;
         }
@@ -734,8 +739,7 @@ export class SessionManager implements Middleware {
 
     private showSessionMenu() {
         const currentExePath = (this.powerShellExePath || "").toLowerCase();
-        const availablePowerShellExes =
-            getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
+        const availablePowerShellExes = Array.from(this.powershellExeFinder.enumeratePowerShellInstallations());
 
         let sessionText: string;
 
@@ -772,7 +776,7 @@ export class SessionManager implements Middleware {
                 .filter((item) => item.exePath.toLowerCase() !== currentExePath)
                 .map((item) => {
                     return new SessionMenuItem(
-                        `Switch to: ${item.versionName}`,
+                        `Switch to: ${item.displayName}`,
                         () => { this.changePowerShellExePath(item.exePath); });
                 });
 
