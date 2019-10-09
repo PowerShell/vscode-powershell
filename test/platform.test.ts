@@ -52,11 +52,11 @@ suite("Platform module", () => {
                 platformDetails,
                 [
                     {
-                        versionName: platform.WindowsPowerShell64BitLabel,
+                        displayName: platform.WindowsPowerShell64BitLabel,
                         exePath: platform.System32PowerShellPath,
                     },
                     {
-                        versionName: platform.WindowsPowerShell32BitLabel,
+                        displayName: platform.WindowsPowerShell32BitLabel,
                         exePath: platform.SysWow64PowerShellPath,
                     },
                 ]);
@@ -82,11 +82,11 @@ suite("Platform module", () => {
                 platformDetails,
                 [
                     {
-                        versionName: platform.WindowsPowerShell64BitLabel,
+                        displayName: platform.WindowsPowerShell64BitLabel,
                         exePath: platform.SysnativePowerShellPath,
                     },
                     {
-                        versionName: platform.WindowsPowerShell32BitLabel,
+                        displayName: platform.WindowsPowerShell32BitLabel,
                         exePath: platform.System32PowerShellPath,
                     },
                 ]);
@@ -112,7 +112,7 @@ suite("Platform module", () => {
                 platformDetails,
                 [
                     {
-                        versionName: platform.WindowsPowerShell32BitLabel,
+                        displayName: platform.WindowsPowerShell32BitLabel,
                         exePath: platform.System32PowerShellPath,
                     },
                 ]);

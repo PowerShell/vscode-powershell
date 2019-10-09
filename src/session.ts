@@ -261,7 +261,7 @@ export class SessionManager implements Middleware {
         if ((this.sessionStatus === SessionStatus.NeverStarted) && this.sessionSettings.powerShellDefaultVersion) {
             const powerShellExePaths = getAvailablePowerShellExes(this.platformDetails, this.sessionSettings);
             const powerShellDefaultVersion =
-                powerShellExePaths.find((item) => item.versionName === this.sessionSettings.powerShellDefaultVersion);
+                powerShellExePaths.find((item) => item.displayName === this.sessionSettings.powerShellDefaultVersion);
 
             if (powerShellDefaultVersion) {
                 powerShellExePath = powerShellDefaultVersion.exePath;
@@ -751,7 +751,7 @@ export class SessionManager implements Middleware {
 
                 const powerShellSessionName =
                     currentPowerShellExe ?
-                        currentPowerShellExe.versionName :
+                        currentPowerShellExe.displayName :
                         `PowerShell ${this.versionDetails.displayVersion} ` +
                         `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
                         `[${this.versionDetails.version}]`;
