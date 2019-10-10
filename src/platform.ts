@@ -429,7 +429,8 @@ export class PowerShellExeFinder {
                 return new PSCoreExe(MacOSExePath, "PowerShell (x64)");
 
             case OperatingSystem.Windows:
-                return this.pwshWindowsInstallationsVal.value.stable;
+                return this.pwshWindowsInstallationsVal.value
+                    && this.pwshWindowsInstallationsVal.value.stable;
         }
     }
 
@@ -442,16 +443,19 @@ export class PowerShellExeFinder {
                 return new PSCoreExe(MacOSPreviewExePath, "PowerShell Preview (x64)");
 
             case OperatingSystem.Windows:
-                return this.pwshWindowsInstallationsVal.value.preview;
+                return this.pwshWindowsInstallationsVal.value.preview
+                    && this.pwshWindowsInstallationsVal.value.preview;
         }
     }
 
     private findPSCore32BitStable(): IPossiblePowerShellExe {
-        return this.pwsh32WindowsInstallationsVal.value.stable;
+        return this.pwsh32WindowsInstallationsVal.value
+            && this.pwsh32WindowsInstallationsVal.value.stable;
     }
 
     private findPSCore32BitPreview(): IPossiblePowerShellExe {
-        return this.pwsh32WindowsInstallationsVal.value.preview;
+        return this.pwsh32WindowsInstallationsVal.value
+            && this.pwsh32WindowsInstallationsVal.value.preview;
     }
 
     private findPSCoreDotnetGlobalTool(): IPossiblePowerShellExe {
