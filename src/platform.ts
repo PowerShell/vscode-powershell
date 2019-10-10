@@ -48,7 +48,6 @@ export interface IPowerShellExeDetails {
 
 export interface IPossiblePowerShellExe extends IPowerShellExeDetails {
     readonly exists: boolean;
-    readonly is32Bit: boolean;
 }
 
 export function getPlatformDetails(): IPlatformDetails {
@@ -80,6 +79,11 @@ export class PowerShellNotFoundError extends Error {
     }
 }
 
+/**
+ * Class to lazily find installed PowerShell executables on a machine.
+ * When given a list of additional PowerShell executables,
+ * this will also surface those at the end of the list.
+ */
 export class PowerShellExeFinder {
     private readonly platformDetails: IPlatformDetails;
 
@@ -108,6 +112,11 @@ export class PowerShellExeFinder {
 
     private additionalPSExeSettings: Iterable<Settings.IPowerShellAdditionalExePathSettings>;
 
+    /**
+     * Create a new PowerShellFinder object to discover PowerShell installations.
+     * @param platformDetails Information about the machine we are running on.
+     * @param additionalPowerShellExes Additional PowerShell installations as configured in the settings.
+     */
     constructor(
         platformDetails: IPlatformDetails,
         additionalPowerShellExes?: Iterable<Settings.IPowerShellAdditionalExePathSettings>) {
@@ -128,13 +137,106 @@ export class PowerShellExeFinder {
         this.sysNativeWinPSExeVal = new Lazy(() => this.findSysNativeWinPS());
     }
 
+    /**
+     * The stable PowerShell 6+ installation.
+     * May be undefined if the installation directory is not present.
+     */
+    private get pwshStable(): IPossiblePowerShellExe {
+        return this.stablePwshExeVal.value;
+    }
+
+    /**
+     * The preview PowerShell 6+ installation.
+     * May be undefined if the installation directory is not present.
+     */
+    private get pwshPreview(): IPossiblePowerShellExe {
+        return this.previewPwshExeVal.value;
+    }
+
+    /**
+     * The stable 32-bit PowerShell 6+ installation.
+     * May be undefined if the installation directory is not present
+     */
+    private get pwsh32Stable(): IPossiblePowerShellExe {
+        return this.stable32BitPwshExeVal.value;
+    }
+
+    /**
+     * The preview 32-bit PowerShell 6+ installation.
+     * May be undefined if the installation directory is not present.
+     */
+    private get pwsh32Preview(): IPossiblePowerShellExe {
+        return this.preview32BitPwshExeVal.value;
+    }
+
+    /**
+     * PowerShell 6+ installation from an MSIX (through the Windows store).
+     * May be undefined if the AppX package is not found.
+     */
+    private get pwshMsix(): IPossiblePowerShellExe {
+        return this.msixExeVal.value;
+    }
+
+    /**
+     * PowerShell 6+ stable Snap installation on Linux.
+     */
+    private get pwshSnapStable(): IPossiblePowerShellExe {
+        return this.stableSnapExeVal.value;
+    }
+
+    /**
+     * PowerShell 6+ preview Snap installation on Linux.
+     */
+    private get pwshSnapPreview(): IPossiblePowerShellExe {
+        return this.previewSnapExeVal.value;
+    }
+
+    /**
+     * PowerShell 6+ .NET Core global tool installation.
+     */
+    private get pwshDotnetGlobalTool(): IPossiblePowerShellExe {
+        return this.dotnetGlobalToolExeVal.value;
+    }
+
+    /**
+     * The Windows PowerShell installation under the %windir%\System32 folder.
+     * This always exists.
+     */
+    private get sys32WinPS(): IPossiblePowerShellExe {
+        return this.sys32WinPSExeVal.value;
+    }
+
+    /**
+     * The 32-bit Windows PowerShell installation when running in a 64-bit process.
+     */
+    private get sysWoW64WinPS(): IPossiblePowerShellExe {
+        return this.sysWow64WinPSExeVal.value;
+    }
+
+    /**
+     * The 64-bit Windows PowerShell installation when running
+     * in a 32-bit process on a 64-bit Windows.
+     */
+    private get sysnativeWinPS(): IPossiblePowerShellExe {
+        return this.sysNativeWinPSExeVal.value;
+    }
+
+    /**
+     * Iterates through PowerShell installations on the machine according
+     * to configuration passed in through the constructor.
+     * PowerShell items returned by this object are verified
+     * to exist on the filesystem.
+     */
     public *enumeratePowerShellInstallations(): Iterable<IPowerShellExeDetails> {
+        // Get the default PowerShell installations first
         for (const defaultPwsh of this.enumerateDefaultPowerShellInstallations()) {
             if (defaultPwsh && defaultPwsh.exists) {
                 yield defaultPwsh;
             }
         }
 
+        // Also show any additionally configured PowerShells
+        // These may be duplicates of the default installations, but given a different name.
         for (const additionalPwsh of this.enumerateAdditionalPowerShellInstallations()) {
             if (additionalPwsh && additionalPwsh.exists) {
                 yield additionalPwsh;
@@ -142,7 +244,12 @@ export class PowerShellExeFinder {
         }
     }
 
-    public *enumerateDefaultPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
+    /**
+     * Iterates through all the possible well-known PowerShell installations on a machine.
+     * Returned values may not exist, but come with an .exists property
+     * which will check whether the executable exists.
+     */
+    private *enumerateDefaultPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
         // Find PSCore stable first
         if (this.pwshStable) {
             yield this.pwshStable;
@@ -155,7 +262,9 @@ export class PowerShellExeFinder {
                     yield this.pwsh32Stable;
                 }
                 // Also look for the MSIX/UWP installation
-                yield this.pwshMsix;
+                if (this.pwshMsix) {
+                    yield this.pwshMsix;
+                }
                 break;
 
             case OperatingSystem.Linux:
@@ -199,54 +308,14 @@ export class PowerShellExeFinder {
         }
     }
 
-    public *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
+    /**
+     * Iterates through the configured additonal PowerShell executable locations,
+     * without checking for their existence.
+     */
+    private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
         for (const additionalPwshSetting of this.additionalPSExeSettings) {
             yield this.findAdditionalPwshExe(additionalPwshSetting);
         }
-    }
-
-    public get pwshStable(): IPossiblePowerShellExe {
-        return this.stablePwshExeVal.value;
-    }
-
-    public get pwshPreview(): IPossiblePowerShellExe {
-        return this.previewPwshExeVal.value;
-    }
-
-    public get pwsh32Stable(): IPossiblePowerShellExe {
-        return this.stable32BitPwshExeVal.value;
-    }
-
-    public get pwsh32Preview(): IPossiblePowerShellExe {
-        return this.preview32BitPwshExeVal.value;
-    }
-
-    public get pwshMsix(): IPossiblePowerShellExe {
-        return this.msixExeVal.value;
-    }
-
-    public get pwshSnapStable(): IPossiblePowerShellExe {
-        return this.stableSnapExeVal.value;
-    }
-
-    public get pwshSnapPreview(): IPossiblePowerShellExe {
-        return this.previewSnapExeVal.value;
-    }
-
-    public get pwshDotnetGlobalTool(): IPossiblePowerShellExe {
-        return this.dotnetGlobalToolExeVal.value;
-    }
-
-    public get sys32WinPS(): IPossiblePowerShellExe {
-        return this.sys32WinPSExeVal.value;
-    }
-
-    public get sysWoW64WinPS(): IPossiblePowerShellExe {
-        return this.sysWow64WinPSExeVal.value;
-    }
-
-    public get sysnativeWinPS(): IPossiblePowerShellExe {
-        return this.sysNativeWinPSExeVal.value;
     }
 
     private findAdditionalPwshExe(additionalPwshSetting: Settings.IPowerShellAdditionalExePathSettings) {
@@ -286,7 +355,7 @@ export class PowerShellExeFinder {
     }
 
     private findPSCore32BitPreview(): IPossiblePowerShellExe {
-        return this.findPSCoreWindows({ use32Bit: true });
+        return this.findPSCoreWindows({ findPreview: true, use32Bit: true });
     }
 
     // Search for PS 6/7 under "%ProgramFiles%\PowerShell\<major-version>[-preview]\pwsh.exe"
@@ -326,7 +395,7 @@ export class PowerShellExeFinder {
                 : "PowerShell (x64)";
 
             const exePath = path.join(psCoreInstallDirPath, item, "pwsh.exe");
-            return new PSCoreExe(exePath, pwshName, { is32Bit: use32Bit });
+            return new PSCoreExe(exePath, pwshName);
         }
 
         // This method may not find any installation
@@ -350,6 +419,10 @@ export class PowerShellExeFinder {
             .toString()
             .trim();
 
+        if (!msixDir) {
+            return undefined;
+        }
+
         const msixExePath = path.join(msixDir, "pwsh.exe");
         return new PSCoreExe(msixExePath, "PowerShell MSIX");
     }
@@ -363,25 +436,25 @@ export class PowerShellExeFinder {
     }
 
     private findSys32WinPS(): IPossiblePowerShellExe {
-        const displayName: string = this.platformDetails.isOS64Bit
+        const displayName: string = this.platformDetails.isProcess64Bit
             ? WindowsPowerShell64BitLabel
             : WindowsPowerShell32BitLabel;
 
         return new WinPSExe(
             System32PowerShellPath,
             displayName,
-            { knownToExist: true, is32Bit: !this.platformDetails.isOS64Bit });
+            { knownToExist: true });
     }
 
     private findSysWow64WinPS(): IPossiblePowerShellExe {
-        return new WinPSExe(WinPS32BitPathOn64Bit, WindowsPowerShell64BitLabel);
+        return new WinPSExe(WinPS32BitPathOn64Bit, WindowsPowerShell32BitLabel);
     }
 
     private findSysNativeWinPS(): IPossiblePowerShellExe {
         return new WinPSExe(
             WinPS64BitPathOn32Bit,
-            WindowsPowerShell32BitLabel,
-            { knownToExist: true, is32Bit: true });
+            WindowsPowerShell64BitLabel,
+            { knownToExist: true });
     }
 }
 
@@ -404,43 +477,28 @@ export function fixWindowsPowerShellPath(powerShellExePath: string, platformDeta
 abstract class PossiblePowerShellExe implements IPossiblePowerShellExe {
     private readonly pathToExe: string;
     private readonly installationName: string;
-    private readonly is32BitExe: boolean;
 
-    private knownToExist: boolean = undefined;
+    private readonly existsCheck: Lazy<boolean> = undefined;
 
     constructor(
         pathToExe: string,
         installationName: string,
-        options?: { knownToExist?: boolean, is32Bit?: boolean }) {
+        options?: { knownToExist?: boolean }) {
 
         this.pathToExe = pathToExe;
         this.installationName = installationName;
 
-        if (options) {
-
-            if (options.knownToExist) {
-                this.knownToExist = options.knownToExist;
-            }
-
-            options.is32Bit = !!options.is32Bit;
-        }
+        this.existsCheck = new Lazy(() => (options && options.knownToExist) || fs.existsSync(this.exePath));
     }
 
     abstract get version(): string;
-
-    get is32Bit(): boolean {
-        return this.is32BitExe;
-    }
 
     get exePath(): string {
         return this.pathToExe;
     }
 
     get exists(): boolean {
-        if (this.knownToExist === undefined) {
-            this.knownToExist = fs.existsSync(this.exePath);
-        }
-        return this.knownToExist;
+        return this.existsCheck.value;
     }
 
     get displayName(): string {
