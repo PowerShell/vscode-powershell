@@ -124,17 +124,17 @@ export class PowerShellExeFinder {
         this.platformDetails = platformDetails;
         this.additionalPSExeSettings = additionalPowerShellExes || [];
 
-        this.stablePwshExeVal = new Lazy(() => this.findPSCoreStable());
-        this.stable32BitPwshExeVal = new Lazy(() => this.findPSCore32BitStable());
+        this.stablePwshExeVal       = new Lazy(() => this.findPSCoreStable());
+        this.stable32BitPwshExeVal  = new Lazy(() => this.findPSCore32BitStable());
         this.preview32BitPwshExeVal = new Lazy(() => this.findPSCore32BitPreview());
-        this.previewPwshExeVal = new Lazy(() => this.findPSCorePreview());
+        this.previewPwshExeVal      = new Lazy(() => this.findPSCorePreview());
         this.dotnetGlobalToolExeVal = new Lazy(() => this.findPSCoreDotnetGlobalTool());
-        this.msixExeVal = new Lazy(() => this.findPSCoreMsix());
-        this.stableSnapExeVal = new Lazy(() => this.findPSCoreStableSnap());
-        this.previewSnapExeVal = new Lazy(() => this.findPSCorePreviewSnap());
-        this.sys32WinPSExeVal = new Lazy(() => this.findSys32WinPS());
-        this.sysWow64WinPSExeVal = new Lazy(() => this.findSysWow64WinPS());
-        this.sysNativeWinPSExeVal = new Lazy(() => this.findSysNativeWinPS());
+        this.msixExeVal             = new Lazy(() => this.findPSCoreMsix());
+        this.stableSnapExeVal       = new Lazy(() => this.findPSCoreStableSnap());
+        this.previewSnapExeVal      = new Lazy(() => this.findPSCorePreviewSnap());
+        this.sys32WinPSExeVal       = new Lazy(() => this.findSys32WinPS());
+        this.sysWow64WinPSExeVal    = new Lazy(() => this.findSysWow64WinPS());
+        this.sysNativeWinPSExeVal   = new Lazy(() => this.findSysNativeWinPS());
     }
 
     /**

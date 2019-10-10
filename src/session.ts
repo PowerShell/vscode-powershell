@@ -5,7 +5,6 @@
 import cp = require("child_process");
 import fs = require("fs");
 import net = require("net");
-import os = require("os");
 import path = require("path");
 import * as semver from "semver";
 import vscode = require("vscode");
@@ -129,45 +128,44 @@ export class SessionManager implements Middleware {
 
         this.suppressRestartPrompt = false;
 
-        if (this.powerShellExePath) {
-
-            this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
-
-            if (this.inDevelopmentMode) {
-                const devBundledModulesPath =
-                    path.resolve(
-                        __dirname,
-                        this.sessionSettings.developer.bundledModulesPath);
-
-                // Make sure the module's bin path exists
-                if (fs.existsSync(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
-                    this.bundledModulesPath = devBundledModulesPath;
-                } else {
-                    this.log.write(
-                        "\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
-                        `found (or has not been built yet): ${devBundledModulesPath}\n`);
-                }
-            }
-
-            this.editorServicesArgs =
-                `-HostName 'Visual Studio Code Host' ` +
-                `-HostProfileId 'Microsoft.VSCode' ` +
-                `-HostVersion '${this.HostVersion}' ` +
-                `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
-                `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
-                `-EnableConsoleRepl `;
-
-            if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
-                this.editorServicesArgs += "-WaitForDebugger ";
-            }
-            if (this.sessionSettings.developer.editorServicesLogLevel) {
-                this.editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
-            }
-
-            this.startPowerShell();
-        } else {
+        if (!this.powerShellExePath) {
             this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
         }
+
+        this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
+
+        if (this.inDevelopmentMode) {
+            const devBundledModulesPath =
+                path.resolve(
+                    __dirname,
+                    this.sessionSettings.developer.bundledModulesPath);
+
+            // Make sure the module's bin path exists
+            if (fs.existsSync(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
+                this.bundledModulesPath = devBundledModulesPath;
+            } else {
+                this.log.write(
+                    "\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
+                    `found (or has not been built yet): ${devBundledModulesPath}\n`);
+            }
+        }
+
+        this.editorServicesArgs =
+            `-HostName 'Visual Studio Code Host' ` +
+            `-HostProfileId 'Microsoft.VSCode' ` +
+            `-HostVersion '${this.HostVersion}' ` +
+            `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
+            `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
+            `-EnableConsoleRepl `;
+
+        if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
+            this.editorServicesArgs += "-WaitForDebugger ";
+        }
+        if (this.sessionSettings.developer.editorServicesLogLevel) {
+            this.editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
+        }
+
+        this.startPowerShell();
     }
 
     public stop() {
@@ -342,11 +340,10 @@ export class SessionManager implements Middleware {
     }
 
     private async showBitnessPathFixWarning(fixedPath: string): Promise<void> {
-        const bitness = this.platformDetails.isOS64Bit ? 64 : 32;
+        const bitness = this.platformDetails.isOS64Bit ? "64" : "32";
 
         const choice = await vscode.window.showWarningMessage(
-            `The specified PowerShell path is incorrect for ${bitness}-bit VS Code, using '${fixedPath}' ` +
-            "instead.",
+            `The specified PowerShell path is incorrect for ${bitness}-bit VS Code, using '${fixedPath}' instead.`,
             "Fix Setting Automatically");
 
         if (!choice) {
