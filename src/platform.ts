@@ -46,10 +46,6 @@ export interface IPowerShellExeDetails {
     readonly exePath: string;
 }
 
-export interface IPossiblePowerShellExe extends IPowerShellExeDetails {
-    readonly exists: boolean;
-}
-
 export function getPlatformDetails(): IPlatformDetails {
     let operatingSystem = OperatingSystem.Unknown;
 
@@ -85,32 +81,41 @@ export class PowerShellNotFoundError extends Error {
  * this will also surface those at the end of the list.
  */
 export class PowerShellExeFinder {
+    // This is required, since parseInt("7-preview") will return 7.
+    private static IntRegex: RegExp = /^\d+$/;
+
     private readonly platformDetails: IPlatformDetails;
 
+    // PSCore version table
+    private readonly pwshWindowsInstallationsVal:
+        Lazy<{ stable: IPossiblePowerShellExe, preview: IPossiblePowerShellExe }>;
+    private readonly pwsh32WindowsInstallationsVal:
+        Lazy<{ stable: IPossiblePowerShellExe, preview: IPossiblePowerShellExe }>;
+
     // PowerShell 6+ installation
-    private stablePwshExeVal: Lazy<IPossiblePowerShellExe>;
-    private previewPwshExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly stablePwshExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly previewPwshExeVal: Lazy<IPossiblePowerShellExe>;
 
     // 32-bit PowerShell 6+ installation
-    private stable32BitPwshExeVal: Lazy<IPossiblePowerShellExe>;
-    private preview32BitPwshExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly stable32BitPwshExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly preview32BitPwshExeVal: Lazy<IPossiblePowerShellExe>;
 
     // .NET Global Tool pwsh installation
-    private dotnetGlobalToolExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly dotnetGlobalToolExeVal: Lazy<IPossiblePowerShellExe>;
 
     // MSIX/UWP installation
-    private msixExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly msixExeVal: Lazy<IPossiblePowerShellExe>;
 
     // Snap pwsh installations on Linux
-    private stableSnapExeVal: Lazy<IPossiblePowerShellExe>;
-    private previewSnapExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly stableSnapExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly previewSnapExeVal: Lazy<IPossiblePowerShellExe>;
 
     // Windows PowerShell installations
-    private sys32WinPSExeVal: Lazy<IPossiblePowerShellExe>;
-    private sysWow64WinPSExeVal: Lazy<IPossiblePowerShellExe>;
-    private sysNativeWinPSExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly sys32WinPSExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly sysWow64WinPSExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly sysNativeWinPSExeVal: Lazy<IPossiblePowerShellExe>;
 
-    private additionalPSExeSettings: Iterable<Settings.IPowerShellAdditionalExePathSettings>;
+    private readonly additionalPSExeSettings: Iterable<Settings.IPowerShellAdditionalExePathSettings>;
 
     /**
      * Create a new PowerShellFinder object to discover PowerShell installations.
@@ -123,6 +128,10 @@ export class PowerShellExeFinder {
 
         this.platformDetails = platformDetails;
         this.additionalPSExeSettings = additionalPowerShellExes || [];
+
+        this.pwshWindowsInstallationsVal = new Lazy(() => this.findPSCoreWindowsInstallations());
+        this.pwsh32WindowsInstallationsVal = new Lazy(
+            () => this.findPSCoreWindowsInstallations({ find32Bit: true }));
 
         this.stablePwshExeVal       = new Lazy(() => this.findPSCoreStable());
         this.stable32BitPwshExeVal  = new Lazy(() => this.findPSCore32BitStable());
@@ -139,7 +148,7 @@ export class PowerShellExeFinder {
 
     /**
      * The stable PowerShell 6+ installation.
-     * May be undefined if the installation directory is not present.
+     * May be null if the installation directory is not present.
      */
     private get pwshStable(): IPossiblePowerShellExe {
         return this.stablePwshExeVal.value;
@@ -147,7 +156,7 @@ export class PowerShellExeFinder {
 
     /**
      * The preview PowerShell 6+ installation.
-     * May be undefined if the installation directory is not present.
+     * May be null if the installation directory is not present.
      */
     private get pwshPreview(): IPossiblePowerShellExe {
         return this.previewPwshExeVal.value;
@@ -155,7 +164,7 @@ export class PowerShellExeFinder {
 
     /**
      * The stable 32-bit PowerShell 6+ installation.
-     * May be undefined if the installation directory is not present
+     * May be null if the installation directory is not present
      */
     private get pwsh32Stable(): IPossiblePowerShellExe {
         return this.stable32BitPwshExeVal.value;
@@ -163,7 +172,7 @@ export class PowerShellExeFinder {
 
     /**
      * The preview 32-bit PowerShell 6+ installation.
-     * May be undefined if the installation directory is not present.
+     * May be null if the installation directory is not present.
      */
     private get pwsh32Preview(): IPossiblePowerShellExe {
         return this.preview32BitPwshExeVal.value;
@@ -171,7 +180,7 @@ export class PowerShellExeFinder {
 
     /**
      * PowerShell 6+ installation from an MSIX (through the Windows store).
-     * May be undefined if the AppX package is not found.
+     * May be null if the AppX package is not found.
      */
     private get pwshMsix(): IPossiblePowerShellExe {
         return this.msixExeVal.value;
@@ -323,6 +332,88 @@ export class PowerShellExeFinder {
         }
     }
 
+    private findPSCoreWindowsInstallations(options?: { find32Bit: boolean }):
+            { stable: IPossiblePowerShellExe | null, preview: IPossiblePowerShellExe | null } | null {
+
+        const find32Bit: boolean = options && options.find32Bit;
+
+        const programFilesPath: string = find32Bit
+            ? process.env["ProgramFiles(x86)"]
+            : process.env.ProgramFiles;
+
+        const powerShellInstallBaseDir = path.join(programFilesPath, "PowerShell");
+
+        // Ensure the base directory exists
+        if (!(fs.existsSync(powerShellInstallBaseDir) && fs.lstatSync(powerShellInstallBaseDir).isDirectory())) {
+            return null;
+        }
+
+        let highestSeenStableNumber: number = -1;
+        let stablePath: string = null;
+        let highestSeenPreviewNumber: number = -1;
+        let previewPath: string = null;
+        for (const item of fs.readdirSync(powerShellInstallBaseDir)) {
+
+            // Search for a directory like "6" or "7" first
+            if (item.match(PowerShellExeFinder.IntRegex)) {
+                const currentStable = parseInt(item, 10);
+
+                // We may have already picked up a higher version
+                if (currentStable <= highestSeenStableNumber) {
+                    continue;
+                }
+
+                // If the directory exists, but not pwsh.exe, just keep looking through dirs
+                const stableExePath = path.join(powerShellInstallBaseDir, item, "pwsh.exe");
+                if (!fs.existsSync(stableExePath)) {
+                    continue;
+                }
+
+                stablePath = stableExePath;
+                highestSeenStableNumber = currentStable;
+                continue;
+            }
+
+            // Now look for something like "7-preview"
+
+            // Preview dirs all have dashes in them
+            const dashIndex = item.indexOf("-");
+            if (dashIndex < 0) {
+                continue;
+            }
+
+            // Verify that the part before the dash is an integer
+            const intPart: string = item.substring(0, dashIndex);
+            if (!intPart.match(PowerShellExeFinder.IntRegex)) {
+                continue;
+            }
+
+            // Weed out non preview dirs or versions lower than the one we've already seen
+            const currentPreview = parseInt(intPart, 10);
+            if (currentPreview <= highestSeenPreviewNumber || item.substring(dashIndex + 1) !== "preview") {
+                continue;
+            }
+
+            // Now look for the file
+            const previewExePath = path.join(powerShellInstallBaseDir, item, "pwsh.exe");
+            if (!fs.existsSync(previewExePath)) {
+                continue;
+            }
+
+            previewPath = previewExePath;
+            highestSeenPreviewNumber = currentPreview;
+        }
+
+        const bitness: string = find32Bit
+            ? "(x86)"
+            : "(x64)";
+
+        return {
+            stable: stablePath && new PSCoreExe(stablePath, `PowerShell ${bitness}`, { knownToExist: true }),
+            preview: previewPath && new PSCoreExe(previewPath, `PowerShell Preview ${bitness}`, { knownToExist: true }),
+        };
+    }
+
     private findAdditionalPwshExe(additionalPwshSetting: Settings.IPowerShellAdditionalExePathSettings) {
         return new PSCoreExe(
             additionalPwshSetting.exePath,
@@ -338,7 +429,7 @@ export class PowerShellExeFinder {
                 return new PSCoreExe(MacOSExePath, "PowerShell (x64)");
 
             case OperatingSystem.Windows:
-                return this.findPSCoreWindows();
+                return this.pwshWindowsInstallationsVal.value.stable;
         }
     }
 
@@ -351,61 +442,16 @@ export class PowerShellExeFinder {
                 return new PSCoreExe(MacOSPreviewExePath, "PowerShell Preview (x64)");
 
             case OperatingSystem.Windows:
-                return this.findPSCoreWindows({ findPreview: true });
+                return this.pwshWindowsInstallationsVal.value.preview;
         }
     }
 
     private findPSCore32BitStable(): IPossiblePowerShellExe {
-        return this.findPSCoreWindows({ use32Bit: true });
+        return this.pwsh32WindowsInstallationsVal.value.stable;
     }
 
     private findPSCore32BitPreview(): IPossiblePowerShellExe {
-        return this.findPSCoreWindows({ findPreview: true, use32Bit: true });
-    }
-
-    // Search for PS 6/7 under "%ProgramFiles%\PowerShell\<major-version>[-preview]\pwsh.exe"
-    private findPSCoreWindows(options?: { use32Bit?: boolean, findPreview?: boolean }): IPossiblePowerShellExe {
-
-        const use32Bit: boolean = options && options.use32Bit;
-
-        const programFilesPath: string = use32Bit
-            ? process.env["ProgramFiles(x86)"]
-            : process.env.ProgramFiles;
-
-        // Path to "%ProgramFiles%\PowerShell"
-        const psCoreInstallDirPath: string = path.join(programFilesPath, "PowerShell");
-
-        // Make sure it exists and is a directory
-        if (!(fs.existsSync(psCoreInstallDirPath) && fs.lstatSync(psCoreInstallDirPath).isDirectory())) {
-            return undefined;
-        }
-
-        // Look for folders that match the number[-preview] scheme
-        for (const item of fs.readdirSync(psCoreInstallDirPath)) {
-            if (options && options.findPreview) {
-                // Look for something like "7-preview"
-                const dashIndex = item.indexOf("-");
-                if (dashIndex <= 0 || !parseInt(item.substring(0, dashIndex), 10) || item.substring(dashIndex + 1) !== "preview") {
-                    continue;
-                }
-            } else {
-                // Look for something like "6"
-                if (!parseInt(item, 10)) {
-                    continue;
-                }
-            }
-
-            const pwshName = use32Bit
-                ? "PowerShell (x86)"
-                : "PowerShell (x64)";
-
-            const exePath = path.join(psCoreInstallDirPath, item, "pwsh.exe");
-            return new PSCoreExe(exePath, pwshName);
-        }
-
-        // This method may not find any installation
-        // Callers should be aware of this
-        return undefined;
+        return this.pwsh32WindowsInstallationsVal.value.preview;
     }
 
     private findPSCoreDotnetGlobalTool(): IPossiblePowerShellExe {
@@ -425,7 +471,7 @@ export class PowerShellExeFinder {
             .trim();
 
         if (!msixDir) {
-            return undefined;
+            return null;
         }
 
         const msixExePath = path.join(msixDir, "pwsh.exe");
@@ -458,8 +504,7 @@ export class PowerShellExeFinder {
     private findSysNativeWinPS(): IPossiblePowerShellExe {
         return new WinPSExe(
             WinPS64BitPathOn32Bit,
-            WindowsPowerShell64BitLabel,
-            { knownToExist: true });
+            WindowsPowerShell64BitLabel);
     }
 }
 
@@ -479,11 +524,16 @@ export function fixWindowsPowerShellPath(powerShellExePath: string, platformDeta
     return powerShellExePath;
 }
 
+interface IPossiblePowerShellExe extends IPowerShellExeDetails {
+    readonly exists: boolean;
+}
+
 abstract class PossiblePowerShellExe implements IPossiblePowerShellExe {
+    protected readonly lazyVersion: Lazy<string>;
+
     private readonly pathToExe: string;
     private readonly installationName: string;
-
-    private readonly existsCheck: Lazy<boolean> = undefined;
+    private readonly existsCheck: Lazy<boolean> = null;
 
     constructor(
         pathToExe: string,
@@ -494,9 +544,12 @@ abstract class PossiblePowerShellExe implements IPossiblePowerShellExe {
         this.installationName = installationName;
 
         this.existsCheck = new Lazy(() => (options && options.knownToExist) || fs.existsSync(this.exePath));
+        this.lazyVersion = new Lazy(() => this.findVersion());
     }
 
-    abstract get version(): string;
+    get version(): string {
+        return this.lazyVersion.value;
+    }
 
     get exePath(): string {
         return this.pathToExe;
@@ -509,27 +562,21 @@ abstract class PossiblePowerShellExe implements IPossiblePowerShellExe {
     get displayName(): string {
         return this.installationName;
     }
+
+    protected abstract findVersion(): string;
 }
 
 class WinPSExe extends PossiblePowerShellExe {
-    private psVersion: string;
-
-    get version(): string {
-        if (!this.psVersion) {
-            this.psVersion = child_process.execFileSync(this.exePath, ["-c", "$PSVersionTable.PSVersion.ToString()"]);
-        }
-        return this.psVersion;
+    protected findVersion(): string {
+        return child_process.execFileSync(this.exePath, ["-c", "$PSVersionTable.PSVersion.ToString()"]);
     }
 }
 
 class PSCoreExe extends PossiblePowerShellExe {
-    private psVersion: string;
-
-    get version(): string {
-        if (!this.psVersion) {
-            this.psVersion = child_process.execFileSync(this.exePath, ["-v"]);
-        }
-        return this.psVersion;
+    protected findVersion(): string {
+        const versionLine = child_process.execFileSync(this.exePath, ["-v"]);
+        const spaceIndex = versionLine.indexOf(" ");
+        return versionLine.substring(spaceIndex + 1);
     }
 }
 
@@ -540,7 +587,7 @@ class Lazy<T> {
 
     constructor(factory: () => T) {
         this.constructed = false;
-        this.underlyingValue = undefined;
+        this.underlyingValue = null;
         this.factory = factory;
     }
 
