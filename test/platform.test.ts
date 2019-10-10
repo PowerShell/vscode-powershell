@@ -5,7 +5,9 @@
 import * as assert from "assert";
 import * as platform from "../src/platform";
 
-function checkDefaultPowerShellPath(platformDetails, expectedPath) {
+function checkDefaultPowerShellPath(
+    platformDetails: platform.IPlatformDetails,
+    expectedPath: string) {
     const powerShellExeFinder = new platform.PowerShellExeFinder(platformDetails);
     test("returns correct default path", () => {
         let defaultPath: string;
@@ -35,7 +37,10 @@ function checkAvailableWindowsPowerShellPaths(
     });
 }
 
-function checkFixedWindowsPowerShellpath(platformDetails, inputPath, expectedPath) {
+function checkFixedWindowsPowerShellpath(
+    platformDetails: platform.IPlatformDetails,
+    inputPath: string,
+    expectedPath: string) {
     test("fixes incorrect Windows PowerShell Sys* path", () => {
         assert.equal(
             platform.fixWindowsPowerShellPath(inputPath, platformDetails),
@@ -59,6 +64,10 @@ suite("Platform module", () => {
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
                 [
+                    {
+                        displayName: "PowerShell (x64)",
+                        exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+                    },
                     {
                         displayName: platform.WindowsPowerShell64BitLabel,
                         exePath: platform.System32PowerShellPath,
@@ -90,6 +99,10 @@ suite("Platform module", () => {
                 platformDetails,
                 [
                     {
+                        displayName: "PowerShell (x64)",
+                        exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+                    },
+                    {
                         displayName: platform.WindowsPowerShell64BitLabel,
                         exePath: platform.SysnativePowerShellPath,
                     },
@@ -120,10 +133,42 @@ suite("Platform module", () => {
                 platformDetails,
                 [
                     {
+                        displayName: "PowerShell (x86)",
+                        exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
+                    },
+                    {
                         displayName: platform.WindowsPowerShell32BitLabel,
                         exePath: platform.System32PowerShellPath,
                     },
                 ]);
+        });
+    }
+
+    if (process.platform === "darwin") {
+        suite("macOS", () => {
+            const platformDetails: platform.IPlatformDetails = {
+                operatingSystem: platform.OperatingSystem.MacOS,
+                isOS64Bit: true,
+                isProcess64Bit: true,
+            };
+
+            checkDefaultPowerShellPath(
+                platformDetails,
+                "/usr/local/bin/pwsh");
+        });
+    }
+
+    if (process.platform === "linux") {
+        suite("linux", () => {
+            const platformDetails: platform.IPlatformDetails = {
+                operatingSystem: platform.OperatingSystem.Linux,
+                isOS64Bit: true,
+                isProcess64Bit: true,
+            };
+
+            checkDefaultPowerShellPath(
+                platformDetails,
+                "/usr/bin/pwsh");
         });
     }
 });
