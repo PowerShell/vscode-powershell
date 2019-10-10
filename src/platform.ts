@@ -443,7 +443,7 @@ export class PowerShellExeFinder {
                 return new PSCoreExe(MacOSPreviewExePath, "PowerShell Preview (x64)");
 
             case OperatingSystem.Windows:
-                return this.pwshWindowsInstallationsVal.value.preview
+                return this.pwshWindowsInstallationsVal.value
                     && this.pwshWindowsInstallationsVal.value.preview;
         }
     }
