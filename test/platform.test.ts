@@ -10,11 +10,7 @@ function checkDefaultPowerShellPath(
     expectedPath: string) {
     const powerShellExeFinder = new platform.PowerShellExeFinder(platformDetails);
     test("returns correct default path", () => {
-        let defaultPath: string;
-        for (const pwshExe of powerShellExeFinder.enumeratePowerShellInstallations()) {
-            defaultPath = pwshExe.exePath;
-            break;
-        }
+        const defaultPath = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
         assert.equal(defaultPath, expectedPath);
     });
 }
@@ -64,10 +60,6 @@ suite("Platform module", () => {
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
                 [
-                    {
-                        displayName: "PowerShell (x64)",
-                        exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
-                    },
                     {
                         displayName: platform.WindowsPowerShell64BitLabel,
                         exePath: platform.System32PowerShellPath,
