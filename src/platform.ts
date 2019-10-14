@@ -123,10 +123,10 @@ export class PowerShellExeFinder {
      * @param additionalPowerShellExes Additional PowerShell installations as configured in the settings.
      */
     constructor(
-        platformDetails: IPlatformDetails,
+        platformDetails?: IPlatformDetails,
         additionalPowerShellExes?: Iterable<Settings.IPowerShellAdditionalExePathSettings>) {
 
-        this.platformDetails = platformDetails;
+        this.platformDetails = platformDetails || getPlatformDetails();
         this.additionalPSExeSettings = additionalPowerShellExes || [];
 
         this.pwshWindowsInstallationsVal = new Lazy(() => this.findPSCoreWindowsInstallations());
