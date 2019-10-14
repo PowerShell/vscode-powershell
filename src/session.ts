@@ -269,9 +269,10 @@ export class SessionManager implements Middleware {
             return this.resolvePowerShellPath(powerShellExePath);
         }
 
-        for (const powerShellExe of this.powershellExeFinder.enumeratePowerShellInstallations()) {
-            // No need to resolve these paths, since the enumeration checks for existence
-            return powerShellExe.exePath;
+        const firstAvailablePwsh = this.powershellExeFinder.getFirstAvailablePowerShellInstallation();
+        if (firstAvailablePwsh) {
+            // No need to resolve this path, since the finder guarantees its existence
+            return firstAvailablePwsh.exePath;
         }
 
         this.setSessionFailure("Unable to find PowerShell installation, see logs for more details");
@@ -736,7 +737,7 @@ export class SessionManager implements Middleware {
 
     private showSessionMenu() {
         const currentExePath = (this.powerShellExePath || "").toLowerCase();
-        const availablePowerShellExes = Array.from(this.powershellExeFinder.enumeratePowerShellInstallations());
+        const availablePowerShellExes = this.powershellExeFinder.getAllAvailablePowerShellInstallations();
 
         let sessionText: string;
 

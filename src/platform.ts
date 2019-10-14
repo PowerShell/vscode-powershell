@@ -231,6 +231,22 @@ export class PowerShellExeFinder {
     }
 
     /**
+     * Returns the first available PowerShell executable found in the search order.
+     */
+    public getFirstAvailablePowerShellInstallation(): IPowerShellExeDetails {
+        for (const pwsh of this.enumeratePowerShellInstallations()) {
+            return pwsh;
+        }
+    }
+
+    /**
+     * Get an array of all PowerShell executables found when searching for PowerShell installations.
+     */
+    public getAllAvailablePowerShellInstallations(): IPowerShellExeDetails[] {
+        return Array.from(this.enumeratePowerShellInstallations());
+    }
+
+    /**
      * Iterates through PowerShell installations on the machine according
      * to configuration passed in through the constructor.
      * PowerShell items returned by this object are verified
