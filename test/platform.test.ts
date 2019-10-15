@@ -28,7 +28,7 @@ function checkAvailableWindowsPowerShellPaths(
         let i = 0;
         for (const pwshExe of pwshExeFinder.enumeratePowerShellInstallations()) {
             assert.equal(pwshExe.displayName, expectedPaths[i].displayName);
-            assert.equal(pwshExe.exePath.toLowerCase(), expectedPaths[i].exePath.toLowerCase())
+            assert.equal(pwshExe.exePath.toLowerCase(), expectedPaths[i].exePath.toLowerCase());
             i++;
         }
     });
