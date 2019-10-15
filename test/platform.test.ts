@@ -28,7 +28,7 @@ function checkAvailableWindowsPowerShellPaths(
         let i = 0;
         for (const pwshExe of pwshExeFinder.enumeratePowerShellInstallations()) {
             assert.equal(pwshExe.displayName, expectedPaths[i].displayName);
-            assert.equal(pwshExe.exePath, expectedPaths[i].exePath);
+            assert.equal(pwshExe.exePath.toLowerCase(), expectedPaths[i].exePath.toLowerCase())
             i++;
         }
     });
@@ -75,7 +75,7 @@ suite("Platform module", () => {
                 platformDetails,
                 platform.SysnativePowerShellPath,
                 platform.System32PowerShellPath);
-        });
+        }).timeout(5000);
 
         suite("64-bit Windows, 32-bit VS Code", () => {
             const platformDetails: platform.IPlatformDetails = {
@@ -92,12 +92,12 @@ suite("Platform module", () => {
                 platformDetails,
                 [
                     {
-                        displayName: platform.WindowsPowerShell64BitLabel,
-                        exePath: platform.SysnativePowerShellPath,
-                    },
-                    {
                         displayName: platform.WindowsPowerShell32BitLabel,
                         exePath: platform.System32PowerShellPath,
+                    },
+                    {
+                        displayName: platform.WindowsPowerShell64BitLabel,
+                        exePath: platform.SysnativePowerShellPath,
                     },
                 ]);
 
@@ -116,7 +116,7 @@ suite("Platform module", () => {
 
             checkDefaultPowerShellPath(
                 platformDetails,
-                "C:\\Program Files\\PowerShell\\6\\pwsh.exe");
+                platform.System32PowerShellPath);
 
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
