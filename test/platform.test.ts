@@ -10,7 +10,7 @@ function checkDefaultPowerShellPath(
     expectedPath: string) {
     const powerShellExeFinder = new platform.PowerShellExeFinder(platformDetails);
     test("returns correct default path", () => {
-        const defaultPath = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+        const defaultPath = powerShellExeFinder.getFirstAvailablePowerShellInstallation().exePath;
         assert.equal(defaultPath, expectedPath);
     });
 }
