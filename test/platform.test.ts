@@ -27,7 +27,7 @@ function checkAvailableWindowsPowerShellPaths(
         // enumerate the first list items.
         let i = 0;
         for (const pwshExe of pwshExeFinder.enumeratePowerShellInstallations()) {
-            assert.equal(pwshExe.exePath, expectedPaths[i]);
+            assert.equal(pwshExe, expectedPaths[i]);
             i++;
         }
     });
@@ -120,10 +120,6 @@ suite("Platform module", () => {
             checkAvailableWindowsPowerShellPaths(
                 platformDetails,
                 [
-                    {
-                        displayName: "PowerShell (x86)",
-                        exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
-                    },
                     {
                         displayName: platform.WindowsPowerShell32BitLabel,
                         exePath: platform.System32PowerShellPath,
