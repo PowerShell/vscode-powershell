@@ -248,6 +248,11 @@
         "command": "PowerShell.OpenExamplesFolder",
         "title": "Open Examples Folder",
         "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.InvokeRegisteredEditorCommand",
+        "title": "Invoke Registered Editor Command",
+        "category": "PowerShell"
       }
     ],
     "menus": {
@@ -259,6 +264,10 @@
         {
           "command": "PowerShell.RefreshCommandsExplorer",
           "when": "config.powershell.sideBar.CommandExplorerVisibility"
+        },
+        {
+          "command": "PowerShell.InvokeRegisteredEditorCommand",
+          "when": "false"
         }
       ],
       "editor/context": [
