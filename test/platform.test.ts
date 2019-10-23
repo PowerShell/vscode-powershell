@@ -4,7 +4,6 @@
 
 import * as assert from "assert";
 import * as child_process from "child_process";
-import * as fs from "fs";
 import mockFS = require("mock-fs");
 import FileSystem = require("mock-fs/lib/filesystem");
 import * as sinon from "sinon";
@@ -27,9 +26,9 @@ const testPlatforms: ITestPlatform[] = [
             isProcess64Bit: true,
         },
         expectedPowerShellSequence: [
-            { exePath: "/usr/bin/pwsh", displayName: "PowerShell (x64)" },
+            { exePath: "/usr/bin/pwsh", displayName: "PowerShell" },
             { exePath: "/snap/bin/pwsh", displayName: "PowerShell Snap" },
-            { exePath: "/usr/bin/pwsh-preview", displayName: "PowerShell Preview (x64)" },
+            { exePath: "/usr/bin/pwsh-preview", displayName: "PowerShell Preview" },
             { exePath: "/snap/bin/pwsh-preview", displayName: "PowerShell Preview Snap" },
         ],
         filesystem: {
@@ -51,8 +50,8 @@ const testPlatforms: ITestPlatform[] = [
             isProcess64Bit: true,
         },
         expectedPowerShellSequence: [
-            { exePath: "/usr/local/bin/pwsh", displayName: "PowerShell (x64)" },
-            { exePath: "/usr/local/bin/pwsh-preview", displayName: "PowerShell Preview (x64)" },
+            { exePath: "/usr/local/bin/pwsh", displayName: "PowerShell" },
+            { exePath: "/usr/local/bin/pwsh-preview", displayName: "PowerShell Preview" },
         ],
         filesystem: {
             "/usr/local/bin": {
@@ -147,7 +146,7 @@ const testPlatforms: ITestPlatform[] = [
             isProcess64Bit: false,
         },
         environmentVars: {
-            "ProgramFiles": "C:\\Program Files",
+            "ProgramFiles": "C:\\Program Files (x86)",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
             "winddir": "C:\\WINDOWS",
         },
@@ -161,8 +160,8 @@ const testPlatforms: ITestPlatform[] = [
             },
             { exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x86)" },
             { exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x64)" },
-            { exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
-            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
+            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
         ],
         filesystem: {
             "C:\\Program Files\\PowerShell": {
@@ -189,6 +188,131 @@ const testPlatforms: ITestPlatform[] = [
             },
             "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0": {
                 "powershell.exe": "",
+            },
+        },
+    },
+    {
+        name: "Windows 64-bit, 32-bit VSCode (Windows PowerShell only)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Windows,
+            isOS64Bit: true,
+            isProcess64Bit: false,
+        },
+        environmentVars: {
+            "ProgramFiles": "C:\\Program Files (x86)",
+            "ProgramFiles(x86)": "C:\\Program Files (x86)",
+            "winddir": "C:\\WINDOWS",
+        },
+        expectedPowerShellSequence: [
+            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
+        ],
+        filesystem: {
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+            "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+        },
+    },
+    {
+        name: "Windows 32-bit, 32-bit VSCode (all installations)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Windows,
+            isOS64Bit: true,
+            isProcess64Bit: false,
+        },
+        environmentVars: {
+            "ProgramFiles": "C:\\Program Files (x86)",
+            "ProgramFiles(x86)": "C:\\Program Files (x86)",
+            "winddir": "C:\\WINDOWS",
+        },
+        expectedPowerShellSequence: [
+            { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
+            { exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x86)" },
+            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+        ],
+        filesystem: {
+            "C:\\Program Files (x86)\\PowerShell": {
+                "6": {
+                    "pwsh.exe": "",
+                },
+                "7-preview": {
+                    "pwsh.exe": "",
+                },
+            },
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+        },
+    },
+    {
+        name: "Windows 32-bit, 32-bit VSCode (Windows PowerShell only)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Windows,
+            isOS64Bit: true,
+            isProcess64Bit: false,
+        },
+        environmentVars: {
+            "ProgramFiles": "C:\\Program Files (x86)",
+            "ProgramFiles(x86)": "C:\\Program Files (x86)",
+            "winddir": "C:\\WINDOWS",
+        },
+        expectedPowerShellSequence: [
+            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+        ],
+        filesystem: {
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+        },
+    },
+    {
+        name: "Linux (stable only)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Linux,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        expectedPowerShellSequence: [
+            { exePath: "/usr/bin/pwsh", displayName: "PowerShell" },
+        ],
+        filesystem: {
+            "/usr/bin": {
+                pwsh: "",
+            },
+        },
+    },
+    {
+        name: "Linux (stable snap only)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Linux,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        expectedPowerShellSequence: [
+            { exePath: "/snap/bin/pwsh", displayName: "PowerShell Snap" },
+        ],
+        filesystem: {
+            "/snap/bin": {
+                pwsh: "",
+            },
+        },
+    },
+    {
+        name: "MacOS (stable only)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.MacOS,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        expectedPowerShellSequence: [
+            { exePath: "/usr/local/bin/pwsh", displayName: "PowerShell" },
+        ],
+        filesystem: {
+            "/usr/local/bin": {
+                pwsh: "",
             },
         },
     },

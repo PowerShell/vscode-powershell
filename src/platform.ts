@@ -464,10 +464,10 @@ export class PowerShellExeFinder {
     private findPSCoreStable(): IPossiblePowerShellExe {
         switch (this.platformDetails.operatingSystem) {
             case OperatingSystem.Linux:
-                return new PSCoreExe(LinuxExePath, "PowerShell (x64)");
+                return new PSCoreExe(LinuxExePath, "PowerShell");
 
             case OperatingSystem.MacOS:
-                return new PSCoreExe(MacOSExePath, "PowerShell (x64)");
+                return new PSCoreExe(MacOSExePath, "PowerShell");
 
             case OperatingSystem.Windows:
                 return this.pwshWindowsInstallationsVal.value
@@ -478,10 +478,10 @@ export class PowerShellExeFinder {
     private findPSCorePreview(): IPossiblePowerShellExe {
         switch (this.platformDetails.operatingSystem) {
             case OperatingSystem.Linux:
-                return new PSCoreExe(LinuxPreviewExePath, "PowerShell Preview (x64)");
+                return new PSCoreExe(LinuxPreviewExePath, "PowerShell Preview");
 
             case OperatingSystem.MacOS:
-                return new PSCoreExe(MacOSPreviewExePath, "PowerShell Preview (x64)");
+                return new PSCoreExe(MacOSPreviewExePath, "PowerShell Preview");
 
             case OperatingSystem.Windows:
                 return this.pwshWindowsInstallationsVal.value
