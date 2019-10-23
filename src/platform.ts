@@ -94,7 +94,7 @@ export function getDefaultPowerShellPath(
                     exePath: path.join(item, "pwsh.exe"),
                 }));
 
-            if (psCorePaths) {
+            if (psCorePaths && psCorePaths.length > 0) {
                 return powerShellExePath = psCorePaths[0].exePath;
             }
         }
