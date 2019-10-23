@@ -11,9 +11,7 @@ import * as platform from "../src/platform";
 
 /**
  * Describes a platform on which the PowerShell extension should work,
- * including the test conditions (filesystem, environment variables),
- * and the expected PowerShell installations the extension will resolve.
- * The default PowerShell is the first installation.
+ * including the test conditions (filesystem, environment variables).
  */
 interface ITestPlatform {
     name: string;
@@ -22,14 +20,16 @@ interface ITestPlatform {
     environmentVars?: Record<string, string>;
 }
 
+/**
+ * A platform where the extension should find a PowerShell,
+ * including the sequence of PowerShell installations that should be found.
+ * The expected default PowerShell is the first installation.
+ */
 interface ITestPlatformSuccessCase extends ITestPlatform {
     expectedPowerShellSequence: platform.IPowerShellExeDetails[];
 }
 
-interface ITestPlatformFailureCase extends ITestPlatform {
-    error: string;
-}
-
+// Platform configurations where we expect to find a set of PowerShells
 const successTestCases: ITestPlatformSuccessCase[] = [
     {
         name: "Linux (all installations)",
@@ -81,25 +81,28 @@ const successTestCases: ITestPlatformSuccessCase[] = [
             isProcess64Bit: true,
         },
         environmentVars: {
-            "ProgramFiles": "C:\\Program Files",
-            "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "windir": "C:\\WINDOWS",
+            "ProgramFiles": "C:/Program Files",
+            "ProgramFiles(x86)": "C:/Program Files (x86)",
+            "windir": "C:/WINDOWS",
         },
         expectedPowerShellSequence: [
-            { exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x64)" },
-            { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
+            { exePath: "C:/Program Files/PowerShell/6/pwsh.exe", displayName: "PowerShell (x64)" },
+            { exePath: "C:/Program Files (x86)/PowerShell/6/pwsh.exe", displayName: "PowerShell (x86)" },
             {
                 exePath:
-                    "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe\\pwsh.exe",
+                    "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe/pwsh.exe",
                 displayName: "PowerShell MSIX",
             },
-            { exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x64)" },
-            { exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x86)" },
-            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
-            { exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:/Program Files/PowerShell/7-preview/pwsh.exe", displayName: "PowerShell Preview (x64)" },
+            {
+                exePath: "C:/Program Files (x86)/PowerShell/7-preview/pwsh.exe",
+                displayName: "PowerShell Preview (x86)",
+            },
+            { exePath: "C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x64)" },
+            { exePath: "C:/WINDOWS/SysWOW64/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x86)" },
         ],
         filesystem: {
-            "C:\\Program Files\\PowerShell": {
+            "C:/Program Files/PowerShell": {
                 "6": {
                     "pwsh.exe": "",
                 },
@@ -107,7 +110,7 @@ const successTestCases: ITestPlatformSuccessCase[] = [
                     "pwsh.exe": "",
                 },
             },
-            "C:\\Program Files (x86)\\PowerShell": {
+            "C:/Program Files (x86)/PowerShell": {
                 "6": {
                     "pwsh.exe": "",
                 },
@@ -115,13 +118,13 @@ const successTestCases: ITestPlatformSuccessCase[] = [
                     "pwsh.exe": "",
                 },
             },
-            "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
+            "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
                 "pwsh.exe": "",
             },
-            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/System32/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
-            "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/SysWOW64/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
         },
@@ -134,19 +137,19 @@ const successTestCases: ITestPlatformSuccessCase[] = [
             isProcess64Bit: true,
         },
         environmentVars: {
-            "ProgramFiles": "C:\\Program Files",
-            "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "windir": "C:\\WINDOWS",
+            "ProgramFiles": "C:/Program Files",
+            "ProgramFiles(x86)": "C:/Program Files (x86)",
+            "windir": "C:/WINDOWS",
         },
         expectedPowerShellSequence: [
-            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
-            { exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x64)" },
+            { exePath: "C:/WINDOWS/SysWOW64/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x86)" },
         ],
         filesystem: {
-            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/System32/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
-            "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/SysWOW64/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
         },
@@ -159,25 +162,27 @@ const successTestCases: ITestPlatformSuccessCase[] = [
             isProcess64Bit: false,
         },
         environmentVars: {
-            "ProgramFiles": "C:\\Program Files (x86)",
-            "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "windir": "C:\\WINDOWS",
+            "ProgramFiles": "C:/Program Files (x86)",
+            "ProgramFiles(x86)": "C:/Program Files (x86)",
+            "windir": "C:/WINDOWS",
         },
         expectedPowerShellSequence: [
-            { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
-            { exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x64)" },
+            { exePath: "C:/Program Files (x86)/PowerShell/6/pwsh.exe", displayName: "PowerShell (x86)" },
+            { exePath: "C:/Program Files/PowerShell/6/pwsh.exe", displayName: "PowerShell (x64)" },
             {
-                exePath:
-                    "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe\\pwsh.exe",
+                exePath: "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe/pwsh.exe",
                 displayName: "PowerShell MSIX",
             },
-            { exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x86)" },
-            { exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x64)" },
-            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
-            { exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
+            {
+                exePath: "C:/Program Files (x86)/PowerShell/7-preview/pwsh.exe",
+                displayName: "PowerShell Preview (x86)",
+            },
+            { exePath: "C:/Program Files/PowerShell/7-preview/pwsh.exe", displayName: "PowerShell Preview (x64)" },
+            { exePath: "C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:/WINDOWS/Sysnative/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x64)" },
         ],
         filesystem: {
-            "C:\\Program Files\\PowerShell": {
+            "C:/Program Files/PowerShell": {
                 "6": {
                     "pwsh.exe": "",
                 },
@@ -185,7 +190,7 @@ const successTestCases: ITestPlatformSuccessCase[] = [
                     "pwsh.exe": "",
                 },
             },
-            "C:\\Program Files (x86)\\PowerShell": {
+            "C:/Program Files (x86)/PowerShell": {
                 "6": {
                     "pwsh.exe": "",
                 },
@@ -193,13 +198,13 @@ const successTestCases: ITestPlatformSuccessCase[] = [
                     "pwsh.exe": "",
                 },
             },
-            "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
+            "C:/Program Files/WindowsApps/Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
                 "pwsh.exe": "",
             },
-            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/System32/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
-            "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/Sysnative/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
         },
@@ -212,19 +217,19 @@ const successTestCases: ITestPlatformSuccessCase[] = [
             isProcess64Bit: false,
         },
         environmentVars: {
-            "ProgramFiles": "C:\\Program Files (x86)",
-            "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "windir": "C:\\WINDOWS",
+            "ProgramFiles": "C:/Program Files (x86)",
+            "ProgramFiles(x86)": "C:/Program Files (x86)",
+            "windir": "C:/WINDOWS",
         },
         expectedPowerShellSequence: [
-            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
-            { exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
+            { exePath: "C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:/WINDOWS/Sysnative/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x64)" },
         ],
         filesystem: {
-            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/System32/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
-            "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/Sysnative/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
         },
@@ -237,17 +242,23 @@ const successTestCases: ITestPlatformSuccessCase[] = [
             isProcess64Bit: false,
         },
         environmentVars: {
-            "ProgramFiles": "C:\\Program Files (x86)",
-            "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "windir": "C:\\WINDOWS",
+            "ProgramFiles": "C:/Program Files (x86)",
+            "ProgramFiles(x86)": "C:/Program Files (x86)",
+            "windir": "C:/WINDOWS",
         },
         expectedPowerShellSequence: [
-            { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
-            { exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x86)" },
-            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:/Program Files (x86)/PowerShell/6/pwsh.exe", displayName: "PowerShell (x86)" },
+            {
+                exePath: "C:/Program Files (x86)/PowerShell/7-preview/pwsh.exe",
+                displayName: "PowerShell Preview (x86)",
+            },
+            {
+                exePath: "C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe",
+                displayName: "Windows PowerShell (x86)",
+            },
         ],
         filesystem: {
-            "C:\\Program Files (x86)\\PowerShell": {
+            "C:/Program Files (x86)/PowerShell": {
                 "6": {
                     "pwsh.exe": "",
                 },
@@ -255,7 +266,7 @@ const successTestCases: ITestPlatformSuccessCase[] = [
                     "pwsh.exe": "",
                 },
             },
-            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/System32/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
         },
@@ -268,15 +279,15 @@ const successTestCases: ITestPlatformSuccessCase[] = [
             isProcess64Bit: false,
         },
         environmentVars: {
-            "ProgramFiles": "C:\\Program Files (x86)",
-            "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "windir": "C:\\WINDOWS",
+            "ProgramFiles": "C:/Program Files (x86)",
+            "ProgramFiles(x86)": "C:/Program Files (x86)",
+            "windir": "C:/WINDOWS",
         },
         expectedPowerShellSequence: [
-            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:/WINDOWS/System32/WindowsPowerShell/v1.0/powershell.exe", displayName: "Windows PowerShell (x86)" },
         ],
         filesystem: {
-            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+            "C:/WINDOWS/System32/WindowsPowerShell/v1.0": {
                 "powershell.exe": "",
             },
         },
@@ -331,7 +342,7 @@ const successTestCases: ITestPlatformSuccessCase[] = [
     },
 ];
 
-const errorTestCases: ITestPlatformFailureCase[] = [
+const errorTestCases: ITestPlatform[] = [
     {
         name: "Linux (no PowerShell)",
         platformDetails: {
@@ -340,7 +351,6 @@ const errorTestCases: ITestPlatformFailureCase[] = [
             isProcess64Bit: true,
         },
         filesystem: {},
-        error: "Bad",
     },
     {
         name: "MacOS (no PowerShell)",
@@ -350,7 +360,6 @@ const errorTestCases: ITestPlatformFailureCase[] = [
             isProcess64Bit: true,
         },
         filesystem: {},
-        error: "Bad",
     },
 ];
 
@@ -361,20 +370,48 @@ suite("Platform module", () => {
         const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
         switch (process.platform) {
             case "darwin":
-                assert.equal(platformDetails.operatingSystem, platform.OperatingSystem.MacOS);
-                assert.equal(platformDetails.isProcess64Bit, true);
-                assert.equal(platformDetails.isOS64Bit, true);
+                assert.strictEqual(
+                    platformDetails.operatingSystem,
+                    platform.OperatingSystem.MacOS,
+                    "Platform details operating system should be MacOS");
+                assert.strictEqual(
+                    platformDetails.isProcess64Bit,
+                    true,
+                    "VSCode on darwin should be 64-bit");
+                assert.strictEqual(
+                    platformDetails.isOS64Bit,
+                    true,
+                    "Darwin is 64-bit only");
+                break;
 
             case "linux":
-                assert.equal(platformDetails.operatingSystem, platform.OperatingSystem.Linux);
-                assert.equal(platformDetails.isProcess64Bit, true);
-                assert.equal(platformDetails.isOS64Bit, true);
+                assert.strictEqual(
+                    platformDetails.operatingSystem,
+                    platform.OperatingSystem.Linux,
+                    "Platform details operating system should be Linux");
+                assert.strictEqual(
+                    platformDetails.isProcess64Bit,
+                    true,
+                    "Only 64-bit VSCode supported on Linux");
+                assert.strictEqual(
+                    platformDetails.isOS64Bit,
+                    true,
+                    "Only 64-bit Linux supported by PowerShell");
                 return;
 
             case "win32":
-                assert.equal(platformDetails.operatingSystem, platform.OperatingSystem.Windows);
-                assert.equal(platformDetails.isProcess64Bit, process.arch === "x64");
-                assert.equal(platformDetails.isOS64Bit, !!(platformDetails.isProcess64Bit || process.env.ProgramW6432));
+                assert.strictEqual(
+                    platformDetails.operatingSystem,
+                    platform.OperatingSystem.Windows,
+                    "Platform details operating system should be Windows");
+                assert.strictEqual(
+                    platformDetails.isProcess64Bit,
+                    process.arch === "x64",
+                    "Windows process bitness should match process arch");
+                assert.strictEqual(
+                    platformDetails.isOS64Bit,
+                    !!(platformDetails.isProcess64Bit || process.env.ProgramW6432),
+                    "Windows OS arch should match process bitness unless 64-bit env var set");
                 return;
 
             default:
@@ -445,13 +482,8 @@ suite("Platform module", () => {
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
-                let error;
-                try {
-                    const defaultPowerShell = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
-                    error = defaultPowerShell;
-                } catch (e) {
-                    error = e;
-                }
+                const defaultPowerShell = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                assert.strictEqual(defaultPowerShell, undefined);
             });
         }
     });
@@ -499,7 +531,10 @@ suite("Platform module", () => {
                     assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell.displayName);
                 }
 
-                assert.strictEqual(foundPowerShells.length, testPlatform.expectedPowerShellSequence.length);
+                assert.strictEqual(
+                    foundPowerShells.length,
+                    testPlatform.expectedPowerShellSequence.length,
+                    "Number of expected PowerShells found does not match");
             });
         }
     });

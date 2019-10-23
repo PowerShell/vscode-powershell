@@ -555,7 +555,12 @@ export class PowerShellExeFinder {
 }
 
 export function getWindowsSystemPowerShellPath(systemFolderName: string) {
-    return `${process.env.windir}\\${systemFolderName}\\WindowsPowerShell\\v1.0\\powershell.exe`;
+    return path.join(
+        process.env.windir,
+        systemFolderName,
+        "WindowsPowerShell",
+        "v1.0",
+        "powershell.exe");
 }
 
 export function fixWindowsPowerShellPath(powerShellExePath: string, platformDetails: IPlatformDetails): string {
