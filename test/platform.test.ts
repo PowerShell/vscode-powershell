@@ -10,46 +10,6 @@ import FileSystem = require("mock-fs/lib/filesystem");
 import * as sinon from "sinon";
 import * as platform from "../src/platform";
 
-function checkDefaultPowerShellPath(
-    platformDetails: platform.IPlatformDetails,
-    expectedPath: string) {
-    const powerShellExeFinder = new platform.PowerShellExeFinder(platformDetails);
-    test("returns correct default path", () => {
-        const defaultPath = powerShellExeFinder.getFirstAvailablePowerShellInstallation().exePath;
-        assert.equal(defaultPath, expectedPath);
-    });
-}
-
-function checkAvailableWindowsPowerShellPaths(
-    platformDetails: platform.IPlatformDetails,
-    expectedPaths: platform.IPowerShellExeDetails[]) {
-
-    const pwshExeFinder = new platform.PowerShellExeFinder(platformDetails);
-
-    test("correctly enumerates available Windows PowerShell paths", () => {
-
-        // The system may return PowerShell Core paths so only
-        // enumerate the first list items.
-        let i = 0;
-        for (const pwshExe of pwshExeFinder.enumeratePowerShellInstallations()) {
-            assert.equal(pwshExe.displayName, expectedPaths[i].displayName);
-            assert.equal(pwshExe.exePath.toLowerCase(), expectedPaths[i].exePath.toLowerCase());
-            i++;
-        }
-    });
-}
-
-function checkFixedWindowsPowerShellpath(
-    platformDetails: platform.IPlatformDetails,
-    inputPath: string,
-    expectedPath: string) {
-    test("fixes incorrect Windows PowerShell Sys* path", () => {
-        assert.equal(
-            platform.fixWindowsPowerShellPath(inputPath, platformDetails),
-            expectedPath);
-    });
-}
-
 interface ITestPlatform {
     name: string;
     platformDetails: platform.IPlatformDetails;
@@ -111,6 +71,7 @@ const testPlatforms: ITestPlatform[] = [
         environmentVars: {
             "ProgramFiles": "C:\\Program Files",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
+            "winddir": "C:\\WINDOWS",
         },
         expectedPowerShellSequence: [
             { exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x64)" },
@@ -149,6 +110,84 @@ const testPlatforms: ITestPlatform[] = [
                 "powershell.exe": "",
             },
             "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+        },
+    },
+    {
+        name: "Windows 64-bit, 64-bit VSCode (only Windows PowerShell)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Windows,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        environmentVars: {
+            "ProgramFiles": "C:\\Program Files",
+            "ProgramFiles(x86)": "C:\\Program Files (x86)",
+            "winddir": "C:\\WINDOWS",
+        },
+        expectedPowerShellSequence: [
+            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
+            { exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+        ],
+        filesystem: {
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+            "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+        },
+    },
+    {
+        name: "Windows 64-bit, 32-bit VSCode (all installations)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Windows,
+            isOS64Bit: true,
+            isProcess64Bit: false,
+        },
+        environmentVars: {
+            "ProgramFiles": "C:\\Program Files",
+            "ProgramFiles(x86)": "C:\\Program Files (x86)",
+            "winddir": "C:\\WINDOWS",
+        },
+        expectedPowerShellSequence: [
+            { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
+            { exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x64)" },
+            {
+                exePath:
+                    "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe\\pwsh.exe",
+                displayName: "PowerShell MSIX",
+            },
+            { exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x86)" },
+            { exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x64)" },
+            { exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
+        ],
+        filesystem: {
+            "C:\\Program Files\\PowerShell": {
+                "6": {
+                    "pwsh.exe": "",
+                },
+                "7-preview": {
+                    "pwsh.exe": "",
+                },
+            },
+            "C:\\Program Files (x86)\\PowerShell": {
+                "6": {
+                    "pwsh.exe": "",
+                },
+                "7-preview": {
+                    "pwsh.exe": "",
+                },
+            },
+            "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
+                "pwsh.exe": "",
+            },
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+            "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0": {
                 "powershell.exe": "",
             },
         },
@@ -273,117 +312,3 @@ suite("Platform module", () => {
         }
     });
 });
-
-/*
-    if (process.platform === "win32") {
-        suite("64-bit Windows, 64-bit VS Code", () => {
-            const platformDetails: platform.IPlatformDetails = {
-                operatingSystem: platform.OperatingSystem.Windows,
-                isOS64Bit: true,
-                isProcess64Bit: true,
-            };
-
-            checkDefaultPowerShellPath(
-                platformDetails,
-                platform.System32PowerShellPath);
-
-            checkAvailableWindowsPowerShellPaths(
-                platformDetails,
-                [
-                    {
-                        displayName: platform.WindowsPowerShell64BitLabel,
-                        exePath: platform.System32PowerShellPath,
-                    },
-                    {
-                        displayName: platform.WindowsPowerShell32BitLabel,
-                        exePath: platform.SysWow64PowerShellPath,
-                    },
-                ]);
-
-            checkFixedWindowsPowerShellpath(
-                platformDetails,
-                platform.SysnativePowerShellPath,
-                platform.System32PowerShellPath);
-        });
-
-        suite("64-bit Windows, 32-bit VS Code", () => {
-            const platformDetails: platform.IPlatformDetails = {
-                operatingSystem: platform.OperatingSystem.Windows,
-                isOS64Bit: true,
-                isProcess64Bit: false,
-            };
-
-            checkDefaultPowerShellPath(
-                platformDetails,
-                platform.System32PowerShellPath);
-
-            checkAvailableWindowsPowerShellPaths(
-                platformDetails,
-                [
-                    {
-                        displayName: platform.WindowsPowerShell32BitLabel,
-                        exePath: platform.System32PowerShellPath,
-                    },
-                    {
-                        displayName: platform.WindowsPowerShell64BitLabel,
-                        exePath: platform.SysnativePowerShellPath,
-                    },
-                ]);
-
-            checkFixedWindowsPowerShellpath(
-                platformDetails,
-                platform.SysWow64PowerShellPath,
-                platform.System32PowerShellPath);
-        });
-
-        suite("32-bit Windows, 32-bit VS Code", () => {
-            const platformDetails: platform.IPlatformDetails = {
-                operatingSystem: platform.OperatingSystem.Windows,
-                isOS64Bit: false,
-                isProcess64Bit: false,
-            };
-
-            checkDefaultPowerShellPath(
-                platformDetails,
-                platform.System32PowerShellPath);
-
-            checkAvailableWindowsPowerShellPaths(
-                platformDetails,
-                [
-                    {
-                        displayName: platform.WindowsPowerShell32BitLabel,
-                        exePath: platform.System32PowerShellPath,
-                    },
-                ]);
-        });
-    }
-
-    if (process.platform === "darwin") {
-        suite("macOS", () => {
-            const platformDetails: platform.IPlatformDetails = {
-                operatingSystem: platform.OperatingSystem.MacOS,
-                isOS64Bit: true,
-                isProcess64Bit: true,
-            };
-
-            checkDefaultPowerShellPath(
-                platformDetails,
-                "/usr/local/bin/pwsh");
-        });
-    }
-
-    if (process.platform === "linux") {
-        suite("linux", () => {
-            const platformDetails: platform.IPlatformDetails = {
-                operatingSystem: platform.OperatingSystem.Linux,
-                isOS64Bit: true,
-                isProcess64Bit: true,
-            };
-
-            checkDefaultPowerShellPath(
-                platformDetails,
-                "/usr/bin/pwsh");
-        });
-    }
-});
-*/
