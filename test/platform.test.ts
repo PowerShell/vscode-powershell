@@ -6,6 +6,7 @@ import * as assert from "assert";
 import * as child_process from "child_process";
 import mockFS = require("mock-fs");
 import FileSystem = require("mock-fs/lib/filesystem");
+import * as path from "path";
 import * as sinon from "sinon";
 import * as platform from "../src/platform";
 
@@ -32,6 +33,8 @@ interface ITestPlatformSuccessCase extends ITestPlatform {
 // Platform configurations where we expect to find a set of PowerShells
 let successTestCases: ITestPlatformSuccessCase[];
 
+const pwshMsixDir = "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
+const pwshMsixPath = path.join(pwshMsixDir, "pwsh.exe");
 if (process.platform === "win32") {
     successTestCases = [
         {
@@ -56,8 +59,7 @@ if (process.platform === "win32") {
                     displayName: "PowerShell (x86)",
                 },
                 {
-                    exePath:
-                        "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe\\pwsh.exe",
+                    exePath: pwshMsixPath,
                     displayName: "PowerShell MSIX",
                 },
                 {
@@ -94,7 +96,7 @@ if (process.platform === "win32") {
                         "pwsh.exe": "",
                     },
                 },
-                "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
+                [pwshMsixDir]: {
                     "pwsh.exe": "",
                 },
                 "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
@@ -158,7 +160,7 @@ if (process.platform === "win32") {
                     displayName: "PowerShell (x64)",
                 },
                 {
-                    exePath: "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe\\pwsh.exe",
+                    exePath: pwshMsixPath,
                     displayName: "PowerShell MSIX",
                 },
                 {
@@ -195,7 +197,7 @@ if (process.platform === "win32") {
                         "pwsh.exe": "",
                     },
                 },
-                "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
+                [pwshMsixDir]: {
                     "pwsh.exe": "",
                 },
                 "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
@@ -496,7 +498,7 @@ suite("Platform module", () => {
                         return child_process.execFileSync(procName, args, options);
                     }
 
-                    return "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
+                    return pwshMsixDir;
                 });
 
                 if (testPlatform.environmentVars) {
@@ -526,7 +528,7 @@ suite("Platform module", () => {
                         return child_process.execFileSync(procName, args, options);
                     }
 
-                    return "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
+                    return pwshMsixDir;
                 });
 
                 if (testPlatform.environmentVars) {
@@ -565,7 +567,7 @@ suite("Platform module", () => {
                         return child_process.execFileSync(procName, args, options);
                     }
 
-                    return "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
+                    return pwshMsixDir;
                 });
 
                 if (testPlatform.environmentVars) {

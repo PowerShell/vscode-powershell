@@ -122,7 +122,8 @@ export class SessionManager implements Middleware {
         try {
             this.powerShellExePath = this.getPowerShellExePath();
         } catch (e) {
-            vscode.window.showErrorMessage("Unable to find PowerShell. Do you have PowerShell installed? See logs for more details.");
+            vscode.window.showErrorMessage(
+                "Unable to find PowerShell. Do you have PowerShell installed? See logs for more details.");
             this.log.writeError(`Unable to find PowerShell executable:\n${e}`);
         }
 
@@ -367,7 +368,8 @@ export class SessionManager implements Middleware {
             }
 
             // Default PowerShell version was configured but we didn't find it
-            this.log.writeWarning(`Could not find powerShellDefaultVersion: '${this.sessionSettings.powerShellDefaultVersion}'`);
+            this.log.writeWarning(
+                `Could not find powerShellDefaultVersion: '${this.sessionSettings.powerShellDefaultVersion}'`);
         }
 
         if (this.sessionSettings.powerShellExePath) {
