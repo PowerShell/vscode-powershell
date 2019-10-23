@@ -409,7 +409,7 @@ export class PowerShellExeFinder {
             highestSeenPreviewNumber = currentPreview;
         }
 
-        const bitness: string = programFilesPath.includes("x84")
+        const bitness: string = programFilesPath.includes("x86")
             ? "(x86)"
             : "(x64)";
 
@@ -528,7 +528,7 @@ export class PowerShellExeFinder {
     }
 
     private findPSCorePreviewSnap(): IPossiblePowerShellExe {
-        return new PSCoreExe(SnapExePath, "PowerShell Preview Snap");
+        return new PSCoreExe(SnapPreviewExePath, "PowerShell Preview Snap");
     }
 
     private findWinPS(options?: { findNonNativeBitness: boolean }): IPossiblePowerShellExe {

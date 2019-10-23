@@ -55,6 +55,7 @@ interface ITestPlatform {
     platformDetails: platform.IPlatformDetails;
     expectedPowerShellSequence: platform.IPowerShellExeDetails[];
     filesystem: FileSystem.DirectoryItems;
+    environmentVars?: Record<string, string>;
 }
 
 const testPlatforms: ITestPlatform[] = [
@@ -69,7 +70,7 @@ const testPlatforms: ITestPlatform[] = [
             { exePath: "/usr/bin/pwsh", displayName: "PowerShell (x64)" },
             { exePath: "/snap/bin/pwsh", displayName: "PowerShell Snap" },
             { exePath: "/usr/bin/pwsh-preview", displayName: "PowerShell Preview (x64)" },
-            { exePath: "/snap/bin/pwsh-preview", displayName: "PowerShell Snap Preview" },
+            { exePath: "/snap/bin/pwsh-preview", displayName: "PowerShell Preview Snap" },
         ],
         filesystem: {
             "/usr/bin": {
@@ -82,9 +83,81 @@ const testPlatforms: ITestPlatform[] = [
             },
         },
     },
+    {
+        name: "MacOS (all installations)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.MacOS,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        expectedPowerShellSequence: [
+            { exePath: "/usr/local/bin/pwsh", displayName: "PowerShell (x64)" },
+            { exePath: "/usr/local/bin/pwsh-preview", displayName: "PowerShell Preview (x64)" },
+        ],
+        filesystem: {
+            "/usr/local/bin": {
+                "pwsh": "",
+                "pwsh-preview": "",
+            },
+        },
+    },
+    {
+        name: "Windows 64-bit, 64-bit VSCode (all installations)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Windows,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        environmentVars: {
+            "ProgramFiles": "C:\\Program Files",
+            "ProgramFiles(x86)": "C:\\Program Files (x86)",
+        },
+        expectedPowerShellSequence: [
+            { exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x64)" },
+            { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
+            {
+                exePath:
+                    "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe\\pwsh.exe",
+                displayName: "PowerShell MSIX",
+            },
+            { exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x64)" },
+            { exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe", displayName: "PowerShell Preview (x86)" },
+            { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
+            { exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
+        ],
+        filesystem: {
+            "C:\\Program Files\\PowerShell": {
+                "6": {
+                    "pwsh.exe": "",
+                },
+                "7-preview": {
+                    "pwsh.exe": "",
+                },
+            },
+            "C:\\Program Files (x86)\\PowerShell": {
+                "6": {
+                    "pwsh.exe": "",
+                },
+                "7-preview": {
+                    "pwsh.exe": "",
+                },
+            },
+            "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe": {
+                "pwsh.exe": "",
+            },
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+            "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
+                "powershell.exe": "",
+            },
+        },
+    },
 ];
 
 suite("Platform module", () => {
+    let tempEnv: NodeJS.ProcessEnv;
+
     suite("PlatformDetails", () => {
         const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
         switch (process.platform) {
@@ -111,7 +184,12 @@ suite("Platform module", () => {
     });
 
     suite("Default PowerShell installation", () => {
+        setup(() => {
+            tempEnv = Object.assign({}, process.env);
+        });
+
         teardown(() => {
+            process.env = tempEnv;
             sinon.restore();
             mockFS.restore();
         });
@@ -119,6 +197,22 @@ suite("Platform module", () => {
         for (const testPlatform of testPlatforms) {
             test(`Default PowerShell path on ${testPlatform.name}`, () => {
                 mockFS(testPlatform.filesystem);
+
+                // The type inference here is wrong, so we need typescript to ignore it
+                // @ts-ignore
+                sinon.stub(child_process, "execFileSync").callsFake((procName, args?, options?) => {
+                    if (!procName.includes("powershell")) {
+                        return child_process.execFileSync(procName, args, options);
+                    }
+
+                    return "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
+                });
+
+                if (testPlatform.environmentVars) {
+                    for (const envVar of Object.keys(testPlatform.environmentVars)) {
+                        process.env[envVar] = testPlatform.environmentVars[envVar];
+                    }
+                }
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
@@ -132,7 +226,12 @@ suite("Platform module", () => {
     });
 
     suite("Expected PowerShell installation list", () => {
+        setup(() => {
+            tempEnv = Object.assign({}, process.env);
+        });
+
         teardown(() => {
+            process.env = tempEnv;
             sinon.restore();
             mockFS.restore();
         });
@@ -141,19 +240,35 @@ suite("Platform module", () => {
             test(`PowerShell installation list on ${testPlatform.name}`, () => {
                 mockFS(testPlatform.filesystem);
 
+                // The type inference here is wrong, so we need typescript to ignore it
+                // @ts-ignore
+                sinon.stub(child_process, "execFileSync").callsFake((procName, args?, options?) => {
+                    if (!procName.includes("powershell")) {
+                        return child_process.execFileSync(procName, args, options);
+                    }
+
+                    return "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
+                });
+
+                if (testPlatform.environmentVars) {
+                    for (const envVar of Object.keys(testPlatform.environmentVars)) {
+                        process.env[envVar] = testPlatform.environmentVars[envVar];
+                    }
+                }
+
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
                 const foundPowerShells = powerShellExeFinder.getAllAvailablePowerShellInstallations();
 
-                assert.strictEqual(foundPowerShells.length, testPlatform.expectedPowerShellSequence.length);
-
-                for (let i = 0; i < foundPowerShells.length; i++) {
+                for (let i = 0; i < testPlatform.expectedPowerShellSequence.length; i++) {
                     const foundPowerShell = foundPowerShells[i];
                     const expectedPowerShell = testPlatform.expectedPowerShellSequence[i];
 
-                    assert.strictEqual(foundPowerShell.exePath, expectedPowerShell.exePath);
-                    assert.strictEqual(foundPowerShell.displayName, expectedPowerShell.displayName);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell.exePath);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell.displayName);
                 }
+
+                assert.strictEqual(foundPowerShells.length, testPlatform.expectedPowerShellSequence.length);
             });
         }
     });
