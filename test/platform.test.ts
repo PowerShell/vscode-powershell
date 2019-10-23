@@ -9,15 +9,28 @@ import FileSystem = require("mock-fs/lib/filesystem");
 import * as sinon from "sinon";
 import * as platform from "../src/platform";
 
+/**
+ * Describes a platform on which the PowerShell extension should work,
+ * including the test conditions (filesystem, environment variables),
+ * and the expected PowerShell installations the extension will resolve.
+ * The default PowerShell is the first installation.
+ */
 interface ITestPlatform {
     name: string;
     platformDetails: platform.IPlatformDetails;
-    expectedPowerShellSequence: platform.IPowerShellExeDetails[];
     filesystem: FileSystem.DirectoryItems;
     environmentVars?: Record<string, string>;
 }
 
-const testPlatforms: ITestPlatform[] = [
+interface ITestPlatformSuccessCase extends ITestPlatform {
+    expectedPowerShellSequence: platform.IPowerShellExeDetails[];
+}
+
+interface ITestPlatformFailureCase extends ITestPlatform {
+    error: string;
+}
+
+const successTestCases: ITestPlatformSuccessCase[] = [
     {
         name: "Linux (all installations)",
         platformDetails: {
@@ -70,7 +83,7 @@ const testPlatforms: ITestPlatform[] = [
         environmentVars: {
             "ProgramFiles": "C:\\Program Files",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "winddir": "C:\\WINDOWS",
+            "windir": "C:\\WINDOWS",
         },
         expectedPowerShellSequence: [
             { exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x64)" },
@@ -123,7 +136,7 @@ const testPlatforms: ITestPlatform[] = [
         environmentVars: {
             "ProgramFiles": "C:\\Program Files",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "winddir": "C:\\WINDOWS",
+            "windir": "C:\\WINDOWS",
         },
         expectedPowerShellSequence: [
             { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x64)" },
@@ -148,7 +161,7 @@ const testPlatforms: ITestPlatform[] = [
         environmentVars: {
             "ProgramFiles": "C:\\Program Files (x86)",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "winddir": "C:\\WINDOWS",
+            "windir": "C:\\WINDOWS",
         },
         expectedPowerShellSequence: [
             { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
@@ -201,7 +214,7 @@ const testPlatforms: ITestPlatform[] = [
         environmentVars: {
             "ProgramFiles": "C:\\Program Files (x86)",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "winddir": "C:\\WINDOWS",
+            "windir": "C:\\WINDOWS",
         },
         expectedPowerShellSequence: [
             { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
@@ -226,7 +239,7 @@ const testPlatforms: ITestPlatform[] = [
         environmentVars: {
             "ProgramFiles": "C:\\Program Files (x86)",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "winddir": "C:\\WINDOWS",
+            "windir": "C:\\WINDOWS",
         },
         expectedPowerShellSequence: [
             { exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe", displayName: "PowerShell (x86)" },
@@ -257,7 +270,7 @@ const testPlatforms: ITestPlatform[] = [
         environmentVars: {
             "ProgramFiles": "C:\\Program Files (x86)",
             "ProgramFiles(x86)": "C:\\Program Files (x86)",
-            "winddir": "C:\\WINDOWS",
+            "windir": "C:\\WINDOWS",
         },
         expectedPowerShellSequence: [
             { exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", displayName: "Windows PowerShell (x86)" },
@@ -318,6 +331,29 @@ const testPlatforms: ITestPlatform[] = [
     },
 ];
 
+const errorTestCases: ITestPlatformFailureCase[] = [
+    {
+        name: "Linux (no PowerShell)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.Linux,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        filesystem: {},
+        error: "Bad",
+    },
+    {
+        name: "MacOS (no PowerShell)",
+        platformDetails: {
+            operatingSystem: platform.OperatingSystem.MacOS,
+            isOS64Bit: true,
+            isProcess64Bit: true,
+        },
+        filesystem: {},
+        error: "Bad",
+    },
+];
+
 suite("Platform module", () => {
     let tempEnv: NodeJS.ProcessEnv;
 
@@ -357,7 +393,7 @@ suite("Platform module", () => {
             mockFS.restore();
         });
 
-        for (const testPlatform of testPlatforms) {
+        for (const testPlatform of successTestCases) {
             test(`Default PowerShell path on ${testPlatform.name}`, () => {
                 mockFS(testPlatform.filesystem);
 
@@ -386,6 +422,38 @@ suite("Platform module", () => {
                 assert.strictEqual(defaultPowerShell.displayName, expectedPowerShell.displayName);
             });
         }
+
+        for (const testPlatform of errorTestCases) {
+            test(`Extension startup fails gracefully on ${testPlatform.name}`, () => {
+                mockFS(testPlatform.filesystem);
+
+                // The type inference here is wrong, so we need typescript to ignore it
+                // @ts-ignore
+                sinon.stub(child_process, "execFileSync").callsFake((procName, args?, options?) => {
+                    if (!procName.includes("powershell")) {
+                        return child_process.execFileSync(procName, args, options);
+                    }
+
+                    return "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
+                });
+
+                if (testPlatform.environmentVars) {
+                    for (const envVar of Object.keys(testPlatform.environmentVars)) {
+                        process.env[envVar] = testPlatform.environmentVars[envVar];
+                    }
+                }
+
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+
+                let error;
+                try {
+                    const defaultPowerShell = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                    error = defaultPowerShell;
+                } catch (e) {
+                    error = e;
+                }
+            });
+        }
     });
 
     suite("Expected PowerShell installation list", () => {
@@ -399,7 +467,7 @@ suite("Platform module", () => {
             mockFS.restore();
         });
 
-        for (const testPlatform of testPlatforms) {
+        for (const testPlatform of successTestCases) {
             test(`PowerShell installation list on ${testPlatform.name}`, () => {
                 mockFS(testPlatform.filesystem);
 
