@@ -89,7 +89,7 @@ export class PowerShellExeFinder {
     // PSCore version table
     private readonly pwshWindowsInstallationsVal:
         Lazy<{ stable: IPossiblePowerShellExe, preview: IPossiblePowerShellExe }>;
-    private readonly pwsh32WindowsInstallationsVal:
+    private readonly pwshAlternateBitnessWindowsInstallationsVal:
         Lazy<{ stable: IPossiblePowerShellExe, preview: IPossiblePowerShellExe }>;
 
     // PowerShell 6+ installation
@@ -97,8 +97,8 @@ export class PowerShellExeFinder {
     private readonly previewPwshExeVal: Lazy<IPossiblePowerShellExe>;
 
     // 32-bit PowerShell 6+ installation
-    private readonly stable32BitPwshExeVal: Lazy<IPossiblePowerShellExe>;
-    private readonly preview32BitPwshExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly stableAlternateBitnessPwshExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly previewAlternateBitnessPwshExeVal: Lazy<IPossiblePowerShellExe>;
 
     // .NET Global Tool pwsh installation
     private readonly dotnetGlobalToolExeVal: Lazy<IPossiblePowerShellExe>;
@@ -111,10 +111,10 @@ export class PowerShellExeFinder {
     private readonly previewSnapExeVal: Lazy<IPossiblePowerShellExe>;
 
     // Windows PowerShell installations
-    private readonly sys32WinPSExeVal: Lazy<IPossiblePowerShellExe>;
-    private readonly sysWow64WinPSExeVal: Lazy<IPossiblePowerShellExe>;
-    private readonly sysNativeWinPSExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly winPSExeVal: Lazy<IPossiblePowerShellExe>;
+    private readonly alternateBitnessWinPSExeVal: Lazy<IPossiblePowerShellExe>;
 
+    // Additional configured PowerShells
     private readonly additionalPSExeSettings: Iterable<Settings.IPowerShellAdditionalExePathSettings>;
 
     /**
@@ -130,20 +130,19 @@ export class PowerShellExeFinder {
         this.additionalPSExeSettings = additionalPowerShellExes || [];
 
         this.pwshWindowsInstallationsVal = new Lazy(() => this.findPSCoreWindowsInstallations());
-        this.pwsh32WindowsInstallationsVal = new Lazy(
-            () => this.findPSCoreWindowsInstallations({ find32Bit: true }));
+        this.pwshAlternateBitnessWindowsInstallationsVal = new Lazy(
+            () => this.findPSCoreWindowsInstallations({ findNonNativeBitness: true }));
 
-        this.stablePwshExeVal       = new Lazy(() => this.findPSCoreStable());
-        this.stable32BitPwshExeVal  = new Lazy(() => this.findPSCore32BitStable());
-        this.preview32BitPwshExeVal = new Lazy(() => this.findPSCore32BitPreview());
-        this.previewPwshExeVal      = new Lazy(() => this.findPSCorePreview());
-        this.dotnetGlobalToolExeVal = new Lazy(() => this.findPSCoreDotnetGlobalTool());
-        this.msixExeVal             = new Lazy(() => this.findPSCoreMsix());
-        this.stableSnapExeVal       = new Lazy(() => this.findPSCoreStableSnap());
-        this.previewSnapExeVal      = new Lazy(() => this.findPSCorePreviewSnap());
-        this.sys32WinPSExeVal       = new Lazy(() => this.findSys32WinPS());
-        this.sysWow64WinPSExeVal    = new Lazy(() => this.findSysWow64WinPS());
-        this.sysNativeWinPSExeVal   = new Lazy(() => this.findSysNativeWinPS());
+        this.stablePwshExeVal                  = new Lazy(() => this.findPSCoreStable());
+        this.stableAlternateBitnessPwshExeVal  = new Lazy(() => this.findPSCoreAlternateBitnessStable());
+        this.previewAlternateBitnessPwshExeVal = new Lazy(() => this.findPSCoreAlternateBitnessPreview());
+        this.previewPwshExeVal                 = new Lazy(() => this.findPSCorePreview());
+        this.dotnetGlobalToolExeVal            = new Lazy(() => this.findPSCoreDotnetGlobalTool());
+        this.msixExeVal                        = new Lazy(() => this.findPSCoreMsix());
+        this.stableSnapExeVal                  = new Lazy(() => this.findPSCoreStableSnap());
+        this.previewSnapExeVal                 = new Lazy(() => this.findPSCorePreviewSnap());
+        this.winPSExeVal                       = new Lazy(() => this.findWinPS());
+        this.alternateBitnessWinPSExeVal       = new Lazy(() => this.findWinPS({ findNonNativeBitness: true }));
     }
 
     /**
@@ -163,19 +162,21 @@ export class PowerShellExeFinder {
     }
 
     /**
-     * The stable 32-bit PowerShell 6+ installation.
+     * The stable non-process-native bitness PowerShell 6+ installation.
+     * This means 32-bit in a 64-bit process, and vice versa.
      * May be null if the installation directory is not present
      */
-    private get pwsh32Stable(): IPossiblePowerShellExe {
-        return this.stable32BitPwshExeVal.value;
+    private get pwshAlternateBitnessStable(): IPossiblePowerShellExe {
+        return this.stableAlternateBitnessPwshExeVal.value;
     }
 
     /**
-     * The preview 32-bit PowerShell 6+ installation.
+     * The preview non-process-native bitness PowerShell 6+ installation.
+     * This means 32-bit in a 64-bit process, and vice versa.
      * May be null if the installation directory is not present.
      */
-    private get pwsh32Preview(): IPossiblePowerShellExe {
-        return this.preview32BitPwshExeVal.value;
+    private get pwshAlternateBitnessPreview(): IPossiblePowerShellExe {
+        return this.previewAlternateBitnessPwshExeVal.value;
     }
 
     /**
@@ -211,23 +212,16 @@ export class PowerShellExeFinder {
      * The Windows PowerShell installation under the %windir%\System32 folder.
      * This always exists.
      */
-    private get sys32WinPS(): IPossiblePowerShellExe {
-        return this.sys32WinPSExeVal.value;
+    private get winPS(): IPossiblePowerShellExe {
+        return this.winPSExeVal.value;
     }
 
     /**
-     * The 32-bit Windows PowerShell installation when running in a 64-bit process.
+     * On 64-bit Windows, refers to the Windows PowerShell installation
+     * not native to the current process' bitness.
      */
-    private get sysWoW64WinPS(): IPossiblePowerShellExe {
-        return this.sysWow64WinPSExeVal.value;
-    }
-
-    /**
-     * The 64-bit Windows PowerShell installation when running
-     * in a 32-bit process on a 64-bit Windows.
-     */
-    private get sysnativeWinPS(): IPossiblePowerShellExe {
-        return this.sysNativeWinPSExeVal.value;
+    private get alternateBitnessWinPS(): IPossiblePowerShellExe {
+        return this.alternateBitnessWinPSExeVal.value;
     }
 
     /**
@@ -283,8 +277,8 @@ export class PowerShellExeFinder {
         switch (this.platformDetails.operatingSystem) {
             case OperatingSystem.Windows:
                 // Windows may have a 32-bit pwsh.exe
-                if (this.pwsh32Stable) {
-                    yield this.pwsh32Stable;
+                if (this.pwshAlternateBitnessStable) {
+                    yield this.pwshAlternateBitnessStable;
                 }
                 // Also look for the MSIX/UWP installation
                 if (this.pwshMsix) {
@@ -317,23 +311,21 @@ export class PowerShellExeFinder {
                 yield this.pwshSnapPreview;
                 break;
 
-            // Finally, on Windows, get Windows PowerShell
             case OperatingSystem.Windows:
-                if (this.pwsh32Preview) {
-                    yield this.pwsh32Preview;
+                // Look for pwsh-preview with the opposite bitness
+                if (this.pwshAlternateBitnessPreview) {
+                    yield this.pwshAlternateBitnessPreview;
                 }
-                // Get the natural Windows PowerShell for the process bitness
-                yield this.sys32WinPS;
 
-                if (this.platformDetails.isProcess64Bit) {
-                    // If this is a 64-bit process (which must be on a 64-bit OS),
-                    // look for a 32-bit in SysWoW WinPS as well
-                    yield this.sysWoW64WinPS;
-                } else if (this.platformDetails.isOS64Bit) {
-                    // If this is a 32-bit process on a 64-bit operating system,
-                    // look for the the system-native 64-bit WinPS too
-                    yield this.sysnativeWinPS;
+                // Finally, get Windows PowerShell
+
+                // Get the natural Windows PowerShell for the process bitness
+                yield this.winPS;
+
+                if (this.alternateBitnessWinPS) {
+                    yield this.alternateBitnessWinPS;
                 }
+
                 break;
         }
     }
@@ -348,14 +340,11 @@ export class PowerShellExeFinder {
         }
     }
 
-    private findPSCoreWindowsInstallations(options?: { find32Bit: boolean }):
+    private findPSCoreWindowsInstallations(options?: { findNonNativeBitness?: boolean }):
             { stable: IPossiblePowerShellExe | null, preview: IPossiblePowerShellExe | null } | null {
 
-        const find32Bit: boolean = options && options.find32Bit;
-
-        const programFilesPath: string = find32Bit
-            ? process.env["ProgramFiles(x86)"]
-            : process.env.ProgramFiles;
+        const programFilesPath: string = this.getProgramFilesPath(
+            { useAlternateBitness: options && options.findNonNativeBitness });
 
         const powerShellInstallBaseDir = path.join(programFilesPath, "PowerShell");
 
@@ -420,7 +409,7 @@ export class PowerShellExeFinder {
             highestSeenPreviewNumber = currentPreview;
         }
 
-        const bitness: string = find32Bit
+        const bitness: string = programFilesPath.includes("x84")
             ? "(x86)"
             : "(x64)";
 
@@ -428,6 +417,42 @@ export class PowerShellExeFinder {
             stable: stablePath && new PSCoreExe(stablePath, `PowerShell ${bitness}`, { knownToExist: true }),
             preview: previewPath && new PSCoreExe(previewPath, `PowerShell Preview ${bitness}`, { knownToExist: true }),
         };
+    }
+
+    private getProgramFilesPath(options?: { useAlternateBitness?: boolean }): string | null {
+        if (!options || !options.useAlternateBitness) {
+            return process.env.ProgramFiles;
+        }
+
+        if (this.platformDetails.isProcess64Bit) {
+            return process.env["ProgramFiles(x86)"];
+        }
+
+        if (this.platformDetails.isOS64Bit) {
+            return process.env.ProgramW6432;
+        }
+
+        // We're a 32-bit process on 32-bit Windows, there is no other Program Files dir
+        return null;
+    }
+
+    private getSystem32Path(options?: { useAlternateBitness?: boolean }): string | null {
+        const windir: string = process.env.windir;
+
+        if (!options || !options.useAlternateBitness) {
+            return path.join(windir, "System32");
+        }
+
+        if (this.platformDetails.isProcess64Bit) {
+            return path.join(windir, "SysWOW64");
+        }
+
+        if (this.platformDetails.isOS64Bit) {
+            return path.join(windir, "Sysnative");
+        }
+
+        // We're on a 32-bit Windows, so no alternate bitness
+        return null;
     }
 
     private findAdditionalPwshExe(additionalPwshSetting: Settings.IPowerShellAdditionalExePathSettings) {
@@ -464,14 +489,14 @@ export class PowerShellExeFinder {
         }
     }
 
-    private findPSCore32BitStable(): IPossiblePowerShellExe {
-        return this.pwsh32WindowsInstallationsVal.value
-            && this.pwsh32WindowsInstallationsVal.value.stable;
+    private findPSCoreAlternateBitnessStable(): IPossiblePowerShellExe {
+        return this.pwshAlternateBitnessWindowsInstallationsVal.value
+            && this.pwshAlternateBitnessWindowsInstallationsVal.value.stable;
     }
 
-    private findPSCore32BitPreview(): IPossiblePowerShellExe {
-        return this.pwsh32WindowsInstallationsVal.value
-            && this.pwsh32WindowsInstallationsVal.value.preview;
+    private findPSCoreAlternateBitnessPreview(): IPossiblePowerShellExe {
+        return this.pwshAlternateBitnessWindowsInstallationsVal.value
+            && this.pwshAlternateBitnessWindowsInstallationsVal.value.preview;
     }
 
     private findPSCoreDotnetGlobalTool(): IPossiblePowerShellExe {
@@ -485,7 +510,7 @@ export class PowerShellExeFinder {
     }
 
     private findPSCoreMsix(): IPossiblePowerShellExe {
-        const winPSPath: string = this.findSys32WinPS().exePath;
+        const winPSPath: string = this.findWinPS().exePath;
         const msixDir: string = child_process.execFileSync(winPSPath, ["-c", "(Get-AppxPackage -Name Microsoft.PowerShell).InstallLocation"])
             .toString()
             .trim();
@@ -506,25 +531,26 @@ export class PowerShellExeFinder {
         return new PSCoreExe(SnapExePath, "PowerShell Preview Snap");
     }
 
-    private findSys32WinPS(): IPossiblePowerShellExe {
-        const displayName: string = this.platformDetails.isProcess64Bit
-            ? WindowsPowerShell64BitLabel
-            : WindowsPowerShell32BitLabel;
+    private findWinPS(options?: { findNonNativeBitness: boolean }): IPossiblePowerShellExe {
+        const useAlternateBitness: boolean = options && options.findNonNativeBitness;
 
-        return new WinPSExe(
-            System32PowerShellPath,
-            displayName,
-            { knownToExist: true });
-    }
+        const systemFolderPath: string = this.getSystem32Path({ useAlternateBitness });
+        const winPSPath = path.join(systemFolderPath, "WindowsPowerShell", "v1.0", "powershell.exe");
 
-    private findSysWow64WinPS(): IPossiblePowerShellExe {
-        return new WinPSExe(WinPS32BitPathOn64Bit, WindowsPowerShell32BitLabel);
-    }
+        let displayName: string;
+        if (this.platformDetails.isProcess64Bit) {
+            displayName = useAlternateBitness
+                ? WindowsPowerShell32BitLabel
+                : WindowsPowerShell64BitLabel;
+        } else if (this.platformDetails.isOS64Bit) {
+            displayName = useAlternateBitness
+                ? WindowsPowerShell64BitLabel
+                : WindowsPowerShell32BitLabel;
+        } else {
+            displayName = WindowsPowerShell32BitLabel;
+        }
 
-    private findSysNativeWinPS(): IPossiblePowerShellExe {
-        return new WinPSExe(
-            WinPS64BitPathOn32Bit,
-            WindowsPowerShell64BitLabel);
+        return new WinPSExe(winPSPath, displayName, { knownToExist: !useAlternateBitness });
     }
 }
 
