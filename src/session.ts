@@ -23,7 +23,7 @@ import {
 
 import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./features/UpdatePowerShell";
 import {
-    fixWindowsPowerShellPath, getPlatformDetails, IPlatformDetails,
+    getPlatformDetails, IPlatformDetails,
     OperatingSystem, PowerShellExeFinder } from "./platform";
 
 export enum SessionStatus {
@@ -252,9 +252,8 @@ export class SessionManager implements Middleware {
         if (powerShellExePath) {
             if (this.platformDetails.operatingSystem === OperatingSystem.Windows) {
                 // Check the path bitness
-                const fixedPath = fixWindowsPowerShellPath(
-                    powerShellExePath,
-                    this.platformDetails);
+                const fixedPath = this.powershellExeFinder.fixWindowsPowerShellPath(
+                    powerShellExePath);
 
                 if (fixedPath !== powerShellExePath) {
                     // Show deprecation message with fix action.

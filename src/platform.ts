@@ -9,15 +9,8 @@ import * as path from "path";
 import * as process from "process";
 import * as Settings from "./settings";
 
-export const System32PowerShellPath = getWindowsSystemPowerShellPath("System32");
-export const SysnativePowerShellPath = getWindowsSystemPowerShellPath("Sysnative");
-export const SysWow64PowerShellPath = getWindowsSystemPowerShellPath("SysWow64");
-
-export const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
-export const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
-
-const WinPS64BitPathOn32Bit = SysnativePowerShellPath.toLocaleLowerCase();
-const WinPS32BitPathOn64Bit = SysWow64PowerShellPath.toLocaleLowerCase();
+const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
+const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
 
 const LinuxExePath        = "/usr/bin/pwsh";
 const LinuxPreviewExePath = "/usr/bin/pwsh-preview";
@@ -238,6 +231,21 @@ export class PowerShellExeFinder {
      */
     public getAllAvailablePowerShellInstallations(): IPowerShellExeDetails[] {
         return Array.from(this.enumeratePowerShellInstallations());
+    }
+
+    /**
+     * Fixes PowerShell paths when Windows PowerShell is set to the non-native bitness.
+     * @param configuredPowerShellPath the PowerShell path configured by the user.
+     */
+    public fixWindowsPowerShellPath(configuredPowerShellPath: string): string {
+        const lowerConfiguredPath = configuredPowerShellPath.toLocaleLowerCase();
+        const lowerAltWinPSPath = this.alternateBitnessWinPS.exePath.toLocaleLowerCase();
+
+        if (lowerConfiguredPath === lowerAltWinPSPath) {
+            return this.winPS.exePath;
+        }
+
+        return configuredPowerShellPath;
     }
 
     /**
@@ -561,18 +569,6 @@ export function getWindowsSystemPowerShellPath(systemFolderName: string) {
         "WindowsPowerShell",
         "v1.0",
         "powershell.exe");
-}
-
-export function fixWindowsPowerShellPath(powerShellExePath: string, platformDetails: IPlatformDetails): string {
-    const lowerCasedPath = powerShellExePath.toLocaleLowerCase();
-
-    if ((platformDetails.isProcess64Bit && (lowerCasedPath === WinPS64BitPathOn32Bit)) ||
-        (!platformDetails.isProcess64Bit && (lowerCasedPath === WinPS32BitPathOn64Bit))) {
-            return System32PowerShellPath;
-    }
-
-    // If the path doesn't need to be fixed, return the original
-    return powerShellExePath;
 }
 
 interface IPossiblePowerShellExe extends IPowerShellExeDetails {

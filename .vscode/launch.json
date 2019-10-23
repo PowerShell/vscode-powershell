@@ -34,10 +34,10 @@
 			"outFiles": ["${workspaceRoot}/out/test/**/*.js"],
 			"preLaunchTask": "Build",
 			"skipFiles": [
-				"${workspaceFolder}/node_modules/**/*.js",
-				"${workspaceFolder}/lib/**/*.js",
-				"/private/var/folders/**/*.js",
-				"<node_internals>/**/*.js"
+				"${workspaceFolder}/node_modules/**/*",
+				"${workspaceFolder}/lib/**/*",
+				"/private/var/folders/**/*",
+				"<node_internals>/**/*"
 			]
 		},
 		{
