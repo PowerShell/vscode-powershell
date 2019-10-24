@@ -183,7 +183,7 @@ Logs provide context for what was happening when the issue occurred.
 #### Provide Language Server Protocol payload logs
 
 The PowerShell extension works mostly from sending and receiving messages from [PowerShell Editor Services](httos://github.com/PowerShell/PowerShellEditorServices).
-If we need more information, we may ask to see the payloads of these messages. To do this:
+In some cases, getting to the bottom of a bug will require looking at the payloads of these messages. To do this:
 
 - Add the following setting to your settings file:
 
