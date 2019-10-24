@@ -273,7 +273,8 @@ export class SessionManager implements Middleware {
         }
 
         // No need to resolve this path, since the finder guarantees its existence
-        return this.powershellExeFinder.getFirstAvailablePowerShellInstallation() || null;
+        const firstPowerShell = this.powershellExeFinder.getFirstAvailablePowerShellInstallation();
+        return firstPowerShell && firstPowerShell.exePath || null;
     }
 
     // ----- LanguageClient middleware methods -----
