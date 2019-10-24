@@ -7,7 +7,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as process from "process";
-import * as Settings from "./settings";
+import { IPowerShellAdditionalExePathSettings } from "./settings";
 
 const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
 const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
@@ -108,7 +108,7 @@ export class PowerShellExeFinder {
     private readonly alternateBitnessWinPSExeVal: Lazy<IPossiblePowerShellExe>;
 
     // Additional configured PowerShells
-    private readonly additionalPSExeSettings: Iterable<Settings.IPowerShellAdditionalExePathSettings>;
+    private readonly additionalPSExeSettings: Iterable<IPowerShellAdditionalExePathSettings>;
 
     /**
      * Create a new PowerShellFinder object to discover PowerShell installations.
@@ -117,7 +117,7 @@ export class PowerShellExeFinder {
      */
     constructor(
         platformDetails?: IPlatformDetails,
-        additionalPowerShellExes?: Iterable<Settings.IPowerShellAdditionalExePathSettings>) {
+        additionalPowerShellExes?: Iterable<IPowerShellAdditionalExePathSettings>) {
 
         this.platformDetails = platformDetails || getPlatformDetails();
         this.additionalPSExeSettings = additionalPowerShellExes || [];
@@ -463,7 +463,7 @@ export class PowerShellExeFinder {
         return null;
     }
 
-    private findAdditionalPwshExe(additionalPwshSetting: Settings.IPowerShellAdditionalExePathSettings) {
+    private findAdditionalPwshExe(additionalPwshSetting: IPowerShellAdditionalExePathSettings) {
         return new PSCoreExe(
             additionalPwshSetting.exePath,
             additionalPwshSetting.versionName);

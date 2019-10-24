@@ -122,15 +122,18 @@ export class SessionManager implements Middleware {
         try {
             this.powerShellExePath = this.getPowerShellExePath();
         } catch (e) {
-            vscode.window.showErrorMessage(
-                "Unable to find PowerShell. Do you have PowerShell installed? See logs for more details.");
             this.log.writeError(`Unable to find PowerShell executable:\n${e}`);
         }
 
         this.suppressRestartPrompt = false;
 
         if (!this.powerShellExePath) {
-            this.setSessionFailure("PowerShell could not be started, click 'Show Logs' for more details.");
+            this.setSessionFailure(
+                "Unable to find PowerShell."
+                + " Do you have PowerShell installed?"
+                + " To get PowerShell, go to https://aka.ms/get-powershell."
+                + " Click 'Show Logs' for more details.");
+            return;
         }
 
         this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
@@ -275,7 +278,6 @@ export class SessionManager implements Middleware {
             return firstAvailablePwsh.exePath;
         }
 
-        this.setSessionFailure("Unable to find PowerShell installation, see logs for more details");
         return null;
     }
 
