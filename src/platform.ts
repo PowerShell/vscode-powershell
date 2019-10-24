@@ -59,15 +59,6 @@ export function getPlatformDetails(): IPlatformDetails {
     };
 }
 
-export class PowerShellNotFoundError extends Error {
-    public readonly powershellPath: string;
-
-    constructor(powershellPath: string) {
-        super(`Unable to find PowerShell installation at path '${powershellPath}'`);
-        this.powershellPath = powershellPath;
-    }
-}
-
 /**
  * Class to lazily find installed PowerShell executables on a machine.
  * When given a list of additional PowerShell executables,
