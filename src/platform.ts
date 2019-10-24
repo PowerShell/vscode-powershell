@@ -510,7 +510,12 @@ export class PowerShellExeFinder {
 
     private findPSCoreMsix(): IPossiblePowerShellExe {
         const winPSPath: string = this.findWinPS().exePath;
-        const winPSArgs = ["-c", "(Get-AppxPackage -Name Microsoft.PowerShell).InstallLocation"];
+        const winPSArgs = [
+            "-nologo",
+            "-noprofile",
+            "-c",
+            "(Get-AppxPackage -Name Microsoft.PowerShell).InstallLocation",
+        ];
         const msixDir: string = child_process.execFileSync(winPSPath, winPSArgs)
             .toString()
             .trim();
