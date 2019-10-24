@@ -8,7 +8,7 @@ import { LanguageClient, NotificationType, RequestType } from "vscode-languagecl
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
 
-export const ExpandAliasRequestType = new RequestType<string, any, void, void>("powerShell/expandAlias");
+export const ExpandAliasRequestType = new RequestType<any, any, void, void>("powerShell/expandAlias");
 
 export class ExpandAliasFeature implements IFeature {
     private command: vscode.Disposable;
@@ -39,9 +39,9 @@ export class ExpandAliasFeature implements IFeature {
                 range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
             }
 
-            this.languageClient.sendRequest(ExpandAliasRequestType, text).then((result) => {
+            this.languageClient.sendRequest(ExpandAliasRequestType, { text }).then((result) => {
                 editor.edit((editBuilder) => {
-                    editBuilder.replace(range, result);
+                    editBuilder.replace(range, result.text);
                 });
             });
         });

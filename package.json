@@ -50,7 +50,7 @@
     "@types/mocha": "~5.2.7",
     "@types/mock-fs": "~4.10.0",
     "@types/node": "~10.11.0",
-    "@types/node-fetch": "~2.5.0",
+    "@types/node-fetch": "^2.5.2",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~6.0.2",
     "@types/sinon": "~7.5.0",
@@ -62,7 +62,7 @@
     "sinon": "~7.5.0",
     "tslint": "~5.20.0",
     "typescript": "~3.5.3",
-    "vsce": "~1.66.0",
+    "vsce": "~1.67.1",
     "vscode": "~1.1.36"
   },
   "extensionDependencies": [
@@ -166,9 +166,22 @@
         "category": "PowerShell"
       },
       {
+        "command": "workbench.action.debug.start",
+        "title": "Run",
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/run.svg",
+          "dark": "resources/dark/run.svg"
+        }
+      },
+      {
         "command": "PowerShell.RunSelection",
         "title": "Run Selection",
-        "category": "PowerShell"
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/play.svg",
+          "dark": "resources/dark/play.svg"
+        }
       },
       {
         "command": "PowerShell.RestartSession",
@@ -239,6 +252,11 @@
         "command": "PowerShell.OpenExamplesFolder",
         "title": "Open Examples Folder",
         "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.InvokeRegisteredEditorCommand",
+        "title": "Invoke Registered Editor Command",
+        "category": "PowerShell"
       }
     ],
     "menus": {
@@ -250,6 +268,10 @@
         {
           "command": "PowerShell.RefreshCommandsExplorer",
           "when": "config.powershell.sideBar.CommandExplorerVisibility"
+        },
+        {
+          "command": "PowerShell.InvokeRegisteredEditorCommand",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -262,6 +284,18 @@
           "when": "editorLangId == powershell",
           "command": "PowerShell.ShowHelp",
           "group": "2_powershell"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceLangId == powershell",
+          "command": "workbench.action.debug.start",
+          "group": "navigation@100"
+        },
+        {
+          "when": "resourceLangId == powershell",
+          "command": "PowerShell.RunSelection",
+          "group": "navigation@101"
         }
       ],
       "editor/title/context": [

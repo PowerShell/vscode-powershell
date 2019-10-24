@@ -16,7 +16,6 @@ import { DebugSessionFeature } from "./features/DebugSession";
 import { PickPSHostProcessFeature } from "./features/DebugSession";
 import { PickRunspaceFeature } from "./features/DebugSession";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
-import { DocumentFormatterFeature } from "./features/DocumentFormatter";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
@@ -155,7 +154,6 @@ export function activate(context: vscode.ExtensionContext): void {
         new SelectPSSARulesFeature(logger),
         new CodeActionsFeature(logger),
         new NewFileOrProjectFeature(),
-        new DocumentFormatterFeature(logger, documentSelector),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager),
         new PickPSHostProcessFeature(),
