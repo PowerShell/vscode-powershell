@@ -516,9 +516,15 @@ export class PowerShellExeFinder {
             "-c",
             "(Get-AppxPackage -Name Microsoft.PowerShell).InstallLocation",
         ];
-        const msixDir: string = child_process.execFileSync(winPSPath, winPSArgs)
-            .toString()
-            .trim();
+
+        let msixDir: string;
+        try {
+            msixDir = child_process.execFileSync(winPSPath, winPSArgs)
+                .toString()
+                .trim();
+        } catch {
+            // Do nothing
+        }
 
         if (!msixDir) {
             return null;

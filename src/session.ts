@@ -122,17 +122,23 @@ export class SessionManager implements Middleware {
         try {
             this.powerShellExePath = this.getPowerShellExePath();
         } catch (e) {
-            this.log.writeError(`Unable to find PowerShell executable:\n${e}`);
+            this.log.writeError(`Error occurred while searching for a PowerShell executable:\n${e}`);
         }
 
         this.suppressRestartPrompt = false;
 
         if (!this.powerShellExePath) {
-            this.setSessionFailure(
-                "Unable to find PowerShell."
+            const message = "Unable to find PowerShell."
                 + " Do you have PowerShell installed?"
-                + " To get PowerShell, go to https://aka.ms/get-powershell."
-                + " Click 'Show Logs' for more details.");
+                + " You can also set the 'powershell.powerShellAdditionalExePaths' configuration.";
+
+            this.log.writeAndShowErrorWithActions(message, [{
+                prompt: "Get PowerShell",
+                action: async () => {
+                    const getPSUri = vscode.Uri.parse("https://aka.ms/AA6dwxc");
+                    vscode.env.openExternal(getPSUri);
+                },
+            }]);
             return;
         }
 
@@ -669,6 +675,12 @@ export class SessionManager implements Middleware {
         this.sessionStatus = status;
         this.statusBarItem.color = statusColor;
         this.statusBarItem.text = statusIconText + statusText;
+    }
+
+    private async warnPowerShellNotFoundAndSetSessionFailure() {
+        const warningMessage = "Unable to find PowerShell." +
+            " Do you have PowerShell installed?" +
+            " Click 'Show Logs' for more details.";
     }
 
     private setSessionFailure(message: string, ...additionalMessages: string[]) {
