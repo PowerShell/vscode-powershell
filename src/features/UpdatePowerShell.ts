@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import fetch from "node-fetch";
+import fetch, { RequestInit } from "node-fetch";
 import * as semver from "semver";
 import { MessageItem, window } from "vscode";
 import { LanguageClient } from "vscode-languageclient";
@@ -16,15 +16,25 @@ const PowerShellGitHubPrereleasesUrl =
 
 export class GitHubReleaseInformation {
     public static async FetchLatestRelease(preview: boolean): Promise<GitHubReleaseInformation> {
+        const requestConfig: RequestInit = {};
+
+        // For CI. This prevents GitHub from rate limiting us.
+        if (process.env.PS_TEST_GITHUB_API_USERNAME && process.env.PS_TEST_GITHUB_API_PAT) {
+            const authHeaderValue = Buffer.from(`${process.env.PS_TEST_GITHUB_API_USERNAME}:${process.env.PS_TEST_GITHUB_API_PAT}`).toString("base64");
+            requestConfig.headers = {
+                Authorization: `Basic ${authHeaderValue}`,
+            };
+        }
+
         // Fetch the latest PowerShell releases from GitHub.
         let releaseJson: any;
         if (preview) {
             // This gets all releases and the first one is the latest prerelease if
             // there is a prerelease version.
-            releaseJson = (await fetch(PowerShellGitHubPrereleasesUrl)
+            releaseJson = (await fetch(PowerShellGitHubPrereleasesUrl, requestConfig)
                 .then((res) => res.json())).find((release: any) => release.prerelease);
         } else {
-            releaseJson = await fetch(PowerShellGitHubReleasesUrl)
+            releaseJson = await fetch(PowerShellGitHubReleasesUrl, requestConfig)
                 .then((res) => res.json());
         }
 
