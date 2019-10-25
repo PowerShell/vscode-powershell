@@ -130,15 +130,18 @@ export class SessionManager implements Middleware {
         if (!this.powerShellExePath) {
             const message = "Unable to find PowerShell."
                 + " Do you have PowerShell installed?"
-                + " You can also set the 'powershell.powerShellAdditionalExePaths' configuration.";
+                + " You can also configure custom PowerShell installations"
+                + " with the 'powershell.powerShellAdditionalExePaths' setting.";
 
-            this.log.writeAndShowErrorWithActions(message, [{
-                prompt: "Get PowerShell",
-                action: async () => {
-                    const getPSUri = vscode.Uri.parse("https://aka.ms/AA6dwxc");
-                    vscode.env.openExternal(getPSUri);
+            this.log.writeAndShowErrorWithActions(message, [
+                {
+                    prompt: "Get PowerShell",
+                    action: async () => {
+                        const getPSUri = vscode.Uri.parse("https://aka.ms/get-powershell-vscode");
+                        vscode.env.openExternal(getPSUri);
+                    },
                 },
-            }]);
+            ]);
             return;
         }
 
