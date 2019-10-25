@@ -20,7 +20,9 @@ export class GitHubReleaseInformation {
 
         // For CI. This prevents GitHub from rate limiting us.
         if (process.env.PS_TEST_GITHUB_API_USERNAME && process.env.PS_TEST_GITHUB_API_PAT) {
-            const authHeaderValue = Buffer.from(`${process.env.PS_TEST_GITHUB_API_USERNAME}:${process.env.PS_TEST_GITHUB_API_PAT}`).toString("base64");
+            const authHeaderValue = Buffer
+                .from(`${process.env.PS_TEST_GITHUB_API_USERNAME}:${process.env.PS_TEST_GITHUB_API_PAT}`)
+                .toString("base64");
             requestConfig.headers = {
                 Authorization: `Basic ${authHeaderValue}`,
             };
