@@ -29,29 +29,19 @@ export class GitHubReleaseInformation {
         }
 
         // Fetch the latest PowerShell releases from GitHub.
-        let releaseJson: any;
-        if (preview) {
-            // This gets all releases and the first one is the latest prerelease if
-            // there is a prerelease version.
-            const response = await fetch(PowerShellGitHubPrereleasesUrl, requestConfig);
+        const response = await fetch(
+            preview ? PowerShellGitHubPrereleasesUrl : PowerShellGitHubReleasesUrl,
+            requestConfig);
 
-            if (!response.ok) {
-                const json = await response.json();
-                throw json.message || json || "response was not ok.";
-            }
-
-            releaseJson = (await response.json()).find((release: any) => release.prerelease);
-        } else {
-            // Get the latest stable release.
-            const response = await fetch(PowerShellGitHubReleasesUrl, requestConfig);
-
-            if (!response.ok) {
-                const json = await response.json();
-                throw json.message || json || "response was not ok.";
-            }
-
-            releaseJson = await response.json();
+        if (!response.ok) {
+            const json = await response.json();
+            throw json.message || json || "response was not ok.";
         }
+
+        // For preview, we grab all the releases and then grab the first prerelease.
+        const releaseJson = preview
+            ? (await response.json()).find((release: any) => release.prerelease)
+            : await response.json();
 
         return new GitHubReleaseInformation(
             releaseJson.tag_name, releaseJson.assets);
