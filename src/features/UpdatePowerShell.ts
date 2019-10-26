@@ -33,11 +33,24 @@ export class GitHubReleaseInformation {
         if (preview) {
             // This gets all releases and the first one is the latest prerelease if
             // there is a prerelease version.
-            releaseJson = (await fetch(PowerShellGitHubPrereleasesUrl, requestConfig)
-                .then((res) => res.json())).find((release: any) => release.prerelease);
+            const response = await fetch(PowerShellGitHubPrereleasesUrl, requestConfig);
+
+            if (!response.ok) {
+                const json = await response.json();
+                throw json.message || json || "response was not ok.";
+            }
+
+            releaseJson = (await response.json()).find((release: any) => release.prerelease);
         } else {
-            releaseJson = await fetch(PowerShellGitHubReleasesUrl, requestConfig)
-                .then((res) => res.json());
+            // Get the latest stable release.
+            const response = await fetch(PowerShellGitHubReleasesUrl, requestConfig);
+
+            if (!response.ok) {
+                const json = await response.json();
+                throw json.message || json || "response was not ok.";
+            }
+
+            releaseJson = await response.json();
         }
 
         return new GitHubReleaseInformation(

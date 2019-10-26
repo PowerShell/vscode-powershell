@@ -591,8 +591,9 @@ export class SessionManager implements Middleware {
                                         localVersion,
                                         this.versionDetails.architecture,
                                         release);
-                                } catch {
+                                } catch(e) {
                                     // best effort. This probably failed to fetch the data from GitHub.
+                                    this.log.writeWarning(e.message);
                                 }
                             });
 
