@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import fetch from "node-fetch";
+import fetch, { RequestInit } from "node-fetch";
 import * as semver from "semver";
 import { MessageItem, window } from "vscode";
 import { LanguageClient } from "vscode-languageclient";
@@ -16,17 +16,32 @@ const PowerShellGitHubPrereleasesUrl =
 
 export class GitHubReleaseInformation {
     public static async FetchLatestRelease(preview: boolean): Promise<GitHubReleaseInformation> {
-        // Fetch the latest PowerShell releases from GitHub.
-        let releaseJson: any;
-        if (preview) {
-            // This gets all releases and the first one is the latest prerelease if
-            // there is a prerelease version.
-            releaseJson = (await fetch(PowerShellGitHubPrereleasesUrl)
-                .then((res) => res.json())).find((release: any) => release.prerelease);
-        } else {
-            releaseJson = await fetch(PowerShellGitHubReleasesUrl)
-                .then((res) => res.json());
+        const requestConfig: RequestInit = {};
+
+        // For CI. This prevents GitHub from rate limiting us.
+        if (process.env.PS_TEST_GITHUB_API_USERNAME && process.env.PS_TEST_GITHUB_API_PAT) {
+            const authHeaderValue = Buffer
+                .from(`${process.env.PS_TEST_GITHUB_API_USERNAME}:${process.env.PS_TEST_GITHUB_API_PAT}`)
+                .toString("base64");
+            requestConfig.headers = {
+                Authorization: `Basic ${authHeaderValue}`,
+            };
         }
+
+        // Fetch the latest PowerShell releases from GitHub.
+        const response = await fetch(
+            preview ? PowerShellGitHubPrereleasesUrl : PowerShellGitHubReleasesUrl,
+            requestConfig);
+
+        if (!response.ok) {
+            const json = await response.json();
+            throw json.message || json || "response was not ok.";
+        }
+
+        // For preview, we grab all the releases and then grab the first prerelease.
+        const releaseJson = preview
+            ? (await response.json()).find((release: any) => release.prerelease)
+            : await response.json();
 
         return new GitHubReleaseInformation(
             releaseJson.tag_name, releaseJson.assets);
