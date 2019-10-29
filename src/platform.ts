@@ -416,13 +416,16 @@ export class PowerShellExeFinder {
         { useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): string | null {
 
         if (!useAlternateBitness) {
+            // Just use the native system bitness
             return process.env.ProgramFiles;
         }
 
+        // We might be a 64-bit process looking for 32-bit program files
         if (this.platformDetails.isProcess64Bit) {
             return process.env["ProgramFiles(x86)"];
         }
 
+        // We might be a 32-bit process looking for 64-bit program files
         if (this.platformDetails.isOS64Bit) {
             return process.env.ProgramW6432;
         }
@@ -435,13 +438,16 @@ export class PowerShellExeFinder {
         const windir: string = process.env.windir;
 
         if (!useAlternateBitness) {
+            // Just use the native system bitness
             return path.join(windir, "System32");
         }
 
+        // We might be a 64-bit process looking for 32-bit system32
         if (this.platformDetails.isProcess64Bit) {
             return path.join(windir, "SysWOW64");
         }
 
+        // We might be a 32-bit process looking for 64-bit system32
         if (this.platformDetails.isOS64Bit) {
             return path.join(windir, "Sysnative");
         }
