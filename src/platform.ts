@@ -166,7 +166,7 @@ export class PowerShellExeFinder {
 
             case OperatingSystem.Windows:
                 // Windows may have a 32-bit pwsh.exe
-                yield this.findPSCoreWindowsInstallation({ findNonNativeBitness: true });
+                yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true });
 
                 // Also look for the MSIX/UWP installation
                 yield this.findPSCoreMsix();
@@ -196,7 +196,7 @@ export class PowerShellExeFinder {
                 yield this.findPSCoreMsix({ findPreview: true });
 
                 // Look for pwsh-preview with the opposite bitness
-                yield this.findPSCoreWindowsInstallation({ findNonNativeBitness: true, findPreview: true });
+                yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true, findPreview: true });
 
                 // Finally, get Windows PowerShell
 
@@ -204,7 +204,7 @@ export class PowerShellExeFinder {
                 yield this.findWinPS();
 
                 // Get the alternate bitness Windows PowerShell
-                yield this.findWinPS({ findNonNativeBitness: true });
+                yield this.findWinPS({ useAlternateBitness: true });
 
                 break;
         }
@@ -256,7 +256,7 @@ export class PowerShellExeFinder {
         return new PossiblePowerShellExe(dotnetGlobalToolExePath, ".NET Core PowerShell Global Tool");
     }
 
-    private findPSCoreMsix(options?: { findPreview: boolean }): IPossiblePowerShellExe {
+    private findPSCoreMsix({ findPreview }: { findPreview?: boolean } = {}): IPossiblePowerShellExe {
         // We can't proceed if there's no LOCALAPPDATA path
         if (!process.env.LOCALAPPDATA) {
             return null;
@@ -270,15 +270,9 @@ export class PowerShellExeFinder {
         }
 
         // Define whether we're looking for the preview or the stable
-        let pwshMsixDirRegex: RegExp = null;
-        let pwshMsixName: string = null;
-        if (options && options.findPreview) {
-            pwshMsixDirRegex = PowerShellExeFinder.PwshPreviewMsixRegex;
-            pwshMsixName = "PowerShell Preview MSIX";
-        } else {
-            pwshMsixDirRegex = PowerShellExeFinder.PwshMsixRegex;
-            pwshMsixName = "PowerShell MSIX";
-        }
+        const { pwshMsixDirRegex, pwshMsixName } = findPreview
+            ? { pwshMsixDirRegex: PowerShellExeFinder.PwshPreviewMsixRegex, pwshMsixName: "PowerShell Preview MSIX" }
+            : { pwshMsixDirRegex: PowerShellExeFinder.PwshMsixRegex, pwshMsixName: "PowerShell MSIX" };
 
         // We should find only one such application, so return on the first one
         for (const subdir of fs.readdirSync(msixAppDir)) {
@@ -300,13 +294,11 @@ export class PowerShellExeFinder {
         return new PossiblePowerShellExe(SnapPreviewExePath, "PowerShell Preview Snap");
     }
 
-    private findPSCoreWindowsInstallation(options?: {
-        findNonNativeBitness?: boolean; findPreview?: boolean }): IPossiblePowerShellExe {
+    private findPSCoreWindowsInstallation(
+        { useAlternateBitness = false, findPreview = false }:
+            { useAlternateBitness?: boolean; findPreview?: boolean } = {}): IPossiblePowerShellExe {
 
-        const findPreview = options && options.findPreview || false;
-
-        const programFilesPath: string = this.getProgramFilesPath(
-            { useAlternateBitness: options && options.findNonNativeBitness });
+        const programFilesPath: string = this.getProgramFilesPath({ useAlternateBitness });
 
         if (!programFilesPath) {
             return null;
@@ -382,8 +374,7 @@ export class PowerShellExeFinder {
         return new PossiblePowerShellExe(pwshExePath, `PowerShell${preview} ${bitness}`);
     }
 
-    private findWinPS(options?: { findNonNativeBitness: boolean }): IPossiblePowerShellExe {
-        const useAlternateBitness: boolean = options && options.findNonNativeBitness;
+    private findWinPS({ useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): IPossiblePowerShellExe {
 
         // 32-bit OSes only have one WinPS on them
         if (!this.platformDetails.isOS64Bit && useAlternateBitness) {
@@ -421,8 +412,10 @@ export class PowerShellExeFinder {
         return winPS;
     }
 
-    private getProgramFilesPath(options?: { useAlternateBitness?: boolean }): string | null {
-        if (!options || !options.useAlternateBitness) {
+    private getProgramFilesPath(
+        { useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): string | null {
+
+        if (!useAlternateBitness) {
             return process.env.ProgramFiles;
         }
 
@@ -438,10 +431,10 @@ export class PowerShellExeFinder {
         return null;
     }
 
-    private getSystem32Path(options?: { useAlternateBitness?: boolean }): string | null {
+    private getSystem32Path({ useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): string | null {
         const windir: string = process.env.windir;
 
-        if (!options || !options.useAlternateBitness) {
+        if (!useAlternateBitness) {
             return path.join(windir, "System32");
         }
 
@@ -480,11 +473,11 @@ class PossiblePowerShellExe implements IPossiblePowerShellExe {
     constructor(
         pathToExe: string,
         installationName: string,
-        options?: { knownToExist?: boolean }) {
+        { knownToExist = false }: { knownToExist?: boolean } = {}) {
 
         this.exePath = pathToExe;
         this.displayName = installationName;
-        this.knownToExist = options && options.knownToExist || undefined;
+        this.knownToExist = knownToExist || undefined;
     }
 
     public exists(): boolean {
