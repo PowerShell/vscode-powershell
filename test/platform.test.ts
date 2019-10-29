@@ -32,10 +32,14 @@ interface ITestPlatformSuccessCase extends ITestPlatform {
 // Platform configurations where we expect to find a set of PowerShells
 let successTestCases: ITestPlatformSuccessCase[];
 
-const msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
-const pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
-const pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
+let msixAppDir = null;
+let pwshMsixPath = null;
+let pwshPreviewMsixPath = null;
 if (process.platform === "win32") {
+    msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
+    pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
+    pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
+
     successTestCases = [
         {
             name: "Windows 64-bit, 64-bit VSCode (all installations)",
