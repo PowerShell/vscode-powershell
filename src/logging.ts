@@ -114,6 +114,29 @@ export class Logger implements ILogger {
         });
     }
 
+    public async writeAndShowErrorWithActions(
+        message: string,
+        actions: Array<{ prompt: string; action: () => Promise<void> }>) {
+        this.writeError(message);
+
+        const fullActions = [
+            ...actions,
+            { prompt: "Show Logs", action: async () => { this.showLogPanel(); } },
+        ];
+
+        const actionKeys: string[] = fullActions.map((action) => action.prompt);
+
+        const choice = await vscode.window.showErrorMessage(message, ...actionKeys);
+        if (choice) {
+            for (const action of fullActions) {
+                if (choice === action.prompt) {
+                    await action.action();
+                    return;
+                }
+            }
+        }
+    }
+
     public startNewLog(minimumLogLevel: string = "Normal") {
         this.MinimumLogLevel = this.logLevelNameToValue(minimumLogLevel.trim());
 
