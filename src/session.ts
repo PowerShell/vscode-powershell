@@ -680,12 +680,6 @@ export class SessionManager implements Middleware {
         this.statusBarItem.text = statusIconText + statusText;
     }
 
-    private async warnPowerShellNotFoundAndSetSessionFailure() {
-        const warningMessage = "Unable to find PowerShell." +
-            " Do you have PowerShell installed?" +
-            " Click 'Show Logs' for more details.";
-    }
-
     private setSessionFailure(message: string, ...additionalMessages: string[]) {
         this.log.writeAndShowError(message, ...additionalMessages);
 
