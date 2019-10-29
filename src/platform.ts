@@ -265,6 +265,10 @@ export class PowerShellExeFinder {
         // Find the base directory for MSIX application exe shortcuts
         const msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
 
+        if (!fs.existsSync(msixAppDir)) {
+            return null;
+        }
+
         // Define whether we're looking for the preview or the stable
         let pwshMsixDirRegex: RegExp = null;
         let pwshMsixName: string = null;
@@ -303,6 +307,10 @@ export class PowerShellExeFinder {
 
         const programFilesPath: string = this.getProgramFilesPath(
             { useAlternateBitness: options && options.findNonNativeBitness });
+
+        if (!programFilesPath) {
+            return null;
+        }
 
         const powerShellInstallBaseDir = path.join(programFilesPath, "PowerShell");
 
@@ -359,6 +367,10 @@ export class PowerShellExeFinder {
 
             pwshExePath = exePath;
             highestSeenVersion = currentVersion;
+        }
+
+        if (!pwshExePath) {
+            return null;
         }
 
         const bitness: string = programFilesPath.includes("x86")

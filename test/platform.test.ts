@@ -3,7 +3,6 @@
  *--------------------------------------------------------*/
 
 import * as assert from "assert";
-import * as child_process from "child_process";
 import mockFS = require("mock-fs");
 import FileSystem = require("mock-fs/lib/filesystem");
 import * as path from "path";
@@ -33,8 +32,7 @@ interface ITestPlatformSuccessCase extends ITestPlatform {
 // Platform configurations where we expect to find a set of PowerShells
 let successTestCases: ITestPlatformSuccessCase[];
 
-const localAppDataDir = "C:\\Users\\Alex Briggs\\AppData\\Local";
-const msixAppDir = path.join(localAppDataDir, "Microsoft", "WindowsApps");
+const msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
 const pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
 const pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
 if (process.platform === "win32") {
@@ -50,7 +48,6 @@ if (process.platform === "win32") {
                 "ProgramFiles": "C:\\Program Files",
                 "ProgramFiles(x86)": "C:\\Program Files (x86)",
                 "windir": "C:\\WINDOWS",
-                "LOCALAPPDATA": localAppDataDir,
             },
             expectedPowerShellSequence: [
                 {
@@ -264,7 +261,7 @@ if (process.platform === "win32") {
             name: "Windows 32-bit, 32-bit VSCode (all installations)",
             platformDetails: {
                 operatingSystem: platform.OperatingSystem.Windows,
-                isOS64Bit: true,
+                isOS64Bit: false,
                 isProcess64Bit: false,
             },
             environmentVars: {
@@ -278,8 +275,16 @@ if (process.platform === "win32") {
                     displayName: "PowerShell (x86)",
                 },
                 {
+                    exePath: pwshMsixPath,
+                    displayName: "PowerShell MSIX",
+                },
+                {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x86)",
+                },
+                {
+                    exePath: pwshPreviewMsixPath,
+                    displayName: "PowerShell Preview MSIX",
                 },
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
@@ -295,6 +300,14 @@ if (process.platform === "win32") {
                         "pwsh.exe": "",
                     },
                 },
+                [msixAppDir]: {
+                    "Microsoft.PowerShell_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
+                    "Microsoft.PowerShellPreview_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
+                },
                 "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
                     "powershell.exe": "",
                 },
@@ -304,7 +317,7 @@ if (process.platform === "win32") {
             name: "Windows 32-bit, 32-bit VSCode (Windows PowerShell only)",
             platformDetails: {
                 operatingSystem: platform.OperatingSystem.Windows,
-                isOS64Bit: true,
+                isOS64Bit: false,
                 isProcess64Bit: false,
             },
             environmentVars: {
@@ -442,8 +455,6 @@ const errorTestCases: ITestPlatform[] = [
 ];
 
 suite("Platform module", () => {
-    let tempEnv: NodeJS.ProcessEnv;
-
     suite("PlatformDetails", () => {
         const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
         switch (process.platform) {
@@ -498,12 +509,7 @@ suite("Platform module", () => {
     });
 
     suite("Default PowerShell installation", () => {
-        setup(() => {
-            tempEnv = Object.assign({}, process.env);
-        });
-
         teardown(() => {
-            process.env = tempEnv;
             sinon.restore();
             mockFS.restore();
         });
@@ -514,7 +520,7 @@ suite("Platform module", () => {
 
                 if (testPlatform.environmentVars) {
                     for (const envVar of Object.keys(testPlatform.environmentVars)) {
-                        process.env[envVar] = testPlatform.environmentVars[envVar];
+                        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
                     }
                 }
 
@@ -534,7 +540,7 @@ suite("Platform module", () => {
 
                 if (testPlatform.environmentVars) {
                     for (const envVar of Object.keys(testPlatform.environmentVars)) {
-                        process.env[envVar] = testPlatform.environmentVars[envVar];
+                        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
                     }
                 }
 
@@ -547,12 +553,7 @@ suite("Platform module", () => {
     });
 
     suite("Expected PowerShell installation list", () => {
-        setup(() => {
-            tempEnv = Object.assign({}, process.env);
-        });
-
         teardown(() => {
-            process.env = tempEnv;
             sinon.restore();
             mockFS.restore();
         });
@@ -563,7 +564,7 @@ suite("Platform module", () => {
 
                 if (testPlatform.environmentVars) {
                     for (const envVar of Object.keys(testPlatform.environmentVars)) {
-                        process.env[envVar] = testPlatform.environmentVars[envVar];
+                        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
                     }
                 }
 
