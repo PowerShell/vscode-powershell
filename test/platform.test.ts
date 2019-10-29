@@ -458,6 +458,16 @@ const errorTestCases: ITestPlatform[] = [
     },
 ];
 
+function setupTestEnvironment(testPlatform: ITestPlatform) {
+    mockFS(testPlatform.filesystem);
+
+    if (testPlatform.environmentVars) {
+        for (const envVar of Object.keys(testPlatform.environmentVars)) {
+            sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
+        }
+    }
+}
+
 suite("Platform module", () => {
     suite("PlatformDetails", () => {
         const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
@@ -520,13 +530,7 @@ suite("Platform module", () => {
 
         for (const testPlatform of successTestCases) {
             test(`Default PowerShell path on ${testPlatform.name}`, () => {
-                mockFS(testPlatform.filesystem);
-
-                if (testPlatform.environmentVars) {
-                    for (const envVar of Object.keys(testPlatform.environmentVars)) {
-                        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
-                    }
-                }
+                setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
@@ -540,13 +544,7 @@ suite("Platform module", () => {
 
         for (const testPlatform of errorTestCases) {
             test(`Extension startup fails gracefully on ${testPlatform.name}`, () => {
-                mockFS(testPlatform.filesystem);
-
-                if (testPlatform.environmentVars) {
-                    for (const envVar of Object.keys(testPlatform.environmentVars)) {
-                        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
-                    }
-                }
+                setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
@@ -564,13 +562,7 @@ suite("Platform module", () => {
 
         for (const testPlatform of successTestCases) {
             test(`PowerShell installation list on ${testPlatform.name}`, () => {
-                mockFS(testPlatform.filesystem);
-
-                if (testPlatform.environmentVars) {
-                    for (const envVar of Object.keys(testPlatform.environmentVars)) {
-                        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
-                    }
-                }
+                setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
@@ -588,6 +580,17 @@ suite("Platform module", () => {
                     foundPowerShells.length,
                     testPlatform.expectedPowerShellSequence.length,
                     "Number of expected PowerShells found does not match");
+            });
+        }
+
+        for (const testPlatform of errorTestCases) {
+            test(`Extension startup fails gracefully on ${testPlatform.name}`, () => {
+                setupTestEnvironment(testPlatform);
+
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+
+                const foundPowerShells = powerShellExeFinder.getAllAvailablePowerShellInstallations();
+                assert.strictEqual(foundPowerShells.length, 0);
             });
         }
     });
