@@ -33,8 +33,10 @@ interface ITestPlatformSuccessCase extends ITestPlatform {
 // Platform configurations where we expect to find a set of PowerShells
 let successTestCases: ITestPlatformSuccessCase[];
 
-const pwshMsixDir = "C:\\Program Files\\WindowsApps\\Microsoft.PowerShell_7.0.0.4_neutral__8wekyb3d8bbwe";
-const pwshMsixPath = path.join(pwshMsixDir, "pwsh.exe");
+const localAppDataDir = "C:\\Users\\Alex Briggs\\AppData\\Local";
+const msixAppDir = path.join(localAppDataDir, "Microsoft", "WindowsApps");
+const pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
+const pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
 if (process.platform === "win32") {
     successTestCases = [
         {
@@ -48,6 +50,7 @@ if (process.platform === "win32") {
                 "ProgramFiles": "C:\\Program Files",
                 "ProgramFiles(x86)": "C:\\Program Files (x86)",
                 "windir": "C:\\WINDOWS",
+                "LOCALAPPDATA": localAppDataDir,
             },
             expectedPowerShellSequence: [
                 {
@@ -65,6 +68,10 @@ if (process.platform === "win32") {
                 {
                     exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x64)",
+                },
+                {
+                    exePath: pwshPreviewMsixPath,
+                    displayName: "PowerShell Preview MSIX",
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
@@ -96,8 +103,13 @@ if (process.platform === "win32") {
                         "pwsh.exe": "",
                     },
                 },
-                [pwshMsixDir]: {
-                    "pwsh.exe": "",
+                [msixAppDir]: {
+                    "Microsoft.PowerShell_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
+                    "Microsoft.PowerShellPreview_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
                 },
                 "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
                     "powershell.exe": "",
@@ -168,6 +180,10 @@ if (process.platform === "win32") {
                     displayName: "PowerShell Preview (x86)",
                 },
                 {
+                    exePath: pwshPreviewMsixPath,
+                    displayName: "PowerShell Preview MSIX",
+                },
+                {
                     exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x64)",
                 },
@@ -197,8 +213,13 @@ if (process.platform === "win32") {
                         "pwsh.exe": "",
                     },
                 },
-                [pwshMsixDir]: {
-                    "pwsh.exe": "",
+                [msixAppDir]: {
+                    "Microsoft.PowerShell_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
+                    "Microsoft.PowerShellPreview_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
                 },
                 "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
                     "powershell.exe": "",
@@ -491,16 +512,6 @@ suite("Platform module", () => {
             test(`Default PowerShell path on ${testPlatform.name}`, () => {
                 mockFS(testPlatform.filesystem);
 
-                // The type inference here is wrong, so we need typescript to ignore it
-                // @ts-ignore
-                sinon.stub(child_process, "execFileSync").callsFake((procName, args?, options?) => {
-                    if (!procName.includes("powershell")) {
-                        return child_process.execFileSync(procName, args, options);
-                    }
-
-                    return pwshMsixDir;
-                });
-
                 if (testPlatform.environmentVars) {
                     for (const envVar of Object.keys(testPlatform.environmentVars)) {
                         process.env[envVar] = testPlatform.environmentVars[envVar];
@@ -520,16 +531,6 @@ suite("Platform module", () => {
         for (const testPlatform of errorTestCases) {
             test(`Extension startup fails gracefully on ${testPlatform.name}`, () => {
                 mockFS(testPlatform.filesystem);
-
-                // The type inference here is wrong, so we need typescript to ignore it
-                // @ts-ignore
-                sinon.stub(child_process, "execFileSync").callsFake((procName, args?, options?) => {
-                    if (!procName.includes("powershell")) {
-                        return child_process.execFileSync(procName, args, options);
-                    }
-
-                    return pwshMsixDir;
-                });
 
                 if (testPlatform.environmentVars) {
                     for (const envVar of Object.keys(testPlatform.environmentVars)) {
@@ -559,16 +560,6 @@ suite("Platform module", () => {
         for (const testPlatform of successTestCases) {
             test(`PowerShell installation list on ${testPlatform.name}`, () => {
                 mockFS(testPlatform.filesystem);
-
-                // The type inference here is wrong, so we need typescript to ignore it
-                // @ts-ignore
-                sinon.stub(child_process, "execFileSync").callsFake((procName, args?, options?) => {
-                    if (!procName.includes("powershell")) {
-                        return child_process.execFileSync(procName, args, options);
-                    }
-
-                    return pwshMsixDir;
-                });
 
                 if (testPlatform.environmentVars) {
                     for (const envVar of Object.keys(testPlatform.environmentVars)) {
