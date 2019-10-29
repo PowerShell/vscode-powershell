@@ -271,8 +271,8 @@ export class PowerShellExeFinder {
 
         // Define whether we're looking for the preview or the stable
         const { pwshMsixDirRegex, pwshMsixName } = findPreview
-            ? { pwshMsixDirRegex: PowerShellExeFinder.PwshPreviewMsixRegex, pwshMsixName: "PowerShell Preview MSIX" }
-            : { pwshMsixDirRegex: PowerShellExeFinder.PwshMsixRegex, pwshMsixName: "PowerShell MSIX" };
+            ? { pwshMsixDirRegex: PowerShellExeFinder.PwshPreviewMsixRegex, pwshMsixName: "PowerShell Preview (Store)" }
+            : { pwshMsixDirRegex: PowerShellExeFinder.PwshMsixRegex, pwshMsixName: "PowerShell (Store)" };
 
         // We should find only one such application, so return on the first one
         for (const subdir of fs.readdirSync(msixAppDir)) {

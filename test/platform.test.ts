@@ -64,7 +64,7 @@ if (process.platform === "win32") {
                 },
                 {
                     exePath: pwshMsixPath,
-                    displayName: "PowerShell MSIX",
+                    displayName: "PowerShell (Store)",
                 },
                 {
                     exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
@@ -72,7 +72,7 @@ if (process.platform === "win32") {
                 },
                 {
                     exePath: pwshPreviewMsixPath,
-                    displayName: "PowerShell Preview MSIX",
+                    displayName: "PowerShell Preview (Store)",
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
@@ -174,7 +174,7 @@ if (process.platform === "win32") {
                 },
                 {
                     exePath: pwshMsixPath,
-                    displayName: "PowerShell MSIX",
+                    displayName: "PowerShell (Store)",
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
@@ -182,7 +182,7 @@ if (process.platform === "win32") {
                 },
                 {
                     exePath: pwshPreviewMsixPath,
-                    displayName: "PowerShell Preview MSIX",
+                    displayName: "PowerShell Preview (Store)",
                 },
                 {
                     exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
@@ -280,7 +280,7 @@ if (process.platform === "win32") {
                 },
                 {
                     exePath: pwshMsixPath,
-                    displayName: "PowerShell MSIX",
+                    displayName: "PowerShell (Store)",
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
@@ -288,7 +288,7 @@ if (process.platform === "win32") {
                 },
                 {
                     exePath: pwshPreviewMsixPath,
-                    displayName: "PowerShell Preview MSIX",
+                    displayName: "PowerShell Preview (Store)",
                 },
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
