@@ -127,7 +127,7 @@ export class Logger implements ILogger {
         const actionKeys: string[] = fullActions.map((action) => action.prompt);
 
         const choice = await vscode.window.showErrorMessage(message, ...actionKeys);
-        if (choice !== undefined) {
+        if (choice) {
             for (const action of fullActions) {
                 if (choice === action.prompt) {
                     await action.action();
