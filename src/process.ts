@@ -57,7 +57,11 @@ export class PowerShellProcess {
                     this.startArgs +=
                         `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
                         `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
-                        `-FeatureFlags @(${featureFlags})`;
+                        `-FeatureFlags @(${featureFlags}) `;
+
+                    if (this.sessionSettings.integratedConsole.useLegacyReadLine) {
+                        this.startArgs += "-UseLegacyReadLine";
+                    }
 
                     const powerShellArgs = [
                         "-NoProfile",

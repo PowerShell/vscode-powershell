@@ -98,6 +98,7 @@ export interface ISettings {
 export interface IIntegratedConsoleSettings {
     showOnStartup?: boolean;
     focusConsoleOnExecute?: boolean;
+    useLegacyReadLine?: boolean;
 }
 
 export function load(): ISettings {
@@ -118,14 +119,8 @@ export function load(): ISettings {
         createTemporaryIntegratedConsole: false,
     };
 
-    // TODO: Remove when PSReadLine is out of preview
-    const featureFlags = [];
-    if (utils.isWindowsOS()) {
-        featureFlags.push("PSReadLine");
-    }
-
     const defaultDeveloperSettings: IDeveloperSettings = {
-        featureFlags,
+        featureFlags: [],
         powerShellExePath: undefined,
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
@@ -159,6 +154,7 @@ export function load(): ISettings {
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
         showOnStartup: true,
         focusConsoleOnExecute: true,
+        useLegacyReadLine: false,
     };
 
     return {
