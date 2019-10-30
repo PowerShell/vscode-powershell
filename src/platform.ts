@@ -116,11 +116,17 @@ export class PowerShellExeFinder {
      * @param configuredPowerShellPath the PowerShell path configured by the user.
      */
     public fixWindowsPowerShellPath(configuredPowerShellPath: string): string {
+        const altWinPS = this.findWinPS({ useAlternateBitness: true });
+
+        if (!altWinPS) {
+            return configuredPowerShellPath;
+        }
+
+        const lowerAltWinPSPath = altWinPS.exePath.toLocaleLowerCase();
         const lowerConfiguredPath = configuredPowerShellPath.toLocaleLowerCase();
-        const lowerAltWinPSPath = this.alternateBitnessWinPS.exePath.toLocaleLowerCase();
 
         if (lowerConfiguredPath === lowerAltWinPSPath) {
-            return this.winPS.exePath;
+            return this.findWinPS().exePath;
         }
 
         return configuredPowerShellPath;
@@ -180,7 +186,7 @@ export class PowerShellExeFinder {
         // Currently it cannot take startup arguments to start PSES with.
         //
         // Look for the .NET global tool
-        // yield this.pwshDotnetGlobalTool;
+        // yield this.findPSCoreDotnetGlobalTool();
 
         // Look for PSCore preview
         yield this.findPSCorePreview();
