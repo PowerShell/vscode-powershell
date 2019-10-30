@@ -186,7 +186,7 @@ export class PowerShellExeFinder {
         // Currently it cannot take startup arguments to start PSES with.
         //
         // Look for the .NET global tool
-        // yield this.pwshDotnetGlobalTool;
+        // yield this.findPSCoreDotnetGlobalTool();
 
         // Look for PSCore preview
         yield this.findPSCorePreview();
