@@ -594,4 +594,47 @@ suite("Platform module", () => {
             });
         }
     });
+
+    suite("Windows PowerShell path fix", () => {
+        teardown(() => {
+            sinon.restore();
+            mockFS.restore();
+        });
+
+        for (const testPlatform of successTestCases
+                .filter((tp) => tp.platformDetails.operatingSystem === platform.OperatingSystem.Windows)) {
+
+            test(`Corrects the Windows PowerShell path on ${testPlatform.name}`, () => {
+                setupTestEnvironment(testPlatform);
+
+                function getWinPSPath(systemDir: string) {
+                    return path.join(
+                        testPlatform.environmentVars.windir,
+                        systemDir,
+                        "WindowsPowerShell",
+                        "v1.0",
+                        "powershell.exe");
+                }
+
+                const winPSPath = getWinPSPath("System32");
+
+                let altWinPSPath;
+                if (testPlatform.platformDetails.isProcess64Bit) {
+                    altWinPSPath = getWinPSPath("SysWOW64");
+                } else if (testPlatform.platformDetails.isOS64Bit) {
+                    altWinPSPath = getWinPSPath("Sysnative");
+                } else {
+                    altWinPSPath = null;
+                }
+
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+
+                assert.strictEqual(powerShellExeFinder.fixWindowsPowerShellPath(winPSPath), winPSPath);
+
+                if (altWinPSPath) {
+                    assert.strictEqual(powerShellExeFinder.fixWindowsPowerShellPath(altWinPSPath), winPSPath);
+                }
+            });
+        }
+    });
 });
