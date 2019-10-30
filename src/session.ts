@@ -406,7 +406,9 @@ export class SessionManager implements Middleware {
              settings.developer.editorServicesLogLevel.toLowerCase() !==
                 this.sessionSettings.developer.editorServicesLogLevel.toLowerCase() ||
              settings.developer.bundledModulesPath.toLowerCase() !==
-                this.sessionSettings.developer.bundledModulesPath.toLowerCase())) {
+                this.sessionSettings.developer.bundledModulesPath.toLowerCase() ||
+            settings.integratedConsole.useLegacyReadLine !==
+                this.sessionSettings.integratedConsole.useLegacyReadLine)) {
 
             vscode.window.showInformationMessage(
                 "The PowerShell runtime configuration has changed, would you like to start a new session?",
