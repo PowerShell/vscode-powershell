@@ -10,16 +10,6 @@ suite("Settings module", () => {
         assert.doesNotThrow(Settings.load);
     });
 
-    // TODO: Remove this test when PSReadLine is in stable
-    test("PSReadLine featureFlag set correctly", () => {
-        const settings: Settings.ISettings = Settings.load();
-        if (process.platform === "win32") {
-            assert.deepEqual(settings.developer.featureFlags, ["PSReadLine"]);
-        } else {
-            assert.deepEqual(settings.developer.featureFlags, []);
-        }
-    });
-
     test("Settings update correctly", async () => {
         // then syntax
         Settings.change("helpCompletion", "BlockComment", false).then(() =>
