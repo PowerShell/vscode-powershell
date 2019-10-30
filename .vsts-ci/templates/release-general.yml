@@ -83,8 +83,15 @@ steps:
     optionsFTPATH: '$(Build.SourcesDirectory)\tools\terms\FileTypeSet.xml'
     # toolVersion: 5.8.2.1
 
+- pwsh: |
+    Get-ChildItem -Exclude node_modules | Get-ChildItem -Recurse | ForEach-Object FullName > "$env:BUILD_SOURCESDIRECTORY/credscan.tsv"
+  displayName: Create credscan.tsv as the list of files to scan
+
 - task: CredScan@2
   condition: succeededOrFailed()
+  inputs:
+    debugMode: false
+    scanFolder: '$(Build.SourcesDirectory)/credscan.tsv'
 
 # Publish results as artifacts
 - task: PublishSecurityAnalysisLogs@3
