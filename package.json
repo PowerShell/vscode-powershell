@@ -683,6 +683,11 @@
           "default": true,
           "description": "Switches focus to the console when a script selection is run or a script file is debugged. This is an accessibility feature. To disable it, set to false."
         },
+        "powershell.integratedConsole.useLegacyReadLine": {
+          "type": "boolean",
+          "default": false,
+          "description": "Falls back to the legacy (lightweight) ReadLine experience. This will disable the use of PSReadLine in the PowerShell Integrated Console."
+        },
         "powershell.debugging.createTemporaryIntegratedConsole": {
           "type": "boolean",
           "default": false,
