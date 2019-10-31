@@ -1,7 +1,7 @@
 # PowerShell Preview Extension Release History
 
 ## v2019.11.0
-### Thursday, October 31, 2019
+### Friday, November 1, 2019
 
 ##### Special Note
 In this release of the preview extension,
