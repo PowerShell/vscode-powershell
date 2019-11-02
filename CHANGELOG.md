@@ -19,6 +19,8 @@
   Support new console color configuration in PowerShell 7.
 - 🐛 [vscode-powershell #2116](https://github.com/PowerShell/PowerShellEditorServices/pull/1044) -
   Fix UNC intellisense backslash.
+- 🐛 [vscode-powershell #2214](https://github.com/PowerShell/PowerShellEditorServices/pull/1050) -
+  Fix issue where PipelineIndentationStyle setting is ignored.
 
 ## v2019.9.0
 ### Monday, September 23, 2019
