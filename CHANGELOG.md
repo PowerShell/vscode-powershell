@@ -1,30 +1,24 @@
 # vscode-powershell Release History
 
 ## v2019.11.0
-### Saturday, November 02, 2019
+### Friday, November 1, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
-- [vscode-PowerShell #2258](https://github.com/PowerShell/vscode-PowerShell/pull/2258) -
-  Bump @types/semver from 6.0.2 to 6.2.0. (Thanks @dependabot-preview[bot]!)
-- [vscode-PowerShell #2247](https://github.com/PowerShell/vscode-PowerShell/pull/2247) -
-  Bump @types/semver from 6.0.1 to 6.0.2. (Thanks @dependabot-preview[bot]!)
-- [vscode-PowerShell #2249](https://github.com/PowerShell/vscode-PowerShell/pull/2249) -
-  Bump vsce from 1.66.0 to 1.68.0. (Thanks @dependabot-preview[bot]!)
-- [vscode-PowerShell #2252](https://github.com/PowerShell/vscode-PowerShell/pull/2252) -
-  Fix bug finding Windows PowerShell.
+- 🐛 [vscode-PowerShell #2252](https://github.com/PowerShell/vscode-PowerShell/pull/2252) -
+  Fix bug finding Windows PowerShell when PowerShell 6+ not installed.
 - 🔍 [vscode-powershell #2144](https://github.com/PowerShell/vscode-PowerShell/pull/2223) -
-  Don't delete the session file to fix restart capability..
-- [vscode-PowerShell #2224](https://github.com/PowerShell/vscode-PowerShell/pull/2224) -
+   Fix debugging restart capability by ensuring the session file is not deleted.
+- 📺 [vscode-PowerShell #2224](https://github.com/PowerShell/vscode-PowerShell/pull/2224) -
   Provide Run Selection button in Editor Title Menu. (Thanks @jpogran!)
-- [vscode-PowerShell #2225](https://github.com/PowerShell/vscode-PowerShell/pull/2225) -
+- 📺 [vscode-PowerShell #2225](https://github.com/PowerShell/vscode-PowerShell/pull/2225) -
   Surface Invoke Registered Editor Command. (Thanks @jpogran!)
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
-- [PowerShellEditorServices #1077](https://github.com/PowerShell/PowerShellEditorServices/pull/1077) -
-  New colors supported by PS7 (#1064).
+- 📟 [PowerShellEditorServices #1077](https://github.com/PowerShell/PowerShellEditorServices/pull/1077) -
+  Support new console color configuration in PowerShell 7.
 - 🐛 [vscode-powershell #2116](https://github.com/PowerShell/PowerShellEditorServices/pull/1044) -
-  Fix UNC intellisense backslash.
+  Fix UNC intellisense backslash.
 
 ## v2019.9.0
 ### Monday, September 23, 2019
