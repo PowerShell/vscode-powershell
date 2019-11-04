@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.4
+.VERSION 1.4.1
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -25,6 +25,8 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    07/10/2019 - Fix a version check when installing user-builds with Windows Powershell greater than 5.
+    --
     30/08/2019 - added functionality to install the "User Install" variant of Stable Edition.
     --
     07/11/2018 - added support for PowerShell Core and macOS/Linux platforms.
