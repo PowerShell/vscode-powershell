@@ -137,18 +137,13 @@ Logs provide context for what was happening when the issue occurred.
 **Note: You should skim through your logs for any sensitive information you would not like to share online**
 
 - Before sending through logs, try and reproduce the issue with
-  **log level set to Verbose** or **Diagnostic**. You can set this
+  **log level set to Diagnostic**. You can set this
   in the [VSCode Settings] (<kbd>Ctrl</kbd>+<kbd>,</kbd>) with:
-
-  ```json
-  "powershell.developer.editorServicesLogLevel": "Verbose"
-  ```
-
-  or for diagnostic logging:
 
   ```json
   "powershell.developer.editorServicesLogLevel": "Diagnostic"
   ```
+
   After you have captured the issue with the log level turned up,
   you may want to return it (since verbose logging can use disk space):
 
@@ -182,6 +177,33 @@ Logs provide context for what was happening when the issue occurred.
   them onto your open issue description in the browser.
 
 - If you prefer to share your logs privately, you can send them to
+  vscode-powershell@microsoft.com. Please still open an issue though
+  so we can track the work &mdash; other users may have the same issue.
+
+#### Provide Language Server Protocol payload logs
+
+> NOTE: This currently only applies to the PowerShell Preview extension and only if you have version
+> 2019.11.0 or higher.
+
+The PowerShell extension works mostly from sending and receiving messages from [PowerShell Editor Services](httos://github.com/PowerShell/PowerShellEditorServices).
+In some cases, getting to the bottom of a bug will require looking at the payloads of these messages. To do this:
+
+- Add the following setting to your settings file:
+
+  ```json
+  "powershell editor services.trace.server":"verbose"
+  ```
+
+- Restart Visual Studio Code and reproduce the issue.
+
+- Go into the "Output" panel (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd> or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd>).
+
+- In the drop down on the right, select "PowerShell Editor Services".
+
+- Copy the entire contents of the Output panel and paste it into the GitHub issue in the browser.
+At this point, you may delete the setting if you want.
+
+- Again, if you prefer to share your logs privately, you can send them to
   vscode-powershell@microsoft.com. Please still open an issue though
   so we can track the work &mdash; other users may have the same issue.
 
