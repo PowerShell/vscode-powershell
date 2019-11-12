@@ -288,12 +288,12 @@
       ],
       "editor/title": [
         {
-          "when": "resourceLangId == powershell",
+          "when": "editorLangId == powershell",
           "command": "workbench.action.debug.start",
           "group": "navigation@100"
         },
         {
-          "when": "resourceLangId == powershell",
+          "when": "editorLangId == powershell",
           "command": "PowerShell.RunSelection",
           "group": "navigation@101"
         }
