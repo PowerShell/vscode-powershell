@@ -499,12 +499,6 @@
           "default": [],
           "description": "Specify array of Modules to exclude from Command Explorer listing."
         },
-        "powershell.powerShellExePath": {
-          "type": "string",
-          "default": "",
-          "scope": "machine",
-          "description": "Specifies the full path to a PowerShell executable. Changes the installation of PowerShell used for language and debugging services."
-        },
         "powershell.powerShellAdditionalExePaths": {
           "type": "array",
           "description": "Specifies an array of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
@@ -530,7 +524,7 @@
         },
         "powershell.powerShellDefaultVersion": {
           "type": "string",
-          "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6 (x64)\"."
+          "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6 (x64)\". You can specify additional PowerShell executables by using the \"powershell.powerShellAdditionalExePaths\" setting."
         },
         "powershell.promptToUpdatePowerShell": {
           "type": "boolean",

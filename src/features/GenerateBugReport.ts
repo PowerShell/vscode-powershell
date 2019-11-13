@@ -113,7 +113,7 @@ ${tableHeader}\n${table};
 
     private getRuntimeInfo() {
 
-        const powerShellExePath = this.sessionManager.getPowerShellExePath();
+        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
         const powerShellArgs = [
             "-NoProfile",
             "-Command",

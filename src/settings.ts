@@ -69,6 +69,7 @@ export interface IDebuggingSettings {
 
 export interface IDeveloperSettings {
     featureFlags?: string[];
+    // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
@@ -79,6 +80,7 @@ export interface IDeveloperSettings {
 export interface ISettings {
     powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
     powerShellDefaultVersion?: string;
+    // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
     promptToUpdatePowerShell?: boolean;
     bundledModulesPath?: string;
