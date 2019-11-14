@@ -526,6 +526,12 @@
           "type": "string",
           "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6 (x64)\". You can specify additional PowerShell executables by using the \"powershell.powerShellAdditionalExePaths\" setting."
         },
+        "powershell.powerShellExePath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "REMOVED. Please use the \"powershell.powerShellDefaultVersion\" setting instead."
+        },
         "powershell.promptToUpdatePowerShell": {
           "type": "boolean",
           "description": "Specifies whether you should be prompted to update your version of PowerShell.",

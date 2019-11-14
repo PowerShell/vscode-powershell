@@ -304,11 +304,6 @@ export class SessionManager implements Middleware {
             this.suppressRestartPrompt = true;
             try {
                 await Settings.change("powerShellExePath", undefined, true);
-
-                // This has been deprecated for a while so siliently remove it if it's there.
-                if (this.sessionSettings.developer.powerShellExePath) {
-                    await Settings.change("developer.powerShellExePath", undefined, true);
-                }
             } finally {
                 this.suppressRestartPrompt = false;
             }
