@@ -104,8 +104,11 @@ export class SessionManager implements Middleware {
         this.extensionFeatures = extensionFeatures;
     }
 
-    public start() {
+    public start(exeNameOverride?: string) {
         this.sessionSettings = Settings.load();
+        if (exeNameOverride) {
+            this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
+        }
 
         this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
 
@@ -223,6 +226,11 @@ export class SessionManager implements Middleware {
         }
 
         this.sessionStatus = SessionStatus.NotStarted;
+    }
+
+    public restartSession(exeNameOverride?: string) {
+        this.stop();
+        this.start(exeNameOverride);
     }
 
     public getSessionDetails(): utils.IEditorServicesSessionDetails {
@@ -572,11 +580,6 @@ export class SessionManager implements Middleware {
         });
     }
 
-    private restartSession() {
-        this.stop();
-        this.start();
-    }
-
     private createStatusBarItem() {
         if (this.statusBarItem === undefined) {
             // Create the status bar item and place it right next
@@ -630,7 +633,11 @@ export class SessionManager implements Middleware {
         this.suppressRestartPrompt = true;
         Settings
             .change("powerShellDefaultVersion", exePath.displayName, true)
-            .then(() => this.restartSession());
+            // We pass in the display name so that we force the extension to use that version
+            // rather than pull from the settings. The issue we prevent here is when a
+            // workspace setting is defined which gets priority over user settings which
+            // is what the change above sets.
+            .then(() => this.restartSession(exePath.displayName));
     }
 
     private showSessionConsole(isExecute?: boolean) {
@@ -691,7 +698,11 @@ export class SessionManager implements Middleware {
 
             new SessionMenuItem(
                 "Restart Current Session",
-                () => { this.restartSession(); }),
+                () => {
+                    // We pass in the display name so we guarentee that the session
+                    // will be the same PowerShell.
+                    this.restartSession(this.PowerShellExeDetails.displayName);
+                }),
 
             new SessionMenuItem(
                 "Open Session Logs Folder",
