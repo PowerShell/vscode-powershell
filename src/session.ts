@@ -667,7 +667,7 @@ export class SessionManager implements Middleware {
 
         const powerShellItems =
             availablePowerShellExes
-                .filter((item) => item.displayName.toLowerCase() !== this.PowerShellExeDetails.displayName)
+                .filter((item) => item.displayName !== this.PowerShellExeDetails.displayName)
                 .map((item) => {
                     return new SessionMenuItem(
                         `Switch to: ${item.displayName}`,
@@ -679,16 +679,20 @@ export class SessionManager implements Middleware {
                 sessionText,
                 () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
 
-            new SessionMenuItem(
-                "Restart Current Session",
-                () => { this.restartSession(); }),
-
             // Add all of the different PowerShell options
             ...powerShellItems,
 
             new SessionMenuItem(
+                "Restart Current Session",
+                () => { this.restartSession(); }),
+
+            new SessionMenuItem(
                 "Open Session Logs Folder",
                 () => { vscode.commands.executeCommand("PowerShell.OpenLogFolder"); }),
+
+            new SessionMenuItem(
+                "Modify 'powerShell.powerShellAdditionalExePaths' in Settings",
+                () => { vscode.commands.executeCommand("workbench.action.openSettingsJson"); }),
         ];
 
         vscode
