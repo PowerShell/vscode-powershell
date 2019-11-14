@@ -121,7 +121,19 @@ export class SessionManager implements Middleware {
         this.promptPowerShellExeSettingsCleanup();
 
         try {
-            this.PowerShellExeDetails = this.powershellExeFinder.getFirstAvailablePowerShellInstallation();
+            let powerShellExeDetails;
+            if (this.sessionSettings.powerShellDefaultVersion) {
+                for (const details of this.powershellExeFinder.enumeratePowerShellInstallations()) {
+                    if (details.displayName === this.sessionSettings.powerShellDefaultVersion) {
+                        powerShellExeDetails = details;
+                        break;
+                    }
+                }
+            }
+
+            this.PowerShellExeDetails = powerShellExeDetails ||
+                this.powershellExeFinder.getFirstAvailablePowerShellInstallation();
+
         } catch (e) {
             this.log.writeError(`Error occurred while searching for a PowerShell executable:\n${e}`);
         }
