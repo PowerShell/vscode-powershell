@@ -6,7 +6,8 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-import { LanguageClient, NotificationType, NotificationType0, Position, Range, RequestType } from "vscode-languageclient";
+import { LanguageClient, NotificationType, NotificationType0,
+    Position, Range, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import Settings = require("../settings");
