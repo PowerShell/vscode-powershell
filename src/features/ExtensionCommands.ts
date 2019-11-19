@@ -6,9 +6,10 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-import { LanguageClient, NotificationType, Position, Range, RequestType } from "vscode-languageclient";
+import { LanguageClient, NotificationType, NotificationType0, Position, Range, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
+import Settings = require("../settings");
 
 export interface IExtensionCommand {
     name: string;
@@ -155,6 +156,9 @@ export const SetStatusBarMessageRequestType =
     new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void, void>(
         "editor/setStatusBarMessage");
 
+export const ClearTerminalNotificationType =
+        new NotificationType0("editor/clearTerminal");
+
 export interface ISaveFileDetails {
     filePath: string;
     newPath?: string;
@@ -265,6 +269,16 @@ export class ExtensionCommandsFeature implements IFeature {
             this.languageClient.onRequest(
                 SetStatusBarMessageRequestType,
                 (messageDetails) => this.setStatusBarMessage(messageDetails));
+
+            this.languageClient.onNotification(
+                ClearTerminalNotificationType,
+                () => {
+                    // We check to see if they have TrueClear on. If not, no-op because the
+                    // overriden Clear-Host already calls [System.Console]::Clear()
+                    if (Settings.load().integratedConsole.useTrueClear) {
+                        vscode.commands.executeCommand("workbench.action.terminal.clear");
+                    }
+                });
         }
     }
 

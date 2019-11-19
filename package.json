@@ -688,6 +688,10 @@
           "default": false,
           "description": "Falls back to the legacy (lightweight) ReadLine experience. This will disable the use of PSReadLine in the PowerShell Integrated Console."
         },
+        "powershell.integratedConsole.useTrueClear": {
+          "type": "boolean",
+          "description": "Use the vscode API to clear the terminal since that's the only way to trigger a true clear. A true clear is a clear that shows nothing when you scroll up after running Clear-Host."
+        },
         "powershell.debugging.createTemporaryIntegratedConsole": {
           "type": "boolean",
           "default": false,
