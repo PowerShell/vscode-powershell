@@ -156,7 +156,6 @@ export function load(): ISettings {
         showOnStartup: true,
         focusConsoleOnExecute: true,
         useLegacyReadLine: false,
-        // This behavior is expected on Windows but not on non-Windows
         forceClearScrollbackBuffer: false,
     };
 
