@@ -629,15 +629,15 @@ export class SessionManager implements Middleware {
             SessionStatus.Failed);
     }
 
-    private changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
+    private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
         this.suppressRestartPrompt = true;
-        Settings
-            .change("powerShellDefaultVersion", exePath.displayName, true)
-            // We pass in the display name so that we force the extension to use that version
-            // rather than pull from the settings. The issue we prevent here is when a
-            // workspace setting is defined which gets priority over user settings which
-            // is what the change above sets.
-            .then(() => this.restartSession(exePath.displayName));
+        await Settings.change("powerShellDefaultVersion", exePath.displayName, true);
+
+        // We pass in the display name so that we force the extension to use that version
+        // rather than pull from the settings. The issue we prevent here is when a
+        // workspace setting is defined which gets priority over user settings which
+        // is what the change above sets.
+        this.restartSession(exePath.displayName);
     }
 
     private showSessionConsole(isExecute?: boolean) {

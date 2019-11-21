@@ -69,7 +69,6 @@ export interface IDebuggingSettings {
 
 export interface IDeveloperSettings {
     featureFlags?: string[];
-    // This setting is no longer used but is here to assist in cleaning up the users settings.
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
