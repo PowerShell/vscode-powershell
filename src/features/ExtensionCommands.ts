@@ -276,7 +276,7 @@ export class ExtensionCommandsFeature implements IFeature {
                 () => {
                     // We check to see if they have TrueClear on. If not, no-op because the
                     // overriden Clear-Host already calls [System.Console]::Clear()
-                    if (Settings.load().integratedConsole.useTrueClear) {
+                    if (Settings.load().integratedConsole.forceClearScrollbackBuffer) {
                         vscode.commands.executeCommand("workbench.action.terminal.clear");
                     }
                 });
