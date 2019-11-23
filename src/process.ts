@@ -41,11 +41,11 @@ export class PowerShellProcess {
         return new Promise<utils.IEditorServicesSessionDetails>(
             (resolve, reject) => {
                 try {
-                    const startScriptPath =
+                    const psesModulePath =
                         path.resolve(
                             __dirname,
                             this.bundledModulesPath,
-                            "PowerShellEditorServices/Start-EditorServices.ps1");
+                            "PowerShellEditorServices/PowerShellEditorServices.psd1");
 
                     const editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
@@ -73,9 +73,9 @@ export class PowerShellProcess {
                         powerShellArgs.push("-ExecutionPolicy", "Bypass");
                     }
 
-                    const startEditorServices = "& '" +
-                        PowerShellProcess.escapeSingleQuotes(startScriptPath) +
-                        "' " + this.startArgs;
+                    const startEditorServices = "Import-Module '" +
+                        PowerShellProcess.escapeSingleQuotes(psesModulePath) +
+                        "'; Start-EditorServices " + this.startArgs;
 
                     if (utils.isWindowsOS()) {
                         powerShellArgs.push(
@@ -108,7 +108,7 @@ export class PowerShellProcess {
                     this.log.write(
                         "Language server starting --",
                         "    exe: " + powerShellExePath,
-                        "    args: " + startScriptPath + " " + this.startArgs);
+                        "    args: " + startEditorServices);
 
                     // Make sure no old session file exists
                     utils.deleteSessionFile(this.sessionFilePath);
