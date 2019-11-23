@@ -2,12 +2,22 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
+import { spawn } from "child_process";
+import * as fs from "fs";
 import fetch, { RequestInit } from "node-fetch";
+import * as os from "os";
+import * as path from "path";
 import * as semver from "semver";
-import { MessageItem, window } from "vscode";
+import * as stream from "stream";
+import * as util from "util";
+import { MessageItem, ProgressLocation, window } from "vscode";
 import { LanguageClient } from "vscode-languageclient";
+import { SessionManager } from "../session";
 import * as Settings from "../settings";
+import { isMacOS, isWindows } from "../utils";
 import { EvaluateRequestType } from "./Console";
+
+const streamPipeline = util.promisify(stream.pipeline);
 
 const PowerShellGitHubReleasesUrl =
         "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
@@ -67,6 +77,7 @@ interface IUpdateMessageItem extends MessageItem {
 }
 
 export async function InvokePowerShellUpdateCheck(
+    sessionManager: SessionManager,
     languageServerClient: LanguageClient,
     localVersion: semver.SemVer,
     arch: string,
@@ -103,7 +114,6 @@ export async function InvokePowerShellUpdateCheck(
         return;
     }
 
-    const isMacOS: boolean = process.platform === "darwin";
     const result = await window.showInformationMessage(
         `${commonText} Would you like to update the version? ${
             isMacOS ? "(Homebrew is required on macOS)" : ""
@@ -116,39 +126,55 @@ export async function InvokePowerShellUpdateCheck(
     switch (result.id) {
         // Yes choice.
         case 0:
-            let script: string;
-            if (process.platform === "win32") {
+            if (isWindows) {
                 const msiMatcher = arch === "x86" ?
                     "win-x86.msi" : "win-x64.msi";
 
-                const assetUrl = release.assets.filter((asset: any) =>
-                    asset.name.indexOf(msiMatcher) >= 0)[0].browser_download_url;
+                const asset = release.assets.filter((a: any) => a.name.indexOf(msiMatcher) >= 0)[0];
+                const msiDownloadPath = path.join(os.tmpdir(), asset.name);
 
-                // Grab MSI and run it.
-                // tslint:disable-next-line: max-line-length
-                script = `
-$randomFileName = [System.IO.Path]::GetRandomFileName()
-$tmpMsiPath = Microsoft.PowerShell.Management\\Join-Path ([System.IO.Path]::GetTempPath()) "$randomFileName.msi"
-Microsoft.PowerShell.Utility\\Invoke-RestMethod -Uri ${assetUrl} -OutFile $tmpMsiPath
-try
-{
-    Microsoft.PowerShell.Management\\Start-Process -Wait -Path $tmpMsiPath
-}
-finally
-{
-    Microsoft.PowerShell.Management\\Remove-Item $tmpMsiPath
-}`;
+                const res = await fetch(asset.browser_download_url);
+                if (!res.ok) {
+                    throw new Error("unable to fetch MSI");
+                }
+
+                await window.withProgress({
+                    title: "Downloading PowerShell Installer...",
+                    location: ProgressLocation.Notification,
+                    cancellable: false,
+                },
+                async () => {
+                    // Streams the body of the request to a file.
+                    await streamPipeline(res.body, fs.createWriteStream(msiDownloadPath));
+                });
+
+                // Stop the Integrated Console session because Windows likes to hold on to files.
+                sessionManager.stop();
+
+                // Invoke the MSI via cmd.
+                const msi = spawn("cmd", [`/S /C ${msiDownloadPath}`], {
+                    detached: true,
+                    cwd: os.homedir(),
+                    env: process.env,
+                });
+
+                msi.on("close", (code) => {
+                    // Now that the MSI is finished, start the Integrated Console session.
+                    sessionManager.start();
+                    fs.unlinkSync(msiDownloadPath);
+                });
 
             } else if (isMacOS) {
-                script = "brew cask upgrade powershell";
+                let script = "brew cask upgrade powershell";
                 if (release.isPreview) {
                     script = "brew cask upgrade powershell-preview";
                 }
+
+                await languageServerClient.sendRequest(EvaluateRequestType, {
+                    expression: script,
+                });
             }
 
-            await languageServerClient.sendRequest(EvaluateRequestType, {
-                expression: script,
-            });
             break;
 
         // Never choice.

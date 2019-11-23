@@ -546,6 +546,7 @@ export class SessionManager implements Middleware {
                                         await GitHubReleaseInformation.FetchLatestRelease(isPreRelease);
 
                                     await InvokePowerShellUpdateCheck(
+                                        this,
                                         this.languageServerClient,
                                         localVersion,
                                         this.versionDetails.architecture,
