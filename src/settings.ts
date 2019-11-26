@@ -69,7 +69,6 @@ export interface IDebuggingSettings {
 
 export interface IDeveloperSettings {
     featureFlags?: string[];
-    powerShellExePath?: string;
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
@@ -79,6 +78,7 @@ export interface IDeveloperSettings {
 export interface ISettings {
     powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
     powerShellDefaultVersion?: string;
+    // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
     promptToUpdatePowerShell?: boolean;
     bundledModulesPath?: string;
@@ -121,7 +121,6 @@ export function load(): ISettings {
 
     const defaultDeveloperSettings: IDeveloperSettings = {
         featureFlags: [],
-        powerShellExePath: undefined,
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
