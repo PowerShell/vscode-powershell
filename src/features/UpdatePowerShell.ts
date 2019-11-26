@@ -152,11 +152,7 @@ export async function InvokePowerShellUpdateCheck(
                 sessionManager.stop();
 
                 // Invoke the MSI via cmd.
-                const msi = spawn("cmd", [`/S /C ${msiDownloadPath}`], {
-                    detached: true,
-                    cwd: os.homedir(),
-                    env: process.env,
-                });
+                const msi = spawn("msiexec", ["/i", msiDownloadPath]);
 
                 msi.on("close", (code) => {
                     // Now that the MSI is finished, start the Integrated Console session.
@@ -165,10 +161,9 @@ export async function InvokePowerShellUpdateCheck(
                 });
 
             } else if (isMacOS) {
-                let script = "brew cask upgrade powershell";
-                if (release.isPreview) {
-                    script = "brew cask upgrade powershell-preview";
-                }
+                const script = release.isPreview
+                    ? "brew cask upgrade powershell-preview"
+                    : "brew cask upgrade powershell";
 
                 await languageServerClient.sendRequest(EvaluateRequestType, {
                     expression: script,
