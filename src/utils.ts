@@ -8,7 +8,7 @@ import fs = require("fs");
 import os = require("os");
 import path = require("path");
 
-export let PowerShellLanguageId = "powershell";
+export const PowerShellLanguageId = "powershell";
 
 export function ensurePathExists(targetPath: string) {
     // Ensure that the path exists
@@ -116,6 +116,6 @@ export function getTimestampString() {
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;
 }
 
-export function isWindowsOS(): boolean {
-    return os.platform() === "win32";
-}
+export const isMacOS: boolean = process.platform === "darwin";
+export const isWindows: boolean = process.platform === "win32";
+export const isLinux: boolean = !isMacOS && !isWindows;

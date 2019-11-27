@@ -69,7 +69,7 @@ export class PowerShellProcess {
                     ];
 
                     // Only add ExecutionPolicy param on Windows
-                    if (utils.isWindowsOS()) {
+                    if (utils.isWindows) {
                         powerShellArgs.push("-ExecutionPolicy", "Bypass");
                     }
 
@@ -77,7 +77,7 @@ export class PowerShellProcess {
                         PowerShellProcess.escapeSingleQuotes(startScriptPath) +
                         "' " + this.startArgs;
 
-                    if (utils.isWindowsOS()) {
+                    if (utils.isWindows) {
                         powerShellArgs.push(
                             "-Command",
                             startEditorServices);
