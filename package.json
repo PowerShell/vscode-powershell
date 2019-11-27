@@ -688,6 +688,10 @@
           "default": false,
           "description": "Falls back to the legacy (lightweight) ReadLine experience. This will disable the use of PSReadLine in the PowerShell Integrated Console."
         },
+        "powershell.integratedConsole.forceClearScrollbackBuffer": {
+          "type": "boolean",
+          "description": "Use the vscode API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're use to 'Clear-Host' clearing scroll history as wellclear-terminal-via-lsp."
+        },
         "powershell.debugging.createTemporaryIntegratedConsole": {
           "type": "boolean",
           "default": false,

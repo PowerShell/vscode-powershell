@@ -99,6 +99,7 @@ export interface IIntegratedConsoleSettings {
     showOnStartup?: boolean;
     focusConsoleOnExecute?: boolean;
     useLegacyReadLine?: boolean;
+    forceClearScrollbackBuffer?: boolean;
 }
 
 export function load(): ISettings {
@@ -154,6 +155,7 @@ export function load(): ISettings {
         showOnStartup: true,
         focusConsoleOnExecute: true,
         useLegacyReadLine: false,
+        forceClearScrollbackBuffer: false,
     };
 
     return {
