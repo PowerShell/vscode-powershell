@@ -38,6 +38,8 @@
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
     "onCommand:PowerShell.RestartSession",
+    "onCommand:PowerShell.SetISECompatibility",
+    "onCommand:PowerShell.UnsetISECompatibility",
     "onView:PowerShellCommands"
   ],
   "dependencies": {
@@ -131,6 +133,16 @@
       {
         "command": "PowerShell.ExpandAlias",
         "title": "Expand Alias",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.SetISECompatibility",
+        "title": "Set ISE like compatibility",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.UnsetISECompatibility",
+        "title": "Unset ISE like compatibility (restore to defaults)",
         "category": "PowerShell"
       },
       {

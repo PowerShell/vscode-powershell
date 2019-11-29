@@ -23,6 +23,7 @@ import { FindModuleFeature } from "./features/FindModule";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
+import { ISECompatibilityFeature } from "./features/ISECompatibility";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
@@ -146,6 +147,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new GenerateBugReportFeature(sessionManager),
         new ExpandAliasFeature(logger),
         new GetCommandsFeature(logger),
+        new ISECompatibilityFeature(),
         new ShowHelpFeature(logger),
         new FindModuleFeature(),
         new PesterTestsFeature(sessionManager),
