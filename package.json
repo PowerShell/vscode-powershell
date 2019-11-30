@@ -38,8 +38,8 @@
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
     "onCommand:PowerShell.RestartSession",
-    "onCommand:PowerShell.SetISECompatibility",
-    "onCommand:PowerShell.UnsetISECompatibility",
+    "onCommand:PowerShell.EnableISEMode",
+    "onCommand:PowerShell.DisableISEMode",
     "onView:PowerShellCommands"
   ],
   "dependencies": {
@@ -136,13 +136,13 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.SetISECompatibility",
-        "title": "Set ISE like compatibility",
+        "command": "PowerShell.EnableISEMode",
+        "title": "Enable ISE Mode",
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.UnsetISECompatibility",
-        "title": "Unset ISE like compatibility (restore to defaults)",
+        "command": "PowerShell.DisableISEMode",
+        "title": "Disable ISE Mode (restore to defaults)",
         "category": "PowerShell"
       },
       {

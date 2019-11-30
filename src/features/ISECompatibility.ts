@@ -12,21 +12,20 @@ export class ISECompatibilityFeature implements IFeature {
     private iseCommand: vscode.Disposable;
     private defaultCommand: vscode.Disposable;
     private settings = [
-        {section: "workbench.activityBar", setting: "visible", value: false},
-        {section: "debug", setting: "openDebug", value: "neverOpen"},
-        {section: "editor", setting: "tabCompletion", value: "on"},
-        {section: "powershell.integratedConsole", setting: "focusConsoleOnExecute", value: false},
-        {section: "powershell.integratedConsole", setting: "showOnStartup", value: false},
-        {section: "files", setting: "defaultLanguage", value: "powershell"},
-        {section: "workbench", setting: "colorTheme", value: "PowerShell ISE"},
+        { section: "workbench.activityBar", setting: "visible", value: false },
+        { section: "debug", setting: "openDebug", value: "neverOpen" },
+        { section: "editor", setting: "tabCompletion", value: "on" },
+        { section: "powershell.integratedConsole", setting: "focusConsoleOnExecute", value: false },
+        { section: "files", setting: "defaultLanguage", value: "powershell" },
+        { section: "workbench", setting: "colorTheme", value: "PowerShell ISE" },
     ];
     private languageClient: LanguageClient;
 
     constructor() {
-        this.iseCommand = vscode.commands.registerCommand("PowerShell.SetISECompatibility",
-            () => this.SetISECompatibility());
-        this.defaultCommand = vscode.commands.registerCommand("PowerShell.UnsetISECompatibility",
-            () => this.UnsetISECompatibility());
+        this.iseCommand = vscode.commands.registerCommand("PowerShell.EnableISEMode",
+            () => this.EnableISEMode());
+        this.defaultCommand = vscode.commands.registerCommand("PowerShell.DisableISEMode",
+            () => this.DisableISEMode());
     }
 
     public dispose() {
@@ -38,15 +37,18 @@ export class ISECompatibilityFeature implements IFeature {
         this.languageClient = languageclient;
     }
 
-    private SetISECompatibility() {
+    private EnableISEMode() {
         this.settings.forEach((value) => {
             vscode.workspace.getConfiguration(value.section).update(value.setting, value.value, true);
         });
     }
 
-    private UnsetISECompatibility() {
+    private DisableISEMode() {
         this.settings.forEach((value) => {
-            vscode.workspace.getConfiguration(value.section).update(value.setting, undefined, true);
+            const currently = vscode.workspace.getConfiguration(value.section).get(value.setting);
+            if (currently === value.value) {
+                vscode.workspace.getConfiguration(value.section).update(value.setting, undefined, true);
+            }
         });
-       }
+    }
 }
