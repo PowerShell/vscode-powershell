@@ -62,7 +62,7 @@
     "sinon": "~7.5.0",
     "tslint": "~5.20.1",
     "typescript": "~3.5.3",
-    "vsce": "~1.64.0",
+    "vsce": "~1.70.0",
     "vscode": "~1.1.36"
   },
   "extensionDependencies": [
