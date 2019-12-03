@@ -12,9 +12,9 @@
 
 .TAGS install vscode installer
 
-.LICENSEURI https://github.com/PowerShell/vscode-powershell/blob/develop/LICENSE.txt
+.LICENSEURI https://github.com/PowerShell/vscode-powershell/blob/master/LICENSE.txt
 
-.PROJECTURI https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
+.PROJECTURI https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1
 
 .ICONURI
 
