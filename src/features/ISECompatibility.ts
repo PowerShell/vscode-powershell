@@ -38,16 +38,16 @@ export class ISECompatibilityFeature implements IFeature {
     }
 
     private EnableISEMode() {
-        this.settings.forEach((value) => {
-            vscode.workspace.getConfiguration(value.section).update(value.setting, value.value, true);
+        this.settings.forEach(async (value) => {
+            await vscode.workspace.getConfiguration(value.section).update(value.setting, value.value, true);
         });
     }
 
     private DisableISEMode() {
-        this.settings.forEach((value) => {
+        this.settings.forEach(async (value) => {
             const currently = vscode.workspace.getConfiguration(value.section).get(value.setting);
             if (currently === value.value) {
-                vscode.workspace.getConfiguration(value.section).update(value.setting, undefined, true);
+                await vscode.workspace.getConfiguration(value.section).update(value.setting, undefined, true);
             }
         });
     }
