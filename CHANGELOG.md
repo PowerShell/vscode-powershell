@@ -1,5 +1,13 @@
 # PowerShell Preview Extension Release History
 
+## v2019.12.0
+### Tuesday, December 10, 2019
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+
 ## v2019.11.0
 ### Friday, November 1, 2019
 
