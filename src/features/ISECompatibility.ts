@@ -5,32 +5,38 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 import { IFeature } from "../feature";
 
+interface ISetting {
+    path: string;
+    name: string;
+    value: string|boolean;
+}
+
 /**
  * A feature to implement commands to make code like the ISE and reset the settings.
  */
 export class ISECompatibilityFeature implements IFeature {
-    private iseCommand: vscode.Disposable;
-    private defaultCommand: vscode.Disposable;
-    private settings = [
-        { section: "workbench.activityBar", setting: "visible", value: false },
-        { section: "debug", setting: "openDebug", value: "neverOpen" },
-        { section: "editor", setting: "tabCompletion", value: "on" },
-        { section: "powershell.integratedConsole", setting: "focusConsoleOnExecute", value: false },
-        { section: "files", setting: "defaultLanguage", value: "powershell" },
-        { section: "workbench", setting: "colorTheme", value: "PowerShell ISE" },
+    private iseCommandRegistration: vscode.Disposable;
+    private defaultCommandRegistration: vscode.Disposable;
+    private settings: ISetting[] = [
+        { path: "workbench.activityBar", name: "visible", value: false },
+        { path: "debug", name: "openDebug", value: "neverOpen" },
+        { path: "editor", name: "tabCompletion", value: "on" },
+        { path: "powershell.integratedConsole", name: "focusConsoleOnExecute", value: false },
+        { path: "files", name: "defaultLanguage", value: "powershell" },
+        { path: "workbench", name: "colorTheme", value: "PowerShell ISE" },
     ];
     private languageClient: LanguageClient;
 
     constructor() {
-        this.iseCommand = vscode.commands.registerCommand("PowerShell.EnableISEMode",
+        this.iseCommandRegistration = vscode.commands.registerCommand("PowerShell.EnableISEMode",
             () => this.EnableISEMode());
-        this.defaultCommand = vscode.commands.registerCommand("PowerShell.DisableISEMode",
+        this.defaultCommandRegistration = vscode.commands.registerCommand("PowerShell.DisableISEMode",
             () => this.DisableISEMode());
     }
 
     public dispose() {
-        this.iseCommand.dispose();
-        this.defaultCommand.dispose();
+        this.iseCommandRegistration.dispose();
+        this.defaultCommandRegistration.dispose();
     }
 
     public setLanguageClient(languageclient: LanguageClient) {
@@ -38,16 +44,16 @@ export class ISECompatibilityFeature implements IFeature {
     }
 
     private EnableISEMode() {
-        this.settings.forEach(async (value) => {
-            await vscode.workspace.getConfiguration(value.section).update(value.setting, value.value, true);
+        this.settings.forEach(async (iseSetting) => {
+            await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
         });
     }
 
     private DisableISEMode() {
-        this.settings.forEach(async (value) => {
-            const currently = vscode.workspace.getConfiguration(value.section).get(value.setting);
-            if (currently === value.value) {
-                await vscode.workspace.getConfiguration(value.section).update(value.setting, undefined, true);
+        this.settings.forEach(async (iseSetting) => {
+            const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
+            if (currently === iseSetting.value) {
+                await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, undefined, true);
             }
         });
     }
