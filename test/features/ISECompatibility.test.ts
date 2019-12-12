@@ -5,19 +5,17 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import { ISECompatibilityFeature } from "../../src/features/ISECompatibility";
 
-const ISECompatibility: ISECompatibilityFeature = new ISECompatibilityFeature();
-
 suite("ISECompatibility feature", () => {
     test("It sets ISE Settings", async () => {
         await vscode.commands.executeCommand("PowerShell.EnableISEMode");
-        for (const iseSetting of ISECompatibility.settings) {
+        for (const iseSetting of ISECompatibilityFeature.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             assert.equal(currently, iseSetting.value);
         }
     });
     test("It unsets ISE Settings", async () => {
         await vscode.commands.executeCommand("PowerShell.DisableISEMode");
-        for (const iseSetting of ISECompatibility.settings) {
+        for (const iseSetting of ISECompatibilityFeature.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             assert.notEqual(currently, iseSetting.value);
         }
@@ -26,11 +24,10 @@ suite("ISECompatibility feature", () => {
         await vscode.commands.executeCommand("PowerShell.EnableISEMode");
         await vscode.workspace.getConfiguration("workbench").update("colorTheme", "Dark+", true);
         await vscode.commands.executeCommand("PowerShell.DisableISEMode");
-        for (const iseSetting of ISECompatibility.settings) {
+        for (const iseSetting of ISECompatibilityFeature.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             assert.notEqual(currently, iseSetting.value);
         }
         assert.equal(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "Dark+");
     });
 });
-ISECompatibility.dispose();

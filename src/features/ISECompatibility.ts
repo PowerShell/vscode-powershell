@@ -16,7 +16,7 @@ interface ISetting {
  */
 export class ISECompatibilityFeature implements IFeature {
     // Marking settings as public so we can use it within the tests without needing to duplicate the list of settings.
-    public settings: ISetting[] = [
+    public static settings: ISetting[] = [
         { path: "workbench.activityBar", name: "visible", value: false },
         { path: "debug", name: "openDebug", value: "neverOpen" },
         { path: "editor", name: "tabCompletion", value: "on" },
@@ -45,13 +45,13 @@ export class ISECompatibilityFeature implements IFeature {
     }
 
     private async EnableISEMode() {
-        for (const iseSetting of this.settings) {
+        for (const iseSetting of ISECompatibilityFeature.settings) {
             await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
         }
     }
 
     private async DisableISEMode() {
-        for (const iseSetting of this.settings) {
+        for (const iseSetting of ISECompatibilityFeature.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get<string | boolean>(iseSetting.name);
             if (currently === iseSetting.value) {
                 await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, undefined, true);
