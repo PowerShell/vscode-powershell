@@ -10,7 +10,7 @@ export function run(): Promise<void> {
     // Create the mocha test
     const mocha = new Mocha({
         ui: "tdd", 		// the TDD UI is being used in extension.test.ts (suite, test, etc.)
-        useColors: true, // colored output from test results
+        useColors: !process.env.TF_BUILD, // colored output from test results
         reporter: "mocha-multi-reporters",
         timeout: 5000,
         reporterOptions: {
