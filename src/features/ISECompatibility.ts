@@ -8,7 +8,7 @@ import { IFeature } from "../feature";
 interface ISetting {
     path: string;
     name: string;
-    value: string|boolean;
+    value: string | boolean;
 }
 
 /**
@@ -43,18 +43,18 @@ export class ISECompatibilityFeature implements IFeature {
         this.languageClient = languageclient;
     }
 
-    private EnableISEMode() {
-        this.settings.forEach(async (iseSetting) => {
+    private async EnableISEMode() {
+        for (const iseSetting of this.settings) {
             await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
-        });
+        }
     }
 
-    private DisableISEMode() {
-        this.settings.forEach(async (iseSetting) => {
+    private async DisableISEMode() {
+        for (const iseSetting of this.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             if (currently === iseSetting.value) {
                 await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, undefined, true);
             }
-        });
+        }
     }
 }
