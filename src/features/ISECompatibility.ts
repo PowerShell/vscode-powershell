@@ -15,9 +15,8 @@ interface ISetting {
  * A feature to implement commands to make code like the ISE and reset the settings.
  */
 export class ISECompatibilityFeature implements IFeature {
-    private iseCommandRegistration: vscode.Disposable;
-    private defaultCommandRegistration: vscode.Disposable;
-    private settings: ISetting[] = [
+    // Marking settings as public so we can use it within the tests without needing to duplicate the list of settings.
+    public settings: ISetting[] = [
         { path: "workbench.activityBar", name: "visible", value: false },
         { path: "debug", name: "openDebug", value: "neverOpen" },
         { path: "editor", name: "tabCompletion", value: "on" },
@@ -25,6 +24,8 @@ export class ISECompatibilityFeature implements IFeature {
         { path: "files", name: "defaultLanguage", value: "powershell" },
         { path: "workbench", name: "colorTheme", value: "PowerShell ISE" },
     ];
+    private iseCommandRegistration: vscode.Disposable;
+    private defaultCommandRegistration: vscode.Disposable;
     private languageClient: LanguageClient;
 
     constructor() {
