@@ -29,10 +29,8 @@ export class ISECompatibilityFeature implements IFeature {
     private languageClient: LanguageClient;
 
     constructor() {
-        this.iseCommandRegistration = vscode.commands.registerCommand("PowerShell.EnableISEMode",
-            () => this.EnableISEMode());
-        this.defaultCommandRegistration = vscode.commands.registerCommand("PowerShell.DisableISEMode",
-            () => this.DisableISEMode());
+        this.iseCommandRegistration = vscode.commands.registerCommand("PowerShell.EnableISEMode", this.EnableISEMode);
+        this.defaultCommandRegistration = vscode.commands.registerCommand("PowerShell.DisableISEMode", this.DisableISEMode);
     }
 
     public dispose() {
@@ -52,7 +50,7 @@ export class ISECompatibilityFeature implements IFeature {
 
     private async DisableISEMode() {
         for (const iseSetting of this.settings) {
-            const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
+            const currently = vscode.workspace.getConfiguration(iseSetting.path).get<string | boolean>(iseSetting.name);
             if (currently === iseSetting.value) {
                 await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, undefined, true);
             }
