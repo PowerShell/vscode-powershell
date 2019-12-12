@@ -16,8 +16,8 @@ async function main() {
         // Passed to --extensionTestsPath
         const extensionTestsPath = path.resolve(__dirname, "./testRunner");
 
-        // Download VS Code, unzip it and run the integration test
-        await runTests({ extensionDevelopmentPath, extensionTestsPath });
+        // Download VS Code, unzip it and run the integration test from the local directory.
+        await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: ["."] });
     } catch (err) {
         // tslint:disable-next-line:no-console
         console.error(err);
