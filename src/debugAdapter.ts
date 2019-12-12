@@ -58,7 +58,11 @@ function startDebugging() {
     // Route any output from the socket through stdout
     debugServiceSocket.on(
         "data",
-        (data: Buffer) => process.stdout.write(data));
+        (data: Buffer) => {
+            debugAdapterLogWriter.write("\n\nRECEIVED: \n\n");
+            debugAdapterLogWriter.write(data);
+            process.stdout.write(data);
+        });
 
     // Wait for the connection to complete
     debugServiceSocket.on(
@@ -70,7 +74,11 @@ function startDebugging() {
             // When data comes on stdin, route it through the socket
             process.stdin.on(
                 "data",
-                (data: Buffer) => debugServiceSocket.write(data));
+                (data: Buffer) => {
+                    debugAdapterLogWriter.write("\n\nSENT: \n\n");
+                    debugAdapterLogWriter.write(data);
+                    debugServiceSocket.write(data);
+                });
 
             // Resume the stdin stream
             process.stdin.resume();
