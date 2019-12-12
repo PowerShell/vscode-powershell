@@ -1,5 +1,53 @@
 # PowerShell Preview Extension Release History
 
+## v2019.12.0
+### Wednesday, December 11, 2019
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- ⚡️ 🛫 [vscode-PowerShell #2348](https://github.com/PowerShell/vscode-PowerShell/pull/2348) -
+  Start EditorServices without start script.
+- ✨ 📟 [vscode-PowerShell #2316](https://github.com/PowerShell/vscode-PowerShell/pull/2316) -
+  Handle clearTerminal message by using vscode clear command.
+- 🐛 📺 [vscode-PowerShell #2325](https://github.com/PowerShell/vscode-PowerShell/pull/2325) -
+  Fix update powershell feature on windows.
+- 🔧 📁 🐛 [vscode-powershell #2099](https://github.com/PowerShell/vscode-PowerShell/pull/2304) -
+  Use `powerShellDefaultVersion` everywhere and stop using `powerShellExePath`.
+- 🐛 📺 [vscode-PowerShell #2294](https://github.com/PowerShell/vscode-PowerShell/pull/2294) -
+  Buttons show up for untitled files.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 👷 📟 [PowerShellEditorServices #1129](https://github.com/PowerShell/PowerShellEditorServices/pull/1129) -
+  Update PSReadLine to 2.0.0-rc1 in modules.json.
+- 🛫 🐛 ⚡️ [vscode-powershell #2292](https://github.com/PowerShell/PowerShellEditorServices/pull/1118) -
+  Isolate PSES dependencies from PowerShell on load + make PSES a pure binary module.
+- ✨ 📟 [PowerShellEditorServices #1108](https://github.com/PowerShell/PowerShellEditorServices/pull/1108) -
+  Clear the terminal via the LSP.
+- 🔍 🐛 [vscode-powershell #2319](https://github.com/PowerShell/PowerShellEditorServices/pull/1117) -
+  Run one invocation per SetBreakpoints request. (Thanks @SeeminglyScience!)
+- 🐛 [PowerShellEditorServices #1114](https://github.com/PowerShell/PowerShellEditorServices/pull/1114) -
+  Fix Import-EditorCommand -Module. (Thanks @sk82jack!)
+- 🐛 🔍 [PowerShellEditorServices #1112](https://github.com/PowerShell/PowerShellEditorServices/pull/1112) -
+  Fix breakpoint setting deadlock.
+- 🔗 🐛 [vscode-powershell #2306](https://github.com/PowerShell/PowerShellEditorServices/pull/1110) -
+  Fix references on Windows due to bad WorkspacePath.
+- ✨ 👷 [PowerShellEditorServices #993](https://github.com/PowerShell/PowerShellEditorServices/pull/993) -
+  Add devcontainer support for building in container. (Thanks @bergmeister!)
+- 🛫 🐛 [vscode-powershell #2311](https://github.com/PowerShell/PowerShellEditorServices/pull/1107) -
+  Protect against no RootUri (no open workspace).
+- 🐛 📟 [vscode-powershell #2274](https://github.com/PowerShell/PowerShellEditorServices/pull/1092) -
+  Fix '@' appearing in console.
+- 👮‍ 🐛 [vscode-powershell #2288](https://github.com/PowerShell/PowerShellEditorServices/pull/1094) -
+  Use RootUri.LocalPath for workspace path.
+- 🐛 👮‍ [PowerShellEditorServices #1101](https://github.com/PowerShell/PowerShellEditorServices/pull/1101) -
+  Add PSAvoidAssignmentToAutomaticVariable to the default set of PSSA rules. (Thanks @bergmeister!)
+- 👮‍ 🔗 🐛 [vscode-powershell #2290](https://github.com/PowerShell/PowerShellEditorServices/pull/1098) -
+  Fix diagnostics not showing in untitled files and now also show CodeLens.
+- 🔍 🐛 [vscode-powershell #1850](https://github.com/PowerShell/PowerShellEditorServices/pull/1097) -
+  Fixes no prompt showing up when debugging.
+- 🚂 📺 🐛 [vscode-powershell #2284](https://github.com/PowerShell/PowerShellEditorServices/pull/1096) -
+  Fix running indicator by ignoring PSRL aborts.
+
 ## v2019.11.0
 ### Friday, November 1, 2019
 
