@@ -101,13 +101,12 @@ task BuildAll BuildEditorServices, Build
 #region Test tasks
 
 task Test Build, {
-    if (!$global:IsLinux) {
-        Write-Host "`n### Running extension tests" -ForegroundColor Green
-        exec { & npm run test }
+    if ($env:TF_BUILD -and $global:IsLinux) {
+        Write-Warning "Skipping extension tests in Linux CI because vscode does not support it."
+        return
     }
-    else {
-        Write-Warning "Skipping extension tests on Linux platform because vscode does not support it."
-    }
+    Write-Host "`n### Running extension tests" -ForegroundColor Green
+    exec { & npm run test }
 }
 
 task TestEditorServices {
