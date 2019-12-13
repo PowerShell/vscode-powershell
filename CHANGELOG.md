@@ -1,5 +1,14 @@
 # vscode-powershell Release History
 
+## v2019.12.0
+### Thursday, December 12, 2019
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 👮‍ [PowerShellEditorServices #1102](https://github.com/PowerShell/PowerShellEditorServices/pull/1102) -
+  Add `PSAvoidAssignmentToAutomaticVariable` to the default set of PSSA rules. (Thanks @bergmeister!)
+- 🐛 👮‍ [vscode-PowerShell #2214](https://github.com/PowerShell/PowerShellEditorServices/pull/1050) -
+  Fix `PipelineIndentationStyle` configuration issue. (Thanks @bergmeister!)
+
 ## v2019.11.0
 ### Friday, November 1, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
