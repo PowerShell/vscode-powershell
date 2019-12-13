@@ -9,6 +9,7 @@ steps:
     Write-Host "sending " + $vstsCommandString
     Write-Host "##$vstsCommandString"
     displayName: Install PowerShell Core
+  condition: eq(variables['Agent.OS'], 'Windows_NT')
   # Build setup
   - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
     displayName: Set Build Name for Non-PR
