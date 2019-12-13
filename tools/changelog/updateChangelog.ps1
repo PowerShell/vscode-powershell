@@ -163,7 +163,10 @@ $psesRepoName = 'PowerShellEditorServices'
 $dateFormat = 'dddd, MMMM dd, yyyy'
 
 $ignore = @{
-    User = 'dependabot[bot]'
+    User = @(
+        'dependabot[bot]'
+        'dependabot-preview[bot]'
+    )
     CommitLabel = 'Ignore'
 }
 

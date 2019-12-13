@@ -359,10 +359,10 @@ filter Skip-IgnoredChange
     :outer foreach ($chg in $Change)
     {
         $msg = $chg.Subject
-        if ($chg.ContributingUser -in $User)
+        $cu = $chg.ContributingUser
+        if ($cu.EndsWith('[bot]') -or $cu -in $User)
         {
-            $u = $chg.ContributingUser
-            Write-Verbose "Skipping change from user '$u': '$msg'"
+            Write-Verbose "Skipping change from user '$cu': '$msg'"
             continue
         }
 
