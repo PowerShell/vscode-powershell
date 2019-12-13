@@ -3,10 +3,17 @@
 
 #requires -Version 6.0
 
+[CmdletBinding()]
 param(
     [Parameter(Mandatory)]
-    [semver]
-    $Version,
+    [Alias("Tag")]
+    [string]
+    $ReleaseTag,
+
+    [Parameter(Mandatory)]
+    [Alias("Branch")]
+    [string]
+    $BranchName,
 
     [Parameter(Mandatory)]
     [string]
@@ -26,7 +33,10 @@ param(
 
     [Parameter()]
     [string[]]
-    $AssetPath
+    $AssetPath,
+
+    [switch]
+    $Preview
 )
 
 Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
@@ -60,17 +70,16 @@ function GetDescriptionFromChangelog
     return $sb.ToString()
 }
 
-$tag = "v$Version"
-
 $releaseParams = @{
     Organization = $TargetFork
     Repository = $Repository
-    Tag = $tag
-    ReleaseName = $tag
-    Branch = "release/$Version"
+    Tag = $ReleaseTag
+    ReleaseName = $ReleaseTag
+    Branch = $BranchName
     AssetPath = $AssetPath
-    Prerelease = [bool]($Version.PreReleaseLabel)
+    Prerelease = $Preview
     Description = GetDescriptionFromChangelog -ChangelogPath $ChangelogPath
     GitHubToken = $GitHubToken
+    Draft = $true
 }
 Publish-GitHubRelease @releaseParams
