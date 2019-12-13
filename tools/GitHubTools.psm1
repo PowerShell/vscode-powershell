@@ -298,9 +298,10 @@ function Copy-GitRepository
     }
 
     Push-Location $Destination
+    $autocrlfSetting = git config core.autocrlf
     try
     {
-        Exec { git config core.autocrlf true }
+        Exec { git config core.autocrlf input }
 
         if ($Remotes)
         {
@@ -327,6 +328,7 @@ function Copy-GitRepository
     }
     finally
     {
+        git config core.autocrlf $autocrlfSetting
         Pop-Location
     }
 }
