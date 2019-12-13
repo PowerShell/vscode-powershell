@@ -459,22 +459,31 @@ function Get-GitCommit
 
         return $commits |
             ForEach-Object {
+
                 $hash,$parents,$name,$email,$subject = $_.Split('||')
                 $body = (Exec { git --no-pager show $hash -s --format=%b }) -join "`n"
+
                 $commitVal = [GitHubCommitInfo]@{
-                Hash = $hash
-                ParentHashes = $parents
-                ContributorName = $name
-                ContributorEmail = $email
-                Subject = $subject
-                Body = $body
-                Organization = $organization
-                Repository = $repository
+                    Hash = $hash
+                    ParentHashes = $parents
+                    ContributorName = $name
+                    ContributorEmail = $email
+                    Subject = $subject
+                    Body = $body
+                    Organization = $organization
+                    Repository = $repository
                 }
 
                 # Query the GitHub API for more commit information
                 Write-Verbose "Querying GitHub api for data on commit $hash"
-                $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash" @irmParams
+                try
+                {
+                    $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash" @irmParams
+                }
+                catch
+                {
+                    Write-Warning "Commit '$hash' (Subject: '$subject') not found on GitHub"
+                }
 
                 # Look for something like 'This is a commit message (#1224)'
                 $pr = [regex]::Match($subject, '\(#(\d+)\)$').Groups[1].Value
