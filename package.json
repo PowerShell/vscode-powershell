@@ -87,7 +87,7 @@
       "activitybar": [
         {
           "id": "PowerShellCommandExplorer",
-          "title": "PowerShell Command Explorer",
+          "title": "(Preview) PowerShell Command Explorer",
           "icon": "media/pwsh.svg"
         }
       ]

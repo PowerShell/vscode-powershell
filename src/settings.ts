@@ -93,6 +93,7 @@ export interface ISettings {
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
     bugReporting?: IBugReportingSettings;
+    sideBar?: ISideBarSettings;
 }
 
 export interface IIntegratedConsoleSettings {
@@ -100,6 +101,10 @@ export interface IIntegratedConsoleSettings {
     focusConsoleOnExecute?: boolean;
     useLegacyReadLine?: boolean;
     forceClearScrollbackBuffer?: boolean;
+}
+
+export interface ISideBarSettings {
+    CommandExplorerVisibility?: boolean;
 }
 
 export function load(): ISettings {
@@ -158,6 +163,10 @@ export function load(): ISettings {
         forceClearScrollbackBuffer: false,
     };
 
+    const defaultSideBarSettings: ISideBarSettings = {
+        CommandExplorerVisibility: true,
+    };
+
     return {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
@@ -191,6 +200,8 @@ export function load(): ISettings {
             configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
         bugReporting:
             configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
+        sideBar:
+            configuration.get<ISideBarSettings>("sideBar", defaultSideBarSettings),
     };
 }
 

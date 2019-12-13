@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import * as Settings from "../settings";
 
 interface ISetting {
     path: string;
@@ -47,6 +48,14 @@ export class ISECompatibilityFeature implements IFeature {
     private async EnableISEMode() {
         for (const iseSetting of ISECompatibilityFeature.settings) {
             await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
+        }
+
+        // Show the PowerShell Command Explorer
+        await vscode.commands.executeCommand("workbench.view.extension.PowerShellCommandExplorer");
+
+        if (!Settings.load().sideBar.CommandExplorerVisibility) {
+            // Hide the explorer if the setting says so.
+            await vscode.commands.executeCommand("workbench.action.toggleSidebarVisibility");
         }
     }
 
