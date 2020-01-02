@@ -729,7 +729,7 @@ export class SessionManager implements Middleware {
 
     private isLoginShell(pwshPath: string): boolean {
         try {
-            cp.execFileSync(pwshPath, ["-Login", "-NoProfile", "-NoLogo", "-Command", "0"]);
+            cp.execFileSync(pwshPath, ["-Login", "-NoProfile", "-NoLogo", "-Command", "exit 0"]);
         } catch {
             return false;
         }
