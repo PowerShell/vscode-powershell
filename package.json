@@ -550,6 +550,11 @@
           "description": "Specifies whether you should be prompted to update your version of PowerShell.",
           "default": true
         },
+        "powershell.startAsLoginShell": {
+          "type": "boolean",
+          "default": false,
+          "description": "Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable."
+        },
         "powershell.startAutomatically": {
           "type": "boolean",
           "default": true,

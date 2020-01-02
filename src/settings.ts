@@ -82,6 +82,7 @@ export interface ISettings {
     powerShellExePath?: string;
     promptToUpdatePowerShell?: boolean;
     bundledModulesPath?: string;
+    startAsLoginShell?: boolean;
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;

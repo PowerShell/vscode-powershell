@@ -2,6 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
+import * as cp from "child_process";
 import fs = require("fs");
 import net = require("net");
 import path = require("path");
@@ -186,6 +187,12 @@ export class SessionManager implements Middleware {
             `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
             `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
             `-EnableConsoleRepl `;
+
+        if (this.sessionSettings.startAsLoginShell
+            && this.platformDetails.operatingSystem !== OperatingSystem.Windows
+            && this.isLoginShell(this.PowerShellExeDetails.exePath)) {
+            this.editorServicesArgs = "-Login " + this.editorServicesArgs;
+        }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
             this.editorServicesArgs += "-WaitForDebugger ";
@@ -718,6 +725,16 @@ export class SessionManager implements Middleware {
             .window
             .showQuickPick<SessionMenuItem>(menuItems)
             .then((selectedItem) => { selectedItem.callback(); });
+    }
+
+    private isLoginShell(pwshPath: string): boolean {
+        try {
+            cp.execFileSync(pwshPath, ["-Login", "-NoProfile", "-NoLogo", "-Command", "0"]);
+        } catch {
+            return false;
+        }
+
+        return true;
     }
 }
 
