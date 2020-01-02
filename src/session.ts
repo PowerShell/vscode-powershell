@@ -127,7 +127,8 @@ export class SessionManager implements Middleware {
             let powerShellExeDetails;
             if (this.sessionSettings.powerShellDefaultVersion) {
                 for (const details of this.powershellExeFinder.enumeratePowerShellInstallations()) {
-                    if (details.displayName === this.sessionSettings.powerShellDefaultVersion) {
+                    const wantedName = this.sessionSettings.powerShellDefaultVersion;
+                    if (wantedName.localeCompare(details.displayName, undefined, { sensitivity: "accent" }) === 0) {
                         powerShellExeDetails = details;
                         break;
                     }
