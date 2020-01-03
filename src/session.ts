@@ -729,6 +729,10 @@ export class SessionManager implements Middleware {
 
     private isLoginShell(pwshPath: string): boolean {
         try {
+            // We can't know what version of PowerShell we have without running it
+            // So we try to start PowerShell with -Login
+            // If it exits successfully, we return true
+            // If it exits unsuccessfully, node throws, we catch, and return false
             cp.execFileSync(pwshPath, ["-Login", "-NoProfile", "-NoLogo", "-Command", "exit 0"]);
         } catch {
             return false;
