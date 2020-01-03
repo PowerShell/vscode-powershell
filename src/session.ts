@@ -179,18 +179,17 @@ export class SessionManager implements Middleware {
             }
         }
 
-        const startupBanner = this.sessionSettings.integratedConsole.suppressStartupBanner
-            ? ""
-            : "`n`n                  =====> PowerShell Integrated Console <=====`n`n";
-
         this.editorServicesArgs =
             `-HostName 'Visual Studio Code Host' ` +
             `-HostProfileId 'Microsoft.VSCode' ` +
             `-HostVersion '${this.HostVersion}' ` +
             `-AdditionalModules @('PowerShellEditorServices.VSCode') ` +
             `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
-            `-StartupBanner "${startupBanner}" ` +
             `-EnableConsoleRepl `;
+
+        if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
+            this.editorServicesArgs += "-StartupBanner '' ";
+        }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
             this.editorServicesArgs += "-WaitForDebugger ";
