@@ -187,6 +187,10 @@ export class SessionManager implements Middleware {
             `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(this.bundledModulesPath)}' ` +
             `-EnableConsoleRepl `;
 
+        if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
+            this.editorServicesArgs += "-StartupBanner '' ";
+        }
+
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
             this.editorServicesArgs += "-WaitForDebugger ";
         }

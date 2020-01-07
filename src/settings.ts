@@ -101,6 +101,7 @@ export interface IIntegratedConsoleSettings {
     focusConsoleOnExecute?: boolean;
     useLegacyReadLine?: boolean;
     forceClearScrollbackBuffer?: boolean;
+    suppressStartupBanner?: boolean;
 }
 
 export interface ISideBarSettings {

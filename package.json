@@ -705,6 +705,11 @@
           "type": "boolean",
           "description": "Use the vscode API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're use to 'Clear-Host' clearing scroll history as wellclear-terminal-via-lsp."
         },
+        "powershell.integratedConsole.suppressStartupBanner": {
+          "type": "boolean",
+          "default": false,
+          "description": "Do not show the Powershell Integrated Console banner on launch"
+        },
         "powershell.debugging.createTemporaryIntegratedConsole": {
           "type": "boolean",
           "default": false,
