@@ -61,7 +61,7 @@
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~1.23.1",
     "mocha-multi-reporters": "~1.1.7",
-    "mock-fs": "~4.10.3",
+    "mock-fs": "~4.10.4",
     "rewire": "~4.0.1",
     "sinon": "~7.5.0",
     "tslint": "~5.20.1",
