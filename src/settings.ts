@@ -72,7 +72,6 @@ export interface IDeveloperSettings {
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
-    powerShellExeIsWindowsDevBuild?: boolean;
 }
 
 export interface ISettings {
@@ -82,7 +81,7 @@ export interface ISettings {
     powerShellExePath?: string;
     promptToUpdatePowerShell?: boolean;
     bundledModulesPath?: string;
-    startAsLoginShell?: boolean;
+    startAsLoginShell?: IStartAsLoginShellSettings;
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
@@ -95,6 +94,11 @@ export interface ISettings {
     integratedConsole?: IIntegratedConsoleSettings;
     bugReporting?: IBugReportingSettings;
     sideBar?: ISideBarSettings;
+}
+
+export interface IStartAsLoginShellSettings {
+    osx?: boolean;
+    linux?: boolean;
 }
 
 export interface IIntegratedConsoleSettings {
@@ -131,7 +135,6 @@ export function load(): ISettings {
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
-        powerShellExeIsWindowsDevBuild: false,
     };
 
     const defaultCodeFoldingSettings: ICodeFoldingSettings = {
@@ -155,6 +158,11 @@ export function load(): ISettings {
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
         useCorrectCasing: false,
+    };
+
+    const defaultStartAsLoginShellSettings: IStartAsLoginShellSettings = {
+        osx: true,
+        linux: false,
     };
 
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
@@ -203,6 +211,13 @@ export function load(): ISettings {
             configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
         sideBar:
             configuration.get<ISideBarSettings>("sideBar", defaultSideBarSettings),
+        startAsLoginShell:
+            // tslint:disable-next-line
+            // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
+            //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
+            //   is the reason terminals on macOS typically run login shells by default which set up
+            //   the environment. See http://unix.stackexchange.com/a/119675/115410"
+            configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
     };
 }
 

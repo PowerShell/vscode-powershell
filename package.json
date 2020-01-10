@@ -550,7 +550,12 @@
           "description": "Specifies whether you should be prompted to update your version of PowerShell.",
           "default": true
         },
-        "powershell.startAsLoginShell": {
+        "powershell.startAsLoginShell.osx": {
+          "type": "boolean",
+          "default": true,
+          "description": "Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable."
+        },
+        "powershell.startAsLoginShell.linux": {
           "type": "boolean",
           "default": false,
           "description": "Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable."
@@ -740,11 +745,6 @@
           "type": "array",
           "default": null,
           "description": "An array of strings that enable experimental features in the PowerShell extension."
-        },
-        "powershell.developer.powerShellExeIsWindowsDevBuild": {
-          "type": "boolean",
-          "default": false,
-          "description": "Indicates that the powerShellExePath points to a developer build of Windows PowerShell and configures it for development."
         }
       }
     },
