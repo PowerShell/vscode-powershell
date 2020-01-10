@@ -65,11 +65,11 @@ export class PowerShellProcess {
 
                     const powerShellArgs = [];
 
-                    const checkLoginShell: boolean =
+                    const useLoginShell: boolean =
                         (utils.isMacOS && this.sessionSettings.startAsLoginShell.osx)
                         || (utils.isLinux && this.sessionSettings.startAsLoginShell.linux);
 
-                    if (checkLoginShell && this.isLoginShell(this.exePath)) {
+                    if (useLoginShell && this.isLoginShell(this.exePath)) {
                         // This MUST be the first argument.
                         powerShellArgs.push("-Login");
                     }
