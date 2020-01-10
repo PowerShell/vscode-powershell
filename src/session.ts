@@ -2,7 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import * as cp from "child_process";
 import fs = require("fs");
 import net = require("net");
 import path = require("path");
