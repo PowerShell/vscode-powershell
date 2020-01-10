@@ -63,10 +63,19 @@ export class PowerShellProcess {
                         this.startArgs += "-UseLegacyReadLine";
                     }
 
-                    const powerShellArgs = [
-                        "-NoProfile",
-                        "-NonInteractive",
-                    ];
+                    const powerShellArgs = [];
+
+                    const useLoginShell: boolean =
+                        (utils.isMacOS && this.sessionSettings.startAsLoginShell.osx)
+                        || (utils.isLinux && this.sessionSettings.startAsLoginShell.linux);
+
+                    if (useLoginShell && this.isLoginShell(this.exePath)) {
+                        // This MUST be the first argument.
+                        powerShellArgs.push("-Login");
+                    }
+
+                    powerShellArgs.push("-NoProfile");
+                    powerShellArgs.push("-NonInteractive");
 
                     // Only add ExecutionPolicy param on Windows
                     if (utils.isWindows) {
@@ -88,27 +97,11 @@ export class PowerShellProcess {
                             Buffer.from(startEditorServices, "utf16le").toString("base64"));
                     }
 
-                    let powerShellExePath = this.exePath;
-
-                    if (this.sessionSettings.developer.powerShellExeIsWindowsDevBuild) {
-                        // Windows PowerShell development builds need the DEVPATH environment
-                        // variable set to the folder where development binaries are held
-
-                        // NOTE: This batch file approach is needed temporarily until VS Code's
-                        // createTerminal API gets an argument for setting environment variables
-                        // on the launched process.
-                        const batScriptPath = path.resolve(__dirname, "../../sessions/powershell.bat");
-                        fs.writeFileSync(
-                            batScriptPath,
-                            `@set DEVPATH=${path.dirname(powerShellExePath)}\r\n@${powerShellExePath} %*`);
-
-                        powerShellExePath = batScriptPath;
-                    }
-
                     this.log.write(
                         "Language server starting --",
-                        "    exe: " + powerShellExePath,
-                        "    args: " + startEditorServices);
+                        "    PowerShell executable: " + this.exePath,
+                        "    PowerShell args: " + powerShellArgs.join(" "),
+                        "    PowerShell Editor Services args: " + startEditorServices);
 
                     // Make sure no old session file exists
                     utils.deleteSessionFile(this.sessionFilePath);
@@ -117,7 +110,7 @@ export class PowerShellProcess {
                     this.consoleTerminal =
                         vscode.window.createTerminal(
                             this.title,
-                            powerShellExePath,
+                            this.exePath,
                             powerShellArgs);
 
                     if (this.sessionSettings.integratedConsole.showOnStartup) {
@@ -177,5 +170,19 @@ export class PowerShellProcess {
             this.consoleTerminal.dispose();
             this.consoleTerminal = undefined;
         }
+    }
+
+    private isLoginShell(pwshPath: string): boolean {
+        try {
+            // We can't know what version of PowerShell we have without running it
+            // So we try to start PowerShell with -Login
+            // If it exits successfully, we return true
+            // If it exits unsuccessfully, node throws, we catch, and return false
+            cp.execFileSync(pwshPath, ["-Login", "-NoProfile", "-NoLogo", "-Command", "exit 0"]);
+        } catch {
+            return false;
+        }
+
+        return true;
     }
 }
