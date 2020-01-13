@@ -4,12 +4,6 @@
 ### Monday, January 13, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
-- [vscode-PowerShell #2391](https://github.com/PowerShell/vscode-PowerShell/pull/2391) -
-  Bump semver from 6.3.0 to 7.1.1. (Thanks @dependabot-preview[bot]!)
-- [vscode-PowerShell #2403](https://github.com/PowerShell/vscode-PowerShell/pull/2403) -
-  Bump sinon from 7.5.0 to 8.0.4. (Thanks @dependabot-preview[bot]!)
-- [vscode-PowerShell #2340](https://github.com/PowerShell/vscode-PowerShell/pull/2340) -
-  Bump mock-fs from 4.10.3 to 4.10.4. (Thanks @dependabot-preview[bot]!)
 - 🛫 ✨ [vscode-powershell #2384](https://github.com/PowerShell/vscode-PowerShell/pull/2400) -
   Add -Login startup option.
 - 🛫 🐛 [vscode-powershell #2380](https://github.com/PowerShell/vscode-PowerShell/pull/2399) -
