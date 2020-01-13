@@ -7,9 +7,3 @@ update_configs:
   - package_manager: "javascript"
     directory: "/"
     update_schedule: "weekly"
-
-  # Will also update legacy branch
-  - package_manager: "javascript"
-    directory: "/"
-    update_schedule: "weekly"
-    target_branch: "legacy/1.x"
