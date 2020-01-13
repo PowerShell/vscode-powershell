@@ -17,8 +17,6 @@
   Add tooltip to completions ParameterValue.
 - 🛫 🐛 [vscode-powershell #2393](https://github.com/PowerShell/PowerShellEditorServices/pull/1151) -
   Probe netfx dir for deps.
-- [PowerShellEditorServices #1136](https://github.com/PowerShell/PowerShellEditorServices/pull/1136) -
-  Bump Microsoft.CodeAnalysis.FxCopAnalyzers from 2.9.7 to 2.9.8. (Thanks @dependabot-preview[bot]!)
 - 🚂 ⏱️ 🐛 [vscode-powershell #2352](https://github.com/PowerShell/PowerShellEditorServices/pull/1149) -
   Fix lock up that occurs when WinForms is executed on the pipeline thread.
 - 💭 🐛 [vscode-powershell #2402](https://github.com/PowerShell/PowerShellEditorServices/pull/1150) -
