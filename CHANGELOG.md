@@ -1,5 +1,37 @@
 # PowerShell Preview Extension Release History
 
+## v2020.1.0
+### Monday, January 13, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 🛫 ✨ [vscode-powershell #2384](https://github.com/PowerShell/vscode-PowerShell/pull/2400) -
+  Add -Login startup option.
+- 🛫 🐛 [vscode-powershell #2380](https://github.com/PowerShell/vscode-PowerShell/pull/2399) -
+  Make PowerShell names case insensitive for configuration.
+- 🛫 📺 ✨ [vscode-powershell #2370](https://github.com/PowerShell/vscode-PowerShell/pull/2398) -
+  Add configuration to enable/disable banner.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 📺 [vscode-powershell #2405](https://github.com/PowerShell/PowerShellEditorServices/pull/1152) -
+  Add tooltip to completions ParameterValue.
+- 🛫 🐛 [vscode-powershell #2393](https://github.com/PowerShell/PowerShellEditorServices/pull/1151) -
+  Probe netfx dir for deps.
+- 🚂 ⏱️ 🐛 [vscode-powershell #2352](https://github.com/PowerShell/PowerShellEditorServices/pull/1149) -
+  Fix lock up that occurs when WinForms is executed on the pipeline thread.
+- 💭 🐛 [vscode-powershell #2402](https://github.com/PowerShell/PowerShellEditorServices/pull/1150) -
+  Fix temp debugging after it broke bringing in $psEditor.
+- 🧠 🐛 [vscode-powershell #2324](https://github.com/PowerShell/PowerShellEditorServices/pull/1143) -
+  Fix unicode character uri bug.
+- 🛫 📺 ✨ [vscode-powershell #2370](https://github.com/PowerShell/PowerShellEditorServices/pull/1141) -
+  Make startup banner simpler.
+- [vscode-powershell #2386](https://github.com/PowerShell/PowerShellEditorServices/pull/1140) -
+  Fix uncaught exception when SafeToString returns null. (Thanks @jborean93!)
+- 🔗 🐛 [vscode-powershell #2374](https://github.com/PowerShell/PowerShellEditorServices/pull/1139) -
+  Simplify logic of determining Reference definition.
+- 🛫 🐛 [vscode-powershell #2379](https://github.com/PowerShell/PowerShellEditorServices/pull/1138) -
+  Use -Option AllScope to fix Windows PowerShell error.
+
 ## v2019.12.0
 ### Wednesday, December 11, 2019
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
