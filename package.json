@@ -63,7 +63,7 @@
     "mocha-multi-reporters": "~1.1.7",
     "mock-fs": "~4.10.4",
     "rewire": "~4.0.1",
-    "sinon": "~8.0.4",
+    "sinon": "~8.1.0",
     "tslint": "~5.20.1",
     "typescript": "~3.5.3",
     "vsce": "~1.64.0",
