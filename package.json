@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.34.0"
+    "vscode": "^1.40.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -57,7 +57,7 @@
     "@types/rewire": "~2.5.28",
     "@types/semver": "~6.2.0",
     "@types/sinon": "~7.5.1",
-    "@types/vscode": "1.34.0",
+    "@types/vscode": "1.40.0",
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~1.23.2",
     "mocha-multi-reporters": "~1.1.7",

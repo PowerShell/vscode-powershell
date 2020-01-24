@@ -108,12 +108,15 @@ export class PowerShellProcess {
 
                     // Launch PowerShell in the integrated terminal
                     this.consoleTerminal =
-                        vscode.window.createTerminal(
-                            this.title,
-                            this.exePath,
-                            powerShellArgs);
+                        vscode.window.createTerminal({
+                            name: this.title,
+                            shellPath: this.exePath,
+                            shellArgs: powerShellArgs,
+                            hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
+                        });
 
                     if (this.sessionSettings.integratedConsole.showOnStartup) {
+                        // We still need to run this to set the active terminal to the Integrated Console.
                         this.consoleTerminal.show(true);
                     }
 
