@@ -63,16 +63,35 @@ if (!$pesterModule) {
 }
 
 if ($All) {
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
-}
-elseif ($TestName) {
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName
+    if ($pesterModule.Version -ge '5.0.0') {
+        Pester\Invoke-Pester -Configuration @{ Run = $ScriptPath } | Out-Null
+    }
+    else {
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+    }
 }
 elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption (New-PesterOption -ScriptBlockFilter @{
-        IncludeVSCodeMarker=$true; Line=$LineNumber; Path=$ScriptPath})
+    if ($pesterModule.Version -ge '5.0.0') {
+       Pester\Invoke-Pester -Configuration @{ Run = $ScriptPath; Filter = @{ Line = "${ScriptPath}:$LineNumber"} } | Out-Null
+    }
+    else {
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption (New-PesterOption -ScriptBlockFilter @{
+            IncludeVSCodeMarker=$true; Line=$LineNumber; Path=$ScriptPath})
+    }
+}
+elseif ($TestName) {
+    if ($pesterModule.Version -ge '5.0.0') {
+       throw "Running tests by test name is unsafe. This should not trigger for Pester 5."
+    }
+    else {
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName
+    }
 }
 else {
+    if ($pesterModule.Version -ge '5.0.0') {
+       throw "Running tests by expandable string is unsafe. This should not trigger for Pester 5."
+    }
+
     # We get here when the TestName expression is of type ExpandableStringExpressionAst.
     # PSES will not attempt to "evaluate" the expression so it returns null for the TestName.
     Write-Warning "The Describe block's TestName cannot be evaluated. EXECUTING ALL TESTS instead."
