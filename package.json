@@ -287,6 +287,16 @@
           "when": "false"
         }
       ],
+      "explorer/context": [
+        {
+          "command": "PowerShell.RunPesterTestsFromFile",
+          "when": "resourceFilename =~ /\\.tests\\.ps1$/i"
+        },
+        {
+          "command": "PowerShell.DebugPesterTestsFromFile",
+          "when": "resourceFilename =~ /\\.tests\\.ps1$/i"
+        }
+      ],
       "editor/context": [
         {
           "when": "editorLangId == powershell",
