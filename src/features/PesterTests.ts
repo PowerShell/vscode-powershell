@@ -51,7 +51,7 @@ export class PesterTestsFeature implements IFeature {
         this.languageClient = languageClient;
     }
 
-    private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri?: vscode.Uri) {
+    private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri: vscode.Uri) {
         const uriString = fileUri.toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
         launchConfig.args.push("-All");
