@@ -355,9 +355,9 @@
             "message": 1
           },
           {
-            "regexp": "^\\s+at\\s+[^,]+,\\s*(.*?):\\s+line\\s+(\\d+)$",
-            "file": 1,
-            "line": 2
+            "regexp": "^\\s+[Aa]t\\s+([^,]+,)?(.+?):(\\s+line\\s+)?(\\d+)(\\s+char:\\d+)?$",
+            "file": 2,
+            "line": 4
           }
         ]
       }
