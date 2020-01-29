@@ -26,14 +26,14 @@ export class PesterTestsFeature implements IFeature {
         // File context-menu command - Run Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTestsFromFile",
-            () => {
-                this.launchAllTestsInActiveEditor(LaunchType.Run);
+            (fileUri) => {
+                this.launchAllTestsInActiveEditor(LaunchType.Run, fileUri);
             });
         // File context-menu command - Debug Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.DebugPesterTestsFromFile",
-            () => {
-                this.launchAllTestsInActiveEditor(LaunchType.Debug);
+            (fileUri) => {
+                this.launchAllTestsInActiveEditor(LaunchType.Debug, fileUri);
             });
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
@@ -51,8 +51,8 @@ export class PesterTestsFeature implements IFeature {
         this.languageClient = languageClient;
     }
 
-    private launchAllTestsInActiveEditor(launchType: LaunchType) {
-        const uriString = vscode.window.activeTextEditor.document.uri.toString();
+    private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri?: vscode.Uri) {
+        const uriString = fileUri.toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
         launchConfig.args.push("-All");
         this.launch(launchConfig);
