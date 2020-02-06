@@ -145,7 +145,12 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         const generateLaunchConfig = !config.request;
 
         const settings = Settings.load();
-        let createNewIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
+
+        // If the createTemporaryIntegratedConsole field is not specified in the launch config, set the field using
+        // the value from the corresponding setting.  Otherwise, the launch config value overrides the setting.
+        if (config.createTemporaryIntegratedConsole === undefined) {
+            config.createTemporaryIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
+        }
 
         if (config.request === "attach") {
             const platformDetails = getPlatformDetails();
@@ -192,7 +197,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     ? currentDocument.uri.toString()
                     : currentDocument.fileName;
 
-            if (settings.debugging.createTemporaryIntegratedConsole) {
+            if (config.createTemporaryIntegratedConsole) {
                 // For a folder-less workspace, vscode.workspace.rootPath will be undefined.
                 // PSES will convert that undefined to a reasonable working dir.
                 config.cwd =
@@ -222,6 +227,12 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                 }
 
                 if (currentDocument.isUntitled) {
+                    if (config.createTemporaryIntegratedConsole) {
+                        const msg = "Debugging Untitled files in a temporary console is currently not supported.";
+                        vscode.window.showErrorMessage(msg);
+                        return;
+                    }
+
                     if (currentDocument.languageId === "powershell") {
                         if (!generateLaunchConfig) {
                             // Cover the case of existing launch.json but unsaved (Untitled) document.
@@ -264,14 +275,6 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
             if ((currentDocument !== undefined) && (config.cwd === "${file}")) {
                 config.cwd = currentDocument.fileName;
             }
-
-            // If the createTemporaryIntegratedConsole field is not specified in the launch config, set the field using
-            // the value from the corresponding setting.  Otherwise, the launch config value overrides the setting.
-            if (config.createTemporaryIntegratedConsole === undefined) {
-                config.createTemporaryIntegratedConsole = createNewIntegratedConsole;
-            } else {
-                createNewIntegratedConsole = config.createTemporaryIntegratedConsole;
-            }
         }
 
         // Prevent the Debug Console from opening
@@ -282,7 +285,7 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
 
         const sessionFilePath = utils.getDebugSessionFilePath();
 
-        if (createNewIntegratedConsole) {
+        if (config.createTemporaryIntegratedConsole) {
             if (this.tempDebugProcess) {
                 this.tempDebugProcess.dispose();
             }
