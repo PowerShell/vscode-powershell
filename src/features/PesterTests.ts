@@ -109,6 +109,12 @@ export class PesterTestsFeature implements IFeature {
             launchConfig.args.push("-TestName", `'${testName}'`);
         }
 
+        if (settings.pester.pester5CodeLens) {
+            launchConfig.args.push("-MinimumVersion5");
+        }
+
+        launchConfig.args.push("-Output", `'${settings.pester.output}'`);
+
         return launchConfig;
     }
 
