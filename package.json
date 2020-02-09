@@ -686,6 +686,11 @@
           "default": true,
           "description": "Adds a space after an opening brace ('{') and before a closing brace ('}')."
         },
+        "powershell.codeFormatting.whitespaceBetweenParameters": {
+            "type": "boolean",
+            "default": false,
+            "description": "Removes redundant whitespace between parameters."
+        },
         "powershell.codeFormatting.whitespaceAroundPipe": {
           "type": "boolean",
           "default": true,
