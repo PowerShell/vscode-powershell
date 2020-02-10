@@ -57,7 +57,7 @@
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.1.0",
     "@types/sinon": "~7.5.1",
-    "@types/vscode": "1.40.0",
+    "@types/vscode": "1.42.0",
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~1.23.3",
     "mocha-multi-reporters": "~1.1.7",
