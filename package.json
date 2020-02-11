@@ -681,6 +681,11 @@
           "default": true,
           "description": "Adds a space before and after the pipeline operator ('|')."
         },
+        "powershell.codeFormatting.trimWhitespaceAroundPipe": {
+          "type": "boolean",
+          "default": true,
+          "description": "Trims extraneous whitespace (more than 1 character) before and after the pipeline operator ('|')."
+        },
         "powershell.codeFormatting.ignoreOneLineBlock": {
           "type": "boolean",
           "default": true,
