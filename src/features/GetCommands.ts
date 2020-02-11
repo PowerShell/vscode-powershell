@@ -4,7 +4,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { LanguageClient, RequestType0 } from "vscode-languageclient";
+import { LanguageClient, RequestType, RequestType0 } from "vscode-languageclient";
+import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -21,6 +22,11 @@ interface ICommand {
  * Expects: ICommand to be returned
  */
 export const GetCommandRequestType = new RequestType0<ICommand[], void, void>("powerShell/getCommand");
+// Split across two lines because tslint didn't like it shorter than the first attempt????
+// Sending any because we couldn't send <ICommand[], string, void, void>
+// TODO: Send something other than any...
+export const GetCommandInformationRequestType = new RequestType<any, any,
+void, void>("powerShell/getCommandInformation");
 
 /**
  * A PowerShell Command listing feature. Implements a treeview control.
@@ -57,7 +63,8 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         });
 
         vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => {
-            this.languageClient.sendRequest(GetCommandRequestType, item.Name).then((result) => {
+            const Name = item.Name;
+            this.languageClient.sendRequest(GetCommandInformationRequestType, { Name }).then((result) => {
                 this.BuildCommand(result);
             });
         });
