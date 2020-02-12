@@ -38,7 +38,7 @@ You can find the changelog from the old stable fork
   until debugging when `showOnStartup` is disabled.
 - ✨🐢 [vscode-PowerShell #2445](https://github.com/PowerShell/vscode-powershell/pull/2445) -
   Add `Run/Debug Pester tests` context menu options in the VSCode explorer
-  for *.Tests.ps1 files. (Thanks @bergmeister!)
+  for Pester test files. (Thanks @bergmeister!)
 - 🐛🐢 [vscode-PowerShell #2438](https://github.com/PowerShell/vscode-powershell/pull/2447/) -
   Fixes test failures in Pester contexts not showing up in the Problems pane. (Thanks @tillig!)
 - 🐛🔍 [vscode-PowerShell #2548](https://github.com/PowerShell/vscode-powershell/pull/2458) -
