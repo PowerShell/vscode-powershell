@@ -4,7 +4,7 @@
     "windows": {
         "options": {
             "shell": {
-                "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "executable": "pwsh.exe",
                 "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command" ]
             }
         }

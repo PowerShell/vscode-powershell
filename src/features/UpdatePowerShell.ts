@@ -116,7 +116,8 @@ export async function InvokePowerShellUpdateCheck(
 
     const result = await window.showInformationMessage(
         `${commonText} Would you like to update the version? ${
-            isMacOS ? "(Homebrew is required on macOS)" : ""
+            isMacOS ? "(Homebrew is required on macOS)"
+                : "(This will close ALL pwsh terminals running in this Visual Studio Code session)"
         }`, ...options);
 
     // If the user cancels the notification.
@@ -150,6 +151,15 @@ export async function InvokePowerShellUpdateCheck(
 
                 // Stop the Integrated Console session because Windows likes to hold on to files.
                 sessionManager.stop();
+
+                // Close all terminals with the name "pwsh" in the current VS Code session.
+                // This will encourage folks to not close the instance of VS Code that spawned
+                // the MSI process.
+                for (const terminal of window.terminals) {
+                    if (terminal.name === "pwsh") {
+                        terminal.dispose();
+                    }
+                }
 
                 // Invoke the MSI via cmd.
                 const msi = spawn("msiexec", ["/i", msiDownloadPath]);
