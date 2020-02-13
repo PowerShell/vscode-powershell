@@ -1,5 +1,5 @@
 # DO NOT COPY THIS MANIFEST VERBATIM.  THIS IS JUST A SAMPLE.
-# GENERATE YOUR MANIFEST USING THE New-ManifestModule COMMAND TO
+# GENERATE YOUR MANIFEST USING THE New-ModuleManifest COMMAND TO
 # GUARANTEE YOU GET A UNIQUE GUID FOR YOUR MODULE.
 @{
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
