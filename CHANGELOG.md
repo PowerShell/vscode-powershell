@@ -5,25 +5,31 @@
 
 #### Release of preview work to stable branch
 
-This release, coinciding with the [GA release of PowerShell 7](link to PowerShell 7 release),
+This release, coinciding with the [GA release of PowerShell 7](https://devblogs.microsoft.com/powershell/announcing-PowerShell-7-0/),
 brings a year of work on the PowerShell extension into the stable release.
 The timing of this release is deliberate, since some of the new features
 depend on additions and bugfixes in PowerShell 7,
-and even those that don't generally work better in PowerShell 7
+while others have a much better experience in PowerShell 7
 thanks to many improvements shipping with it.
 
-Some changes that stabilise in this release include:
+Some changes that come to the stable channel in this release include:
 
-- Integration of PSReadLine into the Integrated Console
+- [Integration of PSReadLine into the Integrated Console](https://github.com/PowerShell/vscode-PowerShell/issues/535),
+  enabling syntax highlighting, a better (and more configurable) completion experience,
+  multiline editing and searchable history
 - Performance and reliability improvements gained
-  by replacing a hand-rolled Language Server Protocol stack
+  by [replacing](https://github.com/PowerShell/PowerShellEditorServices/pull/1056)
+  a hand-rolled Language Server Protocol stack
   with the LSP server library from the Omnisharp project
-- ISE compatibility mode setting
-- Debugging improvements in PowerShell 7
-- End of support for PowerShell v3/v4 and .NET 4.5.2
-- More things...
+- An [ISE compatibility mode](https://github.com/PowerShell/vscode-powershell/pull/2335)
+  setting to toggle a more ISE-like user experience
+- Debugging improvements in PowerShell 7,
+  [using its new debugging APIs](https://github.com/PowerShell/PowerShellEditorServices/pull/1119)
+- [End of support for PowerShell v3/v4 and .NET 4.5.2](https://github.com/PowerShell/vscode-PowerShell/issues/1310)
 
-!! [Note about preview/stable release cadence] !!
+After this release, the stable/preview channels will now function as originally intended,
+where the preview channel will be the beta release
+for features to come out in the following stable release.
 
 You may also notice that the history of the changelog has changed.
 For a full list of changes between this release and the previous stable release,
