@@ -12,7 +12,7 @@ steps:
   # Build
   - pwsh: |
       Get-ChildItem -Path env:
-      Write-Host $env:PS_TEST_GITHUB_API_PAT this is something
+      Write-Host $(PS_TEST_GITHUB_API_PAT) this is something
     displayName: Capture environment
     condition: succeededOrFailed()
 
