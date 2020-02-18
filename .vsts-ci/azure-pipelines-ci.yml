@@ -9,7 +9,7 @@ variables:
     value: 'true'
 
   - name: BLAH
-    value: $(PS_TEST_GITHUB_API_PAT)
+    value: $(PLEASE_WORK)
 
 trigger:
   batch: true
