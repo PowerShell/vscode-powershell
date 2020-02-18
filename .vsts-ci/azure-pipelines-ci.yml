@@ -8,6 +8,9 @@ variables:
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
     value: 'true'
 
+  - name: BLAH
+    value: $(PS_TEST_GITHUB_API_PAT)
+
 trigger:
   batch: true
   branches:
@@ -45,7 +48,7 @@ jobs:
   steps:
   - pwsh: |
       Get-ChildItem -Path env:
-      Write-Host '$(PS_TEST_GITHUB_API_PAT) this is something'
+      Write-Host '$(BLAH) this is something'
     displayName: Capture environment
     condition: succeededOrFailed()
   - template: templates/ci-general.yml
