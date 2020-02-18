@@ -7,7 +7,7 @@ param(
     [string]$EditorServicesRepoPath = $null
 )
 
-[Environment]::GetEnvironmentVariables()
+[Environment]::GetEnvironmentVariables() | Out-String | Write-Host
 
 #Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
 
