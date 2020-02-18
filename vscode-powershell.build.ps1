@@ -7,6 +7,8 @@ param(
     [string]$EditorServicesRepoPath = $null
 )
 
+[Environment]::GetEnvironmentVariables()
+
 #Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
 
 # Grab package.json data which is used throughout the build.
