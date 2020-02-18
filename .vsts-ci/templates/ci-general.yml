@@ -9,6 +9,9 @@ steps:
       Install-Module PlatyPS -Scope CurrentUser -Force
   # Build
   - pwsh: Invoke-Build
+    env:
+      PS_TEST_GITHUB_API_USERNAME: $(PS_TEST_GITHUB_API_USERNAME)
+      PS_TEST_GITHUB_API_PAT: $(PS_TEST_GITHUB_API_PAT)
   - task: PublishTestResults@2
     inputs:
       testRunner: JUnit
