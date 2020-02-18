@@ -106,7 +106,7 @@ task Test Build, {
         return
     }
     Write-Host "`n### Running extension tests" -ForegroundColor Green
-    exec { & npm run test }
+    exec { npm run test }
 }
 
 task TestEditorServices {
