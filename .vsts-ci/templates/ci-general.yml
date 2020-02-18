@@ -8,10 +8,11 @@ steps:
       Install-Module InvokeBuild -Scope CurrentUser -Force
       Install-Module PlatyPS -Scope CurrentUser -Force
   # Build
+  - pwsh: |
+      Get-ChildItem -Path env:
+    displayName: Capture environment
+    condition: succeededOrFailed()
   - pwsh: Invoke-Build
-    env:
-      PS_TEST_GITHUB_API_USERNAME: $(PS_TEST_GITHUB_API_USERNAME)
-      PS_TEST_GITHUB_API_PAT: $(PS_TEST_GITHUB_API_PAT)
   - task: PublishTestResults@2
     inputs:
       testRunner: JUnit
