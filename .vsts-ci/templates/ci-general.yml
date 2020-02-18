@@ -3,25 +3,32 @@ steps:
   - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
     displayName: Set Build Name for Non-PR
     condition: ne(variables['Build.Reason'], 'PullRequest')
+
   - pwsh: |
       git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
       Install-Module InvokeBuild -Scope CurrentUser -Force
       Install-Module PlatyPS -Scope CurrentUser -Force
+
   # Build
   - pwsh: |
       Get-ChildItem -Path env:
+      Write-Host $env:PS_TEST_GITHUB_API_PAT this is something
     displayName: Capture environment
     condition: succeededOrFailed()
+
   - pwsh: Invoke-Build
+
   - task: PublishTestResults@2
     inputs:
       testRunner: JUnit
       testResultsFiles: '**/test-results.xml'
     condition: succeededOrFailed()
+
   - task: PublishBuildArtifacts@1
     inputs:
       ArtifactName: vscode-powershell
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+
   # Rich Navigation
   - task: RichCodeNavIndexer@0
     # Note, for now, this is Windows only.
