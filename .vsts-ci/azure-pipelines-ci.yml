@@ -43,6 +43,11 @@ jobs:
   pool:
     vmImage: 'macOS-10.14'
   steps:
+  - pwsh: |
+      Get-ChildItem -Path env:
+      Write-Host '$(PS_TEST_GITHUB_API_PAT) this is something'
+    displayName: Capture environment
+    condition: succeededOrFailed()
   - template: templates/ci-general.yml
 
 - job: Linux
