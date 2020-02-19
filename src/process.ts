@@ -36,120 +36,96 @@ export class PowerShellProcess {
         this.onExited = this.onExitedEmitter.event;
     }
 
-    public start(logFileName: string): Thenable<utils.IEditorServicesSessionDetails> {
+    public async start(logFileName: string): Promise<utils.IEditorServicesSessionDetails> {
+        const editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
-        return new Promise<utils.IEditorServicesSessionDetails>(
-            (resolve, reject) => {
-                try {
-                    const psesModulePath =
-                        path.resolve(
-                            __dirname,
-                            this.bundledModulesPath,
-                            "PowerShellEditorServices/PowerShellEditorServices.psd1");
+        const psesModulePath =
+            path.resolve(
+                __dirname,
+                this.bundledModulesPath,
+                "PowerShellEditorServices/PowerShellEditorServices.psd1");
 
-                    const editorServicesLogPath = this.log.getLogFilePath(logFileName);
+        const featureFlags =
+            this.sessionSettings.developer.featureFlags !== undefined
+                ? this.sessionSettings.developer.featureFlags.map((f) => `'${f}'`).join(", ")
+                : "";
 
-                    const featureFlags =
-                        this.sessionSettings.developer.featureFlags !== undefined
-                            ? this.sessionSettings.developer.featureFlags.map((f) => `'${f}'`).join(", ")
-                            : "";
+        this.startArgs +=
+            `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
+            `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
+            `-FeatureFlags @(${featureFlags}) `;
 
-                    this.startArgs +=
-                        `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
-                        `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
-                        `-FeatureFlags @(${featureFlags}) `;
+        if (this.sessionSettings.integratedConsole.useLegacyReadLine) {
+            this.startArgs += "-UseLegacyReadLine";
+        }
 
-                    if (this.sessionSettings.integratedConsole.useLegacyReadLine) {
-                        this.startArgs += "-UseLegacyReadLine";
-                    }
+        const powerShellArgs = [];
 
-                    const powerShellArgs = [];
+        const useLoginShell: boolean =
+            (utils.isMacOS && this.sessionSettings.startAsLoginShell.osx)
+            || (utils.isLinux && this.sessionSettings.startAsLoginShell.linux);
 
-                    const useLoginShell: boolean =
-                        (utils.isMacOS && this.sessionSettings.startAsLoginShell.osx)
-                        || (utils.isLinux && this.sessionSettings.startAsLoginShell.linux);
+        if (useLoginShell && this.isLoginShell(this.exePath)) {
+            // This MUST be the first argument.
+            powerShellArgs.push("-Login");
+        }
 
-                    if (useLoginShell && this.isLoginShell(this.exePath)) {
-                        // This MUST be the first argument.
-                        powerShellArgs.push("-Login");
-                    }
+        powerShellArgs.push("-NoProfile");
+        powerShellArgs.push("-NonInteractive");
 
-                    powerShellArgs.push("-NoProfile");
-                    powerShellArgs.push("-NonInteractive");
+        // Only add ExecutionPolicy param on Windows
+        if (utils.isWindows) {
+            powerShellArgs.push("-ExecutionPolicy", "Bypass");
+        }
 
-                    // Only add ExecutionPolicy param on Windows
-                    if (utils.isWindows) {
-                        powerShellArgs.push("-ExecutionPolicy", "Bypass");
-                    }
+        const startEditorServices = "Import-Module '" +
+            PowerShellProcess.escapeSingleQuotes(psesModulePath) +
+            "'; Start-EditorServices " + this.startArgs;
 
-                    const startEditorServices = "Import-Module '" +
-                        PowerShellProcess.escapeSingleQuotes(psesModulePath) +
-                        "'; Start-EditorServices " + this.startArgs;
+        if (utils.isWindows) {
+            powerShellArgs.push(
+                "-Command",
+                startEditorServices);
+        } else {
+            // Use -EncodedCommand for better quote support on non-Windows
+            powerShellArgs.push(
+                "-EncodedCommand",
+                Buffer.from(startEditorServices, "utf16le").toString("base64"));
+        }
 
-                    if (utils.isWindows) {
-                        powerShellArgs.push(
-                            "-Command",
-                            startEditorServices);
-                    } else {
-                        // Use -EncodedCommand for better quote support on non-Windows
-                        powerShellArgs.push(
-                            "-EncodedCommand",
-                            Buffer.from(startEditorServices, "utf16le").toString("base64"));
-                    }
+        this.log.write(
+            "Language server starting --",
+            "    PowerShell executable: " + this.exePath,
+            "    PowerShell args: " + powerShellArgs.join(" "),
+            "    PowerShell Editor Services args: " + startEditorServices);
 
-                    this.log.write(
-                        "Language server starting --",
-                        "    PowerShell executable: " + this.exePath,
-                        "    PowerShell args: " + powerShellArgs.join(" "),
-                        "    PowerShell Editor Services args: " + startEditorServices);
+        // Make sure no old session file exists
+        utils.deleteSessionFile(this.sessionFilePath);
 
-                    // Make sure no old session file exists
-                    utils.deleteSessionFile(this.sessionFilePath);
-
-                    // Launch PowerShell in the integrated terminal
-                    this.consoleTerminal =
-                        vscode.window.createTerminal({
-                            name: this.title,
-                            shellPath: this.exePath,
-                            shellArgs: powerShellArgs,
-                            hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
-                        });
-
-                    if (this.sessionSettings.integratedConsole.showOnStartup) {
-                        // We still need to run this to set the active terminal to the Integrated Console.
-                        this.consoleTerminal.show(true);
-                    }
-
-                    // Start the language client
-                    utils.waitForSessionFile(
-                        this.sessionFilePath,
-                        (sessionDetails, error) => {
-                            // Clean up the session file
-                            utils.deleteSessionFile(this.sessionFilePath);
-
-                            if (error) {
-                                reject(error);
-                            } else {
-                                this.sessionDetails = sessionDetails;
-                                resolve(this.sessionDetails);
-                            }
-                    });
-
-                    this.consoleCloseSubscription =
-                        vscode.window.onDidCloseTerminal(
-                            (terminal) => {
-                                if (terminal === this.consoleTerminal) {
-                                    this.log.write("powershell.exe terminated or terminal UI was closed");
-                                    this.onExitedEmitter.fire();
-                                }
-                            });
-
-                    this.consoleTerminal.processId.then(
-                        (pid) => { this.log.write(`powershell.exe started, pid: ${pid}`); });
-                } catch (e) {
-                    reject(e);
-                }
+        // Launch PowerShell in the integrated terminal
+        this.consoleTerminal =
+            vscode.window.createTerminal({
+                name: this.title,
+                shellPath: this.exePath,
+                shellArgs: powerShellArgs,
+                hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
             });
+
+        if (this.sessionSettings.integratedConsole.showOnStartup) {
+            // We still need to run this to set the active terminal to the Integrated Console.
+            this.consoleTerminal.show(true);
+        }
+
+        // Start the language client
+        this.sessionDetails = await this.waitForSessionFile();
+
+        // Subscribe a log event for when the terminal closes
+        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
+
+        // Log that the PowerShell terminal process has been started
+        const terminalPid = await this.consoleTerminal.processId;
+        const pwshName = path.basename(this.exePath);
+        this.log.write(`${pwshName} started, pid: ${terminalPid}`);
     }
 
     public showConsole(preserveFocus: boolean) {
@@ -187,5 +163,30 @@ export class PowerShellProcess {
         }
 
         return true;
+    }
+
+    private waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
+        return new Promise((resolve, reject) => {
+            utils.waitForSessionFile(this.sessionFilePath, (sessionDetails, error) => {
+                utils.deleteSessionFile(this.sessionFilePath);
+
+                if (error) {
+                    return reject(error);
+                }
+
+                resolve(sessionDetails);
+            });
+        });
+    }
+
+    private onTerminalClose(terminal: vscode.Terminal) {
+        if (terminal !== this.consoleTerminal) {
+            return;
+        }
+
+        // It would be very
+
+        this.log.write("powershell.exe terminated or terminal UI was closed");
+        this.onExitedEmitter.fire();
     }
 }
