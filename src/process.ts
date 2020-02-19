@@ -22,14 +22,13 @@ export class PowerShellProcess {
 
     private consoleTerminal: vscode.Terminal = undefined;
     private consoleCloseSubscription: vscode.Disposable;
-    private sessionDetails: utils.IEditorServicesSessionDetails;
 
     constructor(
         public exePath: string,
         private bundledModulesPath: string,
         private title: string,
         private log: Logger,
-        private startArgs: string,
+        private startPsesArgs: string,
         private sessionFilePath: string,
         private sessionSettings: Settings.ISettings) {
 
@@ -50,13 +49,13 @@ export class PowerShellProcess {
                 ? this.sessionSettings.developer.featureFlags.map((f) => `'${f}'`).join(", ")
                 : "";
 
-        this.startArgs +=
+        this.startPsesArgs +=
             `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
             `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 
         if (this.sessionSettings.integratedConsole.useLegacyReadLine) {
-            this.startArgs += "-UseLegacyReadLine";
+            this.startPsesArgs += "-UseLegacyReadLine";
         }
 
         const powerShellArgs = [];
@@ -80,7 +79,7 @@ export class PowerShellProcess {
 
         const startEditorServices = "Import-Module '" +
             PowerShellProcess.escapeSingleQuotes(psesModulePath) +
-            "'; Start-EditorServices " + this.startArgs;
+            "'; Start-EditorServices " + this.startPsesArgs;
 
         if (utils.isWindows) {
             powerShellArgs.push(
@@ -117,7 +116,7 @@ export class PowerShellProcess {
         }
 
         // Start the language client
-        this.sessionDetails = await this.waitForSessionFile();
+        const sessionDetails = await this.waitForSessionFile();
 
         // Subscribe a log event for when the terminal closes
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
@@ -126,6 +125,8 @@ export class PowerShellProcess {
         const terminalPid = await this.consoleTerminal.processId;
         const pwshName = path.basename(this.exePath);
         this.log.write(`${pwshName} started, pid: ${terminalPid}`);
+
+        return sessionDetails;
     }
 
     public showConsole(preserveFocus: boolean) {
