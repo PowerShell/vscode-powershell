@@ -185,8 +185,6 @@ export class PowerShellProcess {
             return;
         }
 
-        // It would be very
-
         this.log.write("powershell.exe terminated or terminal UI was closed");
         this.onExitedEmitter.fire();
     }
