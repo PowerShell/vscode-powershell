@@ -45,7 +45,7 @@ export class GitHubReleaseInformation {
 
         if (!response.ok) {
             const json = await response.json();
-            throw json.message || json || "response was not ok.";
+            throw new Error(json.message || json || "response was not ok.");
         }
 
         // For preview, we grab all the releases and then grab the first prerelease.
