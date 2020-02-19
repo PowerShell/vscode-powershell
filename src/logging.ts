@@ -116,7 +116,7 @@ export class Logger implements ILogger {
 
     public async writeAndShowErrorWithActions(
         message: string,
-        actions: Array<{ prompt: string; action: () => Promise<void> }>) {
+        actions: { prompt: string; action: () => Promise<void> }[]) {
         this.writeError(message);
 
         const fullActions = [
