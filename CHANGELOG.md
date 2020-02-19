@@ -4,6 +4,10 @@
 ### Thursday, February 20, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
+- 🐛📖 [vscode-PowerShell #2470](https://github.com/PowerShell/vscode-powershell/pull/2470) -
+  Fix incorrect reference to `New-ManifestModule` in documentation. (Thanks @rbleattler!)
+- 🐛📺 [vscode-PowerShell #2469](https://github.com/PowerShell/vscode-powershell/pull/2469) -
+  Close other open pwsh instances when updating PowerShell.
 - 🐛📟 [vscode-PowerShell #2434](https://github.com/powershell/vscode-powershell/pull/2437) -
   Use a new VSCode API to hide the integrated terminal from the shell list
   until debugging when `showOnStartup` is disabled.
