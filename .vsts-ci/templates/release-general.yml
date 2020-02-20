@@ -1,4 +1,13 @@
 steps:
+- powershell: |
+    $powerShellPath = Join-Path -Path $env:AGENT_TEMPDIRECTORY -ChildPath 'powershell'
+    Invoke-WebRequest -Uri https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/install-powershell.ps1 -outfile ./install-powershell.ps1
+    ./install-powershell.ps1 -Destination $powerShellPath
+    $vstsCommandString = "vso[task.setvariable variable=PATH]$powerShellPath;$env:PATH"
+    Write-Host "sending " + $vstsCommandString
+    Write-Host "##$vstsCommandString"
+  displayName: Install PowerShell Core
+
 - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
   displayName: Set Build Name for Non-PR
   condition: ne(variables['Build.Reason'], 'PullRequest')
