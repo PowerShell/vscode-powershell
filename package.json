@@ -607,7 +607,7 @@
         },
         "powershell.scriptAnalysis.settingsPath": {
           "type": "string",
-          "default": "",
+          "default": "PSScriptAnalyzerSettings.psd1",
           "description": "Specifies the path to a PowerShell Script Analyzer settings file. To override the default settings for all projects, enter an absolute path, or enter a path relative to your workspace."
         },
         "powershell.codeFolding.enable": {
