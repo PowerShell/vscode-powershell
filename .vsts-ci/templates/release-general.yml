@@ -1,5 +1,11 @@
 steps:
 - powershell: |
+    Write-Host "Installing pwsh..."
+    if (Get-Command pwsh -ErrorAction Ignore)
+    {
+        Write-Host "pwsh already installed, skipping"
+        return
+    }
     $powerShellPath = Join-Path -Path $env:AGENT_TEMPDIRECTORY -ChildPath 'powershell'
     Invoke-WebRequest -Uri https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/install-powershell.ps1 -outfile ./install-powershell.ps1
     ./install-powershell.ps1 -Destination $powerShellPath
