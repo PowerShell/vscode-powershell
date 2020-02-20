@@ -124,7 +124,7 @@ export function load(): ISettings {
 
     const defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
         enable: true,
-        settingsPath: "",
+        settingsPath: "PSScriptAnalyzerSettings.psd1",
     };
 
     const defaultDebuggingSettings: IDebuggingSettings = {
