@@ -114,7 +114,7 @@ function showChoicePrompt(
             vscode.window
                 .showQuickPick(
                     quickPickItems,
-                    { placeHolder: promptDetails.caption + " - " + promptDetails.message })
+                    { placeHolder: promptDetails.message })
                 .then(onItemSelected);
     } else {
         const checkboxQuickPickItems =
@@ -134,7 +134,7 @@ function showChoicePrompt(
         resultThenable =
             showCheckboxQuickPick(
                     checkboxQuickPickItems,
-                    { confirmPlaceHolder: `${promptDetails.caption} - ${promptDetails.message}`})
+                    { confirmPlaceHolder: promptDetails.message })
                 .then(onItemsSelected);
     }
 
