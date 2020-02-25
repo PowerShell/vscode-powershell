@@ -458,7 +458,11 @@ export class SessionManager implements Middleware {
                     this.log.write("Language server startup failed.");
                     this.setSessionFailure("The language service could not be started: ", error);
                 },
-            );
+            )
+            .catch((error) => {
+                this.log.write("Language server startup failed.");
+                this.setSessionFailure("The language server could not be started: ", error);
+            });
     }
 
     private promptForRestart() {
