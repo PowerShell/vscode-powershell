@@ -110,21 +110,25 @@ export class PowerShellProcess {
                 hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
             });
 
+        const pwshName = path.basename(this.exePath);
+        this.log.write(`${pwshName} started.`);
+
         if (this.sessionSettings.integratedConsole.showOnStartup) {
             // We still need to run this to set the active terminal to the Integrated Console.
             this.consoleTerminal.show(true);
         }
 
         // Start the language client
+        this.log.write("Waiting for session file");
         const sessionDetails = await this.waitForSessionFile();
 
         // Subscribe a log event for when the terminal closes
+        this.log.write("Registering terminal close callback");
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
 
         // Log that the PowerShell terminal process has been started
-        const terminalPid = await this.consoleTerminal.processId;
-        const pwshName = path.basename(this.exePath);
-        this.log.write(`${pwshName} started, pid: ${terminalPid}`);
+        this.log.write("Registering terminal PID log callback");
+        this.consoleTerminal.processId.then((pid) => this.logTerminalPid(pid, pwshName));
 
         return sessionDetails;
     }
@@ -152,6 +156,10 @@ export class PowerShellProcess {
         }
     }
 
+    private logTerminalPid(pid: number, exeName: string) {
+        this.log.write(`${exeName} PID: ${pid}`);
+    }
+
     private isLoginShell(pwshPath: string): boolean {
         try {
             // We can't know what version of PowerShell we have without running it
@@ -172,9 +180,11 @@ export class PowerShellProcess {
                 utils.deleteSessionFile(this.sessionFilePath);
 
                 if (error) {
+                    this.log.write("Error occurred retrieving session file");
                     return reject(error);
                 }
 
+                this.log.write("Session file found");
                 resolve(sessionDetails);
             });
         });
