@@ -15,3 +15,10 @@ out/test/**
 test/**
 sessions/**
 scripts/Install-VSCode.ps1
+tools/**
+.poshchan/**
+.github/**
+.vsts-ci/**
+build.ps1
+tsconfig.json
+tslint.json
