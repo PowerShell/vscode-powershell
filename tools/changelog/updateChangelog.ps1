@@ -233,6 +233,7 @@ $clEntryParams = @{
         'Area-IntelliSense' = '🧠'
         'Area-Logging' = '💭'
         'Area-Pester' = '🐢'
+        'Area-psEditor' = '🧰'
         'Area-Script Analysis' = '👮‍'
         'Area-Snippets' = '✂️'
         'Area-Startup' = '🛫'
