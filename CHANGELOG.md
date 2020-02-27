@@ -39,12 +39,12 @@ You can find the changelog from the old stable fork
 
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
-- [vscode-PowerShell #2491](https://github.com/PowerShell/vscode-powershell/pull/2498) -
+- 🐛🛫 [vscode-PowerShell #2491](https://github.com/PowerShell/vscode-powershell/pull/2498) -
   Fix a startup issue where console becomes unresponsive due to the client waiting for the terminal PID from VSCode.
-- [vscode-PowerShell #2190](https://github.com/PowerShell/vscode-powershell/pull/2484) -
+- 🐛👮 [vscode-PowerShell #2190](https://github.com/PowerShell/vscode-powershell/pull/2484) -
   Look for `PSScriptAnalyzerSettings.psd1` in the workspace root by default for script analysis,
   defaulting back to the default rules when not found.
-- [vscode-PowerShell #2477](https://github.com/PowerShell/vscode-powershell/pull/2477) -
+- 🧰 [vscode-PowerShell #2477](https://github.com/PowerShell/vscode-powershell/pull/2477) -
   Stop using the `caption` field on `powerShell/showChoicePrompt` messages,
   and instead display only the `message` field.
 
