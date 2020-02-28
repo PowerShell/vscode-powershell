@@ -39,6 +39,8 @@ You can find the changelog from the old stable fork
 
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
+- ✨📺 [vscode-PowerShell #2503](https://github.com/PowerShell/vscode-powershell/pull/2503) -
+  Pick up the PowerShell dotnet global tool as a PowerShell runtime.
 - 🐛🛫 [vscode-PowerShell #2491](https://github.com/PowerShell/vscode-powershell/pull/2498) -
   Fix a startup issue where console becomes unresponsive due to the client waiting for the terminal PID from VSCode.
 - 🐛👮 [vscode-PowerShell #2190](https://github.com/PowerShell/vscode-powershell/pull/2484) -
