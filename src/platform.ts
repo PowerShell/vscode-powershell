@@ -180,13 +180,10 @@ export class PowerShellExeFinder {
                 break;
         }
 
-        // TODO:
-        // Enable this when the global tool has been updated
-        // to support proper argument passing.
-        // Currently it cannot take startup arguments to start PSES with.
-        //
         // Look for the .NET global tool
-        // yield this.findPSCoreDotnetGlobalTool();
+        // Some older versions of PowerShell have a bug in this where startup will fail,
+        // but this is fixed in newer versions
+        yield this.findPSCoreDotnetGlobalTool();
 
         // Look for PSCore preview
         yield this.findPSCorePreview();
