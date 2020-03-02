@@ -338,12 +338,6 @@ including syntax coloring and multi-line editing and history, in the PowerShell 
 and now in VSCode terminal. For more information on the benefits of PSReadLine,
 check out their [documentation](https://docs.microsoft.com/en-us/powershell/module/psreadline/about/about_psreadline?view=powershell-6).
 
-To enable PSReadLine support in the Preview version on Windows, please add the following to your user settings:
-
-```
-"powershell.developer.featureFlags": [ "PSReadLine" ]
-```
-
 HUGE thanks to @SeeminglyScience for all his amazing work getting PSReadLine working in PowerShell Editor Services!
 
 #### Breaking Changes
