@@ -33,7 +33,7 @@ for features to come out in the following stable release.
 
 You may also notice that the history of the changelog has changed.
 For a full list of changes between this release and the previous stable release,
-see [here](link to Sydney's changelog).
+see [here](https://github.com/PowerShell/vscode-powershell/blob/master/docs/preview_to_stable_changelog.md).
 You can find the changelog from the old stable fork
 [here](https://github.com/PowerShell/vscode-powershell/blob/legacy/1.x/CHANGELOG.md).
 
