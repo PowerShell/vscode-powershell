@@ -1,5 +1,37 @@
 # PowerShell Preview Extension Release History
 
+## v2020.3.0
+### Thursday, March 12, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- ✨📺 [vscode-PowerShell #2503](https://github.com/PowerShell/vscode-powershell/pull/2503) -
+  Pick up the PowerShell dotnet global tool as a PowerShell runtime.
+- 🐛🛫 [vscode-PowerShell #2491](https://github.com/PowerShell/vscode-powershell/pull/2498) -
+  Fix a startup issue where console becomes unresponsive due to the client waiting for the terminal PID from VSCode.
+- 🐛👮 [vscode-PowerShell #2190](https://github.com/PowerShell/vscode-powershell/pull/2484) -
+  Look for `PSScriptAnalyzerSettings.psd1` in the workspace root by default for script analysis,
+  defaulting back to the default rules when not found.
+- 🧰 [vscode-PowerShell #2477](https://github.com/PowerShell/vscode-powershell/pull/2477) -
+  Stop using the `caption` field on `powerShell/showChoicePrompt` messages,
+  and instead display only the `message` field.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛📟 [PowerShellEditorServices #1201](https://github.com/PowerShell/PowerShellEditorServices/pull/1201) -
+  Fix newlines in error formatting.
+- 🐛👮 [vscode-PowerShell #2489](https://github.com/PowerShell/PowerShellEditorServices/pull/1206) -
+  Fix PSScriptAnalyzer not using default rules when no settings file present.
+- 🐛📟 [vscode-PowerShell #2291](https://github.com/PowerShell/PowerShellEditorServices/pull/1207) -
+  Fix `Read-Host` dropping characters.
+- 🐛📺 [vscode-PowerShell #2424](https://github.com/PowerShell/PowerShellEditorServices/pull/1209) -
+  Fix `F8` not working repeatedly in an Interactive Debugging session.
+- 🐛🛫 [vscode-PowerShell #2404](https://github.com/PowerShell/PowerShellEditorServices/pull/1208) -
+  Fix execution policy being set incorrectly at startup on Windows.
+- 🐛🧠 [vscode-PowerShell #2364](https://github.com/PowerShell/PowerShellEditorServices/pull/1210) -
+  Fix intellisense and `F5` not working after debugging.
+- 🐛🧰 [vscode-PowerShell #2495](https://github.com/PowerShell/PowerShellEditorServices/pull/1211) -
+  Fix PowerShellEditorServices.Commands module commands not working due to types being moved.
+
 ## v2020.2.0
 ### Thursday, February 20, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
