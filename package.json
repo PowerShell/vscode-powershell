@@ -2,7 +2,7 @@
   "name": "powershell",
   "displayName": "PowerShell",
   "version": "2020.3.0",
-  "preview": true,
+  "preview": false,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
