@@ -1,5 +1,5 @@
 $vstsVariables = @{
-    PSES_BRANCH = 'master'
+    PSES_BRANCH = 'release/2.0.0'
 }
 
 # Use VSTS's API to set an env vars
