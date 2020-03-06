@@ -495,7 +495,8 @@ export class SessionManager implements Middleware {
             const clientOptions: LanguageClientOptions = {
                 documentSelector: this.documentSelector,
                 synchronize: {
-                    configurationSection: utils.PowerShellLanguageId,
+                    // backend uses "files" and "search" to ignore references.
+                    configurationSection: [ utils.PowerShellLanguageId, "files", "search" ],
                     // fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
                 },
                 errorHandler: {
