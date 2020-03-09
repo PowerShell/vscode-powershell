@@ -180,7 +180,7 @@ export class PowerShellProcess {
                 utils.deleteSessionFile(this.sessionFilePath);
 
                 if (error) {
-                    this.log.write("Error occurred retrieving session file");
+                    this.log.write(`Error occurred retrieving session file:\n${error}`);
                     return reject(error);
                 }
 
