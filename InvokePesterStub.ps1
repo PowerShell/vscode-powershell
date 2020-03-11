@@ -79,7 +79,7 @@ $pester4Output = switch ($Output) {
 }
 
 if ($MinimumVersion5 -and $pesterModule.Version -lt "5.0.0") {
-    Write-Warning "Pester 5.0.0 or newer is required because setting PowerShell > Pester > Pester5 Code Lens is enabled, but Pester $($pesterModule.Version) is loaded. Some of the code lense features might not work as expected."
+    Write-Warning "Pester 5.0.0 or newer is required because setting PowerShell > Pester: Enable Legacy Code Lens is disabled, but Pester $($pesterModule.Version) is loaded. Some of the code lense features might not work as expected."
 }
 
 

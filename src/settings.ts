@@ -115,8 +115,8 @@ export interface ISideBarSettings {
 }
 
 export interface IPesterSettings {
-    pester5CodeLens?: boolean;
-    output?: string;
+    enableLegacyCodeLens?: boolean;
+    outputVerbosity?: string;
 }
 
 export function load(): ISettings {
@@ -184,8 +184,8 @@ export function load(): ISettings {
     };
 
     const defaultPesterSettings: IPesterSettings = {
-        pester5CodeLens: false,
-        output: "FromPreference",
+        enableLegacyCodeLens: true,
+        outputVerbosity: "FromPreference",
     };
 
     return {
