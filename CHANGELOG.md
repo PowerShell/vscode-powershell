@@ -1,4 +1,4 @@
-# PowerShell Preview Extension Release History
+﻿# PowerShell Preview Extension Release History
 
 ## v2020.3.0
 ### Thursday, March 12, 2020
