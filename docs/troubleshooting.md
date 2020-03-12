@@ -262,7 +262,7 @@ EditorConfig.EditorConfig@0.12.4
 jchannon.csharpextensions@1.3.0
 k--kato.docomment@0.1.2
 ms-vscode.cpptools@0.18.1
-ms-vscode.csharp@1.16.1
+ms-dotnettools.csharp@1.12.13
 ms-vscode.PowerShell@2.0.0
 twxs.cmake@0.0.17
 vscodevim.vim@0.16.5
