@@ -5,11 +5,12 @@
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
 - 🐛👷‍♀️ [vscode-powershell #2533](https://github.com/PowerShell/vscode-powershell/pull/2533) -
-  Change Ms-vscode.csharp to ms-dotnettools.csharp. (Thanks @devlead!)
+  Change source repository's recommended extension from ms-vscode.csharp to ms-dotnettools.csharp. (Thanks @devlead!)
+
 - ✨🐢 [vscode-powershell #2441](https://github.com/PowerShell/vscode-powershell/pull/2441) -
   Run a single Pester test. (Thanks @nohwnd!)
 - 🐛🔧 [vscode-powershell #2524](https://github.com/PowerShell/vscode-powershell/pull/2524) -
-  Add "files" and "search" to configurationSection.
+  Add `files.exclude` and `search.exclude` to configurations sent through to exclude them from PSES functionality
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
