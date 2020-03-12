@@ -4,6 +4,90 @@
 ### Thursday, March 12, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
+- [vscode-powershell #2533](https://github.com/PowerShell/vscode-powershell/pull/2533) -
+  Ms-vscode.csharp to ms-dotnettools.csharp. (Thanks @devlead!)
+- [vscode-powershell #2441](https://github.com/PowerShell/vscode-powershell/pull/2441) -
+  Run single Pester test. (Thanks @nohwnd!)
+- [vscode-powershell #2541](https://github.com/PowerShell/vscode-powershell/pull/2541) -
+  Bump @types/mocha from 7.0.1 to 7.0.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2524](https://github.com/PowerShell/vscode-powershell/pull/2524) -
+  Add "files" and "search" to configurationSection.
+- [vscode-powershell #2514](https://github.com/PowerShell/vscode-powershell/pull/2514) -
+  Bump @types/node-fetch from 2.5.4 to 2.5.5. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2515](https://github.com/PowerShell/vscode-powershell/pull/2515) -
+  Bump @types/sinon from 7.5.1 to 7.5.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2503](https://github.com/PowerShell/vscode-powershell/pull/2503) -
+  Enable dotnet global tool pwsh.
+- [vscode-powershell #2498](https://github.com/PowerShell/vscode-powershell/pull/2498) -
+  Workaround for terminal PID freeze.
+- [vscode-powershell #2492](https://github.com/PowerShell/vscode-powershell/pull/2492) -
+  Bump mock-fs from 4.10.4 to 4.11.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2494](https://github.com/PowerShell/vscode-powershell/pull/2494) -
+  Bump sinon from 8.1.1 to 9.0.0. (Thanks @dependabot-preview[bot]!)
+- 👮‍ ✨ [vscode-powershell #2190](https://github.com/PowerShell/vscode-powershell/pull/2484) -
+  Make PSSA look for a file in the workspace root by default.
+- [vscode-powershell #2477](https://github.com/PowerShell/vscode-powershell/pull/2477) -
+  Remove caption usage from message.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #1232](https://github.com/PowerShell/PowerShellEditorServices/pull/1232) -
+  Only resolve completion items from commands.
+- [PowerShellEditorServices #1167](https://github.com/PowerShell/PowerShellEditorServices/pull/1167) -
+  Run single test in Pester v5. (Thanks @nohwnd!)
+- [vscode-powershell #2534](https://github.com/PowerShell/PowerShellEditorServices/pull/1230) -
+  Ensure that errors are written to the console when debugging.
+- 🔍 🐛 [vscode-powershell #2525](https://github.com/PowerShell/PowerShellEditorServices/pull/1229) -
+  Don't warn user on Clear-Host.
+- [PowerShellEditorServices #1228](https://github.com/PowerShell/PowerShellEditorServices/pull/1228) -
+  Add better logging for formatter and refactor it into 1 class.
+- 🚂 🐛 [vscode-powershell #2397](https://github.com/PowerShell/PowerShellEditorServices/pull/1227) -
+  Use Assembly.LoadFile in WinPS.
+- [PowerShellEditorServices #1222](https://github.com/PowerShell/PowerShellEditorServices/pull/1222) -
+  Make initial logging work in constrained language mode.
+- [PowerShellEditorServices #1225](https://github.com/PowerShell/PowerShellEditorServices/pull/1225) -
+  Sign Clear-Host.ps1.
+- [PowerShellEditorServices #1219](https://github.com/PowerShell/PowerShellEditorServices/pull/1219) -
+  Ensure log directory is created.
+- [PowerShellEditorServices #1223](https://github.com/PowerShell/PowerShellEditorServices/pull/1223) -
+  Ms-vscode.csharp to ms-dotnettools.csharp. (Thanks @devlead!)
+- [PowerShellEditorServices #1220](https://github.com/PowerShell/PowerShellEditorServices/pull/1220) -
+  Fix typo in settings.
+- [PowerShellEditorServices #1218](https://github.com/PowerShell/PowerShellEditorServices/pull/1218) -
+  Switch to better document selecting.
+- [PowerShellEditorServices #1217](https://github.com/PowerShell/PowerShellEditorServices/pull/1217) -
+  Make session-state lock task-reentrant.
+- 👮‍ 🐛 [vscode-powershell #2516](https://github.com/PowerShell/PowerShellEditorServices/pull/1216) -
+  Fix CommentHelp for when a function has other problems with it.
+- [PowerShellEditorServices #1213](https://github.com/PowerShell/PowerShellEditorServices/pull/1213) -
+  Update changelog for 2.0, increment version to 2.1-preview.1.
+- 🐛 [vscode-powershell #2495](https://github.com/PowerShell/PowerShellEditorServices/pull/1211) -
+  Fix PSES Commands module.
+- 🔍 🧠 🐛 🔍 🐛 🔍 🐛 [vscode-powershell #2364](https://github.com/PowerShell/PowerShellEditorServices/pull/1210) -
+  Fix bad context state after debugging.
+- 🚂 🐛 [vscode-powershell #2504](https://github.com/PowerShell/PowerShellEditorServices/pull/1214) -
+  Fix startup in AllSigned execution policy.
+- 🛫 🐛 [vscode-powershell #2404](https://github.com/PowerShell/PowerShellEditorServices/pull/1208) -
+  Fix how we set execution policy.
+- 🔍 🐛 [vscode-powershell #2424](https://github.com/PowerShell/PowerShellEditorServices/pull/1209) -
+  Fire and forget evaluate.
+- 🔍 🐛 [vscode-powershell #2291](https://github.com/PowerShell/PowerShellEditorServices/pull/1207) -
+  Also check for tempSession.
+- 👮‍ 🐛 [vscode-powershell #2489](https://github.com/PowerShell/PowerShellEditorServices/pull/1206) -
+  Fix PSSA settings discovery.
+- [PowerShellEditorServices #1203](https://github.com/PowerShell/PowerShellEditorServices/pull/1203) -
+  Startup task tweaks.
+- [PowerShellEditorServices #1204](https://github.com/PowerShell/PowerShellEditorServices/pull/1204) -
+  Bump Microsoft.Extensions.Logging from 3.1.1 to 3.1.2. (Thanks @dependabot-preview[bot]!)
+- [PowerShellEditorServices #1205](https://github.com/PowerShell/PowerShellEditorServices/pull/1205) -
+  Bump Microsoft.Extensions.FileSystemGlobbing from 3.1.1 to 3.1.2. (Thanks @dependabot-preview[bot]!)
+- [PowerShellEditorServices #1201](https://github.com/PowerShell/PowerShellEditorServices/pull/1201) -
+  Make sure ErrorRecords go to Error stream.
+
+## v2020.3.0
+### Thursday, March 12, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
 - ✨📺 [vscode-PowerShell #2503](https://github.com/PowerShell/vscode-powershell/pull/2503) -
   Pick up the PowerShell dotnet global tool as a PowerShell runtime.
 - 🐛🛫 [vscode-PowerShell #2491](https://github.com/PowerShell/vscode-powershell/pull/2498) -
