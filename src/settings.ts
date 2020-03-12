@@ -94,6 +94,7 @@ export interface ISettings {
     integratedConsole?: IIntegratedConsoleSettings;
     bugReporting?: IBugReportingSettings;
     sideBar?: ISideBarSettings;
+    pester?: IPesterSettings;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -111,6 +112,11 @@ export interface IIntegratedConsoleSettings {
 
 export interface ISideBarSettings {
     CommandExplorerVisibility?: boolean;
+}
+
+export interface IPesterSettings {
+    useLegacyCodeLens?: boolean;
+    outputVerbosity?: string;
 }
 
 export function load(): ISettings {
@@ -177,6 +183,11 @@ export function load(): ISettings {
         CommandExplorerVisibility: true,
     };
 
+    const defaultPesterSettings: IPesterSettings = {
+        useLegacyCodeLens: true,
+        outputVerbosity: "FromPreference",
+    };
+
     return {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
@@ -212,6 +223,8 @@ export function load(): ISettings {
             configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
         sideBar:
             configuration.get<ISideBarSettings>("sideBar", defaultSideBarSettings),
+        pester:
+            configuration.get<IPesterSettings>("pester", defaultPesterSettings),
         startAsLoginShell:
             // tslint:disable-next-line
             // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107

@@ -760,6 +760,21 @@
           "type": "array",
           "default": null,
           "description": "An array of strings that enable experimental features in the PowerShell extension."
+        },
+        "powershell.pester.enableLegacyCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable code lense that is compatible with Pester 4. Disabling this will show 'Run Tests' on all It, Describe and Context blocks, and will correctly work only with Pester 5 and newer."
+        },
+        "powershell.pester.outputVerbosity": {
+          "type": "string",
+          "enum": [
+            "FromPreference",
+            "Normal",
+            "Minimal"
+          ],
+          "default": "FromPreference",
+          "description": "Defines the verbosity of output to be used. For Pester 5 and newer the default value FromPreference, will use the Output settings from the $PesterPreference defined in the caller context, and will default to Normal if there is none. For Pester 4 the FromPreference and Normal options map to All, and Minimal option maps to Fails."
         }
       }
     },
