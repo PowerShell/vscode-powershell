@@ -3,6 +3,16 @@
 
 #requires -Version 6.0
 
+<#
+.EXAMPLE
+./publishGHRelease.ps1 -ReleaseTag v2020.3.0-preview -Branch release/preview/2020.3.0 -GitHubToken $ghTok -Repository 'vscode-PowerShell' -ChangelogPath "../../CHANGELOG.md" -AssetPath ../../PowerShell-Preview-2020.3.0.vsix,../../scripts/Install-VSCode.ps1
+
+.EXAMPLE
+./publishGHRelease.ps1 -ReleaseTag v2020.3.0-preview -Branch release/preview/2020.3.0 -GitHubToken $ghTok -Repository 'PowerShellEditorServices' -ChangelogPath "../../../PowerShellEditorServices/CHANGELOG.md" -AssetPath ../../../PowerShellEditorServices/PowerShellEditorServices.zip
+
+.EXAMPLE
+./publishGHRelease.ps1 -ReleaseTag v2020.4.0 -Branch release/stable/2020.3.0 -Stable -GitHubToken $ghTok -Repository 'PowerShellEditorServices' -ChangelogPath "../../../PowerShellEditorServices/CHANGELOG.md" -AssetPath ../../../PowerShellEditorServices/PowerShellEditorServices.zip
+#>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
@@ -36,7 +46,7 @@ param(
     $AssetPath,
 
     [switch]
-    $Preview
+    $Stable
 )
 
 Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
@@ -77,7 +87,7 @@ $releaseParams = @{
     ReleaseName = $ReleaseTag
     Branch = $BranchName
     AssetPath = $AssetPath
-    Prerelease = $Preview
+    Prerelease = -not $Stable
     Description = GetDescriptionFromChangelog -ChangelogPath $ChangelogPath
     GitHubToken = $GitHubToken
     Draft = $true
