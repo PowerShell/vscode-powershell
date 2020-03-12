@@ -1,5 +1,46 @@
 # PowerShell Preview Extension Release History
 
+## v2020.3.0-preview
+### Thursday, March 12, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 🐛👷‍♀️ [vscode-powershell #2533](https://github.com/PowerShell/vscode-powershell/pull/2533) -
+  Change source repository's recommended extension from ms-vscode.csharp to ms-dotnettools.csharp. (Thanks @devlead!)
+
+- ✨🐢 [vscode-powershell #2441](https://github.com/PowerShell/vscode-powershell/pull/2441) -
+  Run a single Pester test. (Thanks @nohwnd!)
+- 🐛🔧 [vscode-powershell #2524](https://github.com/PowerShell/vscode-powershell/pull/2524) -
+  Add `files.exclude` and `search.exclude` to configurations sent through to exclude them from PSES functionality
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨🧠 [PowerShellEditorServices #1232](https://github.com/PowerShell/PowerShellEditorServices/pull/1232) -
+  Only resolve completion items from commands.
+- ✨🐢 [PowerShellEditorServices #1167](https://github.com/PowerShell/PowerShellEditorServices/pull/1167) -
+  Run a single test in Pester v5. (Thanks @nohwnd!)
+- 🐛🔍 [vscode-powershell #2534](https://github.com/PowerShell/PowerShellEditorServices/pull/1230) -
+  Ensure that errors are written to the console when debugging.
+- 🐛🔍 [vscode-powershell #2525](https://github.com/PowerShell/PowerShellEditorServices/pull/1229) -
+  Don't warn users when using `Clear-Host` in temp sessions.
+- ✨💎 [PowerShellEditorServices #1228](https://github.com/PowerShell/PowerShellEditorServices/pull/1228) -
+  Add better logging for formatter and refactor it into 1 class.
+- 🐛🚂 [vscode-powershell #2397](https://github.com/PowerShell/PowerShellEditorServices/pull/1227) -
+  Use Assembly.LoadFile for dependency loading in WinPS.
+- ✨🛫 [PowerShellEditorServices #1222](https://github.com/PowerShell/PowerShellEditorServices/pull/1222) -
+  Make initial logging work in constrained language mode, allowing the desired user-facing error to present.
+- 🐛🛫 [PowerShellEditorServices #1225](https://github.com/PowerShell/PowerShellEditorServices/pull/1225) -
+  Sign Clear-Host.ps1.
+- 🐛🛫 [PowerShellEditorServices #1219](https://github.com/PowerShell/PowerShellEditorServices/pull/1219) -
+  Ensure log directory is created.
+- 🐛👷‍♀️ [PowerShellEditorServices #1223](https://github.com/PowerShell/PowerShellEditorServices/pull/1223) -
+  Change Ms-vscode.csharp to ms-dotnettools.csharp. (Thanks @devlead!)
+- 🐛🔧 [PowerShellEditorServices #1220](https://github.com/PowerShell/PowerShellEditorServices/pull/1220) -
+  Fix typo in settings.
+- ✨🔧 [PowerShellEditorServices #1218](https://github.com/PowerShell/PowerShellEditorServices/pull/1218) -
+  Switch to better document selecting for vim extension.
+- 🐛🧠 [PowerShellEditorServices #1217](https://github.com/PowerShell/PowerShellEditorServices/pull/1217) -
+  Make session-state lock task-reentrant to fix Untitled file debugging.
+
 ## v2020.3.0
 ### Thursday, March 12, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
