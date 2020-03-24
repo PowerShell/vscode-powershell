@@ -92,7 +92,7 @@
 - 🐛🐢 [vscode-PowerShell #2438](https://github.com/PowerShell/vscode-powershell/pull/2447/) -
   Fixes test failures in Pester contexts not showing up in the Problems pane. (Thanks @tillig!)
 - 🐛🔍 [vscode-PowerShell #2548](https://github.com/PowerShell/vscode-powershell/pull/2458) -
-  Show error message instead of hanging when temp debugging is used with an untitled file.
+  Show error message instead of not responding when temp debugging is used with an untitled file.
 - 👷 [vscode-PowerShell #2465](https://github.com/PowerShell/vscode-powershell/pull/2465) -
   Move macOS CI images to 10.14 (Thanks @bergmeister!)
 
@@ -117,7 +117,7 @@
   Improve PSReadLine experience where no new line is rendered in the console.
 - ✨🔍 [PowerShellEditorServices #1119](https://github.com/powershell/powershelleditorservices/pull/1119) -
   Enable new debugging APIs added in PowerShell 7, improving performance and fixing issues where
-  the debugger would hang or be unable to update breakpoints while scripts were running.
+  the debugger would stop responding or be unable to update breakpoints while scripts were running.
 - 👷📟 [PowerShellEditorServices #1187](https://github.com/PowerShell/PowerShellEditorServices/pull/1187) -
   Upgrade built-in PSReadLine to 2.0.0 GA.
 - 🐛👮 [PowerShellEditorServices #1179](https://github.com/PowerShell/PowerShellEditorServices/pull/1179) -
@@ -1072,7 +1072,7 @@ As stated above, this version of the PowerShell extension only works with Window
   Handle exception case when finding references of a symbol
 
 - [PowerShell/vscode-powershell #942](https://github.com/PowerShell/vscode-powershell/issues/942) -
-  Temporary debugging session now does not hang when running "PowerShell Interactive Session" debugging configuration
+  Temporary debugging session now does not stop responding when running "PowerShell Interactive Session" debugging configuration
 
 - [PowerShell/vscode-powershell #917](https://github.com/PowerShell/vscode-powershell/issues/917) -
   Added PowerShell.InvokeRegisteredEditorCommand command to be used from HTML preview views for invoking editor commands registered in PowerShell.  Thanks to [Kamil Kosek](https://github.com/kamilkosek)!
@@ -1308,7 +1308,7 @@ Special thanks to [Doug Finke](https://github.com/dfinke) for the contribution!
   the CodeLens feature.
 
 - [#851](https://github.com/PowerShell/vscode-powershell/issues/851) -
-  Fixed an issue where the language server would hang when typing out a describe
+  Fixed an issue where the language server would stop responding when typing out a describe
   block.
 
 - [#852](https://github.com/PowerShell/vscode-powershell/issues/852) -
