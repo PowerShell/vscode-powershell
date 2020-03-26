@@ -1,12 +1,24 @@
 # PowerShell Preview Extension Release History
 
+## v2020.3.1-preview
+### Thursday, March 26, 2020
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛🧠 [vscode-powershell #2584](https://github.com/PowerShell/PowerShellEditorServices/pull/1243) -
+  Refactor GetCommandSynopsisAsync method to make sure cmdlets with module prefixes work.
+- 🐛⚡️🧠📚 [vscode-powershell #2556](https://github.com/PowerShell/PowerShellEditorServices/pull/1238) -
+  Add cancellation for `textDocument/completion`, `textDocument/codeAction`, `textDocument/folding`.
+- ✨👮 [vscode-powershell #2572](https://github.com/PowerShell/PowerShellEditorServices/pull/1241) -
+  Only run diagnostics on PowerShell files.
+- ⚡️🧠 [PowerShellEditorServices #1237](https://github.com/PowerShell/PowerShellEditorServices/pull/1237) -
+  Optimize when we run GetCommandInfoAsync to use the pipeline less for Intellisense.
+
 ## v2020.3.0-preview
 ### Thursday, March 12, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
 - 🐛👷‍♀️ [vscode-powershell #2533](https://github.com/PowerShell/vscode-powershell/pull/2533) -
   Change source repository's recommended extension from ms-vscode.csharp to ms-dotnettools.csharp. (Thanks @devlead!)
-
 - ✨🐢 [vscode-powershell #2441](https://github.com/PowerShell/vscode-powershell/pull/2441) -
   Run a single Pester test. (Thanks @nohwnd!)
 - 🐛🔧 [vscode-powershell #2524](https://github.com/PowerShell/vscode-powershell/pull/2524) -
