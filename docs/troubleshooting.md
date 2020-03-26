@@ -173,6 +173,8 @@ Logs provide context for what was happening when the issue occurred.
   (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
   with `PowerShell: Open PowerShell Extension Logs Folder`.
 
+> NOTE: Don't forget to also attach the [Language Server Protocol payload logs](#provide-language-server-protocol-payload-logs)!
+
 - You can attach your logs to an issue by zipping them and drag/dropping
   them onto your open issue description in the browser.
 
@@ -181,9 +183,6 @@ Logs provide context for what was happening when the issue occurred.
   so we can track the work &mdash; other users may have the same issue.
 
 #### Provide Language Server Protocol payload logs
-
-> NOTE: This currently only applies to the PowerShell Preview extension and only if you have version
-> 2019.11.0 or higher.
 
 The PowerShell extension works mostly from sending and receiving messages from [PowerShell Editor Services](httos://github.com/PowerShell/PowerShellEditorServices).
 In some cases, getting to the bottom of a bug will require looking at the payloads of these messages. To do this:
