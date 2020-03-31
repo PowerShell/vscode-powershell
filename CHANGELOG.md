@@ -1,5 +1,14 @@
 # PowerShell Preview Extension Release History
 
+## v2020.3.2-preview
+### Tuesday, March 31, 2020
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨📟 [PowerShellEditorServices #1245](https://github.com/PowerShell/PowerShellEditorServices/pull/1245) -
+  Better PSReadLine version filter check to include 2.1.0+ prereleases.
+- 🐛⚡️🧠🔗 [PowerShellEditorServices #1248](https://github.com/PowerShell/PowerShellEditorServices/pull/1248) -
+  Fix cancellation for completions and add `textDocument/hover` cancellation support.
+
 ## v2020.3.1-preview
 ### Thursday, March 26, 2020
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
