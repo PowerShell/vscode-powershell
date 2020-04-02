@@ -9,7 +9,7 @@ steps:
       targetType: filePath
       filePath: ./tools/releaseBuild/setVstsVariables.ps1
   - pwsh: |
-      git clone --single-branch --branch $env:PSES_BRANCH https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
+      git clone --single-branch --branch $env:PSES_BRANCH https://github.com/$env:PSES_FORK/PowerShellEditorServices.git ../PowerShellEditorServices
       Install-Module InvokeBuild -Scope CurrentUser -Force
       Install-Module PlatyPS -Scope CurrentUser -Force
   # Build
