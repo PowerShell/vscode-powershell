@@ -1,5 +1,6 @@
 $vstsVariables = @{
     PSES_BRANCH = 'master'
+    PSES_FORK = 'PowerShell'
 }
 
 # Use VSTS's API to set an env vars
