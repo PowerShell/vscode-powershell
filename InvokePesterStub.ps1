@@ -59,15 +59,20 @@ param(
 $pesterModule = Microsoft.PowerShell.Core\Get-Module Pester
 # add one line, so the subsequent output is not shifted to the side
 Write-Output ''
+
 if (!$pesterModule) {
     Write-Output "Importing Pester module..."
-    $minimumVersion = if ($MinimumVersion5) { "5.0.0" } else { "0.0.0" }
-    $versionMessage = " version $minimumVersion"
-    $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru -MinimumVersion $minimumVersion
+    if ($MinimumVersion5) {
+        $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru -MinimumVersion 5.0.0
+    }
+
     if (!$pesterModule) {
-        # If we still don't have an imported Pester module, that is (most likely) because Pester is not installed.
-        Write-Warning "Failed to import Pester$(if ($MinimumVersion5){ $versionMessage }). You must install Pester module to run or debug Pester tests."
-        Write-Warning "You can install Pester by executing: Install-Module Pester $(if ($MinimumVersion5) {"-MinimumVersion 5.0.0" }) -Scope CurrentUser -Force"
+        $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru
+    }
+
+    if (!$pesterModule) {
+        Write-Warning "Failed to import Pester. You must install Pester module to run or debug Pester tests."
+        Write-Warning "$(if ($MinimumVersion5) {"Recommended version to install is Pester 5.0.0 or newer. "})You can install Pester by executing: Install-Module Pester$(if ($MinimumVersion5) {" -MinimumVersion 5.0.0" }) -Scope CurrentUser -Force"
         return
     }
 }
@@ -79,7 +84,7 @@ $pester4Output = switch ($Output) {
 }
 
 if ($MinimumVersion5 -and $pesterModule.Version -lt "5.0.0") {
-    Write-Warning "Pester 5.0.0 or newer is required because setting PowerShell > Pester: Enable Legacy Code Lens is disabled, but Pester $($pesterModule.Version) is loaded. Some of the code lense features might not work as expected."
+    Write-Warning "Pester 5.0.0 or newer is required because setting PowerShell > Pester: Use Legacy Code Lens is disabled, but Pester $($pesterModule.Version) is loaded. Some of the code lense features might not work as expected."
 }
 
 
