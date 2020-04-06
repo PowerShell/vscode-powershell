@@ -56,7 +56,7 @@
     "@types/node-fetch": "~2.5.5",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.1.0",
-    "@types/sinon": "~7.5.2",
+    "@types/sinon": "~9.0.0",
     "@types/vscode": "1.40.0",
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~1.23.3",
