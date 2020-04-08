@@ -23,7 +23,7 @@ _To contribute, check out our [guide here](#contributing)._
 | [DataTable](#datatable) | _Creates a DataTable_ |
 | [DateTimeWriteVerbose](#datetimewriteverbose) | _Write-Verbose with the time and date pre-pended to your message by @ThmsRynr_ |
 | [Error-Terminating](#error-terminating) | _Create a full terminating error by @omniomi_ |
-| [Exchange Online Connection](exchange-online-connection) | _Create a connection to Exchange Online by @vmsilvamolina_ | 
+| [Exchange Online Connection](#exchange-online-connection) | _Create a connection to Exchange Online by @vmsilvamolina_ |
 | [HTML header](#html-header) | _Add HTML header with the style tag by @vmsilvamolina_ |
 | [MaxColumnLengthinDataTable](#maxcolumnlengthindatatable) | _Gets the max length of string columns in datatables_ |
 | [New Azure Resource Group](#new-azure-resource-group) | _Create an Azure Resource group by @vmsilvamolina_ |
