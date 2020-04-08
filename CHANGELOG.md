@@ -1,5 +1,23 @@
 # PowerShell Preview Extension Release History
 
+## v2020.4.0-preview
+### Wednesday, April 08, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- ✨👷 [vscode-powershell #2617](https://github.com/PowerShell/vscode-powershell/pull/2617) -
+  Use PowerShell Daily in CI.
+- 🐛📖 [vscode-powershell #2618](https://github.com/PowerShell/vscode-powershell/pull/2618) -
+  Fix link to 'Exchange Online Connection' in community snippets ToC. (Thanks @hjorslev!)
+- 🐛🐢 [vscode-powershell #2606](https://github.com/PowerShell/vscode-powershell/pull/2606) -
+  Fix Pester CodeLens setting which allows Pester v4 scripts to work again. (Thanks @nohwnd!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨👷 [PowerShellEditorServices #1252](https://github.com/PowerShell/PowerShellEditorServices/pull/1252) -
+  Use PowerShell Daily in CI.
+- 🐛⚡️🧠🔗 [PowerShellEditorServices #1251](https://github.com/PowerShell/PowerShellEditorServices/pull/1251) -
+  Add cancellation to SignatureHelp request and cache results for cmdlets on `Get-Command` and `Get-Help`.
+
 ## v2020.3.2-preview
 ### Tuesday, March 31, 2020
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
