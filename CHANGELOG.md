@@ -1,5 +1,31 @@
 # PowerShell Preview Extension Release History
 
+## v2020.4.0
+### Wednesday, April 08, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- [vscode-powershell #2613](https://github.com/PowerShell/vscode-powershell/pull/2613) -
+  Bump tslint from 6.1.0 to 6.1.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2611](https://github.com/PowerShell/vscode-powershell/pull/2611) -
+  Bump vsce from 1.74.0 to 1.75.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2612](https://github.com/PowerShell/vscode-powershell/pull/2612) -
+  Bump @types/sinon from 7.5.2 to 9.0.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2617](https://github.com/PowerShell/vscode-powershell/pull/2617) -
+  Use PowerShell Daily in CI.
+- [vscode-powershell #2618](https://github.com/PowerShell/vscode-powershell/pull/2618) -
+  Fix link in TOC: link to 'Exchange Online Connection' returns 404. (Thanks @hjorslev!)
+- [vscode-powershell #2606](https://github.com/PowerShell/vscode-powershell/pull/2606) -
+  Fix Pester code lense. (Thanks @nohwnd!)
+- [vscode-powershell #2604](https://github.com/PowerShell/vscode-powershell/pull/2604) -
+  Ability to specify PSES branch and fork in CI build.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #1252](https://github.com/PowerShell/PowerShellEditorServices/pull/1252) -
+  Use PowerShell Daily in CI.
+- [PowerShellEditorServices #1251](https://github.com/PowerShell/PowerShellEditorServices/pull/1251) -
+  Signaturehelp cancellation and some caching.
+
 ## v2020.3.2-preview
 ### Tuesday, March 31, 2020
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
