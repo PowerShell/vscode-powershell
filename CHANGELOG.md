@@ -1,5 +1,12 @@
 # PowerShell Preview Extension Release History
 
+## v2020.4.1-preview
+### Wednesday, April 09, 2020
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨📟 [PowerShellEditorServices #1255](https://github.com/PowerShell/PowerShellEditorServices/pull/1255) -
+  Move PSReadLine invocation into cmdlets to get closer to supporting ConstrainedLanguage mode. Also removes hard coded PSReadLine assembly version.
+
 ## v2020.4.0-preview
 ### Wednesday, April 08, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
