@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.43.0"
+    "vscode": "^1.44.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -62,7 +62,7 @@
     "@types/semver": "~7.2.0",
     "@types/sinon": "~9.0.4",
     "@types/uuid": "^8.0.0",
-    "@types/vscode": "1.43.0",
+    "@types/vscode": "1.44.0",
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~2.0.0",
     "mocha-multi-reporters": "~1.1.7",
@@ -72,7 +72,8 @@
     "tslint": "~6.1.2",
     "typescript": "~3.9.3",
     "vsce": "~1.77.0",
-    "vscode-test": "~1.4.0"
+    "vscode-test": "~1.4.0",
+    "vscode-dts": "^0.3.1"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -80,7 +81,10 @@
   "scripts": {
     "compile": "tsc -v && tsc -p ./ && tslint -p ./",
     "compile-watch": "tsc -watch -p ./",
-    "test": "node ./out/test/runTests.js"
+    "test": "node ./out/test/runTests.js",
+    "download-api": "vscode-dts dev",
+    "postdownload-api": "vscode-dts master",
+    "postinstall": "npm run download-api"
   },
   "contributes": {
     "breakpoints": [
@@ -106,6 +110,17 @@
         }
       ]
     },
+    "notebookProvider": [
+      {
+        "viewType": "psnb",
+        "displayName": "Powershell Notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.ps1"
+          }
+        ]
+      }
+    ],
     "keybindings": [
       {
         "command": "PowerShell.ShowHelp",

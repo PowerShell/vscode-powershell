@@ -34,6 +34,8 @@ import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
+import utils = require("./utils");
+import { PowerShellNotebooksFeature } from "./features/PowerShellNotebooks";
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires
@@ -133,6 +135,9 @@ export function activate(context: vscode.ExtensionContext): void {
             PackageJSON.version,
             telemetryReporter);
 
+    const powerShellNotebooksFeature = new PowerShellNotebooksFeature();
+    context.subscriptions.push(vscode.notebook.registerNotebookProvider('psnb', powerShellNotebooksFeature));
+
     // Create features
     extensionFeatures = [
         new ConsoleFeature(logger),
@@ -156,7 +161,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
-        new ExternalApiFeature(sessionManager, logger)
+        new ExternalApiFeature(sessionManager, logger),
+        powerShellNotebooksFeature
     ];
 
     sessionManager.setExtensionFeatures(extensionFeatures);
