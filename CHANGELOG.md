@@ -1,5 +1,12 @@
 # PowerShell Preview Extension Release History
 
+## v2020.4.2-preview
+### Monday, April 13, 2020
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛📟 [PowerShellEditorServices #1258](https://github.com/PowerShell/PowerShellEditorServices/pull/1258) -
+  No more warning about PowerShellEditorServices module being imported with unapproved verb.
+
 ## v2020.4.1-preview
 ### Wednesday, April 09, 2020
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
