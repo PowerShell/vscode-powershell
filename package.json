@@ -43,7 +43,8 @@
     "onCommand:PowerShell.RegisterExternalExtension",
     "onCommand:PowerShell.UnregisterExternalExtension",
     "onCommand:PowerShell.GetPowerShellVersionDetails",
-    "onView:PowerShellCommands"
+    "onView:PowerShellCommands",
+    "onNotebookEditor:PowerShellNotebookMode"
   ],
   "dependencies": {
     "node-fetch": "^2.6.0",
@@ -112,7 +113,7 @@
     },
     "notebookProvider": [
       {
-        "viewType": "psnb",
+        "viewType": "PowerShellNotebookMode",
         "displayName": "Powershell Notebook",
         "selector": [
           {
