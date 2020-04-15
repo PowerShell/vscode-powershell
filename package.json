@@ -53,7 +53,7 @@
     "@types/mocha": "~7.0.2",
     "@types/mock-fs": "~4.10.0",
     "@types/node": "~10.11.0",
-    "@types/node-fetch": "~2.5.5",
+    "@types/node-fetch": "~2.5.6",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.1.0",
     "@types/sinon": "~9.0.0",
