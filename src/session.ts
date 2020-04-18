@@ -194,11 +194,10 @@ export class SessionManager implements Middleware {
         } else {
             const packageJSON: any = require("../../package.json");
             const previewStr = (packageJSON.name.toLowerCase() === "powershell-preview") ? "Preview " : "";
-            const version = packageJSON.version;
 
             const startupBanner = `
 
-            =====> PowerShell ${previewStr}Integrated Console v${version} <=====
+            =====> PowerShell ${previewStr}Integrated Console v${this.HostVersion} <=====
 
             `;
 
