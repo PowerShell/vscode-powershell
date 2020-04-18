@@ -191,6 +191,18 @@ export class SessionManager implements Middleware {
 
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
+        } else {
+            const packageJSON: any = require("../../package.json");
+            const previewStr = (packageJSON.name.toLowerCase() === "powershell-preview") ? "Preview " : "";
+            const version = packageJSON.version;
+
+            const startupBanner = `
+
+            =====> PowerShell ${previewStr}Integrated Console v${version} <=====
+
+            `;
+
+            this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
         }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
