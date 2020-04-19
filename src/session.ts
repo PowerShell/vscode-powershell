@@ -4,7 +4,6 @@
 
 import fs = require("fs");
 import net = require("net");
-import * as os from "os";
 import path = require("path");
 import * as semver from "semver";
 import vscode = require("vscode");
@@ -196,7 +195,9 @@ export class SessionManager implements Middleware {
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
         } else {
-            const startupBanner = `=====> ${this.HostName} Integrated Console v${this.HostVersion} <=====${os.EOL}`;
+            const startupBanner = `
+        =====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
+`;
             this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
         }
 
