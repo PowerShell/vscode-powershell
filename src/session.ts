@@ -195,8 +195,7 @@ export class SessionManager implements Middleware {
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
         } else {
-            const startupBanner = `
-        =====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
+            const startupBanner = `=====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
 `;
             this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
         }
