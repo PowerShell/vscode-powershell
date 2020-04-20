@@ -57,7 +57,7 @@
 
     Please contribute improvements to this script on GitHub!
 
-    https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
+    https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1
 
 .PARAMETER Architecture
     A validated string defining the bit version to download. Values can be either 64-bit or 32-bit.
