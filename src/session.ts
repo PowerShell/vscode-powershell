@@ -35,6 +35,7 @@ export enum SessionStatus {
 }
 
 export class SessionManager implements Middleware {
+    public HostName: string;
     public HostVersion: string;
     public PowerShellExeDetails: IPowerShellExeDetails;
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
@@ -68,11 +69,13 @@ export class SessionManager implements Middleware {
         private requiredEditorServicesVersion: string,
         private log: Logger,
         private documentSelector: DocumentSelector,
+        private hostName: string,
         private version: string,
         private reporter: TelemetryReporter) {
 
         this.platformDetails = getPlatformDetails();
 
+        this.HostName = hostName;
         this.HostVersion = version;
         this.telemetryReporter = reporter;
 
@@ -81,7 +84,7 @@ export class SessionManager implements Middleware {
 
         this.log.write(
             `Visual Studio Code v${vscode.version} ${procBitness}`,
-            `PowerShell Extension v${this.HostVersion}`,
+            `${this.HostName} Extension v${this.HostVersion}`,
             `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`);
 
         // Fix the host version so that PowerShell can consume it.
@@ -191,6 +194,10 @@ export class SessionManager implements Middleware {
 
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
+        } else {
+            const startupBanner = `=====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
+`;
+            this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
         }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {

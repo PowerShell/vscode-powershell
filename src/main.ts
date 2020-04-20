@@ -136,6 +136,7 @@ export function activate(context: vscode.ExtensionContext): void {
             requiredEditorServicesVersion,
             logger,
             documentSelector,
+            PackageJSON.displayName,
             PackageJSON.version,
             telemetryReporter);
 
