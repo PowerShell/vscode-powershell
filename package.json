@@ -761,10 +761,10 @@
           "default": null,
           "description": "An array of strings that enable experimental features in the PowerShell extension."
         },
-        "powershell.developer.waitForSessionFileNumOfTries": {
-          "type":"number",
-          "default": 120,
-          "description": "When the PowerShell extension is starting up, it checks for a session file in order to connect to the language server. It checks this number of times ever 2 seconds."
+        "powershell.developer.waitForSessionFileTimeoutSeconds": {
+          "type": "number",
+          "default": 240,
+          "description": "When the PowerShell extension is starting up, it checks for a session file in order to connect to the language server. This setting determines how long until checking for the session file times out. (default is 240 seconds or 4 minutes)"
         },
         "powershell.pester.useLegacyCodeLens": {
           "type": "boolean",

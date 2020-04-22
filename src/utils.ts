@@ -45,7 +45,6 @@ export interface IEditorServicesSessionDetails {
 }
 
 export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
-export type IWaitForSessionFileCallback = (details: IEditorServicesSessionDetails, error: string) => void;
 
 const sessionsFolder = path.resolve(__dirname, "..", "..", "sessions/");
 const sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);

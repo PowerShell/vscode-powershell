@@ -17,6 +17,10 @@ export class PowerShellProcess {
         return pspath.replace(new RegExp("'", "g"), "''");
     }
 
+    // This is used to warn the user that the extension is taking longer than expected to startup.
+    // After the 15th try we've hit 30 seconds and should warn.
+    private static warnUserThreshold = 15;
+
     public onExited: vscode.Event<void>;
     private onExitedEmitter = new vscode.EventEmitter<void>();
 
@@ -179,11 +183,11 @@ export class PowerShellProcess {
     }
 
     private async waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
-        const numOfTries = this.sessionSettings.developer.waitForSessionFileNumOfTries;
+        // Determine how many tries by dividing by 2000 thus checking every 2 seconds.
+        const numOfTries = this.sessionSettings.developer.waitForSessionFileTimeoutSeconds / 2;
+        const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
 
-        // This is used to warn the user that the extension is taking longer than expected to startup.
-        const warnUserThreshold = numOfTries / 2;
-
+        // Check every 2 seconds
         for (let i = numOfTries; i > 0; i--) {
             if (utils.checkIfFileExists(this.sessionFilePath)) {
                 this.log.write("Session file found");
@@ -192,9 +196,9 @@ export class PowerShellProcess {
                 return sessionDetails;
             }
 
-            if (warnUserThreshold === i) {
+            if (warnAt === i) {
                 vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
-    If you're using anti-virus software, this can affect start up performance.`);
+    If you're using privilege enforcement software, this can affect start up performance.`);
             }
 
             // Wait a bit and try again

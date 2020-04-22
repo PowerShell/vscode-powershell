@@ -72,7 +72,7 @@ export interface IDeveloperSettings {
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
-    waitForSessionFileNumOfTries?: number;
+    waitForSessionFileTimeoutSeconds?: number;
 }
 
 export interface ISettings {
@@ -143,7 +143,7 @@ export function load(): ISettings {
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
-        waitForSessionFileNumOfTries: 120,
+        waitForSessionFileTimeoutSeconds: 240,
     };
 
     const defaultCodeFoldingSettings: ICodeFoldingSettings = {
