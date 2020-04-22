@@ -7,7 +7,6 @@
 import fs = require("fs");
 import os = require("os");
 import path = require("path");
-import * as vscode from "vscode";
 
 export const PowerShellLanguageId = "powershell";
 
@@ -70,31 +69,6 @@ export function writeSessionFile(sessionFilePath: string, sessionDetails: IEdito
     writeStream.close();
 }
 
-function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export async function waitForSessionFile(sessionFilePath: string, numOfTries: number = 120): Promise<IEditorServicesSessionDetails> {
-    // This is used to warn the user that the extension is taking longer than expected to startup.
-    const warnUserThreshold = numOfTries / 2;
-
-    for (let i = numOfTries; i > 0; i--) {
-        if (checkIfFileExists(sessionFilePath)) {
-            // Session file was found, load and return it
-            return readSessionFile(sessionFilePath);
-        }
-
-        if (warnUserThreshold === i) {
-            vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
-If you're using anti-virus software, this can affect start up performance.`);
-        }
-
-        // Wait a bit and try again
-        await sleep(2000);
-    }
-
-    throw new Error("Timed out waiting for session file to appear.");
-}
 
 export function readSessionFile(sessionFilePath: string): IEditorServicesSessionDetails {
     const fileContents = fs.readFileSync(sessionFilePath, "utf-8");

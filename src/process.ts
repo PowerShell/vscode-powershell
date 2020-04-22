@@ -174,18 +174,36 @@ export class PowerShellProcess {
         return true;
     }
 
+    private sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     private async waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
-        try {
-            const sessionDetails: utils.IEditorServicesSessionDetails = await utils.waitForSessionFile(
-                this.sessionFilePath, this.sessionSettings.developer.waitForSessionFileNumOfTries);
-            this.log.write("Session file found");
-            return sessionDetails;
-        } catch (e) {
-            this.log.write(`Error occurred retrieving session file:\n${e}`);
-            throw e;
-        } finally {
-            utils.deleteSessionFile(this.sessionFilePath);
+        const numOfTries = this.sessionSettings.developer.waitForSessionFileNumOfTries;
+
+        // This is used to warn the user that the extension is taking longer than expected to startup.
+        const warnUserThreshold = numOfTries / 2;
+
+        for (let i = numOfTries; i > 0; i--) {
+            if (utils.checkIfFileExists(this.sessionFilePath)) {
+                this.log.write("Session file found");
+                const sessionDetails = utils.readSessionFile(this.sessionFilePath);
+                utils.deleteSessionFile(this.sessionFilePath);
+                return sessionDetails;
+            }
+
+            if (warnUserThreshold === i) {
+                vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
+    If you're using anti-virus software, this can affect start up performance.`);
+            }
+
+            // Wait a bit and try again
+            await this.sleep(2000);
         }
+
+        const err = "Timed out waiting for session file to appear.";
+        this.log.write(err);
+        throw new Error(err);
     }
 
     private onTerminalClose(terminal: vscode.Terminal) {
