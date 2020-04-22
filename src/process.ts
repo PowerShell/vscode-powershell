@@ -176,7 +176,7 @@ export class PowerShellProcess {
 
     private waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
         return new Promise((resolve, reject) => {
-            utils.waitForSessionFile(this.sessionFilePath, (sessionDetails, error) => {
+            utils.waitForSessionFile(this.sessionFilePath, this.sessionSettings.developer.waitForSessionFileNumOfTries, (sessionDetails, error) => {
                 utils.deleteSessionFile(this.sessionFilePath);
 
                 if (error) {
