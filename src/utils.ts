@@ -70,31 +70,30 @@ export function writeSessionFile(sessionFilePath: string, sessionDetails: IEdito
     writeStream.close();
 }
 
-export function waitForSessionFile(sessionFilePath: string, numOfTries: number = 120, callback: IWaitForSessionFileCallback) {
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
+export async function waitForSessionFile(sessionFilePath: string, numOfTries: number = 120): Promise<IEditorServicesSessionDetails> {
     // This is used to warn the user that the extension is taking longer than expected to startup.
     const warnUserThreshold = numOfTries / 2;
-    function innerTryFunc(remainingTries: number, delayMilliseconds: number) {
-        if (remainingTries === 0) {
-            callback(undefined, "Timed out waiting for session file to appear.");
-        } else if (!checkIfFileExists(sessionFilePath)) {
-            if (warnUserThreshold === remainingTries) {
-                vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
-If you using anti-virus software, this can affect start up performance.`);
-            }
 
-            // Wait a bit and try again
-            setTimeout(
-                () => { innerTryFunc(remainingTries - 1, delayMilliseconds); },
-                delayMilliseconds);
-        } else {
+    for (let i = numOfTries; i > 0; i--) {
+        if (checkIfFileExists(sessionFilePath)) {
             // Session file was found, load and return it
-            callback(readSessionFile(sessionFilePath), undefined);
+            return readSessionFile(sessionFilePath);
         }
+
+        if (warnUserThreshold === i) {
+            vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
+If you're using anti-virus software, this can affect start up performance.`);
+        }
+
+        // Wait a bit and try again
+        await sleep(2000);
     }
 
-    // Try once every 2 seconds, 60 times - making two full minutes
-    innerTryFunc(numOfTries, 2000);
+    throw new Error("Timed out waiting for session file to appear.");
 }
 
 export function readSessionFile(sessionFilePath: string): IEditorServicesSessionDetails {

@@ -174,20 +174,18 @@ export class PowerShellProcess {
         return true;
     }
 
-    private waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
-        return new Promise((resolve, reject) => {
-            utils.waitForSessionFile(this.sessionFilePath, this.sessionSettings.developer.waitForSessionFileNumOfTries, (sessionDetails, error) => {
-                utils.deleteSessionFile(this.sessionFilePath);
-
-                if (error) {
-                    this.log.write(`Error occurred retrieving session file:\n${error}`);
-                    return reject(error);
-                }
-
-                this.log.write("Session file found");
-                resolve(sessionDetails);
-            });
-        });
+    private async waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
+        try {
+            const sessionDetails: utils.IEditorServicesSessionDetails = await utils.waitForSessionFile(
+                this.sessionFilePath, this.sessionSettings.developer.waitForSessionFileNumOfTries);
+            this.log.write("Session file found");
+            return sessionDetails;
+        } catch (e) {
+            this.log.write(`Error occurred retrieving session file:\n${e}`);
+            throw e;
+        } finally {
+            utils.deleteSessionFile(this.sessionFilePath);
+        }
     }
 
     private onTerminalClose(terminal: vscode.Terminal) {
