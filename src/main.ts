@@ -136,7 +136,12 @@ export function activate(context: vscode.ExtensionContext): void {
             telemetryReporter);
 
     const powerShellNotebooksFeature = new PowerShellNotebooksFeature();
-    context.subscriptions.push(vscode.notebook.registerNotebookProvider('PowerShellNotebookMode', powerShellNotebooksFeature));
+
+    try {
+        context.subscriptions.push(vscode.notebook.registerNotebookProvider('PowerShellNotebookMode', powerShellNotebooksFeature));
+    } catch (e) {
+        // This would happen in VS Code changes their API.
+    }
 
     // Create features
     extensionFeatures = [

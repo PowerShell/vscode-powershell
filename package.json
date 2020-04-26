@@ -26,6 +26,7 @@
     "url": "https://github.com/PowerShell/vscode-powershell.git"
   },
   "main": "./out/src/main",
+  "enableProposedApi": true,
   "activationEvents": [
     "onDebugInitialConfigurations",
     "onDebugResolve:PowerShell",
@@ -218,6 +219,24 @@
         }
       },
       {
+        "command": "PowerShell.ShowNotebookMode",
+        "title": "(Preview) Show Notebook Mode",
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/book.svg",
+          "dark": "resources/dark/book.svg"
+        }
+      },
+      {
+        "command": "PowerShell.HideNotebookMode",
+        "title": "Show Text Editor",
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/file-code.svg",
+          "dark": "resources/dark/file-code.svg"
+        }
+      },
+      {
         "command": "PowerShell.RestartSession",
         "title": "Restart Current Session",
         "category": "PowerShell"
@@ -392,6 +411,16 @@
           "when": "editorLangId == powershell && config.powershell.buttons.showRunButtons",
           "command": "PowerShell.RunSelection",
           "group": "navigation@101"
+        },
+        {
+          "when": "editorLangId == powershell && config.powershell.notebooks.showToggleButton",
+          "command": "PowerShell.ShowNotebookMode",
+          "group": "navigation@102"
+        },
+        {
+          "when": "resourceLangId == powershell && notebookEditorFocused",
+          "command": "PowerShell.HideNotebookMode",
+          "group": "navigation@102"
         }
       ],
       "editor/title/context": [
@@ -897,6 +926,11 @@
           "type": "boolean",
           "default": false,
           "description": "Show buttons in the editor titlebar for moving the panel around."
+        },
+        "powershell.notebooks.showToggleButton": {
+          "type":"boolean",
+          "default": false,
+          "description": "Controls whether we show or hide the buttons to toggle Notebook mode in the top right."
         }
       }
     },
