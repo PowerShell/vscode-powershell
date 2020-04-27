@@ -237,11 +237,6 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.SelectPSSARules",
-        "title": "Select PSScriptAnalyzer Rules",
-        "category": "PowerShell"
-      },
-      {
         "command": "PowerShell.ShowSessionConsole",
         "title": "Show Integrated Console",
         "category": "PowerShell"
