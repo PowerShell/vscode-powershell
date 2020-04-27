@@ -33,7 +33,7 @@ export class HelpCompletionFeature implements IFeature {
     constructor(private log: Logger) {
         this.settings = Settings.load();
 
-        if (this.settings.helpCompletion !== Settings.HelpCompletion.Disabled) {
+        if (this.settings.helpCompletion !== Settings.CommentType.Disabled) {
             this.helpCompletionProvider = new HelpCompletionProvider();
             const subscriptions = [];
             workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
@@ -166,7 +166,7 @@ class HelpCompletionProvider {
         const result = await this.langClient.sendRequest(CommentHelpRequestType, {
             documentUri: doc.uri.toString(),
             triggerPosition: triggerStartPos,
-            blockComment: this.settings.helpCompletion === Settings.HelpCompletion.BlockComment,
+            blockComment: this.settings.helpCompletion === Settings.CommentType.BlockComment,
         });
 
         if (!(result && result.content)) {

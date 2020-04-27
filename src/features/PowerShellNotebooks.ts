@@ -3,15 +3,17 @@
  *--------------------------------------------------------*/
 
 import * as vscode from 'vscode';
+import { CommentType } from '../settings';
 import { IFeature, LanguageClient } from '../feature';
 import { EvaluateRequestType } from './Console';
+import Settings = require("../settings");
 
 export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFeature {
 
     private readonly showNotebookModeCommand: vscode.Disposable;
     private readonly hideNotebookModeCommand: vscode.Disposable;
     private languageClient: LanguageClient;
-    private blockCommentCells: Set<number>;
+    private blockCommentCells: Map<number, CommentType>;
 
     constructor() {
         const editorAssociations = vscode.workspace.getConfiguration("workbench").get<any[]>("editorAssociations");
@@ -52,7 +54,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
 
         await editor.edit(editBuilder => {
             let curr: string[] = [];
-            this.blockCommentCells = new Set<number>();
+            this.blockCommentCells = new Map<number, CommentType>();
             let currentCellIndex: number = 0;
             let cellKind: vscode.CellKind | undefined;
             let insideBlockComment: boolean = false;
@@ -64,7 +66,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
                     if (lines[i] === "#>") {
                         insideBlockComment = false;
                         editBuilder.insert(0, curr, 'markdown', vscode.CellKind.Markdown, [], undefined)
-                        this.blockCommentCells.add(currentCellIndex);
+                        this.blockCommentCells.set(currentCellIndex, CommentType.BlockComment);
                         currentCellIndex++;
                         curr = [];
                         cellKind = undefined;
@@ -76,6 +78,9 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
                 } else if (lines[i] === "<#") {
                     // Insert what we saw leading up to this.
                     editBuilder.insert(0, curr, cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell', cellKind!, [], undefined)
+                    if (cellKind === vscode.CellKind.Markdown) {
+                        this.blockCommentCells.set(currentCellIndex, CommentType.LineComment);
+                    }
                     currentCellIndex++;
 
                     // reset state because we're starting a new Markdown cell.
@@ -96,6 +101,9 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
                     // If cellKind is not undifined, then we can add the cell we've just computed to the editBuilder.
                     if (cellKind !== undefined) {
                         editBuilder.insert(0, curr, cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell', cellKind!, [], undefined)
+                        if (cellKind === vscode.CellKind.Markdown) {
+                            this.blockCommentCells.set(currentCellIndex, CommentType.LineComment);
+                        }
                         currentCellIndex++;
                     }
 
@@ -108,6 +116,9 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
 
             if (curr.length) {
                 editBuilder.insert(0, curr, cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell', cellKind!, [], undefined)
+                if (cellKind === vscode.CellKind.Markdown) {
+                    this.blockCommentCells.set(currentCellIndex, insideBlockComment ? CommentType.BlockComment : CommentType.LineComment);
+                }
                 currentCellIndex++;
             }
         });
@@ -127,7 +138,13 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
             if (cell.cellKind === vscode.CellKind.Code) {
                 retArr.push(...cell.source.split(/\r|\n|\r\n/));
             } else {
-                if (this.blockCommentCells.has(index)) {
+                // First honor the comment type of the cell if it already has one.
+                // If not, use the user setting.
+                const commentKind = this.blockCommentCells.has(index)
+                    ? this.blockCommentCells.get(index)
+                    : Settings.load().notebooks.saveMarkdownCellsAs;
+
+                if (commentKind === CommentType.BlockComment) {
                     retArr.push("<#");
                     retArr.push(...cell.source.split(/\r|\n|\r\n/));
                     retArr.push("#>");

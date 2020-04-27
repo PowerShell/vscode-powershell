@@ -931,6 +931,15 @@
           "type":"boolean",
           "default": false,
           "description": "Controls whether we show or hide the buttons to toggle Notebook mode in the top right."
+        },
+        "powershell.notebooks.saveMarkdownCellsAs": {
+          "type":"string",
+          "enum": [
+            "BlockComment",
+            "LineComment"
+          ],
+          "default": "BlockComment",
+          "description": "Controls what new markdown cells in Notebook Mode get saved as in the PowerShell file."
         }
       }
     },
