@@ -1,5 +1,61 @@
 # PowerShell Extension Release History
 
+## v2020.4.3
+### Tuesday, April 28, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- [vscode-powershell #2650](https://github.com/PowerShell/vscode-powershell/pull/2650) -
+  Bump semver from 7.2.3 to 7.3.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2651](https://github.com/PowerShell/vscode-powershell/pull/2651) -
+  Add setting for the PackageManagement update feature.
+- [vscode-powershell #2665](https://github.com/PowerShell/vscode-powershell/pull/2665) -
+  Bump @types/node-fetch from 2.5.6 to 2.5.7. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2664](https://github.com/PowerShell/vscode-powershell/pull/2664) -
+  Bump vscode-extension-telemetry from 0.1.2 to 0.1.3. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2663](https://github.com/PowerShell/vscode-powershell/pull/2663) -
+  Bump tslint from 6.1.1 to 6.1.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2662](https://github.com/PowerShell/vscode-powershell/pull/2662) -
+  Bump mock-fs from 4.11.0 to 4.12.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2659](https://github.com/PowerShell/vscode-powershell/pull/2659) -
+  Remove broken 'Select PSScriptAnalyzer Rules' command. (Thanks @bergmeister!)
+- 🛫 🐛 [vscode-powershell #2526](https://github.com/PowerShell/vscode-powershell/pull/2653) -
+  Clean up WaitForSessionFile logic and support increasing timeout with warning.
+- [vscode-powershell #2644](https://github.com/PowerShell/vscode-powershell/pull/2644) -
+  Display preview state and version info in PSIC startup banner. (Thanks @rkeithhill!)
+- [vscode-powershell #2645](https://github.com/PowerShell/vscode-powershell/pull/2645) -
+  Add workspace file to load both vscode-powershell and PSES. (Thanks @rkeithhill!)
+- [vscode-powershell #2631](https://github.com/PowerShell/vscode-powershell/pull/2631) -
+  Bump @types/node-fetch from 2.5.5 to 2.5.6. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2632](https://github.com/PowerShell/vscode-powershell/pull/2632) -
+  Bump semver from 7.1.3 to 7.2.3. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2633](https://github.com/PowerShell/vscode-powershell/pull/2633) -
+  Bump sinon from 9.0.1 to 9.0.2. (Thanks @dependabot-preview[bot]!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #1272](https://github.com/PowerShell/PowerShellEditorServices/pull/1272) -
+  Allow progress colors to be settable and gettable from the internal host.
+- [PowerShellEditorServices #1273](https://github.com/PowerShell/PowerShellEditorServices/pull/1273) -
+  Bump Microsoft.NET.Test.Sdk from 16.6.0 to 16.6.1. (Thanks @dependabot-preview[bot]!)
+- [PowerShellEditorServices #1239](https://github.com/PowerShell/PowerShellEditorServices/pull/1239) -
+  Prompt to update PackageManagement when using an old version.
+- [PowerShellEditorServices #1269](https://github.com/PowerShell/PowerShellEditorServices/pull/1269) -
+  Support ConstrainedLanguage mode.
+- [PowerShellEditorServices #1268](https://github.com/PowerShell/PowerShellEditorServices/pull/1268) -
+  Refactor GetCommandHandler to not use dynamic.
+- [vscode-powershell #2654](https://github.com/PowerShell/PowerShellEditorServices/pull/1270) -
+  Fix interpolation in Log points, switch to double quotes. (Thanks @rkeithhill!)
+- [PowerShellEditorServices #1267](https://github.com/PowerShell/PowerShellEditorServices/pull/1267) -
+  Update module manifest to match current module.
+- [PowerShellEditorServices #1266](https://github.com/PowerShell/PowerShellEditorServices/pull/1266) -
+  Bump Microsoft.NET.Test.Sdk from 16.5.0 to 16.6.0. (Thanks @dependabot-preview[bot]!)
+- 📟 🐛 🐛 [vscode-powershell #2637](https://github.com/PowerShell/PowerShellEditorServices/pull/1264) -
+  Leverage internal HostUI for VT check.
+- 📟 🐛 [vscode-powershell #2637](https://github.com/PowerShell/PowerShellEditorServices/pull/1263) -
+  AllowPrerelease when building Preview build.
+- 💎 🐛 [vscode-powershell #2543](https://github.com/PowerShell/PowerShellEditorServices/pull/1262) -
+  Allow formatting when ScriptAnalysis is off.
+
 ## v2020.4.0
 ### Thursday, April 15, 2020
 
