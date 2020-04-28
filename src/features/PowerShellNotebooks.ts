@@ -13,7 +13,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
     private readonly showNotebookModeCommand: vscode.Disposable;
     private readonly hideNotebookModeCommand: vscode.Disposable;
     private languageClient: LanguageClient;
-    private blockCommentCells: Map<number, CommentType>;
+    private cellCommentTypes: Map<vscode.Uri, Map<number, CommentType>> = new Map<vscode.Uri, Map<number, CommentType>>();
 
     constructor() {
         const editorAssociations = vscode.workspace.getConfiguration("workbench").get<any[]>("editorAssociations");
@@ -49,12 +49,18 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
     async resolveNotebook(editor: vscode.NotebookEditor): Promise<void> {
         editor.document.languages = ['powershell'];
         const uri = editor.document.uri;
+
+        if (!this.cellCommentTypes.has(uri)) {
+            this.cellCommentTypes.set(uri, new Map<number, CommentType>());
+        }
+        const notebookCommentTypes = this.cellCommentTypes.get(uri);
+
+
         const data = (await vscode.workspace.fs.readFile(uri)).toString();
         const lines = data.split(/\r|\n|\r\n/g);
 
         await editor.edit(editBuilder => {
             let curr: string[] = [];
-            this.blockCommentCells = new Map<number, CommentType>();
             let currentCellIndex: number = 0;
             let cellKind: vscode.CellKind | undefined;
             let insideBlockComment: boolean = false;
@@ -66,7 +72,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
                     if (lines[i] === "#>") {
                         insideBlockComment = false;
                         editBuilder.insert(0, curr, 'markdown', vscode.CellKind.Markdown, [], undefined)
-                        this.blockCommentCells.set(currentCellIndex, CommentType.BlockComment);
+                        notebookCommentTypes.set(currentCellIndex, CommentType.BlockComment);
                         currentCellIndex++;
                         curr = [];
                         cellKind = undefined;
@@ -79,7 +85,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
                     // Insert what we saw leading up to this.
                     editBuilder.insert(0, curr, cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell', cellKind!, [], undefined)
                     if (cellKind === vscode.CellKind.Markdown) {
-                        this.blockCommentCells.set(currentCellIndex, CommentType.LineComment);
+                        notebookCommentTypes.set(currentCellIndex, CommentType.LineComment);
                     }
                     currentCellIndex++;
 
@@ -102,7 +108,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
                     if (cellKind !== undefined) {
                         editBuilder.insert(0, curr, cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell', cellKind!, [], undefined)
                         if (cellKind === vscode.CellKind.Markdown) {
-                            this.blockCommentCells.set(currentCellIndex, CommentType.LineComment);
+                            notebookCommentTypes.set(currentCellIndex, CommentType.LineComment);
                         }
                         currentCellIndex++;
                     }
@@ -117,7 +123,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
             if (curr.length) {
                 editBuilder.insert(0, curr, cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell', cellKind!, [], undefined)
                 if (cellKind === vscode.CellKind.Markdown) {
-                    this.blockCommentCells.set(currentCellIndex, insideBlockComment ? CommentType.BlockComment : CommentType.LineComment);
+                    notebookCommentTypes.set(currentCellIndex, insideBlockComment ? CommentType.BlockComment : CommentType.LineComment);
                 }
                 currentCellIndex++;
             }
@@ -133,6 +139,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
 
     async save(document: vscode.NotebookDocument): Promise<boolean> {
         const uri = document.uri;
+        const notebookCommentTypes = this.cellCommentTypes.get(uri);
         const retArr: string[] = [];
         document.cells.forEach((cell, index) => {
             if (cell.cellKind === vscode.CellKind.Code) {
@@ -141,12 +148,12 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
                 // First honor the comment type of the cell if it already has one.
                 // If not, use the user setting.
                 let commentKind: CommentType;
-                if (this.blockCommentCells.has(index)) {
-                    commentKind = this.blockCommentCells.get(index);
+                if (notebookCommentTypes.has(index)) {
+                    commentKind = notebookCommentTypes.get(index);
                 } else {
                     commentKind = Settings.load().notebooks.saveMarkdownCellsAs;
                     // We need to update the metadata for new cells.
-                    this.blockCommentCells.set(index, commentKind);
+                    notebookCommentTypes.set(index, commentKind);
                 }
 
                 if (commentKind === CommentType.BlockComment) {
