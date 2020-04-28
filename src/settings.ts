@@ -81,6 +81,7 @@ export interface ISettings {
     // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
     promptToUpdatePowerShell?: boolean;
+    promptToUpdatePackageManagement?: boolean;
     bundledModulesPath?: string;
     startAsLoginShell?: IStartAsLoginShellSettings;
     startAutomatically?: boolean;
@@ -201,6 +202,8 @@ export function load(): ISettings {
             configuration.get<string>("powerShellExePath", undefined),
         promptToUpdatePowerShell:
             configuration.get<boolean>("promptToUpdatePowerShell", true),
+        promptToUpdatePackageManagement:
+            configuration.get<boolean>("promptToUpdatePackageManagement", true),
         bundledModulesPath:
             "../../modules",
         useX86Host:

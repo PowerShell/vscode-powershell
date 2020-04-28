@@ -555,6 +555,11 @@
           "description": "Specifies whether you should be prompted to update your version of PowerShell.",
           "default": true
         },
+        "powershell.promptToUpdatePackageManagement": {
+          "type": "boolean",
+          "description": "Specifies whether you should be prompted to update your version of PackageManagement if it's under 1.4.6.",
+          "default": true
+        },
         "powershell.startAsLoginShell.osx": {
           "type": "boolean",
           "default": true,
