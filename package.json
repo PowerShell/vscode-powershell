@@ -933,7 +933,7 @@
           "description": "Controls whether we show or hide the buttons to toggle Notebook mode in the top right."
         },
         "powershell.notebooks.saveMarkdownCellsAs": {
-          "type":"string",
+          "type": "string",
           "enum": [
             "BlockComment",
             "LineComment"

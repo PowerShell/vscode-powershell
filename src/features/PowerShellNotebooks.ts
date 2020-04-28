@@ -140,9 +140,14 @@ export class PowerShellNotebooksFeature implements vscode.NotebookProvider, IFea
             } else {
                 // First honor the comment type of the cell if it already has one.
                 // If not, use the user setting.
-                const commentKind = this.blockCommentCells.has(index)
-                    ? this.blockCommentCells.get(index)
-                    : Settings.load().notebooks.saveMarkdownCellsAs;
+                let commentKind: CommentType;
+                if (this.blockCommentCells.has(index)) {
+                    commentKind = this.blockCommentCells.get(index);
+                } else {
+                    commentKind = Settings.load().notebooks.saveMarkdownCellsAs;
+                    // We need to update the metadata for new cells.
+                    this.blockCommentCells.set(index, commentKind);
+                }
 
                 if (commentKind === CommentType.BlockComment) {
                     retArr.push("<#");
