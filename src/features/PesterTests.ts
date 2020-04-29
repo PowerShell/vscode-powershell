@@ -115,7 +115,6 @@ export class PesterTestsFeature implements IFeature {
 
         if (launchType === LaunchType.Debug) {
             launchConfig.args.push("-Output", `'${settings.pester.debugOutputVerbosity}'`);
-
         }
         else {
             launchConfig.args.push("-Output", `'${settings.pester.outputVerbosity}'`);
