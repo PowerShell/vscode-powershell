@@ -790,7 +790,7 @@
             "Diagnostic"
           ],
           "default": "Diagnostic",
-          "description": "Defines the verbosity of output to be used when debugging a test. For Pester 5 and newer the default value Diagnostic will print additional information about discovery, skipped and filtered tests, mocking and more."
+          "description": "Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value Diagnostic will print additional information about discovery, skipped and filtered tests, mocking and more."
         }
       }
     },
