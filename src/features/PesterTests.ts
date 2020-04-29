@@ -113,7 +113,13 @@ export class PesterTestsFeature implements IFeature {
             launchConfig.args.push("-MinimumVersion5");
         }
 
-        launchConfig.args.push("-Output", `'${settings.pester.outputVerbosity}'`);
+        if (launchType === LaunchType.Debug) {
+            launchConfig.args.push("-Output", `'${settings.pester.debugOutputVerbosity}'`);
+
+        }
+        else {
+            launchConfig.args.push("-Output", `'${settings.pester.outputVerbosity}'`);
+        }
 
         return launchConfig;
     }
