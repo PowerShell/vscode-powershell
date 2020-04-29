@@ -12,19 +12,34 @@ import { PowerShellProcess} from "../process";
 import { SessionManager, SessionStatus } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
+import { NamedPipeDebugAdapter } from "../debugAdapter";
+import { Logger } from "../logging";
 
 export const StartDebuggerNotificationType =
     new NotificationType<void, void>("powerShell/startDebugger");
 
-export class DebugSessionFeature implements IFeature, DebugConfigurationProvider {
+export class DebugSessionFeature implements IFeature, DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
 
     private sessionCount: number = 1;
     private command: vscode.Disposable;
     private tempDebugProcess: PowerShellProcess;
+    private tempSessionDetails: utils.IEditorServicesSessionDetails;
 
-    constructor(context: ExtensionContext, private sessionManager: SessionManager) {
+    constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: Logger) {
         // Register a debug configuration provider
         context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("PowerShell", this));
+        context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory("PowerShell", this))
+    }
+
+    createDebugAdapterDescriptor(session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
+        const sessionDetails = session.configuration.createTemporaryIntegratedConsole
+            ? this.tempSessionDetails
+            : this.sessionManager.getSessionDetails();
+
+        // Establish connection before setting up the session
+        this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
+        this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration)}`);
+        return new vscode.DebugAdapterInlineImplementation(new NamedPipeDebugAdapter(sessionDetails.debugServicePipeName, this.logger));
     }
 
     public dispose() {
@@ -295,11 +310,9 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
                     sessionFilePath,
                     settings);
 
-            this.tempDebugProcess
-                .start(`DebugSession-${this.sessionCount++}`)
-                .then((sessionDetails) => {
-                        utils.writeSessionFile(sessionFilePath, sessionDetails);
-                });
+            this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
+            utils.writeSessionFile(sessionFilePath, this.tempSessionDetails);
+
         } else {
             utils.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
         }
