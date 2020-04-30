@@ -656,10 +656,11 @@
           "enum": [
             "IncreaseIndentationForFirstPipeline",
             "IncreaseIndentationAfterEveryPipeline",
-            "NoIndentation"
+            "NoIndentation",
+            "None"
           ],
-          "default": "NoIndentation",
-          "description": "Multi-line pipeline style settings."
+          "default": "None",
+          "description": "Multi-line pipeline style settings (default: None)."
         },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
