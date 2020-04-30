@@ -51,8 +51,9 @@ export interface ICodeFormattingSettings {
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
-    whitespaceInsideBrace: true;
-    whitespaceAroundPipe: true;
+    whitespaceInsideBrace: boolean;
+    addWhitespaceAroundPipe: boolean;
+    trimWhitespaceAroundPipe: boolean;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
     useCorrectCasing: boolean;
@@ -164,7 +165,8 @@ export function load(): ISettings {
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
         whitespaceInsideBrace: true,
-        whitespaceAroundPipe: true,
+        addWhitespaceAroundPipe: true,
+        trimWhitespaceAroundPipe: false,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
         useCorrectCasing: false,
