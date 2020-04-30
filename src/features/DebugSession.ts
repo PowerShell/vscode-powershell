@@ -39,7 +39,11 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
         // Establish connection before setting up the session
         this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
         this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration)}`);
-        return new vscode.DebugAdapterInlineImplementation(new NamedPipeDebugAdapter(sessionDetails.debugServicePipeName, this.logger));
+
+        const debugAdapter = new NamedPipeDebugAdapter(sessionDetails.debugServicePipeName, this.logger);
+        debugAdapter.start();
+
+        return new vscode.DebugAdapterInlineImplementation(debugAdapter);
     }
 
     public dispose() {

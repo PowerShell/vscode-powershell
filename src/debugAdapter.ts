@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {connect, Socket } from "net";
+import { connect, Socket } from "net";
 import { DebugAdapter, Event, DebugProtocolMessage, EventEmitter } from "vscode";
 import { Logger } from "./logging";
 
@@ -11,21 +11,27 @@ export class NamedPipeDebugAdapter implements DebugAdapter {
     private static readonly HEADER_LINESEPARATOR = /\r?\n/;	// allow for non-RFC 2822 conforming line separators
     private static readonly HEADER_FIELDSEPARATOR = /: */;
 
+    private readonly _logger: Logger;
+    private readonly _namedPipe: string;
+
     private _rawData = Buffer.allocUnsafe(0);
     private _contentLength = -1;
     private _isConnected: boolean = false;
     private _debugMessageQueue: DebugProtocolMessage[] = [];
 
     private _debugServiceSocket: Socket;
-    private _logger: Logger;
 
     // The event that VS Code-proper will listen for.
     private _sendMessage: EventEmitter<DebugProtocolMessage> = new EventEmitter<DebugProtocolMessage>();
     onDidSendMessage: Event<DebugProtocolMessage> = this._sendMessage.event;
 
     constructor(namedPipe: string, logger: Logger) {
-        this._debugServiceSocket = connect(namedPipe);
+        this._namedPipe = namedPipe;
         this._logger = logger;
+    }
+
+    public start(): void {
+        this._debugServiceSocket = connect(this._namedPipe);
 
         this._debugServiceSocket.on("error", (e) => {
             this._logger.writeError("Error on Debug Adapter: " + e);
@@ -49,7 +55,7 @@ export class NamedPipeDebugAdapter implements DebugAdapter {
         this._debugServiceSocket.on("close", () => { this.dispose(); });
     }
 
-    handleMessage(message: DebugProtocolMessage): void {
+    public handleMessage(message: DebugProtocolMessage): void {
         if (!this._isConnected) {
             this._debugMessageQueue.push(message);
             return;
@@ -58,22 +64,21 @@ export class NamedPipeDebugAdapter implements DebugAdapter {
         this.writeMessageToDebugAdapter(message);
     }
 
-    dispose() {
+    public dispose() {
         this._debugServiceSocket.destroy();
         this._sendMessage.dispose();
     }
 
     private writeMessageToDebugAdapter(message: DebugProtocolMessage): void {
         const msg = JSON.stringify(message);
-        const messageWrapped = `Content-Length: ${Buffer.byteLength(msg, "utf8")}\r\n\r\n${msg}`
+        const messageWrapped = `Content-Length: ${Buffer.byteLength(msg, "utf8")}${NamedPipeDebugAdapter.TWO_CRLF}${msg}`;
         this._logger.writeDiagnostic(`SENDING TO DEBUG ADAPTER: ${messageWrapped}`);
-        this._debugServiceSocket.write(messageWrapped);
+        this._debugServiceSocket.write(messageWrapped, "utf8");
     }
 
-    // Shameless stolen from VS Code's implementation with slight modification by using public types and our logger:
+    // Shamelessly stolen from VS Code's implementation with slight modification by using public types and our logger:
     // https://github.com/microsoft/vscode/blob/ff1b513fbca1acad4467dfd768997e9e0b9c5735/src/vs/workbench/contrib/debug/node/debugAdapter.ts#L55-L92
     private handleData(data: Buffer): void {
-
         this._rawData = Buffer.concat([this._rawData, data]);
 
         while (true) {
