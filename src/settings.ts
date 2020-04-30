@@ -18,6 +18,7 @@ enum PipelineIndentationStyle {
     IncreaseIndentationForFirstPipeline,
     IncreaseIndentationAfterEveryPipeline,
     NoIndentation,
+    None,
 }
 
 export enum HelpCompletion {
@@ -51,6 +52,7 @@ export interface ICodeFormattingSettings {
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
+    whitespaceBetweenParameters: boolean;
     whitespaceInsideBrace: boolean;
     addWhitespaceAroundPipe: boolean;
     trimWhitespaceAroundPipe: boolean;
@@ -159,11 +161,12 @@ export function load(): ISettings {
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
         newLineAfterCloseBrace: true,
-        pipelineIndentationStyle: PipelineIndentationStyle.NoIndentation,
+        pipelineIndentationStyle: PipelineIndentationStyle.None,
         whitespaceBeforeOpenBrace: true,
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
+        whitespaceBetweenParameters: false,
         whitespaceInsideBrace: true,
         addWhitespaceAroundPipe: true,
         trimWhitespaceAroundPipe: false,
