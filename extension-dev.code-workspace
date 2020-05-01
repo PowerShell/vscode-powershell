@@ -1,12 +1,12 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "..\\PowerShellEditorServices"
-		}
-	],
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../PowerShellEditorServices"
+        }
+    ],
   "settings": {
     "files.associations": {
       "**/snippets/*.json": "jsonc"
