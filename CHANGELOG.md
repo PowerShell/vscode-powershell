@@ -7,26 +7,22 @@
 - [vscode-powershell #2676](https://github.com/PowerShell/vscode-powershell/pull/2676) -
   Fix Pester invocation for 3x versions. (Thanks @nohwnd!)
 - [vscode-powershell #2674](https://github.com/PowerShell/vscode-powershell/pull/2674) -
-  PSSA 1.19.0 settings. (Thanks @bergmeister!)
-- [vscode-powershell #2678](https://github.com/PowerShell/vscode-powershell/pull/2678) -
-  Bump vscode-extension-telemetry from 0.1.3 to 0.1.5. (Thanks @dependabot-preview[bot]!)
+  Add additional settings for PSScriptAnalyzer 1.19. (Thanks @bergmeister!)
 - [vscode-powershell #2672](https://github.com/PowerShell/vscode-powershell/pull/2672) -
   Use in-memory debug adapter instead of spinning up new process.
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
-- [PowerShellEditorServices #1285](https://github.com/PowerShell/PowerShellEditorServices/pull/1285) -
+- 🛫🐛 [PowerShellEditorServices #1285](https://github.com/PowerShell/PowerShellEditorServices/pull/1285) -
   Use API on ScriptBlock to generate PSCommand to run in ConstrainedLanguage mode.
-- [PowerShellEditorServices #1283](https://github.com/PowerShell/PowerShellEditorServices/pull/1283) -
-  Move to omnisharp 0.17.0.
-- [PowerShellEditorServices #1280](https://github.com/PowerShell/PowerShellEditorServices/pull/1280) -
-  PSSA 1.19.0 settings. (Thanks @bergmeister!)
-- [PowerShellEditorServices #1284](https://github.com/PowerShell/PowerShellEditorServices/pull/1284) -
-  Bump Microsoft.CodeAnalysis.FxCopAnalyzers from 2.9.8 to 3.0.0. (Thanks @dependabot-preview[bot]!)
+- ⚡️🧠 [PowerShellEditorServices #1283](https://github.com/PowerShell/PowerShellEditorServices/pull/1283) -
+  Move to Omnisharp lib 0.17.0 for increased performance.
+- ✨👮 [PowerShellEditorServices #1280](https://github.com/PowerShell/PowerShellEditorServices/pull/1280) -
+  Add additional settings for PSScriptAnalyzer 1.19. (Thanks @bergmeister!)
 - 🔗 🐛 [vscode-powershell #305](https://github.com/PowerShell/PowerShellEditorServices/pull/1279) -
   Fix document highlight column.
-- [PowerShellEditorServices #1276](https://github.com/PowerShell/PowerShellEditorServices/pull/1276) -
-  Fix when no CommandInfo comes back.
+- 🐛🧠 [PowerShellEditorServices #1276](https://github.com/PowerShell/PowerShellEditorServices/pull/1276) -
+  Handle when no CommandInfo comes back from Get-Command to prevent an Exception showing up in logs.
 
 ## v2020.4.3-preview
 ### Tuesday, April 28, 2020
