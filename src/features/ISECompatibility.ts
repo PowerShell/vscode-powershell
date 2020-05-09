@@ -2,8 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 import * as vscode from "vscode";
-import { LanguageClient } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import * as Settings from "../settings";
 
 interface ISetting {
@@ -15,7 +13,7 @@ interface ISetting {
 /**
  * A feature to implement commands to make code like the ISE and reset the settings.
  */
-export class ISECompatibilityFeature implements IFeature {
+export class ISECompatibilityFeature implements vscode.Disposable {
     // Marking settings as public so we can use it within the tests without needing to duplicate the list of settings.
     public static settings: ISetting[] = [
         { path: "workbench.activityBar", name: "visible", value: false },
@@ -27,7 +25,6 @@ export class ISECompatibilityFeature implements IFeature {
     ];
     private iseCommandRegistration: vscode.Disposable;
     private defaultCommandRegistration: vscode.Disposable;
-    private languageClient: LanguageClient;
 
     constructor() {
         this.iseCommandRegistration = vscode.commands.registerCommand(
@@ -39,10 +36,6 @@ export class ISECompatibilityFeature implements IFeature {
     public dispose() {
         this.iseCommandRegistration.dispose();
         this.defaultCommandRegistration.dispose();
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     private async EnableISEMode() {

@@ -10,7 +10,6 @@ import { IFeature } from "../feature";
 export class CustomViewsFeature implements IFeature {
 
     private commands: vscode.Disposable[] = [];
-    private languageClient: LanguageClient;
     private contentProvider: PowerShellContentProvider;
 
     constructor() {
@@ -65,8 +64,6 @@ export class CustomViewsFeature implements IFeature {
                     args.id,
                     args.appendedHtmlBodyContent);
             });
-
-        this.languageClient = languageClient;
     }
 }
 

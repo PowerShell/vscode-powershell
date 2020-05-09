@@ -325,10 +325,9 @@ export class DebugSessionFeature implements IFeature, DebugConfigurationProvider
     }
 }
 
-export class SpecifyScriptArgsFeature implements IFeature {
+export class SpecifyScriptArgsFeature implements vscode.Disposable {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private context: vscode.ExtensionContext;
 
     constructor(context: vscode.ExtensionContext) {
@@ -338,10 +337,6 @@ export class SpecifyScriptArgsFeature implements IFeature {
             vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
                 return this.specifyScriptArguments();
             });
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     public dispose() {

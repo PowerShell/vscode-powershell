@@ -4,7 +4,6 @@
 
 import * as path from "path";
 import vscode = require("vscode");
-import { IFeature, LanguageClient } from "../feature";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
@@ -14,10 +13,9 @@ enum LaunchType {
     Run,
 }
 
-export class PesterTestsFeature implements IFeature {
+export class PesterTestsFeature implements vscode.Disposable {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private invokePesterStubScriptPath: string;
 
     constructor(private sessionManager: SessionManager) {
@@ -45,10 +43,6 @@ export class PesterTestsFeature implements IFeature {
 
     public dispose() {
         this.command.dispose();
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
-        this.languageClient = languageClient;
     }
 
     private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri: vscode.Uri) {

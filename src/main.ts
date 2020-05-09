@@ -50,6 +50,7 @@ const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 let logger: Logger;
 let sessionManager: SessionManager;
 let extensionFeatures: IFeature[] = [];
+let commandRegistrations: vscode.Disposable[] = [];
 let telemetryReporter: TelemetryReporter;
 
 const documentSelector: DocumentSelector = [
@@ -139,26 +140,30 @@ export function activate(context: vscode.ExtensionContext): void {
             PackageJSON.version,
             telemetryReporter);
 
-    // Create features
-    extensionFeatures = [
-        new ConsoleFeature(logger),
+    // Register commands that do not require Language client
+    commandRegistrations = [
         new ExamplesFeature(),
-        new OpenInISEFeature(),
         new GenerateBugReportFeature(sessionManager),
-        new ExpandAliasFeature(logger),
-        new GetCommandsFeature(logger),
         new ISECompatibilityFeature(),
-        new ShowHelpFeature(logger),
-        new FindModuleFeature(),
+        new OpenInISEFeature(),
         new PesterTestsFeature(sessionManager),
         new RunCodeFeature(sessionManager),
-        new ExtensionCommandsFeature(logger),
         new CodeActionsFeature(logger),
+        new SpecifyScriptArgsFeature(context),
+    ]
+
+    // Create features that require language client
+    extensionFeatures = [
+        new ConsoleFeature(logger),
+        new ExpandAliasFeature(logger),
+        new GetCommandsFeature(logger),
+        new ShowHelpFeature(logger),
+        new FindModuleFeature(),
+        new ExtensionCommandsFeature(logger),
         new NewFileOrProjectFeature(),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new PickPSHostProcessFeature(),
-        new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
@@ -204,6 +209,10 @@ export function deactivate(): void {
     // Clean up all extension features
     extensionFeatures.forEach((feature) => {
        feature.dispose();
+    });
+
+    commandRegistrations.forEach((commandRegistration) => {
+        commandRegistration.dispose();
     });
 
     // Dispose of the current session

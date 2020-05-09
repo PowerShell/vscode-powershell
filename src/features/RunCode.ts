@@ -14,10 +14,9 @@ enum LaunchType {
     Run,
 }
 
-export class RunCodeFeature implements IFeature {
+export class RunCodeFeature implements vscode.Disposable {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand(
@@ -29,10 +28,6 @@ export class RunCodeFeature implements IFeature {
 
     public dispose() {
         this.command.dispose();
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
-        this.languageClient = languageClient;
     }
 
     private async launchTask(
