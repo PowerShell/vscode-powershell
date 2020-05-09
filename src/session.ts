@@ -54,7 +54,6 @@ export class SessionManager implements Middleware {
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
     private bundledModulesPath: string;
-    private telemetryReporter: TelemetryReporter;
 
     // Initialized by the start() method, since this requires settings
     private powershellExeFinder: PowerShellExeFinder;
@@ -66,18 +65,16 @@ export class SessionManager implements Middleware {
         vscode.env.sessionId === "someValue.sessionId";
 
     constructor(
-        private requiredEditorServicesVersion: string,
         private log: Logger,
         private documentSelector: DocumentSelector,
-        private hostName: string,
-        private version: string,
-        private reporter: TelemetryReporter) {
+        hostName: string,
+        version: string,
+        private telemetryReporter: TelemetryReporter) {
 
         this.platformDetails = getPlatformDetails();
 
         this.HostName = hostName;
         this.HostVersion = version;
-        this.telemetryReporter = reporter;
 
         const osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";

@@ -2,7 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import cp = require("child_process");
 import os = require("os");
 import vscode = require("vscode");
 import { IFeature, LanguageClient } from "../feature";
@@ -30,7 +29,6 @@ const extensions =
 export class GenerateBugReportFeature implements IFeature {
 
     private command: vscode.Disposable;
-    private powerShellProcess: cp.ChildProcess;
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", () => {
