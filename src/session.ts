@@ -328,7 +328,7 @@ export class SessionManager implements Middleware {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
         if (configuration.has(deprecatedSetting) && !configuration.has('codeFormatting.addWhitespaceAroundPipe')) {
-            const configurationTarget = await Settings.getConfigurationTarget(deprecatedSetting);
+            const configurationTarget = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
             const value = configuration.get(deprecatedSetting, configurationTarget)
             await Settings.change('codeFormatting.addWhitespaceAroundPipe', value, configurationTarget);
         }

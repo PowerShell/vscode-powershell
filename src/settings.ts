@@ -245,7 +245,8 @@ export function load(): ISettings {
     };
 }
 
-export async function getConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget> {
+// Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
+export async function getEffectiveConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget> {
     const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
     const detail = configuration.inspect(settingName);
