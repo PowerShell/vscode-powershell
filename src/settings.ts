@@ -250,14 +250,14 @@ export async function getConfigurationTarget(settingName: string): Promise<vscod
 
     const detail = configuration.inspect(settingName);
     let configurationTarget = null;
-    if (detail.workspaceFolderValue !== undefined) {
-        configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder
+    if (typeof detail.workspaceFolderValue !== undefined) {
+        configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
     }
-    else if (detail.workspaceValue !== undefined) {
-        configurationTarget = vscode.ConfigurationTarget.Workspace
+    else if (typeof detail.workspaceValue !== undefined) {
+        configurationTarget = vscode.ConfigurationTarget.Workspace;
     }
-    else if (detail.globalValue !== undefined) {
-        configurationTarget = vscode.ConfigurationTarget.Global
+    else if (typeof detail.globalValue !== undefined) {
+        configurationTarget = vscode.ConfigurationTarget.Global;
     }
     return configurationTarget;
 }
