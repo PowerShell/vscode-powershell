@@ -126,6 +126,8 @@ export class SessionManager implements Middleware {
 
         this.promptPowerShellExeSettingsCleanup();
 
+        this.migrateWhitespaceAroundPipeSetting();
+
         try {
             let powerShellExeDetails;
             if (this.sessionSettings.powerShellDefaultVersion) {
@@ -318,6 +320,18 @@ export class SessionManager implements Middleware {
             }
 
             return resolvedCodeLens;
+    }
+
+    // During preview, populate a new setting value but not remove the old value.
+    // When the PowerShell extension releases the RTM version, then the old value can be safely removed.
+    private async migrateWhitespaceAroundPipeSetting() {
+        const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+        const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
+        if (configuration.has(deprecatedSetting) && !configuration.has('codeFormatting.addWhitespaceAroundPipe')) {
+            const configurationTarget = await Settings.getConfigurationTarget(deprecatedSetting);
+            const value = configuration.get(deprecatedSetting, configurationTarget)
+            await Settings.change('codeFormatting.addWhitespaceAroundPipe', value, configurationTarget);
+        }
     }
 
     private async promptPowerShellExeSettingsCleanup() {

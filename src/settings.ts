@@ -245,12 +245,30 @@ export function load(): ISettings {
     };
 }
 
-export async function change(settingName: string, newValue: any, global: boolean = false): Promise<void> {
-    const configuration: vscode.WorkspaceConfiguration =
-        vscode.workspace.getConfiguration(
-            utils.PowerShellLanguageId);
+export async function getConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget> {
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
-    await configuration.update(settingName, newValue, global);
+    const detail = configuration.inspect(settingName);
+    let configurationTarget = null;
+    if (detail.workspaceFolderValue !== undefined) {
+        configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder
+    }
+    else if (detail.workspaceValue !== undefined) {
+        configurationTarget = vscode.ConfigurationTarget.Workspace
+    }
+    else if (detail.globalValue !== undefined) {
+        configurationTarget = vscode.ConfigurationTarget.Global
+    }
+    return configurationTarget;
+}
+
+export async function change(
+    settingName: string,
+    newValue: any, configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
+
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+
+    await configuration.update(settingName, newValue, configurationTarget);
 }
 
 function getWorkspaceSettingsWithDefaults<TSettings>(
