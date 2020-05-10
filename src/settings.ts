@@ -251,13 +251,13 @@ export async function getEffectiveConfigurationTarget(settingName: string): Prom
 
     const detail = configuration.inspect(settingName);
     let configurationTarget = null;
-    if (typeof detail.workspaceFolderValue !== undefined) {
+    if (typeof detail.workspaceFolderValue !== "undefined") {
         configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
     }
-    else if (typeof detail.workspaceValue !== undefined) {
+    else if (typeof detail.workspaceValue !== "undefined") {
         configurationTarget = vscode.ConfigurationTarget.Workspace;
     }
-    else if (typeof detail.globalValue !== undefined) {
+    else if (typeof detail.globalValue !== "undefined") {
         configurationTarget = vscode.ConfigurationTarget.Global;
     }
     return configurationTarget;
@@ -265,7 +265,8 @@ export async function getEffectiveConfigurationTarget(settingName: string): Prom
 
 export async function change(
     settingName: string,
-    newValue: any, configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
+    newValue: any,
+    configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
 
     const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
