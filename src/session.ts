@@ -326,7 +326,7 @@ export class SessionManager implements Middleware {
 
             const choice = await vscode.window.showWarningMessage(warningMessage, "Let's do it!");
 
-            if (choice === "") {
+            if (choice === undefined) {
                 // They hit the 'x' to close the dialog.
                 return;
             }
