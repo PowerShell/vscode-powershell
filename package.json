@@ -45,7 +45,7 @@
   "dependencies": {
     "node-fetch": "^2.6.0",
     "semver": "^7.3.2",
-    "vscode-extension-telemetry": "~0.1.5",
+    "vscode-extension-telemetry": "~0.1.6",
     "vscode-languageclient": "~5.2.1"
   },
   "devDependencies": {
