@@ -323,7 +323,7 @@ export class SessionManager implements Middleware {
     }
 
     // During preview, populate a new setting value but not remove the old value.
-    // When the PowerShell extension releases the RTM version, then the old value can be safely removed.
+    // TODO: When the next stable extension releases, then the old value can be safely removed. Tracked in this issue: https://github.com/PowerShell/vscode-powershell/issues/2693
     private async migrateWhitespaceAroundPipeSetting() {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
