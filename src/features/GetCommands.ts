@@ -21,12 +21,9 @@ interface ICommand {
  * RequestType sent over to PSES.
  * Expects: ICommand to be returned
  */
-export const GetCommandRequestType = new RequestType0<ICommand[], void, void>("powerShell/getCommand");
-// Split across two lines because tslint didn't like it shorter than the first attempt????
+export const GetCommandRequestType = new RequestType<any, any, void, void>("powerShell/getCommand");
 // Sending any because we couldn't send <ICommand[], string, void, void>
 // TODO: Send something other than any...
-export const GetCommandInformationRequestType = new RequestType<any, any,
-void, void>("powerShell/getCommandInformation");
 
 /**
  * A PowerShell Command listing feature. Implements a treeview control.
@@ -64,7 +61,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
 
         vscode.commands.registerCommand("PowerShell.InsertCommand", (item) => {
             const Name = item.Name;
-            this.languageClient.sendRequest(GetCommandInformationRequestType, { Name }).then((result) => {
+            this.languageClient.sendRequest(GetCommandRequestType, { Name }).then((result) => {
                 this.BuildCommand(result);
             });
         });
@@ -86,7 +83,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
             this.log.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
             return;
         }
-        this.languageClient.sendRequest(GetCommandRequestType).then((result) => {
+        this.languageClient.sendRequest(GetCommandRequestType, null).then((result) => {
             const SidebarConfig = vscode.workspace.getConfiguration("powershell.sideBar");
             const excludeFilter = (SidebarConfig.CommandExplorerExcludeFilter).map((filter) => filter.toLowerCase());
             result = result.filter((command) => (excludeFilter.indexOf(command.moduleName.toLowerCase()) === -1));
