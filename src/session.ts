@@ -123,6 +123,8 @@ export class SessionManager implements Middleware {
 
         this.promptPowerShellExeSettingsCleanup();
 
+        this.migrateWhitespaceAroundPipeSetting();
+
         try {
             let powerShellExeDetails;
             if (this.sessionSettings.powerShellDefaultVersion) {
@@ -315,6 +317,18 @@ export class SessionManager implements Middleware {
             }
 
             return resolvedCodeLens;
+    }
+
+    // During preview, populate a new setting value but not remove the old value.
+    // TODO: When the next stable extension releases, then the old value can be safely removed. Tracked in this issue: https://github.com/PowerShell/vscode-powershell/issues/2693
+    private async migrateWhitespaceAroundPipeSetting() {
+        const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+        const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
+        if (configuration.has(deprecatedSetting) && !configuration.has('codeFormatting.addWhitespaceAroundPipe')) {
+            const configurationTarget = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
+            const value = configuration.get(deprecatedSetting, configurationTarget)
+            await Settings.change('codeFormatting.addWhitespaceAroundPipe', value, configurationTarget);
+        }
     }
 
     private async promptPowerShellExeSettingsCleanup() {
