@@ -784,11 +784,22 @@
           "type": "string",
           "enum": [
             "FromPreference",
+            "Minimal",
             "Normal",
-            "Minimal"
+            "Diagnostic"
           ],
           "default": "FromPreference",
           "description": "Defines the verbosity of output to be used. For Pester 5 and newer the default value FromPreference, will use the Output settings from the $PesterPreference defined in the caller context, and will default to Normal if there is none. For Pester 4 the FromPreference and Normal options map to All, and Minimal option maps to Fails."
+        },
+        "powershell.pester.debugOutputVerbosity": {
+          "type": "string",
+          "enum": [
+            "Minimal",
+            "Normal",
+            "Diagnostic"
+          ],
+          "default": "Diagnostic",
+          "description": "Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value Diagnostic will print additional information about discovery, skipped and filtered tests, mocking and more."
         }
       }
     },
