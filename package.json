@@ -657,8 +657,8 @@
             "NoIndentation",
             "None"
           ],
-          "default": "None",
-          "description": "Multi-line pipeline style settings (default: None)."
+          "default": "NoIndentation",
+          "description": "Multi-line pipeline style settings (default: NoIndentation)."
         },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
