@@ -4,11 +4,11 @@
 ### Wednesday, May 13, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
-- ✨🐢 [vscode-powershell #2670](https://github.com/PowerShell/vscode-powershell/pull/2670)
+- ✨🐢 [vscode-powershell #2670](https://github.com/PowerShell/vscode-powershell/pull/2670) -
   Add debug output setting for Pester. (Thanks @nohwnd!)
-- ✨🔧 [vscode-powershell #2689](https://github.com/PowerShell/vscode-powershell/pull/2689)
+- ✨🔧 [vscode-powershell #2689](https://github.com/PowerShell/vscode-powershell/pull/2689) -
   Migrate setting value of `powershell.codeFormatting.whitespaceAroundPipe` to `powershell.codeFormatting.addWhitespaceAroundPipe` automatically. (Thanks @bergmeister!)
-- 🐛🔧 [vscode-powershell #2688](https://github.com/PowerShell/vscode-powershell/pull/2688)
+- 🐛🔧 [vscode-powershell #2688](https://github.com/PowerShell/vscode-powershell/pull/2688) -
   Respect user choice when dismissing the `powerShellExePath` dialog. (Thanks @bergmeister!)
 - ✨👷 [vscode-powershell #2686](https://github.com/PowerShell/vscode-powershell/pull/2686) -
   Code clean up around some unused variables. (Thanks @bergmeister!)
