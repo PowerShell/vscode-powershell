@@ -1,14 +1,22 @@
 # PowerShell Extension Release History
 
-## v2020.5.0
-### Wednesday, May 06, 2020
+## v2020.5.0-preview
+### Wednesday, May 13, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
-- [vscode-powershell #2676](https://github.com/PowerShell/vscode-powershell/pull/2676) -
+- ✨🐢 [vscode-powershell #2670](https://github.com/PowerShell/vscode-powershell/pull/2670)
+  Add debug output setting for Pester. (Thanks @nohwnd!)
+- ✨🔧 [vscode-powershell #2689](https://github.com/PowerShell/vscode-powershell/pull/2689)
+  Migrate setting value of `powershell.codeFormatting.whitespaceAroundPipe` to `powershell.codeFormatting.addWhitespaceAroundPipe` automatically. (Thanks @bergmeister!)
+- 🐛🔧 [vscode-powershell #2688](https://github.com/PowerShell/vscode-powershell/pull/2688)
+  Respect user choice when dismissing the `powerShellExePath` dialog. (Thanks @bergmeister!)
+- ✨👷 [vscode-powershell #2686](https://github.com/PowerShell/vscode-powershell/pull/2686) -
+  Code clean up around some unused variables. (Thanks @bergmeister!)
+- 🐛🐢 [vscode-powershell #2676](https://github.com/PowerShell/vscode-powershell/pull/2676) -
   Fix Pester invocation for 3x versions. (Thanks @nohwnd!)
-- [vscode-powershell #2674](https://github.com/PowerShell/vscode-powershell/pull/2674) -
+- ✨👮‍ [vscode-powershell #2674](https://github.com/PowerShell/vscode-powershell/pull/2674) -
   Add additional settings for PSScriptAnalyzer 1.19. (Thanks @bergmeister!)
-- [vscode-powershell #2672](https://github.com/PowerShell/vscode-powershell/pull/2672) -
+- ⚡️🔍 [vscode-powershell #2672](https://github.com/PowerShell/vscode-powershell/pull/2672) -
   Use in-memory debug adapter instead of spinning up new process.
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
