@@ -162,7 +162,7 @@ export function load(): ISettings {
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
         newLineAfterCloseBrace: true,
-        pipelineIndentationStyle: PipelineIndentationStyle.None,
+        pipelineIndentationStyle: PipelineIndentationStyle.NoIndentation,
         whitespaceBeforeOpenBrace: true,
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
