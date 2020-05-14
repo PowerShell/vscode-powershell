@@ -265,6 +265,33 @@
         "command": "PowerShell.InvokeRegisteredEditorCommand",
         "title": "Invoke Registered Editor Command",
         "category": "PowerShell"
+      },
+      {
+        "command": "workbench.action.closePanel",
+        "title": "Close panel",
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/ClosePanel.svg",
+          "dark": "resources/dark/ClosePanel.svg"
+        }
+      },
+      {
+        "command": "workbench.action.positionPanelLeft",
+        "title": "Move panel left",
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/MovePanelLeft.svg",
+          "dark": "resources/dark/MovePanelLeft.svg"
+        }
+      },
+      {
+        "command": "workbench.action.positionPanelBottom",
+        "title": "Move panel to bottom",
+        "category": "PowerShell",
+        "icon": {
+          "light": "resources/light/MovePanelBottom.svg",
+          "dark": "resources/dark/MovePanelBottom.svg"
+        }
       }
     ],
     "menus": {
@@ -305,6 +332,21 @@
         }
       ],
       "editor/title": [
+        {
+          "when": "editorLangId == powershell",
+          "command": "workbench.action.positionPanelBottom",
+          "group": "navigation@97"
+        },
+        {
+          "when": "editorLangId == powershell",
+          "command": "workbench.action.positionPanelLeft",
+          "group": "navigation@98"
+        },
+        {
+          "when": "editorLangId == powershell",
+          "command": "workbench.action.closePanel",
+          "group": "navigation@99"
+        },
         {
           "when": "editorLangId == powershell",
           "command": "workbench.action.debug.start",
