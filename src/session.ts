@@ -294,15 +294,15 @@ export class SessionManager implements Middleware {
 
                         codeLensToFix.command.arguments = [
                             vscode.Uri.parse(oldArgs[0]),
-                            new vscode.Position(oldArgs[1].Line, oldArgs[1].Character),
+                            new vscode.Position(oldArgs[1].line, oldArgs[1].character),
                             oldArgs[2].map((position) => {
                                 return new vscode.Location(
-                                    vscode.Uri.parse(position.Uri),
+                                    vscode.Uri.parse(position.uri),
                                     new vscode.Range(
-                                        position.Range.Start.Line,
-                                        position.Range.Start.Character,
-                                        position.Range.End.Line,
-                                        position.Range.End.Character));
+                                        position.range.start.line,
+                                        position.range.start.character,
+                                        position.range.end.line,
+                                        position.range.end.character));
                             }),
                         ];
                     }
