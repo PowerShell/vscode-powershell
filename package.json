@@ -1,12 +1,12 @@
 {
   "name": "powershell-preview",
   "displayName": "PowerShell Preview",
-  "version": "2020.4.3",
+  "version": "2020.5.0",
   "preview": true,
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.40.0"
+    "vscode": "^1.43.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
@@ -28,7 +28,7 @@
   "main": "./out/src/main",
   "activationEvents": [
     "onDebugInitialConfigurations",
-    "onDebugResolve:powershell",
+    "onDebugResolve:PowerShell",
     "onLanguage:powershell",
     "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
@@ -44,8 +44,8 @@
   ],
   "dependencies": {
     "node-fetch": "^2.6.0",
-    "semver": "^7.2.3",
-    "vscode-extension-telemetry": "~0.1.2",
+    "semver": "^7.3.2",
+    "vscode-extension-telemetry": "~0.1.6",
     "vscode-languageclient": "~5.2.1"
   },
   "devDependencies": {
@@ -53,11 +53,11 @@
     "@types/mocha": "~7.0.2",
     "@types/mock-fs": "~4.10.0",
     "@types/node": "~12.12.39",
-    "@types/node-fetch": "~2.5.6",
+    "@types/node-fetch": "~2.5.7",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.1.0",
     "@types/sinon": "~9.0.0",
-    "@types/vscode": "1.40.0",
+    "@types/vscode": "1.43.0",
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~1.23.3",
     "mocha-multi-reporters": "~1.1.7",
@@ -377,8 +377,6 @@
       {
         "type": "PowerShell",
         "label": "PowerShell",
-        "program": "./out/src/debugAdapter.js",
-        "runtime": "node",
         "variables": {
           "PickPSHostProcess": "PowerShell.PickPSHostProcess",
           "PickRunspace": "PowerShell.PickRunspace",
@@ -555,6 +553,11 @@
           "description": "Specifies whether you should be prompted to update your version of PowerShell.",
           "default": true
         },
+        "powershell.promptToUpdatePackageManagement": {
+          "type": "boolean",
+          "description": "Specifies whether you should be prompted to update your version of PackageManagement if it's under 1.4.6.",
+          "default": true
+        },
         "powershell.startAsLoginShell.osx": {
           "type": "boolean",
           "default": true,
@@ -651,10 +654,11 @@
           "enum": [
             "IncreaseIndentationForFirstPipeline",
             "IncreaseIndentationAfterEveryPipeline",
-            "NoIndentation"
+            "NoIndentation",
+            "None"
           ],
           "default": "NoIndentation",
-          "description": "Multi-line pipeline style settings."
+          "description": "Multi-line pipeline style settings (default: NoIndentation)."
         },
         "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
           "type": "boolean",
@@ -681,10 +685,20 @@
           "default": true,
           "description": "Adds a space after an opening brace ('{') and before a closing brace ('}')."
         },
-        "powershell.codeFormatting.whitespaceAroundPipe": {
+        "powershell.codeFormatting.whitespaceBetweenParameters": {
+          "type": "boolean",
+          "default": false,
+          "description": "Removes redundant whitespace between parameters."
+        },
+        "powershell.codeFormatting.addWhitespaceAroundPipe": {
           "type": "boolean",
           "default": true,
-          "description": "Adds a space before and after the pipeline operator ('|')."
+          "description": "Adds a space before and after the pipeline operator ('|') if it is missing."
+        },
+        "powershell.codeFormatting.trimWhitespaceAroundPipe": {
+          "type": "boolean",
+          "default": false,
+          "description": "Trims extraneous whitespace (more than 1 character) before and after the pipeline operator ('|')."
         },
         "powershell.codeFormatting.ignoreOneLineBlock": {
           "type": "boolean",
@@ -770,11 +784,22 @@
           "type": "string",
           "enum": [
             "FromPreference",
+            "Minimal",
             "Normal",
-            "Minimal"
+            "Diagnostic"
           ],
           "default": "FromPreference",
           "description": "Defines the verbosity of output to be used. For Pester 5 and newer the default value FromPreference, will use the Output settings from the $PesterPreference defined in the caller context, and will default to Normal if there is none. For Pester 4 the FromPreference and Normal options map to All, and Minimal option maps to Fails."
+        },
+        "powershell.pester.debugOutputVerbosity": {
+          "type": "string",
+          "enum": [
+            "Minimal",
+            "Normal",
+            "Diagnostic"
+          ],
+          "default": "Diagnostic",
+          "description": "Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value Diagnostic will print additional information about discovery, skipped and filtered tests, mocking and more."
         }
       }
     },

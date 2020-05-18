@@ -1,5 +1,73 @@
 # PowerShell Extension Release History
 
+## v2020.5.0-preview
+### Wednesday, May 13, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- ✨🐢 [vscode-powershell #2670](https://github.com/PowerShell/vscode-powershell/pull/2670) -
+  Add debug output setting for Pester. (Thanks @nohwnd!)
+- ✨🔧 [vscode-powershell #2689](https://github.com/PowerShell/vscode-powershell/pull/2689) -
+  Migrate setting value of `powershell.codeFormatting.whitespaceAroundPipe` to `powershell.codeFormatting.addWhitespaceAroundPipe` automatically. (Thanks @bergmeister!)
+- 🐛🔧 [vscode-powershell #2688](https://github.com/PowerShell/vscode-powershell/pull/2688) -
+  Respect user choice when dismissing the `powerShellExePath` dialog. (Thanks @bergmeister!)
+- ✨👷 [vscode-powershell #2686](https://github.com/PowerShell/vscode-powershell/pull/2686) -
+  Code clean up around some unused variables. (Thanks @bergmeister!)
+- 🐛🐢 [vscode-powershell #2676](https://github.com/PowerShell/vscode-powershell/pull/2676) -
+  Fix Pester invocation for 3x versions. (Thanks @nohwnd!)
+- ✨👮‍ [vscode-powershell #2674](https://github.com/PowerShell/vscode-powershell/pull/2674) -
+  Add additional settings for PSScriptAnalyzer 1.19. (Thanks @bergmeister!)
+- ⚡️🔍 [vscode-powershell #2672](https://github.com/PowerShell/vscode-powershell/pull/2672) -
+  Use in-memory debug adapter instead of spinning up new process.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🛫🐛 [PowerShellEditorServices #1285](https://github.com/PowerShell/PowerShellEditorServices/pull/1285) -
+  Use API on ScriptBlock to generate PSCommand to run in ConstrainedLanguage mode.
+- ⚡️🧠 [PowerShellEditorServices #1283](https://github.com/PowerShell/PowerShellEditorServices/pull/1283) -
+  Move to Omnisharp lib 0.17.0 for increased performance.
+- ✨👮 [PowerShellEditorServices #1280](https://github.com/PowerShell/PowerShellEditorServices/pull/1280) -
+  Add additional settings for PSScriptAnalyzer 1.19. (Thanks @bergmeister!)
+- 🔗 🐛 [vscode-powershell #305](https://github.com/PowerShell/PowerShellEditorServices/pull/1279) -
+  Fix document highlight column.
+- 🐛🧠 [PowerShellEditorServices #1276](https://github.com/PowerShell/PowerShellEditorServices/pull/1276) -
+  Handle when no CommandInfo comes back from Get-Command to prevent an Exception showing up in logs.
+
+## v2020.4.3-preview
+### Tuesday, April 28, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 🛫 ✨ [vscode-powershell #2651](https://github.com/PowerShell/vscode-powershell/pull/2651) -
+  Add setting for the PackageManagement update feature.
+- 👮‍ 🐛 [vscode-powershell #2659](https://github.com/PowerShell/vscode-powershell/pull/2659) -
+  Remove broken 'Select PSScriptAnalyzer Rules' command. (Thanks @bergmeister!)
+- 🛫 ✨ [vscode-powershell #2526](https://github.com/PowerShell/vscode-powershell/pull/2653) -
+  Clean up WaitForSessionFile logic and support increasing timeout with warning.
+- 📟 ✨ [vscode-powershell #2644](https://github.com/PowerShell/vscode-powershell/pull/2644) -
+  Display preview state and version info in PSIC startup banner. (Thanks @rkeithhill!)
+- 👷 ✨ [vscode-powershell #2645](https://github.com/PowerShell/vscode-powershell/pull/2645) -
+  Add workspace file to load both vscode-powershell and PSES. (Thanks @rkeithhill!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 📟 🐛 [PowerShellEditorServices #1272](https://github.com/PowerShell/PowerShellEditorServices/pull/1272) -
+  Allow progress colors to be settable and gettable from the internal host.
+- 🛫 ✨ [PowerShellEditorServices #1239](https://github.com/PowerShell/PowerShellEditorServices/pull/1239) -
+  Prompt to update PackageManagement when using an old version.
+- 🛫 ✨ [PowerShellEditorServices #1269](https://github.com/PowerShell/PowerShellEditorServices/pull/1269) -
+  Support ConstrainedLanguage mode.
+- 📺 ✨ [PowerShellEditorServices #1268](https://github.com/PowerShell/PowerShellEditorServices/pull/1268) -
+  Refactor GetCommandHandler to not use dynamic.
+- 🔍 🐛 [vscode-powershell #2654](https://github.com/PowerShell/PowerShellEditorServices/pull/1270) -
+  Fix interpolation in Log points, switch to double quotes. (Thanks @rkeithhill!)
+- [PowerShellEditorServices #1267](https://github.com/PowerShell/PowerShellEditorServices/pull/1267) -
+  Update module manifest to match current module.
+- 📟 🐛 [vscode-powershell #2637](https://github.com/PowerShell/PowerShellEditorServices/pull/1264) -
+  Leverage internal HostUI to check if VT100 is supported.
+- 📟 🐛 [vscode-powershell #2637](https://github.com/PowerShell/PowerShellEditorServices/pull/1263) -
+  Use stable builds of PSReadLine for the PowerShell extension and preview builds for the PowerShell Preview extension.
+- 💎 ✨ [vscode-powershell #2543](https://github.com/PowerShell/PowerShellEditorServices/pull/1262) -
+  Allow formatting when ScriptAnalysis setting is set to disabled.
+
 ## v2020.4.0
 ### Thursday, April 15, 2020
 

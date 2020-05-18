@@ -40,10 +40,6 @@ import utils = require("./utils");
 // tslint:disable-next-line: no-var-requires
 const PackageJSON: any = require("../../package.json");
 
-// NOTE: We will need to find a better way to deal with the required
-//       PS Editor Services version...
-const requiredEditorServicesVersion = "2.0.0";
-
 // the application insights key (also known as instrumentation key) used for telemetry.
 const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
@@ -132,7 +128,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
     sessionManager =
         new SessionManager(
-            requiredEditorServicesVersion,
             logger,
             documentSelector,
             PackageJSON.displayName,
@@ -156,7 +151,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new CodeActionsFeature(logger),
         new NewFileOrProjectFeature(),
         new RemoteFilesFeature(),
-        new DebugSessionFeature(context, sessionManager),
+        new DebugSessionFeature(context, sessionManager, logger),
         new PickPSHostProcessFeature(),
         new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),

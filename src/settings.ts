@@ -18,6 +18,7 @@ enum PipelineIndentationStyle {
     IncreaseIndentationForFirstPipeline,
     IncreaseIndentationAfterEveryPipeline,
     NoIndentation,
+    None,
 }
 
 export enum HelpCompletion {
@@ -51,8 +52,10 @@ export interface ICodeFormattingSettings {
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
-    whitespaceInsideBrace: true;
-    whitespaceAroundPipe: true;
+    whitespaceBetweenParameters: boolean;
+    whitespaceInsideBrace: boolean;
+    addWhitespaceAroundPipe: boolean;
+    trimWhitespaceAroundPipe: boolean;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
     useCorrectCasing: boolean;
@@ -81,6 +84,7 @@ export interface ISettings {
     // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
     promptToUpdatePowerShell?: boolean;
+    promptToUpdatePackageManagement?: boolean;
     bundledModulesPath?: string;
     startAsLoginShell?: IStartAsLoginShellSettings;
     startAutomatically?: boolean;
@@ -118,6 +122,7 @@ export interface ISideBarSettings {
 export interface IPesterSettings {
     useLegacyCodeLens?: boolean;
     outputVerbosity?: string;
+    debugOutputVerbosity?: string;
 }
 
 export function load(): ISettings {
@@ -162,8 +167,10 @@ export function load(): ISettings {
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
+        whitespaceBetweenParameters: false,
         whitespaceInsideBrace: true,
-        whitespaceAroundPipe: true,
+        addWhitespaceAroundPipe: true,
+        trimWhitespaceAroundPipe: false,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
         useCorrectCasing: false,
@@ -188,6 +195,7 @@ export function load(): ISettings {
     const defaultPesterSettings: IPesterSettings = {
         useLegacyCodeLens: true,
         outputVerbosity: "FromPreference",
+        debugOutputVerbosity: "Diagnostic",
     };
 
     return {
@@ -201,6 +209,8 @@ export function load(): ISettings {
             configuration.get<string>("powerShellExePath", undefined),
         promptToUpdatePowerShell:
             configuration.get<boolean>("promptToUpdatePowerShell", true),
+        promptToUpdatePackageManagement:
+            configuration.get<boolean>("promptToUpdatePackageManagement", true),
         bundledModulesPath:
             "../../modules",
         useX86Host:
@@ -237,12 +247,32 @@ export function load(): ISettings {
     };
 }
 
-export async function change(settingName: string, newValue: any, global: boolean = false): Promise<void> {
-    const configuration: vscode.WorkspaceConfiguration =
-        vscode.workspace.getConfiguration(
-            utils.PowerShellLanguageId);
+// Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
+export async function getEffectiveConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget> {
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
-    await configuration.update(settingName, newValue, global);
+    const detail = configuration.inspect(settingName);
+    let configurationTarget = null;
+    if (typeof detail.workspaceFolderValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    else if (typeof detail.workspaceValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.Workspace;
+    }
+    else if (typeof detail.globalValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.Global;
+    }
+    return configurationTarget;
+}
+
+export async function change(
+    settingName: string,
+    newValue: any,
+    configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
+
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+
+    await configuration.update(settingName, newValue, configurationTarget);
 }
 
 function getWorkspaceSettingsWithDefaults<TSettings>(

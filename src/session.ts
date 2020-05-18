@@ -54,7 +54,6 @@ export class SessionManager implements Middleware {
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
     private bundledModulesPath: string;
-    private telemetryReporter: TelemetryReporter;
 
     // Initialized by the start() method, since this requires settings
     private powershellExeFinder: PowerShellExeFinder;
@@ -66,18 +65,16 @@ export class SessionManager implements Middleware {
         vscode.env.sessionId === "someValue.sessionId";
 
     constructor(
-        private requiredEditorServicesVersion: string,
         private log: Logger,
         private documentSelector: DocumentSelector,
-        private hostName: string,
-        private version: string,
-        private reporter: TelemetryReporter) {
+        hostName: string,
+        version: string,
+        private telemetryReporter: TelemetryReporter) {
 
         this.platformDetails = getPlatformDetails();
 
         this.HostName = hostName;
         this.HostVersion = version;
-        this.telemetryReporter = reporter;
 
         const osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
@@ -125,6 +122,8 @@ export class SessionManager implements Middleware {
         this.createStatusBarItem();
 
         this.promptPowerShellExeSettingsCleanup();
+
+        this.migrateWhitespaceAroundPipeSetting();
 
         try {
             let powerShellExeDetails;
@@ -320,6 +319,18 @@ export class SessionManager implements Middleware {
             return resolvedCodeLens;
     }
 
+    // During preview, populate a new setting value but not remove the old value.
+    // TODO: When the next stable extension releases, then the old value can be safely removed. Tracked in this issue: https://github.com/PowerShell/vscode-powershell/issues/2693
+    private async migrateWhitespaceAroundPipeSetting() {
+        const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+        const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
+        if (configuration.has(deprecatedSetting) && !configuration.has('codeFormatting.addWhitespaceAroundPipe')) {
+            const configurationTarget = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
+            const value = configuration.get(deprecatedSetting, configurationTarget)
+            await Settings.change('codeFormatting.addWhitespaceAroundPipe', value, configurationTarget);
+        }
+    }
+
     private async promptPowerShellExeSettingsCleanup() {
         if (this.sessionSettings.powerShellExePath) {
             let warningMessage = "The 'powerShell.powerShellExePath' setting is no longer used. ";
@@ -329,7 +340,7 @@ export class SessionManager implements Middleware {
 
             const choice = await vscode.window.showWarningMessage(warningMessage, "Let's do it!");
 
-            if (choice === "") {
+            if (choice === undefined) {
                 // They hit the 'x' to close the dialog.
                 return;
             }

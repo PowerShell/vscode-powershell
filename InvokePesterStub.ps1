@@ -105,8 +105,18 @@ if ($All) {
         }
         Pester\Invoke-Pester -Configuration $configuration | Out-Null
     }
-    else {
+    elseif ($pesterModule.Version -ge '3.4.5') {
+        # -Show was introduced in 3.4.5
         Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -Show $pester4Output
+    }
+    elseif ($pesterModule.Version -ge '3.4.0') {
+        # -PesterOption was introduced before 3.4.0, and VSCodeMarker in 4.0.3-rc,
+        # but because no-one checks the integrity of this hashtable we can call all of the versions
+        # down to 3.4.0 like this
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+    }
+    else {
+        Pester\Invoke-Pester -Script $ScriptPath
     }
 }
 elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
