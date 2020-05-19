@@ -24,9 +24,7 @@ export class ISECompatibilityFeature implements IFeature {
         { path: "powershell.integratedConsole", name: "focusConsoleOnExecute", value: false },
         { path: "files", name: "defaultLanguage", value: "powershell" },
         { path: "workbench", name: "colorTheme", value: "PowerShell ISE" },
-        { path: "powershell.buttons", name: "ClosePanelButtonVisibility", value: true },
-        { path: "powershell.buttons", name: "MovePanelLeftButtonVisibility", value: true },
-        { path: "powershell.buttons", name: "MovePanelToBottomButtonVisibility", value: true }
+        { path: "powershell.buttons", name: "showPanelMovementButtons", value: true }
     ];
     private iseCommandRegistration: vscode.Disposable;
     private defaultCommandRegistration: vscode.Disposable;

@@ -127,11 +127,8 @@ export interface IPesterSettings {
 }
 
 export interface IButtonSettings {
-    RunButtonVisibility?: boolean;
-    RunSelectionButtonVisibility?: boolean;
-    ClosePanelButtonVisibility?: boolean;
-    MovePanelLeftButtonVisibility?: boolean;
-    MovePanelToBottomButtonVisibility?: boolean;
+    showRunButtons?: boolean;
+    showPanelMovementButtons?: boolean;
 }
 
 export function load(): ISettings {
@@ -202,11 +199,8 @@ export function load(): ISettings {
     };
 
     const defaultButtonSettings: IButtonSettings = {
-        RunButtonVisibility: true,
-        RunSelectionButtonVisibility: true,
-        ClosePanelButtonVisibility: false,
-        MovePanelLeftButtonVisibility: false,
-        MovePanelToBottomButtonVisibility: false
+        showRunButtons: true,
+        showPanelMovementButtons: false
     };
 
     const defaultPesterSettings: IPesterSettings = {

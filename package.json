@@ -333,27 +333,27 @@
       ],
       "editor/title": [
         {
-          "when": "editorLangId == powershell && config.powershell.buttons.MovePanelToBottomButtonVisibility",
+          "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
           "command": "workbench.action.positionPanelBottom",
           "group": "navigation@97"
         },
         {
-          "when": "editorLangId == powershell && config.powershell.buttons.MovePanelLeftButtonVisibility",
+          "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
           "command": "workbench.action.positionPanelLeft",
           "group": "navigation@98"
         },
         {
-          "when": "editorLangId == powershell && config.powershell.buttons.ClosePanelButtonVisibility",
+          "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
           "command": "workbench.action.closePanel",
           "group": "navigation@99"
         },
         {
-          "when": "editorLangId == powershell && config.powershell.buttons.RunButtonVisibility",
+          "when": "editorLangId == powershell && config.powershell.buttons.showRunButtons",
           "command": "workbench.action.debug.start",
           "group": "navigation@100"
         },
         {
-          "when": "editorLangId == powershell && config.powershell.buttons.RunSelectionButtonVisibility",
+          "when": "editorLangId == powershell && config.powershell.buttons.showRunButtons",
           "command": "PowerShell.RunSelection",
           "group": "navigation@101"
         }
@@ -843,30 +843,15 @@
           "default": "Diagnostic",
           "description": "Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value Diagnostic will print additional information about discovery, skipped and filtered tests, mocking and more."
         },
-        "powershell.buttons.RunButtonVisibility": {
+        "powershell.buttons.showRunButtons": {
           "type": "boolean",
           "default": true,
-          "description": "Show the Run button in the editor titlebar."
+          "description": "Show the Run and Run Selection buttons in the editor titlebar."
         },
-        "powershell.buttons.RunSelectionButtonVisibility": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show the Run Selection button in the editor titlebar."
-        },
-        "powershell.buttons.ClosePanelButtonVisibility": {
+        "powershell.buttons.showPanelMovementButtons": {
           "type": "boolean",
           "default": false,
-          "description": "Show the Close panel button in the editor titlebar."
-        },
-        "powershell.buttons.MovePanelLeftButtonVisibility": {
-          "type": "boolean",
-          "default": false,
-          "description": "Show the Move panel left button in the editor titlebar."
-        },
-        "powershell.buttons.MovePanelToBottomButtonVisibility": {
-          "type": "boolean",
-          "default": false,
-          "description": "Show the Move panel to bottom button in the editor titlebar."
+          "description": "Show buttons in the editor titlebar for moving the panel around."
         }
       }
     },
