@@ -24,7 +24,8 @@ export class ISECompatibilityFeature implements IFeature {
         { path: "powershell.integratedConsole", name: "focusConsoleOnExecute", value: false },
         { path: "files", name: "defaultLanguage", value: "powershell" },
         { path: "workbench", name: "colorTheme", value: "PowerShell ISE" },
-        { path: "editor", name: "wordSeparators", value: "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?" }
+        { path: "editor", name: "wordSeparators", value: "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?" },
+        { path: "powershell.buttons", name: "showPanelMovementButtons", value: true }
     ];
     private iseCommandRegistration: vscode.Disposable;
     private defaultCommandRegistration: vscode.Disposable;
