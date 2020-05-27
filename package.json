@@ -826,8 +826,10 @@
           "type": "string",
           "enum": [
             "FromPreference",
+            "None",
             "Minimal",
             "Normal",
+            "Detailed",
             "Diagnostic"
           ],
           "default": "FromPreference",
@@ -836,8 +838,10 @@
         "powershell.pester.debugOutputVerbosity": {
           "type": "string",
           "enum": [
+            "None",
             "Minimal",
             "Normal",
+            "Detailed",
             "Diagnostic"
           ],
           "default": "Diagnostic",
