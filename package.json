@@ -312,11 +312,11 @@
       "explorer/context": [
         {
           "command": "PowerShell.RunPesterTestsFromFile",
-          "when": "resourceFilename =~ /\\.tests\\.ps1$/i"
+          "when": "false"
         },
         {
           "command": "PowerShell.DebugPesterTestsFromFile",
-          "when": "resourceFilename =~ /\\.tests\\.ps1$/i"
+          "when": "false"
         }
       ],
       "editor/context": [
