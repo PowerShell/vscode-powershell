@@ -1,10 +1,30 @@
 steps:
   # Setup
+  - powershell: |
+      Write-Host "Installing PowerShell Daily..."
+
+      # Use `AGENT_TEMPDIRECTORY` to make sure the downloaded PowerShell is cleaned up.
+      $powerShellPath = Join-Path -Path $env:AGENT_TEMPDIRECTORY -ChildPath 'powershell'
+      Invoke-WebRequest -Uri https://aka.ms/install-powershell.ps1 -OutFile ./install-powershell.ps1
+
+      ./install-powershell.ps1 -Destination $powerShellPath -Daily
+
+      # Using `prependpath` to update the PATH just for this build.
+      Write-Host "##vso[task.prependpath]$powerShellPath"
+    displayName: Install PowerShell Daily
+  - pwsh: '$PSVersionTable'
+    displayName: Display PowerShell version information
   - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
     displayName: Set Build Name for Non-PR
     condition: ne(variables['Build.Reason'], 'PullRequest')
+  - task: PowerShell@2
+    displayName: 'Set environment variables for VSTS (Phase 1)'
+    inputs:
+      targetType: filePath
+      filePath: ./tools/releaseBuild/setVstsVariables.ps1
   - pwsh: |
-      git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
+      Write-Host "Cloning '$env:PSES_BRANCH' branch from '$env:PSES_FORK/PowerShellEditorServices'"
+      git clone --single-branch --branch $env:PSES_BRANCH https://github.com/$env:PSES_FORK/PowerShellEditorServices.git ../PowerShellEditorServices
       Install-Module InvokeBuild -Scope CurrentUser -Force
       Install-Module PlatyPS -Scope CurrentUser -Force
   # Build

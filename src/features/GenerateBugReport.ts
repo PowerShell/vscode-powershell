@@ -2,7 +2,6 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import cp = require("child_process");
 import os = require("os");
 import vscode = require("vscode");
 import { IFeature, LanguageClient } from "../feature";
@@ -30,7 +29,6 @@ const extensions =
 export class GenerateBugReportFeature implements IFeature {
 
     private command: vscode.Disposable;
-    private powerShellProcess: cp.ChildProcess;
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", () => {
@@ -43,7 +41,7 @@ I am experiencing a problem with...
 Attached Logs
 =====
 
-Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell#reporting-problems) about
+Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md) about
 capturing and sending logs.
 
 Environment Information
@@ -113,7 +111,7 @@ ${tableHeader}\n${table};
 
     private getRuntimeInfo() {
 
-        const powerShellExePath = this.sessionManager.getPowerShellExePath();
+        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
         const powerShellArgs = [
             "-NoProfile",
             "-Command",

@@ -93,7 +93,9 @@
 			"name": "Variables",
 			"scope": [
 				"variable",
-				"support.variable"
+				"support.variable",
+				"punctuation.definition.variable.powershell",
+				"variable.other.readwrite.powershell"
 			],
 			"settings": {
 				"foreground": "#FF4500"

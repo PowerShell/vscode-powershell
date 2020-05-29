@@ -34,14 +34,11 @@ Import-Module "$PSScriptRoot/../GitHubTools.psm1" -Force
 <#
 .SYNOPSIS
 Get the release description from the CHANGELOG
-
 .DESCRIPTION
 Gets the latest CHANGELOG entry from the CHANGELOG for use as the GitHub release description
-
 .PARAMETER ChangelogPath
 Path to the changelog file
 #>
-
 function GetDescriptionFromChangelog
 {
     param(

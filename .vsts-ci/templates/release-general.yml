@@ -1,0 +1,143 @@
+steps:
+- powershell: |
+    Write-Host "Installing pwsh..."
+    if (Get-Command pwsh -ErrorAction Ignore)
+    {
+        Write-Host "pwsh already installed, skipping"
+        return
+    }
+    $powerShellPath = Join-Path -Path $env:AGENT_TEMPDIRECTORY -ChildPath 'powershell'
+    Invoke-WebRequest -Uri https://raw.githubusercontent.com/PowerShell/PowerShell/master/tools/install-powershell.ps1 -outfile ./install-powershell.ps1
+    ./install-powershell.ps1 -Destination $powerShellPath
+    $vstsCommandString = "vso[task.setvariable variable=PATH]$powerShellPath;$env:PATH"
+    Write-Host "sending " + $vstsCommandString
+    Write-Host "##$vstsCommandString"
+  displayName: Install PowerShell Core
+
+- pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
+  displayName: Set Build Name for Non-PR
+  condition: ne(variables['Build.Reason'], 'PullRequest')
+
+- pwsh: |
+    Get-ChildItem -Path env:
+  displayName: Capture environment
+  condition: succeededOrFailed()
+
+- task: PkgESSetupBuild@10
+  displayName: 'Package ES - Setup Build'
+  inputs:
+    productName: vscode-powershell
+
+- task: PowerShell@2
+  displayName: 'Set environment variables for VSTS (Phase 1)'
+  inputs:
+    targetType: filePath
+    filePath: ./tools/releaseBuild/setVstsVariables.ps1
+
+- task: PowerShell@2
+  displayName: 'Find PowerShellEditorServices build'
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+  inputs:
+    targetType: filePath
+    filePath: ./tools/releaseBuild/findPsesBuild.ps1
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Artifacts from PowerShell Editor Services'
+  inputs:
+    buildType: specific
+    project: '8e2735c1-3674-408a-bcab-87f089ea29d5'
+    pipeline: 1056
+    buildVersionToDownload: specific
+    buildId: '$(PSES_BUILDID)'
+    downloadType: single
+    artifactName: 'PowerShellEditorServices'
+    downloadPath: '$(Build.SourcesDirectory)'
+
+- pwsh: |
+    Install-Module InvokeBuild -Force
+    Invoke-Build Release
+
+- task: PublishTestResults@2
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: '**/test-results.xml'
+  condition: succeededOrFailed()
+
+- task: PkgESCodeSign@10
+  displayName: 'CodeSign tools/releaseBuild/signing.xml'
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+  inputs:
+    signConfigXml: tools/releaseBuild/signing.xml
+    inPathRoot: '$(Build.ArtifactStagingDirectory)'
+    outPathRoot: '$(Build.ArtifactStagingDirectory)\Signed'
+
+- task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+  displayName: 'Component Detection'
+
+- task: AntiMalware@3
+  inputs:
+    InputType: 'Basic'
+    ScanType: 'CustomScan'
+    FileDirPath: '$(Build.ArtifactStagingDirectory)'
+    EnableServices: false
+    SupportLogOnError: false
+    TreatSignatureUpdateFailureAs: 'Warning'
+    SignatureFreshness: 'UpToDate'
+    TreatStaleSignatureAs: 'Error'
+
+- task: PoliCheck@1
+  condition: succeededOrFailed()
+  inputs:
+    targetType: F
+    optionsFC: 0
+    optionsXS: 0
+    optionsPE: '1|2|3|4'
+    optionsHMENABLE: 0
+    optionsFTPATH: '$(Build.SourcesDirectory)\tools\terms\FileTypeSet.xml'
+    # toolVersion: 5.8.2.1
+
+- pwsh: |
+    Get-ChildItem -Exclude node_modules | Get-ChildItem -Recurse | ForEach-Object FullName > "$env:BUILD_SOURCESDIRECTORY/credscan.tsv"
+  displayName: Create credscan.tsv as the list of files to scan
+
+- task: CredScan@2
+  condition: succeededOrFailed()
+  inputs:
+    debugMode: false
+    scanFolder: '$(Build.SourcesDirectory)/credscan.tsv'
+
+# Publish results as artifacts
+- task: PublishSecurityAnalysisLogs@3
+  condition: succeededOrFailed()
+  inputs:
+    ArtifactName: 'CodeAnalysisLogs'
+    ArtifactType: 'Container'
+
+# Publish to TSA server
+- task: TSAUpload@1
+  condition: succeededOrFailed()
+  continueOnError: true
+  inputs:
+    tsaVersion: 'TsaV2'
+    codebase: 'Existing'
+    tsaEnvironment: 'PROD'
+    codeBaseName: 'PowerShell_PowerShellEditorServices_20190917'
+    uploadAPIScan: false
+    uploadBinSkim: false
+    uploadCredScan: true
+    uploadFortifySCA: false
+    uploadFxCop: false
+    uploadModernCop: false
+    uploadPoliCheck: true
+    uploadPREfast: false
+    uploadRoslyn: false
+    uploadTSLint: false
+    uploadAsync: true
+
+- task: PowerShell@1
+  displayName: 'Upload artifacts'
+  inputs:
+    scriptType: inlineScript
+    inlineScript: 'Write-Host "##vso[artifact.upload containerfolder=vscode-powershell;artifactname=vscode-powershell]$(System.ArtifactsDirectory)\Signed"'

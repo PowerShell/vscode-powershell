@@ -1,0 +1,43 @@
+name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
+variables:
+  # Don't download unneeded packages
+  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+    value: 'true'
+  # Improve performance by not sending telemetry
+  - name: DOTNET_CLI_TELEMETRY_OPTOUT
+    value: 'true'
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - legacy/1.x
+  paths:
+    exclude:
+      - /.dependabot/*
+      - /.poshchan/*
+      - /.github/**/*
+      - /.vscode/**/*
+      - /.vsts-ci/misc-analysis.yml
+      - /tools/**/*
+      - .editorconfig
+      - .gitattributes
+      - .gitignore
+      - /docs/**/*
+      - /CHANGELOG.md
+      - /CONTRIBUTING.md
+      - /README.md
+      - /LICENSE
+      - /CODE_OF_CONDUCT.md
+
+jobs:
+
+- job: 'ReleaseBuild'
+  displayName: 'Build release'
+  pool:
+    name: 'Package ES CodeHub Lab E'
+    demands: DotNetFramework
+  steps:
+  - template: templates/release-general.yml

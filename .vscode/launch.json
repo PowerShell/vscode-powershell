@@ -32,7 +32,13 @@
 			"stopOnEntry": false,
 			"sourceMaps": true,
 			"outFiles": ["${workspaceRoot}/out/test/**/*.js"],
-			"preLaunchTask": "Build"
+			"preLaunchTask": "Build",
+			"skipFiles": [
+				"${workspaceFolder}/node_modules/**/*",
+				"${workspaceFolder}/lib/**/*",
+				"/private/var/folders/**/*",
+				"<node_internals>/**/*"
+			]
 		},
 		{
 			"name": "Attach",

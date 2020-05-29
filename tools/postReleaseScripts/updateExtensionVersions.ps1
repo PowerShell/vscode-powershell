@@ -116,23 +116,6 @@ function FindPackageJsonVersionSpan
     throw 'Did not find package.json version field'
 }
 
-function FindRequiredPsesVersionSpan
-{
-    param(
-        [Parameter(Mandatory)]
-        [string]
-        $MainTsContent
-    )
-
-    $pattern = [regex]'const\s+requiredEditorServicesVersion\s+=\s+"(.*)"'
-    $versionGroup = $pattern.Match($MainTsContent).Groups[1]
-
-    return @{
-        Start = $versionGroup.Index
-        End = $versionGroup.Index + $versionGroup.Length
-    }
-}
-
 function FindVstsBuildVersionSpan
 {
     param(
@@ -147,27 +130,6 @@ function FindVstsBuildVersionSpan
     return @{
         Start = $versionGroup.Index
         End = $versionGroup.Index + $versionGroup.Length
-    }
-}
-
-function UpdateMainTsPsesVersion
-{
-    param(
-        [Parameter(Mandatory)]
-        [string]
-        $MainTsPath,
-
-        [Parameter(Mandatory)]
-        [version]
-        $Version
-    )
-
-    $mainTsContent = Get-Content -Raw $MainTsPath
-    $mainTsVersionSpan = FindRequiredPsesVersionSpan $mainTsContent
-    $newMainTsContent = New-StringWithSegment -String $mainTsContent -NewSegment $Version -StartIndex $mainTsVersionSpan.Start -EndIndex $mainTsVersionSpan.End
-    if ($newMainTsContent -ne $mainTsContent)
-    {
-        Set-Content -Path $MainTsPath -Value $newMainTsContent -Encoding utf8NoBOM -NoNewline
     }
 }
 
@@ -247,15 +209,11 @@ if (-not $PRDescription)
 }
 
 # Get the marketplace/non-semver versions for various files
-$psesVersion = Get-VersionFromSemVer -SemVer $NewVersion
 $marketPlaceVersion = GetMarketplaceVersionFromSemVer -SemVer $NewVersion
 
 # Finally create the new package.json file
 $newPkgJsonContent = New-StringWithSegment -String $packageJson -NewSegment $NewVersion -StartIndex $pkgJsonVersionOffsetSpan.Start -EndIndex $pkgJsonVersionOffsetSpan.End
 Set-Content -Path $paths.packageJson -Value $newPkgJsonContent -Encoding utf8NoBOM -NoNewline
-
-# Create the new content for the main.ts required version file
-UpdateMainTsPsesVersion -MainTsPath $paths.mainTs -Version $psesVersion
 
 # Create the new content for the VSTS dockerfile
 UpdateDockerFileVersion -DockerFilePath $paths.vstsDockerFile -Version $marketPlaceVersion

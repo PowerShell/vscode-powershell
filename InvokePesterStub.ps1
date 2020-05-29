@@ -47,36 +47,115 @@ param(
     # If specified, executes all the tests in the specified test script.
     [Parameter()]
     [switch]
-    $All
+    $All,
+
+    [Parameter()]
+    [switch] $MinimumVersion5,
+
+    [Parameter(Mandatory)]
+    [string] $Output
 )
 
 $pesterModule = Microsoft.PowerShell.Core\Get-Module Pester
+# add one line, so the subsequent output is not shifted to the side
+Write-Output ''
+
 if (!$pesterModule) {
     Write-Output "Importing Pester module..."
-    $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru
+    if ($MinimumVersion5) {
+        $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru -MinimumVersion 5.0.0
+    }
+
     if (!$pesterModule) {
-        # If we still don't have an imported Pester module, that is (most likely) because Pester is not installed.
-        Write-Warning "Failed to import the Pester module. You must install Pester to run or debug Pester tests."
-        Write-Warning "You can install Pester by executing: Install-Module Pester -Scope CurrentUser -Force"
+        $pesterModule = Microsoft.PowerShell.Core\Import-Module Pester -ErrorAction Ignore -PassThru
+    }
+
+    if (!$pesterModule) {
+        Write-Warning "Failed to import Pester. You must install Pester module to run or debug Pester tests."
+        Write-Warning "$(if ($MinimumVersion5) {"Recommended version to install is Pester 5.0.0 or newer. "})You can install Pester by executing: Install-Module Pester$(if ($MinimumVersion5) {" -MinimumVersion 5.0.0" }) -Scope CurrentUser -Force"
         return
     }
 }
 
-if ($All) {
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+$pester4Output = switch ($Output) {
+    "None" { "None" }
+    "Minimal" { "Fails" }
+    default { "All" }
 }
-elseif ($TestName) {
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName
+
+if ($MinimumVersion5 -and $pesterModule.Version -lt "5.0.0") {
+    Write-Warning "Pester 5.0.0 or newer is required because setting PowerShell > Pester: Use Legacy Code Lens is disabled, but Pester $($pesterModule.Version) is loaded. Some of the code lense features might not work as expected."
+}
+
+
+if ($All) {
+    if ($pesterModule.Version -ge '5.0.0') {
+        $configuration = @{
+            Run = @{
+                Path = $ScriptPath
+            }
+        }
+        # only override this if user asks us to do it, to allow Pester to pick up
+        # $PesterPreference from caller context and merge it with the configuration
+        # we provide below, this way user can specify his output (and other) settings
+        # using the standard [PesterConfiguration] object, and we can avoid providing
+        # settings for everything
+        if ("FromPreference" -ne $Output) {
+            $configuration.Add('Output', @{ Verbosity = $Output })
+        }
+        Pester\Invoke-Pester -Configuration $configuration | Out-Null
+    }
+    elseif ($pesterModule.Version -ge '3.4.5') {
+        # -Show was introduced in 3.4.5
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -Show $pester4Output
+    }
+    elseif ($pesterModule.Version -ge '3.4.0') {
+        # -PesterOption was introduced before 3.4.0, and VSCodeMarker in 4.0.3-rc,
+        # but because no-one checks the integrity of this hashtable we can call all of the versions
+        # down to 3.4.0 like this
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+    }
+    else {
+        Pester\Invoke-Pester -Script $ScriptPath
+    }
 }
 elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption (New-PesterOption -ScriptBlockFilter @{
-        IncludeVSCodeMarker=$true; Line=$LineNumber; Path=$ScriptPath})
+    if ($pesterModule.Version -ge '5.0.0') {
+        $configuration = @{
+            Run = @{
+                Path = $ScriptPath
+            }
+            Filter = @{
+                Line = "${ScriptPath}:$LineNumber"
+            }
+        }
+        if ("FromPreference" -ne $Output) {
+            $configuration.Add('Output', @{ Verbosity = $Output })
+        }
+        Pester\Invoke-Pester -Configuration $configuration | Out-Null
+    }
+    else {
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption (New-PesterOption -ScriptBlockFilter @{
+            IncludeVSCodeMarker=$true; Line=$LineNumber; Path=$ScriptPath}) -Show $pester4Output
+    }
+}
+elseif ($TestName) {
+    if ($pesterModule.Version -ge '5.0.0') {
+       throw "Running tests by test name is unsafe. This should not trigger for Pester 5."
+    }
+    else {
+        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName -Show $pester4Output
+    }
 }
 else {
+    if ($pesterModule.Version -ge '5.0.0') {
+       throw "Running tests by expandable string is unsafe. This should not trigger for Pester 5."
+    }
+
     # We get here when the TestName expression is of type ExpandableStringExpressionAst.
     # PSES will not attempt to "evaluate" the expression so it returns null for the TestName.
     Write-Warning "The Describe block's TestName cannot be evaluated. EXECUTING ALL TESTS instead."
     Write-Warning "To avoid this, install Pester >= 4.6.0 or remove any expressions in the TestName."
 
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
+    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -Show $pester4Output
 }

@@ -23,7 +23,7 @@ the experience of the PowerShell ISE.
 However, we do want to support compatibility whenever possible
 to do so without breaking existing functionality.
 
-Please see [the ISE compatibility doc](./ise_compatibility.md)
+Please see [the ISE compatibility doc](https://docs.microsoft.com/powershell/scripting/components/vscode/how-to-replicate-the-ise-experience-in-vscode)
 for ways to configure VSCode to be closer to the ISE.
 
 Bear in mind that many of the UI/UX aspects of VSCode are driven by
@@ -137,18 +137,13 @@ Logs provide context for what was happening when the issue occurred.
 **Note: You should skim through your logs for any sensitive information you would not like to share online**
 
 - Before sending through logs, try and reproduce the issue with
-  **log level set to Verbose** or **Diagnostic**. You can set this
+  **log level set to Diagnostic**. You can set this
   in the [VSCode Settings] (<kbd>Ctrl</kbd>+<kbd>,</kbd>) with:
-
-  ```json
-  "powershell.developer.editorServicesLogLevel": "Verbose"
-  ```
-
-  or for diagnostic logging:
 
   ```json
   "powershell.developer.editorServicesLogLevel": "Diagnostic"
   ```
+
   After you have captured the issue with the log level turned up,
   you may want to return it (since verbose logging can use disk space):
 
@@ -178,10 +173,36 @@ Logs provide context for what was happening when the issue occurred.
   (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
   with `PowerShell: Open PowerShell Extension Logs Folder`.
 
+> NOTE: Don't forget to also attach the [Language Server Protocol payload logs](#provide-language-server-protocol-payload-logs)!
+
 - You can attach your logs to an issue by zipping them and drag/dropping
   them onto your open issue description in the browser.
 
 - If you prefer to share your logs privately, you can send them to
+  vscode-powershell@microsoft.com. Please still open an issue though
+  so we can track the work &mdash; other users may have the same issue.
+
+#### Provide Language Server Protocol payload logs
+
+The PowerShell extension works mostly from sending and receiving messages from [PowerShell Editor Services](httos://github.com/PowerShell/PowerShellEditorServices).
+In some cases, getting to the bottom of a bug will require looking at the payloads of these messages. To do this:
+
+- Add the following setting to your settings file:
+
+  ```json
+  "powershell editor services.trace.server":"verbose"
+  ```
+
+- Restart Visual Studio Code and reproduce the issue.
+
+- Go into the "Output" panel (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd> or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd>).
+
+- In the drop down on the right, select "PowerShell Editor Services".
+
+- Copy the entire contents of the Output panel and paste it into the GitHub issue in the browser.
+At this point, you may delete the setting if you want.
+
+- Again, if you prefer to share your logs privately, you can send them to
   vscode-powershell@microsoft.com. Please still open an issue though
   so we can track the work &mdash; other users may have the same issue.
 
@@ -240,7 +261,7 @@ EditorConfig.EditorConfig@0.12.4
 jchannon.csharpextensions@1.3.0
 k--kato.docomment@0.1.2
 ms-vscode.cpptools@0.18.1
-ms-vscode.csharp@1.16.1
+ms-dotnettools.csharp@1.12.13
 ms-vscode.PowerShell@2.0.0
 twxs.cmake@0.0.17
 vscodevim.vim@0.16.5

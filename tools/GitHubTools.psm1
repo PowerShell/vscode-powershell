@@ -1,23 +1,216 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 
-function GetHumanishRepositoryName
+#requires -Version 6.0
+
+class GitCommitInfo
+{
+    [string]$Hash
+    [string[]]$ParentHashes
+    [string]$Subject
+    [string]$Body
+    [string]$ContributorName
+    [string]$ContributorEmail
+    [string[]]$CommitLabels
+    [int]$PRNumber = -1
+}
+
+class GitHubCommitInfo : GitCommitInfo
+{
+    [string]$Organization
+    [string]$Repository
+    [pscustomobject]$GitHubCommitData
+}
+
+class GitHubIssueInfo
+{
+    [int]$Number
+    [string]$Organization
+    [string]$Repository
+
+    [uri]GetHtmlUri()
+    {
+        return [uri]"https://github.com/$($this.Organization)/$($this.Repository)/issues/$($this.Number)"
+    }
+
+    [uri]GetApiUri()
+    {
+        return [uri]"https://api.github.com/repos/$($this.Organization)/$($this.Repository)/issues/$($this.Number)"
+    }
+}
+
+class GitHubIssue : GitHubIssueInfo
+{
+    [pscustomobject]$RawResponse
+    [string]$Body
+    [string[]]$Labels
+}
+
+class GitHubPR : GitHubIssue
+{
+    hidden [GitHubIssueInfo[]]$ClosedIssues = $null
+
+    [GitHubIssueInfo[]]GetClosedIssueInfos()
+    {
+        if ($null -eq $this.ClosedIssues)
+        {
+            $this.ClosedIssues = $this.Body |
+                GetClosedIssueUrisInBodyText |
+                GetGitHubIssueFromUri
+        }
+
+        return $this.ClosedIssues
+    }
+
+    [uri]GetHtmlUri()
+    {
+        return [uri]"https://github.com/$($this.Organization)/$($this.Repository)/pull/$($this.Number)"
+    }
+
+    [uri]GetApiUri()
+    {
+        return [uri]"https://api.github.com/repos/$($this.Organization)/$($this.Repository)/pulls/$($this.Number)"
+    }
+}
+
+function GetGitHubHeaders
+{
+    param(
+        [Parameter()]
+        [string]
+        $GitHubToken,
+
+        [Parameter()]
+        [string]
+        $Accept
+    )
+
+    $headers = @{}
+
+    if ($GitHubToken)
+    {
+        $headers.Authorization = "token $GitHubToken"
+    }
+
+    if ($Accept)
+    {
+        $headers.Accept = $Accept
+    }
+
+    return $headers
+}
+
+$script:CloseKeywords = @(
+    'close'
+    'closes'
+    'closed'
+    'fix'
+    'fixes'
+    'fixed'
+    'resolve'
+    'resolves'
+    'resolved'
+)
+$script:EndNonCharRegex = [regex]::new('[^0-9]*$', 'compiled')
+filter GetClosedIssueUrisInBodyText
+{
+    param(
+        [Parameter(ValueFromPipeline)]
+        [string]
+        $Text
+    )
+
+    $words = $Text.Split()
+
+    $expectIssue = $false
+    for ($i = 0; $i -lt $words.Length; $i++)
+    {
+        $currWord = $words[$i]
+
+        if ($script:CloseKeywords -contains $currWord)
+        {
+            $expectIssue = $true
+            continue
+        }
+
+        if (-not $expectIssue)
+        {
+            continue
+        }
+
+        $expectIssue = $false
+
+        $trimmedWord = $script:EndNonCharRegex.Replace($currWord, '')
+
+        if ([uri]::IsWellFormedUriString($trimmedWord, 'Absolute'))
+        {
+            # Yield
+            [uri]$trimmedWord
+        }
+    }
+}
+
+filter GetGitHubIssueFromUri
+{
+    param(
+        [Parameter(ValueFromPipeline)]
+        [uri]
+        $IssueUri
+    )
+
+    if ($IssueUri.Authority -ne 'github.com')
+    {
+        return
+    }
+
+    if ($IssueUri.Segments.Length -ne 5)
+    {
+        return
+    }
+
+    if ($IssueUri.Segments[3] -ne 'issues/')
+    {
+        return
+    }
+
+    $issueNum = -1
+    if (-not [int]::TryParse($IssueUri.Segments[4], [ref]$issueNum))
+    {
+        return
+    }
+
+    return [GitHubIssueInfo]@{
+        Organization = $IssueUri.Segments[1].TrimEnd('/')
+        Repository = $IssueUri.Segments[2].TrimEnd('/')
+        Number = $issueNum
+    }
+}
+
+filter GetHumanishRepositoryDetails
 {
     param(
         [string]
-        $Repository
+        $RemoteUrl
     )
 
-    if ($Repository.EndsWith('.git'))
+    if ($RemoteUrl.EndsWith('.git'))
     {
-        $Repository = $Repository.Substring(0, $Repository.Length - 4)
+        $RemoteUrl = $RemoteUrl.Substring(0, $RemoteUrl.Length - 4)
     }
     else
     {
-        $Repository = $Repository.Trim('/')
+        $RemoteUrl = $RemoteUrl.Trim('/')
     }
 
-    return $Repository.Substring($Repository.LastIndexOf('/') + 1)
+    $lastSlashIdx = $RemoteUrl.LastIndexOf('/')
+    $repository =  $RemoteUrl.Substring($lastSlashIdx + 1)
+    $secondLastSlashIdx = $RemoteUrl.LastIndexOfAny(('/', ':'), $lastSlashIdx - 1)
+    $organization = $RemoteUrl.Substring($secondLastSlashIdx + 1, $lastSlashIdx - $secondLastSlashIdx - 1)
+
+    return @{
+        Organization = $organization
+        Repository = $repository
+    }
 }
 
 function Exec
@@ -53,7 +246,7 @@ function Copy-GitRepository
         [Parameter()]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Destination = (GetHumanishRepositoryName $OriginRemote),
+        $Destination = ((GetHumanishRepositoryDetails $OriginRemote).Repository),
 
         [Parameter()]
         [string]
@@ -95,25 +288,35 @@ function Copy-GitRepository
         New-Item -Path $containingDir -ItemType Directory -ErrorAction Stop
     }
 
-    Exec { git clone --single-branch --branch $CloneBranch $OriginRemote $Destination }
+    Write-Verbose "Cloning git repository '$OriginRemote' to path '$Destination'"
+
+    Exec { git clone $OriginRemote --branch $CloneBranch --single-branch $Destination }
+
+    if ($CloneBranch)
+    {
+        Write-Verbose "Cloned branch: $CloneBranch"
+    }
 
     Push-Location $Destination
     try
     {
         Exec { git config core.autocrlf true }
 
-        foreach ($remote in $Remotes.get_Keys())
+        if ($Remotes)
         {
-            Exec { git remote add $remote $Remotes[$remote] }
-        }
-
-        if ($PullUpstream -and $remote['upstream'])
-        {
-            Exec { git pull upstream $CloneBranch }
-
-            if ($UpdateOrigin)
+            foreach ($remote in $Remotes.get_Keys())
             {
-                Exec { git push origin "+$CloneBranch"}
+                Exec { git remote add $remote $Remotes[$remote] }
+            }
+
+            if ($PullUpstream -and $Remotes['upstream'])
+            {
+                Exec { git pull upstream $CloneBranch }
+
+                if ($UpdateOrigin)
+                {
+                    Exec { git push origin "+$CloneBranch"}
+                }
             }
         }
 
@@ -139,9 +342,9 @@ function Submit-GitChanges
         [string]
         $Branch,
 
-        [Parameter(Mandatory)]
+        [Parameter()]
         [string]
-        $RepositoryLocation,
+        $RepositoryLocation = (Get-Location),
 
         [Parameter()]
         [string[]]
@@ -173,12 +376,129 @@ function Submit-GitChanges
         {
             Exec { git add -A }
         }
+
+        Write-Verbose "Commiting and pushing changes in '$RepositoryLocation' to '$Remote/$Branch'"
+
         Exec { git commit -m $Message }
         Exec { git push $Remote $Branch }
     }
     finally
     {
         Pop-Location
+    }
+}
+
+function Get-GitCommit
+{
+    [OutputType([GitHubCommitInfo])]
+    [CmdletBinding(DefaultParameterSetName='SinceRef')]
+    param(
+       [Parameter(Mandatory, ParameterSetName='SinceRef')]
+       [Alias('SinceBranch', 'SinceTag')]
+       [string]
+       $SinceRef,
+
+       [Parameter(ParameterSetName='SinceRef')]
+       [Alias('UntilBranch', 'UntilTag')]
+       [string]
+       $UntilRef = 'HEAD',
+
+       [Parameter()]
+       [string]
+       $Remote,
+
+       [Parameter()]
+       [string]
+       $GitHubToken,
+
+       [Parameter()]
+       [string]
+       $RepositoryPath
+    )
+
+    if ($RepositoryPath)
+    {
+        Push-Location $RepositoryPath
+    }
+    try
+    {
+        if (-not $Remote)
+        {
+            $Remote = 'upstream'
+            try
+            {
+                $null = Exec { git remote get-url $Remote }
+            }
+            catch
+            {
+                $Remote = 'origin'
+            }
+        }
+
+        $originDetails = GetHumanishRepositoryDetails -RemoteUrl (Exec { git remote get-url $Remote })
+        $organization = $originDetails.Organization
+        $repository = $originDetails.Repository
+
+        Write-Verbose "Getting local git commit data"
+
+        $null = Exec { git fetch --all }
+
+        $lastCommonCommit = Exec { git merge-base $SinceRef $UntilRef }
+
+        $format = '%H||%P||%aN||%aE||%s'
+        $commits = Exec { git --no-pager log "$lastCommonCommit..$UntilRef" --format=$format }
+
+        $irmParams = if ($GitHubToken)
+        {
+            @{ Headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json' }
+        }
+        else
+        {
+            @{ Headers = GetGitHubHeaders -Accept 'application/vnd.github.v3+json' }
+        }
+
+        return $commits |
+            ForEach-Object {
+                $hash,$parents,$name,$email,$subject = $_.Split('||')
+                $body = (Exec { git --no-pager show $hash -s --format=%b }) -join "`n"
+                $commitVal = [GitHubCommitInfo]@{
+                Hash = $hash
+                ParentHashes = $parents
+                ContributorName = $name
+                ContributorEmail = $email
+                Subject = $subject
+                Body = $body
+                Organization = $organization
+                Repository = $repository
+                }
+
+                # Query the GitHub API for more commit information
+                Write-Verbose "Querying GitHub api for data on commit $hash"
+                $commitVal.GitHubCommitData = Invoke-RestMethod -Method Get -Uri "https://api.github.com/repos/$organization/$repository/commits/$hash" @irmParams
+
+                # Look for something like 'This is a commit message (#1224)'
+                $pr = [regex]::Match($subject, '\(#(\d+)\)$').Groups[1].Value
+                if ($pr)
+                {
+                    $commitVal.PRNumber = $pr
+                }
+
+                # Look for something like '[Ignore] [giraffe] Fix tests'
+                $commitLabels = [regex]::Matches($subject, '^(\[(.*?)\]\s*)*')
+                if ($commitLabels.Groups.Length -ge 3 -and $commitLabels.Groups[2].Captures.Value)
+                {
+                    $commitVal.CommitLabels = $commitLabels.Groups[2].Captures.Value
+                }
+
+                $commitVal
+            }
+    }
+    finally
+    {
+        if ($RepositoryPath)
+        {
+            Pop-Location
+        }
     }
 }
 
@@ -232,12 +552,119 @@ function New-GitHubPR
         maintainer_can_modify = $true
     } | ConvertTo-Json
 
-    $headers = @{
-        Accept = 'application/vnd.github.v3+json'
-        Authorization = "token $GitHubToken"
-    }
+    $headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json'
 
+    Write-Verbose "Opening new GitHub pull request on '$Organization/$Repository' with title '$Title'"
     Invoke-RestMethod -Method Post -Uri $uri -Body $body -Headers $headers
+}
+
+function Get-GitHubPR
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory)]
+        [string]
+        $Repository,
+
+        [Parameter(Mandatory)]
+        [int[]]
+        $PullNumber,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GitHubToken
+    )
+
+    return $PullNumber |
+        ForEach-Object {
+            $params = @{
+                Method = 'Get'
+                Uri = "https://api.github.com/repos/$Organization/$Repository/pulls/$_"
+            }
+
+            if ($GitHubToken)
+            {
+                $params.Headers = GetGitHubHeaders -GitHubToken $GitHubToken
+            }
+
+            Write-Verbose "Retrieving GitHub pull request #$_"
+
+            $prResponse = Invoke-RestMethod @params
+
+            [GitHubPR]@{
+                RawResponse = $prResponse
+                Number = $prResponse.Number
+                Organization = $Organization
+                Repository = $Repository
+                Body = $prResponse.body
+                Labels = $prResponse.labels.name
+            }
+        }
+}
+
+filter Get-GitHubIssue
+{
+    [CmdletBinding(DefaultParameterSetName='IssueInfo')]
+    param(
+        [Parameter(Mandatory, ValueFromPipeline, Position=0, ParameterSetName='IssueInfo')]
+        [GitHubIssueInfo[]]
+        $IssueInfo,
+
+        [Parameter(Mandatory, ParameterSetName='Params')]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory, ParameterSetName='Params')]
+        [string]
+        $Repository,
+
+        [Parameter(Mandatory, ParameterSetName='Params')]
+        [int]
+        $Number,
+
+        [Parameter()]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $GitHubToken
+    )
+
+    foreach ($issue in $IssueInfo)
+    {
+        if (-not $issue)
+        {
+            $issue = [GitHubIssueInfo]@{
+                Organization = $Organization
+                Repository = $Repository
+                Number = $Number
+            }
+        }
+
+        $irmParams = @{
+            Method = 'Get'
+            Uri = $IssueInfo.GetApiUri()
+        }
+
+        if ($GitHubToken)
+        {
+            $irmParams.Headers = GetGitHubHeaders -GitHubToken $GitHubToken
+        }
+
+        Write-Verbose "Retrieving GitHub issue #$($issue.Number)"
+        $issueResponse = Invoke-RestMethod @irmParams
+
+        return [GitHubIssue]@{
+            Organization = $issue.Organization
+            Repository = $issue.Repository
+            Number = $issue.Number
+            RawResponse = $issueResponse
+            Body = $issueResponse.body
+            Labels = $issueResponse.labels.name
+        }
+    }
 }
 
 function Publish-GitHubRelease
@@ -298,10 +725,9 @@ function Publish-GitHubRelease
 
     $restBody = ConvertTo-Json -InputObject $restParams
     $uri = "https://api.github.com/repos/$Organization/$Repository/releases"
-    $headers = @{
-        Accept = 'application/vnd.github.v3+json'
-        Authorization = "token $GitHubToken"
-    }
+    $headers = GetGitHubHeaders -GitHubToken $GitHubToken -Accept 'application/vnd.github.v3+json'
+
+    Write-Verbose "Publishing GitHub release '$ReleaseName' to $Organization/$Repository"
 
     $response = Invoke-RestMethod -Method Post -Uri $uri -Body $restBody -Headers $headers
 
@@ -328,9 +754,10 @@ function Publish-GitHubRelease
         }
 
         $assetUri = "${assetBaseUri}?name=$fileName"
-        $headers = @{
-            Authorization = "token $GitHubToken"
-        }
+        $headers = GetGitHubHeaders -GitHubToken $GitHubToken
+
+        Write-Verbose "Uploading release asset '$fileName' to release '$ReleaseName' in $Organization/$Repository"
+
         # This can be very slow, but it does work
         $null = Invoke-RestMethod -Method Post -Uri $assetUri -InFile $asset -ContentType $contentType -Headers $headers
     }
@@ -338,4 +765,12 @@ function Publish-GitHubRelease
     return $response
 }
 
-Export-ModuleMember -Function Copy-GitRepository,Submit-GitChanges,New-GitHubPR,Publish-GitHubRelease
+Export-ModuleMember -Function @(
+    'Copy-GitRepository',
+    'Submit-GitChanges',
+    'Get-GitCommit',
+    'New-GitHubPR',
+    'Get-GitHubPR',
+    'Get-GitHubIssue',
+    'Publish-GitHubRelease'
+)

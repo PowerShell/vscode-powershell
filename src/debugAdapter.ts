@@ -2,136 +2,117 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import fs = require("fs");
-import net = require("net");
-import os = require("os");
-import path = require("path");
+import { connect, Socket } from "net";
+import { DebugAdapter, Event, DebugProtocolMessage, EventEmitter } from "vscode";
 import { Logger } from "./logging";
-import utils = require("./utils");
 
-// NOTE: The purpose of this file is to serve as a bridge between
-// VS Code's debug adapter client (which communicates via stdio) and
-// PowerShell Editor Services' debug service (which communicates via
-// named pipes or a network protocol).  It is purely a naive data
-// relay between the two transports.
+export class NamedPipeDebugAdapter implements DebugAdapter {
+    private static readonly TWO_CRLF = '\r\n\r\n';
+    private static readonly HEADER_LINESEPARATOR = /\r?\n/;	// allow for non-RFC 2822 conforming line separators
+    private static readonly HEADER_FIELDSEPARATOR = /: */;
 
-const logBasePath = path.resolve(__dirname, "../../logs");
+    private readonly _logger: Logger;
+    private readonly _namedPipe: string;
 
-const debugAdapterLogWriter =
-    fs.createWriteStream(
-        path.resolve(
-            logBasePath,
-            "DebugAdapter.log"));
+    private _rawData = Buffer.allocUnsafe(0);
+    private _contentLength = -1;
+    private _isConnected: boolean = false;
+    private _debugMessageQueue: DebugProtocolMessage[] = [];
 
-// Pause the stdin buffer until we're connected to the
-// debug server
-process.stdin.pause();
+    private _debugServiceSocket: Socket;
 
-const debugSessionFilePath = utils.getDebugSessionFilePath();
-debugAdapterLogWriter.write("Session file path: " + debugSessionFilePath + ", pid: " + process.pid + " \r\n");
+    // The event that VS Code-proper will listen for.
+    private _sendMessage: EventEmitter<DebugProtocolMessage> = new EventEmitter<DebugProtocolMessage>();
+    onDidSendMessage: Event<DebugProtocolMessage> = this._sendMessage.event;
 
-function startDebugging() {
-    // Read the details of the current session to learn
-    // the connection details for the debug service
-    const sessionDetails = utils.readSessionFile(debugSessionFilePath);
+    constructor(namedPipe: string, logger: Logger) {
+        this._namedPipe = namedPipe;
+        this._logger = logger;
+    }
 
-    // Delete the session file after it has been read so that
-    // it isn't used mistakenly by another debug session
-    utils.deleteSessionFile(debugSessionFilePath);
+    public start(): void {
+        this._debugServiceSocket = connect(this._namedPipe);
 
-    // Establish connection before setting up the session
-    debugAdapterLogWriter.write("Connecting to pipe: " + sessionDetails.debugServicePipeName + "\r\n");
-
-    let isConnected = false;
-    const debugServiceSocket = net.connect(sessionDetails.debugServicePipeName);
-
-    // Write any errors to the log file
-    debugServiceSocket.on(
-        "error",
-        (e) => {
-            debugAdapterLogWriter.write("Socket ERROR: " + e + "\r\n");
-            debugAdapterLogWriter.close();
-            debugServiceSocket.destroy();
-            process.exit(0);
+        this._debugServiceSocket.on("error", (e) => {
+            this._logger.writeError("Error on Debug Adapter: " + e);
+            this.dispose();
         });
 
-    // Route any output from the socket through stdout
-    debugServiceSocket.on(
-        "data",
-        (data: Buffer) => process.stdout.write(data));
+        // Route any output from the socket through to VS Code.
+        this._debugServiceSocket.on("data", (data: Buffer) => this.handleData(data));
 
-    // Wait for the connection to complete
-    debugServiceSocket.on(
-        "connect",
-        () => {
-            isConnected = true;
-            debugAdapterLogWriter.write("Connected to socket!\r\n\r\n");
-
-            // When data comes on stdin, route it through the socket
-            process.stdin.on(
-                "data",
-                (data: Buffer) => debugServiceSocket.write(data));
-
-            // Resume the stdin stream
-            process.stdin.resume();
-    });
-
-    // When the socket closes, end the session
-    debugServiceSocket.on(
-        "close",
-        () => {
-            debugAdapterLogWriter.write("Socket closed, shutting down.");
-            debugAdapterLogWriter.close();
-            isConnected = false;
-
-            // Close after a short delay to give the client time
-            // to finish up
-            setTimeout(() => {
-                process.exit(0);
-            }, 2000);
-        },
-    );
-
-    process.on(
-        "exit",
-        (e) => {
-            if (debugAdapterLogWriter) {
-                debugAdapterLogWriter.write("Debug adapter process is exiting...");
+        // Wait for the connection to complete.
+        this._debugServiceSocket.on("connect", () => {
+            while(this._debugMessageQueue.length) {
+                this.writeMessageToDebugAdapter(this._debugMessageQueue.shift());
             }
-        },
-    );
-}
 
-function waitForSessionFile(triesRemaining: number) {
+            this._isConnected = true;
+            this._logger.writeVerbose("Connected to socket!");
+        });
 
-    debugAdapterLogWriter.write(`Waiting for session file, tries remaining: ${triesRemaining}...\r\n`);
+        // When the socket closes, end the session.
+        this._debugServiceSocket.on("close", () => { this.dispose(); });
+    }
 
-    if (triesRemaining > 0) {
-        if (utils.checkIfFileExists(debugSessionFilePath)) {
-            debugAdapterLogWriter.write(`Session file present, connecting to debug adapter...\r\n\r\n`);
-            startDebugging();
-        } else {
-            // Wait for a second and try again
-            setTimeout(
-                () => waitForSessionFile(triesRemaining - 1),
-                1000);
+    public handleMessage(message: DebugProtocolMessage): void {
+        if (!this._isConnected) {
+            this._debugMessageQueue.push(message);
+            return;
         }
-    } else {
-        debugAdapterLogWriter.write(`Timed out waiting for session file!\r\n`);
-        const errorJson =
-            JSON.stringify({
-                type: "response",
-                request_seq: 1,
-                command: "initialize",
-                success: false,
-                message: "Timed out waiting for the PowerShell extension to start.",
-            });
 
-        process.stdout.write(
-            `Content-Length: ${Buffer.byteLength(errorJson, "utf8")}\r\n\r\n${errorJson}`,
-            "utf8");
+        this.writeMessageToDebugAdapter(message);
+    }
+
+    public dispose() {
+        this._debugServiceSocket.destroy();
+        this._sendMessage.dispose();
+    }
+
+    private writeMessageToDebugAdapter(message: DebugProtocolMessage): void {
+        const msg = JSON.stringify(message);
+        const messageWrapped = `Content-Length: ${Buffer.byteLength(msg, "utf8")}${NamedPipeDebugAdapter.TWO_CRLF}${msg}`;
+        this._logger.writeDiagnostic(`SENDING TO DEBUG ADAPTER: ${messageWrapped}`);
+        this._debugServiceSocket.write(messageWrapped, "utf8");
+    }
+
+    // Shamelessly stolen from VS Code's implementation with slight modification by using public types and our logger:
+    // https://github.com/microsoft/vscode/blob/ff1b513fbca1acad4467dfd768997e9e0b9c5735/src/vs/workbench/contrib/debug/node/debugAdapter.ts#L55-L92
+    private handleData(data: Buffer): void {
+        this._rawData = Buffer.concat([this._rawData, data]);
+
+        while (true) {
+            if (this._contentLength >= 0) {
+                if (this._rawData.length >= this._contentLength) {
+                    const message = this._rawData.toString('utf8', 0, this._contentLength);
+                    this._rawData = this._rawData.slice(this._contentLength);
+                    this._contentLength = -1;
+                    if (message.length > 0) {
+                        try {
+                            this._logger.writeDiagnostic(`RECEIVED FROM DEBUG ADAPTER: ${message}`);
+                            this._sendMessage.fire(JSON.parse(message) as DebugProtocolMessage);
+                        } catch (e) {
+                             this._logger.writeError("Error firing event in VS Code: ", (e.message || e), message);
+                        }
+                    }
+                    continue; // there may be more complete messages to process
+                }
+            } else {
+                const idx = this._rawData.indexOf(NamedPipeDebugAdapter.TWO_CRLF);
+                if (idx !== -1) {
+                    const header = this._rawData.toString('utf8', 0, idx);
+                    const lines = header.split(NamedPipeDebugAdapter.HEADER_LINESEPARATOR);
+                    for (const h of lines) {
+                        const kvPair = h.split(NamedPipeDebugAdapter.HEADER_FIELDSEPARATOR);
+                        if (kvPair[0] === 'Content-Length') {
+                            this._contentLength = Number(kvPair[1]);
+                        }
+                    }
+                    this._rawData = this._rawData.slice(idx + NamedPipeDebugAdapter.TWO_CRLF.length);
+                    continue;
+                }
+            }
+            break;
+        }
     }
 }
-
-// Wait for the session file to appear
-waitForSessionFile(30);

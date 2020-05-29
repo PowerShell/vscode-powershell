@@ -3,12 +3,12 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient, NotificationType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
 
-export const ShowHelpRequestType =
-    new RequestType<string, void, void, void>("powerShell/showHelp");
+export const ShowHelpNotificationType =
+    new NotificationType<any, void>("powerShell/showHelp");
 
 export class ShowHelpFeature implements IFeature {
     private command: vscode.Disposable;
@@ -31,9 +31,9 @@ export class ShowHelpFeature implements IFeature {
                 const cwr = doc.getWordRangeAtPosition(selection.active);
                 const text = doc.getText(cwr);
 
-                this.languageClient.sendRequest(ShowHelpRequestType, text);
+                this.languageClient.sendNotification(ShowHelpNotificationType, { text });
             } else {
-                this.languageClient.sendRequest(ShowHelpRequestType, item.Name);
+                this.languageClient.sendNotification(ShowHelpNotificationType, { text: item.Name } );
             }
         });
     }

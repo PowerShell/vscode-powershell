@@ -1,6 +1,6 @@
 <#PSScriptInfo
 
-.VERSION 1.3
+.VERSION 1.4.1
 
 .GUID 539e5585-7a02-4dd6-b9a6-5dd288d0a5d0
 
@@ -12,9 +12,9 @@
 
 .TAGS install vscode installer
 
-.LICENSEURI https://github.com/PowerShell/vscode-powershell/blob/develop/LICENSE.txt
+.LICENSEURI https://github.com/PowerShell/vscode-powershell/blob/master/LICENSE.txt
 
-.PROJECTURI https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
+.PROJECTURI https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1
 
 .ICONURI
 
@@ -25,6 +25,10 @@
 .EXTERNALSCRIPTDEPENDENCIES
 
 .RELEASENOTES
+    07/10/2019 - Fix a version check when installing user-builds with Windows Powershell greater than 5.
+    --
+    30/08/2019 - added functionality to install the "User Install" variant of Stable Edition.
+    --
     07/11/2018 - added support for PowerShell Core and macOS/Linux platforms.
     --
     15/08/2018 - added functionality to install the new "User Install" variant of Insiders Edition.
@@ -53,7 +57,7 @@
 
     Please contribute improvements to this script on GitHub!
 
-    https://github.com/PowerShell/vscode-powershell/blob/develop/scripts/Install-VSCode.ps1
+    https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1
 
 .PARAMETER Architecture
     A validated string defining the bit version to download. Values can be either 64-bit or 32-bit.
@@ -128,12 +132,12 @@
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
     [parameter()]
-    [ValidateSet(, "64-bit", "32-bit")]
-    [string]$Architecture = "64-bit",
+    [ValidateSet('64-bit', '32-bit')]
+    [string]$Architecture = '64-bit',
 
     [parameter()]
-    [ValidateSet("Stable", "Insider-System", "Insider-User")]
-    [string]$BuildEdition = "Stable",
+    [ValidateSet('Stable-System', 'Stable-User', 'Insider-System', 'Insider-User')]
+    [string]$BuildEdition = "Stable-System",
 
     [Parameter()]
     [ValidateNotNull()]
@@ -166,7 +170,7 @@ gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 
 function Test-IsOsArchX64 {
     if ($PSVersionTable.PSVersion.Major -lt 6) {
-        return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq "64-bit"
+        return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -eq '64-bit'
     }
 
     return [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::X64
@@ -199,7 +203,7 @@ function Get-CodePlatformInformation {
         $Bitness,
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet('Stable', 'Insider-System', 'Insider-User')]
+        [ValidateSet('Stable-System', 'Stable-User', 'Insider-System', 'Insider-User')]
         [string]
         $BuildEdition
     )
@@ -226,8 +230,13 @@ function Get-CodePlatformInformation {
     }
 
     switch ($BuildEdition) {
-        'Stable' {
+        'Stable-System' {
             $appName = "Visual Studio Code ($Bitness)"
+            break
+        }
+
+        'Stable-User' {
+            $appName = "Visual Studio Code ($($Architecture) - User)"
             break
         }
 
@@ -318,8 +327,12 @@ function Get-CodePlatformInformation {
             }
 
             switch ($BuildEdition) {
-                'Stable' {
+                'Stable-System' {
                     $exePath = "$installBase\Microsoft VS Code\bin\code.cmd"
+                }
+
+                'Stable-User' {
+                    $exePath = "${env:LocalAppData}\Programs\Microsoft VS Code\bin\code.cmd"
                 }
 
                 'Insider-System' {
@@ -334,8 +347,14 @@ function Get-CodePlatformInformation {
     }
 
     switch ($BuildEdition) {
-        'Stable' {
+        'Stable-System' {
             $channel = 'stable'
+            break
+        }
+
+        'Stable-User' {
+            $channel = 'stable'
+            $platform += '-user'
             break
         }
 
@@ -388,19 +407,19 @@ function Save-WithBitsTransfer {
 
     $bitsDl = Start-BitsTransfer $FileUri -Destination $Destination -Asynchronous
 
-    while (($bitsDL.JobState -eq "Transferring") -or ($bitsDL.JobState -eq "Connecting")) {
+    while (($bitsDL.JobState -eq 'Transferring') -or ($bitsDL.JobState -eq 'Connecting')) {
         Write-Progress -Activity "Downloading: $AppName" -Status "$([math]::round($bitsDl.BytesTransferred / 1mb))mb / $([math]::round($bitsDl.BytesTotal / 1mb))mb" -PercentComplete ($($bitsDl.BytesTransferred) / $($bitsDl.BytesTotal) * 100 )
     }
 
     switch ($bitsDl.JobState) {
 
-        "Transferred" {
+        'Transferred' {
             Complete-BitsTransfer -BitsJob $bitsDl
             break
         }
 
-        "Error" {
-            throw "Error downloading installation media."
+        'Error' {
+            throw 'Error downloading installation media.'
         }
     }
 }
@@ -417,7 +436,7 @@ function Install-VSCodeFromTar {
     )
 
     $tarDir = Join-Path ([System.IO.Path]::GetTempPath()) 'VSCodeTar'
-    $destDir = "/opt/VSCode-linux-x64"
+    $destDir = '/opt/VSCode-linux-x64'
 
     New-Item -ItemType Directory -Force -Path $tarDir
     try {
@@ -439,7 +458,12 @@ function Install-VSCodeFromTar {
 
 # We need to be running as elevated on *nix
 if (($IsLinux -or $IsMacOS) -and (id -u) -ne 0) {
-    throw "Must be running as root to install VSCode.`nInvoke this script with (for example):`n`tsudo pwsh -f Install-VSCode.ps1 -BuildEdition Stable"
+    throw "Must be running as root to install VSCode.`nInvoke this script with (for example):`n`tsudo pwsh -f Install-VSCode.ps1 -BuildEdition Stable-System"
+}
+
+# User builds can only be installed on Windows systems
+if ($BuildEdition.EndsWith('User') -and -not ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6)) {
+    throw 'User builds are not available for non-Windows systems'
 }
 
 try {
@@ -506,7 +530,7 @@ try {
             }
 
             switch ($BuildEdition) {
-                'Stable' {
+                'Stable-System' {
                     & $pacMan install -y code
                 }
 
@@ -550,7 +574,7 @@ try {
                 break
             }
 
-            Install-VSCodeFromTar -TarPath $installerPath -Insiders:($BuildEdition -ne 'Stable')
+            Install-VSCodeFromTar -TarPath $installerPath -Insiders:($BuildEdition -ne 'Stable-System')
             break
         }
 

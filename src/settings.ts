@@ -18,6 +18,7 @@ enum PipelineIndentationStyle {
     IncreaseIndentationForFirstPipeline,
     IncreaseIndentationAfterEveryPipeline,
     NoIndentation,
+    None,
 }
 
 export enum HelpCompletion {
@@ -41,6 +42,7 @@ export interface ICodeFoldingSettings {
 }
 
 export interface ICodeFormattingSettings {
+    autoCorrectAliases: boolean;
     preset: CodeFormattingPreset;
     openBraceOnSameLine: boolean;
     newLineAfterOpenBrace: boolean;
@@ -50,8 +52,10 @@ export interface ICodeFormattingSettings {
     whitespaceBeforeOpenParen: boolean;
     whitespaceAroundOperator: boolean;
     whitespaceAfterSeparator: boolean;
-    whitespaceInsideBrace: true;
-    whitespaceAroundPipe: true;
+    whitespaceBetweenParameters: boolean;
+    whitespaceInsideBrace: boolean;
+    addWhitespaceAroundPipe: boolean;
+    trimWhitespaceAroundPipe: boolean;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
     useCorrectCasing: boolean;
@@ -68,18 +72,21 @@ export interface IDebuggingSettings {
 
 export interface IDeveloperSettings {
     featureFlags?: string[];
-    powerShellExePath?: string;
     bundledModulesPath?: string;
     editorServicesLogLevel?: string;
     editorServicesWaitForDebugger?: boolean;
-    powerShellExeIsWindowsDevBuild?: boolean;
+    waitForSessionFileTimeoutSeconds?: number;
 }
 
 export interface ISettings {
     powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
     powerShellDefaultVersion?: string;
+    // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
+    promptToUpdatePowerShell?: boolean;
+    promptToUpdatePackageManagement?: boolean;
     bundledModulesPath?: string;
+    startAsLoginShell?: IStartAsLoginShellSettings;
     startAutomatically?: boolean;
     useX86Host?: boolean;
     enableProfileLoading?: boolean;
@@ -91,11 +98,37 @@ export interface ISettings {
     codeFormatting?: ICodeFormattingSettings;
     integratedConsole?: IIntegratedConsoleSettings;
     bugReporting?: IBugReportingSettings;
+    sideBar?: ISideBarSettings;
+    pester?: IPesterSettings;
+    buttons?: IButtonSettings;
+}
+
+export interface IStartAsLoginShellSettings {
+    osx?: boolean;
+    linux?: boolean;
 }
 
 export interface IIntegratedConsoleSettings {
     showOnStartup?: boolean;
     focusConsoleOnExecute?: boolean;
+    useLegacyReadLine?: boolean;
+    forceClearScrollbackBuffer?: boolean;
+    suppressStartupBanner?: boolean;
+}
+
+export interface ISideBarSettings {
+    CommandExplorerVisibility?: boolean;
+}
+
+export interface IPesterSettings {
+    useLegacyCodeLens?: boolean;
+    outputVerbosity?: string;
+    debugOutputVerbosity?: string;
+}
+
+export interface IButtonSettings {
+    showRunButtons?: boolean;
+    showPanelMovementButtons?: boolean;
 }
 
 export function load(): ISettings {
@@ -109,26 +142,19 @@ export function load(): ISettings {
 
     const defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
         enable: true,
-        settingsPath: "",
+        settingsPath: "PSScriptAnalyzerSettings.psd1",
     };
 
     const defaultDebuggingSettings: IDebuggingSettings = {
         createTemporaryIntegratedConsole: false,
     };
 
-    // TODO: Remove when PSReadLine is out of preview
-    const featureFlags = [];
-    if (utils.isWindowsOS()) {
-        featureFlags.push("PSReadLine");
-    }
-
     const defaultDeveloperSettings: IDeveloperSettings = {
-        featureFlags,
-        powerShellExePath: undefined,
+        featureFlags: [],
         bundledModulesPath: "../../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
-        powerShellExeIsWindowsDevBuild: false,
+        waitForSessionFileTimeoutSeconds: 240,
     };
 
     const defaultCodeFoldingSettings: ICodeFoldingSettings = {
@@ -137,6 +163,7 @@ export function load(): ISettings {
     };
 
     const defaultCodeFormattingSettings: ICodeFormattingSettings = {
+        autoCorrectAliases: false,
         preset: CodeFormattingPreset.Custom,
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
@@ -146,16 +173,40 @@ export function load(): ISettings {
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
         whitespaceAfterSeparator: true,
+        whitespaceBetweenParameters: false,
         whitespaceInsideBrace: true,
-        whitespaceAroundPipe: true,
+        addWhitespaceAroundPipe: true,
+        trimWhitespaceAroundPipe: false,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
         useCorrectCasing: false,
     };
 
+    const defaultStartAsLoginShellSettings: IStartAsLoginShellSettings = {
+        osx: true,
+        linux: false,
+    };
+
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
         showOnStartup: true,
         focusConsoleOnExecute: true,
+        useLegacyReadLine: false,
+        forceClearScrollbackBuffer: false,
+    };
+
+    const defaultSideBarSettings: ISideBarSettings = {
+        CommandExplorerVisibility: true,
+    };
+
+    const defaultButtonSettings: IButtonSettings = {
+        showRunButtons: true,
+        showPanelMovementButtons: false
+    };
+
+    const defaultPesterSettings: IPesterSettings = {
+        useLegacyCodeLens: true,
+        outputVerbosity: "FromPreference",
+        debugOutputVerbosity: "Diagnostic",
     };
 
     return {
@@ -167,6 +218,10 @@ export function load(): ISettings {
             configuration.get<string>("powerShellDefaultVersion", undefined),
         powerShellExePath:
             configuration.get<string>("powerShellExePath", undefined),
+        promptToUpdatePowerShell:
+            configuration.get<boolean>("promptToUpdatePowerShell", true),
+        promptToUpdatePackageManagement:
+            configuration.get<boolean>("promptToUpdatePackageManagement", true),
         bundledModulesPath:
             "../../modules",
         useX86Host:
@@ -189,15 +244,48 @@ export function load(): ISettings {
             configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
         bugReporting:
             configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
+        sideBar:
+            configuration.get<ISideBarSettings>("sideBar", defaultSideBarSettings),
+        pester:
+            configuration.get<IPesterSettings>("pester", defaultPesterSettings),
+        buttons:
+            configuration.get<IButtonSettings>("buttons", defaultButtonSettings),
+        startAsLoginShell:
+            // tslint:disable-next-line
+            // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
+            //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
+            //   is the reason terminals on macOS typically run login shells by default which set up
+            //   the environment. See http://unix.stackexchange.com/a/119675/115410"
+            configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
     };
 }
 
-export async function change(settingName: string, newValue: any, global: boolean = false): Promise<void> {
-    const configuration: vscode.WorkspaceConfiguration =
-        vscode.workspace.getConfiguration(
-            utils.PowerShellLanguageId);
+// Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
+export async function getEffectiveConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget> {
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
-    await configuration.update(settingName, newValue, global);
+    const detail = configuration.inspect(settingName);
+    let configurationTarget = null;
+    if (typeof detail.workspaceFolderValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    else if (typeof detail.workspaceValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.Workspace;
+    }
+    else if (typeof detail.globalValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.Global;
+    }
+    return configurationTarget;
+}
+
+export async function change(
+    settingName: string,
+    newValue: any,
+    configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
+
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+
+    await configuration.update(settingName, newValue, configurationTarget);
 }
 
 function getWorkspaceSettingsWithDefaults<TSettings>(

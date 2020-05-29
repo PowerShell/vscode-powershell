@@ -26,14 +26,14 @@ export class PesterTestsFeature implements IFeature {
         // File context-menu command - Run Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTestsFromFile",
-            () => {
-                this.launchAllTestsInActiveEditor(LaunchType.Run);
+            (fileUri) => {
+                this.launchAllTestsInActiveEditor(LaunchType.Run, fileUri);
             });
         // File context-menu command - Debug Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.DebugPesterTestsFromFile",
-            () => {
-                this.launchAllTestsInActiveEditor(LaunchType.Debug);
+            (fileUri) => {
+                this.launchAllTestsInActiveEditor(LaunchType.Debug, fileUri);
             });
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
@@ -51,8 +51,8 @@ export class PesterTestsFeature implements IFeature {
         this.languageClient = languageClient;
     }
 
-    private launchAllTestsInActiveEditor(launchType: LaunchType) {
-        const uriString = vscode.window.activeTextEditor.document.uri.toString();
+    private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri: vscode.Uri) {
+        const uriString = fileUri.toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
         launchConfig.args.push("-All");
         this.launch(launchConfig);
@@ -107,6 +107,17 @@ export class PesterTestsFeature implements IFeature {
             }
 
             launchConfig.args.push("-TestName", `'${testName}'`);
+        }
+
+        if (!settings.pester.useLegacyCodeLens) {
+            launchConfig.args.push("-MinimumVersion5");
+        }
+
+        if (launchType === LaunchType.Debug) {
+            launchConfig.args.push("-Output", `'${settings.pester.debugOutputVerbosity}'`);
+        }
+        else {
+            launchConfig.args.push("-Output", `'${settings.pester.outputVerbosity}'`);
         }
 
         return launchConfig;
