@@ -283,7 +283,7 @@ export class SessionManager implements Middleware {
             const resolvedCodeLens = next(codeLens, token);
             const resolveFunc =
                 (codeLensToFix: vscode.CodeLens): vscode.CodeLens => {
-                    if (codeLensToFix.command.command === "editor.action.showReferences") {
+                    if (codeLensToFix.command?.command === "editor.action.showReferences") {
                         const oldArgs = codeLensToFix.command.arguments;
 
                         // Our JSON objects don't get handled correctly by
