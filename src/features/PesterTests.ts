@@ -54,7 +54,6 @@ export class PesterTestsFeature implements IFeature {
     private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri: vscode.Uri) {
         const uriString = (fileUri || vscode.window.activeTextEditor.document.uri).toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
-        launchConfig.args.push("-All");
         this.launch(launchConfig);
     }
 
@@ -105,15 +104,15 @@ export class PesterTestsFeature implements IFeature {
 
         if (lineNum) {
             launchConfig.args.push("-LineNumber", `${lineNum}`);
-        }
-
-        if (testName) {
+        } else if (testName) {
             // Escape single quotes inside double quotes by doubling them up
             if (testName.includes("'")) {
                 testName = testName.replace(/'/g, "''");
             }
 
             launchConfig.args.push("-TestName", `'${testName}'`);
+        } else {
+            launchConfig.args.push("-All");
         }
 
         if (!settings.pester.useLegacyCodeLens) {
