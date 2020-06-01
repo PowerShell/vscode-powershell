@@ -38,8 +38,8 @@ export class PesterTestsFeature implements IFeature {
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTests",
-            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?) => {
-                this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber);
+            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?, outputPath?) => {
+                this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber, outputPath);
             });
     }
 
@@ -52,9 +52,8 @@ export class PesterTestsFeature implements IFeature {
     }
 
     private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri: vscode.Uri) {
-        const uriString = fileUri.toString();
+        const uriString = (fileUri || vscode.window.activeTextEditor.document.uri).toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
-        launchConfig.args.push("-All");
         this.launch(launchConfig);
     }
 
@@ -62,14 +61,21 @@ export class PesterTestsFeature implements IFeature {
         uriString: string,
         runInDebugger: boolean,
         describeBlockName?: string,
-        describeBlockLineNumber?: number) {
+        describeBlockLineNumber?: number,
+        outputPath?: string) {
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, describeBlockLineNumber);
+        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, describeBlockLineNumber, outputPath);
         this.launch(launchConfig);
     }
 
-    private createLaunchConfig(uriString: string, launchType: LaunchType, testName?: string, lineNum?: number) {
+    private createLaunchConfig(
+        uriString: string,
+        launchType: LaunchType,
+        testName?: string,
+        lineNum?: number,
+        outputPath?: string) {
+
         const uri = vscode.Uri.parse(uriString);
         const currentDocument = vscode.window.activeTextEditor.document;
         const settings = Settings.load();
@@ -98,15 +104,15 @@ export class PesterTestsFeature implements IFeature {
 
         if (lineNum) {
             launchConfig.args.push("-LineNumber", `${lineNum}`);
-        }
-
-        if (testName) {
+        } else if (testName) {
             // Escape single quotes inside double quotes by doubling them up
             if (testName.includes("'")) {
                 testName = testName.replace(/'/g, "''");
             }
 
             launchConfig.args.push("-TestName", `'${testName}'`);
+        } else {
+            launchConfig.args.push("-All");
         }
 
         if (!settings.pester.useLegacyCodeLens) {
@@ -118,6 +124,10 @@ export class PesterTestsFeature implements IFeature {
         }
         else {
             launchConfig.args.push("-Output", `'${settings.pester.outputVerbosity}'`);
+        }
+
+        if (outputPath) {
+            launchConfig.args.push("-OutputPath", `'${outputPath}'`);
         }
 
         return launchConfig;
