@@ -1,5 +1,47 @@
 # PowerShell Extension Release History
 
+## v2020.6.0
+### Monday, June 01, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- [vscode-powershell #2705](https://github.com/PowerShell/vscode-powershell/pull/2705) -
+  Move to lowercase now that we use Omnisharp's serializer.
+- [vscode-powershell #2702](https://github.com/PowerShell/vscode-powershell/pull/2702) -
+  Add coloring for $ and wordSepartors. (Thanks @MJECloud!)
+- [vscode-powershell #2710](https://github.com/PowerShell/vscode-powershell/pull/2710) -
+  Bump @types/semver from 7.1.0 to 7.2.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2711](https://github.com/PowerShell/vscode-powershell/pull/2711) -
+  Bump typescript from 3.8.3 to 3.9.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2709](https://github.com/PowerShell/vscode-powershell/pull/2709) -
+  Bump @types/sinon from 9.0.0 to 9.0.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2704](https://github.com/PowerShell/vscode-powershell/pull/2704) -
+  Add buttons for moving the terminal around.. (Thanks @MartinGC94!)
+- [vscode-powershell #2703](https://github.com/PowerShell/vscode-powershell/pull/2703) -
+  Tweak whitespaceAroundPipe settings migration logic to do it only once. (Thanks @bergmeister!)
+- [vscode-powershell #2580](https://github.com/PowerShell/vscode-powershell/pull/2580) -
+  Bump vscode-languageclient from 5.2.1 to 6.1.3. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2513](https://github.com/PowerShell/vscode-powershell/pull/2513) -
+  Bump typescript from 3.5.3 to 3.8.3. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2698](https://github.com/PowerShell/vscode-powershell/pull/2698) -
+  Change default of powershell.codeFormatting.pipelineIndentationStyle from None back to NoIndentation due to PSSA bug. (Thanks @bergmeister!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- [PowerShellEditorServices #1301](https://github.com/PowerShell/PowerShellEditorServices/pull/1301) -
+  Fix AddLanguageProtocolLogging OmniSharp breaking change.
+- [PowerShellEditorServices #1298](https://github.com/PowerShell/PowerShellEditorServices/pull/1298) -
+  Remove leftover csproj reference to already removed project in test project PowerShellEditorServices.Test.Host.csproj. (Thanks @bergmeister!)
+- [PowerShellEditorServices #1300](https://github.com/PowerShell/PowerShellEditorServices/pull/1300) -
+  Address breaking changes in Omnisharp lib and depend on DocumentUri more.
+- [PowerShellEditorServices #1291](https://github.com/PowerShell/PowerShellEditorServices/pull/1291) -
+  Depend on DocumentUri for handing vscode Uri's.
+- 🧠 ✨ [vscode-powershell #2706](https://github.com/PowerShell/PowerShellEditorServices/pull/1294) -
+  Show tooltip for comparison operators.
+- [PowerShellEditorServices #1292](https://github.com/PowerShell/PowerShellEditorServices/pull/1292) -
+  Bump Microsoft.Extensions.Logging from 3.1.3 to 3.1.4. (Thanks @dependabot-preview[bot]!)
+- [PowerShellEditorServices #1293](https://github.com/PowerShell/PowerShellEditorServices/pull/1293) -
+  Bump Microsoft.Extensions.FileSystemGlobbing from 3.1.3 to 3.1.4. (Thanks @dependabot-preview[bot]!)
+
 ## v2020.5.0-preview
 ### Wednesday, May 13, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
