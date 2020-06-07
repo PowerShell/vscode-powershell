@@ -53,7 +53,10 @@ param(
     [switch] $MinimumVersion5,
 
     [Parameter(Mandatory)]
-    [string] $Output
+    [string] $Output,
+
+    [Parameter()]
+    [string] $OutputPath
 )
 
 $pesterModule = Microsoft.PowerShell.Core\Get-Module Pester
@@ -103,6 +106,14 @@ if ($All) {
         if ("FromPreference" -ne $Output) {
             $configuration.Add('Output', @{ Verbosity = $Output })
         }
+
+        if ($OutputPath) {
+            $configuration.Add('TestResult', @{
+                Enabled = $true
+                OutputFormat = "NUnit2.5"
+                OutputPath = $OutputPath
+            })
+        }
         Pester\Invoke-Pester -Configuration $configuration | Out-Null
     }
     elseif ($pesterModule.Version -ge '3.4.5') {
@@ -132,6 +143,15 @@ elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
         if ("FromPreference" -ne $Output) {
             $configuration.Add('Output', @{ Verbosity = $Output })
         }
+
+        if ($OutputPath) {
+            $configuration.Add('TestResult', @{
+                Enabled = $true
+                OutputFormat = "NUnit2.5"
+                OutputPath = $OutputPath
+            })
+        }
+
         Pester\Invoke-Pester -Configuration $configuration | Out-Null
     }
     else {

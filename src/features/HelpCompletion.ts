@@ -127,7 +127,6 @@ class TriggerFinder {
 
 class HelpCompletionProvider {
     private triggerFinderHelpComment: TriggerFinder;
-    private lastChangeText: string;
     private lastChangeRange: Range;
     private lastDocument: TextDocument;
     private langClient: LanguageClient;
@@ -148,7 +147,6 @@ class HelpCompletionProvider {
 
     public updateState(document: TextDocument, changeText: string, changeRange: Range): void {
         this.lastDocument = document;
-        this.lastChangeText = changeText;
         this.lastChangeRange = changeRange;
         this.triggerFinderHelpComment.updateState(document, changeText);
     }

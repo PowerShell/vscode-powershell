@@ -1,14 +1,52 @@
 # PowerShell Extension Release History
 
-## v2020.5.0
-### Wednesday, May 06, 2020
+## v2020.6.0-preview
+### Monday, June 01, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
-- [vscode-powershell #2676](https://github.com/PowerShell/vscode-powershell/pull/2676) -
+- 🐢✨ [vscode-powershell #2730](https://github.com/PowerShell/vscode-powershell/pull/2730) -
+  Support adding an `OutputFile` and allow running Pester tests from the command pallet.
+- 🔗🐛 [vscode-powershell #2705](https://github.com/PowerShell/vscode-powershell/pull/2705) -
+  Tweak CodeLens logic now that we use Omnisharp's serializer.
+- 📺✨ [vscode-powershell #2702](https://github.com/PowerShell/vscode-powershell/pull/2702) -
+  Add coloring for `$` and remove it from `wordSepartors`. (Thanks @MJECloud!)
+- 📺✨ [vscode-powershell #2704](https://github.com/PowerShell/vscode-powershell/pull/2704) -
+  Add buttons for moving the terminal pane around. (Thanks @MartinGC94!)
+- 👮‍🐛 [vscode-powershell #2703](https://github.com/PowerShell/vscode-powershell/pull/2703) -
+  Tweak `whitespaceAroundPipe` settings migration logic to do it only once. (Thanks @bergmeister!)
+- 👮‍🐛 [vscode-powershell #2698](https://github.com/PowerShell/vscode-powershell/pull/2698) -
+  Change default of `powershell.codeFormatting.pipelineIndentationStyle` from None back to NoIndentation due to PSScriptAnalyzer bug. (Thanks @bergmeister!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🚂✨ [PowerShellEditorServices #1301](https://github.com/PowerShell/PowerShellEditorServices/pull/1301) -
+  Fix `AddLanguageProtocolLogging` OmniSharp breaking change.
+- 🚨✨ [PowerShellEditorServices #1298](https://github.com/PowerShell/PowerShellEditorServices/pull/1298) -
+  Remove leftover csproj reference to already removed project in test project PowerShellEditorServices.Test.Host.csproj. (Thanks @bergmeister!)
+- 🚂✨ [PowerShellEditorServices #1300](https://github.com/PowerShell/PowerShellEditorServices/pull/1300) -
+  Address breaking changes in Omnisharp lib and depend on `DocumentUri` more.
+- 🚂✨ [PowerShellEditorServices #1291](https://github.com/PowerShell/PowerShellEditorServices/pull/1291) -
+  Depend on `DocumentUri` for handing vscode `Uri`'s.
+- 🧠✨ [vscode-powershell #2706](https://github.com/PowerShell/PowerShellEditorServices/pull/1294) -
+  Support `completionItem/resolve` request for comparison operators to show tooltip information.
+
+## v2020.5.0-preview
+### Wednesday, May 13, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- ✨🐢 [vscode-powershell #2670](https://github.com/PowerShell/vscode-powershell/pull/2670) -
+  Add debug output setting for Pester. (Thanks @nohwnd!)
+- ✨🔧 [vscode-powershell #2689](https://github.com/PowerShell/vscode-powershell/pull/2689) -
+  Migrate setting value of `powershell.codeFormatting.whitespaceAroundPipe` to `powershell.codeFormatting.addWhitespaceAroundPipe` automatically. (Thanks @bergmeister!)
+- 🐛🔧 [vscode-powershell #2688](https://github.com/PowerShell/vscode-powershell/pull/2688) -
+  Respect user choice when dismissing the `powerShellExePath` dialog. (Thanks @bergmeister!)
+- ✨👷 [vscode-powershell #2686](https://github.com/PowerShell/vscode-powershell/pull/2686) -
+  Code clean up around some unused variables. (Thanks @bergmeister!)
+- 🐛🐢 [vscode-powershell #2676](https://github.com/PowerShell/vscode-powershell/pull/2676) -
   Fix Pester invocation for 3x versions. (Thanks @nohwnd!)
-- [vscode-powershell #2674](https://github.com/PowerShell/vscode-powershell/pull/2674) -
+- ✨👮‍ [vscode-powershell #2674](https://github.com/PowerShell/vscode-powershell/pull/2674) -
   Add additional settings for PSScriptAnalyzer 1.19. (Thanks @bergmeister!)
-- [vscode-powershell #2672](https://github.com/PowerShell/vscode-powershell/pull/2672) -
+- ⚡️🔍 [vscode-powershell #2672](https://github.com/PowerShell/vscode-powershell/pull/2672) -
   Use in-memory debug adapter instead of spinning up new process.
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)

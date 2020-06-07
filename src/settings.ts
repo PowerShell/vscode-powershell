@@ -100,6 +100,7 @@ export interface ISettings {
     bugReporting?: IBugReportingSettings;
     sideBar?: ISideBarSettings;
     pester?: IPesterSettings;
+    buttons?: IButtonSettings;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -122,6 +123,12 @@ export interface ISideBarSettings {
 export interface IPesterSettings {
     useLegacyCodeLens?: boolean;
     outputVerbosity?: string;
+    debugOutputVerbosity?: string;
+}
+
+export interface IButtonSettings {
+    showRunButtons?: boolean;
+    showPanelMovementButtons?: boolean;
 }
 
 export function load(): ISettings {
@@ -161,7 +168,7 @@ export function load(): ISettings {
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
         newLineAfterCloseBrace: true,
-        pipelineIndentationStyle: PipelineIndentationStyle.None,
+        pipelineIndentationStyle: PipelineIndentationStyle.NoIndentation,
         whitespaceBeforeOpenBrace: true,
         whitespaceBeforeOpenParen: true,
         whitespaceAroundOperator: true,
@@ -191,9 +198,15 @@ export function load(): ISettings {
         CommandExplorerVisibility: true,
     };
 
+    const defaultButtonSettings: IButtonSettings = {
+        showRunButtons: true,
+        showPanelMovementButtons: false
+    };
+
     const defaultPesterSettings: IPesterSettings = {
         useLegacyCodeLens: true,
         outputVerbosity: "FromPreference",
+        debugOutputVerbosity: "Diagnostic",
     };
 
     return {
@@ -235,6 +248,8 @@ export function load(): ISettings {
             configuration.get<ISideBarSettings>("sideBar", defaultSideBarSettings),
         pester:
             configuration.get<IPesterSettings>("pester", defaultPesterSettings),
+        buttons:
+            configuration.get<IButtonSettings>("buttons", defaultButtonSettings),
         startAsLoginShell:
             // tslint:disable-next-line
             // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
@@ -245,12 +260,32 @@ export function load(): ISettings {
     };
 }
 
-export async function change(settingName: string, newValue: any, global: boolean = false): Promise<void> {
-    const configuration: vscode.WorkspaceConfiguration =
-        vscode.workspace.getConfiguration(
-            utils.PowerShellLanguageId);
+// Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
+export async function getEffectiveConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget> {
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
-    await configuration.update(settingName, newValue, global);
+    const detail = configuration.inspect(settingName);
+    let configurationTarget = null;
+    if (typeof detail.workspaceFolderValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
+    }
+    else if (typeof detail.workspaceValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.Workspace;
+    }
+    else if (typeof detail.globalValue !== "undefined") {
+        configurationTarget = vscode.ConfigurationTarget.Global;
+    }
+    return configurationTarget;
+}
+
+export async function change(
+    settingName: string,
+    newValue: any,
+    configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
+
+    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+
+    await configuration.update(settingName, newValue, configurationTarget);
 }
 
 function getWorkspaceSettingsWithDefaults<TSettings>(
