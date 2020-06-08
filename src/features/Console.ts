@@ -8,6 +8,7 @@ import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/check
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import Settings = require("../settings");
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody, void>("output");
@@ -197,19 +198,14 @@ function onInputEntered(responseText: string): IShowInputPromptResponseBody {
     }
 }
 
-export class ConsoleFeature implements IFeature {
+export class ConsoleFeature extends LanguageClientConsumer implements IFeature {
     private commands: vscode.Disposable[];
-    private languageClient: LanguageClient;
     private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 
     constructor(private log: Logger) {
+        super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
-                if (this.languageClient === undefined) {
-                    this.log.writeAndShowError(`<${ConsoleFeature.name}>: ` +
-                        "Unable to instantiate; language client undefined.");
-                    return;
-                }
 
                 if (vscode.window.activeTerminal &&
                     vscode.window.activeTerminal.name !== "PowerShell Integrated Console") {
@@ -257,7 +253,6 @@ export class ConsoleFeature implements IFeature {
 
     public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
-
         this.languageClient.onRequest(
             ShowChoicePromptRequestType,
             (promptDetails) => showChoicePrompt(promptDetails, this.languageClient));

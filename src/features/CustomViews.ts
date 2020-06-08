@@ -6,13 +6,15 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export class CustomViewsFeature implements IFeature {
+export class CustomViewsFeature extends LanguageClientConsumer implements IFeature {
 
     private commands: vscode.Disposable[] = [];
     private contentProvider: PowerShellContentProvider;
 
     constructor() {
+        super();
         this.contentProvider = new PowerShellContentProvider();
         this.commands.push(
             vscode.workspace.registerTextDocumentContentProvider(

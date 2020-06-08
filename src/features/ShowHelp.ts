@@ -6,22 +6,18 @@ import vscode = require("vscode");
 import { LanguageClient, NotificationType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import { Logger } from "../logging";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const ShowHelpNotificationType =
     new NotificationType<any, void>("powerShell/showHelp");
 
-export class ShowHelpFeature implements IFeature {
+export class ShowHelpFeature extends LanguageClientConsumer implements IFeature {
     private command: vscode.Disposable;
     private deprecatedCommand: vscode.Disposable;
-    private languageClient: LanguageClient;
 
     constructor(private log: Logger) {
+        super();
         this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", (item?) => {
-            if (this.languageClient === undefined) {
-                this.log.writeAndShowError(`<${ShowHelpFeature.name}>: ` +
-                    "Unable to instantiate; language client undefined.");
-                return;
-            }
             if (!item || !item.Name) {
 
                 const editor = vscode.window.activeTextEditor;

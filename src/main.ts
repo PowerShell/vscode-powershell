@@ -34,7 +34,6 @@ import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
-import utils = require("./utils");
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires

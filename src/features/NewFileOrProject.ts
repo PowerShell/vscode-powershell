@@ -3,17 +3,18 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export class NewFileOrProjectFeature implements IFeature {
+export class NewFileOrProjectFeature extends LanguageClientConsumer implements IFeature {
 
     private readonly loadIcon = "  $(sync)  ";
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private waitingForClientToken: vscode.CancellationTokenSource;
 
     constructor() {
+        super();
         this.command =
             vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", () => {
 

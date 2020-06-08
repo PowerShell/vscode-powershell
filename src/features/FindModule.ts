@@ -3,10 +3,10 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
-import Window = vscode.window;
+import { LanguageClient, RequestType } from "vscode-languageclient";
 import { IFeature } from "../feature";
 import QuickPickItem = vscode.QuickPickItem;
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const FindModuleRequestType =
     new RequestType<any, any, void, void>("powerShell/findModule");
@@ -14,13 +14,13 @@ export const FindModuleRequestType =
 export const InstallModuleRequestType =
     new RequestType<string, void, void, void>("powerShell/installModule");
 
-export class FindModuleFeature implements IFeature {
+export class FindModuleFeature extends LanguageClientConsumer implements IFeature {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
     private cancelFindToken: vscode.CancellationTokenSource;
 
     constructor() {
+        super();
         this.command = vscode.commands.registerCommand("PowerShell.PowerShellFindModule", () => {
             // It takes a while to get the list of PowerShell modules, display some UI to let user know
             this.cancelFindToken = new vscode.CancellationTokenSource();
