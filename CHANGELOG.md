@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2020.6.1
+### Monday, June 08, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 👷 ✨ [vscode-powershell #2740](https://github.com/PowerShell/vscode-powershell/pull/2740) -
+  Add CodeQL security scanning. (Thanks @jhutchings1!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🔗 🐛 [PowerShellEditorServices #1304](https://github.com/PowerShell/PowerShellEditorServices/pull/1304) -
+  Use From instead of FromFileSystem fixing CodeLens references.
+- 📟 ✨ [PowerShellEditorServices #1290](https://github.com/PowerShell/PowerShellEditorServices/pull/1290) -
+  Allow PSReadLine to work in ConstrainedLanguage mode.
+
 ## v2020.6.0-preview
 ### Monday, June 01, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
