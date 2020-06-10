@@ -7,18 +7,23 @@ import { LanguageClient } from "vscode-languageclient";
 
 export abstract class LanguageClientConsumer {
 
-    abstract setLanguageClient(languageclient: LanguageClient): void;
+    private _languageClient: LanguageClient;
+
+    public setLanguageClient(languageClient: LanguageClient) {
+        this.languageClient = languageClient;
+    }
+
     abstract dispose(): void;
 
     public get languageClient(): LanguageClient {
-        if (!this.languageClient) {
+        if (!this._languageClient) {
             window.showInformationMessage(
                 "PowerShell extension has not finished starting up yet. Please try again in a few moments.");
         }
-        return this.languageClient;
+        return this._languageClient;
     }
 
     public set languageClient(value: LanguageClient) {
-        this.languageClient = value;
+        this._languageClient = value;
     }
 }

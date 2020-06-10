@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { LanguageClient, RequestType } from "vscode-languageclient";
+import { RequestType } from "vscode-languageclient";
 import QuickPickItem = vscode.QuickPickItem;
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -50,10 +50,6 @@ export class FindModuleFeature extends LanguageClientConsumer {
                 }
             });
         });
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     public dispose() {

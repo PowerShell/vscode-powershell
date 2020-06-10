@@ -4,7 +4,7 @@
 
 import vscode = require("vscode");
 import Window = vscode.window;
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { RequestType } from "vscode-languageclient";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -44,9 +44,5 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
 
     public dispose() {
         this.command.dispose();
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 }

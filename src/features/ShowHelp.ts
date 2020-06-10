@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { LanguageClient, NotificationType } from "vscode-languageclient";
+import { NotificationType } from "vscode-languageclient";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -38,7 +38,4 @@ export class ShowHelpFeature extends LanguageClientConsumer {
         this.deprecatedCommand.dispose();
     }
 
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
-    }
 }

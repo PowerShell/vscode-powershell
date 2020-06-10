@@ -5,7 +5,7 @@
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, TextDocumentIdentifier } from "vscode-languageclient";
+import { NotificationType, TextDocumentIdentifier } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 // NOTE: The following two DidSaveTextDocument* types will
@@ -51,10 +51,6 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
     public dispose() {
         // Close any leftover remote files before exiting
         this.closeRemoteFiles();
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     private isDocumentRemote(doc: vscode.TextDocument) {
