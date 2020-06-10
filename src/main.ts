@@ -8,7 +8,6 @@ import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter from "vscode-extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
-import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
@@ -34,6 +33,7 @@ import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
+import { LanguageClientConsumer } from "./languageClientConsumer";
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires
@@ -44,7 +44,7 @@ const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
 let logger: Logger;
 let sessionManager: SessionManager;
-let extensionFeatures: IFeature[] = [];
+let languageClientConsumers: LanguageClientConsumer[] = [];
 let commandRegistrations: vscode.Disposable[] = [];
 let telemetryReporter: TelemetryReporter;
 
@@ -146,8 +146,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new SpecifyScriptArgsFeature(context),
     ]
 
-    // Create features that require language client
-    extensionFeatures = [
+    // Features and command registrations that require language client
+    languageClientConsumers = [
         new ConsoleFeature(logger),
         new ExpandAliasFeature(logger),
         new GetCommandsFeature(logger),
@@ -163,7 +163,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new PickRunspaceFeature(),
     ];
 
-    sessionManager.setExtensionFeatures(extensionFeatures);
+    sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
@@ -201,8 +201,8 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext, version: strin
 
 export function deactivate(): void {
     // Clean up all extension features
-    extensionFeatures.forEach((feature) => {
-       feature.dispose();
+    languageClientConsumers.forEach((languageClientConsumer) => {
+        languageClientConsumer.dispose();
     });
 
     commandRegistrations.forEach((commandRegistration) => {

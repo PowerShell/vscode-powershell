@@ -6,7 +6,6 @@ import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, WorkspaceFolder } from "vscode";
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
 import { SessionManager, SessionStatus } from "../session";
@@ -20,7 +19,7 @@ export const StartDebuggerNotificationType =
     new NotificationType<void, void>("powerShell/startDebugger");
 
 export class DebugSessionFeature extends LanguageClientConsumer
-    implements IFeature, DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
+    implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
 
     private sessionCount: number = 1;
     private command: vscode.Disposable;
@@ -389,7 +388,7 @@ interface IGetPSHostProcessesResponseBody {
     hostProcesses: IPSHostProcessInfo[];
 }
 
-export class PickPSHostProcessFeature extends LanguageClientConsumer implements IFeature {
+export class PickPSHostProcessFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private waitingForClientToken: vscode.CancellationTokenSource;
@@ -520,7 +519,7 @@ interface IRunspace {
 export const GetRunspaceRequestType =
     new RequestType<any, IRunspace[], string, void>("powerShell/getRunspace");
 
-export class PickRunspaceFeature extends LanguageClientConsumer implements IFeature {
+export class PickRunspaceFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private waitingForClientToken: vscode.CancellationTokenSource;

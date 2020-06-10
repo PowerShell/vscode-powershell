@@ -8,7 +8,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, NotificationType, NotificationType0,
     Position, Range, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
@@ -174,7 +173,7 @@ interface IInvokeRegisteredEditorCommandParameter {
     commandName: string;
 }
 
-export class ExtensionCommandsFeature extends LanguageClientConsumer implements IFeature {
+export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private command2: vscode.Disposable;

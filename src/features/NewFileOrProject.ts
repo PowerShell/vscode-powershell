@@ -4,10 +4,9 @@
 
 import vscode = require("vscode");
 import { LanguageClient, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export class NewFileOrProjectFeature extends LanguageClientConsumer implements IFeature {
+export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
     private readonly loadIcon = "  $(sync)  ";
     private command: vscode.Disposable;

@@ -5,7 +5,6 @@
 import { Disposable, EndOfLine, Position, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
@@ -25,7 +24,7 @@ interface ICommentHelpRequestResult {
 
 enum SearchState { Searching, Locked, Found }
 
-export class HelpCompletionFeature extends LanguageClientConsumer implements IFeature {
+export class HelpCompletionFeature extends LanguageClientConsumer {
     private helpCompletionProvider: HelpCompletionProvider;
     private disposable: Disposable;
     private settings: Settings.ISettings;

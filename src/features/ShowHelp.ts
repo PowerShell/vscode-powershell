@@ -4,14 +4,13 @@
 
 import vscode = require("vscode");
 import { LanguageClient, NotificationType } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const ShowHelpNotificationType =
     new NotificationType<any, void>("powerShell/showHelp");
 
-export class ShowHelpFeature extends LanguageClientConsumer implements IFeature {
+export class ShowHelpFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
     private deprecatedCommand: vscode.Disposable;
 

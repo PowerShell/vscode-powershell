@@ -4,7 +4,6 @@
 
 import vscode = require("vscode");
 import { LanguageClient, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import QuickPickItem = vscode.QuickPickItem;
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -14,7 +13,7 @@ export const FindModuleRequestType =
 export const InstallModuleRequestType =
     new RequestType<string, void, void, void>("powerShell/installModule");
 
-export class FindModuleFeature extends LanguageClientConsumer implements IFeature {
+export class FindModuleFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private cancelFindToken: vscode.CancellationTokenSource;

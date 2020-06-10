@@ -6,7 +6,6 @@ import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
 import { LanguageClient, NotificationType, TextDocumentIdentifier } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 // NOTE: The following two DidSaveTextDocument* types will
@@ -23,7 +22,7 @@ export const DidSaveTextDocumentNotificationType =
     new NotificationType<IDidSaveTextDocumentParams, void>(
         "textDocument/didSave");
 
-export class RemoteFilesFeature extends LanguageClientConsumer implements IFeature {
+export class RemoteFilesFeature extends LanguageClientConsumer {
 
     private tempSessionPathPrefix: string;
 

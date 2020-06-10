@@ -3,7 +3,6 @@
  *--------------------------------------------------------*/
 import * as vscode from "vscode";
 import { LanguageClient, RequestType0 } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -24,7 +23,7 @@ export const GetCommandRequestType = new RequestType0<ICommand[], void, void>("p
 /**
  * A PowerShell Command listing feature. Implements a treeview control.
  */
-export class GetCommandsFeature extends LanguageClientConsumer implements IFeature {
+export class GetCommandsFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;

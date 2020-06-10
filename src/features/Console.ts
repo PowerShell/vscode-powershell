@@ -5,7 +5,6 @@
 import vscode = require("vscode");
 import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
-import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
@@ -198,7 +197,7 @@ function onInputEntered(responseText: string): IShowInputPromptResponseBody {
     }
 }
 
-export class ConsoleFeature extends LanguageClientConsumer implements IFeature {
+export class ConsoleFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
     private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 

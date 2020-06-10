@@ -4,7 +4,6 @@
 
 import * as path from "path";
 import vscode = require("vscode");
-import { IFeature, LanguageClient } from "../feature";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
