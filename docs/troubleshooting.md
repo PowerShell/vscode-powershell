@@ -39,15 +39,8 @@ and you can ask for new features [in their repository](https://github.com/Micros
   This is expected until VSCode offers extension channels - [vscode#15756](https://github.com/Microsoft/vscode/issues/15756)
   - You MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance.
     Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)
-- Highlighting/completions/command history don't work as I expect in the
-  Integrated Console - [#535]
-  - The Integrated Console implements a [custom host]
-    to work with VSCode, meaning that functionality could be different than that of the regular host in the PowerShell Console
-  - [PSReadLine] (the module providing these features in regular PowerShell) is available in the PowerShell Preview Extension, helping to bridge this gap
-  - Making PSReadline fully available is being actively worked on.
-- Command history is not preserved when debugging in the Integrated Console -
-  [#550]
-  - This feature is also provided by [PSReadLine].
+- The extension won't start but it does start with the x86 version of PowerShell
+  - Do you use Avecto/BeyondSoft? We've received reports that Avecto, BeyondSoft and other privilege management software dramatically slow down the start up of Windows PowerShell x64. Please give the privilege management software feedback. For some, updating to the latest version has fixed the issue.
 - Intellisense is slow - [#647]
   - This is a known issue that we've been chipping away at. There doesn't seem
     to be any one performance drain, but we've been trying to incrementally
@@ -66,16 +59,11 @@ and you can ask for new features [in their repository](https://github.com/Micros
   - Check that the dialog hasn't opened behind VSCode. This is a known
     [VSCode issue].
 - PowerShell classes don't have proper reference/symbol support - [#3]
-  - To maintain compatibility with PowerShell v3/v4 we use an older
-    PowerShell parsing API that does not support classes. A future version
-    of the [PowerShell Extension] [will break this compatibility] to support
-    classes, among other things.
+  - One of the blockers for this was that we still supported Windows PowerShell v3 and v4. However, we don't support v3 and v4 anymore so we can do this work but it's not on the roadmap at this time.
 - Document formatting takes a long time - [#984]
   - Document formatting is provided by [PSScriptAnalyzer], but there
     may be opportunities to improve our integration with it in the
     [PowerShell Extension] too.
-- `Write-Progress` doesn't output to the console - [#140]
-  - `Write-Progress` is available in the PowerShell Preview Extension
 
 ## Reporting an Issue
 
