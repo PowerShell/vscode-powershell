@@ -39,12 +39,12 @@ and you can ask for new features [in their repository](https://github.com/Micros
   This is expected until VSCode offers extension channels - [vscode#15756](https://github.com/Microsoft/vscode/issues/15756)
   - You MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance.
     Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)
-- The extension won't start but it does start with the x86 version of PowerShell
+- "The Language Service could not be started" but it does start with the x86 version of PowerShell
   - Do you use Avecto/BeyondSoft? We've received reports that Avecto, BeyondSoft and other privilege management software dramatically slow down the start up of Windows PowerShell x64. Please give the privilege management software feedback. For some, updating to the latest version has fixed the issue.
-- Intellisense is slow - [#647]
+- Intellisense is slow
   - This is a known issue that we've been chipping away at. There doesn't seem
     to be any one performance drain, but we've been trying to incrementally
-    improve performance bit-by-bit everywhere.
+    improve performance bit-by-bit everywhere. Currently we are focusing on [this issue](https://github.com/PowerShell/PowerShellEditorServices/issues/1295).
 - Variable renaming doesn't work properly - [#261]
   - PowerShell's usage of [dynamic scope] rather than [lexical scope]
     makes it [formally undecidable] to statically rename variables correctly
