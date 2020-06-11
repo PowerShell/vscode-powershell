@@ -40,7 +40,13 @@ and you can ask for new features [in their repository](https://github.com/Micros
   - You MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance.
     Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)
 - "The Language Service could not be started" but it does start with the x86 version of PowerShell
-  - Do you use Avecto/BeyondSoft? We've received reports that Avecto, BeyondSoft and other privilege management software dramatically slow down the start up of Windows PowerShell x64. Please give the privilege management software feedback. For some, updating to the latest version has fixed the issue.
+  - Do you use Avecto/BeyondSoft?
+    We've received reports that Avecto, BeyondSoft
+    and other privilege management software
+    dramatically slow down the start up of Windows PowerShell x64.
+    Please give the privilege management software feedback.
+    For some,
+    [updating to the latest version has fixed the issue](https://github.com/PowerShell/vscode-powershell/issues/2526#issuecomment-638329157).
 - Intellisense is slow
   - This is a known issue that we've been chipping away at. There doesn't seem
     to be any one performance drain, but we've been trying to incrementally
