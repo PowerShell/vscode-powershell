@@ -1,6 +1,18 @@
 # PowerShell Extension Release History
 
-## v2020.6.1
+## v2020.6.0
+### Thursday, June 11, 2020
+
+- ⚡️🧠 Better performance of overall.
+- ✨🛫 Support for ConstrainedLanguage mode.
+- 🐛 Many squashed bugs
+- ✨👮 Updated PSScriptAnalyzer to 1.19.0.
+      - More formatting settings! (Thanks @bergmeister!)
+- 📟 ✨ Updated PSReadLine to 2.0.2.
+(From now on,
+the stable extension will have the latest stable version of PSReadLine and the PowerShell Preview extension will have the latest preview of PSReadLine)
+
+## v2020.6.1-preview
 ### Monday, June 08, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
@@ -13,6 +25,12 @@
   Use From instead of FromFileSystem fixing CodeLens references.
 - 📟 ✨ [PowerShellEditorServices #1290](https://github.com/PowerShell/PowerShellEditorServices/pull/1290) -
   Allow PSReadLine to work in ConstrainedLanguage mode.
+- 📟 ✨ The PowerShell Preview extension now uses v2.1.0-preview.2 of PSReadLine.
+If you want the predictions feature back, add the following to your `$PROFILE`:
+
+```pwsh
+Set-PSReadLineOption -PredictionSource History
+```
 
 ## v2020.6.0-preview
 ### Monday, June 01, 2020
