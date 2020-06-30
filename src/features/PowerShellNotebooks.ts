@@ -8,36 +8,39 @@ import { IFeature, LanguageClient } from '../feature';
 import { EvaluateRequestType } from './Console';
 import Settings = require("../settings");
 
-export class PowerShellNotebooksFeature implements vscode.NotebookContentProvider, IFeature {
+export class PowerShellNotebooksFeature implements vscode.NotebookContentProvider, vscode.NotebookKernel, IFeature {
 
     private readonly showNotebookModeCommand: vscode.Disposable;
     private readonly hideNotebookModeCommand: vscode.Disposable;
     private languageClient: LanguageClient;
 
+    private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
+    onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent> = this._onDidChangeNotebook.event;
+    kernel?: vscode.NotebookKernel;
+
     constructor() {
-        const editorAssociations = vscode.workspace.getConfiguration("workbench").get<any[]>("editorAssociations");
-
-        if(!editorAssociations.some((value) =>
-            value.filenamePattern === "*.ps1" && value.viewType === "default")) {
-            editorAssociations.push({
-                viewType: "default",
-                filenamePattern: "*.ps1"
-            });
-        }
-
-        vscode.workspace.getConfiguration("workbench").update("editorAssociations", editorAssociations, true);
-
+        this.kernel = this;
         this.showNotebookModeCommand = vscode.commands.registerCommand("PowerShell.ShowNotebookMode", async () => {
-            await vscode.commands.executeCommand("vscode.openWith", vscode.window.activeTextEditor.document.uri, "PowerShellNotebookMode");
+            const uri = vscode.window.activeTextEditor.document.uri;
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+            await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookMode");
         });
 
         this.hideNotebookModeCommand = vscode.commands.registerCommand("PowerShell.HideNotebookMode", async () => {
-            await vscode.commands.executeCommand("vscode.openWith", vscode.notebook.activeNotebookDocument.uri, "default");
+            const uri = vscode.notebook.activeNotebookEditor.document.uri;
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+            await vscode.commands.executeCommand("vscode.openWith", uri, "default");
         });
     }
 
-    async openNotebook(uri: vscode.Uri): Promise<vscode.NotebookData> {
-        const data = (await vscode.workspace.fs.readFile(uri)).toString();
+    label: string = 'PowerShell';
+    preloads?: vscode.Uri[];
+
+    async openNotebook(uri: vscode.Uri, context: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
+        // load from backup if needed.
+        const actualUri = context.backupId ? vscode.Uri.parse(context.backupId) : uri;
+
+        const data = (await vscode.workspace.fs.readFile(actualUri)).toString();
         const lines = data.split(/\r|\n|\r\n/g);
 
         const notebookData: vscode.NotebookData = {
@@ -144,36 +147,28 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
         return notebookData;
     }
 
-    async saveNotebook(document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-        const uri = document.uri;
-        const retArr: string[] = [];
-        document.cells.forEach((cell, index) => {
-            if (cell.cellKind === vscode.CellKind.Code) {
-                retArr.push(...cell.source.split(/\r|\n|\r\n/));
-            } else {
-                // First honor the comment type of the cell if it already has one.
-                // If not, use the user setting.
-                const commentKind = cell.metadata.custom?.commentType || Settings.load().notebooks.saveMarkdownCellsAs;
+    resolveNotebook(document: vscode.NotebookDocument, webview: { readonly onDidReceiveMessage: vscode.Event<any>; postMessage(message: any): Thenable<boolean>; asWebviewUri(localResource: vscode.Uri): vscode.Uri; }): Promise<void> {
+        return;
+    }
 
-                if (commentKind === CommentType.BlockComment) {
-                    retArr.push("<#");
-                    retArr.push(...cell.source.split(/\r|\n|\r\n/));
-                    retArr.push("#>");
-                } else {
-                    retArr.push(...cell.source.split(/\r|\n|\r\n/).map(line => `# ${line}`));
-                }
-            }
-        });
-
-        await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(retArr.join('\n')));
+    saveNotebook(document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
+        return this._save(document, document.uri, cancellation);
     }
 
     saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-        throw new Error("Method not implemented.");
+        return this._save(document, targetResource, cancellation);
     }
 
-    onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent>;
-    kernel?: vscode.NotebookKernel;
+    async backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
+        await this._save(document, context.destination, cancellation);
+
+        return {
+            id: context.destination.toString(),
+            delete: () => {
+                vscode.workspace.fs.delete(context.destination);
+            }
+        };
+    }
 
     public dispose() {
         this.showNotebookModeCommand.dispose();
@@ -184,9 +179,42 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
         this.languageClient = languageClient;
     }
 
+    async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri, _token: vscode.CancellationToken): Promise<void> {
+        const retArr: string[] = [];
+        document.cells.forEach((cell, index) => {
+            if (cell.cellKind === vscode.CellKind.Code) {
+                retArr.push(...cell.document.getText().split(/\r|\n|\r\n/));
+            } else {
+                // First honor the comment type of the cell if it already has one.
+                // If not, use the user setting.
+                const commentKind = cell.metadata.custom?.commentType || Settings.load().notebooks.saveMarkdownCellsAs;
+
+                if (commentKind === CommentType.BlockComment) {
+                    retArr.push("<#");
+                    retArr.push(...cell.document.getText().split(/\r|\n|\r\n/));
+                    retArr.push("#>");
+                } else {
+                    retArr.push(...cell.document.getText().split(/\r|\n|\r\n/).map(line => `# ${line}`));
+                }
+            }
+        });
+
+        await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join('\n')));
+    }
+
+    async executeAllCells(document: vscode.NotebookDocument, token: vscode.CancellationToken): Promise<void> {
+        for (const cell of document.cells) {
+            await this.executeCell(document, cell, token);
+        }
+    }
+
     async executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell | undefined, token: vscode.CancellationToken): Promise<void> {
+        if (token.isCancellationRequested) {
+            return;
+        }
+
         await this.languageClient.sendRequest(EvaluateRequestType, {
-            expression: cell.source,
+            expression: cell.document.getText(),
         });
     }
 }

@@ -120,7 +120,8 @@
           {
             "filenamePattern": "*.ps1"
           }
-        ]
+        ],
+        "priority": "option"
       }
     ],
     "keybindings": [
@@ -928,7 +929,7 @@
           "description": "Show buttons in the editor titlebar for moving the panel around."
         },
         "powershell.notebooks.showToggleButton": {
-          "type":"boolean",
+          "type": "boolean",
           "default": false,
           "description": "Controls whether we show or hide the buttons to toggle Notebook mode in the top right."
         },
