@@ -68,6 +68,10 @@ jobs:
         $oldFile = Get-Content ./old.vscode.proposed.d.ts -Raw
         $newFile = Get-Content ./vscode.proposed.d.ts -Raw
 
+        if($oldFile -ne $newFile) {
+          Write-Host "New changes detected!"
+        }
+
         # Or else tsc will complain.
         Remove-Item ./old.vscode.proposed.d.ts -Force
 
