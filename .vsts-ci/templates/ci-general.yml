@@ -11,9 +11,6 @@ steps:
 
       # Using `prependpath` to update the PATH just for this build.
       Write-Host "##vso[task.prependpath]$powerShellPath"
-
-      # Force override of unimportant errors in the install script
-      exit 0
     displayName: Install PowerShell Daily
   - pwsh: '$PSVersionTable'
     displayName: Display PowerShell version information
