@@ -67,9 +67,6 @@ jobs:
 
         $oldFile = Get-Content ./old.vscode.proposed.d.ts -Raw
         $newFile = Get-Content ./vscode.proposed.d.ts -Raw
-        if ($oldFile -eq $newFile) {
-            $env:SKIP_PR = '1'
-        }
 
         # Or else tsc will complain.
         Remove-Item ./old.vscode.proposed.d.ts -Force
@@ -78,7 +75,7 @@ jobs:
       run: npm run compile
 
     - name: Create Pull Request
-      if: env.SKIP_PR != '1'
+      if: github.event_name == 'schedule'
       id: cpr
       uses: peter-evans/create-pull-request@v2
       env:
