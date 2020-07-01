@@ -10,6 +10,9 @@ jobs:
   Update-Notebook-Api:
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
