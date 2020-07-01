@@ -71,6 +71,9 @@ jobs:
             $env:SKIP_PR = '1'
         }
 
+        # Or else tsc will complain.
+        Remove-Item ./old.vscode.proposed.d.ts -Force
+
     - name: Run
       run: npm run compile
 
