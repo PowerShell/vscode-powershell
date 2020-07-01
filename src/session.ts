@@ -196,7 +196,7 @@ export class SessionManager implements Middleware {
         } else {
             const startupBanner = `=====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
 `;
-            this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
+            this.editorServicesArgs += `-StartupBanner '${startupBanner}' `;
         }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
