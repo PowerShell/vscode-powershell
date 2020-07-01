@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
   schedule:
-    - cron: 53 18 * * *
+    - cron: 0 22 * * *
 
 jobs:
   Update-Notebook-Api:
@@ -23,19 +23,19 @@ jobs:
       uses: actions/setup-node@v2.1.0
 
     # Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: mv ./vscode.proposed.d.ts ./old.vscode.proposed.d.ts
+    - name: Rename proposed dts to old
+      run: Move-Item ./vscode.proposed.d.ts ./old.vscode.proposed.d.ts
 
     # Runs a single command using the runners shell
-    - name: Run a one-line script
+    - name: npm install
       run: npm install
 
     # Runs a single command using the runners shell
-    - name: Run a one-line script
+    - name: Get latest proposed dts
       run: npm run download-api
 
     # Runs a set of commands using the runners shell
-    - name: Run a multi-line script
+    - name: Generate new dts and compare it with the old one
       run: |
         $fullFile = [System.Collections.Generic.List[string]]@()
         $dts = Get-Content ./vscode.proposed.d.ts
@@ -75,7 +75,7 @@ jobs:
         # Or else tsc will complain.
         Remove-Item ./old.vscode.proposed.d.ts -Force
 
-    - name: Run
+    - name: Compile the TypeScript to check for errors
       run: npm run compile
 
     - name: Create Pull Request
