@@ -14,7 +14,6 @@ jobs:
       run:
         shell: pwsh
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
@@ -22,19 +21,15 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v2.1.0
 
-    # Runs a single command using the runners shell
     - name: Rename proposed dts to old
       run: Move-Item ./vscode.proposed.d.ts ./old.vscode.proposed.d.ts
 
-    # Runs a single command using the runners shell
     - name: npm install
       run: npm install
 
-    # Runs a single command using the runners shell
     - name: Get latest proposed dts
       run: npm run download-api
 
-    # Runs a set of commands using the runners shell
     - name: Generate new dts and compare it with the old one
       run: |
         # This will contain the content of our new file
