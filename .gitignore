@@ -15,4 +15,3 @@ npm-debug.log
 *.DS_Store
 test-results.xml
 vscode.d.ts
-vscode.proposed.d.ts

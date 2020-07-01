@@ -84,9 +84,7 @@
     "compile": "tsc -v && tsc -p ./ && tslint -p ./",
     "compile-watch": "tsc -watch -p ./",
     "test": "node ./out/test/runTests.js",
-    "download-api": "vscode-dts dev",
-    "postdownload-api": "vscode-dts master",
-    "postinstall": "npm run download-api"
+    "download-api": "vscode-dts dev"
   },
   "contributes": {
     "breakpoints": [

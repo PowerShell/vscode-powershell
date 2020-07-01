@@ -1,0 +1,90 @@
+name: "Update Notebook API"
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 22 * * *'
+
+jobs:
+  Update-Notebook-Api:
+
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2.1.0
+
+    # Runs a single command using the runners shell
+    - name: Run a one-line script
+      run: mv ./vscode.proposed.d.ts ./old.vscode.proposed.d.ts
+
+    # Runs a single command using the runners shell
+    - name: Run a one-line script
+      run: npm install
+
+    # Runs a single command using the runners shell
+    - name: Run a one-line script
+      run: npm run download-api
+
+    # Runs a set of commands using the runners shell
+    - name: Run a multi-line script
+      run: |
+        $fullFile = [System.Collections.Generic.List[string]]@()
+        $dts = Get-Content ./vscode.proposed.d.ts
+
+        $index = 0
+        while ($dts[$index] -notmatch "declare module 'vscode' {") {
+            $fullFile += $dts[$index]
+            $index++
+        }
+
+        $fullFile += $dts[$index]
+
+        for ( $i = $index; $i -lt $dts.Length; $i++) {
+            if($dts[$i] -match '//#region @rebornix: Notebook') {
+                $index = $i
+                break
+            }
+        }
+
+        while ($dts[$index] -notmatch "//#endregion") {
+            $fullFile += $dts[$index]
+            $index++
+        }
+
+        $fullFile += $dts[$index]
+        $fullFile += '}'
+
+        $fullFile | Set-Content ./vscode.proposed.d.ts
+
+        $oldFile = Get-Content ./old.vscode.proposed.d.ts -Raw
+        $newFile = Get-Content ./vscode.proposed.d.ts -Raw
+        if ($oldFile -eq $newFile) {
+            $env:SKIP_PR = '1'
+        }
+
+    - name: Run
+      run: npm run compile
+
+    - name: Create Pull Request
+      if: env.SKIP_PR != '1'
+      id: cpr
+      uses: peter-evans/create-pull-request@v2
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      with:
+        commit-message: "Update Notebook dts"
+        committer: GitHub <noreply@github.com>
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        title: "Update Notebook dts"
+        assignees: TylerLeonhardt
+        reviewers: TylerLeonhardt
+        base: notebook-ui-support
+        draft: false
+        branch: powershell-notebook-patch-${{ env.BRANCH_POSTFIX }}
+        labels: Created_by_Action

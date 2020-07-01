@@ -141,6 +141,7 @@ export function activate(context: vscode.ExtensionContext): void {
         context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PowerShellNotebookMode', powerShellNotebooksFeature));
     } catch (e) {
         // This would happen in VS Code changes their API.
+        logger.writeVerbose("Failed to register NotebookContentProvider", e);
     }
 
     // Create features
