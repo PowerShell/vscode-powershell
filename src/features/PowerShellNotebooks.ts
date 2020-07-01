@@ -181,7 +181,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
 
     async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri, _token: vscode.CancellationToken): Promise<void> {
         const retArr: string[] = [];
-        document.cells.forEach((cell, index) => {
+        document.cells.forEach((cell) => {
             if (cell.cellKind === vscode.CellKind.Code) {
                 retArr.push(...cell.document.getText().split(/\r|\n|\r\n/));
             } else {

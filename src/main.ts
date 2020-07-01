@@ -135,15 +135,6 @@ export function activate(context: vscode.ExtensionContext): void {
             PackageJSON.version,
             telemetryReporter);
 
-    const powerShellNotebooksFeature = new PowerShellNotebooksFeature();
-
-    try {
-        context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PowerShellNotebookMode', powerShellNotebooksFeature));
-    } catch (e) {
-        // This would happen in VS Code changes their API.
-        logger.writeVerbose("Failed to register NotebookContentProvider", e);
-    }
-
     // Create features
     extensionFeatures = [
         new ConsoleFeature(logger),
@@ -167,9 +158,22 @@ export function activate(context: vscode.ExtensionContext): void {
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
-        new ExternalApiFeature(sessionManager, logger),
-        powerShellNotebooksFeature
+        new ExternalApiFeature(sessionManager, logger)
     ];
+
+    // Notebook UI is only supported in VS Code Insiders.
+    if(vscode.env.uriScheme === "vscode-insiders") {
+        const powerShellNotebooksFeature = new PowerShellNotebooksFeature();
+
+        try {
+            context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PowerShellNotebookMode', powerShellNotebooksFeature));
+            extensionFeatures.push(powerShellNotebooksFeature);
+        } catch (e) {
+            // This would happen in VS Code changes their API.
+            powerShellNotebooksFeature.dispose();
+            logger.writeVerbose("Failed to register NotebookContentProvider", e);
+        }
+    }
 
     sessionManager.setExtensionFeatures(extensionFeatures);
 
