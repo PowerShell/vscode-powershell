@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
   schedule:
-    - cron: 45 18 * * *
+    - cron: 53 18 * * *
 
 jobs:
   Update-Notebook-Api:
