@@ -97,5 +97,5 @@ jobs:
         reviewers: TylerLeonhardt
         base: notebook-ui-support
         draft: false
-        branch: powershell-notebook-patch-${{ env.GITHUB_RUN_NUMBER }}
+        branch: powershell-notebook-patch-${{ github.run_id }}
         labels: Created_by_Action
