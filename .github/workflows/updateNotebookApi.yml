@@ -37,17 +37,21 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Generate new dts and compare it with the old one
       run: |
+        # This will contain the content of our new file
         $fullFile = [System.Collections.Generic.List[string]]@()
         $dts = Get-Content ./vscode.proposed.d.ts
 
+        # First add everything up to the declare statement
         $index = 0
         while ($dts[$index] -notmatch "declare module 'vscode' {") {
             $fullFile += $dts[$index]
             $index++
         }
 
+        # Add the declare statement
         $fullFile += $dts[$index]
 
+        # Find the Notebook region start index
         for ( $i = $index; $i -lt $dts.Length; $i++) {
             if($dts[$i] -match '//#region @rebornix: Notebook') {
                 $index = $i
@@ -55,24 +59,29 @@ jobs:
             }
         }
 
+        # Add everything until the endregion to the new file
         while ($dts[$index] -notmatch "//#endregion") {
             $fullFile += $dts[$index]
             $index++
         }
 
+        # Add the endregion line and ending brace line
         $fullFile += $dts[$index]
         $fullFile += '}'
 
+        # Overwrite the file with the new content
         $fullFile | Set-Content ./vscode.proposed.d.ts
 
+        # Get the old and new files' raw text
         $oldFile = Get-Content ./old.vscode.proposed.d.ts -Raw
         $newFile = Get-Content ./vscode.proposed.d.ts -Raw
 
+        # Compare them and log if they are different
         if($oldFile -ne $newFile) {
           Write-Host "New changes detected!"
         }
 
-        # Or else tsc will complain.
+        # Remove the old file so it doesn't get picked up by tsc
         Remove-Item ./old.vscode.proposed.d.ts -Force
 
     - name: Compile the TypeScript to check for errors
