@@ -781,6 +781,11 @@
           "default": false,
           "description": "Do not show the Powershell Integrated Console banner on launch"
         },
+        "powershell.integratedConsole.cwd": {
+          "type": "string",
+          "default": null,
+          "description": "An explicit start path where the Powershell Integrated Console will be launched. Predefined variables can be used (i.e. ${fileDirname} to use the current opened file's directory"
+        },
         "powershell.debugging.createTemporaryIntegratedConsole": {
           "type": "boolean",
           "default": false,

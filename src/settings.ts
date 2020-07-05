@@ -114,6 +114,7 @@ export interface IIntegratedConsoleSettings {
     useLegacyReadLine?: boolean;
     forceClearScrollbackBuffer?: boolean;
     suppressStartupBanner?: boolean;
+    cwd?: string
 }
 
 export interface ISideBarSettings {
@@ -192,6 +193,7 @@ export function load(): ISettings {
         focusConsoleOnExecute: true,
         useLegacyReadLine: false,
         forceClearScrollbackBuffer: false,
+        cwd: null
     };
 
     const defaultSideBarSettings: ISideBarSettings = {
