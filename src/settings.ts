@@ -101,6 +101,7 @@ export interface ISettings {
     sideBar?: ISideBarSettings;
     pester?: IPesterSettings;
     buttons?: IButtonSettings;
+    cwd?: string;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -114,7 +115,6 @@ export interface IIntegratedConsoleSettings {
     useLegacyReadLine?: boolean;
     forceClearScrollbackBuffer?: boolean;
     suppressStartupBanner?: boolean;
-    cwd?: string
 }
 
 export interface ISideBarSettings {
@@ -193,7 +193,6 @@ export function load(): ISettings {
         focusConsoleOnExecute: true,
         useLegacyReadLine: false,
         forceClearScrollbackBuffer: false,
-        cwd: null
     };
 
     const defaultSideBarSettings: ISideBarSettings = {
@@ -259,6 +258,8 @@ export function load(): ISettings {
             //   is the reason terminals on macOS typically run login shells by default which set up
             //   the environment. See http://unix.stackexchange.com/a/119675/115410"
             configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
+        cwd:
+            configuration.get<string>("cwd", null),
     };
 }
 
