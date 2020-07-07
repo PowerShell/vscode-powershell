@@ -105,9 +105,6 @@ export class PowerShellProcess {
         // Make sure no old session file exists
         utils.deleteSessionFile(this.sessionFilePath);
 
-        // Open workspace folders take precedence over cwd setting
-        const cwd = vscode.workspace.workspaceFolders === undefined ? this.sessionSettings.cwd : null;
-
         // Launch PowerShell in the integrated terminal
         this.consoleTerminal =
             vscode.window.createTerminal({
@@ -115,7 +112,7 @@ export class PowerShellProcess {
                 shellPath: this.exePath,
                 shellArgs: powerShellArgs,
                 hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
-                cwd
+                cwd: this.sessionSettings.cwd
             });
 
         const pwshName = path.basename(this.exePath);
