@@ -96,6 +96,10 @@ export function getTimestampString() {
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;
 }
 
+export function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export const isMacOS: boolean = process.platform === "darwin";
 export const isWindows: boolean = process.platform === "win32";
 export const isLinux: boolean = !isMacOS && !isWindows;
