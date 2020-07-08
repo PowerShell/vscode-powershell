@@ -82,9 +82,9 @@ export class ExternalApiFeature implements IFeature {
             RETURNS:
                 true if it worked, otherwise throws an error.
             */
-            vscode.commands.registerCommand("PowerShell.UnregisterExternalExtension", (uuid: string): boolean => {
+            vscode.commands.registerCommand("PowerShell.UnregisterExternalExtension", (uuid: string = ""): boolean => {
                 log.writeDiagnostic(`Unregistering extension with session UUID: ${uuid}`);
-                if (!uuid && !ExternalApiFeature.registeredExternalExtension.delete(uuid)) {
+                if (!ExternalApiFeature.registeredExternalExtension.delete(uuid)) {
                     throw new Error(`No extension registered with session UUID: ${uuid}`);
                 }
                 return true;
@@ -109,8 +109,8 @@ export class ExternalApiFeature implements IFeature {
                     architecture: string;
                 }
             */
-           vscode.commands.registerCommand("PowerShell.GetPowerShellVersionDetails", async (uuid: string): Promise<IExternalPowerShellDetails> => {
-                if (!uuid && !ExternalApiFeature.registeredExternalExtension.has(uuid)) {
+           vscode.commands.registerCommand("PowerShell.GetPowerShellVersionDetails", async (uuid: string = ""): Promise<IExternalPowerShellDetails> => {
+                if (!ExternalApiFeature.registeredExternalExtension.has(uuid)) {
                     throw new Error(
                         "UUID provided was invalid, make sure you execute the 'PowerShell.GetPowerShellVersionDetails' command and pass in the UUID that it returns to subsequent command executions.");
                 }
