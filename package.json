@@ -640,6 +640,11 @@
           "default": "BlockComment",
           "description": "Controls the comment-based help completion behavior triggered by typing '##'. Set the generated help style with 'BlockComment' or 'LineComment'. Disable the feature with 'Disabled'."
         },
+        "powershell.cwd": {
+          "type": "string",
+          "default": null,
+          "description": "An explicit start path where the Powershell Integrated Console will be launched. Both the PowerShell process and the shell's location will be set to this directory. Predefined variables can be used (i.e. ${fileDirname} to use the current opened file's directory)."
+        },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
           "default": true,

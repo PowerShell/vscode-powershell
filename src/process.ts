@@ -112,6 +112,7 @@ export class PowerShellProcess {
                 shellPath: this.exePath,
                 shellArgs: powerShellArgs,
                 hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
+                cwd: this.sessionSettings.cwd
             });
 
         const pwshName = path.basename(this.exePath);
