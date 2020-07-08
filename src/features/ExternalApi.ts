@@ -8,11 +8,6 @@ import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import { SessionManager } from "../session";
 
-interface IExternalExtension {
-    readonly id: string;
-    readonly apiVersion: string;
-}
-
 export interface IExternalPowerShellDetails {
     exePath: string;
     version: string;
@@ -41,33 +36,8 @@ export class ExternalApiFeature implements IFeature {
             RETURNS:
                 string session uuid
             */
-            vscode.commands.registerCommand("PowerShell.RegisterExternalExtension", (id: string, apiVersion: string = 'v1'): string => {
-                log.writeDiagnostic(`Registering extension '${id}' for use with API version '${apiVersion}'.`);
-
-                for (const [_, externalExtension] of ExternalApiFeature.registeredExternalExtension) {
-                    if (externalExtension.id === id) {
-                        const message = `The extension '${id}' is already registered.`;
-                        log.writeWarning(message);
-                        throw new Error(message);
-                    }
-                }
-
-                if (!vscode.extensions.all.some(ext => ext.id === id)) {
-                    throw new Error(`No extension installed with id '${id}'. You must use a valid extension id.`);
-                }
-
-                // If we're in development mode, we allow these to be used for testing purposes.
-                if (!sessionManager.InDevelopmentMode && (id === "ms-vscode.PowerShell" || id === "ms-vscode.PowerShell-Preview")) {
-                    throw new Error("You can't use the PowerShell extension's id in this registration.");
-                }
-
-                const uuid = uuidv4();
-                ExternalApiFeature.registeredExternalExtension.set(uuid, {
-                    id,
-                    apiVersion
-                });
-                return uuid;
-            }),
+            vscode.commands.registerCommand("PowerShell.RegisterExternalExtension", (id: string, apiVersion: string = 'v1'): string =>
+                this.registerExternalExtension(id, apiVersion)),
 
             /*
             DESCRIPTION:
@@ -82,13 +52,8 @@ export class ExternalApiFeature implements IFeature {
             RETURNS:
                 true if it worked, otherwise throws an error.
             */
-            vscode.commands.registerCommand("PowerShell.UnregisterExternalExtension", (uuid: string = ""): boolean => {
-                log.writeDiagnostic(`Unregistering extension with session UUID: ${uuid}`);
-                if (!ExternalApiFeature.registeredExternalExtension.delete(uuid)) {
-                    throw new Error(`No extension registered with session UUID: ${uuid}`);
-                }
-                return true;
-            }),
+            vscode.commands.registerCommand("PowerShell.UnregisterExternalExtension", (uuid: string = ""): boolean =>
+                this.unregisterExternalExtension(uuid)),
 
             /*
             DESCRIPTION:
@@ -109,27 +74,66 @@ export class ExternalApiFeature implements IFeature {
                     architecture: string;
                 }
             */
-           vscode.commands.registerCommand("PowerShell.GetPowerShellVersionDetails", async (uuid: string = ""): Promise<IExternalPowerShellDetails> => {
-                if (!ExternalApiFeature.registeredExternalExtension.has(uuid)) {
-                    throw new Error(
-                        "UUID provided was invalid, make sure you execute the 'PowerShell.GetPowerShellVersionDetails' command and pass in the UUID that it returns to subsequent command executions.");
-                }
-
-                // TODO: When we have more than one API version, make sure to include a check here.
-                const extension = ExternalApiFeature.registeredExternalExtension.get(uuid);
-                log.writeDiagnostic(`Extension '${extension.id}' used command 'PowerShell.GetPowerShellVersionDetails'.`);
-
-                await sessionManager.waitUntilStarted();
-                const versionDetails = sessionManager.getPowerShellVersionDetails();
-
-                return {
-                    exePath: sessionManager.PowerShellExeDetails.exePath,
-                    version: versionDetails.version,
-                    displayName: sessionManager.PowerShellExeDetails.displayName, // comes from the Session Menu
-                    architecture: versionDetails.architecture
-                };
-            }),
+            vscode.commands.registerCommand("PowerShell.GetPowerShellVersionDetails", (uuid: string = ""): Promise<IExternalPowerShellDetails> =>
+                this.getPowerShellVersionDetails(uuid)),
         ]
+    }
+
+    private registerExternalExtension(id: string, apiVersion: string = 'v1'): string {
+        this.log.writeDiagnostic(`Registering extension '${id}' for use with API version '${apiVersion}'.`);
+
+        for (const [_, externalExtension] of ExternalApiFeature.registeredExternalExtension) {
+            if (externalExtension.id === id) {
+                const message = `The extension '${id}' is already registered.`;
+                this.log.writeWarning(message);
+                throw new Error(message);
+            }
+        }
+
+        if (!vscode.extensions.all.some(ext => ext.id === id)) {
+            throw new Error(`No extension installed with id '${id}'. You must use a valid extension id.`);
+        }
+
+        // If we're in development mode, we allow these to be used for testing purposes.
+        if (!this.sessionManager.InDevelopmentMode && (id === "ms-vscode.PowerShell" || id === "ms-vscode.PowerShell-Preview")) {
+            throw new Error("You can't use the PowerShell extension's id in this registration.");
+        }
+
+        const uuid = uuidv4();
+        ExternalApiFeature.registeredExternalExtension.set(uuid, {
+            id,
+            apiVersion
+        });
+        return uuid;
+    }
+
+    private unregisterExternalExtension(uuid: string = ""): boolean {
+        this.log.writeDiagnostic(`Unregistering extension with session UUID: ${uuid}`);
+        if (!ExternalApiFeature.registeredExternalExtension.delete(uuid)) {
+            throw new Error(`No extension registered with session UUID: ${uuid}`);
+        }
+        return true;
+    }
+
+    private async getPowerShellVersionDetails(uuid: string = ""): Promise<IExternalPowerShellDetails> {
+        if (!ExternalApiFeature.registeredExternalExtension.has(uuid)) {
+            throw new Error(
+                "UUID provided was invalid, make sure you execute the 'PowerShell.GetPowerShellVersionDetails' command and pass in the UUID that it returns to subsequent command executions.");
+        }
+
+        // TODO: When we have more than one API version, make sure to include a check here.
+        const extension = ExternalApiFeature.registeredExternalExtension.get(uuid);
+        this.log.writeDiagnostic(`Extension '${extension.id}' used command 'PowerShell.GetPowerShellVersionDetails'.`);
+
+        await this.sessionManager.waitUntilStarted();
+        const versionDetails = this.sessionManager.getPowerShellVersionDetails();
+
+        return {
+            exePath: this.sessionManager.PowerShellExeDetails.exePath,
+            version: versionDetails.version,
+            displayName: this.sessionManager.PowerShellExeDetails.displayName, // comes from the Session Menu
+            architecture: versionDetails.architecture
+        };
     }
 
     public dispose() {
@@ -141,4 +145,9 @@ export class ExternalApiFeature implements IFeature {
     public setLanguageClient(languageclient: LanguageClient) {
         this.languageClient = languageclient;
     }
+}
+
+interface IExternalExtension {
+    readonly id: string;
+    readonly apiVersion: string;
 }
