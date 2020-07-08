@@ -96,7 +96,7 @@ export function getTimestampString() {
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;
 }
 
-export function sleep(ms: number) {
+export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
