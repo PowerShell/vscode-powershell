@@ -85,17 +85,21 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
             } else if (lines[i] === "<#") {
                 // If we found the start of a block comment,
                 // insert what we saw leading up to this.
-                notebookData.cells.push({
-                    cellKind: cellKind!,
-                    language: cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell',
-                    outputs: [],
-                    source: currentCellSource.join("\n"),
-                    metadata: {
-                        custom: {
-                            commentType: cellKind === vscode.CellKind.Markdown ? CommentType.LineComment : CommentType.Disabled,
+                // If cellKind is undefined, that means we
+                // are starting the file with a BlockComment.
+                if (cellKind) {
+                    notebookData.cells.push({
+                        cellKind,
+                        language: cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell',
+                        outputs: [],
+                        source: currentCellSource.join("\n"),
+                        metadata: {
+                            custom: {
+                                commentType: cellKind === vscode.CellKind.Markdown ? CommentType.LineComment : CommentType.Disabled,
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
                 // reset state because we're starting a new Markdown cell.
                 currentCellSource = [];
