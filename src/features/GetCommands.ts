@@ -93,8 +93,7 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     }
 
     public refresh(): void {
-        // we pass in null because no event data in needed.
-        this.didChangeTreeData.fire(null);
+        this.didChangeTreeData.fire();
     }
 
     public getTreeItem(element: Command): vscode.TreeItem {
