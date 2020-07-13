@@ -29,8 +29,12 @@
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": [
+				"--disable-extensions",
+				"--enable-proposed-api", "ms-vscode.powershell-preview",
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/out/test/testRunner.js" ],
+				"--extensionTestsPath=${workspaceFolder}/out/test/testRunner.js",
+				"${workspaceFolder}/test"
+			],
 			"outFiles": ["${workspaceFolder}/out/**/*.js"],
 			"preLaunchTask": "Build"
 		}

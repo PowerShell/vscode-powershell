@@ -2,12 +2,12 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import * as vscode from 'vscode';
-import { CommentType } from '../settings';
-import { IFeature, LanguageClient } from '../feature';
-import { EvaluateRequestType } from './Console';
+import * as vscode from "vscode";
+import { CommentType } from "../settings";
+import { IFeature, LanguageClient } from "../feature";
+import { EvaluateRequestType } from "./Console";
 import Settings = require("../settings");
-import { ILogger } from '../logging';
+import { ILogger } from "../logging";
 
 export class PowerShellNotebooksFeature implements vscode.NotebookContentProvider, vscode.NotebookKernel, IFeature {
 
@@ -19,7 +19,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     public onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent> = this._onDidChangeNotebook.event;
     public kernel?: vscode.NotebookKernel;
 
-    public label: string = 'PowerShell';
+    public label: string = "PowerShell";
     public preloads?: vscode.Uri[];
 
     public constructor(private logger: ILogger, skipRegisteringCommands?: boolean) {
@@ -49,7 +49,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
             languages: ["powershell"],
             cells: [],
             metadata: {}
-        }
+        };
 
         let currentCellSource: string[] = [];
         let cellKind: vscode.CellKind | undefined;
@@ -94,7 +94,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
                 if (cellKind) {
                     notebookData.cells.push({
                         cellKind,
-                        language: cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell',
+                        language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
                         outputs: [],
                         source: currentCellSource.join("\n"),
                         metadata: {
@@ -118,13 +118,13 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
 
             // If this line is a continuation of the previous cell type, then add this line to the current cell source.
             if (kind === cellKind) {
-                currentCellSource.push(kind === vscode.CellKind.Markdown && !insideBlockComment ? lines[i].replace(/^\#\s*/, '') : lines[i]);
+                currentCellSource.push(kind === vscode.CellKind.Markdown && !insideBlockComment ? lines[i].replace(/^\#\s*/, "") : lines[i]);
             } else {
                 // If cellKind is not undifined, then we can add the cell we've just computed.
                 if (cellKind !== undefined) {
                     notebookData.cells.push({
                         cellKind: cellKind!,
-                        language: cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell',
+                        language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
                         outputs: [],
                         source: currentCellSource.join("\n"),
                         metadata: {
@@ -138,7 +138,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
                 // set initial new cell state
                 currentCellSource = [];
                 cellKind = kind;
-                currentCellSource.push(kind === vscode.CellKind.Markdown ? lines[i].replace(/^\#\s*/, '') : lines[i]);
+                currentCellSource.push(kind === vscode.CellKind.Markdown ? lines[i].replace(/^\#\s*/, "") : lines[i]);
             }
         }
 
@@ -148,7 +148,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
         if (currentCellSource.length) {
             notebookData.cells.push({
                 cellKind: cellKind!,
-                language: cellKind === vscode.CellKind.Markdown ? 'markdown' : 'powershell',
+                language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
                 outputs: [],
                 source: currentCellSource.join("\n"),
                 metadata: {
@@ -212,23 +212,23 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
                     retArr.push(...cell.document.getText().split(/\r|\n|\r\n/));
                     retArr.push("#>");
                 } else {
-                    retArr.push(...cell.document.getText().split(/\r|\n|\r\n/).map(line => `# ${line}`));
+                    retArr.push(...cell.document.getText().split(/\r|\n|\r\n/).map((line) => `# ${line}`));
                 }
             }
         }
 
-        await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join('\n')));
+        await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join("\n")));
     }
 
     private static async showNotebookMode() {
         const uri = vscode.window.activeTextEditor.document.uri;
-        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookMode");
     }
 
     private static async hideNotebookMode() {
         const uri = vscode.notebook.activeNotebookEditor.document.uri;
-        await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         await vscode.commands.executeCommand("vscode.openWith", uri, "default");
     }
 

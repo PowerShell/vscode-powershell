@@ -20,8 +20,12 @@ async function main() {
         await runTests({
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: ["--disable-extensions", "--enable-proposed-api", "ms-vscode.powershell-preview", "."],
-            version: 'insiders'
+            launchArgs: [
+                "--disable-extensions",
+                "--enable-proposed-api", "ms-vscode.powershell-preview",
+                "./test"
+            ],
+            version: "insiders"
         });
     } catch (err) {
         // tslint:disable-next-line:no-console

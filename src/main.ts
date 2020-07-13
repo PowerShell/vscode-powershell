@@ -166,7 +166,7 @@ export function activate(context: vscode.ExtensionContext): void {
         const powerShellNotebooksFeature = new PowerShellNotebooksFeature(logger);
 
         try {
-            context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PowerShellNotebookMode', powerShellNotebooksFeature));
+            context.subscriptions.push(vscode.notebook.registerNotebookContentProvider("PowerShellNotebookMode", powerShellNotebooksFeature));
             extensionFeatures.push(powerShellNotebooksFeature);
         } catch (e) {
             // This would happen if VS Code changes their API.

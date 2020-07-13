@@ -217,7 +217,7 @@ export function load(): ISettings {
 
     const defaultNotebooksSettings: INotebooksSettings = {
         saveMarkdownCellsAs: CommentType.BlockComment,
-    }
+    };
 
     return {
         startAutomatically:

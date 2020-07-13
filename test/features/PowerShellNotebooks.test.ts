@@ -35,6 +35,22 @@ const notebookSimpleMixedComments = vscode.Uri.file(
 
 const notebookTestData = new Map<vscode.Uri, vscode.NotebookCellData[]>();
 
+function readBackingFile(uri: vscode.Uri): string {
+    return readFileSync(uri.fsPath).toString();
+}
+
+function compareCells(actualCells: vscode.NotebookCellData[], expectedCells: vscode.NotebookCellData[]) : void {
+    assert.deepStrictEqual(actualCells.length, expectedCells.length);
+
+    // Compare cell metadata
+    for (let i = 0; i < actualCells.length; i++) {
+        assert.deepStrictEqual(
+            actualCells[i].metadata.custom,
+            expectedCells[i].metadata.custom
+        );
+    }
+}
+
 suite("PowerShellNotebooks tests", () => {
     notebookTestData.set(notebookOnlyCode, [
         {
@@ -210,19 +226,3 @@ suite("PowerShellNotebooks tests", () => {
         compareCells(newNotebook.cells, expectedCells);
     }).timeout(20000);
 });
-
-function readBackingFile(uri: vscode.Uri): string {
-    return readFileSync(uri.fsPath).toString();
-}
-
-function compareCells(actualCells: vscode.NotebookCellData[], expectedCells: vscode.NotebookCellData[]) : void {
-    assert.deepStrictEqual(actualCells.length, expectedCells.length);
-
-    // Compare cell metadata
-    for (let i = 0; i < actualCells.length; i++) {
-        assert.deepStrictEqual(
-            actualCells[i].metadata.custom,
-            expectedCells[i].metadata.custom
-        );
-    }
-}
