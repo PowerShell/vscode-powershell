@@ -7,6 +7,7 @@ import { CommentType } from '../settings';
 import { IFeature, LanguageClient } from '../feature';
 import { EvaluateRequestType } from './Console';
 import Settings = require("../settings");
+import { ILogger } from '../logging';
 
 export class PowerShellNotebooksFeature implements vscode.NotebookContentProvider, vscode.NotebookKernel, IFeature {
 
@@ -21,7 +22,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     public label: string = 'PowerShell';
     public preloads?: vscode.Uri[];
 
-    public constructor(skipRegisteringCommands?: boolean) {
+    public constructor(private logger: ILogger, skipRegisteringCommands?: boolean) {
         // VS Code Notebook API uses this property for handling cell execution.
         this.kernel = this;
 
@@ -39,6 +40,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     public async openNotebook(uri: vscode.Uri, context: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
         // load from backup if needed.
         const actualUri = context.backupId ? vscode.Uri.parse(context.backupId) : uri;
+        this.logger.writeDiagnostic(`Opening Notebook: ${uri.toString()}`);
 
         const data = (await vscode.workspace.fs.readFile(actualUri)).toString();
         const lines = data.split(/\r\n|\r|\n/g);
@@ -194,6 +196,8 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     }
 
     private async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri, _token: vscode.CancellationToken): Promise<void> {
+        this.logger.writeDiagnostic(`Saving Notebook: ${targetResource.toString()}`);
+
         const retArr: string[] = [];
         for (const cell of document.cells) {
             if (cell.cellKind === vscode.CellKind.Code) {

@@ -6,11 +6,11 @@ import * as assert from "assert";
 import * as path from "path";
 import * as vscode from "vscode";
 import { PowerShellNotebooksFeature } from "../../src/features/PowerShellNotebooks";
-import { before } from "mocha";
 import os = require("os");
 import { readFileSync } from "fs";
 import { CommentType } from "../../src/settings";
 import * as utils from "../../src/utils";
+import { MockLogger } from "../test_utils";
 
 const notebookDir = [
     __dirname,
@@ -175,7 +175,7 @@ suite("PowerShellNotebooks tests", () => {
         },
     ]);
 
-    const feature = new PowerShellNotebooksFeature(true);
+    const feature = new PowerShellNotebooksFeature(new MockLogger(), true);
 
     for (const [uri, expectedCells] of notebookTestData) {
         test(`Can open a notebook with expected cells - ${uri.fsPath}`, async () => {

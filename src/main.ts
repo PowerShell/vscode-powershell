@@ -163,7 +163,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     // Notebook UI is only supported in VS Code Insiders.
     if(vscode.env.uriScheme === "vscode-insiders") {
-        const powerShellNotebooksFeature = new PowerShellNotebooksFeature();
+        const powerShellNotebooksFeature = new PowerShellNotebooksFeature(logger);
 
         try {
             context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PowerShellNotebookMode', powerShellNotebooksFeature));
