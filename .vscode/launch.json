@@ -9,7 +9,7 @@
 			"args": [ "--extensionDevelopmentPath=${workspaceRoot}" ],
 			"stopOnEntry": false,
 			"sourceMaps": true,
-			"outFiles": ["${workspaceRoot}/out/src/**/*.js"],
+			"outFiles": ["${workspaceFolder}/out/src/**/*.js"],
 			"preLaunchTask": "BuildAll"
 		},
 		{
@@ -17,10 +17,10 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
-			"args": [ "--extensionDevelopmentPath=${workspaceRoot}" ],
+			"args": [ "--extensionDevelopmentPath=${workspaceFolder}" ],
 			"stopOnEntry": false,
 			"sourceMaps": true,
-			"outFiles": ["${workspaceRoot}/out/src/**/*.js"],
+			"outFiles": ["${workspaceFolder}/out/src/**/*.js"],
 			"preLaunchTask": "Build"
 		},
 		{
@@ -28,25 +28,11 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
-			"args": ["--extensionDevelopmentPath=${workspaceRoot}", "--extensionTestsPath=${workspaceRoot}/out/test" ],
-			"stopOnEntry": false,
-			"sourceMaps": true,
-			"outFiles": ["${workspaceRoot}/out/test/**/*.js"],
-			"preLaunchTask": "Build",
-			"skipFiles": [
-				"${workspaceFolder}/node_modules/**/*",
-				"${workspaceFolder}/lib/**/*",
-				"/private/var/folders/**/*",
-				"<node_internals>/**/*"
-			]
-		},
-		{
-			"name": "Attach",
-			"type": "node",
-			"request": "attach",
-			"address": "localhost",
-			"port": 5858,
-			"sourceMaps": false
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/testRunner.js" ],
+			"outFiles": ["${workspaceFolder}/out/**/*.js"],
+			"preLaunchTask": "Build"
 		}
 	]
 }

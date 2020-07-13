@@ -179,10 +179,6 @@ export class PowerShellProcess {
         return true;
     }
 
-    private sleep(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     private async waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
         // Determine how many tries by dividing by 2000 thus checking every 2 seconds.
         const numOfTries = this.sessionSettings.developer.waitForSessionFileTimeoutSeconds / 2;
@@ -203,7 +199,7 @@ export class PowerShellProcess {
             }
 
             // Wait a bit and try again
-            await this.sleep(2000);
+            await utils.sleep(2000);
         }
 
         const err = "Timed out waiting for session file to appear.";
