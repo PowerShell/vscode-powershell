@@ -41,7 +41,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
         const actualUri = context.backupId ? vscode.Uri.parse(context.backupId) : uri;
 
         const data = (await vscode.workspace.fs.readFile(actualUri)).toString();
-        const lines = data.split(/\r|\n|\r\n/g);
+        const lines = data.split(/\r\n|\r|\n/g);
 
         const notebookData: vscode.NotebookData = {
             languages: ["powershell"],
