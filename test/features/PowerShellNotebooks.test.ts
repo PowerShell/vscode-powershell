@@ -10,6 +10,7 @@ import { before } from "mocha";
 import os = require("os");
 import { readFileSync } from "fs";
 import { CommentType } from "../../src/settings";
+import * as utils from "../../src/utils";
 
 const notebookDir = [
     __dirname,
@@ -195,7 +196,7 @@ suite("PowerShellNotebooks tests", () => {
         await vscode.commands.executeCommand("vscode.openWith", notebookSimpleMixedComments, "PowerShellNotebookMode");
 
         // Allow some time to pass to render the Notebook
-        await sleep(5000);
+        await utils.sleep(5000);
         assert.strictEqual(
             vscode.notebook.activeNotebookEditor.document.uri.toString(),
             notebookSimpleMixedComments.toString());
@@ -224,8 +225,4 @@ function compareCells(actualCells: vscode.NotebookCellData[], expectedCells: vsc
             expectedCells[i].metadata.custom
         );
     }
-}
-
-function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
