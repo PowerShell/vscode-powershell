@@ -79,7 +79,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
                     });
 
                     currentCellSource = [];
-                    cellKind = undefined;
+                    cellKind = null;
                     continue;
                 }
 
@@ -89,7 +89,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
             } else if (lines[i] === "<#") {
                 // If we found the start of a block comment,
                 // insert what we saw leading up to this.
-                // If cellKind is undefined, that means we
+                // If cellKind is null/undefined, that means we
                 // are starting the file with a BlockComment.
                 if (cellKind) {
                     notebookData.cells.push({
@@ -120,8 +120,8 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
             if (kind === cellKind) {
                 currentCellSource.push(kind === vscode.CellKind.Markdown && !insideBlockComment ? lines[i].replace(/^\#\s*/, "") : lines[i]);
             } else {
-                // If cellKind is not undifined, then we can add the cell we've just computed.
-                if (cellKind !== undefined) {
+                // If cellKind has a value, then we can add the cell we've just computed.
+                if (cellKind) {
                     notebookData.cells.push({
                         cellKind: cellKind!,
                         language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
