@@ -17,7 +17,12 @@ async function main() {
         const extensionTestsPath = path.resolve(__dirname, "./testRunner");
 
         // Download VS Code, unzip it and run the integration test from the local directory.
-        await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: ["."] });
+        await runTests({
+            extensionDevelopmentPath,
+            extensionTestsPath,
+            launchArgs: ["--disable-extensions", "--enable-proposed-api", "ms-vscode.powershell-preview", "."],
+            version: 'insiders'
+        });
     } catch (err) {
         // tslint:disable-next-line:no-console
         console.error(err);

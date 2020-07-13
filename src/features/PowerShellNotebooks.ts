@@ -21,17 +21,19 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     public label: string = 'PowerShell';
     public preloads?: vscode.Uri[];
 
-    public constructor() {
+    public constructor(skipRegisteringCommands?: boolean) {
         // VS Code Notebook API uses this property for handling cell execution.
         this.kernel = this;
 
-        this.showNotebookModeCommand = vscode.commands.registerCommand(
-            "PowerShell.ShowNotebookMode",
-            PowerShellNotebooksFeature.showNotebookMode);
+        if(!skipRegisteringCommands) {
+            this.showNotebookModeCommand = vscode.commands.registerCommand(
+                "PowerShell.ShowNotebookMode",
+                PowerShellNotebooksFeature.showNotebookMode);
 
-        this.hideNotebookModeCommand = vscode.commands.registerCommand(
-            "PowerShell.HideNotebookMode",
-            PowerShellNotebooksFeature.hideNotebookMode);
+            this.hideNotebookModeCommand = vscode.commands.registerCommand(
+                "PowerShell.HideNotebookMode",
+                PowerShellNotebooksFeature.hideNotebookMode);
+        }
     }
 
     public async openNotebook(uri: vscode.Uri, context: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {

@@ -9,6 +9,7 @@ import { PowerShellNotebooksFeature } from "../../src/features/PowerShellNoteboo
 import { before } from "mocha";
 import os = require("os");
 import { readFileSync } from "fs";
+import { CommentType } from "../../src/settings";
 
 const notebookDir = [
     __dirname,
@@ -40,7 +41,11 @@ suite("PowerShellNotebooks tests", () => {
             language: "powershell",
             source: readBackingFile(notebookOnlyCode),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
         }
     ]);
 
@@ -50,7 +55,11 @@ suite("PowerShellNotebooks tests", () => {
             language: "markdown",
             source: readBackingFile(notebookOnlyMarkdown),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.LineComment,
+                }
+            }
         }
     ]);
 
@@ -61,21 +70,33 @@ suite("PowerShellNotebooks tests", () => {
             language: "markdown",
             source: content.slice(0, 5).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                }
+            }
         },
         {
             cellKind: vscode.CellKind.Code,
             language: "powershell",
             source: content.slice(5, 6).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
         },
         {
             cellKind: vscode.CellKind.Markdown,
             language: "markdown",
             source: content.slice(6, 11).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                }
+            }
         },
     ]);
 
@@ -86,21 +107,33 @@ suite("PowerShellNotebooks tests", () => {
             language: "markdown",
             source: content.slice(0, 3).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.LineComment,
+                }
+            }
         },
         {
             cellKind: vscode.CellKind.Code,
             language: "powershell",
             source: content.slice(3, 4).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
         },
         {
             cellKind: vscode.CellKind.Markdown,
             language: "markdown",
             source: content.slice(4, 7).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.LineComment,
+                }
+            }
         },
     ]);
 
@@ -111,34 +144,88 @@ suite("PowerShellNotebooks tests", () => {
             language: "markdown",
             source: content.slice(0, 3).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.LineComment,
+                }
+            }
         },
         {
             cellKind: vscode.CellKind.Code,
             language: "powershell",
             source: content.slice(3, 4).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
         },
         {
             cellKind: vscode.CellKind.Markdown,
             language: "markdown",
             source: content.slice(4, 9).join(os.EOL),
             outputs: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                }
+            }
         },
     ]);
 
-    const feature = new PowerShellNotebooksFeature();
+    const feature = new PowerShellNotebooksFeature(true);
 
-    for (const [uri, cells] of notebookTestData) {
+    for (const [uri, expectedCells] of notebookTestData) {
         test(`Can open a notebook with expected cells - ${uri.fsPath}`, async () => {
-            const notebookData = await feature.openNotebook(uri, {});
-            assert.deepStrictEqual(notebookData.cells.length, cells.length);
+            const actualNotebookData = await feature.openNotebook(uri, {});
+            compareCells(actualNotebookData.cells, expectedCells);
         });
     }
+
+    test("Can save a new notebook with expected cells and metadata", async () => {
+        const uri = vscode.Uri.file(path.join(__dirname, "testFile.ps1"));
+        try {
+            await vscode.workspace.fs.delete(uri);
+        } catch {
+            // If the file doesn't exist that's fine.
+        }
+
+        // Open an existing notebook ps1.
+        await vscode.commands.executeCommand("vscode.openWith", notebookSimpleMixedComments, "PowerShellNotebookMode");
+
+        // Allow some time to pass to render the Notebook
+        await sleep(5000);
+        assert.strictEqual(
+            vscode.notebook.activeNotebookEditor.document.uri.toString(),
+            notebookSimpleMixedComments.toString());
+
+        // Save it as testFile.ps1 and reopen it using the feature.
+        await feature.saveNotebookAs(uri, vscode.notebook.activeNotebookEditor.document, null);
+        const newNotebook = await feature.openNotebook(uri, {});
+
+        // Compare that saving as a file results in the same cell data as the existing one.
+        const expectedCells = notebookTestData.get(notebookSimpleMixedComments);
+        compareCells(newNotebook.cells, expectedCells);
+    }).timeout(20000);
 });
 
 function readBackingFile(uri: vscode.Uri): string {
     return readFileSync(uri.fsPath).toString();
+}
+
+function compareCells(actualCells: vscode.NotebookCellData[], expectedCells: vscode.NotebookCellData[]) : void {
+    assert.deepStrictEqual(actualCells.length, expectedCells.length);
+
+    // Compare cell metadata
+    for (let i = 0; i < actualCells.length; i++) {
+        assert.deepStrictEqual(
+            actualCells[i].metadata.custom,
+            expectedCells[i].metadata.custom
+        );
+    }
+}
+
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
