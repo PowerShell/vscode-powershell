@@ -34,6 +34,8 @@ import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
+import utils = require("./utils");
+import { PowerShellNotebooksFeature } from "./features/PowerShellNotebooks";
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires
@@ -158,6 +160,20 @@ export function activate(context: vscode.ExtensionContext): void {
         new PickRunspaceFeature(),
         new ExternalApiFeature(sessionManager, logger)
     ];
+
+    // Notebook UI is only supported in VS Code Insiders.
+    if(vscode.env.uriScheme === "vscode-insiders") {
+        const powerShellNotebooksFeature = new PowerShellNotebooksFeature(logger);
+
+        try {
+            context.subscriptions.push(vscode.notebook.registerNotebookContentProvider("PowerShellNotebookMode", powerShellNotebooksFeature));
+            extensionFeatures.push(powerShellNotebooksFeature);
+        } catch (e) {
+            // This would happen if VS Code changes their API.
+            powerShellNotebooksFeature.dispose();
+            logger.writeVerbose("Failed to register NotebookContentProvider", e);
+        }
+    }
 
     sessionManager.setExtensionFeatures(extensionFeatures);
 

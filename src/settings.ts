@@ -21,7 +21,7 @@ enum PipelineIndentationStyle {
     None,
 }
 
-export enum HelpCompletion {
+export enum CommentType {
     Disabled = "Disabled",
     BlockComment = "BlockComment",
     LineComment = "LineComment",
@@ -102,6 +102,7 @@ export interface ISettings {
     pester?: IPesterSettings;
     buttons?: IButtonSettings;
     cwd?: string;
+    notebooks?: INotebooksSettings;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -130,6 +131,10 @@ export interface IPesterSettings {
 export interface IButtonSettings {
     showRunButtons?: boolean;
     showPanelMovementButtons?: boolean;
+}
+
+export interface INotebooksSettings {
+    saveMarkdownCellsAs?: CommentType;
 }
 
 export function load(): ISettings {
@@ -210,6 +215,10 @@ export function load(): ISettings {
         debugOutputVerbosity: "Diagnostic",
     };
 
+    const defaultNotebooksSettings: INotebooksSettings = {
+        saveMarkdownCellsAs: CommentType.BlockComment,
+    };
+
     return {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
@@ -230,7 +239,7 @@ export function load(): ISettings {
         enableProfileLoading:
             configuration.get<boolean>("enableProfileLoading", false),
         helpCompletion:
-            configuration.get<string>("helpCompletion", HelpCompletion.BlockComment),
+            configuration.get<string>("helpCompletion", CommentType.BlockComment),
         scriptAnalysis:
             configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
         debugging:
@@ -251,6 +260,8 @@ export function load(): ISettings {
             configuration.get<IPesterSettings>("pester", defaultPesterSettings),
         buttons:
             configuration.get<IButtonSettings>("buttons", defaultButtonSettings),
+        notebooks:
+            configuration.get<INotebooksSettings>("notebooks", defaultNotebooksSettings),
         startAsLoginShell:
             // tslint:disable-next-line
             // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107

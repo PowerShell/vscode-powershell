@@ -1,0 +1,101 @@
+name: "Update Notebook API"
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: 0 22 * * *
+
+jobs:
+  Update-Notebook-Api:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2.1.0
+
+    - name: Rename proposed dts to old
+      run: Move-Item ./vscode.proposed.d.ts ./old.vscode.proposed.d.ts
+
+    - name: npm install
+      run: npm install
+
+    - name: Get latest proposed dts
+      run: npm run download-api
+
+    - name: Generate new dts and compare it with the old one
+      run: |
+        # This will contain the content of our new file
+        $fullFile = [System.Collections.Generic.List[string]]@()
+        $dts = Get-Content ./vscode.proposed.d.ts
+
+        # First add everything up to the declare statement
+        $index = 0
+        while ($dts[$index] -notmatch "declare module 'vscode' {") {
+            $fullFile += $dts[$index]
+            $index++
+        }
+
+        # Add the declare statement
+        $fullFile += $dts[$index]
+
+        # Find the Notebook region start index
+        for ( $i = $index; $i -lt $dts.Length; $i++) {
+            if($dts[$i] -match '//#region @rebornix: Notebook') {
+                $index = $i
+                break
+            }
+        }
+
+        # Add everything until the endregion to the new file
+        while ($dts[$index] -notmatch "//#endregion") {
+            $fullFile += $dts[$index]
+            $index++
+        }
+
+        # Add the endregion line and ending brace line
+        $fullFile += $dts[$index]
+        $fullFile += '}'
+
+        # Overwrite the file with the new content
+        $fullFile | Set-Content ./vscode.proposed.d.ts
+
+        # Get the old and new files' raw text
+        $oldFile = Get-Content ./old.vscode.proposed.d.ts -Raw
+        $newFile = Get-Content ./vscode.proposed.d.ts -Raw
+
+        # Compare them and log if they are different
+        if($oldFile -ne $newFile) {
+          Write-Host "New changes detected!"
+        }
+
+        # Remove the old file so it doesn't get picked up by tsc
+        Remove-Item ./old.vscode.proposed.d.ts -Force
+
+    - name: Compile the TypeScript to check for errors
+      run: npm run compile
+
+    - name: Create Pull Request
+      if: github.event_name == 'schedule'
+      id: cpr
+      uses: peter-evans/create-pull-request@v2
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      with:
+        commit-message: "Update Notebook dts"
+        committer: GitHub <noreply@github.com>
+        author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+        title: "Update Notebook dts"
+        assignees: TylerLeonhardt
+        reviewers: TylerLeonhardt
+        base: master
+        draft: false
+        branch: powershell-notebook-patch-${{ github.run_id }}
+        labels: Created_by_Action
