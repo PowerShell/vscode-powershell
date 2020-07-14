@@ -95,7 +95,7 @@ jobs:
         title: "Update Notebook dts"
         assignees: TylerLeonhardt
         reviewers: TylerLeonhardt
-        base: notebook-ui-support
+        base: master
         draft: false
         branch: powershell-notebook-patch-${{ github.run_id }}
         labels: Created_by_Action
