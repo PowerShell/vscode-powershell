@@ -89,10 +89,10 @@ jobs:
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
-        commit-message: "Update Notebook dts"
+        commit-message: "[Ignore] Update Notebook dts"
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-        title: "Update Notebook dts"
+        title: "[Ignore] Update Notebook dts"
         assignees: TylerLeonhardt
         reviewers: TylerLeonhardt
         base: master
