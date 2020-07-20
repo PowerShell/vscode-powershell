@@ -1,7 +1,7 @@
 # PowerShell Extension Release History
 
 ## v2020.7.0-preview
-### Monday, July 20, 2020
+### Wednesday, July 22, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
 - 📺✨ [vscode-powershell #2789](https://github.com/PowerShell/vscode-powershell/pull/2789) -
