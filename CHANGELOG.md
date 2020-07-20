@@ -1,5 +1,33 @@
 # PowerShell Extension Release History
 
+## v2020.7.0-preview
+### Monday, July 20, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 📺✨ [vscode-powershell #2789](https://github.com/PowerShell/vscode-powershell/pull/2789) -
+  Initial Notebook UI Mode in VS Code Insiders.
+- ✨ [vscode-powershell #2799](https://github.com/PowerShell/vscode-powershell/pull/2799) -
+  Initial External API: regisering, unregistering, and getting PowerShell version details.
+- 🛫✨ [vscode-powershell #2796](https://github.com/PowerShell/vscode-powershell/pull/2796) -
+  Add setting to change the cwd of the Powershell Integrated Console. (Thanks @jwfx!)
+- 🛫🐛 [vscode-powershell #2780](https://github.com/PowerShell/vscode-powershell/pull/2788) -
+  Fix quoting of banner for global tool.
+- 🔍🐛 [vscode-powershell #2765](https://github.com/PowerShell/vscode-powershell/pull/2775) -
+  Emit 'terminated' event if PSES is restarted.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 📺✨ [PowerShellEditorServices #1321](https://github.com/PowerShell/PowerShellEditorServices/pull/1321) -
+  Needed changes for Notebook UI Support.
+- 🛫✨ [PowerShellEditorServices #1323](https://github.com/PowerShell/PowerShellEditorServices/pull/1323) -
+  Add cwd property to settings. (Thanks @jwfx!)
+- 🛫🐛 [PowerShellEditorServices #1317](https://github.com/PowerShell/PowerShellEditorServices/pull/1318) -
+  Move tests to PS7 and PS7.1 and fix IsNetCore check.
+- 🔗✨ [PowerShellEditorServices #1316](https://github.com/PowerShell/PowerShellEditorServices/pull/1316) -
+  Return null when Hover request is cancelled or no symbol details. (Thanks @ralish!)
+- 🛫🐛 [vscode-powershell #2763](https://github.com/PowerShell/PowerShellEditorServices/pull/1315) -
+  TLS 1.2 Support When Installing PackageManagement Module. (Thanks @serkanz!)
+
 ## v2020.6.0
 ### Thursday, June 11, 2020
 
