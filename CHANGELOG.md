@@ -7,7 +7,7 @@
 - 📺✨ [vscode-powershell #2789](https://github.com/PowerShell/vscode-powershell/pull/2789) -
   Initial Notebook UI Mode in VS Code Insiders.
 - ✨ [vscode-powershell #2799](https://github.com/PowerShell/vscode-powershell/pull/2799) -
-  Initial External API: regisering, unregistering, and getting PowerShell version details.
+  Initial VSCode-extension-facing PowerShell API: registering, unregistering, and getting PowerShell version details.
 - 🛫✨ [vscode-powershell #2796](https://github.com/PowerShell/vscode-powershell/pull/2796) -
   Add setting to change the cwd of the Powershell Integrated Console. (Thanks @jwfx!)
 - 🛫🐛 [vscode-powershell #2780](https://github.com/PowerShell/vscode-powershell/pull/2788) -
