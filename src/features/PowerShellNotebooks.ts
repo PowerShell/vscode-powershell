@@ -9,32 +9,67 @@ import { LanguageClientConsumer } from "../languageClientConsumer";
 import Settings = require("../settings");
 import { ILogger } from "../logging";
 
-export class PowerShellNotebooksFeature extends LanguageClientConsumer implements vscode.NotebookContentProvider, vscode.NotebookKernel {
+export class PowerShellNotebooksFeature extends LanguageClientConsumer {
 
-    private readonly showNotebookModeCommand: vscode.Disposable;
-    private readonly hideNotebookModeCommand: vscode.Disposable;
+    private readonly disposables: vscode.Disposable[];
+    private readonly notebookContentProvider: vscode.NotebookContentProvider;
+    private readonly notebookKernel: PowerShellNotebookKernel;
 
+    public constructor(logger: ILogger, skipRegisteringCommands?: boolean) {
+        super();
+        this.disposables = [];
+        if(!skipRegisteringCommands) {
+            this.disposables.push(vscode.commands.registerCommand(
+                "PowerShell.EnableNotebookMode",
+                PowerShellNotebooksFeature.EnableNotebookMode));
+
+                this.disposables.push(vscode.commands.registerCommand(
+                "PowerShell.DisableNotebookMode",
+                PowerShellNotebooksFeature.DisableNotebookMode));
+        }
+
+        this.notebookContentProvider = new PowerShellNotebookContentProvider(logger);
+        this.notebookKernel = new PowerShellNotebookKernel();
+    }
+
+    public registerNotebookProviders() {
+        this.disposables.push(vscode.notebook.registerNotebookKernelProvider({
+            viewType: "PowerShellNotebookMode"
+        }, this.notebookKernel));
+
+        this.disposables.push(vscode.notebook.registerNotebookContentProvider(
+            "PowerShellNotebookMode",
+            this.notebookContentProvider));
+    }
+
+    public dispose() {
+        for (const disposable of this.disposables) {
+            disposable.dispose();
+        }
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
+        this.notebookKernel.setLanguageClient(languageClient);
+    }
+
+    private static async EnableNotebookMode() {
+        const uri = vscode.window.activeTextEditor.document.uri;
+        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+        await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookMode");
+    }
+
+    private static async DisableNotebookMode() {
+        const uri = vscode.notebook.activeNotebookEditor.document.uri;
+        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+        await vscode.commands.executeCommand("vscode.openWith", uri, "default");
+    }
+}
+
+class PowerShellNotebookContentProvider implements vscode.NotebookContentProvider {
     private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
     public onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent> = this._onDidChangeNotebook.event;
-    public kernel?: vscode.NotebookKernel;
 
-    public label: string = "PowerShell";
-    public preloads?: vscode.Uri[];
-
-    public constructor(private logger: ILogger, skipRegisteringCommands?: boolean) {
-        super();
-        // VS Code Notebook API uses this property for handling cell execution.
-        this.kernel = this;
-
-        if(!skipRegisteringCommands) {
-            this.showNotebookModeCommand = vscode.commands.registerCommand(
-                "PowerShell.ShowNotebookMode",
-                PowerShellNotebooksFeature.showNotebookMode);
-
-            this.hideNotebookModeCommand = vscode.commands.registerCommand(
-                "PowerShell.HideNotebookMode",
-                PowerShellNotebooksFeature.hideNotebookMode);
-        }
+    public constructor(private logger: ILogger) {
     }
 
     public async openNotebook(uri: vscode.Uri, context: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
@@ -186,11 +221,6 @@ export class PowerShellNotebooksFeature extends LanguageClientConsumer implement
         };
     }
 
-    public dispose() {
-        this.showNotebookModeCommand.dispose();
-        this.hideNotebookModeCommand.dispose();
-    }
-
     private async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri, _token: vscode.CancellationToken): Promise<void> {
         this.logger.writeDiagnostic(`Saving Notebook: ${targetResource.toString()}`);
 
@@ -215,35 +245,51 @@ export class PowerShellNotebooksFeature extends LanguageClientConsumer implement
 
         await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join("\n")));
     }
+}
 
-    private static async showNotebookMode() {
-        const uri = vscode.window.activeTextEditor.document.uri;
-        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-        await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookMode");
-    }
+class PowerShellNotebookKernel implements vscode.NotebookKernel, vscode.NotebookKernelProvider {
+    public id?: string;
+    public label: string = "PowerShell";
+    public description?: string = "The PowerShell Notebook Mode kernel that runs commands in the PowerShell Integrated Console.";
+    public isPreferred?: boolean;
+    public preloads?: vscode.Uri[];
 
-    private static async hideNotebookMode() {
-        const uri = vscode.notebook.activeNotebookEditor.document.uri;
-        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-        await vscode.commands.executeCommand("vscode.openWith", uri, "default");
-    }
+    private languageClient: LanguageClient;
 
-    /*
-        `vscode.NotebookKernel` implementations
-    */
-    public async executeAllCells(document: vscode.NotebookDocument, token: vscode.CancellationToken): Promise<void> {
+    public async executeAllCells(document: vscode.NotebookDocument): Promise<void> {
         for (const cell of document.cells) {
-            await this.executeCell(document, cell, token);
+            if (cell.cellKind === vscode.CellKind.Code) {
+                await this.executeCell(document, cell);
+            }
         }
     }
 
-    public async executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell | undefined, token: vscode.CancellationToken): Promise<void> {
-        if (token.isCancellationRequested) {
-            return;
-        }
-
+    public async executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell | undefined): Promise<void> {
         await this.languageClient.sendRequest(EvaluateRequestType, {
             expression: cell.document.getText(),
         });
+    }
+
+    // Since executing a cell is a "fire and forget", there's no time for the user to cancel
+    // any of the executing cells. We can bring this in after PSES has a better API for executing code.
+    public cancelCellExecution(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
+        return;
+    }
+
+    // Since executing a cell is a "fire and forget", there's no time for the user to cancel
+    // any of the executing cells. We can bring this in after PSES has a better API for executing code.
+    public cancelAllCellsExecution(document: vscode.NotebookDocument): void {
+        return;
+    }
+
+    public setLanguageClient(languageClient: LanguageClient) {
+        this.languageClient = languageClient;
+    }
+
+    /*
+        vscode.NotebookKernelProvider implementation
+    */
+    public provideKernels(document: vscode.NotebookDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.NotebookKernel[]> {
+        return [this];
     }
 }
