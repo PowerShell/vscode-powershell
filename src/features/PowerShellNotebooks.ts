@@ -11,8 +11,8 @@ import { ILogger } from "../logging";
 
 export class PowerShellNotebooksFeature implements vscode.NotebookContentProvider, vscode.NotebookKernel, IFeature {
 
-    private readonly showNotebookModeCommand: vscode.Disposable;
-    private readonly hideNotebookModeCommand: vscode.Disposable;
+    private readonly EnterNotebookModeCommand: vscode.Disposable;
+    private readonly ExitNotebookModeCommand: vscode.Disposable;
     private languageClient: LanguageClient;
 
     private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
@@ -27,13 +27,13 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
         this.kernel = this;
 
         if(!skipRegisteringCommands) {
-            this.showNotebookModeCommand = vscode.commands.registerCommand(
-                "PowerShell.ShowNotebookMode",
-                PowerShellNotebooksFeature.showNotebookMode);
+            this.EnterNotebookModeCommand = vscode.commands.registerCommand(
+                "PowerShell.EnterNotebookMode",
+                PowerShellNotebooksFeature.EnterNotebookMode);
 
-            this.hideNotebookModeCommand = vscode.commands.registerCommand(
-                "PowerShell.HideNotebookMode",
-                PowerShellNotebooksFeature.hideNotebookMode);
+            this.ExitNotebookModeCommand = vscode.commands.registerCommand(
+                "PowerShell.ExitNotebookMode",
+                PowerShellNotebooksFeature.ExitNotebookMode);
         }
     }
 
@@ -187,8 +187,8 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     }
 
     public dispose() {
-        this.showNotebookModeCommand.dispose();
-        this.hideNotebookModeCommand.dispose();
+        this.EnterNotebookModeCommand.dispose();
+        this.ExitNotebookModeCommand.dispose();
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
@@ -220,13 +220,13 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
         await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join("\n")));
     }
 
-    private static async showNotebookMode() {
+    private static async EnterNotebookMode() {
         const uri = vscode.window.activeTextEditor.document.uri;
         await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookMode");
     }
 
-    private static async hideNotebookMode() {
+    private static async ExitNotebookMode() {
         const uri = vscode.notebook.activeNotebookEditor.document.uri;
         await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         await vscode.commands.executeCommand("vscode.openWith", uri, "default");

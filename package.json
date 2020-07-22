@@ -39,8 +39,8 @@
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
     "onCommand:PowerShell.RestartSession",
-    "onCommand:PowerShell.EnableISEMode",
-    "onCommand:PowerShell.DisableISEMode",
+    "onCommand:PowerShell.EnterISEMode",
+    "onCommand:PowerShell.ExitISEMode",
     "onCommand:PowerShell.RegisterExternalExtension",
     "onCommand:PowerShell.UnregisterExternalExtension",
     "onCommand:PowerShell.GetPowerShellVersionDetails",
@@ -158,13 +158,13 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.EnableISEMode",
-        "title": "Enable ISE Mode",
+        "command": "PowerShell.EnterISEMode",
+        "title": "Enter ISE Mode",
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.DisableISEMode",
-        "title": "Disable ISE Mode (restore to defaults)",
+        "command": "PowerShell.ExitISEMode",
+        "title": "Exit ISE Mode (restore to defaults)",
         "category": "PowerShell"
       },
       {
@@ -218,8 +218,8 @@
         }
       },
       {
-        "command": "PowerShell.ShowNotebookMode",
-        "title": "(Preview) Show Notebook Mode",
+        "command": "PowerShell.EnterNotebookMode",
+        "title": "(Preview) Enter Notebook Mode",
         "category": "PowerShell",
         "icon": {
           "light": "resources/light/book.svg",
@@ -227,8 +227,8 @@
         }
       },
       {
-        "command": "PowerShell.HideNotebookMode",
-        "title": "Show Text Editor",
+        "command": "PowerShell.ExitNotebookMode",
+        "title": "(Preview) Exit Notebook Mode",
         "category": "PowerShell",
         "icon": {
           "light": "resources/light/file-code.svg",
@@ -413,12 +413,12 @@
         },
         {
           "when": "editorLangId == powershell && config.powershell.notebooks.showToggleButton",
-          "command": "PowerShell.ShowNotebookMode",
+          "command": "PowerShell.EnterNotebookMode",
           "group": "navigation@102"
         },
         {
           "when": "resourceLangId == powershell && notebookEditorFocused",
-          "command": "PowerShell.HideNotebookMode",
+          "command": "PowerShell.ExitNotebookMode",
           "group": "navigation@102"
         }
       ],
