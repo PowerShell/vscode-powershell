@@ -170,13 +170,17 @@ export function activate(context: vscode.ExtensionContext): void {
         const powerShellNotebooksFeature = new PowerShellNotebooksFeature(logger);
 
         try {
-            context.subscriptions.push(vscode.notebook.registerNotebookContentProvider("PowerShellNotebookMode", powerShellNotebooksFeature));
+            powerShellNotebooksFeature.registerNotebookProviders();
             languageClientConsumers.push(powerShellNotebooksFeature);
         } catch (e) {
             // This would happen if VS Code changes their API.
             powerShellNotebooksFeature.dispose();
             logger.writeVerbose("Failed to register NotebookContentProvider", e);
         }
+    } else {
+        vscode.commands.registerCommand(
+            "PowerShell.EnableNotebookMode",
+            () => vscode.window.showWarningMessage("Notebook Mode only works in Visual Studio Code Insiders. To get it, go to: aka.ms/vscode-insiders"));
     }
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);

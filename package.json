@@ -218,8 +218,8 @@
         }
       },
       {
-        "command": "PowerShell.ShowNotebookMode",
-        "title": "(Preview) Show Notebook Mode",
+        "command": "PowerShell.EnableNotebookMode",
+        "title": "(Preview) Enable Notebook Mode",
         "category": "PowerShell",
         "icon": {
           "light": "resources/light/book.svg",
@@ -227,8 +227,8 @@
         }
       },
       {
-        "command": "PowerShell.HideNotebookMode",
-        "title": "Show Text Editor",
+        "command": "PowerShell.DisableNotebookMode",
+        "title": "(Preview) Disable Notebook Mode",
         "category": "PowerShell",
         "icon": {
           "light": "resources/light/file-code.svg",
@@ -413,12 +413,12 @@
         },
         {
           "when": "editorLangId == powershell && config.powershell.notebooks.showToggleButton",
-          "command": "PowerShell.ShowNotebookMode",
+          "command": "PowerShell.EnableNotebookMode",
           "group": "navigation@102"
         },
         {
           "when": "resourceLangId == powershell && notebookEditorFocused",
-          "command": "PowerShell.HideNotebookMode",
+          "command": "PowerShell.DisableNotebookMode",
           "group": "navigation@102"
         }
       ],

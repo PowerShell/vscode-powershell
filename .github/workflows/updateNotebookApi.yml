@@ -79,9 +79,6 @@ jobs:
         # Remove the old file so it doesn't get picked up by tsc
         Remove-Item ./old.vscode.proposed.d.ts -Force
 
-    - name: Compile the TypeScript to check for errors
-      run: npm run compile
-
     - name: Create Pull Request
       if: github.event_name == 'schedule'
       id: cpr

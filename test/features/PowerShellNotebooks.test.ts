@@ -192,10 +192,12 @@ suite("PowerShellNotebooks tests", () => {
     ]);
 
     const feature = new PowerShellNotebooksFeature(new MockLogger(), true);
+    // `notebookContentProvider` is a private property so cast the feature as `any` so we can access it.
+    const notebookContentProvider: vscode.NotebookContentProvider = (feature as any).notebookContentProvider;
 
     for (const [uri, expectedCells] of notebookTestData) {
         test(`Can open a notebook with expected cells - ${uri.fsPath}`, async () => {
-            const actualNotebookData = await feature.openNotebook(uri, {});
+            const actualNotebookData = await notebookContentProvider.openNotebook(uri, {});
             compareCells(actualNotebookData.cells, expectedCells);
         });
     }
@@ -218,8 +220,8 @@ suite("PowerShellNotebooks tests", () => {
             notebookSimpleMixedComments.toString());
 
         // Save it as testFile.ps1 and reopen it using the feature.
-        await feature.saveNotebookAs(uri, vscode.notebook.activeNotebookEditor.document, null);
-        const newNotebook = await feature.openNotebook(uri, {});
+        await notebookContentProvider.saveNotebookAs(uri, vscode.notebook.activeNotebookEditor.document, null);
+        const newNotebook = await notebookContentProvider.openNotebook(uri, {});
 
         // Compare that saving as a file results in the same cell data as the existing one.
         const expectedCells = notebookTestData.get(notebookSimpleMixedComments);
