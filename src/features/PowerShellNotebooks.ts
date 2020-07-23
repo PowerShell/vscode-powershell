@@ -248,13 +248,26 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
 }
 
 class PowerShellNotebookKernel implements vscode.NotebookKernel, vscode.NotebookKernelProvider {
+    private static informationMessage = "PowerShell extension has not finished starting up yet. Please try again in a few moments.";
+
     public id?: string;
     public label: string = "PowerShell";
     public description?: string = "The PowerShell Notebook Mode kernel that runs commands in the PowerShell Integrated Console.";
     public isPreferred?: boolean;
     public preloads?: vscode.Uri[];
 
-    private languageClient: LanguageClient;
+    private _languageClient: LanguageClient;
+    private get languageClient(): LanguageClient {
+        if (!this._languageClient) {
+            vscode.window.showInformationMessage(
+                PowerShellNotebookKernel.informationMessage);
+        }
+        return this._languageClient;
+    }
+
+    private set languageClient(value: LanguageClient) {
+        this._languageClient = value;
+    }
 
     public async executeAllCells(document: vscode.NotebookDocument): Promise<void> {
         for (const cell of document.cells) {
