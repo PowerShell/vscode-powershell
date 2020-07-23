@@ -9,7 +9,6 @@ import * as semver from "semver";
 import vscode = require("vscode");
 import TelemetryReporter from "vscode-extension-telemetry";
 import { Message } from "vscode-jsonrpc";
-import { IFeature } from "./feature";
 import { Logger } from "./logging";
 import { PowerShellProcess } from "./process";
 import Settings = require("./settings");
@@ -24,6 +23,7 @@ import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./feature
 import {
     getPlatformDetails, IPlatformDetails, IPowerShellExeDetails,
     OperatingSystem, PowerShellExeFinder } from "./platform";
+import { LanguageClientConsumer } from "./languageClientConsumer";
 
 export enum SessionStatus {
     NeverStarted,
@@ -44,7 +44,7 @@ export class SessionManager implements Middleware {
     private suppressRestartPrompt: boolean;
     private focusConsoleOnExecute: boolean;
     private platformDetails: IPlatformDetails;
-    private extensionFeatures: IFeature[] = [];
+    private languageClientConsumers: LanguageClientConsumer[] = [];
     private statusBarItem: vscode.StatusBarItem;
     private languageServerProcess: PowerShellProcess;
     private debugSessionProcess: PowerShellProcess;
@@ -101,8 +101,8 @@ export class SessionManager implements Middleware {
         this.registeredCommands.forEach((command) => { command.dispose(); });
     }
 
-    public setExtensionFeatures(extensionFeatures: IFeature[]) {
-        this.extensionFeatures = extensionFeatures;
+    public setLanguageClientConsumers(languageClientConsumers: LanguageClientConsumer[]) {
+        this.languageClientConsumers = languageClientConsumers;
     }
 
     public start(exeNameOverride?: string) {
@@ -599,7 +599,7 @@ export class SessionManager implements Middleware {
                     // Send the new LanguageClient to extension features
                     // so that they can register their message handlers
                     // before the connection is established.
-                    this.updateExtensionFeatures(this.languageServerClient);
+                    this.updateLanguageClientConsumers(this.languageServerClient);
                     this.languageServerClient.onNotification(
                         RunspaceChangedEventType,
                         (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); });
@@ -614,8 +614,8 @@ export class SessionManager implements Middleware {
         }
     }
 
-    private updateExtensionFeatures(languageClient: LanguageClient) {
-        this.extensionFeatures.forEach((feature) => {
+    private updateLanguageClientConsumers(languageClient: LanguageClient) {
+        this.languageClientConsumers.forEach((feature) => {
             feature.setLanguageClient(languageClient);
         });
     }

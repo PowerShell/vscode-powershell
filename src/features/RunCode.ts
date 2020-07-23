@@ -4,7 +4,6 @@
 
 import * as path from "path";
 import vscode = require("vscode");
-import { IFeature, LanguageClient } from "../feature";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
@@ -14,10 +13,9 @@ enum LaunchType {
     Run,
 }
 
-export class RunCodeFeature implements IFeature {
+export class RunCodeFeature implements vscode.Disposable {
 
     private command: vscode.Disposable;
-    private languageClient: LanguageClient;
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand(
@@ -29,10 +27,6 @@ export class RunCodeFeature implements IFeature {
 
     public dispose() {
         this.command.dispose();
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
-        this.languageClient = languageClient;
     }
 
     private async launchTask(

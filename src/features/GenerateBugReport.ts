@@ -4,7 +4,6 @@
 
 import os = require("os");
 import vscode = require("vscode");
-import { IFeature, LanguageClient } from "../feature";
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 
@@ -26,7 +25,7 @@ const extensions =
             return 0;
         });
 
-export class GenerateBugReportFeature implements IFeature {
+export class GenerateBugReportFeature implements vscode.Disposable {
 
     private command: vscode.Disposable;
 
@@ -79,10 +78,6 @@ ${this.generateExtensionTable(extensions)}
 
     public dispose() {
         this.command.dispose();
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        // Eliminate tslint warning.
     }
 
     private generateExtensionTable(installedExtensions): string {

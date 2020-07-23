@@ -8,7 +8,6 @@ import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter from "vscode-extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
-import { IFeature } from "./feature";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
@@ -34,7 +33,7 @@ import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
-import utils = require("./utils");
+import { LanguageClientConsumer } from "./languageClientConsumer";
 import { PowerShellNotebooksFeature } from "./features/PowerShellNotebooks";
 
 // The most reliable way to get the name and version of the current extension.
@@ -46,7 +45,8 @@ const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
 let logger: Logger;
 let sessionManager: SessionManager;
-let extensionFeatures: IFeature[] = [];
+let languageClientConsumers: LanguageClientConsumer[] = [];
+let commandRegistrations: vscode.Disposable[] = [];
 let telemetryReporter: TelemetryReporter;
 
 const documentSelector: DocumentSelector = [
@@ -135,26 +135,30 @@ export function activate(context: vscode.ExtensionContext): void {
             PackageJSON.version,
             telemetryReporter);
 
-    // Create features
-    extensionFeatures = [
-        new ConsoleFeature(logger),
+    // Register commands that do not require Language client
+    commandRegistrations = [
         new ExamplesFeature(),
-        new OpenInISEFeature(),
         new GenerateBugReportFeature(sessionManager),
-        new ExpandAliasFeature(logger),
-        new GetCommandsFeature(logger),
         new ISECompatibilityFeature(),
-        new ShowHelpFeature(logger),
-        new FindModuleFeature(),
+        new OpenInISEFeature(),
         new PesterTestsFeature(sessionManager),
         new RunCodeFeature(sessionManager),
-        new ExtensionCommandsFeature(logger),
         new CodeActionsFeature(logger),
+        new SpecifyScriptArgsFeature(context),
+    ]
+
+    // Features and command registrations that require language client
+    languageClientConsumers = [
+        new ConsoleFeature(logger),
+        new ExpandAliasFeature(logger),
+        new GetCommandsFeature(logger),
+        new ShowHelpFeature(logger),
+        new FindModuleFeature(),
+        new ExtensionCommandsFeature(logger),
         new NewFileOrProjectFeature(),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new PickPSHostProcessFeature(),
-        new SpecifyScriptArgsFeature(context),
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
@@ -167,7 +171,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
         try {
             context.subscriptions.push(vscode.notebook.registerNotebookContentProvider("PowerShellNotebookMode", powerShellNotebooksFeature));
-            extensionFeatures.push(powerShellNotebooksFeature);
+            languageClientConsumers.push(powerShellNotebooksFeature);
         } catch (e) {
             // This would happen if VS Code changes their API.
             powerShellNotebooksFeature.dispose();
@@ -175,7 +179,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     }
 
-    sessionManager.setExtensionFeatures(extensionFeatures);
+    sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
@@ -213,8 +217,12 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext, version: strin
 
 export function deactivate(): void {
     // Clean up all extension features
-    extensionFeatures.forEach((feature) => {
-       feature.dispose();
+    languageClientConsumers.forEach((languageClientConsumer) => {
+        languageClientConsumer.dispose();
+    });
+
+    commandRegistrations.forEach((commandRegistration) => {
+        commandRegistration.dispose();
     });
 
     // Dispose of the current session

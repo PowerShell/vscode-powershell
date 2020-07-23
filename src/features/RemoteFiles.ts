@@ -5,8 +5,8 @@
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType, TextDocumentIdentifier } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { NotificationType, TextDocumentIdentifier } from "vscode-languageclient";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 // NOTE: The following two DidSaveTextDocument* types will
 // be removed when #593 gets fixed.
@@ -22,12 +22,12 @@ export const DidSaveTextDocumentNotificationType =
     new NotificationType<IDidSaveTextDocumentParams, void>(
         "textDocument/didSave");
 
-export class RemoteFilesFeature implements IFeature {
+export class RemoteFilesFeature extends LanguageClientConsumer {
 
     private tempSessionPathPrefix: string;
-    private languageClient: LanguageClient;
 
     constructor() {
+        super();
         // Get the common PowerShell Editor Services temporary file path
         // so that remote files from previous sessions can be closed.
         this.tempSessionPathPrefix =
@@ -51,10 +51,6 @@ export class RemoteFilesFeature implements IFeature {
     public dispose() {
         // Close any leftover remote files before exiting
         this.closeRemoteFiles();
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 
     private isDocumentRemote(doc: vscode.TextDocument) {

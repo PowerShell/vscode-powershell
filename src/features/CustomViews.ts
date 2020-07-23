@@ -5,15 +5,15 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, RequestType } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export class CustomViewsFeature implements IFeature {
+export class CustomViewsFeature extends LanguageClientConsumer {
 
     private commands: vscode.Disposable[] = [];
-    private languageClient: LanguageClient;
     private contentProvider: PowerShellContentProvider;
 
     constructor() {
+        super();
         this.contentProvider = new PowerShellContentProvider();
         this.commands.push(
             vscode.workspace.registerTextDocumentContentProvider(
@@ -65,8 +65,6 @@ export class CustomViewsFeature implements IFeature {
                     args.id,
                     args.appendedHtmlBodyContent);
             });
-
-        this.languageClient = languageClient;
     }
 }
 
