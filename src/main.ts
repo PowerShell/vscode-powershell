@@ -171,7 +171,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
         try {
             context.subscriptions.push(vscode.notebook.registerNotebookContentProvider("PowerShellNotebookMode", powerShellNotebooksFeature));
-            extensionFeatures.push(powerShellNotebooksFeature);
+            languageClientConsumers.push(powerShellNotebooksFeature);
         } catch (e) {
             // This would happen if VS Code changes their API.
             powerShellNotebooksFeature.dispose();
@@ -179,7 +179,7 @@ export function activate(context: vscode.ExtensionContext): void {
         }
     }
 
-    sessionManager.setExtensionFeatures(languageClientConsumers);
+    sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
     if (extensionSettings.startAutomatically) {
         sessionManager.start();

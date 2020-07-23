@@ -4,7 +4,7 @@
 import * as vscode from "vscode";
 import { v4 as uuidv4 } from 'uuid';
 import { LanguageClient } from "vscode-languageclient";
-import { IFeature } from "../feature";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 import { Logger } from "../logging";
 import { SessionManager } from "../session";
 
@@ -15,12 +15,12 @@ export interface IExternalPowerShellDetails {
     architecture: string;
 }
 
-export class ExternalApiFeature implements IFeature {
+export class ExternalApiFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
-    private languageClient: LanguageClient;
     private static readonly registeredExternalExtension: Map<string, IExternalExtension> = new Map<string, IExternalExtension>();
 
     constructor(private sessionManager: SessionManager, private log: Logger) {
+        super();
         this.commands = [
             /*
             DESCRIPTION:
@@ -140,10 +140,6 @@ export class ExternalApiFeature implements IFeature {
         for (const command of this.commands) {
             command.dispose();
         }
-    }
-
-    public setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
     }
 }
 

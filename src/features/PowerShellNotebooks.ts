@@ -4,16 +4,15 @@
 
 import * as vscode from "vscode";
 import { CommentType } from "../settings";
-import { IFeature, LanguageClient } from "../feature";
 import { EvaluateRequestType } from "./Console";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 import Settings = require("../settings");
 import { ILogger } from "../logging";
 
-export class PowerShellNotebooksFeature implements vscode.NotebookContentProvider, vscode.NotebookKernel, IFeature {
+export class PowerShellNotebooksFeature extends LanguageClientConsumer implements vscode.NotebookContentProvider, vscode.NotebookKernel {
 
     private readonly showNotebookModeCommand: vscode.Disposable;
     private readonly hideNotebookModeCommand: vscode.Disposable;
-    private languageClient: LanguageClient;
 
     private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
     public onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent> = this._onDidChangeNotebook.event;
@@ -23,6 +22,7 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     public preloads?: vscode.Uri[];
 
     public constructor(private logger: ILogger, skipRegisteringCommands?: boolean) {
+        super();
         // VS Code Notebook API uses this property for handling cell execution.
         this.kernel = this;
 
@@ -189,10 +189,6 @@ export class PowerShellNotebooksFeature implements vscode.NotebookContentProvide
     public dispose() {
         this.showNotebookModeCommand.dispose();
         this.hideNotebookModeCommand.dispose();
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
-        this.languageClient = languageClient;
     }
 
     private async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri, _token: vscode.CancellationToken): Promise<void> {
