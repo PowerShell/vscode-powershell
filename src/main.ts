@@ -12,12 +12,10 @@ import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
 import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
-import { PickPSHostProcessFeature } from "./features/DebugSession";
-import { PickRunspaceFeature } from "./features/DebugSession";
-import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
+import { ExternalApiFeature } from "./features/ExternalApi";
 import { FindModuleFeature } from "./features/FindModule";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
@@ -26,14 +24,17 @@ import { ISECompatibilityFeature } from "./features/ISECompatibility";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
+import { PickPSHostProcessFeature, PickRunspaceFeature } from "./features/DebugSession";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { RunCodeFeature } from "./features/RunCode";
 import { ShowHelpFeature } from "./features/ShowHelp";
+import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger, LogLevel } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
+import { PowerShellNotebooksFeature } from "./features/PowerShellNotebooks";
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires
@@ -161,9 +162,24 @@ export function activate(context: vscode.ExtensionContext): void {
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
+        new ExternalApiFeature(sessionManager, logger)
     ];
 
-    sessionManager.setLanguageClientConsumers(languageClientConsumers);
+    // Notebook UI is only supported in VS Code Insiders.
+    if(vscode.env.uriScheme === "vscode-insiders") {
+        const powerShellNotebooksFeature = new PowerShellNotebooksFeature(logger);
+
+        try {
+            context.subscriptions.push(vscode.notebook.registerNotebookContentProvider("PowerShellNotebookMode", powerShellNotebooksFeature));
+            extensionFeatures.push(powerShellNotebooksFeature);
+        } catch (e) {
+            // This would happen if VS Code changes their API.
+            powerShellNotebooksFeature.dispose();
+            logger.writeVerbose("Failed to register NotebookContentProvider", e);
+        }
+    }
+
+    sessionManager.setExtensionFeatures(languageClientConsumers);
 
     if (extensionSettings.startAutomatically) {
         sessionManager.start();

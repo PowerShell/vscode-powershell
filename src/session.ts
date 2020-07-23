@@ -54,6 +54,7 @@ export class SessionManager implements Middleware {
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
     private bundledModulesPath: string;
+    private started: boolean = false;
 
     // Initialized by the start() method, since this requires settings
     private powershellExeFinder: PowerShellExeFinder;
@@ -61,7 +62,7 @@ export class SessionManager implements Middleware {
     // When in development mode, VS Code's session ID is a fake
     // value of "someValue.machineId".  Use that to detect dev
     // mode for now until Microsoft/vscode#10272 gets implemented.
-    private readonly inDevelopmentMode =
+    public readonly InDevelopmentMode =
         vscode.env.sessionId === "someValue.sessionId";
 
     constructor(
@@ -167,7 +168,7 @@ export class SessionManager implements Middleware {
 
         this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
 
-        if (this.inDevelopmentMode) {
+        if (this.InDevelopmentMode) {
             const devBundledModulesPath =
                 path.resolve(
                     __dirname,
@@ -196,7 +197,7 @@ export class SessionManager implements Middleware {
         } else {
             const startupBanner = `=====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
 `;
-            this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
+            this.editorServicesArgs += `-StartupBanner '${startupBanner}' `;
         }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
@@ -272,6 +273,12 @@ export class SessionManager implements Middleware {
                 sessionSettings);
 
         return this.debugSessionProcess;
+    }
+
+    public async waitUntilStarted(): Promise<void> {
+        while(!this.started) {
+            await utils.sleep(300);
+        }
     }
 
     // ----- LanguageClient middleware methods -----
@@ -549,8 +556,9 @@ export class SessionManager implements Middleware {
                         .then(
                             async (versionDetails) => {
                                 this.versionDetails = versionDetails;
+                                this.started = true;
 
-                                if (!this.inDevelopmentMode) {
+                                if (!this.InDevelopmentMode) {
                                     this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
                                         { powershellVersion: versionDetails.version });
                                 }

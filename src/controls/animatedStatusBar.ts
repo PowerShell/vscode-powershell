@@ -7,7 +7,8 @@ import {
     StatusBarAlignment,
     StatusBarItem,
     ThemeColor,
-    window} from "vscode";
+    window,
+    Command} from "vscode";
 
 export function showAnimatedStatusBarMessage(text: string, hideWhenDone: Thenable<any>): Disposable {
     const animatedStatusBarItem: AnimatedStatusBarItem = new AnimatedStatusBarItem(text);
@@ -58,11 +59,11 @@ class AnimatedStatusBarItem implements StatusBarItem {
         this.statusBarItem.color = value;
     }
 
-    public get command(): string {
+    public get command(): string | Command {
         return this.statusBarItem.command;
     }
 
-    public set command(value: string) {
+    public set command(value: string | Command) {
         this.statusBarItem.command = value;
     }
 
