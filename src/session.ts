@@ -542,6 +542,8 @@ export class SessionManager implements Middleware {
                     connectFunc,
                     clientOptions);
 
+            this.languageServerClient.registerProposedFeatures();
+
             this.languageServerClient.onReady().then(
                 () => {
                     this.languageServerClient
