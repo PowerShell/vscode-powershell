@@ -50,7 +50,7 @@
   "dependencies": {
     "node-fetch": "^2.6.0",
     "semver": "^7.3.2",
-    "uuid": "^8.2.0",
+    "uuid": "^8.3.0",
     "vscode-extension-telemetry": "~0.1.6",
     "vscode-languageclient": "~6.1.3"
   },
