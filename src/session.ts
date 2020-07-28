@@ -326,8 +326,7 @@ export class SessionManager implements Middleware {
             return resolvedCodeLens;
     }
 
-    // During preview, populate a new setting value but not remove the old value.
-    // TODO: When the next stable extension releases, then the old value can be safely removed. Tracked in this issue: https://github.com/PowerShell/vscode-powershell/issues/2693
+    // Move old setting codeFormatting.whitespaceAroundPipe to new setting codeFormatting.addWhitespaceAroundPipe
     private async migrateWhitespaceAroundPipeSetting() {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
@@ -337,6 +336,7 @@ export class SessionManager implements Middleware {
             const configurationTarget = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
             const value = configuration.get(deprecatedSetting, configurationTarget)
             await Settings.change(newSetting, value, configurationTarget);
+            await Settings.change(deprecatedSetting, undefined, configurationTarget);
         }
     }
 

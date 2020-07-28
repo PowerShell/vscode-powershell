@@ -50,7 +50,7 @@
   "dependencies": {
     "node-fetch": "^2.6.0",
     "semver": "^7.3.2",
-    "uuid": "^8.2.0",
+    "uuid": "^8.3.0",
     "vscode-extension-telemetry": "~0.1.6",
     "vscode-languageclient": "~6.1.3"
   },
@@ -58,7 +58,7 @@
     "@types/glob": "^7.1.3",
     "@types/mocha": "~7.0.2",
     "@types/mock-fs": "~4.10.0",
-    "@types/node": "~14.0.23",
+    "@types/node": "~14.0.26",
     "@types/node-fetch": "~2.5.7",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.3.1",
@@ -218,8 +218,8 @@
         }
       },
       {
-        "command": "PowerShell.ShowNotebookMode",
-        "title": "(Preview) Show Notebook Mode",
+        "command": "PowerShell.EnableNotebookMode",
+        "title": "(Preview) Enable Notebook Mode",
         "category": "PowerShell",
         "icon": {
           "light": "resources/light/book.svg",
@@ -227,8 +227,8 @@
         }
       },
       {
-        "command": "PowerShell.HideNotebookMode",
-        "title": "Show Text Editor",
+        "command": "PowerShell.DisableNotebookMode",
+        "title": "(Preview) Disable Notebook Mode",
         "category": "PowerShell",
         "icon": {
           "light": "resources/light/file-code.svg",
@@ -413,12 +413,12 @@
         },
         {
           "when": "editorLangId == powershell && config.powershell.notebooks.showToggleButton",
-          "command": "PowerShell.ShowNotebookMode",
+          "command": "PowerShell.EnableNotebookMode",
           "group": "navigation@102"
         },
         {
           "when": "resourceLangId == powershell && notebookEditorFocused",
-          "command": "PowerShell.HideNotebookMode",
+          "command": "PowerShell.DisableNotebookMode",
           "group": "navigation@102"
         }
       ],
@@ -800,6 +800,11 @@
           "type": "boolean",
           "default": false,
           "description": "Removes redundant whitespace between parameters."
+        },
+        "powershell.codeFormatting.whitespaceAroundPipe": {
+          "type": "boolean",
+          "default": true,
+          "description": "REMOVED. Please use the \"powershell.codeFormatting.addWhitespaceAroundPipe\" setting instead. If you've used this setting before, we have moved it for you automatically."
         },
         "powershell.codeFormatting.addWhitespaceAroundPipe": {
           "type": "boolean",
