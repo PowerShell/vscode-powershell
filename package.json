@@ -826,6 +826,11 @@
           "default": true,
           "description": "Align assignment statements in a hashtable or a DSC Configuration."
         },
+        "powershell.codeFormatting.useConstantStrings": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use single quotes if a string is not interpolated and its value does not contain a single quote."
+        },
         "powershell.codeFormatting.useCorrectCasing": {
           "type": "boolean",
           "default": false,

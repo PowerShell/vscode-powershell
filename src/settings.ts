@@ -58,6 +58,7 @@ export interface ICodeFormattingSettings {
     trimWhitespaceAroundPipe: boolean;
     ignoreOneLineBlock: boolean;
     alignPropertyValuePairs: boolean;
+    useConstantStrings: boolean;
     useCorrectCasing: boolean;
 }
 
@@ -185,6 +186,7 @@ export function load(): ISettings {
         trimWhitespaceAroundPipe: false,
         ignoreOneLineBlock: true,
         alignPropertyValuePairs: true,
+        useConstantStrings: false,
         useCorrectCasing: false,
     };
 
