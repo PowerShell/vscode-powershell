@@ -1,11 +1,19 @@
 # PowerShell Extension Release History
 
 ## v2020.7.0-preview
-### Wednesday, July 22, 2020
+### Thursday, July 30, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
+- 📺✨ [vscode-powershell #2834](https://github.com/PowerShell/vscode-powershell/pull/2834) -
+  Enable LSP proposed features for Semantic Highlighting. Also allow the PowerShell ISE theme to use Semantic Highlighting.
+- 👮✨ [vscode-powershell #2831](https://github.com/PowerShell/vscode-powershell/pull/2831) -
+  Expose new formatter setting `powershell.codeFormatting.useConstantStrings` from PSScriptAnalyzer 1.19.1. (Thanks @bergmeister!)
 - 📺✨ [vscode-powershell #2789](https://github.com/PowerShell/vscode-powershell/pull/2789) -
   Initial Notebook UI Mode in VS Code Insiders.
+- 🔧✨ [vscode-powershell #2693](https://github.com/PowerShell/vscode-powershell/pull/2830) -
+  Migrate setting value of `powershell.codeFormatting.whitespaceAroundPipe` to new setting `powershell.codeFormatting.addWhitespaceAroundPipe` automatically. (Thanks @bergmeister!)
+- 🧹✨ [vscode-powershell #2685](https://github.com/PowerShell/vscode-powershell/pull/2685) -
+  Refactor vscode-powershell IFeature classes to separate them into features that depend on the language server and features that don't. (Thanks @bergmeister!)
 - ✨ [vscode-powershell #2799](https://github.com/PowerShell/vscode-powershell/pull/2799) -
   Initial VSCode-extension-facing PowerShell API: registering, unregistering, and getting PowerShell version details.
 - 🛫✨ [vscode-powershell #2796](https://github.com/PowerShell/vscode-powershell/pull/2796) -
@@ -17,6 +25,10 @@
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
+- 📺✨ [PowerShellEditorServices #1328](https://github.com/PowerShell/PowerShellEditorServices/pull/1328) -
+  Enable handlers for Semantic Highlighting for better highlighting accuracy.
+- 👮✨ [PowerShellEditorServices #1333](https://github.com/PowerShell/PowerShellEditorServices/pull/1333) -
+  Expose new rule PSAvoidUsingDoubleQuotesForConstantString added in PSScriptAnalyzer 1.19.1. (Thanks @bergmeister!)
 - 📺✨ [PowerShellEditorServices #1321](https://github.com/PowerShell/PowerShellEditorServices/pull/1321) -
   Needed changes for Notebook UI Support.
 - 🛫✨ [PowerShellEditorServices #1323](https://github.com/PowerShell/PowerShellEditorServices/pull/1323) -
