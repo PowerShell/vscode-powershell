@@ -1,5 +1,6 @@
 {
 	"name": "PowerShell ISE",
+	"semanticHighlighting": true,
 	"tokenColors": [
 		{
 			"settings": {

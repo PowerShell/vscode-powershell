@@ -549,6 +549,9 @@ export class SessionManager implements Middleware {
                     connectFunc,
                     clientOptions);
 
+            // This enables handling Semantic Highlighting messages in PowerShell Editor Services
+            this.languageServerClient.registerProposedFeatures();
+
             this.languageServerClient.onReady().then(
                 () => {
                     this.languageServerClient
