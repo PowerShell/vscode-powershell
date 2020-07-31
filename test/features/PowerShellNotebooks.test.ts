@@ -210,6 +210,41 @@ suite("PowerShellNotebooks tests", () => {
                 }
             }
         },
+        {
+            cellKind: vscode.CellKind.Code,
+            language: "powershell",
+            source: content.slice(17, 18).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
+        },
+        {
+            cellKind: vscode.CellKind.Markdown,
+            language: "markdown",
+            source: content.slice(18, 19).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: false,
+                    openBlockCommentOnOwnLine: false
+                }
+            }
+        },
+        {
+            cellKind: vscode.CellKind.Code,
+            language: "powershell",
+            source: content.slice(19, 20).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
+        },
     ]);
 
     content = readBackingFile(notebookSimpleLineComments).split(os.EOL);

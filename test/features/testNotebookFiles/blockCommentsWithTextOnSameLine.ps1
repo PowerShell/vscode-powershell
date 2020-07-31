@@ -5,13 +5,16 @@ baz
 #>
 Get-ChildItem
 <# ========
-# Foo
+# A
 ========= #>
 Get-ChildItem
 <# ========
-# Foo
+# B
 #>
 Get-ChildItem
 <#
-# Foo
+# C
 ========= #>
+Get-ChildItem
+<# D #>
+Get-ChildItem
