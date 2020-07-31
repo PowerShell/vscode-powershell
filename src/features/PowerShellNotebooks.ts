@@ -9,6 +9,7 @@ import { LanguageClientConsumer } from "../languageClientConsumer";
 import Settings = require("../settings");
 import { ILogger } from "../logging";
 import { LanguageClient } from "vscode-languageclient";
+import { EOL } from "os";
 
 export class PowerShellNotebooksFeature extends LanguageClientConsumer {
 
@@ -124,7 +125,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                         cellKind: vscode.CellKind.Markdown,
                         language: "markdown",
                         outputs: [],
-                        source: currentCellSource.join("\n"),
+                        source: currentCellSource.join(EOL),
                         metadata: {
                             custom: {
                                 commentType: CommentType.BlockComment,
@@ -152,7 +153,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                         cellKind,
                         language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
                         outputs: [],
-                        source: currentCellSource.join("\n"),
+                        source: currentCellSource.join(EOL),
                         metadata: {
                             custom: {
                                 commentType: cellKind === vscode.CellKind.Markdown ? CommentType.LineComment : CommentType.Disabled,
@@ -195,7 +196,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                         cellKind: cellKind!,
                         language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
                         outputs: [],
-                        source: currentCellSource.join("\n"),
+                        source: currentCellSource.join(EOL),
                         metadata: {
                             custom: {
                                 commentType: cellKind === vscode.CellKind.Markdown ? CommentType.LineComment : CommentType.Disabled,
@@ -219,7 +220,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                 cellKind: cellKind!,
                 language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
                 outputs: [],
-                source: currentCellSource.join("\n"),
+                source: currentCellSource.join(EOL),
                 metadata: {
                     custom: {
                         commentType: cellKind === vscode.CellKind.Markdown ? CommentType.LineComment : CommentType.Disabled,
@@ -261,7 +262,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
         const retArr: string[] = [];
         for (const cell of document.cells) {
             if (cell.cellKind === vscode.CellKind.Code) {
-                retArr.push(...cell.document.getText().split(/\r|\n|\r\n/));
+                retArr.push(...cell.document.getText().split(/\r\n|\r|\n/));
             } else {
                 // First honor the comment type of the cell if it already has one.
                 // If not, use the user setting.
@@ -270,7 +271,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                 if (commentKind === CommentType.BlockComment) {
                     const openBlockCommentOnOwnLine: boolean = cell.metadata.custom?.openBlockCommentOnOwnLine;
                     const closeBlockCommentOnOwnLine: boolean = cell.metadata.custom?.closeBlockCommentOnOwnLine;
-                    const text = cell.document.getText().split(/\r|\n|\r\n/);
+                    const text = cell.document.getText().split(/\r\n|\r|\n/);
                     if (openBlockCommentOnOwnLine) {
                         retArr.push("<#");
                     } else {
@@ -285,12 +286,12 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                         retArr.push("#>");
                     }
                 } else {
-                    retArr.push(...cell.document.getText().split(/\r|\n|\r\n/).map((line) => `# ${line}`));
+                    retArr.push(...cell.document.getText().split(/\r\n|\r|\n/).map((line) => `# ${line}`));
                 }
             }
         }
 
-        await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join("\n")));
+        await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join(EOL)));
     }
 }
 
