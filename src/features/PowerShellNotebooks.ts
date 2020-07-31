@@ -9,7 +9,6 @@ import { LanguageClientConsumer } from "../languageClientConsumer";
 import Settings = require("../settings");
 import { ILogger } from "../logging";
 import { LanguageClient } from "vscode-languageclient";
-import { EOL } from "os";
 
 export class PowerShellNotebooksFeature extends LanguageClientConsumer {
 
@@ -78,7 +77,7 @@ function CreateCell(cellKind: vscode.CellKind, source: string[], metadata: IPowe
         cellKind,
         language: cellKind === vscode.CellKind.Markdown ? "markdown" : "powershell",
         outputs: [],
-        source: source.join(EOL),
+        source: source.join("\n"),
         metadata: {
             custom: metadata,
         },
@@ -98,12 +97,28 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
         this.logger.writeDiagnostic(`Opening Notebook: ${uri.toString()}`);
 
         const data = (await vscode.workspace.fs.readFile(actualUri)).toString();
-        const lines = data.split(/\r\n|\r|\n/g);
+
+        let lines: string[];
+        // store the line ending in the metadata of the document
+        // so that we honor the line ending of the original file
+        // on save.
+        let lineEnding: string;
+        if (data.indexOf('\r\n') !== -1) {
+            lines = data.split(/\r\n/g);
+            lineEnding = '\r\n';
+        } else {
+            lines = data.split(/\n/g);
+            lineEnding = '\n';
+        }
 
         const notebookData: vscode.NotebookData = {
             languages: ["powershell"],
             cells: [],
-            metadata: {}
+            metadata: {
+                custom: {
+                    lineEnding,
+                }
+            }
         };
 
         let currentCellSource: string[] = [];
@@ -291,7 +306,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
         const retArr: string[] = [];
         for (const cell of document.cells) {
             if (cell.cellKind === vscode.CellKind.Code) {
-                retArr.push(...cell.document.getText().split(/\r\n|\r|\n/));
+                retArr.push(...cell.document.getText().split(/\r\n|\n/));
             } else {
                 // First honor the comment type of the cell if it already has one.
                 // If not, use the user setting.
@@ -300,7 +315,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                 if (commentKind === CommentType.BlockComment) {
                     const openBlockCommentOnOwnLine: boolean = cell.metadata.custom?.openBlockCommentOnOwnLine;
                     const closeBlockCommentOnOwnLine: boolean = cell.metadata.custom?.closeBlockCommentOnOwnLine;
-                    const text = cell.document.getText().split(/\r\n|\r|\n/);
+                    const text = cell.document.getText().split(/\r\n|\n/);
                     if (openBlockCommentOnOwnLine) {
                         retArr.push("<#");
                     } else {
@@ -315,12 +330,13 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                         retArr.push("#>");
                     }
                 } else {
-                    retArr.push(...cell.document.getText().split(/\r\n|\r|\n/).map((line) => `# ${line}`));
+                    retArr.push(...cell.document.getText().split(/\r\n|\n/).map((line) => `# ${line}`));
                 }
             }
         }
 
-        await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join(EOL)));
+        const eol = document.metadata.custom.lineEnding;
+        await vscode.workspace.fs.writeFile(targetResource, new TextEncoder().encode(retArr.join(eol)));
     }
 }
 
