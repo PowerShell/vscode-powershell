@@ -91,6 +91,17 @@
 			}
 		},
 		{
+			"name": "Keys and Properties",
+			"scope": [
+				"property",
+				"variable.other.property",
+				"variable.other.property.powershell"
+			],
+			"settings": {
+				"foreground": "#2d2e45"
+			}
+		},
+		{
 			"name": "Variables",
 			"scope": [
 				"variable",
