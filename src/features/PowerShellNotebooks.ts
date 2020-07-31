@@ -91,13 +91,31 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
         let cellKind: vscode.CellKind | undefined;
         let insideBlockComment: boolean = false;
 
+        // This dictates whether the BlockComment cell was read in with content on the same
+        // line as the opening <#. This is so we can preserve the format of the backing file on save.
+        let openBlockCommentOnOwnLine: boolean = false;
+
         // Iterate through all lines in a document (aka ps1 file) and group the lines
         // into cells (markdown or code) that will be rendered in Notebook mode.
         // tslint:disable-next-line: prefer-for-of
         for (let i = 0; i < lines.length; i++) {
             // Handle block comments
             if (insideBlockComment) {
-                if (lines[i] === "#>") {
+                if (lines[i].endsWith("#>")) {
+                    // Get the content of the current line without #>
+                    const currentLine = lines[i]
+                        .substring(0, lines[i].length - 2)
+                        .trimRight();
+
+                    // This dictates whether the BlockComment cell was read in with content on the same
+                    // line as the closing #>. This is so we can preserve the format of the backing file
+                    // on save.
+                    let closeBlockCommentOnOwnLine: boolean = true;
+                    if (currentLine) {
+                        closeBlockCommentOnOwnLine = false;
+                        currentCellSource.push(currentLine);
+                    }
+
                     // We've reached the end of a block comment,
                     // push a markdown cell.
                     insideBlockComment = false;
@@ -109,7 +127,9 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                         source: currentCellSource.join("\n"),
                         metadata: {
                             custom: {
-                                commentType: CommentType.BlockComment
+                                commentType: CommentType.BlockComment,
+                                openBlockCommentOnOwnLine,
+                                closeBlockCommentOnOwnLine
                             }
                         }
                     });
@@ -122,7 +142,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                 // If we're still in a block comment, push the line and continue.
                 currentCellSource.push(lines[i]);
                 continue;
-            } else if (lines[i] === "<#") {
+            } else if (lines[i].startsWith("<#")) {
                 // If we found the start of a block comment,
                 // insert what we saw leading up to this.
                 // If cellKind is null/undefined, that means we
@@ -142,7 +162,20 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                 }
 
                 // reset state because we're starting a new Markdown cell.
-                currentCellSource = [];
+
+                // Get the content of the current line without <#
+                const currentLine = lines[i]
+                    .substring(2, lines[i].length)
+                    .trimLeft();
+
+                if (currentLine) {
+                    openBlockCommentOnOwnLine = false;
+                    currentCellSource = [ currentLine ];
+                } else {
+                    openBlockCommentOnOwnLine = true;
+                    currentCellSource = [];
+                }
+
                 cellKind = vscode.CellKind.Markdown;
                 insideBlockComment = true;
                 continue;
@@ -235,9 +268,22 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
                 const commentKind = cell.metadata.custom?.commentType || Settings.load().notebooks.saveMarkdownCellsAs;
 
                 if (commentKind === CommentType.BlockComment) {
-                    retArr.push("<#");
-                    retArr.push(...cell.document.getText().split(/\r|\n|\r\n/));
-                    retArr.push("#>");
+                    const openBlockCommentOnOwnLine: boolean = cell.metadata.custom?.openBlockCommentOnOwnLine;
+                    const closeBlockCommentOnOwnLine: boolean = cell.metadata.custom?.closeBlockCommentOnOwnLine;
+                    const text = cell.document.getText().split(/\r|\n|\r\n/);
+                    if (openBlockCommentOnOwnLine) {
+                        retArr.push("<#");
+                    } else {
+                        text[0] = `<# ${text[0]}`;
+                    }
+
+                    if (!closeBlockCommentOnOwnLine) {
+                        text[text.length - 1] += " #>";
+                        retArr.push(...text);
+                    } else {
+                        retArr.push(...text);
+                        retArr.push("#>");
+                    }
                 } else {
                     retArr.push(...cell.document.getText().split(/\r|\n|\r\n/).map((line) => `# ${line}`));
                 }

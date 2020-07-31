@@ -28,6 +28,8 @@ const notebookOnlyMarkdown = vscode.Uri.file(
     path.join(...notebookDir,"onlyMarkdown.ps1"));
 const notebookSimpleBlockComments = vscode.Uri.file(
     path.join(...notebookDir,"simpleBlockComments.ps1"));
+const notebookBlockCommentsWithTextOnSameLine = vscode.Uri.file(
+    path.join(...notebookDir,"blockCommentsWithTextOnSameLine.ps1"));
 const notebookSimpleLineComments = vscode.Uri.file(
     path.join(...notebookDir,"simpleLineComments.ps1"));
 const notebookSimpleMixedComments = vscode.Uri.file(
@@ -90,6 +92,8 @@ suite("PowerShellNotebooks tests", () => {
             metadata: {
                 custom: {
                     commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: true,
+                    openBlockCommentOnOwnLine: true
                 }
             }
         },
@@ -112,6 +116,49 @@ suite("PowerShellNotebooks tests", () => {
             metadata: {
                 custom: {
                     commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: true,
+                    openBlockCommentOnOwnLine: true
+                }
+            }
+        },
+    ]);
+
+    content = readBackingFile(notebookBlockCommentsWithTextOnSameLine).split(os.EOL);
+    notebookTestData.set(notebookBlockCommentsWithTextOnSameLine, [
+        {
+            cellKind: vscode.CellKind.Markdown,
+            language: "markdown",
+            source: content.slice(0, 5).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: true,
+                    openBlockCommentOnOwnLine: true
+                }
+            }
+        },
+        {
+            cellKind: vscode.CellKind.Code,
+            language: "powershell",
+            source: content.slice(5, 6).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
+        },
+        {
+            cellKind: vscode.CellKind.Markdown,
+            language: "markdown",
+            source: content.slice(6, 9).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: false,
+                    openBlockCommentOnOwnLine: false
                 }
             }
         },
@@ -186,6 +233,8 @@ suite("PowerShellNotebooks tests", () => {
             metadata: {
                 custom: {
                     commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: true,
+                    openBlockCommentOnOwnLine: true
                 }
             }
         },
@@ -226,5 +275,39 @@ suite("PowerShellNotebooks tests", () => {
         // Compare that saving as a file results in the same cell data as the existing one.
         const expectedCells = notebookTestData.get(notebookSimpleMixedComments);
         compareCells(newNotebook.cells, expectedCells);
+    }).timeout(20000);
+
+    test("Can save a new notebook with expected content", async () => {
+        const uri = vscode.Uri.file(path.join(__dirname, "testFile1.ps1"));
+        try {
+            await vscode.workspace.fs.delete(uri);
+        } catch {
+            // If the file doesn't exist that's fine.
+        }
+
+        // Open an existing notebook ps1.
+        await vscode.commands.executeCommand("vscode.openWith", notebookBlockCommentsWithTextOnSameLine, "PowerShellNotebookMode");
+
+        // Allow some time to pass to render the Notebook
+        await utils.sleep(5000);
+        assert.strictEqual(
+            vscode.notebook.activeNotebookEditor.document.uri.toString(),
+            notebookBlockCommentsWithTextOnSameLine.toString());
+
+        // Save it as testFile1.ps1 and reopen it using the feature.
+        await notebookContentProvider.saveNotebookAs(uri, vscode.notebook.activeNotebookEditor.document, null);
+        const contentOfBackingFile = (await vscode.workspace.fs.readFile(uri)).toString();
+
+        assert.strictEqual(
+`<#
+Foo
+bar
+baz
+#>
+Get-ChildItem
+<# ========
+# Foo
+========= #>`,
+            contentOfBackingFile);
     }).timeout(20000);
 });
