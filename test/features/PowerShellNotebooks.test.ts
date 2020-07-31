@@ -162,6 +162,54 @@ suite("PowerShellNotebooks tests", () => {
                 }
             }
         },
+        {
+            cellKind: vscode.CellKind.Code,
+            language: "powershell",
+            source: content.slice(9, 10).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
+        },
+        {
+            cellKind: vscode.CellKind.Markdown,
+            language: "markdown",
+            source: content.slice(10, 13).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: true,
+                    openBlockCommentOnOwnLine: false
+                }
+            }
+        },
+        {
+            cellKind: vscode.CellKind.Code,
+            language: "powershell",
+            source: content.slice(13, 14).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.Disabled,
+                }
+            }
+        },
+        {
+            cellKind: vscode.CellKind.Markdown,
+            language: "markdown",
+            source: content.slice(14, 17).join(os.EOL),
+            outputs: [],
+            metadata: {
+                custom: {
+                    commentType: CommentType.BlockComment,
+                    closeBlockCommentOnOwnLine: false,
+                    openBlockCommentOnOwnLine: true
+                }
+            }
+        },
     ]);
 
     content = readBackingFile(notebookSimpleLineComments).split(os.EOL);
@@ -294,20 +342,12 @@ suite("PowerShellNotebooks tests", () => {
             vscode.notebook.activeNotebookEditor.document.uri.toString(),
             notebookBlockCommentsWithTextOnSameLine.toString());
 
-        // Save it as testFile1.ps1 and reopen it using the feature.
+        // Save it as testFile1.ps1
+        const contentOfBackingFileBefore = (await vscode.workspace.fs.readFile(notebookBlockCommentsWithTextOnSameLine)).toString();
         await notebookContentProvider.saveNotebookAs(uri, vscode.notebook.activeNotebookEditor.document, null);
-        const contentOfBackingFile = (await vscode.workspace.fs.readFile(uri)).toString();
+        const contentOfBackingFileAfter = (await vscode.workspace.fs.readFile(uri)).toString();
 
-        assert.strictEqual(
-`<#
-Foo
-bar
-baz
-#>
-Get-ChildItem
-<# ========
-# Foo
-========= #>`,
-            contentOfBackingFile);
+        // Verify that saving does not mutate result.
+        assert.strictEqual(contentOfBackingFileBefore, contentOfBackingFileAfter);
     }).timeout(20000);
 });

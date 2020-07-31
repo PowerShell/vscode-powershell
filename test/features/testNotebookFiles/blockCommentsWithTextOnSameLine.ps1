@@ -7,3 +7,11 @@ Get-ChildItem
 <# ========
 # Foo
 ========= #>
+Get-ChildItem
+<# ========
+# Foo
+#>
+Get-ChildItem
+<#
+# Foo
+========= #>
