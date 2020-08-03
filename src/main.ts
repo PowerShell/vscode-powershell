@@ -15,7 +15,7 @@ import { DebugSessionFeature } from "./features/DebugSession";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
-import { ExternalApiFeature } from "./features/ExternalApi";
+import { ExternalApiFeature, IPowerShellExtensionClient } from "./features/ExternalApi";
 import { FindModuleFeature } from "./features/FindModule";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
@@ -54,7 +54,7 @@ const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "untitled" },
 ];
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext): IPowerShellExtensionClient {
     // create telemetry reporter on extension activation
     telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
 
@@ -147,6 +147,8 @@ export function activate(context: vscode.ExtensionContext): void {
         new SpecifyScriptArgsFeature(context),
     ]
 
+    const externalApi = new ExternalApiFeature(sessionManager, logger);
+
     // Features and command registrations that require language client
     languageClientConsumers = [
         new ConsoleFeature(logger),
@@ -162,7 +164,7 @@ export function activate(context: vscode.ExtensionContext): void {
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
-        new ExternalApiFeature(sessionManager, logger)
+        externalApi
     ];
 
     // Notebook UI is only supported in VS Code Insiders.
@@ -188,6 +190,12 @@ export function activate(context: vscode.ExtensionContext): void {
     if (extensionSettings.startAutomatically) {
         sessionManager.start();
     }
+
+    return {
+        registerExternalExtension: (id: string, apiVersion: string = 'v1') => externalApi.registerExternalExtension(id, apiVersion),
+        unregisterExternalExtension: uuid => externalApi.unregisterExternalExtension(uuid),
+        getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
+    };
 }
 
 function checkForUpdatedVersion(context: vscode.ExtensionContext, version: string) {

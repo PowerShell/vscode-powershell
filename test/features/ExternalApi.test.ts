@@ -3,27 +3,37 @@
  *--------------------------------------------------------*/
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { beforeEach, afterEach } from "mocha";
-import { IExternalPowerShellDetails } from "../../src/features/ExternalApi";
+import { before, beforeEach, afterEach } from "mocha";
+import { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 
 const testExtensionId = "ms-vscode.powershell-preview";
 
 suite("ExternalApi feature - Registration API", () => {
-    test("It can register and unregister an extension", async () => {
-        const sessionId: string = await vscode.commands.executeCommand("PowerShell.RegisterExternalExtension", testExtensionId);
+    let powerShellExtensionClient: IPowerShellExtensionClient;
+    before(async () => {
+        const powershellExtension = vscode.extensions.getExtension<IPowerShellExtensionClient>(testExtensionId);
+        if (!powershellExtension.isActive) {
+            powerShellExtensionClient = await powershellExtension.activate();
+            return;
+        }
+        powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
+    });
+
+    test("It can register and unregister an extension", () => {
+        const sessionId: string = powerShellExtensionClient.registerExternalExtension(testExtensionId);
         assert.notStrictEqual(sessionId , "");
         assert.notStrictEqual(sessionId , null);
         assert.strictEqual(
-            await vscode.commands.executeCommand("PowerShell.UnregisterExternalExtension", sessionId),
+            powerShellExtensionClient.unregisterExternalExtension(sessionId),
             true);
     });
 
-    test("It can register and unregister an extension with a version", async () => {
-        const sessionId: string = await vscode.commands.executeCommand("PowerShell.RegisterExternalExtension", "ms-vscode.powershell-preview", "v2");
+    test("It can register and unregister an extension with a version", () => {
+        const sessionId: string = powerShellExtensionClient.registerExternalExtension(testExtensionId, "v2");
         assert.notStrictEqual(sessionId , "");
         assert.notStrictEqual(sessionId , null);
         assert.strictEqual(
-            await vscode.commands.executeCommand("PowerShell.UnregisterExternalExtension", sessionId),
+            powerShellExtensionClient.unregisterExternalExtension(sessionId),
             true);
     });
 
@@ -32,41 +42,55 @@ suite("ExternalApi feature - Registration API", () => {
     */
     test("API fails if not registered", async () => {
         assert.rejects(
-            async () => await vscode.commands.executeCommand("PowerShell.GetPowerShellVersionDetails"),
-            "UUID provided was invalid, make sure you execute the 'PowerShell.RegisterExternalExtension' command and pass in the UUID that it returns to subsequent command executions.");
+            async () => await powerShellExtensionClient.getPowerShellVersionDetails(""),
+            "UUID provided was invalid, make sure you ran the 'powershellExtensionClient.registerExternalExtension(extensionId)' method and pass in the UUID that it returns to subsequent methods.");
     });
 
     test("It can't register the same extension twice", async () => {
-        const sessionId: string = await vscode.commands.executeCommand("PowerShell.RegisterExternalExtension", testExtensionId);
+        const sessionId: string = powerShellExtensionClient.registerExternalExtension(testExtensionId);
         try {
-            assert.rejects(
-                async () => await vscode.commands.executeCommand("PowerShell.RegisterExternalExtension", testExtensionId),
-                `The extension '${testExtensionId}' is already registered.`);
+            assert.throws(
+                () => powerShellExtensionClient.registerExternalExtension(testExtensionId),
+                {
+                    message: `The extension '${testExtensionId}' is already registered.`
+                });
         } finally {
-            await vscode.commands.executeCommand("PowerShell.UnregisterExternalExtension", sessionId);
+            powerShellExtensionClient.unregisterExternalExtension(sessionId);
         }
     });
 
     test("It can't unregister an extension that isn't registered", async () => {
-        assert.rejects(
-            async () => await vscode.commands.executeCommand("PowerShell.RegisterExternalExtension", "not-real"),
-            `No extension registered with session UUID: not-real`);
-    });
+        assert.throws(
+            () => powerShellExtensionClient.unregisterExternalExtension("not-real"),
+            {
+                message: `No extension registered with session UUID: not-real`
+            });
+        });
 });
 
 suite("ExternalApi feature - Other APIs", () => {
     let sessionId: string;
+    let powerShellExtensionClient: IPowerShellExtensionClient;
 
-    beforeEach(async () => {
-        sessionId = await vscode.commands.executeCommand("PowerShell.RegisterExternalExtension", "ms-vscode.powershell-preview");
+    before(async () => {
+        const powershellExtension = vscode.extensions.getExtension<IPowerShellExtensionClient>(testExtensionId);
+        if (!powershellExtension.isActive) {
+            powerShellExtensionClient = await powershellExtension.activate();
+            return;
+        }
+        powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
     });
 
-    afterEach(async () => {
-        await vscode.commands.executeCommand("PowerShell.UnregisterExternalExtension", sessionId);
+    beforeEach(() => {
+        sessionId = powerShellExtensionClient.registerExternalExtension("ms-vscode.powershell-preview");
+    });
+
+    afterEach(() => {
+        powerShellExtensionClient.unregisterExternalExtension(sessionId);
     });
 
     test("It can get PowerShell version details", async () => {
-        const versionDetails: IExternalPowerShellDetails = await vscode.commands.executeCommand("PowerShell.GetPowerShellVersionDetails", sessionId);
+        const versionDetails: IExternalPowerShellDetails = await powerShellExtensionClient.getPowerShellVersionDetails(sessionId);
 
         assert.notStrictEqual(versionDetails.architecture, "");
         assert.notStrictEqual(versionDetails.architecture, null);
