@@ -5,7 +5,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient, RequestType, RequestType0 } from "vscode-languageclient";
-import { IFeature } from "../feature";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
