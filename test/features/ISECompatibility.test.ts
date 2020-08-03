@@ -23,7 +23,7 @@ suite("ISECompatibility feature", () => {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             assert.notEqual(currently, iseSetting.value);
         }
-    });
+    }).timeout(10000);
     test("It leaves Theme after being changed after enabling ISE Mode", async () => {
         await vscode.commands.executeCommand("PowerShell.EnableISEMode");
         assert.equal(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "PowerShell ISE");
@@ -35,5 +35,5 @@ suite("ISECompatibility feature", () => {
             assert.notEqual(currently, iseSetting.value);
         }
         assert.equal(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "Dark+");
-    });
+    }).timeout(10000);
 });
