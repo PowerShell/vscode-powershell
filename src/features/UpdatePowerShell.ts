@@ -11,7 +11,8 @@ import * as semver from "semver";
 import * as stream from "stream";
 import * as util from "util";
 import { MessageItem, ProgressLocation, window } from "vscode";
-import { LanguageClient } from "vscode-languageclient";
+
+import { LanguageClient } from "vscode-languageclient/node";
 import { SessionManager } from "../session";
 import * as Settings from "../settings";
 import { isMacOS, isWindows } from "../utils";

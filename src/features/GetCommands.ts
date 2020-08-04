@@ -2,7 +2,8 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 import * as vscode from "vscode";
-import { LanguageClient, RequestType0 } from "vscode-languageclient";
+import { RequestType0 } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 

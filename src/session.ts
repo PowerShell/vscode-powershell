@@ -15,9 +15,10 @@ import Settings = require("./settings");
 import utils = require("./utils");
 
 import {
-    CloseAction, DocumentSelector, ErrorAction, LanguageClient, LanguageClientOptions,
+    CloseAction, DocumentSelector, ErrorAction, LanguageClientOptions,
     Middleware, NotificationType, RequestType0,
-    ResolveCodeLensSignature, RevealOutputChannelOn, StreamInfo } from "vscode-languageclient";
+    ResolveCodeLensSignature, RevealOutputChannelOn } from "vscode-languageclient";
+import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
 
 import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./features/UpdatePowerShell";
 import {

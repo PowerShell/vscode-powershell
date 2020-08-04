@@ -5,7 +5,8 @@
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, WorkspaceFolder } from "vscode";
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
 import { SessionManager, SessionStatus } from "../session";
