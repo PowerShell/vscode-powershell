@@ -332,11 +332,11 @@ export class SessionManager implements Middleware {
         const deprecatedSetting = 'codeFormatting.whitespaceAroundPipe'
         const newSetting = 'codeFormatting.addWhitespaceAroundPipe'
         const configurationTargetOfNewSetting = await Settings.getEffectiveConfigurationTarget(newSetting);
-        if (configuration.has(deprecatedSetting) && configurationTargetOfNewSetting === null) {
-            const configurationTarget = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
-            const value = configuration.get(deprecatedSetting, configurationTarget)
-            await Settings.change(newSetting, value, configurationTarget);
-            await Settings.change(deprecatedSetting, undefined, configurationTarget);
+        const configurationTargetOfOldSetting = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
+        if (configurationTargetOfOldSetting !== null && configurationTargetOfNewSetting === null) {
+            const value = configuration.get(deprecatedSetting, configurationTargetOfOldSetting)
+            await Settings.change(newSetting, value, configurationTargetOfOldSetting);
+            await Settings.change(deprecatedSetting, undefined, configurationTargetOfOldSetting);
         }
     }
 
