@@ -38,7 +38,7 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         this.closeRemoteFiles();
 
         vscode.workspace.onDidSaveTextDocument((doc) => {
-            if (this.languageClient && this.isDocumentRemote(doc)) {
+            if (this.isDocumentRemote(doc) && this.languageClient) {
                 this.languageClient.sendNotification(
                     DidSaveTextDocumentNotificationType,
                     {

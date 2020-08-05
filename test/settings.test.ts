@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 
 import * as assert from "assert";
-import { IPowerShellExeDetails } from "../src/platform";
+import * as vscode from "vscode";
 import Settings = require("../src/settings");
 
 suite("Settings module", () => {
@@ -33,5 +33,15 @@ suite("Settings module", () => {
         // set to true means it's a user-level setting so this should not throw.
         await Settings.change("powerShellAdditionalExePaths", psExeDetails, true);
         assert.strictEqual(Settings.load().powerShellAdditionalExePaths[0].versionName, psExeDetails[0].versionName);
+    });
+
+    test("Can get effective configuration target", async () => {
+        await Settings.change("helpCompletion", "LineComment", false);
+        let target = await Settings.getEffectiveConfigurationTarget("helpCompletion");
+        assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);
+
+        await Settings.change("helpCompletion", undefined, false);
+        target = await Settings.getEffectiveConfigurationTarget("helpCompletion");
+        assert.strictEqual(target, null);
     });
 });
