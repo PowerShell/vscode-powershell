@@ -80,7 +80,7 @@ jobs:
         Remove-Item ./old.vscode.proposed.d.ts -Force
 
     - name: Create Pull Request
-      if: github.event_name == 'schedule' && github.repository == 'PowerShell/vscode-powershell'
+      if: ${{ github.event_name == 'schedule' && github.repository == 'PowerShell/vscode-powershell' }}
       id: cpr
       uses: peter-evans/create-pull-request@v2
       env:
