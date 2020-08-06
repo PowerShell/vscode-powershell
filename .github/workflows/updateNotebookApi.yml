@@ -13,6 +13,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
+    if: github.repository == 'PowerShell/vscode-powershell'
 
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -80,7 +81,7 @@ jobs:
         Remove-Item ./old.vscode.proposed.d.ts -Force
 
     - name: Create Pull Request
-      if: ${{ github.event_name == 'schedule' && github.repository == 'PowerShell/vscode-powershell' }}
+      if: github.event_name == 'schedule'
       id: cpr
       uses: peter-evans/create-pull-request@v2
       env:
