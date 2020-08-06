@@ -13,6 +13,7 @@ jobs:
     defaults:
       run:
         shell: pwsh
+    if: github.repository == 'PowerShell/vscode-powershell'
 
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
