@@ -8,7 +8,7 @@ import { EvaluateRequestType } from "./Console";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import Settings = require("../settings");
 import { ILogger } from "../logging";
-import { LanguageClient } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 
 export class PowerShellNotebooksFeature extends LanguageClientConsumer {
 

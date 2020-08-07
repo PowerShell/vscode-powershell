@@ -4,7 +4,8 @@
 
 import { Disposable, EndOfLine, Position, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
-import { LanguageClient, RequestType } from "vscode-languageclient";
+import { RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";

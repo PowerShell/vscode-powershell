@@ -3,7 +3,8 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { LanguageClient, RequestType } from "vscode-languageclient";
+import { RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export class NewFileOrProjectFeature extends LanguageClientConsumer {

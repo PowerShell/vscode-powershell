@@ -3,7 +3,8 @@
  *--------------------------------------------------------*/
 
 import vscode = require("vscode");
-import { LanguageClient, NotificationType, RequestType } from "vscode-languageclient";
+import { NotificationType, RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
 import { Logger } from "../logging";
 import Settings = require("../settings");

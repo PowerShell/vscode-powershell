@@ -4,7 +4,8 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { LanguageClient, RequestType } from "vscode-languageclient";
+import { RequestType } from "vscode-languageclient";
+import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export class CustomViewsFeature extends LanguageClientConsumer {
