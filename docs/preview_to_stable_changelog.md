@@ -1,4 +1,4 @@
-﻿# PowerShell Preview Extension Release History March 2020
+# PowerShell Preview Extension Release History March 2020
 
 This document shows the combined changes that were moved from the Preview extension to the stable extension as part of the March 2020 release.
 
