@@ -102,6 +102,7 @@ function Get-InvokePesterParams {
         # all of the versions down to 3.4.0 like this
         $invokePesterParams.Add("PesterOption", @{IncludeVSCodeMarker=$true})
     }
+
     if ($pesterModule.Version -ge '3.4.5') {
         # -Show was introduced in 3.4.5
         $invokePesterParams.Add("Show", $pester4Output)
