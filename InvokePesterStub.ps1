@@ -87,9 +87,28 @@ $pester4Output = switch ($Output) {
 }
 
 if ($MinimumVersion5 -and $pesterModule.Version -lt "5.0.0") {
-    Write-Warning "Pester 5.0.0 or newer is required because setting PowerShell > Pester: Use Legacy Code Lens is disabled, but Pester $($pesterModule.Version) is loaded. Some of the code lense features might not work as expected."
+    Write-Warning "Pester 5.0.0 or newer is required because setting PowerShell > Pester: Use Legacy Code Lens is disabled, but Pester $($pesterModule.Version) is loaded. Some of the code lens features might not work as expected."
 }
 
+
+function Get-InvokePesterParams {
+    $invokePesterParams = @{
+        Script = $ScriptPath
+    }
+
+    if ($pesterModule.Version -ge '3.4.0') {
+        # -PesterOption was introduced before 3.4.0, and VSCodeMarker in 4.0.3-rc,
+        # but because no-one checks the integrity of this hashtable we can call
+        # all of the versions down to 3.4.0 like this
+        $invokePesterParams.Add("PesterOption", @{IncludeVSCodeMarker=$true})
+    }
+    if ($pesterModule.Version -ge '3.4.5') {
+        # -Show was introduced in 3.4.5
+        $invokePesterParams.Add("Show", $pester4Output)
+    }
+
+    return $invokePesterParams
+}
 
 if ($All) {
     if ($pesterModule.Version -ge '5.0.0') {
@@ -116,18 +135,9 @@ if ($All) {
         }
         Pester\Invoke-Pester -Configuration $configuration | Out-Null
     }
-    elseif ($pesterModule.Version -ge '3.4.5') {
-        # -Show was introduced in 3.4.5
-        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -Show $pester4Output
-    }
-    elseif ($pesterModule.Version -ge '3.4.0') {
-        # -PesterOption was introduced before 3.4.0, and VSCodeMarker in 4.0.3-rc,
-        # but because no-one checks the integrity of this hashtable we can call all of the versions
-        # down to 3.4.0 like this
-        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true}
-    }
     else {
-        Pester\Invoke-Pester -Script $ScriptPath
+        $invokePesterParams = Get-InvokePesterParams
+        Pester\Invoke-Pester @invokePesterParams
     }
 }
 elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
@@ -164,7 +174,8 @@ elseif ($TestName) {
        throw "Running tests by test name is unsafe. This should not trigger for Pester 5."
     }
     else {
-        Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -TestName $TestName -Show $pester4Output
+        $invokePesterParams = Get-InvokePesterParams
+        Pester\Invoke-Pester @invokePesterParams
     }
 }
 else {
@@ -177,5 +188,6 @@ else {
     Write-Warning "The Describe block's TestName cannot be evaluated. EXECUTING ALL TESTS instead."
     Write-Warning "To avoid this, install Pester >= 4.6.0 or remove any expressions in the TestName."
 
-    Pester\Invoke-Pester -Script $ScriptPath -PesterOption @{IncludeVSCodeMarker=$true} -Show $pester4Output
+    $invokePesterParams = Get-InvokePesterParams
+    Pester\Invoke-Pester @invokePesterParams
 }
