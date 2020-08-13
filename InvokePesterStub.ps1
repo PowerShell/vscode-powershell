@@ -100,7 +100,7 @@ function Get-InvokePesterParams {
         # -PesterOption was introduced before 3.4.0, and VSCodeMarker in 4.0.3-rc,
         # but because no-one checks the integrity of this hashtable we can call
         # all of the versions down to 3.4.0 like this
-        $invokePesterParams.Add("PesterOption", @{IncludeVSCodeMarker=$true})
+        $invokePesterParams.Add("PesterOption", @{ IncludeVSCodeMarker = $true })
     }
 
     if ($pesterModule.Version -ge '3.4.5') {
