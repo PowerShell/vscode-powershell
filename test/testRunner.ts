@@ -9,7 +9,7 @@ import * as path from "path";
 export function run(): Promise<void> {
     // Create the mocha test
     const mocha = new Mocha({
-        ui: "tdd", 		// the TDD UI is being used in extension.test.ts (suite, test, etc.)
+        ui: "tdd",         // the TDD UI is being used in extension.test.ts (suite, test, etc.)
         useColors: !process.env.TF_BUILD, // colored output from test results
         reporter: "mocha-multi-reporters",
         timeout: 5000,

@@ -8,7 +8,7 @@ import { Logger } from "./logging";
 
 export class NamedPipeDebugAdapter implements DebugAdapter {
     private static readonly TWO_CRLF = '\r\n\r\n';
-    private static readonly HEADER_LINESEPARATOR = /\r?\n/;	// allow for non-RFC 2822 conforming line separators
+    private static readonly HEADER_LINESEPARATOR = /\r?\n/;    // allow for non-RFC 2822 conforming line separators
     private static readonly HEADER_FIELDSEPARATOR = /: */;
 
     private readonly _logger: Logger;
