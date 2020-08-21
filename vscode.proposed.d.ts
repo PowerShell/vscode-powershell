@@ -219,7 +219,7 @@ declare module 'vscode' {
 		readonly viewType: string;
 		readonly isDirty: boolean;
 		readonly isUntitled: boolean;
-		readonly cells: NotebookCell[];
+		readonly cells: ReadonlyArray<NotebookCell>;
 		languages: string[];
 		displayOrder?: GlobPattern[];
 		metadata: NotebookDocumentMetadata;
@@ -263,7 +263,7 @@ declare module 'vscode' {
 		/**
 		 * The column in which this editor shows.
 		 */
-		viewColumn?: ViewColumn;
+		readonly viewColumn?: ViewColumn;
 
 		/**
 		 * Whether the panel is active (focused by the user).
@@ -314,31 +314,6 @@ declare module 'vscode' {
 		output: CellDisplayOutput;
 		mimeType: string;
 		outputId: string;
-	}
-
-	export interface NotebookOutputRenderer {
-		/**
-		 *
-		 * @returns HTML fragment. We can probably return `CellOutput` instead of string ?
-		 *
-		 */
-		render(document: NotebookDocument, request: NotebookRenderRequest): string;
-
-		/**
-		 * Call before HTML from the renderer is executed, and will be called for
-		 * every editor associated with notebook documents where the renderer
-		 * is or was used.
-		 *
-		 * The communication object will only send and receive messages to the
-		 * render API, retrieved via `acquireNotebookRendererApi`, acquired with
-		 * this specific renderer's ID.
-		 *
-		 * If you need to keep an association between the communication object
-		 * and the document for use in the `render()` method, you can use a WeakMap.
-		 */
-		resolveNotebook?(document: NotebookDocument, communication: NotebookCommunication): void;
-
-		readonly preloads?: Uri[];
 	}
 
 	export interface NotebookCellsChangeData {
@@ -557,12 +532,6 @@ declare module 'vscode' {
 			id: string,
 			selectors: GlobPattern[],
 			kernel: NotebookKernel
-		): Disposable;
-
-		export function registerNotebookOutputRenderer(
-			id: string,
-			outputSelector: NotebookOutputSelector,
-			renderer: NotebookOutputRenderer
 		): Disposable;
 
 		export const onDidOpenNotebookDocument: Event<NotebookDocument>;
