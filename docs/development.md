@@ -7,7 +7,9 @@ to before you can proceed.
 
 1. [Fork and clone](https://help.github.com/articles/fork-a-repo/) the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell)
 
-2. [Fork and clone](https://help.github.com/articles/fork-a-repo/) the [PowerShell Editor Services repository](https://github.com/PowerShell/PowerShellEditorServices)
+2. [Fork and clone](https://help.github.com/articles/fork-a-repo/) the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices)
+
+> NOTE: the `vscode-powershell` folder and the `PowerShellEditorServices` folder should be next to each other on the file system. Code in `vscode-powershell` looks for PSES at `../PowerShellEditorServices` if you're building locally so PSES must be in that location.
 
 3. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for PowerShell Editor Services. **You will need to complete this step before proceeding**.
 
