@@ -215,6 +215,7 @@ declare module 'vscode' {
 
 	export interface NotebookDocument {
 		readonly uri: Uri;
+		readonly version: number;
 		readonly fileName: string;
 		readonly viewType: string;
 		readonly isDirty: boolean;
@@ -245,7 +246,14 @@ declare module 'vscode' {
 	}
 
 	export interface NotebookEditorCellEdit {
+
+		replaceCells(from: number, to: number, cells: NotebookCellData[]): void;
+		replaceOutputs(index: number, outputs: CellOutput[]): void;
+		replaceMetadata(index: number, metadata: NotebookCellMetadata): void;
+
+		/** @deprecated */
 		insert(index: number, content: string | string[], language: string, type: CellKind, outputs: CellOutput[], metadata: NotebookCellMetadata | undefined): void;
+		/** @deprecated */
 		delete(index: number): void;
 	}
 
@@ -369,9 +377,9 @@ declare module 'vscode' {
 	export interface NotebookCellData {
 		readonly cellKind: CellKind;
 		readonly source: string;
-		language: string;
-		outputs: CellOutput[];
-		metadata: NotebookCellMetadata;
+		readonly language: string;
+		readonly outputs: CellOutput[];
+		readonly metadata: NotebookCellMetadata | undefined;
 	}
 
 	export interface NotebookData {
