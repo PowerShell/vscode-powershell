@@ -34,13 +34,40 @@ export class PowerShellNotebooksFeature extends LanguageClientConsumer {
     }
 
     public registerNotebookProviders() {
+        const options = {
+            transientOutputs: true,
+            transientMetadata: {
+                inputCollapsed: true,
+                outputCollapsed: true,
+                runState: true,
+                runStartTime: true,
+                executionOrder: true,
+                lastRunDuration: true,
+                statusMessage: true,
+            },
+        };
+
+        // Until vscode supports using the same view type with different priority,
+        // we register 2 of the same viewTypes.
+        // This one is used to open *.Notebook.ps1 files which automatically go straight to Notebook mode.
         this.disposables.push(vscode.notebook.registerNotebookKernelProvider({
-            viewType: "PowerShellNotebookMode"
+            viewType: "PowerShellNotebookModeDefault"
         }, this.notebookKernel));
 
         this.disposables.push(vscode.notebook.registerNotebookContentProvider(
-            "PowerShellNotebookMode",
-            this.notebookContentProvider));
+            "PowerShellNotebookModeDefault",
+            this.notebookContentProvider,
+            options));
+
+        // This one is used to open *.ps1 files which will be opened in the default text editor first.
+        this.disposables.push(vscode.notebook.registerNotebookKernelProvider({
+            viewType: "PowerShellNotebookModeOption"
+        }, this.notebookKernel));
+
+        this.disposables.push(vscode.notebook.registerNotebookContentProvider(
+            "PowerShellNotebookModeOption",
+            this.notebookContentProvider,
+            options));
     }
 
     public dispose() {
@@ -55,8 +82,17 @@ export class PowerShellNotebooksFeature extends LanguageClientConsumer {
 
     private static async EnableNotebookMode() {
         const uri = vscode.window.activeTextEditor.document.uri;
-        await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-        await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookMode");
+
+        // If the file is an untitled file, then we can't close it.
+        if (!vscode.window.activeTextEditor.document.isUntitled) {
+            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+        }
+
+        if (uri.fsPath?.endsWith(".Notebook.ps1")) {
+            await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookModeDefault");
+        } else {
+            await vscode.commands.executeCommand("vscode.openWith", uri, "PowerShellNotebookModeOption");
+        }
     }
 
     private static async DisableNotebookMode() {
@@ -95,8 +131,12 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
         // load from backup if needed.
         const actualUri = context.backupId ? vscode.Uri.parse(context.backupId) : uri;
         this.logger.writeDiagnostic(`Opening Notebook: ${uri.toString()}`);
+        const isUntitled = uri.scheme !== "file";
 
-        const data = (await vscode.workspace.fs.readFile(actualUri)).toString();
+        // If we have an untitled file, get the contents from vscode instead of the file system.
+        const data: string = isUntitled
+            ? (await vscode.workspace.openTextDocument(actualUri)).getText()
+            : (await vscode.workspace.fs.readFile(actualUri)).toString();
 
         let lines: string[];
         // store the line ending in the metadata of the document
@@ -117,6 +157,7 @@ class PowerShellNotebookContentProvider implements vscode.NotebookContentProvide
             metadata: {
                 custom: {
                     lineEnding,
+                    isUntitled,
                 }
             }
         };
@@ -374,6 +415,11 @@ class PowerShellNotebookKernel implements vscode.NotebookKernel, vscode.Notebook
         await this.languageClient.sendRequest(EvaluateRequestType, {
             expression: cell.document.getText(),
         });
+
+        // Show the integrated console if it isn't already visible and
+        // scroll terminal to bottom so new output is visible
+        await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+        await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
     }
 
     // Since executing a cell is a "fire and forget", there's no time for the user to cancel
