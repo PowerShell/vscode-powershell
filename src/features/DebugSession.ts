@@ -372,7 +372,7 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
 }
 
 interface IProcessItem extends vscode.QuickPickItem {
-    pid: string;	// payload for the QuickPick UI
+    pid: string;    // payload for the QuickPick UI
 }
 
 interface IPSHostProcessInfo {
@@ -508,7 +508,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
 }
 
 interface IRunspaceItem extends vscode.QuickPickItem {
-    id: string;	// payload for the QuickPick UI
+    id: string;    // payload for the QuickPick UI
 }
 
 interface IRunspace {

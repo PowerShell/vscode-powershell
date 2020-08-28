@@ -1,76 +1,85 @@
 {
-    "version": "2.0.0",
-
-    "windows": {
-        "options": {
-            "shell": {
-                "executable": "pwsh.exe",
-                "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command" ]
-            }
-        }
+  "version": "2.0.0",
+  "windows": {
+    "options": {
+      "shell": {
+        "executable": "pwsh.exe",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-Command"
+        ]
+      }
+    }
+  },
+  "linux": {
+    "options": {
+      "shell": {
+        "executable": "pwsh",
+        "args": [
+          "-NoProfile",
+          "-Command"
+        ]
+      }
+    }
+  },
+  "osx": {
+    "options": {
+      "shell": {
+        "executable": "/usr/local/bin/pwsh",
+        "args": [
+          "-NoProfile",
+          "-Command"
+        ]
+      }
+    }
+  },
+  "tasks": [
+    {
+      "label": "Install",
+      "type": "shell",
+      "command": "Invoke-Build Restore",
+      "problemMatcher": []
     },
-    "linux": {
-        "options": {
-            "shell": {
-                "executable": "pwsh",
-                "args": [ "-NoProfile", "-Command" ]
-            }
-        }
+    {
+      "label": "CleanAll",
+      "type": "shell",
+      "command": "Invoke-Build CleanAll",
+      "problemMatcher": []
     },
-    "osx": {
-        "options": {
-            "shell": {
-                "executable": "/usr/local/bin/pwsh",
-                "args": [ "-NoProfile", "-Command" ]
-            }
-        }
+    {
+      "label": "Clean",
+      "type": "shell",
+      "command": "Invoke-Build Clean",
+      "problemMatcher": []
     },
-
-    "tasks": [
-        {
-            "label": "Install",
-            "type": "shell",
-            "command": "Invoke-Build Restore",
-            "problemMatcher": []
-        },
-        {
-            "label": "CleanAll",
-            "type": "shell",
-            "command": "Invoke-Build CleanAll",
-            "problemMatcher": []
-        },
-        {
-            "label": "Clean",
-            "type": "shell",
-            "command": "Invoke-Build Clean",
-            "problemMatcher": []
-        },
-        {
-            "label": "BuildAll",
-            "type": "shell",
-            "command": "Invoke-Build BuildAll",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Build",
-            "type": "shell",
-            "command": "Invoke-Build Build",
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "Test",
-            "type": "shell",
-            "command": "Invoke-Build Test",
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "problemMatcher": []
-        }
-    ]
+    {
+      "label": "BuildAll",
+      "type": "shell",
+      "command": "Invoke-Build BuildAll",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build",
+      "type": "shell",
+      "command": "Invoke-Build Build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "Invoke-Build Test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
 }
