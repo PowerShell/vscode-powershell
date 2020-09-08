@@ -14,7 +14,7 @@ steps:
     continueOnError: true
     displayName: Install PowerShell Daily
   - pwsh: |
-      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber PowerShellGet -PassThru
+      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber PowerShellGet -PassThru -RequiredVersion 3.0.0-beta10
       Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber CompatPowerShellGet -PassThru
     continueOnError: true
     displayName: Install latest PowerShellGet preview and compat module
