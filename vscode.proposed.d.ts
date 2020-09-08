@@ -222,7 +222,6 @@ declare module 'vscode' {
 		readonly isUntitled: boolean;
 		readonly cells: ReadonlyArray<NotebookCell>;
 		languages: string[];
-		displayOrder?: GlobPattern[];
 		metadata: NotebookDocumentMetadata;
 	}
 
