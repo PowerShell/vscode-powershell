@@ -34,6 +34,8 @@ const notebookSimpleLineComments = vscode.Uri.file(
     path.join(...notebookDir,"simpleLineComments.ps1"));
 const notebookSimpleMixedComments = vscode.Uri.file(
     path.join(...notebookDir,"simpleMixedComments.ps1"));
+const notebookSimpleDotNotebook = vscode.Uri.file(
+    path.join(...notebookDir,"simple.Notebook.ps1"));
 
 const notebookTestData = new Map<vscode.Uri, vscode.NotebookCellData[]>();
 
@@ -343,7 +345,7 @@ suite("PowerShellNotebooks tests", () => {
         }
 
         // Open an existing notebook ps1.
-        await vscode.commands.executeCommand("vscode.openWith", notebookSimpleMixedComments, "PowerShellNotebookMode");
+        await vscode.commands.executeCommand("vscode.openWith", notebookSimpleMixedComments, "PowerShellNotebookModeOption");
 
         // Allow some time to pass to render the Notebook
         await utils.sleep(5000);
@@ -369,7 +371,7 @@ suite("PowerShellNotebooks tests", () => {
         }
 
         // Open an existing notebook ps1.
-        await vscode.commands.executeCommand("vscode.openWith", notebookBlockCommentsWithTextOnSameLine, "PowerShellNotebookMode");
+        await vscode.commands.executeCommand("vscode.openWith", notebookBlockCommentsWithTextOnSameLine, "PowerShellNotebookModeOption");
 
         // Allow some time to pass to render the Notebook
         await utils.sleep(5000);
@@ -384,5 +386,29 @@ suite("PowerShellNotebooks tests", () => {
 
         // Verify that saving does not mutate result.
         assert.strictEqual(contentOfBackingFileBefore, contentOfBackingFileAfter);
+    }).timeout(20000);
+
+    test("Can open an untitled Notebook", async () => {
+        const doc = await vscode.workspace.openTextDocument({
+            language: "powershell",
+            content: `# asdf
+gci`,
+        });
+
+        const notebookData = await notebookContentProvider.openNotebook(doc.uri, {});
+        assert.strictEqual(notebookData.cells.length, 2);
+        assert.strictEqual(notebookData.cells[0].cellKind, vscode.CellKind.Markdown);
+        assert.strictEqual(notebookData.cells[0].source, "asdf");
+        assert.strictEqual(notebookData.cells[1].cellKind, vscode.CellKind.Code);
+        assert.strictEqual(notebookData.cells[1].source, "gci");
+    }).timeout(20000);
+
+    test(".Notebook.ps1 files are opened automatically", async () => {
+        await vscode.commands.executeCommand("vscode.open", notebookSimpleDotNotebook);
+        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells.length, 2);
+        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[0].cellKind, vscode.CellKind.Markdown);
+        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[0].document.getText(), "asdf");
+        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[1].cellKind, vscode.CellKind.Code);
+        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[1].document.getText(), "gci\n");
     }).timeout(20000);
 });
