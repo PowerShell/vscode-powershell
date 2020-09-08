@@ -14,8 +14,8 @@ steps:
     continueOnError: true
     displayName: Install PowerShell Daily
   - pwsh: |
-      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber PowerShellGet
-      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber CompatPowerShellGet
+      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber PowerShellGet -PassThru
+      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber CompatPowerShellGet -PassThru
     continueOnError: true
     displayName: Install latest PowerShellGet preview and compat module
   - pwsh: '$PSVersionTable'
