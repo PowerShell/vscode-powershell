@@ -48,7 +48,7 @@
     "onNotebookEditor:PowerShellNotebookMode"
   ],
   "dependencies": {
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "semver": "^7.3.2",
     "uuid": "^8.3.0",
     "vscode-extension-telemetry": "~0.1.6",
