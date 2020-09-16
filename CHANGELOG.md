@@ -29,7 +29,7 @@
 - 📺🐛 [vscode-powershell #2845](https://github.com/PowerShell/vscode-powershell/pull/2848) -
   Handle block comments with text on the same line as <# #> in Notebook Mode.
 - ✨ [vscode-powershell #2855](https://github.com/PowerShell/vscode-powershell/pull/2855) -
-  Expose the API via exports instead of editor commands.
+  Expose the extension integration API via exports instead of editor commands.
 - 📺✨ [vscode-powershell #2844](https://github.com/PowerShell/vscode-powershell/pull/2844) -
   Use property scope in the PowerShell ISE theme for better Semantic Highlighting.
 
