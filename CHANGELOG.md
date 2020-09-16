@@ -5,7 +5,7 @@
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
 - 📺✨ [vscode-powershell #2919](https://github.com/PowerShell/vscode-powershell/pull/2919) -
-  Untitled Notebooks and Automatic Notebooks.
+  Create new Untitled Notebooks and support for Automatic Notebooks (`*.Notebook.ps1`).
 - 📺✨ [vscode-powershell #2935](https://github.com/PowerShell/vscode-powershell/pull/2935) -
   Add ISE theme settings borders. (Thanks @CalistusK!)
 - 👷✨ [vscode-powershell #2922](https://github.com/PowerShell/vscode-powershell/pull/2922) -
