@@ -1,5 +1,51 @@
 # PowerShell Extension Release History
 
+## v2020.9.0-preview
+### Wednesday, September 16, 2020
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 📺✨ [vscode-powershell #2919](https://github.com/PowerShell/vscode-powershell/pull/2919) -
+  Create new Untitled Notebooks and support for Automatic Notebooks (`*.Notebook.ps1`).
+- 📺✨ [vscode-powershell #2935](https://github.com/PowerShell/vscode-powershell/pull/2935) -
+  Add ISE theme settings borders. (Thanks @CalistusK!)
+- 👷✨ [vscode-powershell #2922](https://github.com/PowerShell/vscode-powershell/pull/2922) -
+  Add editorconfig to recommended extensions for the local build. (Thanks @xtqqczze!)
+- 👷✨ [vscode-powershell #2889](https://github.com/PowerShell/vscode-powershell/pull/2889) -
+  Use spaces instead of tabs for consistency. (Thanks @xtqqczze!)
+- 👷✨ [vscode-powershell #2884](https://github.com/PowerShell/vscode-powershell/pull/2884) -
+  Update copyright header in *.ps1, *.psm1 files. (Thanks @xtqqczze!)
+- 🐢🐛 [vscode-powershell #2888](https://github.com/PowerShell/vscode-powershell/pull/2888) -
+  Fixed crash when running pester older than 3.4.5. (Thanks @EmmanuelPineiro!)
+- 👷✨ [vscode-powershell #2881](https://github.com/PowerShell/vscode-powershell/pull/2881) -
+  Remove UTF-8 BOM from misc text files. (Thanks @xtqqczze!)
+- 👷✨ [vscode-powershell #2876](https://github.com/PowerShell/vscode-powershell/pull/2876) -
+  Update text in LICENSE.txt. (Thanks @xtqqczze!)
+- 📺✨ [vscode-powershell #2861](https://github.com/PowerShell/vscode-powershell/pull/2861) -
+  Update LSP Client to use new Semantic Highlighting APIs. (Thanks @justinytchen!)
+- 👷✨ [vscode-powershell #2871](https://github.com/PowerShell/vscode-powershell/pull/2871) -
+  Prevent `Update Notebook dts` action from triggering on forked repositories. (Thanks @corbob!)
+- 🔧🐛 [vscode-powershell #2863](https://github.com/PowerShell/vscode-powershell/pull/2863) -
+  Fix migration of `codeFormatting.addWhitespaceAroundPipe` setting when it doesn't already exist.
+- 📺🐛 [vscode-powershell #2845](https://github.com/PowerShell/vscode-powershell/pull/2848) -
+  Handle block comments with text on the same line as <# #> in Notebook Mode.
+- ✨ [vscode-powershell #2855](https://github.com/PowerShell/vscode-powershell/pull/2855) -
+  Expose the extension integration API via exports instead of editor commands.
+- 📺✨ [vscode-powershell #2844](https://github.com/PowerShell/vscode-powershell/pull/2844) -
+  Use property scope in the PowerShell ISE theme for better Semantic Highlighting.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🧠✨ [vscode-powershell #2898](https://github.com/PowerShell/PowerShellEditorServices/pull/1352) -
+  Type and Namespace completions now have tooltips. (Thanks @AspenForester!)
+- 🛫🐛 [vscode-powershell #2719](https://github.com/PowerShell/PowerShellEditorServices/pull/1349) -
+  Fix startup assembly version loading issue in PowerShell 6 and up.
+- 🔗🐛 [vscode-powershell #2810](https://github.com/PowerShell/PowerShellEditorServices/pull/1348) -
+  Fix reference number on Windows due to directory separator difference on Windows.
+- 📺✨ [PowerShellEditorServices #1343](https://github.com/PowerShell/PowerShellEditorServices/pull/1343) -
+  Updated Semantic Handler to work with new LSP APIs. (Thanks @justinytchen!)
+- 📺✨ [PowerShellEditorServices #1337](https://github.com/PowerShell/PowerShellEditorServices/pull/1337) -
+  Treat `Member`s as `Properties` in Semantic Highlighting for better accuracy.
+
 ## v2020.7.0-preview
 ### Thursday, July 30, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
