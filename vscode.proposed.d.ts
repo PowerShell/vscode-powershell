@@ -261,6 +261,9 @@ declare module 'vscode' {
 
 	export interface NotebookCellRange {
 		readonly start: number;
+		/**
+		 * exclusive
+		 */
 		readonly end: number;
 	}
 
@@ -351,6 +354,8 @@ declare module 'vscode' {
 		 * @return A promise that resolves with a value indicating if the edits could be applied.
 		 */
 		edit(callback: (editBuilder: NotebookEditorEdit) => void): Thenable<boolean>;
+
+		setDecorations(decorationType: NotebookEditorDecorationType, range: NotebookCellRange): void;
 
 		revealRange(range: NotebookCellRange, revealType?: NotebookEditorRevealType): void;
 	}
@@ -607,6 +612,18 @@ declare module 'vscode' {
 		dispose(): void;
 	}
 
+	export interface NotebookDecorationRenderOptions {
+		backgroundColor?: string | ThemeColor;
+		borderColor?: string | ThemeColor;
+		top: ThemableDecorationAttachmentRenderOptions;
+	}
+
+	export interface NotebookEditorDecorationType {
+		readonly key: string;
+		dispose(): void;
+	}
+
+
 	export namespace notebook {
 		export function registerNotebookContentProvider(
 			notebookType: string,
@@ -630,6 +647,7 @@ declare module 'vscode' {
 			provider: NotebookKernelProvider
 		): Disposable;
 
+		export function createNotebookEditorDecorationType(options: NotebookDecorationRenderOptions): NotebookEditorDecorationType;
 		export const onDidOpenNotebookDocument: Event<NotebookDocument>;
 		export const onDidCloseNotebookDocument: Event<NotebookDocument>;
 		export const onDidSaveNotebookDocument: Event<NotebookDocument>;
