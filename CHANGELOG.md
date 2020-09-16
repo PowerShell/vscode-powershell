@@ -25,7 +25,7 @@
 - 👷✨ [vscode-powershell #2871](https://github.com/PowerShell/vscode-powershell/pull/2871) -
   Prevent `Update Notebook dts` action from triggering on forked repositories. (Thanks @corbob!)
 - 🔧🐛 [vscode-powershell #2863](https://github.com/PowerShell/vscode-powershell/pull/2863) -
-  Fix migration of `codeFormatting.addWhitespaceAroundPipe` setting.
+  Fix migration of `codeFormatting.addWhitespaceAroundPipe` setting when it doesn't already exist.
 - 📺🐛 [vscode-powershell #2845](https://github.com/PowerShell/vscode-powershell/pull/2848) -
   Handle block comments with text on the same line as <# #> in Notebook Mode.
 - ✨ [vscode-powershell #2855](https://github.com/PowerShell/vscode-powershell/pull/2855) -
