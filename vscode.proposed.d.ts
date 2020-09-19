@@ -214,6 +214,20 @@ declare module 'vscode' {
 		runState?: NotebookRunState;
 	}
 
+	export interface NotebookDocumentContentOptions {
+		/**
+		 * Controls if outputs change will trigger notebook document content change and if it will be used in the diff editor
+		 * Default to false. If the content provider doesn't persisit the outputs in the file document, this should be set to true.
+		 */
+		transientOutputs: boolean;
+
+		/**
+		 * Controls if a meetadata property change will trigger notebook document content change and if it will be used in the diff editor
+		 * Default to false. If the content provider doesn't persisit a metadata property in the file document, it should be set to true.
+		 */
+		transientMetadata: { [K in keyof NotebookCellMetadata]?: boolean };
+	}
+
 	export interface NotebookDocument {
 		readonly uri: Uri;
 		readonly version: number;
@@ -222,6 +236,7 @@ declare module 'vscode' {
 		readonly isDirty: boolean;
 		readonly isUntitled: boolean;
 		readonly cells: ReadonlyArray<NotebookCell>;
+		readonly contentOptions: NotebookDocumentContentOptions;
 		languages: string[];
 		metadata: NotebookDocumentMetadata;
 	}
@@ -572,9 +587,11 @@ declare module 'vscode' {
 		cancelAllCellsExecution(document: NotebookDocument): void;
 	}
 
+	export type NotebookFilenamePattern = GlobPattern | { include: GlobPattern; exclude: GlobPattern };
+
 	export interface NotebookDocumentFilter {
 		viewType?: string | string[];
-		filenamePattern?: GlobPattern | { include: GlobPattern; exclude: GlobPattern };
+		filenamePattern?: NotebookFilenamePattern;
 	}
 
 	export interface NotebookKernelProvider<T extends NotebookKernel = NotebookKernel> {
@@ -628,22 +645,15 @@ declare module 'vscode' {
 		export function registerNotebookContentProvider(
 			notebookType: string,
 			provider: NotebookContentProvider,
-			options?: {
-				/**
-				 * Controls if outputs change will trigger notebook document content change and if it will be used in the diff editor
-				 * Default to false. If the content provider doesn't persisit the outputs in the file document, this should be set to true.
-				 */
-				transientOutputs: boolean;
-				/**
-				 * Controls if a meetadata property change will trigger notebook document content change and if it will be used in the diff editor
-				 * Default to false. If the content provider doesn't persisit a metadata property in the file document, it should be set to true.
-				 */
-				transientMetadata: { [K in keyof NotebookCellMetadata]?: boolean };
-
+			options?: NotebookDocumentContentOptions & {
 				/**
 				 * Not ready for production or development use yet.
 				 */
-				viewOptions?: { displayName: string; filenamePattern: GlobPattern | { include: GlobPattern; exclude: GlobPattern; }; exclusive?: boolean; };
+				viewOptions?: {
+					displayName: string;
+					filenamePattern: NotebookFilenamePattern[];
+					exclusive?: boolean;
+				};
 			}
 		): Disposable;
 
