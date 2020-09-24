@@ -24,7 +24,7 @@ to before you can proceed.
 
 #### From Visual Studio Code:
 
-Press <kbd>Ctrl</kbd>+<kbd>P</kbd> and type `task build`
+Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> and type `task build`
 
 This will compile the TypeScript files in the project to JavaScript files.
 
