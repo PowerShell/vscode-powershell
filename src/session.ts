@@ -703,7 +703,7 @@ export class SessionManager implements Middleware {
             case SessionStatus.Stopping:
                 const currentPowerShellExe =
                 availablePowerShellExes
-                    .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails.displayName);
+                    .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails.displayName.toLowerCase());
 
                 const powerShellSessionName =
                     currentPowerShellExe ?
