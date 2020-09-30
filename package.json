@@ -120,7 +120,7 @@
         "displayName": "Powershell Notebook",
         "selector": [
           {
-            "filenamePattern": "*.Notebook.ps1"
+            "filenamePattern": "*.[Nn]otebook.ps1"
           }
         ],
         "priority": "default"
