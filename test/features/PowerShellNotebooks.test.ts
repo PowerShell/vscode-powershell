@@ -350,11 +350,11 @@ suite("PowerShellNotebooks tests", () => {
         // Allow some time to pass to render the Notebook
         await utils.sleep(5000);
         assert.strictEqual(
-            vscode.notebook.activeNotebookEditor.document.uri.toString(),
+            vscode.window.activeNotebookEditor.document.uri.toString(),
             notebookSimpleMixedComments.toString());
 
         // Save it as testFile.ps1 and reopen it using the feature.
-        await notebookContentProvider.saveNotebookAs(uri, vscode.notebook.activeNotebookEditor.document, null);
+        await notebookContentProvider.saveNotebookAs(uri, vscode.window.activeNotebookEditor.document, null);
         const newNotebook = await notebookContentProvider.openNotebook(uri, {});
 
         // Compare that saving as a file results in the same cell data as the existing one.
@@ -376,12 +376,12 @@ suite("PowerShellNotebooks tests", () => {
         // Allow some time to pass to render the Notebook
         await utils.sleep(5000);
         assert.strictEqual(
-            vscode.notebook.activeNotebookEditor.document.uri.toString(),
+            vscode.window.activeNotebookEditor.document.uri.toString(),
             notebookBlockCommentsWithTextOnSameLine.toString());
 
         // Save it as testFile1.ps1
         const contentOfBackingFileBefore = (await vscode.workspace.fs.readFile(notebookBlockCommentsWithTextOnSameLine)).toString();
-        await notebookContentProvider.saveNotebookAs(uri, vscode.notebook.activeNotebookEditor.document, null);
+        await notebookContentProvider.saveNotebookAs(uri, vscode.window.activeNotebookEditor.document, null);
         const contentOfBackingFileAfter = (await vscode.workspace.fs.readFile(uri)).toString();
 
         // Verify that saving does not mutate result.
@@ -405,10 +405,10 @@ gci`,
 
     test(".Notebook.ps1 files are opened automatically", async () => {
         await vscode.commands.executeCommand("vscode.open", notebookSimpleDotNotebook);
-        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells.length, 2);
-        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[0].cellKind, vscode.CellKind.Markdown);
-        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[0].document.getText(), "asdf");
-        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[1].cellKind, vscode.CellKind.Code);
-        assert.strictEqual(vscode.notebook.activeNotebookEditor.document.cells[1].document.getText(), "gci\n");
+        assert.strictEqual(vscode.window.activeNotebookEditor.document.cells.length, 2);
+        assert.strictEqual(vscode.window.activeNotebookEditor.document.cells[0].cellKind, vscode.CellKind.Markdown);
+        assert.strictEqual(vscode.window.activeNotebookEditor.document.cells[0].document.getText(), "asdf");
+        assert.strictEqual(vscode.window.activeNotebookEditor.document.cells[1].cellKind, vscode.CellKind.Code);
+        assert.strictEqual(vscode.window.activeNotebookEditor.document.cells[1].document.getText(), "gci\n");
     }).timeout(20000);
 });

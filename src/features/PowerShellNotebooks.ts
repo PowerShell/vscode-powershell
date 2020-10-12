@@ -96,7 +96,7 @@ export class PowerShellNotebooksFeature extends LanguageClientConsumer {
     }
 
     private static async DisableNotebookMode() {
-        const uri = vscode.notebook.activeNotebookEditor.document.uri;
+        const uri = vscode.window.activeNotebookEditor.document.uri;
         await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         await vscode.commands.executeCommand("vscode.openWith", uri, "default");
     }
