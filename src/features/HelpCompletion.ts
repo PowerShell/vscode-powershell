@@ -56,6 +56,11 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
     }
 
     public async onEvent(changeEvent: TextDocumentChangeEvent): Promise<void> {
+        // If it's not a PowerShell script, we don't care about it.
+        if (changeEvent.document.languageId !== "powershell") {
+            return;
+        }
+
         if (!(changeEvent && changeEvent.contentChanges)) {
             this.log.writeWarning(`<${HelpCompletionFeature.name}>: ` +
                 `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
