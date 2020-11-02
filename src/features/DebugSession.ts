@@ -17,7 +17,7 @@ import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const StartDebuggerNotificationType =
-    new NotificationType<void, void>("powerShell/startDebugger");
+    new NotificationType<void>("powerShell/startDebugger");
 
 export class DebugSessionFeature extends LanguageClientConsumer
     implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
@@ -383,7 +383,7 @@ interface IPSHostProcessInfo {
 }
 
 export const GetPSHostProcessesRequestType =
-    new RequestType<any, IGetPSHostProcessesResponseBody, string, void>("powerShell/getPSHostProcesses");
+    new RequestType<any, IGetPSHostProcessesResponseBody, string>("powerShell/getPSHostProcesses");
 
 interface IGetPSHostProcessesResponseBody {
     hostProcesses: IPSHostProcessInfo[];
@@ -458,7 +458,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
     }
 
     private pickPSHostProcess(): Thenable<string> {
-        return this.languageClient.sendRequest(GetPSHostProcessesRequestType, null).then((hostProcesses) => {
+        return this.languageClient.sendRequest(GetPSHostProcessesRequestType, {}).then((hostProcesses) => {
             // Start with the current PowerShell process in the list.
             const items: IProcessItem[] = [{
                 label: "Current",
@@ -518,7 +518,7 @@ interface IRunspace {
 }
 
 export const GetRunspaceRequestType =
-    new RequestType<any, IRunspace[], string, void>("powerShell/getRunspace");
+    new RequestType<any, IRunspace[], string>("powerShell/getRunspace");
 
 export class PickRunspaceFeature extends LanguageClientConsumer {
 

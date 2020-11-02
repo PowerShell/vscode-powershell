@@ -240,7 +240,7 @@ enum CustomViewType {
 }
 
 export const NewCustomViewRequestType =
-    new RequestType<INewCustomViewRequestArguments, void, void, void>(
+    new RequestType<INewCustomViewRequestArguments, void, void>(
         "powerShell/newCustomView");
 
 interface INewCustomViewRequestArguments {
@@ -250,7 +250,7 @@ interface INewCustomViewRequestArguments {
 }
 
 export const ShowCustomViewRequestType =
-    new RequestType<IShowCustomViewRequestArguments, void, void, void>(
+    new RequestType<IShowCustomViewRequestArguments, void, void>(
         "powerShell/showCustomView");
 
 interface IShowCustomViewRequestArguments {
@@ -259,7 +259,7 @@ interface IShowCustomViewRequestArguments {
 }
 
 export const CloseCustomViewRequestType =
-    new RequestType<ICloseCustomViewRequestArguments, void, void, void>(
+    new RequestType<ICloseCustomViewRequestArguments, void, void>(
         "powerShell/closeCustomView");
 
 interface ICloseCustomViewRequestArguments {
@@ -267,7 +267,7 @@ interface ICloseCustomViewRequestArguments {
 }
 
 export const SetHtmlContentViewRequestType =
-    new RequestType<ISetHtmlContentViewRequestArguments, void, void, void>(
+    new RequestType<ISetHtmlContentViewRequestArguments, void, void>(
         "powerShell/setHtmlViewContent");
 
 interface IHtmlContent {
@@ -282,7 +282,7 @@ interface ISetHtmlContentViewRequestArguments {
 }
 
 export const AppendHtmlOutputViewRequestType =
-    new RequestType<IAppendHtmlOutputViewRequestArguments, void, void, void>(
+    new RequestType<IAppendHtmlOutputViewRequestArguments, void, void>(
         "powerShell/appendHtmlViewContent");
 
 interface IAppendHtmlOutputViewRequestArguments {

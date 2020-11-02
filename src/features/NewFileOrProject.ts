@@ -186,7 +186,7 @@ interface ITemplateDetails {
 }
 
 export const GetProjectTemplatesRequestType =
-    new RequestType<IGetProjectTemplatesRequestArgs, IGetProjectTemplatesResponseBody, string, void>(
+    new RequestType<IGetProjectTemplatesRequestArgs, IGetProjectTemplatesResponseBody, string>(
         "powerShell/getProjectTemplates");
 
 interface IGetProjectTemplatesRequestArgs {
@@ -199,7 +199,7 @@ interface IGetProjectTemplatesResponseBody {
 }
 
 export const NewProjectFromTemplateRequestType =
-    new RequestType<any, INewProjectFromTemplateResponseBody, string, void>(
+    new RequestType<any, INewProjectFromTemplateResponseBody, string>(
         "powerShell/newProjectFromTemplate");
 
 interface INewProjectFromTemplateRequestArgs {

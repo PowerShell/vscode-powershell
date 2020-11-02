@@ -23,7 +23,7 @@ export interface IExtensionCommandQuickPickItem extends vscode.QuickPickItem {
 }
 
 export const InvokeExtensionCommandRequestType =
-    new RequestType<IInvokeExtensionCommandRequestArguments, void, void, void>(
+    new RequestType<IInvokeExtensionCommandRequestArguments, void, void>(
         "powerShell/invokeExtensionCommand");
 
 export interface IEditorContext {
@@ -40,7 +40,7 @@ export interface IInvokeExtensionCommandRequestArguments {
 }
 
 export const ExtensionCommandAddedNotificationType =
-    new NotificationType<IExtensionCommandAddedNotificationBody, void>(
+    new NotificationType<IExtensionCommandAddedNotificationBody>(
         "powerShell/extensionCommandAdded");
 
 export interface IExtensionCommandAddedNotificationBody {
@@ -91,7 +91,7 @@ function asCodePosition(value: Position): vscode.Position {
 }
 
 export const GetEditorContextRequestType =
-    new RequestType<IGetEditorContextRequestArguments, IEditorContext, void, void>(
+    new RequestType<IGetEditorContextRequestArguments, IEditorContext, void>(
         "editor/getEditorContext");
 
 // tslint:disable-next-line:no-empty-interface
@@ -104,7 +104,7 @@ enum EditorOperationResponse {
 }
 
 export const InsertTextRequestType =
-    new RequestType<IInsertTextRequestArguments, EditorOperationResponse, void, void>(
+    new RequestType<IInsertTextRequestArguments, EditorOperationResponse, void>(
         "editor/insertText");
 
 export interface IInsertTextRequestArguments {
@@ -114,7 +114,7 @@ export interface IInsertTextRequestArguments {
 }
 
 export const SetSelectionRequestType =
-    new RequestType<ISetSelectionRequestArguments, EditorOperationResponse, void, void>(
+    new RequestType<ISetSelectionRequestArguments, EditorOperationResponse, void>(
         "editor/setSelection");
 
 export interface ISetSelectionRequestArguments {
@@ -122,7 +122,7 @@ export interface ISetSelectionRequestArguments {
 }
 
 export const OpenFileRequestType =
-    new RequestType<IOpenFileDetails, EditorOperationResponse, void, void>(
+    new RequestType<IOpenFileDetails, EditorOperationResponse, void>(
         "editor/openFile");
 
 export interface IOpenFileDetails {
@@ -131,31 +131,31 @@ export interface IOpenFileDetails {
 }
 
 export const NewFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/newFile");
 
 export const CloseFileRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/closeFile");
 
 export const SaveFileRequestType =
-    new RequestType<ISaveFileDetails, EditorOperationResponse, void, void>(
+    new RequestType<ISaveFileDetails, EditorOperationResponse, void>(
         "editor/saveFile");
 
 export const ShowErrorMessageRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/showErrorMessage");
 
 export const ShowWarningMessageRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/showWarningMessage");
 
 export const ShowInformationMessageRequestType =
-    new RequestType<string, EditorOperationResponse, void, void>(
+    new RequestType<string, EditorOperationResponse, void>(
         "editor/showInformationMessage");
 
 export const SetStatusBarMessageRequestType =
-    new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void, void>(
+    new RequestType<IStatusBarMessageDetails, EditorOperationResponse, void>(
         "editor/setStatusBarMessage");
 
 export const ClearTerminalNotificationType =

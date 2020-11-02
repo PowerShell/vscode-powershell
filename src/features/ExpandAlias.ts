@@ -8,7 +8,7 @@ import { RequestType } from "vscode-languageclient";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export const ExpandAliasRequestType = new RequestType<any, any, void, void>("powerShell/expandAlias");
+export const ExpandAliasRequestType = new RequestType<any, any, void>("powerShell/expandAlias");
 
 export class ExpandAliasFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
