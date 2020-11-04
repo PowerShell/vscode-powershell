@@ -11,7 +11,7 @@ import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const CommentHelpRequestType =
-    new RequestType<any, any, void, void>("powerShell/getCommentHelp");
+    new RequestType<any, any, void>("powerShell/getCommentHelp");
 
 interface ICommentHelpRequestParams {
     documentUri: string;

@@ -775,11 +775,11 @@ class SessionMenuItem implements vscode.QuickPickItem {
 }
 
 export const PowerShellVersionRequestType =
-    new RequestType0<IPowerShellVersionDetails, void, void>(
+    new RequestType0<IPowerShellVersionDetails, void>(
         "powerShell/getVersion");
 
 export const RunspaceChangedEventType =
-    new NotificationType<IRunspaceDetails, void>(
+    new NotificationType<IRunspaceDetails>(
         "powerShell/runspaceChanged");
 
 export enum RunspaceType {

@@ -8,7 +8,7 @@ import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const ShowHelpNotificationType =
-    new NotificationType<any, void>("powerShell/showHelp");
+    new NotificationType<any>("powerShell/showHelp");
 
 export class ShowHelpFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;

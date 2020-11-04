@@ -10,18 +10,18 @@ import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void, void>("evaluate");
-export const OutputNotificationType = new NotificationType<IOutputNotificationBody, void>("output");
+export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
+export const OutputNotificationType = new NotificationType<IOutputNotificationBody>("output");
 export const ExecutionStatusChangedNotificationType =
-    new NotificationType<IExecutionStatusDetails, void>("powerShell/executionStatusChanged");
+    new NotificationType<IExecutionStatusDetails>("powerShell/executionStatusChanged");
 
 export const ShowChoicePromptRequestType =
     new RequestType<IShowChoicePromptRequestArgs,
-                    IShowChoicePromptResponseBody, string, void>("powerShell/showChoicePrompt");
+                    IShowChoicePromptResponseBody, string>("powerShell/showChoicePrompt");
 
 export const ShowInputPromptRequestType =
     new RequestType<IShowInputPromptRequestArgs,
-                    IShowInputPromptResponseBody, string, void>("powerShell/showInputPrompt");
+                    IShowInputPromptResponseBody, string>("powerShell/showInputPrompt");
 
 export interface IEvaluateRequestArguments {
     expression: string;

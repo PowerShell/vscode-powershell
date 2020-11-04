@@ -8,10 +8,10 @@ import QuickPickItem = vscode.QuickPickItem;
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const FindModuleRequestType =
-    new RequestType<any, any, void, void>("powerShell/findModule");
+    new RequestType<any, any, void>("powerShell/findModule");
 
 export const InstallModuleRequestType =
-    new RequestType<string, void, void, void>("powerShell/installModule");
+    new RequestType<string, void, void>("powerShell/installModule");
 
 export class FindModuleFeature extends LanguageClientConsumer {
 

@@ -19,7 +19,7 @@ interface ICommand {
  * RequestType sent over to PSES.
  * Expects: ICommand to be returned
  */
-export const GetCommandRequestType = new RequestType0<ICommand[], void, void>("powerShell/getCommand");
+export const GetCommandRequestType = new RequestType0<ICommand[], void>("powerShell/getCommand");
 
 /**
  * A PowerShell Command listing feature. Implements a treeview control.

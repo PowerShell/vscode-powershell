@@ -19,7 +19,7 @@ export interface IDidSaveTextDocumentParams {
 }
 
 export const DidSaveTextDocumentNotificationType =
-    new NotificationType<IDidSaveTextDocumentParams, void>(
+    new NotificationType<IDidSaveTextDocumentParams>(
         "textDocument/didSave");
 
 export class RemoteFilesFeature extends LanguageClientConsumer {
