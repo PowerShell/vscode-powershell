@@ -71,7 +71,7 @@
     "@types/vscode": "1.44.0",
     "mocha": "~5.2.0",
     "mocha-junit-reporter": "~2.0.0",
-    "mocha-multi-reporters": "~1.1.7",
+    "mocha-multi-reporters": "~1.5.1",
     "mock-fs": "~4.13.0",
     "rewire": "~5.0.0",
     "sinon": "~9.2.1",
