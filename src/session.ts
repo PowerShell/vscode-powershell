@@ -553,6 +553,14 @@ export class SessionManager implements Middleware {
             // This enables handling Semantic Highlighting messages in PowerShell Editor Services
             this.languageServerClient.registerProposedFeatures();
 
+            if (!this.InDevelopmentMode) {
+                this.languageServerClient.onTelemetry((event) => {
+                    const eventName: string = event.eventName ? event.eventName : "PSESEvent";
+                    const data: any = event.data ? event.data : event
+                    this.telemetryReporter.sendTelemetryEvent(eventName, data);
+                });
+            }
+
             this.languageServerClient.onReady().then(
                 () => {
                     this.languageServerClient
