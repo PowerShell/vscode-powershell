@@ -83,7 +83,7 @@ jobs:
     - name: Create Pull Request
       if: github.event_name == 'schedule'
       id: cpr
-      uses: peter-evans/create-pull-request@v2
+      uses: peter-evans/create-pull-request@v3
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       with:
@@ -91,9 +91,15 @@ jobs:
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         title: "[Ignore] Update Notebook dts"
-        assignees: TylerLeonhardt
-        reviewers: TylerLeonhardt
+        assignees: |
+          TylerLeonhardt
+          rjmholt
+        reviewers: |
+          TylerLeonhardt
+          rjmholt
         base: master
         draft: false
         branch: powershell-notebook-patch-${{ github.run_id }}
-        labels: Created_by_Action
+        labels: |
+          Created_by_Action
+          dependencies
