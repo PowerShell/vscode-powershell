@@ -130,7 +130,6 @@ if ($All) {
         if ($OutputPath) {
             $configuration.Add('TestResult', @{
                 Enabled = $true
-                OutputFormat = "NUnit2.5"
                 OutputPath = $OutputPath
             })
         }
@@ -158,7 +157,6 @@ elseif (($LineNumber -match '\d+') -and ($pesterModule.Version -ge '4.6.0')) {
         if ($OutputPath) {
             $configuration.Add('TestResult', @{
                 Enabled = $true
-                OutputFormat = "NUnit2.5"
                 OutputPath = $OutputPath
             })
         }
