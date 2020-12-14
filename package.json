@@ -56,7 +56,7 @@
     "uuid": "^8.3.1",
     "vscode-extension-telemetry": "~0.1.6",
     "vscode-languageclient": "^7.0.0-next.14",
-    "vscode-languageserver-protocol": "^3.16.0-next.11"
+    "vscode-languageserver-protocol": "^3.16.0"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
