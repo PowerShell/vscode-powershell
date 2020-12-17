@@ -122,7 +122,7 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- [Rob Holt](https://github.com/rjmholt)
+- [Rob Holt](https://github.com/rjmholt) - [@rjmholt](https://twitter.com/rjmholt)
 
 ## License
 
