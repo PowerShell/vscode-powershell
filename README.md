@@ -122,9 +122,7 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
-- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
-- [Rob Holt](https://github.com/rjmholt)
+- [Rob Holt](https://github.com/rjmholt) - [@rjmholt](https://twitter.com/rjmholt)
 
 ## License
 
