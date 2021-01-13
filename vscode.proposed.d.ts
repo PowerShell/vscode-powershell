@@ -239,6 +239,11 @@ declare module 'vscode' {
 		 * When false, insecure outputs like HTML, JavaScript, SVG will not be rendered.
 		 */
 		trusted?: boolean;
+
+		/**
+		 * Languages the document supports
+		 */
+		languages?: string[];
 	}
 
 	export interface NotebookDocumentContentOptions {
