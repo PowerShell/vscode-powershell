@@ -49,7 +49,7 @@ jobs:
 
         # Find the Notebook region start index
         for ( $i = $index; $i -lt $dts.Length; $i++) {
-            if($dts[$i] -match '//#region @rebornix: Notebook') {
+            if($dts[$i] -match '//#region notebook https://github.com/microsoft/vscode/issues/106744') {
                 $index = $i
                 break
             }
