@@ -123,6 +123,7 @@ on how to contribute to this extension!
 ## Maintainers
 
 - [Rob Holt](https://github.com/rjmholt) - [@rjmholt](https://twitter.com/rjmholt)
+- [Andy Schwartzmeyer](https://github.com/andschwa) - [andschwa.com](https://andschwa.com/)
 
 ## License
 
