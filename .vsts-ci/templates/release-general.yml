@@ -27,6 +27,7 @@ steps:
   displayName: 'Package ES - Setup Build'
   inputs:
     productName: vscode-powershell
+    useDFS: false
 
 - task: PowerShell@2
   displayName: 'Set environment variables for VSTS (Phase 1)'
