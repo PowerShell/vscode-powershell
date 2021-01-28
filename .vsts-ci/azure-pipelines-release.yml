@@ -32,12 +32,21 @@ trigger:
       - /LICENSE
       - /CODE_OF_CONDUCT.md
 
+resources:
+  repositories:
+  - repository: ComplianceRepo
+    type: github
+    endpoint: ComplianceGHRepo
+    name: PowerShell/Compliance
+
 jobs:
 
 - job: 'ReleaseBuild'
   displayName: 'Build release'
   pool:
-    name: 'Package ES CodeHub Lab E'
+    name: 'Package ES Standard Build'
     demands: DotNetFramework
+  variables:
+  - group: ESRP
   steps:
   - template: templates/release-general.yml

@@ -191,8 +191,8 @@ task Package UpdateReadme, {
     Move-Item -Force .\$($script:PackageJson.name)-$($script:PackageJson.version).vsix .\PowerShell-insiders.vsix
 
     if ($env:TF_BUILD) {
-        Copy-Item -Verbose -Recurse "./PowerShell-insiders.vsix" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/PowerShell-insiders.vsix"
-        Copy-Item -Verbose -Recurse "./scripts/Install-VSCode.ps1" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/Install-VSCode.ps1"
+        Copy-Item -Verbose -Recurse "./PowerShell-insiders.vsix" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/PowerShell-insiders.vsix"
+        Copy-Item -Verbose -Recurse "./scripts/Install-VSCode.ps1" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/Install-VSCode.ps1"
     }
 }
 
