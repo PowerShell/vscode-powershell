@@ -924,7 +924,7 @@
 		]
     },
     "PSCustomObject": {
-        "prefix": "PSCustomObject",
+        "prefix": "[PSCustomObject]",
         "body": [
             "[PSCustomObject]@{",
             "\t${1:Name} = ${2:Value}",
