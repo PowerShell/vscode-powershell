@@ -9,7 +9,8 @@
     ],
   "settings": {
     "files.associations": {
-      "**/snippets/*.json": "jsonc"
+      "**/snippets/*.json": "jsonc",
+      "**/.vsts-ci/**/*.yml": "azure-pipelines",
     },
     "typescript.tsdk": "./node_modules/typescript/lib"
   }
