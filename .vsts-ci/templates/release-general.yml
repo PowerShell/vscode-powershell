@@ -17,6 +17,7 @@ steps:
     targetType: filePath
     filePath: ./vscode-powershell/tools/releaseBuild/setVstsVariables.ps1
 
+# TODO: Replace this with an upstream trigger.
 - task: PowerShell@2
   displayName: 'Find PowerShellEditorServices build'
   env:
@@ -25,17 +26,17 @@ steps:
     targetType: filePath
     filePath: ./vscode-powershell/tools/releaseBuild/findPsesBuild.ps1
 
-- task: DownloadBuildArtifacts@0
-  displayName: 'Download Build Artifacts from PowerShell Editor Services'
+- task: DownloadPipelineArtifact@2
+  displayName: 'Download Artifacts from PowerShell Editor Services'
   inputs:
-    buildType: specific
+    source: specific
     project: '8e2735c1-3674-408a-bcab-87f089ea29d5'
     pipeline: 1056
-    buildVersionToDownload: specific
-    buildId: '$(PSES_BUILDID)'
-    downloadType: single
-    artifactName: 'PowerShellEditorServices'
-    downloadPath: '$(Build.SourcesDirectory)'
+    preferTriggeringPipeline: true
+    runVersion: specific
+    runId: '$(PSES_BUILDID)'
+    artifact: 'PowerShellEditorServices'
+    path: '$(Build.SourcesDirectory)/PowerShellEditorServices/module/'
 
 - pwsh: |
     New-Item -ItemType Directory $(Build.ArtifactStagingDirectory)/vscode-powershell
