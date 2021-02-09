@@ -28,6 +28,7 @@ steps:
       git clone --single-branch --branch $env:PSES_BRANCH https://github.com/$env:PSES_FORK/PowerShellEditorServices.git ../PowerShellEditorServices
       Install-Module InvokeBuild -Scope CurrentUser -Force
       Install-Module PlatyPS -Scope CurrentUser -Force
+      New-Item -ItemType Directory $(Build.ArtifactStagingDirectory)/vscode-powershell
   # Build
   - pwsh: Invoke-Build
   - task: PublishTestResults@2
@@ -38,7 +39,7 @@ steps:
   - task: PublishBuildArtifacts@1
     inputs:
       ArtifactName: vscode-powershell
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/vscode-powershell'
   # Rich Navigation
   - task: RichCodeNavIndexer@0
     # Note, for now, this is Windows only.
