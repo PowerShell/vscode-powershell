@@ -55,24 +55,21 @@ steps:
 - template: EsrpSign.yml@ComplianceRepo
   parameters:
     buildOutputPath: '$(Build.ArtifactStagingDirectory)/vscode-powershell'
-    signOutputPath: '$(Build.ArtifactStagingDirectory)/ScriptSigned'
+    signOutputPath: '$(Build.ArtifactStagingDirectory)/Signed'
     alwaysCopy: true # So publishing works
     certificateId: 'CP-230012' # Authenticode certificate
     useMinimatch: true # This enables the use of globbing
+    # NOTE: Code AKA *.vsix files are not signed
     pattern: |
       Install-VSCode.ps1
 
-- template: EsrpSign.yml@ComplianceRepo
+- template: EsrpScan.yml@ComplianceRepo
   parameters:
-    buildOutputPath: '$(Build.ArtifactStagingDirectory)/ScriptSigned'
-    signOutputPath: '$(Build.ArtifactStagingDirectory)/ExtensionSigned'
-    alwaysCopy: true # So publishing works
-    certificateId: 'CP-233016' # Microsoft OPC Publisher (VSIX) certificate
-    useMinimatch: true # This enables the use of globbing
-    pattern: |
-      PowerShell-insiders.vsix
+      scanPath: $(Build.ArtifactStagingDirectory)/Signed
+      pattern: |
+        *.vsix
 
-- publish: $(Build.ArtifactsDirectory)/ExtensionSigned
+- publish: $(Build.ArtifactStagingDirectory)/Signed
   artifact: vscode-powershell
   displayName: 'Publish signed (and unsigned) artifacts'
 
