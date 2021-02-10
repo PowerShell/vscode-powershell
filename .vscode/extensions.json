@@ -4,6 +4,7 @@
   "recommendations": [
     "editorconfig.editorconfig",
     "msjsdiag.debugger-for-chrome",
+    "ms-azure-devops.azure-pipelines",
     "ms-vscode.powershell",
     "ms-vscode.vscode-typescript-tslint-plugin",
     "davidanson.vscode-markdownlint"

@@ -14,6 +14,7 @@ Write-Host "`n### Extension Version: $($script:PackageJson.version) Extension Na
 
 #region Utility tasks
 
+# TODO: This needs to be a function, not a task.
 task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices, TestEditorServices, Package {
 
     $script:psesRepoPath = `
@@ -24,7 +25,7 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices,
             "$PSScriptRoot/../PowerShellEditorServices/"
         }
 
-    if (!(Test-Path $script:psesRepoPath)) {
+    if (!(Test-Path "$script:psesRepoPath/PowerShellEditorServices.build.ps1")) {
         # Clear the path so that it won't be used
         Write-Warning "`nThe PowerShellEditorServices repo cannot be found at path $script:psesRepoPath`n"
         $script:psesRepoPath = $null
@@ -172,14 +173,9 @@ task UpdatePackageJson {
 }
 
 task Package UpdateReadme, {
-
-    if ($script:psesBuildScriptPath) {
+    if ($script:psesBuildScriptPath -or $env:TF_BUILD) {
         Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
         Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\* .\modules
-    } elseif (Test-Path .\PowerShellEditorServices) {
-        Write-Host "`n### Moving PowerShellEditorServices module files" -ForegroundColor Green
-        Move-Item -Force .\PowerShellEditorServices\* .\modules
-        Remove-Item -Force .\PowerShellEditorServices
     } else {
         throw "Unable to find PowerShell EditorServices"
     }
@@ -191,8 +187,8 @@ task Package UpdateReadme, {
     Move-Item -Force .\$($script:PackageJson.name)-$($script:PackageJson.version).vsix .\PowerShell-insiders.vsix
 
     if ($env:TF_BUILD) {
-        Copy-Item -Verbose -Recurse "./PowerShell-insiders.vsix" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/PowerShell-insiders.vsix"
-        Copy-Item -Verbose -Recurse "./scripts/Install-VSCode.ps1" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/Install-VSCode.ps1"
+        Copy-Item -Verbose -Recurse "./PowerShell-insiders.vsix" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/PowerShell-insiders.vsix"
+        Copy-Item -Verbose -Recurse "./scripts/Install-VSCode.ps1" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/Install-VSCode.ps1"
     }
 }
 

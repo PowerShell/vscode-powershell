@@ -1,0 +1,13 @@
+{
+  "tool": "Credential Scanner",
+  "suppressions": [
+    {
+      "folder": "node_modules",
+      "_justification": "Third-party code must not be scanned"
+    },
+    {
+      "folder": "PSScriptAnalyzer",
+      "_justification": "Bundled upstream project with false-positives"
+    }
+  ]
+}
