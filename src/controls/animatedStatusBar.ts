@@ -58,6 +58,14 @@ class AnimatedStatusBarItem implements StatusBarItem {
         this.statusBarItem.color = value;
     }
 
+    public get backgroundColor(): string | ThemeColor {
+        return this.statusBarItem.backgroundColor;
+    }
+
+    public set backgroundColor(value: string | ThemeColor) {
+        this.statusBarItem.backgroundColor = value;
+    }
+
     public get command(): string | Command {
         return this.statusBarItem.command;
     }
