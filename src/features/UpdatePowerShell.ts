@@ -173,8 +173,8 @@ export async function InvokePowerShellUpdateCheck(
 
             } else if (isMacOS) {
                 const script = release.isPreview
-                    ? "brew cask upgrade powershell-preview"
-                    : "brew cask upgrade powershell";
+                    ? "brew upgrade --cask powershell-preview"
+                    : "brew upgrade --cask powershell";
 
                 await languageServerClient.sendRequest(EvaluateRequestType, {
                     expression: script,
