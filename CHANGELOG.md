@@ -1,5 +1,141 @@
 # PowerShell Extension Release History
 
+## v2021.2.0
+### Friday, February 19, 2021
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- [vscode-powershell #3185](https://github.com/PowerShell/vscode-powershell/pull/3185) -
+  Bump @types/node from 14.14.25 to 14.14.28. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3184](https://github.com/PowerShell/vscode-powershell/pull/3184) -
+  Bump typescript from 4.1.3 to 4.1.5. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3183](https://github.com/PowerShell/vscode-powershell/pull/3183) -
+  Bump mocha from 8.2.1 to 8.3.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell/pull/3132) -
+  Fix for issue #3131 in regards to brew discarding cask as an option. (Thanks @philippkahr!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell/pull/3173) -
+  Bump @types/node from 14.14.22 to 14.14.25. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #3177 from PowerShell/andschwa/delete-notebook-api. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Delete VS Code Notebook API prototype. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #3162 from PowerShell/andschwa/esrp. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Fix `ci-general.yml` for change to build script. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Scan `*.vsix` instead of signing. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Fix artifact download task. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Fix `Package` task for updated release pipline. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Small cleanup of development instructions. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Replace PackageES with ESRP template. (Thanks @andschwa!)
+- [vscode-powershell #3173](https://github.com/PowerShell/vscode-powershell) -
+  Recognize Azure DevOps files appropriately. (Thanks @andschwa!)
+- [vscode-powershell #3113](https://github.com/PowerShell/vscode-powershell/pull/3113) -
+  Bump @types/sinon from 9.0.9 to 9.0.10. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell/pull/3158) -
+  Bump vsce from 1.84.0 to 1.85.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Add braces to PSCustomObject snippet to play nice with auto-closing pairs.
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #3136 from PowerShell/dependabot/npm_and_yarn/types/node-fetch-2.5.8.
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Bump @types/node-fetch from 2.5.7 to 2.5.8. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #3149 from PowerShell/dependabot/npm_and_yarn/types/node-14.14.22.
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #3150 from PowerShell/dependabot/npm_and_yarn/sinon-9.2.4.
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Merge pull request #3151 from PowerShell/dependabot/npm_and_yarn/vsce-1.84.0.
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Set DFS to false in package build. (Thanks @andschwa!)
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Add self as maintainer to readme. (Thanks @andschwa!)
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Bump vsce from 1.83.0 to 1.84.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Bump sinon from 9.2.3 to 9.2.4. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3158](https://github.com/PowerShell/vscode-powershell) -
+  Bump @types/node from 14.14.14 to 14.14.22. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3125](https://github.com/PowerShell/vscode-powershell/pull/3125) -
+  Bump sinon from 9.2.2 to 9.2.3. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3108](https://github.com/PowerShell/vscode-powershell/pull/3108) -
+  Bump vsce from 1.81.1 to 1.83.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3099](https://github.com/PowerShell/vscode-powershell/pull/3099) -
+  Update dependencies to fix CI on macOS.
+- [vscode-powershell #3089](https://github.com/PowerShell/vscode-powershell/pull/3089) -
+  Remove hardcoded output format.
+- [vscode-powershell #3086](https://github.com/PowerShell/vscode-powershell/pull/3086) -
+  Fix typo in description of legacy codelens description. (Thanks @nexxai!)
+- [vscode-powershell #3085](https://github.com/PowerShell/vscode-powershell/pull/3085) -
+  Bump semver from 7.3.2 to 7.3.4. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3080](https://github.com/PowerShell/vscode-powershell/pull/3080) -
+  Bump @types/sinon from 9.0.8 to 9.0.9. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3079](https://github.com/PowerShell/vscode-powershell/pull/3079) -
+  Bump @types/node from 14.14.9 to 14.14.10. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3067](https://github.com/PowerShell/vscode-powershell/pull/3067) -
+  Bump vscode-languageclient from 7.0.0-next.12 to 7.0.0-next.14. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3068](https://github.com/PowerShell/vscode-powershell/pull/3068) -
+  Bump vscode-languageserver-protocol. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3070](https://github.com/PowerShell/vscode-powershell/pull/3070) -
+  Bump typescript from 4.0.5 to 4.1.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3069](https://github.com/PowerShell/vscode-powershell/pull/3069) -
+  Bump @types/node from 14.14.7 to 14.14.9. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3053](https://github.com/PowerShell/vscode-powershell/pull/3053) -
+  Send telemetry from pses.
+- [vscode-powershell #3055](https://github.com/PowerShell/vscode-powershell/pull/3055) -
+  Bump mocha-multi-reporters from 1.1.7 to 1.5.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3056](https://github.com/PowerShell/vscode-powershell/pull/3056) -
+  Bump @types/node from 14.14.6 to 14.14.7. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3046](https://github.com/PowerShell/vscode-powershell/pull/3046) -
+  Bump sinon from 9.2.0 to 9.2.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3047](https://github.com/PowerShell/vscode-powershell/pull/3047) -
+  Update language server client.
+- [vscode-powershell #3045](https://github.com/PowerShell/vscode-powershell/pull/3045) -
+  Bump @types/node from 14.14.3 to 14.14.6. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3044](https://github.com/PowerShell/vscode-powershell/pull/3044) -
+  Bump typescript from 4.0.3 to 4.0.5. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2998](https://github.com/PowerShell/vscode-powershell/pull/2998) -
+  Added Pester v5 support to problem matcher. (Thanks @fflaten!)
+- [vscode-powershell #3023](https://github.com/PowerShell/vscode-powershell/pull/3023) -
+  Help completion should only run on powershell scripts.
+- [vscode-powershell #3036](https://github.com/PowerShell/vscode-powershell/pull/3036) -
+  Bump @types/node from 14.11.8 to 14.14.3. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3003](https://github.com/PowerShell/vscode-powershell/pull/3003) -
+  Bump @types/node from 14.11.2 to 14.11.8. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3002](https://github.com/PowerShell/vscode-powershell/pull/3002) -
+  Bump sinon from 9.1.0 to 9.2.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #3004](https://github.com/PowerShell/vscode-powershell/pull/3004) -
+  Bump @types/mock-fs from 4.10.0 to 4.13.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2989](https://github.com/PowerShell/vscode-powershell/pull/2989) -
+  Bump sinon from 9.0.3 to 9.1.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2988](https://github.com/PowerShell/vscode-powershell/pull/2988) -
+  Bump uuid from 8.3.0 to 8.3.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2987](https://github.com/PowerShell/vscode-powershell/pull/2987) -
+  Bump vsce from 1.80.0 to 1.81.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2986](https://github.com/PowerShell/vscode-powershell/pull/2986) -
+  Bump @types/sinon from 9.0.6 to 9.0.8. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2986](https://github.com/PowerShell/vscode-powershell) -
+  Fix automatic notebooks by making glob case-insensitive. (Thanks @github-actions[bot]!)
+- [vscode-powershell #2978](https://github.com/PowerShell/vscode-powershell/pull/2978) -
+  Bump @types/sinon from 9.0.5 to 9.0.6. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2977](https://github.com/PowerShell/vscode-powershell/pull/2977) -
+  Bump @types/node from 14.11.1 to 14.11.2. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2976](https://github.com/PowerShell/vscode-powershell/pull/2976) -
+  Bump vsce from 1.79.5 to 1.80.0. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2973](https://github.com/PowerShell/vscode-powershell/pull/2973) -
+  Issue #2906. (Thanks @jeffpatton1971!)
+- [vscode-powershell #2967](https://github.com/PowerShell/vscode-powershell/pull/2967) -
+  Bump @types/node from 14.10.1 to 14.11.1. (Thanks @dependabot-preview[bot]!)
+- [vscode-powershell #2966](https://github.com/PowerShell/vscode-powershell/pull/2966) -
+  Bump typescript from 4.0.2 to 4.0.3. (Thanks @dependabot-preview[bot]!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+
 ## v2020.9.0-preview
 ### Wednesday, September 16, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
