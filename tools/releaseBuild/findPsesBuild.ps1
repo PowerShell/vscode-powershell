@@ -6,6 +6,11 @@ $succeededBuilds = Invoke-RestMethod -ContentType application/json -Uri $buildsU
 Write-Host "Requested URL: $buildsUrl"
 Write-Host "Got response:`n$(ConvertTo-Json $succeededBuilds)"
 
+$buildsURL = $buildsURL -replace "branchName", "tagName"
+$taggedBuilds = Invoke-RestMethod -ContentType application/json -Uri $buildsUrl -Headers $headers
+Write-Host "Requested URL: $buildsUrl"
+Write-Host "Got response:`n$(ConvertTo-Json $taggedBuilds)"
+
 $buildsUrl = $env:VSTS_PSES_URL_TEMPLATE -f $branch, "partiallySucceeded"
 $partiallySucceededBuilds = Invoke-RestMethod -ContentType application/json -Uri $buildsUrl -Headers $headers
 Write-Host "Requested URL: $buildsUrl"
@@ -13,6 +18,7 @@ Write-Host "Got response:`n$(ConvertTo-Json $partiallySucceededBuilds)"
 
 $builds = @(
     $succeededBuilds.value
+    $taggedBuilds.value
     $partiallySucceededBuilds.value
     ) | Sort-Object finishTime -Descending
 
