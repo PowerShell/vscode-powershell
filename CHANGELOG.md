@@ -1,91 +1,53 @@
 # PowerShell Extension Release History
 
-## v2021.2.0
+## v2021.2.0-preview
 ### Friday, February 19, 2021
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell/pull/3132) -
+- 🛫 🐛 [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell/pull/3132) -
   Fix for issue #3131 in regards to brew discarding cask as an option. (Thanks @philippkahr!)
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Merge pull request #3177 from PowerShell/andschwa/delete-notebook-api.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
+- 📺 🐛 [vscode-powershell #3177](https://github.com/PowerShell/vscode-powershell/pull/3177) -
   Delete VS Code Notebook API prototype.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Merge pull request #3162 from PowerShell/andschwa/esrp.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Fix `ci-general.yml` for change to build script.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Scan `*.vsix` instead of signing.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Fix artifact download task.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Fix `Package` task for updated release pipline.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Small cleanup of development instructions.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Replace PackageES with ESRP template.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Recognize Azure DevOps files appropriately.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
+- 👷 ✨ [vscode-powershell #3162](https://github.com/PowerShell/vscode-powershell/pull/3162) -
+  Rewrite release signing pipeline #3162.
+- 💎 🐛 [vscode-powershell #3129](https://github.com/PowerShell/vscode-powershell/pull/3129) -
   Add braces to PSCustomObject snippet to play nice with auto-closing pairs.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Merge pull request #3136 from PowerShell/dependabot/npm_and_yarn/types/node-fetch-2.5.8.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Merge pull request #3149 from PowerShell/dependabot/npm_and_yarn/types/node-14.14.22.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Merge pull request #3150 from PowerShell/dependabot/npm_and_yarn/sinon-9.2.4.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Merge pull request #3151 from PowerShell/dependabot/npm_and_yarn/vsce-1.84.0.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
-  Set DFS to false in package build.
-- [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell) -
+- 📖 ✨ [vscode-powershell #3152](https://github.com/PowerShell/vscode-powershell/pull/3152) -
   Add self as maintainer to readme.
-- [vscode-powershell #3099](https://github.com/PowerShell/vscode-powershell/pull/3099) -
+- 👷 🐛 [vscode-powershell #3099](https://github.com/PowerShell/vscode-powershell/pull/3099) -
   Update dependencies to fix CI on macOS.
-- [vscode-powershell #3089](https://github.com/PowerShell/vscode-powershell/pull/3089) -
+- 🐢 🐛 [vscode-powershell #3089](https://github.com/PowerShell/vscode-powershell/pull/3089) -
   Remove hardcoded output format.
-- [vscode-powershell #3086](https://github.com/PowerShell/vscode-powershell/pull/3086) -
+- 📖 🐛 [vscode-powershell #3086](https://github.com/PowerShell/vscode-powershell/pull/3086) -
   Fix typo in description of legacy codelens description. (Thanks @nexxai!)
-- [vscode-powershell #3053](https://github.com/PowerShell/vscode-powershell/pull/3053) -
+- 🚂 ✨ [vscode-powershell #3053](https://github.com/PowerShell/vscode-powershell/pull/3053) -
   Send telemetry from pses.
-- [vscode-powershell #3047](https://github.com/PowerShell/vscode-powershell/pull/3047) -
+- 🚂 ✨ [vscode-powershell #3047](https://github.com/PowerShell/vscode-powershell/pull/3047) -
   Update language server client.
-- [vscode-powershell #2998](https://github.com/PowerShell/vscode-powershell/pull/2998) -
+- 🐢 ✨ [vscode-powershell #2998](https://github.com/PowerShell/vscode-powershell/pull/2998) -
   Added Pester v5 support to problem matcher. (Thanks @fflaten!)
-- [vscode-powershell #3023](https://github.com/PowerShell/vscode-powershell/pull/3023) -
+- ✂️ 🐛 [vscode-powershell #3023](https://github.com/PowerShell/vscode-powershell/pull/3023) -
   Help completion should only run on powershell scripts.
-- [vscode-powershell #3023](https://github.com/PowerShell/vscode-powershell) -
-  Fix automatic notebooks by making glob case-insensitive. (Thanks @github-actions[bot]!)
-- [vscode-powershell #2973](https://github.com/PowerShell/vscode-powershell/pull/2973) -
-  Issue #2906. (Thanks @jeffpatton1971!)
+- 🛫 🐛 [vscode-powershell #2973](https://github.com/PowerShell/vscode-powershell/pull/2973) -
+  Fix session menu fails to open when PowerShell extension is starting. (Thanks @jeffpatton1971!)
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
-- Fix publish step.
-- Merge pull request #1408 from PowerShell/andschwa/esrp.
-- Fix issues caught by PoliCheck.
-- Exclude .git folder from PoliCheck.
-- Point PoliCheck to source subfolder.
-- Replace compliance tasks with template.
-- Delete deprecated signing.xml.
-- Use ADO tasks instead of pwsh inline scripts.
-- Start simplifying release build.
-- Replace PackageES with ESRP template.
-- Add self as maintainer to readme.
-- Set DFS to false in package build.
-- [PowerShellEditorServices #1398](https://github.com/PowerShell/PowerShellEditorServices/pull/1398) -
+- 👷 ✨ [PowerShellEditorServices #1408](https://github.com/PowerShell/PowerShellEditorServices/pull/1408) -
+  Rewrite release signing pipeline.
+- 🚨 ✨ [PowerShellEditorServices #1398](https://github.com/PowerShell/PowerShellEditorServices/pull/1398) -
   Refactor e2e tests.
-- [PowerShellEditorServices #1381](https://github.com/PowerShell/PowerShellEditorServices/pull/1381) -
+- 🚂 ✨ [PowerShellEditorServices #1381](https://github.com/PowerShell/PowerShellEditorServices/pull/1381) -
   Hook up Telemetry LSP event and add telemetry event when users opt-out/in to features.
-- [PowerShellEditorServices #1397](https://github.com/PowerShell/PowerShellEditorServices/pull/1397) -
+- 👷 🐛 [PowerShellEditorServices #1397](https://github.com/PowerShell/PowerShellEditorServices/pull/1397) -
   More compliant NuGet.config.
-- [vscode-powershell #3071](https://github.com/PowerShell/PowerShellEditorServices/pull/1394) -
+- 📺 🐛 [vscode-powershell #3071](https://github.com/PowerShell/PowerShellEditorServices/pull/1394) -
   Fix #1393: Always use local help to return cmdlet help text. (Thanks @deadlydog!)
-- [PowerShellEditorServices #1376](https://github.com/PowerShell/PowerShellEditorServices/pull/1376) -
+- 🚂 ✨ [PowerShellEditorServices #1376](https://github.com/PowerShell/PowerShellEditorServices/pull/1376) -
   Move to Omnisharp lib 0.18.x.
 - 🛫 🐛 [vscode-powershell #2965](https://github.com/PowerShell/PowerShellEditorServices/pull/1363) -
   Fix error when started in low .NET versions.
-- [PowerShellEditorServices #1364](https://github.com/PowerShell/PowerShellEditorServices/pull/1364) -
+- 📖 🐛 [PowerShellEditorServices #1364](https://github.com/PowerShell/PowerShellEditorServices/pull/1364) -
   Typos in README.md. (Thanks @robotboyfriend!)
 
 ## v2020.9.0-preview
