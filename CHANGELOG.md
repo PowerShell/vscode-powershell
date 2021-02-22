@@ -5,15 +5,15 @@
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
 - 🛫 🐛 [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell/pull/3132) -
-  Fix for issue #3131 in regards to brew discarding cask as an option. (Thanks @philippkahr!)
+  Use new brew cask installation syntax for PowerShell installation. (Thanks @philippkahr!)
 - 📺 🐛 [vscode-powershell #3177](https://github.com/PowerShell/vscode-powershell/pull/3177) -
-  Delete VS Code Notebook API prototype.
+  Disable VSCode Notebook API prototype while the API is still unstable.
 - 👷 ✨ [vscode-powershell #3162](https://github.com/PowerShell/vscode-powershell/pull/3162) -
-  Rewrite release signing pipeline #3162.
+  Rewrite release signing pipeline.
 - 💎 🐛 [vscode-powershell #3129](https://github.com/PowerShell/vscode-powershell/pull/3129) -
   Add braces to PSCustomObject snippet to play nice with auto-closing pairs.
 - 📖 ✨ [vscode-powershell #3152](https://github.com/PowerShell/vscode-powershell/pull/3152) -
-  Add self as maintainer to readme.
+  Add @andschwa to the README as maintainer.
 - 👷 🐛 [vscode-powershell #3099](https://github.com/PowerShell/vscode-powershell/pull/3099) -
   Update dependencies to fix CI on macOS.
 - 🐢 🐛 [vscode-powershell #3089](https://github.com/PowerShell/vscode-powershell/pull/3089) -
@@ -21,13 +21,13 @@
 - 📖 🐛 [vscode-powershell #3086](https://github.com/PowerShell/vscode-powershell/pull/3086) -
   Fix typo in description of legacy codelens description. (Thanks @nexxai!)
 - 🚂 ✨ [vscode-powershell #3053](https://github.com/PowerShell/vscode-powershell/pull/3053) -
-  Send telemetry from pses.
+  Use VSCode telemetry endpoint for PSES telemetry.
 - 🚂 ✨ [vscode-powershell #3047](https://github.com/PowerShell/vscode-powershell/pull/3047) -
   Update language server client.
 - 🐢 ✨ [vscode-powershell #2998](https://github.com/PowerShell/vscode-powershell/pull/2998) -
   Added Pester v5 support to problem matcher. (Thanks @fflaten!)
 - ✂️ 🐛 [vscode-powershell #3023](https://github.com/PowerShell/vscode-powershell/pull/3023) -
-  Help completion should only run on powershell scripts.
+  Ensure help completions only run on powershell scripts.
 - 🛫 🐛 [vscode-powershell #2973](https://github.com/PowerShell/vscode-powershell/pull/2973) -
   Fix session menu fails to open when PowerShell extension is starting. (Thanks @jeffpatton1971!)
 
