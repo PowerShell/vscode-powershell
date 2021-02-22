@@ -1,5 +1,55 @@
 # PowerShell Extension Release History
 
+## v2021.2.0-preview
+### Friday, February 19, 2021
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 🛫 🐛 [vscode-powershell #3132](https://github.com/PowerShell/vscode-powershell/pull/3132) -
+  Use new brew cask installation syntax for PowerShell installation. (Thanks @philippkahr!)
+- 📺 🐛 [vscode-powershell #3177](https://github.com/PowerShell/vscode-powershell/pull/3177) -
+  Disable VSCode Notebook API prototype while the API is still unstable.
+- 👷 ✨ [vscode-powershell #3162](https://github.com/PowerShell/vscode-powershell/pull/3162) -
+  Rewrite release signing pipeline.
+- 💎 🐛 [vscode-powershell #3129](https://github.com/PowerShell/vscode-powershell/pull/3129) -
+  Add braces to PSCustomObject snippet to play nice with auto-closing pairs.
+- 📖 ✨ [vscode-powershell #3152](https://github.com/PowerShell/vscode-powershell/pull/3152) -
+  Add @andschwa to the README as maintainer.
+- 👷 🐛 [vscode-powershell #3099](https://github.com/PowerShell/vscode-powershell/pull/3099) -
+  Update dependencies to fix CI on macOS.
+- 🐢 🐛 [vscode-powershell #3089](https://github.com/PowerShell/vscode-powershell/pull/3089) -
+  Remove hardcoded output format.
+- 📖 🐛 [vscode-powershell #3086](https://github.com/PowerShell/vscode-powershell/pull/3086) -
+  Fix typo in description of legacy codelens description. (Thanks @nexxai!)
+- 🚂 ✨ [vscode-powershell #3053](https://github.com/PowerShell/vscode-powershell/pull/3053) -
+  Use VSCode telemetry endpoint for PSES telemetry.
+- 🚂 ✨ [vscode-powershell #3047](https://github.com/PowerShell/vscode-powershell/pull/3047) -
+  Update language server client.
+- 🐢 ✨ [vscode-powershell #2998](https://github.com/PowerShell/vscode-powershell/pull/2998) -
+  Added Pester v5 support to problem matcher. (Thanks @fflaten!)
+- ✂️ 🐛 [vscode-powershell #3023](https://github.com/PowerShell/vscode-powershell/pull/3023) -
+  Ensure help completions only run on powershell scripts.
+- 🛫 🐛 [vscode-powershell #2973](https://github.com/PowerShell/vscode-powershell/pull/2973) -
+  Fix session menu fails to open when PowerShell extension is starting. (Thanks @jeffpatton1971!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 👷 ✨ [PowerShellEditorServices #1408](https://github.com/PowerShell/PowerShellEditorServices/pull/1408) -
+  Rewrite release signing pipeline.
+- 🚨 ✨ [PowerShellEditorServices #1398](https://github.com/PowerShell/PowerShellEditorServices/pull/1398) -
+  Refactor e2e tests.
+- 🚂 ✨ [PowerShellEditorServices #1381](https://github.com/PowerShell/PowerShellEditorServices/pull/1381) -
+  Hook up Telemetry LSP event and add telemetry event when users opt-out/in to features.
+- 👷 🐛 [PowerShellEditorServices #1397](https://github.com/PowerShell/PowerShellEditorServices/pull/1397) -
+  More compliant NuGet.config.
+- 📺 🐛 [vscode-powershell #3071](https://github.com/PowerShell/PowerShellEditorServices/pull/1394) -
+  Fix #1393: Always use local help to return cmdlet help text. (Thanks @deadlydog!)
+- 🚂 ✨ [PowerShellEditorServices #1376](https://github.com/PowerShell/PowerShellEditorServices/pull/1376) -
+  Move to Omnisharp lib 0.18.x.
+- 🛫 🐛 [vscode-powershell #2965](https://github.com/PowerShell/PowerShellEditorServices/pull/1363) -
+  Fix error when started in low .NET versions.
+- 📖 🐛 [PowerShellEditorServices #1364](https://github.com/PowerShell/PowerShellEditorServices/pull/1364) -
+  Typos in README.md. (Thanks @robotboyfriend!)
+
 ## v2020.9.0-preview
 ### Wednesday, September 16, 2020
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
