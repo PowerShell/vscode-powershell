@@ -13,7 +13,7 @@ param(
     $GitHubToken,
 
     [Parameter(Mandatory)]
-    [string]
+    [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
     $Repository,
 
     [Parameter()]
@@ -22,7 +22,7 @@ param(
 
     [Parameter()]
     [string]
-    $ChangelogPath = "$PSScriptRoot/../../CHANGELOG.md",
+    $ChangelogPath = "$PSScriptRoot/../../../$Repository/CHANGELOG.md",
 
     [Parameter()]
     [string[]]
