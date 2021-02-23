@@ -17,7 +17,7 @@ steps:
     targetType: filePath
     filePath: ./vscode-powershell/tools/releaseBuild/setVstsVariables.ps1
 
-# TODO: Replace this with an upstream trigger.
+# TODO: Remove this when satisfied with added trigger.
 - task: PowerShell@2
   displayName: 'Find PowerShellEditorServices build'
   env:
@@ -54,6 +54,8 @@ steps:
 
 - template: EsrpSign.yml@ComplianceRepo
   parameters:
+    # TODO: $[in(variables['Build.Reason'], 'Manual', 'ResourceTrigger')]
+    shouldSign: true
     buildOutputPath: '$(Build.ArtifactStagingDirectory)/vscode-powershell'
     signOutputPath: '$(Build.ArtifactStagingDirectory)/Signed'
     alwaysCopy: true # So publishing works
