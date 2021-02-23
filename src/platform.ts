@@ -268,7 +268,7 @@ export class PowerShellExeFinder {
         // Find the base directory for MSIX application exe shortcuts
         const msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
 
-        if (!fs.existsSync(msixAppDir)) {
+        if (!fileExistsSync(msixAppDir)) {
             return null;
         }
 
@@ -310,7 +310,13 @@ export class PowerShellExeFinder {
         const powerShellInstallBaseDir = path.join(programFilesPath, "PowerShell");
 
         // Ensure the base directory exists
-        if (!(fs.existsSync(powerShellInstallBaseDir) && fs.lstatSync(powerShellInstallBaseDir).isDirectory())) {
+        try {
+            const powerShellInstallBaseDirLStat = fs.lstatSync(powerShellInstallBaseDir);
+            if (!powerShellInstallBaseDirLStat.isDirectory())
+            {
+                return null;
+            }
+        } catch {
             return null;
         }
 
@@ -469,6 +475,17 @@ export function getWindowsSystemPowerShellPath(systemFolderName: string) {
         "powershell.exe");
 }
 
+function fileExistsSync(filePath: string): boolean {
+    try {
+        // This will throw if the path does not exist,
+        // and otherwise returns a value that we don't care about
+        fs.lstatSync(filePath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 interface IPossiblePowerShellExe extends IPowerShellExeDetails {
     exists(): boolean;
 }
@@ -491,7 +508,7 @@ class PossiblePowerShellExe implements IPossiblePowerShellExe {
 
     public exists(): boolean {
         if (this.knownToExist === undefined) {
-            this.knownToExist = fs.existsSync(this.exePath);
+            this.knownToExist = fileExistsSync(this.exePath);
         }
         return this.knownToExist;
     }
