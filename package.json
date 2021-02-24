@@ -26,7 +26,6 @@
     "url": "https://github.com/PowerShell/vscode-powershell.git"
   },
   "main": "./out/src/main",
-  "enableProposedApi": true,
   "activationEvents": [
     "onDebugInitialConfigurations",
     "onDebugResolve:PowerShell",
