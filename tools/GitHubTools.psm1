@@ -549,6 +549,7 @@ function New-GitHubPR
         body = $Description
         head = $Branch
         base = $TargetBranch
+        draft = $true
         maintainer_can_modify = $true
     } | ConvertTo-Json
 

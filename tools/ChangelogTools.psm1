@@ -340,7 +340,7 @@ filter Skip-IgnoredChange
         $Change,
 
         [Parameter()]
-        [string]
+        [string[]]
         $User,
 
         [Parameter()]

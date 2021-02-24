@@ -13,7 +13,7 @@ param(
     $GitHubToken,
 
     [Parameter(Mandatory)]
-    [string]
+    [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
     $Repository,
 
     [Parameter()]
@@ -22,7 +22,7 @@ param(
 
     [Parameter()]
     [string]
-    $ChangelogPath = "$PSScriptRoot/../../CHANGELOG.md",
+    $ChangelogPath = "$PSScriptRoot/../../../$Repository/CHANGELOG.md",
 
     [Parameter()]
     [string[]]
@@ -63,11 +63,11 @@ function GetDescriptionFromChangelog
 $tag = "v$Version"
 
 $releaseParams = @{
+    Draft = $true
     Organization = $TargetFork
     Repository = $Repository
     Tag = $tag
     ReleaseName = $tag
-    Branch = "release/$Version"
     AssetPath = $AssetPath
     Prerelease = [bool]($Version.PreReleaseLabel)
     Description = GetDescriptionFromChangelog -ChangelogPath $ChangelogPath

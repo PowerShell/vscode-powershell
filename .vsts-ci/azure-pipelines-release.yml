@@ -38,6 +38,15 @@ resources:
     type: github
     endpoint: ComplianceGHRepo
     name: PowerShell/Compliance
+  pipelines:
+  - pipeline: PowerShellEditorServices
+    source: PowerShellEditorServices
+    trigger:
+      branches:
+      - master
+      - releases/*
+      - changelog*
+      - refs/tags/*
 
 jobs:
 
