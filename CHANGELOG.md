@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2021.2.1-preview
+### Tuesday, February 23, 2021
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 👷 🐛 [vscode-powershell #3197](https://github.com/PowerShell/vscode-powershell/pull/3197) -
+  Some improvements to the release scripts.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 📖 🐛 [PowerShellEditorServices #1416](https://github.com/PowerShell/PowerShellEditorServices/pull/1416) -
+  Fix some markdownlint errors in README.
+- 🛫 🐛 [PowerShellEditorServices #1415](https://github.com/PowerShell/PowerShellEditorServices/pull/1415) -
+  Fix configuration processing to ensure that profiles are loaded.
+
 ## v2021.2.0-preview
 ### Friday, February 19, 2021
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
