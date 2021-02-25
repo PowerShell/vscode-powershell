@@ -39,7 +39,7 @@
       "args": [
         "--disable-extensions",
         "--enable-proposed-api",
-        "ms-vscode.powershell",
+        "ms-vscode.powershell-preview",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/testRunner.js",
         "${workspaceFolder}/test"
