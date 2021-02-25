@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2021.2.2
+### Wednesday, February 24, 2021
+#### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
+
+- 📺 ✨ New semantic highlighting. (Thanks @justinytchen!)
+- 🐢 ✨ Added Pester v5 support to problem matcher. (Thanks @fflaten!)
+- ✨ 👮 Updated PSScriptAnalyzer to 1.19.1. Fixes formatting bugs! (Thanks @bergmeister!)
+- 🛫 🐛 [vscode-powershell #3181](https://github.com/PowerShell/vscode-powershell/pull/3202) -
+  Fix PowerShell MSIX (Store) detection.
+- 🐛 Many squashed bugs! (See previews below for details.)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 👷 ✨ No changes, just releasing a stable version.
+
 ## v2021.2.1-preview
 ### Tuesday, February 23, 2021
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
