@@ -6,7 +6,7 @@ import * as vscode from "vscode";
 import { before, beforeEach, afterEach } from "mocha";
 import { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 
-const testExtensionId = "ms-vscode.powershell-preview";
+const testExtensionId = "ms-vscode.powershell";
 
 suite("ExternalApi feature - Registration API", () => {
     let powerShellExtensionClient: IPowerShellExtensionClient;
@@ -82,7 +82,7 @@ suite("ExternalApi feature - Other APIs", () => {
     });
 
     beforeEach(() => {
-        sessionId = powerShellExtensionClient.registerExternalExtension("ms-vscode.powershell-preview");
+        sessionId = powerShellExtensionClient.registerExternalExtension("ms-vscode.powershell");
     });
 
     afterEach(() => {

@@ -22,7 +22,7 @@ async function main() {
             extensionTestsPath,
             launchArgs: [
                 "--disable-extensions",
-                "--enable-proposed-api", "ms-vscode.powershell-preview",
+                "--enable-proposed-api", "ms-vscode.powershell",
                 "./test"
             ],
             version: "insiders"
