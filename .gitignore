@@ -14,5 +14,4 @@ npm-debug.log
 .vscode-test/
 *.DS_Store
 test-results.xml
-vscode.d.ts
 test/.vscode/settings.json
