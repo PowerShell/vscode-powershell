@@ -6,6 +6,10 @@ import * as path from "path";
 
 import { runTests } from "vscode-test";
 
+// tslint:disable-next-line: no-var-requires
+const PackageJSON: any = require("../../package.json");
+const testExtensionId = `${PackageJSON.publisher}.${PackageJSON.name}`;
+
 async function main() {
     try {
         // The folder containing the Extension Manifest package.json
@@ -22,7 +26,7 @@ async function main() {
             extensionTestsPath,
             launchArgs: [
                 "--disable-extensions",
-                "--enable-proposed-api", "ms-vscode.powershell-preview",
+                "--enable-proposed-api", testExtensionId,
                 "./test"
             ],
             version: "insiders"
