@@ -44,8 +44,7 @@ suite("ExternalApi feature - Registration API", () => {
     */
     test("API fails if not registered", async () => {
         assert.rejects(
-            async () => await powerShellExtensionClient.getPowerShellVersionDetails(""),
-            "UUID provided was invalid, make sure you ran the 'powershellExtensionClient.registerExternalExtension(extensionId)' method and pass in the UUID that it returns to subsequent methods.");
+            async () => await powerShellExtensionClient.getPowerShellVersionDetails(""))
     });
 
     test("It can't register the same extension twice", async () => {
