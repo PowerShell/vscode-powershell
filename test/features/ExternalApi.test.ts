@@ -6,7 +6,9 @@ import * as vscode from "vscode";
 import { before, beforeEach, afterEach } from "mocha";
 import { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 
-const testExtensionId = "ms-vscode.powershell-preview";
+// tslint:disable-next-line: no-var-requires
+const PackageJSON: any = require("../../../package.json");
+const testExtensionId = `${PackageJSON.publisher}.${PackageJSON.name}`;
 
 suite("ExternalApi feature - Registration API", () => {
     let powerShellExtensionClient: IPowerShellExtensionClient;
@@ -42,8 +44,7 @@ suite("ExternalApi feature - Registration API", () => {
     */
     test("API fails if not registered", async () => {
         assert.rejects(
-            async () => await powerShellExtensionClient.getPowerShellVersionDetails(""),
-            "UUID provided was invalid, make sure you ran the 'powershellExtensionClient.registerExternalExtension(extensionId)' method and pass in the UUID that it returns to subsequent methods.");
+            async () => await powerShellExtensionClient.getPowerShellVersionDetails(""))
     });
 
     test("It can't register the same extension twice", async () => {
@@ -82,7 +83,7 @@ suite("ExternalApi feature - Other APIs", () => {
     });
 
     beforeEach(() => {
-        sessionId = powerShellExtensionClient.registerExternalExtension("ms-vscode.powershell-preview");
+        sessionId = powerShellExtensionClient.registerExternalExtension(testExtensionId);
     });
 
     afterEach(() => {
