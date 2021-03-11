@@ -90,11 +90,11 @@ export async function InvokePowerShellUpdateCheck(
         },
         {
             id: 1,
-            title: "Not now",
+            title: "Not Now",
         },
         {
             id: 2,
-            title: "Do not show this notification again",
+            title: "Don't Show Again",
         },
     ];
 
