@@ -13,6 +13,12 @@ steps:
       Write-Host "##vso[task.prependpath]$powerShellPath"
     continueOnError: true
     displayName: Install PowerShell Daily
+  - pwsh: |
+      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber PowerShellGet -PassThru -RequiredVersion 3.0.0-beta10
+      Install-Module -Scope CurrentUser -Force -AllowPrerelease -AllowClobber CompatPowerShellGet -PassThru
+    continueOnError: true
+    displayName: Install latest PowerShellGet preview and compat module
+  - pwsh: Register-PSResourceRepository -PSGallery
   - pwsh: '$PSVersionTable'
     displayName: Display PowerShell version information
   - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
