@@ -16,7 +16,7 @@
     "Snippets",
     "Linters"
   ],
-  "icon": "images/PowerShell_icon.png",
+  "icon": "media/PowerShell_icon.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"
@@ -156,8 +156,8 @@
         "command": "PowerShell.RefreshCommandsExplorer",
         "title": "Refresh Command Explorer",
         "icon": {
-          "light": "resources/light/sync.svg",
-          "dark": "resources/dark/sync.svg"
+          "light": "media/resources/light/sync.svg",
+          "dark": "media/resources/dark/sync.svg"
         },
         "category": "PowerShell"
       },
@@ -165,8 +165,8 @@
         "command": "PowerShell.InsertCommand",
         "title": "Insert Command",
         "icon": {
-          "light": "resources/light/pencil.svg",
-          "dark": "resources/dark/pencil.svg"
+          "light": "media/resources/light/pencil.svg",
+          "dark": "media/resources/dark/pencil.svg"
         },
         "category": "PowerShell"
       },
@@ -179,8 +179,8 @@
         "command": "PowerShell.ShowHelp",
         "title": "Get Help for Command",
         "icon": {
-          "light": "resources/light/question.svg",
-          "dark": "resources/dark/question.svg"
+          "light": "media/resources/light/question.svg",
+          "dark": "media/resources/dark/question.svg"
         },
         "category": "PowerShell"
       },
@@ -189,8 +189,8 @@
         "title": "Run",
         "category": "PowerShell",
         "icon": {
-          "light": "resources/light/run.svg",
-          "dark": "resources/dark/run.svg"
+          "light": "media/resources/light/run.svg",
+          "dark": "media/resources/dark/run.svg"
         }
       },
       {
@@ -198,8 +198,8 @@
         "title": "Run Selection",
         "category": "PowerShell",
         "icon": {
-          "light": "resources/light/play.svg",
-          "dark": "resources/dark/play.svg"
+          "light": "media/resources/light/play.svg",
+          "dark": "media/resources/dark/play.svg"
         }
       },
       {
@@ -277,8 +277,8 @@
         "title": "Close panel",
         "category": "PowerShell",
         "icon": {
-          "light": "resources/light/ClosePanel.svg",
-          "dark": "resources/dark/ClosePanel.svg"
+          "light": "media/resources/light/ClosePanel.svg",
+          "dark": "media/resources/dark/ClosePanel.svg"
         }
       },
       {
@@ -286,8 +286,8 @@
         "title": "Move panel left",
         "category": "PowerShell",
         "icon": {
-          "light": "resources/light/MovePanelLeft.svg",
-          "dark": "resources/dark/MovePanelLeft.svg"
+          "light": "media/resources/light/MovePanelLeft.svg",
+          "dark": "media/resources/dark/MovePanelLeft.svg"
         }
       },
       {
@@ -295,8 +295,8 @@
         "title": "Move panel to bottom",
         "category": "PowerShell",
         "icon": {
-          "light": "resources/light/MovePanelBottom.svg",
-          "dark": "resources/dark/MovePanelBottom.svg"
+          "light": "media/resources/light/MovePanelBottom.svg",
+          "dark": "media/resources/dark/MovePanelBottom.svg"
         }
       },
       {
