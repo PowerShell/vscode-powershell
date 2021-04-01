@@ -375,7 +375,7 @@ function Get-CodePlatformInformation {
         ExePath = $exePath
         Platform = $platform
         Channel = $channel
-        FileUri = "https://vscode-update.azurewebsites.net/latest/$platform/$channel"
+        FileUri = "https://update.code.visualstudio.com/latest/$platform/$channel"
         Extension = $ext
     }
 
