@@ -60,7 +60,7 @@ function NewReleaseVersionEntry
             }
             [ordered]@{
                 assetType = 'Microsoft.VisualStudio.Services.Icons.Default'
-                source = 'https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/images/PowerShell_icon.png'
+                source = 'https://raw.githubusercontent.com/PowerShell/vscode-powershell/master/media/PowerShell_icon.png'
             }
             [ordered]@{
                 assetType = 'Microsoft.VisualStudio.Services.Content.Details'
