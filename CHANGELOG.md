@@ -1,5 +1,26 @@
 # PowerShell Extension Release History
 
+## v2021.3.1-preview
+### Friday, April 02, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 👷🐛 [vscode-powershell #3267](https://github.com/PowerShell/vscode-powershell/pull/3267) - Update download host of vscode. (Thanks @thosoo!)
+- 👷✨ [vscode-powershell #3195](https://github.com/PowerShell/vscode-powershell/pull/3265) - Create new `ReleaseTools` module.
+- 📺✨ [vscode-powershell #3236](https://github.com/PowerShell/vscode-powershell/pull/3237) - Use title case and shorter notification text. (Thanks @Tyriar!)
+- 🚨🐛 [vscode-powershell #3208](https://github.com/PowerShell/vscode-powershell/pull/3222) - Fix hardcoded extension name string.
+- 📖🐛 [vscode-powershell #3049](https://github.com/PowerShell/vscode-powershell/pull/3214) - Update examples-module to use Pester 5. (Thanks @nickkimbrough!)
+- 🐛 [vscode-powershell #3209](https://github.com/PowerShell/vscode-powershell/pull/3212) - Remove the rest of the experimental Notebook API.
+- 👷 [vscode-powershell #3178](https://github.com/PowerShell/vscode-powershell/pull/3207) - Update powershell CHANGELOG for v2021.2.2.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🧠✨ [PowerShellEditorServices #1176](https://github.com/PowerShell/PowerShellEditorServices/pull/1427) - Add '$' as trigger character for completion. (Thanks @MartinGC94!)
+- 👷🚨✨ [PowerShellEditorServices #1426](https://github.com/PowerShell/PowerShellEditorServices/pull/1426) - Bump CI images and enable tests on Apple M1.
+- ✨ [PowerShellEditorServices #1424](https://github.com/PowerShell/PowerShellEditorServices/pull/1424) - Update to use OmniSharp 0.19.0.
+- #️⃣ 🙏 [PowerShellEditorServices #1418](https://github.com/PowerShell/PowerShellEditorServices/pull/1418) - Update CHANGELOG for v2.3.0.
+- #️⃣ 🙏 [vscode-powershell #3180](https://github.com/PowerShell/PowerShellEditorServices/pull/1411) - Fix New-EditorFile failing when no Editor window open. (Thanks @corbob!)
+
 ## v2021.2.2
 ### Wednesday, February 24, 2021
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
