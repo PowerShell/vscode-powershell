@@ -220,6 +220,7 @@ function New-DraftRelease {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
+    # TODO: Abstract this to return version components and reuse in `Update-Version`.
     $Changelog = (Get-NewChangelog -RepositoryName $RepositoryName) -join "`n"
     $Version = if ($Changelog -match '## (?<version>v\S+)') {
         $Matches.version
@@ -230,8 +231,7 @@ function New-DraftRelease {
         Name       = $Version
         Body       = $ChangeLog
         PreRelease = $Version -match '-preview'
-        Confirm    = $Confirm
-        WhatIf     = $WhatIf
+        # TODO: Pass -WhatIf and -Confirm parameters correctly.
     }
     Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName |
         New-GitHubRelease @ReleaseParams
