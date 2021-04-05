@@ -181,7 +181,7 @@ task Package UpdateReadme, {
     }
 
     Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
-    exec { & node ./node_modules/vsce/out/vsce package --noGitHubIssueLinking }
+    exec { & node ./node_modules/vsce/out/vsce package --no-gitHubIssueLinking }
 
     # Change the package to have a static name for automation purposes
     Move-Item -Force .\$($script:PackageJson.name)-$($script:PackageJson.version).vsix .\PowerShell-insiders.vsix
