@@ -15,6 +15,12 @@
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
+Please note that these changes were intended to be included in this preview
+release; however, a silent pipeline failure led to the previous version of
+PowerShellEditorServices being included instead. These changes will be included
+in the next preview release. See:
+[#3282](https://github.com/PowerShell/vscode-powershell/issues/3282)
+
 - 🧠✨ [PowerShellEditorServices #1176](https://github.com/PowerShell/PowerShellEditorServices/pull/1427) - Add '$' as trigger character for completion. (Thanks @MartinGC94!)
 - 👷🚨✨ [PowerShellEditorServices #1426](https://github.com/PowerShell/PowerShellEditorServices/pull/1426) - Bump CI images and enable tests on Apple M1.
 - ✨ [PowerShellEditorServices #1424](https://github.com/PowerShell/PowerShellEditorServices/pull/1424) - Update to use OmniSharp 0.19.0.

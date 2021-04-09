@@ -1,40 +1,19 @@
 steps:
 - checkout: self
 
-- pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
-  displayName: Set Build Name for Non-PR
-  condition: ne(variables['Build.Reason'], 'PullRequest')
-
 - pwsh: |
     Get-ChildItem -Path env:
   displayName: Capture environment
   condition: succeededOrFailed()
 
-# TODO: Use modern resources for these variables.
-- task: PowerShell@2
-  displayName: 'Set environment variables for VSTS (Phase 1)'
-  inputs:
-    targetType: filePath
-    filePath: ./vscode-powershell/tools/releaseBuild/setVstsVariables.ps1
-
-# TODO: Remove this when satisfied with added trigger.
-- task: PowerShell@2
-  displayName: 'Find PowerShellEditorServices build'
-  env:
-    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-  inputs:
-    targetType: filePath
-    filePath: ./vscode-powershell/tools/releaseBuild/findPsesBuild.ps1
-
 - task: DownloadPipelineArtifact@2
-  displayName: 'Download Artifacts from PowerShell Editor Services'
+  displayName: 'Download Artifacts from PowerShellEditorServices'
   inputs:
     source: specific
     project: '8e2735c1-3674-408a-bcab-87f089ea29d5'
     pipeline: 1056
     preferTriggeringPipeline: true
-    runVersion: specific
-    runId: '$(PSES_BUILDID)'
+    allowPartiallySucceededBuilds: true
     artifact: 'PowerShellEditorServices'
     path: '$(Build.SourcesDirectory)/PowerShellEditorServices/module/'
 
