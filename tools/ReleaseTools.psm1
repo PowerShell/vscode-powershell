@@ -136,6 +136,25 @@ function Get-NewChangelog {
 
 <#
 .SYNOPSIS
+  Gets current version from changelog as [semver].
+#>
+function Get-Version {
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet([RepoNames])]
+        [string]$RepositoryName
+    )
+    # NOTE: This is joined into a multi-line string so `-match` works.
+    $Changelog = (Get-NewChangelog -RepositoryName $RepositoryName) -join "`n"
+    if ($Changelog -match '## v(?<version>\d+\.\d+\.\d+(-preview\.?\d*)?)') {
+        return [semver]$Matches.version
+    } else {
+        Write-Error "Couldn't find version from changelog!"
+    }
+}
+
+<#
+.SYNOPSIS
   Updates the CHANGELOG file with PRs merged since the last release.
 .DESCRIPTION
   Uses the local Git repositories but does not pull, so ensure HEAD is where
@@ -302,7 +321,8 @@ function Update-Version {
   Creates a new draft GitHub release from the updated changelog.
 .DESCRIPTION
   Requires that the changelog has been updated first as it pulls the release
-  content and new version number from it.
+  content and new version number from it. Note that our tags and version name
+  are prefixed with a `v`.
 #>
 function New-DraftRelease {
     [CmdletBinding(SupportsShouldProcess)]
@@ -311,17 +331,14 @@ function New-DraftRelease {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
-    # TODO: Abstract this to return version components and reuse in `Update-Version`.
+    $Version = Get-Version -RepositoryName $RepositoryName
     $Changelog = (Get-NewChangelog -RepositoryName $RepositoryName) -join "`n"
-    $Version = if ($Changelog -match '## (?<version>v\S+)') {
-        $Matches.version
-    } else { Write-Error "Couldn't find version from changelog!" }
     $ReleaseParams = @{
         Draft      = $true
-        Tag        = $Version
-        Name       = $Version
+        Tag        = "v$Version"
+        Name       = "v$Version"
         Body       = $ChangeLog
-        PreRelease = $Version -match '-preview'
+        PreRelease = [bool]$Version.PreReleaseLabel
         # TODO: Pass -WhatIf and -Confirm parameters correctly.
     }
     Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName |
