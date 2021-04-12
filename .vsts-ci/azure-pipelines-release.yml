@@ -1,5 +1,3 @@
-name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
-
 variables:
   # Don't download unneeded packages
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
@@ -9,28 +7,9 @@ variables:
     value: 'true'
 
 trigger:
-  batch: true
   branches:
     include:
-      - master
-      - legacy/1.x
-  paths:
-    exclude:
-      - /.dependabot/*
-      - /.poshchan/*
-      - /.github/**/*
-      - /.vscode/**/*
-      - /.vsts-ci/misc-analysis.yml
-      - /tools/**/*
-      - .editorconfig
-      - .gitattributes
-      - .gitignore
-      - /docs/**/*
-      - /CHANGELOG.md
-      - /CONTRIBUTING.md
-      - /README.md
-      - /LICENSE
-      - /CODE_OF_CONDUCT.md
+      - release/*
 
 resources:
   repositories:
@@ -43,13 +22,12 @@ resources:
     source: PowerShellEditorServices
     trigger:
       branches:
-      - master
-      - releases/*
-      - changelog*
-      - refs/tags/*
+        include:
+        - release/*
+      tags:
+      - v*
 
 jobs:
-
 - job: 'ReleaseBuild'
   displayName: 'Build release'
   pool:

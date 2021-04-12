@@ -13,24 +13,6 @@ trigger:
   branches:
     include:
       - master
-      - legacy/1.x
-  paths:
-    exclude:
-      - /.dependabot/*
-      - /.poshchan/*
-      - /.github/**/*
-      - /.vscode/**/*
-      - /.vsts-ci/misc-analysis.yml
-      - /tools/**/*
-      - .editorconfig
-      - .gitattributes
-      - .gitignore
-      - /docs/**/*
-      - /CHANGELOG.md
-      - /CONTRIBUTING.md
-      - /README.md
-      - /LICENSE
-      - /CODE_OF_CONDUCT.md
 
 jobs:
 - job: Windows
