@@ -162,8 +162,8 @@ function Update-Changelog {
     $Release = $Repo | Get-GitHubRelease -Latest
     $Commits = git rev-list "$($Release.tag_name)..."
 
-    # NOTE: This is a slow API as it gets all closed PRs, and then filters.
-    $Bullets = $Repo | Get-GitHubPullRequest -State Closed |
+    # NOTE: This is a slow API as it gets all PRs, and then filters.
+    $Bullets = $Repo | Get-GitHubPullRequest -State All |
         Where-Object { $_.merge_commit_sha -in $Commits } |
         Where-Object { -not $_.user.UserName.EndsWith("[bot]") } |
         Where-Object { -not $_.title.StartsWith("[Ignore]") } |
