@@ -162,11 +162,13 @@ function Update-Changelog {
     $Release = $Repo | Get-GitHubRelease -Latest
     $Commits = git rev-list "$($Release.tag_name)..."
 
-    # NOTE: This is a slow API as it gets all closed PRs, and then filters.
-    $Bullets = $Repo | Get-GitHubPullRequest -State Closed |
+    # NOTE: This is a slow API as it gets all PRs, and then filters.
+    $Bullets = $Repo | Get-GitHubPullRequest -State All |
         Where-Object { $_.merge_commit_sha -in $Commits } |
         Where-Object { -not $_.user.UserName.EndsWith("[bot]") } |
         Where-Object { -not $_.title.StartsWith("[Ignore]") } |
+        Where-Object { -not $_.title.StartsWith("Update CHANGELOG") } |
+        Where-Object { -not $_.title.StartsWith("Bump version") } |
         Get-Bullets -RepositoryName $RepositoryName
 
     $NewSection = switch ($RepositoryName) {
@@ -208,6 +210,95 @@ function Update-Changelog {
 
 <#
 .SYNOPSIS
+  Updates version in repository.
+.DESCRIPTION
+  Note that our Git tags and changelog prefix all versions with `v`.
+
+  PowerShellEditorServices: version is `x.y.z-preview.d`
+
+  - PowerShellEditorServices.psd1:
+    - `ModuleVersion` variable with `'x.y.z'` string, no pre-release info
+  - PowerShellEditorServices.Common.props:
+    - `VersionPrefix` field with `x.y.z`
+    - `VersionSuffix` field with pre-release portion excluding hyphen
+
+  vscode-powershell: version is `yyyy.mm.x-preview`
+
+  - package.json:
+    - `version` field with `"x.y.z"` and no prefix or suffix
+    - `preview` field set to `true` or `false` if version is a preview
+    - `name` field has `-preview` appended similarly
+    - `displayName` field has ` Preview` appended similarly
+    - `description` field has `(Preview) ` prepended similarly
+#>
+function Update-Version {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet([RepoNames])]
+        [string]$RepositoryName
+    )
+    # NOTE: This a side effect neccesary for Git operations to work.
+    Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
+
+    $Version = Get-Version -RepositoryName $RepositoryName
+    $v = "$($Version.Major).$($Version.Minor).$($Version.Patch)"
+    # TODO: Maybe cleanup the replacement logic.
+    switch ($RepositoryName) {
+        "vscode-powershell" {
+            $d = "Develop PowerShell scripts in Visual Studio Code!"
+            if ($Version.PreReleaseLabel) {
+                $name = "powershell-preview"
+                $displayName = "PowerShell Preview"
+                $preview = "true"
+                $description = "(Preview) $d"
+            } else {
+                $name = "powershell"
+                $displayName = "PowerShell"
+                $preview = "false"
+                $description = $d
+            }
+            $path = "package.json"
+            $f = Get-Content -Path $path
+            # NOTE: The prefix regex match two spaces exactly to avoid matching
+            # nested objects in the file.
+            $f = $f -replace '^(?<prefix>  "name":\s+")(.+)(?<suffix>",)$', "`${prefix}${name}`${suffix}"
+            $f = $f -replace '^(?<prefix>  "displayName":\s+")(.+)(?<suffix>",)$', "`${prefix}${displayName}`${suffix}"
+            $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
+            $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
+            $f = $f -replace '^(?<prefix>  "description":\s+")(.+)(?<suffix>",)$', "`${prefix}${description}`${suffix}"
+            $f | Set-Content -Path $path
+            git add $path
+        }
+        "PowerShellEditorServices" {
+            $path = "PowerShellEditorServices.Common.props"
+            $f = Get-Content -Path $path
+            $f = $f -replace '^(?<prefix>\s+<VersionPrefix>)(.+)(?<suffix></VersionPrefix>)$', "`${prefix}${v}`${suffix}"
+            $f = $f -replace '^(?<prefix>\s+<VersionSuffix>)(.*)(?<suffix></VersionSuffix>)$', "`${prefix}$($Version.PreReleaseLabel)`${suffix}"
+            $f | Set-Content -Path $path
+            git add $path
+
+            $path = "module/PowerShellEditorServices/PowerShellEditorServices.psd1"
+            $f = Get-Content -Path $path
+            $f = $f -replace "^(?<prefix>ModuleVersion = ')(.+)(?<suffix>')`$", "`${prefix}${v}`${suffix}"
+            $f | Set-Content -Path $path
+            git add $path
+        }
+    }
+
+    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
+        git commit -m "Bump version to v$Version"
+    }
+
+    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git tag")) {
+        git tag "v$Version"
+    }
+
+    Pop-Location
+}
+
+<#
+.SYNOPSIS
   Creates a new draft GitHub release from the updated changelog.
 .DESCRIPTION
   Requires that the changelog has been updated first as it pulls the release
@@ -237,4 +328,4 @@ function New-DraftRelease {
         New-GitHubRelease @ReleaseParams
 }
 
-Export-ModuleMember -Function Update-Changelog, New-DraftRelease
+Export-ModuleMember -Function Update-Changelog, Update-Version, New-DraftRelease
