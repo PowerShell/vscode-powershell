@@ -167,6 +167,8 @@ function Update-Changelog {
         Where-Object { $_.merge_commit_sha -in $Commits } |
         Where-Object { -not $_.user.UserName.EndsWith("[bot]") } |
         Where-Object { -not $_.title.StartsWith("[Ignore]") } |
+        Where-Object { -not $_.title.StartsWith("Update CHANGELOG") } |
+        Where-Object { -not $_.title.StartsWith("Bump version") } |
         Get-Bullets -RepositoryName $RepositoryName
 
     $NewSection = switch ($RepositoryName) {
