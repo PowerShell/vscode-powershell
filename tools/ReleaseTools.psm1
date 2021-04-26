@@ -158,9 +158,9 @@ function Get-Version {
   Updates the CHANGELOG file with PRs merged since the last release.
 .DESCRIPTION
   Uses the local Git repositories but does not pull, so ensure HEAD is where
-  you want it. Creates a new branch at release/$Version if not already
+  you want it. Creates a new branch at 'release/$Version' if not already
   checked out. Handles any merge option for PRs, but is a little slow as it
-  queries all closed PRs.
+  queries all PRs.
 #>
 function Update-Changelog {
     [CmdletBinding(SupportsShouldProcess)]
@@ -178,6 +178,7 @@ function Update-Changelog {
 
     # Get the repo object, latest release, and commits since its tag.
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
+    # TODO: Handle pre-releases (i.e. treat as latest).
     $Release = $Repo | Get-GitHubRelease -Latest
     $Commits = git rev-list "$($Release.tag_name)..."
 
@@ -185,6 +186,7 @@ function Update-Changelog {
     $Bullets = $Repo | Get-GitHubPullRequest -State All |
         Where-Object { $_.merge_commit_sha -in $Commits } |
         Where-Object { -not $_.user.UserName.EndsWith("[bot]") } |
+        Where-Object { "Include" -notin $_.labels.LabelName } |
         Where-Object { -not $_.title.StartsWith("[Ignore]") } |
         Where-Object { -not $_.title.StartsWith("Update CHANGELOG") } |
         Where-Object { -not $_.title.StartsWith("Bump version") } |
@@ -193,10 +195,12 @@ function Update-Changelog {
     $NewSection = switch ($RepositoryName) {
         "vscode-powershell" {
             @(
-                "#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)`n"
+                "#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)"
+                ""
                 $Bullets
                 ""
-                "#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)`n"
+                "#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)"
+                ""
                 (Get-NewChangelog -RepositoryName "PowerShellEditorServices").Where({ $_.StartsWith("- ") }, "SkipUntil")
             )
         }
@@ -210,8 +214,10 @@ function Update-Changelog {
     @(
         $CurrentChangelog[0..1]
         "## $Version"
-        "### $([datetime]::Now.ToString('dddd, MMMM dd, yyyy'))`n"
+        "### $([datetime]::Now.ToString('dddd, MMMM dd, yyyy'))"
+        ""
         $NewSection
+        ""
         $CurrentChangelog[2..$CurrentChangelog.Length]
     ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
@@ -309,20 +315,16 @@ function Update-Version {
         git commit -m "Bump version to v$Version"
     }
 
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git tag")) {
-        git tag "v$Version"
-    }
-
     Pop-Location
 }
 
 <#
 .SYNOPSIS
-  Creates a new draft GitHub release from the updated changelog.
+  Creates a new draft GitHub release and Git tag from the updated changelog.
 .DESCRIPTION
   Requires that the changelog has been updated first as it pulls the release
   content and new version number from it. Note that our tags and version name
-  are prefixed with a `v`.
+  are prefixed with a `v`. Creates a Git tag if it does not already exist.
 #>
 function New-DraftRelease {
     [CmdletBinding(SupportsShouldProcess)]
@@ -341,6 +343,18 @@ function New-DraftRelease {
         PreRelease = [bool]$Version.PreReleaseLabel
         # TODO: Pass -WhatIf and -Confirm parameters correctly.
     }
+
+    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git tag")) {
+        # NOTE: This a side effect neccesary for Git operations to work.
+        Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
+        if (-not (git show-ref --tags "v$Version")) {
+            git tag "v$Version"
+        } else {
+            Write-Warning "git tag $RepositoryName/v$Version already exists!"
+        }
+        Pop-Location
+    }
+
     Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName |
         New-GitHubRelease @ReleaseParams
 }
