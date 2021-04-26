@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2021.4.2-preview
+### Monday, April 26, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 👷✨ [vscode-powershell #3268](https://github.com/PowerShell/vscode-powershell/pull/3292) - Add `Update-Version` to `ReleaseTools` module.
+- 👷🐛 [vscode-powershell #3282](https://github.com/PowerShell/vscode-powershell/pull/3286) - Fix release build pipeline.
+- 👷✨ [vscode-powershell #3275](https://github.com/PowerShell/vscode-powershell/pull/3275) - Update vsce to 1.87.1.
+- 👷✨ [vscode-powershell #3274](https://github.com/PowerShell/vscode-powershell/pull/3274) - Run `npm audit fix`.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🔍🐛 [PowerShellEditorServices #1460](https://github.com/PowerShell/PowerShellEditorServices/pull/1460) - Bump OmniSharp package to `0.19.2-beta0001`.
+- 👷🐛 [PowerShellEditorServices #1455](https://github.com/PowerShell/PowerShellEditorServices/pull/1456) - Fix version in module definition file.
+
 ## v2021.4.1-preview
 ### Friday, April 02, 2021
 
@@ -11,7 +26,6 @@
 - 🚨🐛 [vscode-powershell #3208](https://github.com/PowerShell/vscode-powershell/pull/3222) - Fix hardcoded extension name string.
 - 📖🐛 [vscode-powershell #3049](https://github.com/PowerShell/vscode-powershell/pull/3214) - Update examples-module to use Pester 5. (Thanks @nickkimbrough!)
 - 🐛 [vscode-powershell #3209](https://github.com/PowerShell/vscode-powershell/pull/3212) - Remove the rest of the experimental Notebook API.
-- 👷 [vscode-powershell #3178](https://github.com/PowerShell/vscode-powershell/pull/3207) - Update powershell CHANGELOG for v2021.2.2.
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
