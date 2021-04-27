@@ -1,0 +1,40 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "13:00"
+    timezone: America/Anchorage
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: typescript
+    versions:
+    - ">= 3.6.a, < 3.7"
+  - dependency-name: typescript
+    versions:
+    - ">= 3.7.a, < 3.8"
+  - dependency-name: "@types/mocha"
+    versions:
+    - "> 7.0.2"
+  - dependency-name: "@types/vscode"
+    versions:
+    - "> 1.52.0"
+  - dependency-name: "@types/vscode"
+    versions:
+    - ">= 1.53.a, < 1.54"
+  - dependency-name: vsce
+    versions:
+    - ">= 1.66.a, < 1.67"
+  - dependency-name: vsce
+    versions:
+    - ">= 1.67.a, < 1.68"
+  - dependency-name: vsce
+    versions:
+    - ">= 1.68.a, < 1.69"
+  - dependency-name: vsce
+    versions:
+    - ">= 1.69.a, < 1.70"
+  - dependency-name: vsce
+    versions:
+    - ">= 1.71.a, < 1.72"
