@@ -1,6 +1,5 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 
 import { connect, Socket } from "net";
 import { DebugAdapter, Event, DebugProtocolMessage, EventEmitter } from "vscode";

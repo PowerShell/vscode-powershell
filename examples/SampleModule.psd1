@@ -41,7 +41,7 @@ Author = '<name>'
 CompanyName = 'Unknown'
 
 # Copyright statement for this module
-Copyright = '(c) 2016 <name>. All rights reserved.'
+Copyright = '(c) 2021 <name>.'
 
 # Description of the functionality provided by this module
 Description = 'Some description.  This is required by the PowerShell Gallery'

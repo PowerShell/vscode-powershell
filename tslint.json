@@ -8,7 +8,13 @@
         "indent": [true, "spaces", 4],
         "max-classes-per-file": false,
         "object-literal-sort-keys": false,
-        "file-header": [true, "Copyright \\(C\\) Microsoft Corporation. All rights reserved."]
+        "file-header": [
+          true,
+          {
+            "allow-single-line-comments": true,
+            "match": "Copyright \\(c\\) Microsoft Corporation."
+          }
+        ]
     },
     "rulesDirectory": []
 }
