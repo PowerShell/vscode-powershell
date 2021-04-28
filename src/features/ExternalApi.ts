@@ -1,6 +1,6 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import * as vscode from "vscode";
 import { v4 as uuidv4 } from 'uuid';
 import { LanguageClientConsumer } from "../languageClientConsumer";

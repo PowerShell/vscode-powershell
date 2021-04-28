@@ -1,6 +1,6 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import * as vscode from "vscode";
 import { RequestType0 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";

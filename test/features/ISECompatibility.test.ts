@@ -1,6 +1,6 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import * as assert from "assert";
 import * as vscode from "vscode";
 import { ISECompatibilityFeature } from "../../src/features/ISECompatibility";
