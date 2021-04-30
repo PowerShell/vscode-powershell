@@ -1,8 +1,6 @@
 # PowerShell Language Support for Visual Studio Code
 
 [![Build Status](https://dev.azure.com/powershell/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=master)](https://dev.azure.com/powershell/vscode-powershell/_build/latest?definitionId=51&branchName=master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/df06b9909e7442cebc1132bda0b8c0e3)](https://app.codacy.com/app/TylerLeonhardt/vscode-powershell?utm_source=github.com&utm_medium=referral&utm_content=PowerShell/vscode-powershell&utm_campaign=Badge_Grade_Dashboard)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=PowerShell/vscode-powershell)](https://dependabot.com)
 [![Version](https://vsmarketplacebadge.apphb.com/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
 [![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/psdiscord)
@@ -10,7 +8,7 @@
 
 This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
-that Visual Studio Code provides. 
+that Visual Studio Code provides.
 
 This extension is powered by the PowerShell language server,
 [PowerShell Editor Services](https://github.com/PowerShell/PowerShellEditorServices).
@@ -87,7 +85,8 @@ If you experience any problems with the PowerShell Extension, see
 [the troubleshooting docs](./docs/troubleshooting.md) for information
 on diagnosing and reporting issues.
 
-#### Security Note
+### Security Note
+
 For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
 
 ## Example Scripts
