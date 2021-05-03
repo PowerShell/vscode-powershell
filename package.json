@@ -273,7 +273,7 @@
         "category": "PowerShell"
       },
       {
-        "command": "Powershell.ClosePanel",
+        "command": "PowerShell.ClosePanel",
         "title": "Close panel",
         "category": "PowerShell",
         "icon": {
@@ -282,7 +282,7 @@
         }
       },
       {
-        "command": "Powershell.PositionPanelLeft",
+        "command": "PowerShell.PositionPanelLeft",
         "title": "Move panel left",
         "category": "PowerShell",
         "icon": {
@@ -291,7 +291,7 @@
         }
       },
       {
-        "command": "Powershell.PositionPanelBottom",
+        "command": "PowerShell.PositionPanelBottom",
         "title": "Move panel to bottom",
         "category": "PowerShell",
         "icon": {
@@ -355,17 +355,17 @@
       "editor/title": [
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
-          "command": "Powershell.PositionPanelBottom",
+          "command": "PowerShell.PositionPanelBottom",
           "group": "navigation@97"
         },
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
-          "command": "Powershell.PositionPanelLeft",
+          "command": "PowerShell.PositionPanelLeft",
           "group": "navigation@98"
         },
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
-          "command": "Powershell.ClosePanel",
+          "command": "PowerShell.ClosePanel",
           "group": "navigation@99"
         },
         {

@@ -181,6 +181,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private command4: vscode.Disposable;
     private command5: vscode.Disposable;
     private command6: vscode.Disposable;
+    // TODO: Make a list of commands instead.
     private extensionCommands: IExtensionCommand[] = [];
 
     constructor(private log: Logger) {
@@ -213,13 +214,13 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             }
         });
 
-        this.command3 = vscode.commands.registerCommand('Powershell.ClosePanel',
+        this.command3 = vscode.commands.registerCommand('PowerShell.ClosePanel',
             async () => { await vscode.commands.executeCommand('workbench.action.closePanel'); }),
 
-        this.command4 = vscode.commands.registerCommand('Powershell.PositionPanelLeft',
+        this.command4 = vscode.commands.registerCommand('PowerShell.PositionPanelLeft',
             async () => { await vscode.commands.executeCommand('workbench.action.positionPanelLeft'); }),
 
-        this.command5 = vscode.commands.registerCommand('Powershell.PositionPanelBottom',
+        this.command5 = vscode.commands.registerCommand('PowerShell.PositionPanelBottom',
             async () => { await vscode.commands.executeCommand('workbench.action.positionPanelBottom'); }),
 
         this.command6 = vscode.commands.registerCommand('PowerShell.Debug.Start',
