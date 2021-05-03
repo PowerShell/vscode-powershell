@@ -185,7 +185,7 @@
         "category": "PowerShell"
       },
       {
-        "command": "workbench.action.debug.start",
+        "command": "PowerShell.Debug.Start",
         "title": "Run",
         "category": "PowerShell",
         "icon": {
@@ -273,7 +273,7 @@
         "category": "PowerShell"
       },
       {
-        "command": "workbench.action.closePanel",
+        "command": "PowerShell.ClosePanel",
         "title": "Close panel",
         "category": "PowerShell",
         "icon": {
@@ -282,7 +282,7 @@
         }
       },
       {
-        "command": "workbench.action.positionPanelLeft",
+        "command": "PowerShell.PositionPanelLeft",
         "title": "Move panel left",
         "category": "PowerShell",
         "icon": {
@@ -291,7 +291,7 @@
         }
       },
       {
-        "command": "workbench.action.positionPanelBottom",
+        "command": "PowerShell.PositionPanelBottom",
         "title": "Move panel to bottom",
         "category": "PowerShell",
         "icon": {
@@ -355,22 +355,22 @@
       "editor/title": [
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
-          "command": "workbench.action.positionPanelBottom",
+          "command": "PowerShell.PositionPanelBottom",
           "group": "navigation@97"
         },
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
-          "command": "workbench.action.positionPanelLeft",
+          "command": "PowerShell.PositionPanelLeft",
           "group": "navigation@98"
         },
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
-          "command": "workbench.action.closePanel",
+          "command": "PowerShell.ClosePanel",
           "group": "navigation@99"
         },
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showRunButtons",
-          "command": "workbench.action.debug.start",
+          "command": "PowerShell.Debug.Start",
           "group": "navigation@100"
         },
         {
