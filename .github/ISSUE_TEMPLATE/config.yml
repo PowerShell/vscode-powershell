@@ -1,11 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Editor Syntax Colorization bug report 🌈
-    url:  https://github.com/PowerShell/EditorSyntax/issues/new
-    about: Editor syntax colorization bugs are tracked in a separate GitHub repo.
-  - name: Script analysis or formatting bug report 🚦🖌️
-    url: https://github.com/PowerShell/PSScriptAnalyzer/issues/new/choose
-    about: Script analysis and formatting are provided by PSScriptAnalyzer. Before submitting an issue, check to see whether the issue lies with PSScriptAnalyzer or with the VSCode PowerShell extension.
-  - name: General question?
-    url: https://aka.ms/psdiscord
-    about: "You can also ask general Visual Studio Code questions in the #vscode channel of the PowerShell community Discord. Slack is also available at https://aka.ms/psslack"
+  - name: 🙋 Ask a question
+    url: https://aka.ms/powershell-vscode-discord
+    about: "Find us in #vscode on the PowerShell Community Discord"

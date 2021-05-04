@@ -16,6 +16,20 @@ Instead syntax highlighting for VSCode, Atom, SublimeText and even GitHub is
 provided by the [Editor Syntax] repository on GitHub. Please open any
 [syntax highlighting issues there].
 
+However, with the introduction of [Semantic Highlighting] in [v2021.2.2], the
+chosen colors may be different because this is applied at a layer above [Editor
+Syntax]. To disable semantic highlighting and so restore the colors as they
+were, set:
+
+```json
+"[powershell]": {
+    "editor.semanticHighlighting.enabled": false
+}
+```
+
+If you leave it enabled, you can customize the colors used for the various
+tokens. See [#3221] for more info and to leave suggestions.
+
 ## VSCode is not working like the ISE
 
 The PowerShell extension does not aim to perfectly recreate
@@ -30,7 +44,6 @@ Bear in mind that many of the UI/UX aspects of VSCode are driven by
 VSCode itself and can't be changed by the extension.
 The VSCode maintainers are quite reasonable though,
 and you can ask for new features [in their repository](https://github.com/Microsoft/vscode).
-
 
 ## Known Issues in the Extension
 
@@ -47,7 +60,7 @@ and you can ask for new features [in their repository](https://github.com/Micros
     Please give the privilege management software feedback.
     For some,
     [updating to the latest version has fixed the issue](https://github.com/PowerShell/vscode-powershell/issues/2526#issuecomment-638329157).
-- Intellisense is slow
+- IntelliSense is slow
   - This is a known issue that we've been chipping away at. There doesn't seem
     to be any one performance drain, but we've been trying to incrementally
     improve performance bit-by-bit everywhere. Currently we are focusing on [this issue](https://github.com/PowerShell/PowerShellEditorServices/issues/1295).
@@ -332,7 +345,9 @@ an issue on GitHub is appropriate.
 [open an issue on us on GitHub]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
 [Reporting Problems]: ../README.md#reporting-problems
 [syntax highlighting issues there]: https://github.com/PowerShell/EditorSyntax/issues/new
-[tackling an issue]:./development.md
+[semantic highlighting]: https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
+[tackling an issue]: ./development.md
+[v2021.2.2]: https://github.com/PowerShell/vscode-powershell/releases/tag/v2021.2.2
 [VSCode issue]: https://github.com/Microsoft/vscode/issues/42356
 [VSCode Settings]: https://code.visualstudio.com/docs/getstarted/settings
 [will break this compatibility]: https://github.com/PowerShell/vscode-powershell/issues/1310
@@ -350,3 +365,4 @@ an issue on GitHub is appropriate.
 [#550]: https://github.com/PowerShell/vscode-powershell/issues/550
 [#647]: https://github.com/PowerShell/vscode-powershell/issues/647
 [#984]: https://github.com/PowerShell/vscode-powershell/issues/984
+[#3221]: https://github.com/PowerShell/vscode-powershell/issues/3221#issuecomment-810563456
