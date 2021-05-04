@@ -1,0 +1,24 @@
+name: ✨ Feature request
+description: Open an issue about a potential new feature or improvement.
+labels: Issue-Enhancement
+body:
+- type: checkboxes
+  attributes:
+    label: Prerequisites
+    options:
+    - label: I have written a descriptive issue title.
+      required: true
+    - label: I have searched all [issues](https://github.com/PowerShell/vscode-powershell/issues?q=is%3Aissue) to ensure it has not already been reported.
+      required: true
+- type: textarea
+  attributes:
+    label: Summary
+    description: Explain the feature request below.
+    placeholder: I would like to do X because it would be useful for Y and I cannot currently do it with Z.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Proposed Design
+    description: Optionally explain any technical design below.
+    placeholder: We could accomplish this by extending X to take Y and yield Z.
