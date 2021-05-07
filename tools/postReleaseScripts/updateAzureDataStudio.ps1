@@ -104,7 +104,7 @@ function NewPowerShellExtensionEntry
         extensionId = '35'
         extensionName = 'powershell'
         displayName = 'PowerShell'
-        shortDescription = 'Develop PowerShell scripts in Azure Data Studio'
+        shortDescription = 'Develop PowerShell modules, commands and scripts in Azure Data Studio'
         publisher = [ordered]@{
             displayName = 'Microsoft'
             publisherId = 'Microsoft'

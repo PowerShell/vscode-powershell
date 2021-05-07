@@ -4,7 +4,7 @@
   "version": "2021.4.2",
   "preview": true,
   "publisher": "ms-vscode",
-  "description": "(Preview) Develop PowerShell scripts in Visual Studio Code!",
+  "description": "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
     "vscode": "^1.52.0"
   },
