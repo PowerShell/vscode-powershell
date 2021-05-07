@@ -141,12 +141,12 @@ task UpdatePackageJson {
     if ($script:IsPreviewExtension) {
         $script:PackageJson.name = "powershell-preview"
         $script:PackageJson.displayName = "PowerShell Preview"
-        $script:PackageJson.description = "(Preview) Develop PowerShell scripts in Visual Studio Code!"
+        $script:PackageJson.description = "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!"
         $script:PackageJson.preview = $true
     } else {
         $script:PackageJson.name = "powershell"
         $script:PackageJson.displayName = "PowerShell"
-        $script:PackageJson.description = "Develop PowerShell scripts in Visual Studio Code!"
+        $script:PackageJson.description = "Develop PowerShell modules, commands and scripts in Visual Studio Code!"
         $script:PackageJson.preview = $false
     }
 

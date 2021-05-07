@@ -271,7 +271,7 @@ function Update-Version {
     # TODO: Maybe cleanup the replacement logic.
     switch ($RepositoryName) {
         "vscode-powershell" {
-            $d = "Develop PowerShell scripts in Visual Studio Code!"
+            $d = "Develop PowerShell modules, commands and scripts in Visual Studio Code!"
             if ($Version.PreReleaseLabel) {
                 $name = "powershell-preview"
                 $displayName = "PowerShell Preview"
