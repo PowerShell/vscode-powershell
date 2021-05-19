@@ -656,7 +656,9 @@ export class SessionManager implements Middleware {
 
     private setSessionStatus(statusText: string, status: SessionStatus): void {
         // Set color and icon for 'Running' by default
-        let statusIconText = "$(terminal) ";
+        let statusIconText = (semver.gte(vscode.version, "1.56.0"))
+            ? "$(terminal-powershell) "
+            : "$(terminal) ";
         let statusColor = "#affc74";
 
         if (status === SessionStatus.Initializing) {
