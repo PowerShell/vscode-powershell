@@ -895,6 +895,11 @@
         }
       }
     },
+    "configurationDefaults": {
+      "[powershell]": {
+        "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?"
+      }
+    },
     "themes": [
       {
         "label": "PowerShell ISE",
