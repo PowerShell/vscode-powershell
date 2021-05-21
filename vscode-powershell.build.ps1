@@ -137,41 +137,6 @@ task UpdateReadme -If { $script:IsPreviewExtension } {
     }
 }
 
-task UpdatePackageJson {
-    if ($script:IsPreviewExtension) {
-        $script:PackageJson.name = "powershell-preview"
-        $script:PackageJson.displayName = "PowerShell Preview"
-        $script:PackageJson.description = "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!"
-        $script:PackageJson.preview = $true
-    } else {
-        $script:PackageJson.name = "powershell"
-        $script:PackageJson.displayName = "PowerShell"
-        $script:PackageJson.description = "Develop PowerShell modules, commands and scripts in Visual Studio Code!"
-        $script:PackageJson.preview = $false
-    }
-
-    $currentVersion = [version](($script:PackageJson.version -split "-")[0])
-    $currentDate = Get-Date
-
-    $revision = if ($currentDate.Month -eq $currentVersion.Minor) {
-        $currentVersion.Build + 1
-    } else {
-        0
-    }
-
-    $script:PackageJson.version = "$($currentDate.ToString('yyyy.M')).$revision"
-
-    if ($env:TF_BUILD) {
-        $script:PackageJson.version += "-CI.$env:BUILD_BUILDID"
-    }
-
-    $Utf8NoBomEncoding = [System.Text.UTF8Encoding]::new($false)
-    [System.IO.File]::WriteAllLines(
-        (Resolve-Path "$PSScriptRoot/package.json").Path,
-        ($script:PackageJson | ConvertTo-Json -Depth 100),
-        $Utf8NoBomEncoding)
-}
-
 task Package UpdateReadme, {
     if ($script:psesBuildScriptPath -or $env:TF_BUILD) {
         Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
@@ -197,4 +162,4 @@ task Package UpdateReadme, {
 # The set of tasks for a release
 task Release Clean, Build, Package
 # The default task is to run the entire CI build
-task . CleanAll, BuildAll, Test, UpdatePackageJson, Package, UploadArtifacts
+task . CleanAll, BuildAll, Test, Package, UploadArtifacts
