@@ -125,10 +125,12 @@ function Get-FirstChangelog {
         [string]$RepositoryName
     )
     $Changelog = Get-Content -Path "$PSScriptRoot/../../$RepositoryName/$ChangelogFile"
+    # NOTE: The space after the header marker is important! Otherwise ### matches.
+    $Header = $Changelog.Where({$_.StartsWith("## ")}, "First")
     $Changelog.Where(
-        { $_.StartsWith("##") }, "SkipUntil"
+        { $_ -eq $Header }, "SkipUntil"
     ).Where(
-        { $_.StartsWith("##") }, "Until"
+        { $_.StartsWith("## ") -and $_ -ne $Header }, "Until"
     )
 }
 
@@ -355,5 +357,3 @@ function New-DraftRelease {
     Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName |
         New-GitHubRelease @ReleaseParams
 }
-
-Export-ModuleMember -Function Update-Changelog, Update-Version, New-DraftRelease
