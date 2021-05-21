@@ -1,5 +1,26 @@
 # PowerShell Extension Release History
 
+## v2021.5.0-preview
+### Friday, May 21, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🔗✨ [vscode-powershell #3359](https://github.com/PowerShell/vscode-powershell/pull/3359) - Exclude `-` and `$` from PowerShell `wordSeparators`.
+- 📺✨ [vscode-powershell #3351](https://github.com/PowerShell/vscode-powershell/pull/3356) - Use PowerShell terminal icon (when available).
+- 📖✨ [vscode-powershell #3339](https://github.com/PowerShell/vscode-powershell/pull/3340) - Update Description to reflect that PowerShell is for more than scripting. (Thanks @potatoqualitee!)
+- 📺🐛 [vscode-powershell #3320](https://github.com/PowerShell/vscode-powershell/pull/3329) - Fix duplicated command registrations. (Thanks @MartinGC94!)
+- 📖🐛 [vscode-powershell #2896](https://github.com/PowerShell/vscode-powershell/pull/3322) - Remove "All Rights Reserved" from copyright notices.
+-  [vscode-powershell #3179](https://github.com/PowerShell/vscode-powershell/pull/3179) - Update @types/vscode and `StatusBarItem` implementation.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🛫🐛 [vscode-powershell #3306](https://github.com/PowerShell/PowerShellEditorServices/pull/1481) - Bump OmniSharp to `v0.19.2-beta0002`.
+- 💭✨ [PowerShellEditorServices #1474](https://github.com/PowerShell/PowerShellEditorServices/pull/1474) - Add more logging and internal documentation.
+- 🚂✨ [PowerShellEditorServices #1467](https://github.com/PowerShell/PowerShellEditorServices/pull/1467) - Make code more explicit.
+- 📖🐛 [PowerShellEditorServices #1465](https://github.com/PowerShell/PowerShellEditorServices/pull/1466) - Remove "All Rights Reserved" from copyright notices.
+- 👷✨ [PowerShellEditorServices #1463](https://github.com/PowerShell/PowerShellEditorServices/pull/1464) - Enable CodeQL with `codeql-analysis.yml`.
+
+
 ## v2021.4.2-preview
 ### Monday, April 26, 2021
 
