@@ -116,21 +116,19 @@ function Get-Bullets {
 .DESCRIPTION
   This is used so that we can manually touch-up the automatically updated
   changelog, and then bring its contents into the extension's changelog or
-  the GitHub release.
+  the GitHub release. It just gets the first header's contents.
 #>
-function Get-NewChangelog {
+function Get-FirstChangelog {
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
-    $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
-    $Release = $Repo | Get-GitHubRelease -Latest
     $Changelog = Get-Content -Path "$PSScriptRoot/../../$RepositoryName/$ChangelogFile"
     $Changelog.Where(
         { $_.StartsWith("##") }, "SkipUntil"
     ).Where(
-        { $_.StartsWith("## $($Release.tag_name)") }, "Until"
+        { $_.StartsWith("##") }, "Until"
     )
 }
 
@@ -144,8 +142,8 @@ function Get-Version {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
-    # NOTE: This is joined into a multi-line string so `-match` works.
-    $Changelog = (Get-NewChangelog -RepositoryName $RepositoryName) -join "`n"
+    # NOTE: The first line should always be the header.
+    $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName)[0]
     if ($Changelog -match '## v(?<version>\d+\.\d+\.\d+(-preview\.?\d*)?)') {
         return [semver]$Matches.version
     } else {
@@ -169,6 +167,7 @@ function Update-Changelog {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
+        # TODO: Validate version style for each repo.
         [Parameter(Mandatory)]
         [ValidateScript({ $_.StartsWith("v") })]
         [string]$Version
@@ -178,15 +177,13 @@ function Update-Changelog {
 
     # Get the repo object, latest release, and commits since its tag.
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
-    # TODO: Handle pre-releases (i.e. treat as latest).
-    $Release = $Repo | Get-GitHubRelease -Latest
-    $Commits = git rev-list "$($Release.tag_name)..."
+    $Commits = git rev-list "v$(Get-Version -RepositoryName $RepositoryName)..."
 
     # NOTE: This is a slow API as it gets all PRs, and then filters.
     $Bullets = $Repo | Get-GitHubPullRequest -State All |
         Where-Object { $_.merge_commit_sha -in $Commits } |
         Where-Object { -not $_.user.UserName.EndsWith("[bot]") } |
-        Where-Object { "Include" -notin $_.labels.LabelName } |
+        Where-Object { "Ignore" -notin $_.labels.LabelName } |
         Where-Object { -not $_.title.StartsWith("[Ignore]") } |
         Where-Object { -not $_.title.StartsWith("Update CHANGELOG") } |
         Where-Object { -not $_.title.StartsWith("Bump version") } |
@@ -201,7 +198,7 @@ function Update-Changelog {
                 ""
                 "#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)"
                 ""
-                (Get-NewChangelog -RepositoryName "PowerShellEditorServices").Where({ $_.StartsWith("- ") }, "SkipUntil")
+                (Get-FirstChangelog -RepositoryName "PowerShellEditorServices").Where({ $_.StartsWith("- ") }, "SkipUntil")
             )
         }
         "PowerShellEditorServices" {
@@ -334,7 +331,7 @@ function New-DraftRelease {
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
-    $Changelog = (Get-NewChangelog -RepositoryName $RepositoryName) -join "`n"
+    $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName) -join "`n"
     $ReleaseParams = @{
         Draft      = $true
         Tag        = "v$Version"
