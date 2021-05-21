@@ -186,7 +186,7 @@ function Update-Changelog {
     $Bullets = $Repo | Get-GitHubPullRequest -State All |
         Where-Object { $_.merge_commit_sha -in $Commits } |
         Where-Object { -not $_.user.UserName.EndsWith("[bot]") } |
-        Where-Object { "Include" -notin $_.labels.LabelName } |
+        Where-Object { "Ignore" -notin $_.labels.LabelName } |
         Where-Object { -not $_.title.StartsWith("[Ignore]") } |
         Where-Object { -not $_.title.StartsWith("Update CHANGELOG") } |
         Where-Object { -not $_.title.StartsWith("Bump version") } |
