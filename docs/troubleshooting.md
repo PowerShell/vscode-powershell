@@ -3,23 +3,30 @@
 This document contains troubleshooting steps for commonly reported issues when using the
 [PowerShell Extension] for Visual Studio Code.
 
-## Script Analysis is Reporting False Errors
+## How do I debug my PowerShell script?
 
-Script analysis is provided by the [PSScriptAnalyzer] project on GitHub.
-Please [open an issue there] if you are getting fault script diagnostics
-(red and green squiggly lines under PowerShell in scripts).
+This topic is best covered in the "Debugging PowerShell Script in Visual Studio Code"
+Scripting Guys blog posts (thanks community!):
 
-## Problems with Syntax Highlighting
+* [Part 1](https://blogs.technet.microsoft.com/heyscriptingguy/2017/02/06/debugging-powershell-script-in-visual-studio-code-part-1/)
+* [Part 2](https://blogs.technet.microsoft.com/heyscriptingguy/2017/02/13/debugging-powershell-script-in-visual-studio-code-part-2/)
 
-PowerShell syntax highlighting is not performed by the [PowerShell Extension].
-Instead syntax highlighting for VSCode, Atom, SublimeText and even GitHub is
-provided by the [Editor Syntax] repository on GitHub. Please open any
-[syntax highlighting issues there].
+## Script analysis is reporting false errors
 
-However, with the introduction of [Semantic Highlighting] in [v2021.2.2], the
-chosen colors may be different because this is applied at a layer above [Editor
-Syntax]. To disable semantic highlighting and so restore the colors as they
-were, set:
+Script analysis is provided by the [PSScriptAnalyzer] project on GitHub. If the warning
+message starts with `[PSScriptAnalyzer]` or if you are getting faulty script diagnostics
+(red and green squiggly lines under PowerShell in scripts) please [open an issue there].
+
+## Problems with syntax highlighting
+
+PowerShell syntax highlighting is performed in combintation by the [PowerShell Extension]
+(semantic highlighting) and [Editor Syntax]. Syntax highlighting for VS Code, Atom,
+SublimeText and even GitHub is provided by the [Editor Syntax] repository on GitHub.
+
+With the introduction of [Semantic Highlighting] in [v2021.2.2], the chosen colors may be
+different because this is applied at a layer above [Editor Syntax]. To disable semantic
+highlighting and so restore the colors as they were and rely solely on [Editor Syntax],
+set:
 
 ```json
 "[powershell]": {
@@ -30,7 +37,16 @@ were, set:
 If you leave it enabled, you can customize the colors used for the various
 tokens. See [#3221] for more info and to leave suggestions.
 
-## VSCode is not working like the ISE
+If you disable it and your issue remains, then please open those [syntax highlighting
+issues there].
+
+## Windows aren't appearing
+
+Due to an [issue](https://github.com/Microsoft/vscode/issues/42356) in Electron, windows
+spawned by Visual Studio Code (such as those for `Get-Credential`, `Connect-MsolService`,
+`Connect-AzAccount`, `Connect-AzureAd`, etc.) do not appear above Visual Studio Code.
+
+## Visual Studio Code is not working like the ISE
 
 The PowerShell extension does not aim to perfectly recreate
 the experience of the PowerShell ISE.
@@ -45,7 +61,7 @@ VSCode itself and can't be changed by the extension.
 The VSCode maintainers are quite reasonable though,
 and you can ask for new features [in their repository](https://github.com/Microsoft/vscode).
 
-## Known Issues in the Extension
+## Known issues in the extension
 
 - If you are running the Preview version "PowerShell Preview" side-by-side with the stable version "PowerShell"
   you will experience performance and debug issues.
@@ -84,7 +100,7 @@ and you can ask for new features [in their repository](https://github.com/Micros
     may be opportunities to improve our integration with it in the
     [PowerShell Extension] too.
 
-## Reporting an Issue
+## Reporting an issue
 
 If you experience a problem with the [PowerShell Extension]:
 
@@ -97,7 +113,7 @@ If you experience a problem with the [PowerShell Extension]:
    [look there].
 3. If you don't see the issue you're experiencing, please [open a new issue].
 
-## Opening a New Issue
+## Opening a new issue
 
 If you experience an issue with the [PowerShell Extension] and can't find
 an existing issue for it, [open an issue on us on GitHub].
@@ -118,7 +134,7 @@ When opening an issue, keep in mind:
   [tackling an issue], we always accept contributions and will help you
   at every step.
 
-## Reproducing the Issue
+## Reproducing the issue
 
 To fix the issue, we need to be able to reproduce it.
 To do that, we need:
@@ -134,7 +150,7 @@ the GitHub issue template will have sections
 to guide you through providing all of this information
 as well as environment information discussed below.
 
-## Providing Information About Your Environment
+## Providing information about your environment
 
 For solving most issues, the following information is important to provide:
 
@@ -213,7 +229,7 @@ At this point, you may delete the setting if you want.
   vscode-powershell@microsoft.com. Please still open an issue though
   so we can track the work &mdash; other users may have the same issue.
 
-### Visual Studio Code Version
+### Visual Studio Code version
 
 [Your VSCode version] can be obtained from the Integrated Console
 or PowerShell like this:
@@ -245,7 +261,7 @@ code: The term 'code' is not recognized as the name of a cmdlet, ...
 in this case, use the file menu in VSCode and choose `Help`>`About`
 (or `Code`>`About Visual Studio Code` on macOS) to get version information.
 
-### PowerShell Extension Version
+### PowerShell extension version
 
 [Your installed PowerShell Extension version] can similarly be found with:
 
@@ -278,7 +294,8 @@ If VSCode isn't on your path use the [Command Palette]
 (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) to enter
 `Extensions: Show Installed Extensions` and list your extensions.
 
-### Editor Services Version
+### Editor Services version
+
 To get the [PowerShell Editor Services] version, in the Integrated
 Console, enter:
 
@@ -289,7 +306,8 @@ Major  Minor  Build  Revision
 1      8      4      0
 ```
 
-### PowerShell Version Table
+### PowerShell version table
+
 You can get [your PowerShell version table] from the Integrated Console:
 
 ```powershell
@@ -307,7 +325,7 @@ SerializationVersion           1.1.0.1
 WSManStackVersion              3.0
 ```
 
-### Operating System Information
+### Operating system information
 
 - Windows - all needed information should already be in the `$PSVersionTable`
 - macOS
@@ -316,7 +334,7 @@ WSManStackVersion              3.0
   - `uname -a`
   - Your distro and version (usually `lsb_release -a` is the best here)
 
-### Note on Security
+### Note on security
 
 If you believe there is a security vulnerability in the [PowerShell Extension]
 (or in [PowerShell Editor Services]), it **must** be reported directly to
@@ -328,7 +346,6 @@ an issue on GitHub is appropriate.
 [PowerShell Editor Services]: https://github.com/PowerShell/PowerShellEditorServices
 [PowerShell Extension]: https://github.com/PowerShell/vscode-powershell/
 [PSScriptAnalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
-[PSReadLine]: https://github.com/lzybkr/PSReadLine
 
 [Command Palette]: https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
 [Coordinated Vulnerability Disclosure]: https://technet.microsoft.com/security/dn467923
