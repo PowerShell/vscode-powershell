@@ -16,6 +16,11 @@ This leverages the
 [Language Server Protocol](https://microsoft.github.io/language-server-protocol/)
 where `PowerShellEditorServices` is the server and `vscode-powershell` is the client.
 
+Also included in this extension is the PowerShell ISE theme for Visual Studio Code. It is
+not activated by default, but after installing this extension either click "Set Color
+Theme" or use the [theme picker](https://code.visualstudio.com/docs/getstarted/themes) and
+select "PowerShell ISE" for a fun and familiar experience.
+
 ## Platform support
 
 - **Windows 7 through 10** with Windows PowerShell v3 and higher, and PowerShell Core
@@ -25,7 +30,7 @@ where `PowerShellEditorServices` is the server and `vscode-powershell` is the cl
 Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
 
-Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for answers to common questions.
+Read the [troubleshooting guide](./docs/troubleshooting.md) for answers to common questions.
 
 ## Features
 
@@ -38,18 +43,20 @@ Read the [FAQ](https://github.com/PowerShell/vscode-powershell/wiki/FAQ) for ans
 - Document and workspace symbol discovery
 - Run selected selection of PowerShell code using <kbd>F8</kbd>
 - Launch online help for the symbol under the cursor using <kbd>Ctrl</kbd>+<kbd>F1</kbd>
-- Local script debugging and basic interactive console support!
+- Local script debugging
+- Integrated console support
+- PowerShell ISE color theme
 
 ## Installing the Extension
 
 You can install the official release of the PowerShell extension by following the steps
 in the [Visual Studio Code documentation](https://code.visualstudio.com/docs/editor/extension-gallery).
-In the Extensions pane, search for "PowerShell" extension and install it there.  You will
+In the Extensions pane, search for "PowerShell" extension and install it there. You will
 get notified automatically about any future extension updates!
 
 You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
 [Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
-instructions.  The easiest way is through the command line:
+instructions. The easiest way is through the command line:
 
 ```powershell
 code --install-extension PowerShell-<version>.vsix
