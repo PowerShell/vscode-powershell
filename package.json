@@ -1,10 +1,10 @@
 {
-  "name": "powershell-preview",
-  "displayName": "PowerShell Preview",
-  "version": "2021.5.0",
-  "preview": true,
+  "name": "powershell",
+  "displayName": "PowerShell",
+  "version": "2021.5.1",
+  "preview": false,
   "publisher": "ms-vscode",
-  "description": "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!",
+  "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
     "vscode": "^1.53.0"
   },
