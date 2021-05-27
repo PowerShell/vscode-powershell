@@ -897,8 +897,9 @@
     },
     "configurationDefaults": {
       "[powershell]": {
-        "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?",
-        "debug.saveBeforeStart": "nonUntitledEditorsInActiveGroup"
+        "debug.saveBeforeStart": "nonUntitledEditorsInActiveGroup",
+        "editor.semanticHighlighting.enabled": false,
+        "editor.wordSeparators": "`~!@#%^&*()=+[{]}\\|;:'\",.<>/?"
       }
     },
     "themes": [
