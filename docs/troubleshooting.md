@@ -23,10 +23,12 @@ PowerShell syntax highlighting is performed in combintation by the [PowerShell E
 (semantic highlighting) and [Editor Syntax]. Syntax highlighting for VS Code, Atom,
 SublimeText and even GitHub is provided by the [Editor Syntax] repository on GitHub.
 
-With the introduction of [Semantic Highlighting] in [v2021.2.2], the chosen colors may be
-different because this is applied at a layer above [Editor Syntax]. To disable semantic
-highlighting and so restore the colors as they were and rely solely on [Editor Syntax],
-set:
+We introducted [Semantic Highlighting] in [v2021.2.2], a feature that applies tokenized
+colors at a layer above [Editor Syntax]. However, after [community feedback][#3221] and
+multiple bug reports (including colors changing unexpectedly and [randomly][#3295]), we
+have decided to disable it by default.
+
+To enable semantic highlighting and use this "experimental" feature, set:
 
 ```json
 "[powershell]": {
@@ -34,11 +36,11 @@ set:
 }
 ```
 
-If you leave it enabled, you can customize the colors used for the various
-tokens. See [#3221] for more info and to leave suggestions.
+If you enable it, you can customize the colors used for the various tokens. See [#3221]
+for more info and to leave suggestions.
 
-If you disable it and your issue remains, then please open those [syntax highlighting
-issues there].
+If it is disabled and your issue remains, then please open those syntax highlighting
+issues there in [Editor Syntax].
 
 ## Windows aren't appearing
 
@@ -361,7 +363,6 @@ an issue on GitHub is appropriate.
 [open an issue there]: https://github.com/PowerShell/PSScriptAnalyzer/issues/new/choose
 [open an issue on us on GitHub]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
 [Reporting Problems]: ../README.md#reporting-problems
-[syntax highlighting issues there]: https://github.com/PowerShell/EditorSyntax/issues/new
 [semantic highlighting]: https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
 [tackling an issue]: ./development.md
 [v2021.2.2]: https://github.com/PowerShell/vscode-powershell/releases/tag/v2021.2.2
@@ -383,3 +384,4 @@ an issue on GitHub is appropriate.
 [#647]: https://github.com/PowerShell/vscode-powershell/issues/647
 [#984]: https://github.com/PowerShell/vscode-powershell/issues/984
 [#3221]: https://github.com/PowerShell/vscode-powershell/issues/3221#issuecomment-810563456
+[#3295]: https://github.com/PowerShell/vscode-powershell/issues/3295
