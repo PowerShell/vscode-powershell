@@ -1,5 +1,51 @@
 # PowerShell Extension Release History
 
+## v2021.5.1
+### Thursday, May 27, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+This stable release includes all the changes in the previews since v2021.2.2, plus the
+following:
+
+- 🐛🔧 [vscode-powershell #3221](https://github.com/PowerShell/vscode-powershell/pull/3377) - Disable semantic highlighting by default.
+- 📖📺✨ [vscode-powershell #1943](https://github.com/PowerShell/vscode-powershell/pull/3372) - Note that ISE theme is included in this extension.
+- 🔧🔍🐛✨ [vscode-powershell #3338](https://github.com/PowerShell/vscode-powershell/pull/3357) - Don't prompt to save untitled PowerShell files when debugging.
+
+Since we have disabled semantic highlighting by default now, if you wish to re-enable it,
+use:
+
+```json
+"[powershell]": {
+    "editor.semanticHighlighting.enabled": true
+}
+```
+
+We now also remove `-` and `$` from the word separators by default for PowerShell files.
+To add them back, use:
+
+```json
+"[powershell]": {
+    "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?"
+}
+```
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+This stable release includes all the changes in the previews since v2.3.0, plus the following:
+
+- ✨👷 [PowerShellEditorServices #1491](https://github.com/PowerShell/PowerShellEditorServices/pull/1491) - Bump OmniSharp to `v0.19.2`.
+- 🧠🐛 [vscode-powershell #715](https://github.com/PowerShell/PowerShellEditorServices/pull/1484) - Fix unintentional module import. (Thanks @MartinGC94!)
+
+The most significant change is the update to [OmniSharp
+v0.19.2](https://github.com/OmniSharp/csharp-language-server-protocol/releases/tag/v0.19.2),
+from the previous version v0.18.3, released in November 2020. OmniSharp is the underlying
+Language Server Protocol and Debug Adapter Protocol server library, and as such is our
+biggest dependency. This update brings us to the LSP 3.16 and DAP 1.48.x specifications,
+enabling us to start incorporating all the latest LSP changes, and it includes numerous
+bug fixes and enhancements resulting in a faster and more stable server and extension
+experience.
+
 ## v2021.5.0-preview
 ### Friday, May 21, 2021
 
