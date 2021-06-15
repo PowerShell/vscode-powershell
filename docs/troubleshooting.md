@@ -17,6 +17,44 @@ Script analysis is provided by the [PSScriptAnalyzer] project on GitHub. If the 
 message starts with `[PSScriptAnalyzer]` or if you are getting faulty script diagnostics
 (red and green squiggly lines under PowerShell in scripts) please [open an issue there].
 
+## Double-click isn't selecting the whole variable
+
+Visual Studio Code provides a default set of word separators, that is,
+characters that split words and so affect double-click selections. The editor's
+defaults include both `-` and `$`. In [v2021.5.1] we started providing a default
+value for PowerShell files that excludes these two symbols. The intention of
+this change was to increase predictability, as double-clicking PowerShell
+symbols would now select the same portion that the extension highlights as well
+as align with collected user feedback.
+
+Different users have a variety of different preferences around these word
+selection settings and you can easily configure your own [word separators] in
+Visual Studio Code's settings.
+
+We exclude `-` by default because unlike programming languages that use
+`CamelCase` or `snake_case`, PowerShell uses a `Verb-Noun` style where dashes
+are part of many symbol names (like underscores in other languages). So by
+excluding it we configure Visual Studio Code to treat `Verb-Noun` as one
+symbol/word, which matches what the extension semantically highlights when the
+cursor is placed within it.
+
+We briefly excluded `$` by default too because PowerShell uses it as a prefix
+for variable substition, and many users were already excluding it. However, we
+could not find a strong consensus [#3378], so we reverted this exclusion.
+
+To set the word separator behavior to separate words in PowerShell on `-` and
+`$` add the following entry to the Visual Studio Code's `settings.json`:
+
+```json
+"[powershell]": {
+    "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/?"
+}
+```
+
+This will cause `-` and `$` to register as word boundaries, meaning for example
+that double-clicking on a letter in `$MyVariable` will not select the `$` and on
+the `G` in `Get-Process` will only select `Get` rather than the verb and noun.
+
 ## Problems with syntax highlighting
 
 PowerShell syntax highlighting is performed in combintation by the [PowerShell Extension]
@@ -366,9 +404,11 @@ an issue on GitHub is appropriate.
 [semantic highlighting]: https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
 [tackling an issue]: ./development.md
 [v2021.2.2]: https://github.com/PowerShell/vscode-powershell/releases/tag/v2021.2.2
+[v2021.5.1]: https://github.com/PowerShell/vscode-powershell/releases/tag/v2021.5.1
 [VSCode issue]: https://github.com/Microsoft/vscode/issues/42356
 [VSCode Settings]: https://code.visualstudio.com/docs/getstarted/settings
 [will break this compatibility]: https://github.com/PowerShell/vscode-powershell/issues/1310
+[word separators]: https://stackoverflow.com/questions/31632351/visual-studio-code-customizing-word-separators
 [Your installed PowerShell Extension version]: https://code.visualstudio.com/docs/editor/extension-gallery#_list-installed-extensions
 [your PowerShell version table]: http://www.powertheshell.com/topic/learnpowershell/firststeps/psversion/
 [Your VSCode version]: https://code.visualstudio.com/docs/supporting/FAQ#_how-do-i-find-the-vs-code-version
@@ -385,3 +425,4 @@ an issue on GitHub is appropriate.
 [#984]: https://github.com/PowerShell/vscode-powershell/issues/984
 [#3221]: https://github.com/PowerShell/vscode-powershell/issues/3221#issuecomment-810563456
 [#3295]: https://github.com/PowerShell/vscode-powershell/issues/3295
+[#3378]: https://github.com/PowerShell/vscode-powershell/issues/3378
