@@ -895,6 +895,11 @@
         }
       }
     },
+    "capabilities": {
+      "untrustedWorkspaces": {
+        "supported": false
+      }
+    },
     "configurationDefaults": {
       "[powershell]": {
         "debug.saveBeforeStart": "nonUntitledEditorsInActiveGroup",
