@@ -53,4 +53,44 @@ code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
 
 ## Contributing Snippets
 
-For more information on contributing snippets please read our [snippet requirements](https://github.com/PowerShell/vscode-powershell/blob/master/docs/community_snippets.md#contributing).
+For more information on contributing snippets please read our
+[snippet requirements](https://github.com/PowerShell/vscode-powershell/blob/master/docs/community_snippets.md#contributing).
+
+## Creating a Release
+
+These are the current steps for creating a release for both the editor services
+and the extension. ADO access is restricted to Microsoft employees and is used
+to sign and validate the produced binaries before publishing on behalf of
+Microsoft. The comments are manual steps.
+
+```powershell
+Import-Module ./tools/ReleaseTools.psm1
+Update-Changelog -RepositoryName PowerShellEditorServices -Version <version>
+Update-Changelog -RepositoryName vscode-powershell -Version <version>
+# Amend changelog as necessary
+Update-Version -RepositoryName PowerShellEditorServices
+Update-Version -RepositoryName vscode-powershell
+# Push branches to GitHub and ADO
+# Open PRs for review
+# Download and test assets (assert correct PSES is included)
+# Rename VSIX correctly
+New-DraftRelease -RepositoryName PowerShellEditorServices
+New-DraftRelease -RepositoryName vscode-powershell
+# Point releases to branches for automatic tagging
+# Upload PowerShellEditorServices.zip (for other extensions)
+# Upload VSIX and Install-VSCode.ps1
+# Publish draft releases and merge (don't squash!) branches
+vsce publish --packagePath ./PowerShell-<version>.vsix
+# Update Install-VSCode.ps1 on gallery
+Publish-Script -Path ./Install-VSCode.ps1 -NuGetApiKey (Get-Secret "PowerShell Gallery API Key" -AsPlainText)
+```
+
+### Pending Improvements
+
+* `Update-Changelog` should verify the version is in the correct format
+* `Update-Changelog` could be faster by not downloading _every_ PR
+* `Update-Changelog` should use exactly two emoji and in the right order
+* `Update-Version` could be run by `Update-Changelog`
+* `New-DraftRelease` could automatically set the tag pointers and upload the binaries
+* The build should emit an appropriately named VSIX instead of us manually renaming it
+* A `Publish-Binaries` function could be written to push the binaries out
