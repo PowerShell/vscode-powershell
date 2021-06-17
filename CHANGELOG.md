@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2021.6.1-preview
+### Wednesday, June 16, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 📁✨ [vscode-powershell #3334](https://github.com/PowerShell/vscode-powershell/pull/3416) - Explicitly disable extension for untrusted workspaces.
+- 📺 [vscode-powershell #3378](https://github.com/PowerShell/vscode-powershell/pull/3413) - Include `$` in PowerShell word separators.
+- #️⃣ 🙏 [vscode-powershell #3390](https://github.com/PowerShell/vscode-powershell/pull/3392) - Change OS-architecture check to work with other locales. (Thanks @mat-ocl!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 [PowerShellEditorServices #1495](https://github.com/PowerShell/PowerShellEditorServices/pull/1500) - Prevent some exceptions.
+- #️⃣ 🙏 [vscode-powershell #3395](https://github.com/PowerShell/PowerShellEditorServices/pull/1494) - Work around `dotnet publish` bug.
+
+
 ## v2021.5.1
 ### Thursday, May 27, 2021
 
