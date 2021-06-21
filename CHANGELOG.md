@@ -1,7 +1,7 @@
 # PowerShell Extension Release History
 
-## v2021.6.1-preview
-### Wednesday, June 16, 2021
+## v2021.6.1
+### Monday, June 21, 2021
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
 
@@ -13,7 +13,6 @@
 
 - 🐛 [PowerShellEditorServices #1495](https://github.com/PowerShell/PowerShellEditorServices/pull/1500) - Prevent some exceptions.
 - #️⃣ 🙏 [vscode-powershell #3395](https://github.com/PowerShell/PowerShellEditorServices/pull/1494) - Work around `dotnet publish` bug.
-
 
 ## v2021.5.1
 ### Thursday, May 27, 2021
