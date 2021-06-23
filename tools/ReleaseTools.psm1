@@ -238,7 +238,7 @@ function Update-Changelog {
     if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git")) {
         Update-Branch -Version $Version
         git add $ChangelogFile
-        git commit -m "Update CHANGELOG for $Version"
+        git commit -m "Update CHANGELOG for ``v$Version``"
     }
 
     Pop-Location
@@ -324,7 +324,7 @@ function Update-Version {
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
         Update-Branch -Version $Version
-        git commit -m "Bump version to v$Version"
+        git commit -m "Bump version to ``v$Version``"
     }
 
     Pop-Location
@@ -350,6 +350,7 @@ function New-DraftRelease {
     $ReleaseParams = @{
         Draft      = $true
         Tag        = "v$Version"
+        Committish = "release/v$Version"
         Name       = "v$Version"
         Body       = $ChangeLog
         PreRelease = [bool]$Version.PreReleaseLabel

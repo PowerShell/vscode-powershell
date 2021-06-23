@@ -80,6 +80,7 @@ New-DraftRelease -RepositoryName vscode-powershell
 # Upload PowerShellEditorServices.zip (for other extensions)
 # Upload VSIX and Install-VSCode.ps1
 # Publish draft releases and merge (don't squash!) branches
+# Check telemetry for stability before releasing
 vsce publish --packagePath ./PowerShell-<version>.vsix
 # Update Install-VSCode.ps1 on gallery
 Publish-Script -Path ./Install-VSCode.ps1 -NuGetApiKey (Get-Secret "PowerShell Gallery API Key" -AsPlainText)
