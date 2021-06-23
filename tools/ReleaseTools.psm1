@@ -339,7 +339,6 @@ function Update-Version {
   are prefixed with a `v`. Creates a Git tag if it does not already exist.
 #>
 function New-DraftRelease {
-    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
@@ -349,23 +348,12 @@ function New-DraftRelease {
     $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName) -join "`n"
     $ReleaseParams = @{
         Draft      = $true
+        # NOTE: We rely on GitHub to create the tag at that branch.
         Tag        = "v$Version"
         Committish = "release/v$Version"
         Name       = "v$Version"
         Body       = $ChangeLog
         PreRelease = [bool]$Version.PreReleaseLabel
-        # TODO: Pass -WhatIf and -Confirm parameters correctly.
-    }
-
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git tag")) {
-        # NOTE: This a side effect neccesary for Git operations to work.
-        Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
-        if (-not (git show-ref --tags "v$Version")) {
-            git tag "v$Version"
-        } else {
-            Write-Warning "git tag $RepositoryName/v$Version already exists!"
-        }
-        Pop-Location
     }
 
     Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName |
