@@ -140,6 +140,5 @@ use the same code which includes dependencies).
 * `Update-Changelog` could be faster by not downloading _every_ PR
 * `Update-Changelog` should use exactly two emoji and in the right order
 * `Update-Version` could be run by `Update-Changelog`
-* `New-DraftRelease` could automatically set the tag pointers and upload the binaries
 * The build should emit an appropriately named VSIX instead of us manually renaming it
 * A `Publish-Binaries` function could be written to push the binaries out

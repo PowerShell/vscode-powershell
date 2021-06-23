@@ -342,7 +342,10 @@ function New-DraftRelease {
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
-        [string]$RepositoryName
+        [string]$RepositoryName,
+
+        [Parameter(ValueFromPipeline)]
+        [string[]]$Assets
     )
     $Version = Get-Version -RepositoryName $RepositoryName
     $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName) -join "`n"
@@ -354,8 +357,10 @@ function New-DraftRelease {
         Name       = "v$Version"
         Body       = $ChangeLog
         PreRelease = [bool]$Version.PreReleaseLabel
+        OwnerName  = "PowerShell"
+        RepositoryName = $RepositoryName
     }
 
-    Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName |
-        New-GitHubRelease @ReleaseParams
+    $Release = New-GitHubRelease @ReleaseParams
+    $Assets | New-GitHubReleaseAsset -Release $Release.Id
 }
