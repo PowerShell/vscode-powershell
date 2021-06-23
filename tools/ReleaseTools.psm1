@@ -136,6 +136,21 @@ function Get-FirstChangelog {
 
 <#
 .SYNOPSIS
+  Creates and checks out `release/v<version>` if not already on it.
+#>
+function Update-Branch {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Version
+    )
+    $branch = git branch --show-current
+    if ($branch -ne "release/v$Version") {
+        git checkout -b "release/v$Version"
+    }
+}
+
+<#
+.SYNOPSIS
   Gets current version from changelog as [semver].
 #>
 function Get-Version {
@@ -221,10 +236,7 @@ function Update-Changelog {
     ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git")) {
-        $branch = git branch --show-current
-        if ($branch -ne "release/$Version") {
-            git checkout -b "release/$Version"
-        }
+        Update-Branch -Version $Version
         git add $ChangelogFile
         git commit -m "Update CHANGELOG for $Version"
     }
@@ -311,6 +323,7 @@ function Update-Version {
     }
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
+        Update-Branch -Version $Version
         git commit -m "Bump version to v$Version"
     }
 
