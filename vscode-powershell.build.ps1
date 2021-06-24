@@ -36,14 +36,6 @@ task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices,
     }
 }
 
-task UploadArtifacts {
-    if ($env:TF_BUILD) {
-        # SYSTEM_PHASENAME is the Job name.
-        Copy-Item -Path PowerShell-insiders.vsix `
-            -Destination "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/$($script:PackageJson.name)-$($script:PackageJson.version)-$env:SYSTEM_PHASENAME.vsix"
-    }
-}
-
 #endregion
 #region Restore tasks
 
@@ -145,15 +137,15 @@ task Package UpdateReadme, {
         throw "Unable to find PowerShell EditorServices"
     }
 
-    Write-Host "`n### Packaging PowerShell-insiders.vsix`n" -ForegroundColor Green
+    $packageName = "$($script:PackageJson.name)-$($script:PackageJson.version).vsix"
+    Write-Host "`n### Packaging $packageName`n" -ForegroundColor Green
     exec { & node ./node_modules/vsce/out/vsce package --no-gitHubIssueLinking }
 
-    # Change the package to have a static name for automation purposes
-    Move-Item -Force .\$($script:PackageJson.name)-$($script:PackageJson.version).vsix .\PowerShell-insiders.vsix
-
     if ($env:TF_BUILD) {
-        Copy-Item -Verbose -Recurse "./PowerShell-insiders.vsix" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/PowerShell-insiders.vsix"
-        Copy-Item -Verbose -Recurse "./scripts/Install-VSCode.ps1" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/Install-VSCode.ps1"
+        $artifactsPath = "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/vscode-powershell/"
+        "./$packageName", "./scripts/Install-VSCode.ps1" | ForEach-Object {
+            Copy-Item -Verbose -Recurse $_ $artifactsPath
+        }
     }
 }
 
@@ -162,4 +154,4 @@ task Package UpdateReadme, {
 # The set of tasks for a release
 task Release Clean, Build, Package
 # The default task is to run the entire CI build
-task . CleanAll, BuildAll, Test, Package, UploadArtifacts
+task . CleanAll, BuildAll, Test, Package

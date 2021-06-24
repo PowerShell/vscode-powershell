@@ -73,7 +73,6 @@ Update-Version -RepositoryName vscode-powershell
 # Push branches to GitHub and ADO
 # Open PRs for review
 # Download and test assets (assert correct PSES is included)
-# Rename VSIX correctly
 New-DraftRelease -RepositoryName PowerShellEditorServices
 New-DraftRelease -RepositoryName vscode-powershell
 # Point releases to branches for automatic tagging
