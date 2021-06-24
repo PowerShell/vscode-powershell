@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2021.6.2
+### Thursday, June 24, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 👷🐛 [vscode-powershell #2536](https://github.com/PowerShell/vscode-powershell/pull/3431) - Release refinements.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 👷🐛 [PowerShellEditorServices #1509](https://github.com/PowerShell/PowerShellEditorServices/issues/1509) Fix signing of files in release.
+
+
 ## v2021.6.1
 ### Monday, June 21, 2021
 
