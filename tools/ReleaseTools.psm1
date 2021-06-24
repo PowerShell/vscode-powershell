@@ -236,9 +236,9 @@ function Update-Changelog {
     ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git")) {
-        Update-Branch -Version $Version
+        Update-Branch -Version $Version.Substring(1) # Has "v" prefix
         git add $ChangelogFile
-        git commit -m "Update CHANGELOG for ``v$Version``"
+        git commit -m "Update CHANGELOG for ``$Version``"
     }
 
     Pop-Location
