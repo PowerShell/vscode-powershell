@@ -136,6 +136,21 @@ function Get-FirstChangelog {
 
 <#
 .SYNOPSIS
+  Creates and checks out `release/v<version>` if not already on it.
+#>
+function Update-Branch {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Version
+    )
+    $branch = git branch --show-current
+    if ($branch -ne "release/v$Version") {
+        git checkout -b "release/v$Version"
+    }
+}
+
+<#
+.SYNOPSIS
   Gets current version from changelog as [semver].
 #>
 function Get-Version {
@@ -221,12 +236,9 @@ function Update-Changelog {
     ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git")) {
-        $branch = git branch --show-current
-        if ($branch -ne "release/$Version") {
-            git checkout -b "release/$Version"
-        }
+        Update-Branch -Version $Version
         git add $ChangelogFile
-        git commit -m "Update CHANGELOG for $Version"
+        git commit -m "Update CHANGELOG for ``v$Version``"
     }
 
     Pop-Location
@@ -311,7 +323,8 @@ function Update-Version {
     }
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
-        git commit -m "Bump version to v$Version"
+        Update-Branch -Version $Version
+        git commit -m "Bump version to ``v$Version``"
     }
 
     Pop-Location
@@ -326,34 +339,28 @@ function Update-Version {
   are prefixed with a `v`. Creates a Git tag if it does not already exist.
 #>
 function New-DraftRelease {
-    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
-        [string]$RepositoryName
+        [string]$RepositoryName,
+
+        [Parameter(ValueFromPipeline)]
+        [string[]]$Assets
     )
     $Version = Get-Version -RepositoryName $RepositoryName
     $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName) -join "`n"
     $ReleaseParams = @{
         Draft      = $true
+        # NOTE: We rely on GitHub to create the tag at that branch.
         Tag        = "v$Version"
+        Committish = "release/v$Version"
         Name       = "v$Version"
         Body       = $ChangeLog
         PreRelease = [bool]$Version.PreReleaseLabel
-        # TODO: Pass -WhatIf and -Confirm parameters correctly.
+        OwnerName  = "PowerShell"
+        RepositoryName = $RepositoryName
     }
 
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git tag")) {
-        # NOTE: This a side effect neccesary for Git operations to work.
-        Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
-        if (-not (git show-ref --tags "v$Version")) {
-            git tag "v$Version"
-        } else {
-            Write-Warning "git tag $RepositoryName/v$Version already exists!"
-        }
-        Pop-Location
-    }
-
-    Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName |
-        New-GitHubRelease @ReleaseParams
+    $Release = New-GitHubRelease @ReleaseParams
+    $Assets | New-GitHubReleaseAsset -Release $Release.Id
 }
