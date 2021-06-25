@@ -42,7 +42,6 @@ steps:
     # NOTE: Code AKA *.vsix files are not signed
     pattern: |
       Install-VSCode.ps1
-      InvokePesterStub.ps1
 
 - template: EsrpScan.yml@ComplianceRepo
   parameters:
