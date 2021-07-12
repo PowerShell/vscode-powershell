@@ -344,7 +344,7 @@ function New-DraftRelease {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
-        [Parameter(ValueFromPipeline)]
+        [Parameter()]
         [string[]]$Assets
     )
     $Version = Get-Version -RepositoryName $RepositoryName
@@ -362,5 +362,7 @@ function New-DraftRelease {
     }
 
     $Release = New-GitHubRelease @ReleaseParams
+    Write-Output "Draft release URL: $($Release.html_url)"
+    Write-Output "Uploading assets..."
     $Assets | New-GitHubReleaseAsset -Release $Release.Id
 }

@@ -73,13 +73,10 @@ Update-Version -RepositoryName vscode-powershell
 # Push branches to GitHub and ADO
 # Open PRs for review
 # Download and test assets (assert correct PSES is included)
-New-DraftRelease -RepositoryName PowerShellEditorServices
-New-DraftRelease -RepositoryName vscode-powershell
-# Point releases to branches for automatic tagging
-# Upload PowerShellEditorServices.zip (for other extensions)
-# Upload VSIX and Install-VSCode.ps1
-# Publish draft releases and merge (don't squash!) branches
+New-DraftRelease -RepositoryName PowerShellEditorServices -Assets "PowerShellEditorServices.zip"
+New-DraftRelease -RepositoryName vscode-powershell -Assets "powershell-YYYY.M.X.vsix", "Install-VSCode.ps1"
 # Check telemetry for stability before releasing
+# Publish draft releases and merge (don't squash!) branches
 vsce publish --packagePath ./PowerShell-<version>.vsix
 # Update Install-VSCode.ps1 on gallery
 Publish-Script -Path ./Install-VSCode.ps1 -NuGetApiKey (Get-Secret "PowerShell Gallery API Key" -AsPlainText)
