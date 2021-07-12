@@ -98,7 +98,7 @@ For PowerShellEditor Services, we simply follow semantic versioning, e.g.
 generally used directly: it's a library consumed by other projects which
 themselves use preview releases for beta testing.
 
-For the VS Code PowerShell Extension, our version follows `vYYYY.MM.X`, that is:
+For the VS Code PowerShell Extension, our version follows `vYYYY.M.X`, that is:
 current year, current month, and patch version (not day). This is not semantic
 versioning because of issues with how the VS Code marketplace and extension
 hosting API itself uses our version number. This scheme _does not_ mean we
@@ -137,7 +137,5 @@ use the same code which includes dependencies).
 
 * `Update-Changelog` should verify the version is in the correct format
 * `Update-Changelog` could be faster by not downloading _every_ PR
-* `Update-Changelog` should use exactly two emoji and in the right order
 * `Update-Version` could be run by `Update-Changelog`
-* The build should emit an appropriately named VSIX instead of us manually renaming it
 * A `Publish-Binaries` function could be written to push the binaries out

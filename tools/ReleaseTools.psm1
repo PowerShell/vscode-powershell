@@ -37,10 +37,13 @@ function Get-Bullets {
             'TylerLeonhardt'
         )
 
-        $LabelEmoji = @{
+        $IssueEmojis = @{
             'Issue-Enhancement'         = '✨'
             'Issue-Bug'                 = '🐛'
             'Issue-Performance'         = '⚡️'
+        }
+
+        $AreaEmojis = @{
             'Area-Build & Release'      = '👷'
             'Area-Code Formatting'      = '💎'
             'Area-Configuration'        = '🔧'
@@ -81,12 +84,9 @@ function Get-Bullets {
     process {
         $PullRequests | ForEach-Object {
             # Map all the labels to emoji (or use a default).
-            # NOTE: Whitespacing here is weird.
-            $emoji = if ($_.labels) {
-                $LabelEmoji[$_.labels.LabelName] -join ""
-            } else {
-                '#️⃣ 🙏'
-            }
+            $labels = if ($_.labels) { $_.labels.LabelName } else { "" }
+            $issueEmoji = $IssueEmojis[$labels] + "#️⃣" | Select-Object -First 1
+            $areaEmoji = $AreaEmojis[$labels] + "🙏" | Select-Object -First 1
 
             # Get a linked issue number if it exists (or use the PR).
             $link = if ($_.body -match $IssueRegex) {
@@ -105,7 +105,7 @@ function Get-Bullets {
             }
 
             # Put the bullet point together.
-            ("-", $emoji, "[$link]($($_.html_url))", "-", "$($_.title).", $thanks -join " ").Trim()
+            ("-", $issueEmoji, $areaEmoji, "[$link]($($_.html_url))", "-", "$($_.title).", $thanks -join " ").Trim()
         }
     }
 }
@@ -250,18 +250,18 @@ function Update-Changelog {
 .DESCRIPTION
   Note that our Git tags and changelog prefix all versions with `v`.
 
-  PowerShellEditorServices: version is `x.y.z-preview.d`
+  PowerShellEditorServices: version is `X.Y.Z-preview`
 
   - PowerShellEditorServices.psd1:
-    - `ModuleVersion` variable with `'x.y.z'` string, no pre-release info
+    - `ModuleVersion` variable with `'X.Y.Z'` string, no pre-release info
   - PowerShellEditorServices.Common.props:
-    - `VersionPrefix` field with `x.y.z`
+    - `VersionPrefix` field with `X.Y.Z`
     - `VersionSuffix` field with pre-release portion excluding hyphen
 
-  vscode-powershell: version is `yyyy.mm.x-preview`
+  vscode-powershell: version is `YYYY.M.X-preview`
 
   - package.json:
-    - `version` field with `"x.y.z"` and no prefix or suffix
+    - `version` field with `"X.Y.Z"` and no prefix or suffix
     - `preview` field set to `true` or `false` if version is a preview
     - `name` field has `-preview` appended similarly
     - `displayName` field has ` Preview` appended similarly
