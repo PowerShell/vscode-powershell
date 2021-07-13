@@ -68,10 +68,6 @@ Import-Module ./tools/ReleaseTools.psm1
 Update-Changelog -RepositoryName PowerShellEditorServices -Version <version>
 Update-Changelog -RepositoryName vscode-powershell -Version <version>
 # Amend changelog as necessary
-Update-Version -RepositoryName PowerShellEditorServices
-Update-Version -RepositoryName vscode-powershell
-# Push branches to GitHub and ADO
-# Open PRs for review
 # Download and test assets (assert correct PSES is included)
 New-DraftRelease -RepositoryName PowerShellEditorServices -Assets "PowerShellEditorServices.zip"
 New-DraftRelease -RepositoryName vscode-powershell -Assets "powershell-YYYY.M.X.vsix", "Install-VSCode.ps1"
@@ -134,5 +130,4 @@ use the same code which includes dependencies).
 
 * `Update-Changelog` should verify the version is in the correct format
 * `Update-Changelog` could be faster by not downloading _every_ PR
-* `Update-Version` could be run by `Update-Changelog`
 * A `Publish-Binaries` function could be written to push the binaries out

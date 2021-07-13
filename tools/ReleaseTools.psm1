@@ -202,8 +202,7 @@ function Update-Changelog {
         Where-Object { -not $_.user.UserName.EndsWith("[bot]") } |
         Where-Object { "Ignore" -notin $_.labels.LabelName } |
         Where-Object { -not $_.title.StartsWith("[Ignore]") } |
-        Where-Object { -not $_.title.StartsWith("Update CHANGELOG") } |
-        Where-Object { -not $_.title.StartsWith("Bump version") } |
+        Where-Object { -not $_.title.StartsWith("Release ``v") } |
         Get-Bullets -RepositoryName $RepositoryName
 
     $NewSection = switch ($RepositoryName) {
@@ -242,6 +241,8 @@ function Update-Changelog {
     }
 
     Pop-Location
+
+    Update-Version -RepositoryName $RepositoryName
 }
 
 <#
@@ -326,6 +327,49 @@ function Update-Version {
         Update-Branch -Version $Version
         git commit -m "Bump version to ``v$Version``"
     }
+
+    Pop-Location
+
+    New-ReleasePR -RepositoryName $RepositoryName
+}
+
+<#
+.SYNOPSIS
+  Creates a new draft GitHub PR from the release branch.
+.DESCRIPTION
+  Pushes the release branch to `origin` and then opens a draft PR.
+#>
+function New-ReleasePR {
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet([RepoNames])]
+        [string]$RepositoryName
+    )
+    # NOTE: This a side effect neccesary for Git operations to work.
+    Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
+
+    $Version = Get-Version -RepositoryName $RepositoryName
+    $Branch = "release/v$Version"
+    Update-Branch -Version $Version
+    Write-Output "Pushing branch ``$Branch``..."
+    git push origin $Branch
+
+    $LabelParams = @{
+        OwnerName      = "PowerShell"
+        RepositoryName = $RepositoryName
+        Label          = "Ignore"
+    }
+
+    $PRParams = @{
+        Head  = $Branch
+        Base  = "master"
+        Draft = $true
+        Title = "Release ``v$Version``"
+        Body  = "Automated PR for new release!"
+    }
+
+    $PR = Get-GitHubLabel @LabelParams | New-GitHubPullRequest @PRParams
+    Write-Output "Draft PR URL: $($PR.html_url)"
 
     Pop-Location
 }
