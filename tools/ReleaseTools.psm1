@@ -139,13 +139,17 @@ function Get-FirstChangelog {
   Creates and checks out `release/v<version>` if not already on it.
 #>
 function Update-Branch {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
         [string]$Version
     )
-    $branch = git branch --show-current
-    if ($branch -ne "release/v$Version") {
-        git checkout -b "release/v$Version"
+    $Branch = git branch --show-current
+    $NewBranch = "release/v$Version"
+    if ($Branch -ne $NewBranch) {
+        if ($PSCmdlet.ShouldProcess($NewBranch, "git checkout -b")) {
+            git checkout -b $NewBranch
+        }
     }
 }
 
@@ -234,15 +238,16 @@ function Update-Changelog {
         $CurrentChangelog[2..$CurrentChangelog.Length]
     ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git")) {
-        Update-Branch -Version $Version.Substring(1) # Has "v" prefix
+    Update-Branch -Version $Version.Substring(1) # Has "v" prefix
+
+    if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git commit")) {
         git add $ChangelogFile
         git commit -m "Update CHANGELOG for ``$Version``"
     }
 
-    Pop-Location
-
     Update-Version -RepositoryName $RepositoryName
+
+    Pop-Location
 }
 
 <#
@@ -323,14 +328,15 @@ function Update-Version {
         }
     }
 
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
-        Update-Branch -Version $Version
-        git commit -m "Bump version to ``v$Version``"
-    }
+    Update-Branch -Version $Version
 
-    Pop-Location
+    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
+        git commit -m "Bump version to ``v$Version``"
+    } # TODO: Git reset to unstage
 
     New-ReleasePR -RepositoryName $RepositoryName
+
+    Pop-Location
 }
 
 <#
@@ -340,6 +346,7 @@ function Update-Version {
   Pushes the release branch to `origin` and then opens a draft PR.
 #>
 function New-ReleasePR {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
@@ -350,9 +357,13 @@ function New-ReleasePR {
 
     $Version = Get-Version -RepositoryName $RepositoryName
     $Branch = "release/v$Version"
+
     Update-Branch -Version $Version
-    Write-Output "Pushing branch ``$Branch``..."
-    git push origin $Branch
+
+    if ($PSCmdlet.ShouldProcess("$RepositoryName/$Branch", "git push")) {
+        Write-Host "Pushing branch ``$Branch``..."
+        git push origin $Branch
+    }
 
     $LabelParams = @{
         OwnerName      = "PowerShell"
@@ -361,15 +372,17 @@ function New-ReleasePR {
     }
 
     $PRParams = @{
-        Head  = $Branch
-        Base  = "master"
-        Draft = $true
-        Title = "Release ``v$Version``"
-        Body  = "Automated PR for new release!"
+        Head    = $Branch
+        Base    = "master"
+        Draft   = $true
+        Title   = "Release ``v$Version``"
+        Body    = "Automated PR for new release!"
+        WhatIf  = $WhatIfPreference
+        Confirm = $ConfirmPreference
     }
 
     $PR = Get-GitHubLabel @LabelParams | New-GitHubPullRequest @PRParams
-    Write-Output "Draft PR URL: $($PR.html_url)"
+    Write-Host "Draft PR URL: $($PR.html_url)"
 
     Pop-Location
 }
@@ -383,6 +396,7 @@ function New-ReleasePR {
   are prefixed with a `v`. Creates a Git tag if it does not already exist.
 #>
 function New-DraftRelease {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
@@ -394,19 +408,23 @@ function New-DraftRelease {
     $Version = Get-Version -RepositoryName $RepositoryName
     $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName) -join "`n"
     $ReleaseParams = @{
-        Draft      = $true
         # NOTE: We rely on GitHub to create the tag at that branch.
-        Tag        = "v$Version"
-        Committish = "release/v$Version"
-        Name       = "v$Version"
-        Body       = $ChangeLog
-        PreRelease = [bool]$Version.PreReleaseLabel
-        OwnerName  = "PowerShell"
+        Tag            = "v$Version"
+        Committish     = "release/v$Version"
+        Name           = "v$Version"
+        Body           = $ChangeLog
+        Draft          = $true
+        PreRelease     = [bool]$Version.PreReleaseLabel
+        OwnerName      = "PowerShell"
         RepositoryName = $RepositoryName
+        WhatIf         = $WhatIfPreference
+        Confirm        = $ConfirmPreference
     }
 
     $Release = New-GitHubRelease @ReleaseParams
-    Write-Output "Draft release URL: $($Release.html_url)"
-    Write-Output "Uploading assets..."
-    $Assets | New-GitHubReleaseAsset -Release $Release.Id
+    if ($Release) {
+        Write-Host "Draft release URL: $($Release.html_url)"
+        Write-Host "Uploading assets..."
+        $Assets | New-GitHubReleaseAsset -Release $Release.Id
+    }
 }
