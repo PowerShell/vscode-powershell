@@ -73,9 +73,7 @@ New-DraftRelease -RepositoryName PowerShellEditorServices -Assets "PowerShellEdi
 New-DraftRelease -RepositoryName vscode-powershell -Assets "powershell-YYYY.M.X.vsix", "Install-VSCode.ps1"
 # Check telemetry for stability before releasing
 # Publish draft releases and merge (don't squash!) branches
-vsce publish --packagePath ./PowerShell-<version>.vsix
-# Update Install-VSCode.ps1 on gallery
-Publish-Script -Path ./Install-VSCode.ps1 -NuGetApiKey (Get-Secret "PowerShell Gallery API Key" -AsPlainText)
+# Permit release pipeline to publish assets
 ```
 
 ### Versioning
@@ -130,4 +128,3 @@ use the same code which includes dependencies).
 
 * `Update-Changelog` should verify the version is in the correct format
 * `Update-Changelog` could be faster by not downloading _every_ PR
-* A `Publish-Binaries` function could be written to push the binaries out
