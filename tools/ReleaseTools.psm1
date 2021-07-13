@@ -136,26 +136,21 @@ function Get-FirstChangelog {
 
 <#
 .SYNOPSIS
-  Creates and checks out `release/v<version>` if not already on it.
+  Creates and checks out `release` if not already on it.
 #>
 function Update-Branch {
     [CmdletBinding(SupportsShouldProcess)]
-    param(
-        [Parameter(Mandatory)]
-        [string]$Version
-    )
     $Branch = git branch --show-current
-    $NewBranch = "release/v$Version"
-    if ($Branch -ne $NewBranch) {
-        if ($PSCmdlet.ShouldProcess($NewBranch, "git checkout -b")) {
-            git checkout -b $NewBranch
+    if ($Branch -ne "release") {
+        if ($PSCmdlet.ShouldProcess("release", "git checkout -b")) {
+            git checkout -b "release"
         }
     }
 }
 
 <#
 .SYNOPSIS
-  Gets current version from changelog as [semver].
+  Gets current version from changelog as `[semver]`.
 #>
 function Get-Version {
     param(
@@ -176,10 +171,9 @@ function Get-Version {
 .SYNOPSIS
   Updates the CHANGELOG file with PRs merged since the last release.
 .DESCRIPTION
-  Uses the local Git repositories but does not pull, so ensure HEAD is where
-  you want it. Creates a new branch at 'release/$Version' if not already
-  checked out. Handles any merge option for PRs, but is a little slow as it
-  queries all PRs.
+  Uses the local Git repositories but does not pull, so ensure HEAD is where you
+  want it. Creates the branch `release` if not already checked out. Handles any
+  merge option for PRs, but is a little slow as it queries all PRs.
 #>
 function Update-Changelog {
     [CmdletBinding(SupportsShouldProcess)]
@@ -238,7 +232,7 @@ function Update-Changelog {
         $CurrentChangelog[2..$CurrentChangelog.Length]
     ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
-    Update-Branch -Version $Version.Substring(1) # Has "v" prefix
+    Update-Branch
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git commit")) {
         git add $ChangelogFile
@@ -328,7 +322,7 @@ function Update-Version {
         }
     }
 
-    Update-Branch -Version $Version
+    Update-Branch
 
     if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
         git commit -m "Bump version to ``v$Version``"
@@ -409,7 +403,7 @@ function New-DraftRelease {
     $ReleaseParams = @{
         # NOTE: We rely on GitHub to create the tag at that branch.
         Tag            = "v$Version"
-        Committish     = "release/v$Version"
+        Committish     = "release"
         Name           = "v$Version"
         Body           = $ChangeLog
         Draft          = $true

@@ -6,10 +6,7 @@ variables:
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
     value: 'true'
 
-trigger:
-  branches:
-    include:
-      - release/*
+trigger: none
 
 resources:
   repositories:
@@ -20,12 +17,8 @@ resources:
   pipelines:
   - pipeline: PowerShellEditorServices
     source: PowerShellEditorServices
-    trigger:
-      branches:
-        include:
-        - release/*
-      tags:
-      - v*
+    trigger: true
+
 
 jobs:
 - job: 'ReleaseBuild'
