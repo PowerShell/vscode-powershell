@@ -365,13 +365,9 @@ function New-ReleasePR {
         git push origin $Branch
     }
 
-    $LabelParams = @{
-        OwnerName      = "PowerShell"
-        RepositoryName = $RepositoryName
-        Label          = "Ignore"
-    }
+    $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
 
-    $PRParams = @{
+    $Params = @{
         Head    = $Branch
         Base    = "master"
         Draft   = $true
@@ -381,8 +377,12 @@ function New-ReleasePR {
         Confirm = $ConfirmPreference
     }
 
-    $PR = Get-GitHubLabel @LabelParams | New-GitHubPullRequest @PRParams
+    $PR = $Repo | New-GitHubPullRequest @Params
     Write-Host "Draft PR URL: $($PR.html_url)"
+
+    # NOTE: The API is weird. According to GitHub, all PRs are Issues, so this
+    # works, but the module doesn't support it as easily as it could.
+    $Repo | Add-GitHubIssueLabel -Issue $PR.PullRequestNumber -LabelName "Ignore"
 
     Pop-Location
 }
@@ -424,7 +424,10 @@ function New-DraftRelease {
     $Release = New-GitHubRelease @ReleaseParams
     if ($Release) {
         Write-Host "Draft release URL: $($Release.html_url)"
+        # NOTE: We must loop around `New-GitHubReleaseAsset` so we can pipe
+        # `$Release` or it can fail to find the newly created release by its ID
+        # (probably a race condition).
         Write-Host "Uploading assets..."
-        $Assets | New-GitHubReleaseAsset -Release $Release.Id
+        $Assets | ForEach-Object { $Release | New-GitHubReleaseAsset -Path $_ }
     }
 }

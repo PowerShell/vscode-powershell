@@ -10,8 +10,8 @@ steps:
   displayName: 'Download Artifacts from PowerShellEditorServices'
   inputs:
     source: specific
-    project: '8e2735c1-3674-408a-bcab-87f089ea29d5'
-    pipeline: 1056
+    project: 'PowerShellEditorServices'
+    pipeline: 36
     preferTriggeringPipeline: true
     allowPartiallySucceededBuilds: true
     artifact: 'PowerShellEditorServices'
