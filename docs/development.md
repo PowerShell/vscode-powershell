@@ -68,18 +68,11 @@ Import-Module ./tools/ReleaseTools.psm1
 Update-Changelog -RepositoryName PowerShellEditorServices -Version <version>
 Update-Changelog -RepositoryName vscode-powershell -Version <version>
 # Amend changelog as necessary
-Update-Version -RepositoryName PowerShellEditorServices
-Update-Version -RepositoryName vscode-powershell
-# Push branches to GitHub and ADO
-# Open PRs for review
 # Download and test assets (assert correct PSES is included)
-New-DraftRelease -RepositoryName PowerShellEditorServices
-New-DraftRelease -RepositoryName vscode-powershell
-# Point releases to branches for automatic tagging
-# Upload PowerShellEditorServices.zip (for other extensions)
-# Upload VSIX and Install-VSCode.ps1
-# Publish draft releases and merge (don't squash!) branches
+New-DraftRelease -RepositoryName PowerShellEditorServices -Assets "PowerShellEditorServices.zip"
+New-DraftRelease -RepositoryName vscode-powershell -Assets "powershell-YYYY.M.X.vsix", "Install-VSCode.ps1"
 # Check telemetry for stability before releasing
+# Publish draft releases and merge (don't squash!) branches
 vsce publish --packagePath ./PowerShell-<version>.vsix
 # Update Install-VSCode.ps1 on gallery
 Publish-Script -Path ./Install-VSCode.ps1 -NuGetApiKey (Get-Secret "PowerShell Gallery API Key" -AsPlainText)
@@ -98,7 +91,7 @@ For PowerShellEditor Services, we simply follow semantic versioning, e.g.
 generally used directly: it's a library consumed by other projects which
 themselves use preview releases for beta testing.
 
-For the VS Code PowerShell Extension, our version follows `vYYYY.MM.X`, that is:
+For the VS Code PowerShell Extension, our version follows `vYYYY.M.X`, that is:
 current year, current month, and patch version (not day). This is not semantic
 versioning because of issues with how the VS Code marketplace and extension
 hosting API itself uses our version number. This scheme _does not_ mean we
@@ -137,7 +130,4 @@ use the same code which includes dependencies).
 
 * `Update-Changelog` should verify the version is in the correct format
 * `Update-Changelog` could be faster by not downloading _every_ PR
-* `Update-Changelog` should use exactly two emoji and in the right order
-* `Update-Version` could be run by `Update-Changelog`
-* The build should emit an appropriately named VSIX instead of us manually renaming it
 * A `Publish-Binaries` function could be written to push the binaries out

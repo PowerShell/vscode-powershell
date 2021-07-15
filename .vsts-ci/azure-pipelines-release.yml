@@ -31,8 +31,8 @@ jobs:
 - job: 'ReleaseBuild'
   displayName: 'Build release'
   pool:
-    name: 'Package ES Standard Build'
-    demands: DotNetFramework
+    name: '1ES'
+    demands: ImageOverride -equals MMS2019
   variables:
   - group: ESRP
   steps:
