@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2021.7.0-preview
+### Thursday, July 15, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 👷 [vscode-powershell #3458](https://github.com/PowerShell/vscode-powershell/pull/3458) - Automate more of the release.
+- ✨ 👷 [vscode-powershell #3439](https://github.com/PowerShell/vscode-powershell/pull/3439) - Fix `Package` task.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🚨 [PowerShellEditorServices #1522](https://github.com/PowerShell/PowerShellEditorServices/pull/1522) - Run new PSReadLine test on Windows.
+- ✨ 📖 [PowerShellEditorServices #1519](https://github.com/PowerShell/PowerShellEditorServices/pull/1519) - Update README.md. (Thanks @vladdoster!)
+- ✨ 🙏 [PowerShellEditorServices #1493](https://github.com/PowerShell/PowerShellEditorServices/pull/1514) - Load only bundled `PSReadLine`.
+- 🐛 👷 [PowerShellEditorServices #1513](https://github.com/PowerShell/PowerShellEditorServices/pull/1513) - Import `InvokePesterStub.ps1` from `vscode-powershell` (with history).
+- 🐛 🛫 [PowerShellEditorServices #1503](https://github.com/PowerShell/PowerShellEditorServices/pull/1504) - Handle `incomingSettings` and `profileObject` being null. (Thanks @dkattan!)
+
+
 ## v2021.6.2
 ### Thursday, June 24, 2021
 
