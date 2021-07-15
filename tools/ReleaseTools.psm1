@@ -424,7 +424,10 @@ function New-DraftRelease {
     $Release = New-GitHubRelease @ReleaseParams
     if ($Release) {
         Write-Host "Draft release URL: $($Release.html_url)"
+        # NOTE: We must loop around `New-GitHubReleaseAsset` so we can pipe
+        # `$Release` or it can fail to find the newly created release by its ID
+        # (probably a race condition).
         Write-Host "Uploading assets..."
-        $Assets | New-GitHubReleaseAsset -Release $Release.Id
+        $Assets | ForEach-Object { $Release | New-GitHubReleaseAsset -Path $_ }
     }
 }
