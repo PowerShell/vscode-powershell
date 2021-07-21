@@ -55,6 +55,14 @@ This will cause `-` and `$` to register as word boundaries, meaning for example
 that double-clicking on a letter in `$MyVariable` will not select the `$` and on
 the `G` in `Get-Process` will only select `Get` rather than the verb and noun.
 
+Users may also wish to set Visual Studio Code's integrated terminal's word separators (a
+separate setting) to exclude `-` to mirror the behavior in the terminal. This will apply
+to _all_ terminals, not just PowerShell terminals.
+
+```json
+"terminal.integrated.wordSeparators": " ()[]{}',\"`─"
+```
+
 ## Problems with syntax highlighting
 
 PowerShell syntax highlighting is performed in combintation by the [PowerShell Extension]
