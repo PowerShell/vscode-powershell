@@ -368,13 +368,12 @@ function New-ReleasePR {
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
 
     $Params = @{
-        Head    = $Branch
-        Base    = "master"
-        Draft   = $true
-        Title   = "Release ``v$Version``"
-        Body    = "Automated PR for new release!"
-        WhatIf  = $WhatIfPreference
-        Confirm = $ConfirmPreference
+        Head  = $Branch
+        Base  = "master"
+        Draft = $true
+        Title = "Release ``v$Version``"
+        Body  = "Automated PR for new release!"
+        # TODO: Fix passing Confirm/WhatIf (again)
     }
 
     $PR = $Repo | New-GitHubPullRequest @Params
@@ -417,8 +416,7 @@ function New-DraftRelease {
         PreRelease     = [bool]$Version.PreReleaseLabel
         OwnerName      = "PowerShell"
         RepositoryName = $RepositoryName
-        WhatIf         = $WhatIfPreference
-        Confirm        = $ConfirmPreference
+        # TODO: Fix passing Confirm/WhatIf (again)
     }
 
     $Release = New-GitHubRelease @ReleaseParams
