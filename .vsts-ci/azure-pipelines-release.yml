@@ -1,3 +1,5 @@
+name: Release-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
+
 variables:
   # Don't download unneeded packages
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE

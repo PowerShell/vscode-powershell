@@ -15,7 +15,7 @@ steps:
     displayName: Install PowerShell Daily
 
   - pwsh: '$PSVersionTable'
-    displayName: Display PowerShell version information
+  displayName: PowerShell version
 
   - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
     displayName: Set Build Name for Non-PR
@@ -32,6 +32,7 @@ steps:
   - pwsh: Invoke-Build
 
   - task: PublishTestResults@2
+  displayName: Publish test results
     inputs:
       testRunner: JUnit
       testResultsFiles: '**/test-results.xml'
