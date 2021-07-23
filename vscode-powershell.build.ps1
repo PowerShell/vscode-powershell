@@ -12,31 +12,15 @@ $script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-
 $script:IsPreviewExtension = $script:PackageJson.name -like "*preview*" -or $script:PackageJson.displayName -like "*preview*"
 Write-Host "`n### Extension Version: $($script:PackageJson.version) Extension Name: $($script:PackageJson.name)`n" -ForegroundColor Green
 
-#region Utility tasks
-
-# TODO: This needs to be a function, not a task.
-task ResolveEditorServicesPath -Before CleanEditorServices, BuildEditorServices, TestEditorServices, Package {
-
-    $script:psesRepoPath = `
-        if ($EditorServicesRepoPath) {
-            $EditorServicesRepoPath
-        }
-        else {
-            "$PSScriptRoot/../PowerShellEditorServices/"
-        }
-
-    if (!(Test-Path "$script:psesRepoPath/PowerShellEditorServices.build.ps1")) {
-        # Clear the path so that it won't be used
-        Write-Warning "`nThe PowerShellEditorServices repo cannot be found at path $script:psesRepoPath`n"
-        $script:psesRepoPath = $null
+function Get-EditorServicesPath {
+    $psesRepoPath = if ($EditorServicesRepoPath) {
+        $EditorServicesRepoPath
+    } else {
+        "$PSScriptRoot/../PowerShellEditorServices/"
     }
-    else {
-        $script:psesRepoPath = Resolve-Path $script:psesRepoPath
-        $script:psesBuildScriptPath = Resolve-Path "$script:psesRepoPath/PowerShellEditorServices.build.ps1"
-    }
+    return Resolve-Path "$psesRepoPath/PowerShellEditorServices.build.ps1"
 }
 
-#endregion
 #region Restore tasks
 
 task Restore RestoreNodeModules -If { -not (Test-Path "$PSScriptRoot/node_modules") }
@@ -61,11 +45,9 @@ task Clean {
     Remove-Item -Force -Recurse node_modules -ErrorAction Ignore
 }
 
-task CleanEditorServices {
-    if ($script:psesBuildScriptPath) {
-        Write-Host "`n### Cleaning PowerShellEditorServices`n" -ForegroundColor Green
-        Invoke-Build Clean $script:psesBuildScriptPath
-    }
+task CleanEditorServices -If (Get-EditorServicesPath) {
+    Write-Host "`n### Cleaning PowerShellEditorServices`n" -ForegroundColor Green
+    Invoke-Build Clean (Get-EditorServicesPath)
 }
 
 task CleanAll CleanEditorServices, Clean
@@ -78,12 +60,9 @@ task Build Restore, {
     exec { & npm run compile }
 }
 
-task BuildEditorServices {
-    # If the PSES codebase is co-located, build it first
-    if ($script:psesBuildScriptPath) {
-        Write-Host "`n### Building PowerShellEditorServices`n" -ForegroundColor Green
-        Invoke-Build Build $script:psesBuildScriptPath
-    }
+task BuildEditorServices -If (Get-EditorServicesPath) {
+    Write-Host "`n### Building PowerShellEditorServices`n" -ForegroundColor Green
+    Invoke-Build Build (Get-EditorServicesPath)
 }
 
 task BuildAll BuildEditorServices, Build
@@ -100,11 +79,9 @@ task Test Build, {
     exec { & npm run test }
 }
 
-task TestEditorServices {
-    if ($script:psesBuildScriptPath) {
-        Write-Host "`n### Testing PowerShellEditorServices`n" -ForegroundColor Green
-        Invoke-Build Test $script:psesBuildScriptPath
-    }
+task TestEditorServices -If (Get-EditorServicesPath) {
+    Write-Host "`n### Testing PowerShellEditorServices`n" -ForegroundColor Green
+    Invoke-Build Test (Get-EditorServicesPath)
 }
 
 task TestAll TestEditorServices, Test
@@ -130,7 +107,7 @@ task UpdateReadme -If { $script:IsPreviewExtension } {
 }
 
 task Package UpdateReadme, {
-    if ($script:psesBuildScriptPath -or $env:TF_BUILD) {
+    if (Get-EditorServicesPath -or $env:TF_BUILD) {
         Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
         Copy-Item -Recurse -Force ..\PowerShellEditorServices\module\* .\modules
     } else {
