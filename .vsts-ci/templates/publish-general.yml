@@ -1,0 +1,19 @@
+parameters:
+- name: draftRelease
+  displayName: Draft GitHub Release
+  type: boolean
+  default: false
+- name: publishAssets
+  displayName: Publish Assets
+  type: boolean
+  default: false
+
+steps:
+- checkout: self
+- checkout: vscode-powershell
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Artifacts'
+  inputs:
+    artifactName: PowerShellEditorServices
+- pwsh:
+

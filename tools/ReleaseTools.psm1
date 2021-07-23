@@ -155,7 +155,7 @@ function Update-Branch {
 
 <#
 .SYNOPSIS
-  Gets current version from changelog as [semver].
+  Gets current version from changelog as `[semver]`.
 #>
 function Get-Version {
     param(
@@ -177,7 +177,7 @@ function Get-Version {
   Updates the CHANGELOG file with PRs merged since the last release.
 .DESCRIPTION
   Uses the local Git repositories but does not pull, so ensure HEAD is where
-  you want it. Creates a new branch at 'release/$Version' if not already
+  you want it. Creates a new branch at `release/$Version` if not already
   checked out. Handles any merge option for PRs, but is a little slow as it
   queries all PRs.
 #>
@@ -429,5 +429,44 @@ function New-DraftRelease {
         # (probably a race condition).
         Write-Host "Uploading assets..."
         $Assets | ForEach-Object { $Release | New-GitHubReleaseAsset -Path $_ }
+    }
+}
+
+<#
+.SYNOPSIS
+  Uploads VSIX and PS1 binaries to their respective marketplaces.
+.DESCRIPTION
+  The VSIX is uploaded to the Visual Studio Code Marketplace using the `vsce`
+  tool and the `VsceToken` parameter:
+  https://marketplace.visualstudio.com/VSCode
+
+  The PS1 is uploaded to the PowerShell Gallery using the `Publish-Script`
+  cmdlet and the `GalleryToken` parameter: https://www.powershellgallery.com
+
+  This function is primarily used by ADO pipelines, but could be used manually.
+#>
+function Publish-Assets {
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$Assets,
+
+        [Parameter()]
+        [string]$VsceToken,
+
+        [Parameter()]
+        [string]$GalleryToken
+    )
+    switch ($Assets) {
+        { $_.EndsWith(".vsix") } {
+            Write-Host "Uploading VSIX..."
+            vsce publish --packagePath $_ --pat $VsceToken
+        }
+        { $_.EndsWith(".ps1") } {
+            Write-Host "Uploading PS1..."
+            Publish-Script -Path $_ -NuGetApiKey $GalleryToken
+        }
+        default {
+            Write-Error "Unsupported file: $_"
+        }
     }
 }
