@@ -16,9 +16,39 @@ $ChangelogFile = "CHANGELOG.md"
 
 <#
 .SYNOPSIS
+  Given the repository name, execute the script in its directory.
+#>
+function Use-Repository {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet([RepoNames])]
+        [string]$RepositoryName,
+
+        [Parameter(Mandatory)]
+        [scriptblock]$Script
+    )
+    try {
+        switch ($RepositoryName) {
+            "vscode-powershell" {
+                Push-Location -Path "$PSScriptRoot/../"
+            }
+            "PowerShellEditorServices" {
+                Push-Location -Path "$PSScriptRoot/../../PowerShellEditorServices"
+            }
+        }
+        & $Script
+    } finally {
+        Pop-Location
+    }
+}
+
+<#
+.SYNOPSIS
   Given a collection of PRs, generates a bulleted list.
 #>
 function Get-Bullets {
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
@@ -124,7 +154,9 @@ function Get-FirstChangelog {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
-    $Changelog = Get-Content -Path "$PSScriptRoot/../../$RepositoryName/$ChangelogFile"
+    $Changelog = Use-Repository -RepositoryName $RepositoryName -Script {
+        Get-Content -Path $ChangelogFile
+    }
     # NOTE: The space after the header marker is important! Otherwise ### matches.
     $Header = $Changelog.Where({$_.StartsWith("## ")}, "First")
     $Changelog.Where(
@@ -140,10 +172,17 @@ function Get-FirstChangelog {
 #>
 function Update-Branch {
     [CmdletBinding(SupportsShouldProcess)]
-    $Branch = git branch --show-current
-    if ($Branch -ne "release") {
-        if ($PSCmdlet.ShouldProcess("release", "git checkout -b")) {
-            git checkout -b "release"
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet([RepoNames])]
+        [string]$RepositoryName
+    )
+    Use-Repository -RepositoryName $RepositoryName -Script {
+        $Branch = git branch --show-current
+        if ($Branch -ne "release") {
+            if ($PSCmdlet.ShouldProcess("release", "git checkout -b")) {
+                git checkout -b "release"
+            }
         }
     }
 }
@@ -187,12 +226,12 @@ function Update-Changelog {
         [ValidateScript({ $_.StartsWith("v") })]
         [string]$Version
     )
-    # NOTE: This a side effect neccesary for Git operations to work.
-    Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
 
     # Get the repo object, latest release, and commits since its tag.
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
-    $Commits = git rev-list "v$(Get-Version -RepositoryName $RepositoryName)..."
+    $Commits = Use-Repository -RepositoryName $RepositoryName -Script {
+        git rev-list "v$(Get-Version -RepositoryName $RepositoryName)..."
+    }
 
     # NOTE: This is a slow API as it gets all PRs, and then filters.
     $Bullets = $Repo | Get-GitHubPullRequest -State All |
@@ -220,28 +259,27 @@ function Update-Changelog {
         }
     }
 
-    $CurrentChangelog = Get-Content -Path $ChangelogFile
+    Update-Branch -RepositoryName $RepositoryName
 
-    @(
-        $CurrentChangelog[0..1]
-        "## $Version"
-        "### $([datetime]::Now.ToString('dddd, MMMM dd, yyyy'))"
-        ""
-        $NewSection
-        ""
-        $CurrentChangelog[2..$CurrentChangelog.Length]
-    ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
+    Use-Repository -RepositoryName $RepositoryName -Script {
+        $CurrentChangelog = Get-Content -Path $ChangelogFile
+        @(
+            $CurrentChangelog[0..1]
+            "## $Version"
+            "### $([datetime]::Now.ToString('dddd, MMMM dd, yyyy'))"
+            ""
+            $NewSection
+            ""
+            $CurrentChangelog[2..$CurrentChangelog.Length]
+        ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
-    Update-Branch
-
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git commit")) {
-        git add $ChangelogFile
-        git commit -m "Update CHANGELOG for ``$Version``"
+        if ($PSCmdlet.ShouldProcess("$RepositoryName/$ChangelogFile", "git commit")) {
+            git add $ChangelogFile
+            git commit -m "Update CHANGELOG for ``$Version``"
+        }
     }
 
     Update-Version -RepositoryName $RepositoryName
-
-    Pop-Location
 }
 
 <#
@@ -274,63 +312,62 @@ function Update-Version {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
-    # NOTE: This a side effect neccesary for Git operations to work.
-    Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
-
     $Version = Get-Version -RepositoryName $RepositoryName
     $v = "$($Version.Major).$($Version.Minor).$($Version.Patch)"
-    # TODO: Maybe cleanup the replacement logic.
-    switch ($RepositoryName) {
-        "vscode-powershell" {
-            $d = "Develop PowerShell modules, commands and scripts in Visual Studio Code!"
-            if ($Version.PreReleaseLabel) {
-                $name = "powershell-preview"
-                $displayName = "PowerShell Preview"
-                $preview = "true"
-                $description = "(Preview) $d"
-            } else {
-                $name = "powershell"
-                $displayName = "PowerShell"
-                $preview = "false"
-                $description = $d
-            }
-            $path = "package.json"
-            $f = Get-Content -Path $path
-            # NOTE: The prefix regex match two spaces exactly to avoid matching
-            # nested objects in the file.
-            $f = $f -replace '^(?<prefix>  "name":\s+")(.+)(?<suffix>",)$', "`${prefix}${name}`${suffix}"
-            $f = $f -replace '^(?<prefix>  "displayName":\s+")(.+)(?<suffix>",)$', "`${prefix}${displayName}`${suffix}"
-            $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
-            $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
-            $f = $f -replace '^(?<prefix>  "description":\s+")(.+)(?<suffix>",)$', "`${prefix}${description}`${suffix}"
-            $f | Set-Content -Path $path
-            git add $path
-        }
-        "PowerShellEditorServices" {
-            $path = "PowerShellEditorServices.Common.props"
-            $f = Get-Content -Path $path
-            $f = $f -replace '^(?<prefix>\s+<VersionPrefix>)(.+)(?<suffix></VersionPrefix>)$', "`${prefix}${v}`${suffix}"
-            $f = $f -replace '^(?<prefix>\s+<VersionSuffix>)(.*)(?<suffix></VersionSuffix>)$', "`${prefix}$($Version.PreReleaseLabel)`${suffix}"
-            $f | Set-Content -Path $path
-            git add $path
 
-            $path = "module/PowerShellEditorServices/PowerShellEditorServices.psd1"
-            $f = Get-Content -Path $path
-            $f = $f -replace "^(?<prefix>ModuleVersion = ')(.+)(?<suffix>')`$", "`${prefix}${v}`${suffix}"
-            $f | Set-Content -Path $path
-            git add $path
+    Update-Branch -RepositoryName $RepositoryName
+
+    # TODO: Maybe cleanup the replacement logic.
+    Use-Repository -RepositoryName $RepositoryName -Script {
+        switch ($RepositoryName) {
+            "vscode-powershell" {
+                $d = "Develop PowerShell modules, commands and scripts in Visual Studio Code!"
+                if ($Version.PreReleaseLabel) {
+                    $name = "powershell-preview"
+                    $displayName = "PowerShell Preview"
+                    $preview = "true"
+                    $description = "(Preview) $d"
+                } else {
+                    $name = "powershell"
+                    $displayName = "PowerShell"
+                    $preview = "false"
+                    $description = $d
+                }
+
+                $path = "package.json"
+                $f = Get-Content -Path $path
+                # NOTE: The prefix regex match two spaces exactly to avoid matching
+                # nested objects in the file.
+                $f = $f -replace '^(?<prefix>  "name":\s+")(.+)(?<suffix>",)$', "`${prefix}${name}`${suffix}"
+                $f = $f -replace '^(?<prefix>  "displayName":\s+")(.+)(?<suffix>",)$', "`${prefix}${displayName}`${suffix}"
+                $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
+                $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
+                $f = $f -replace '^(?<prefix>  "description":\s+")(.+)(?<suffix>",)$', "`${prefix}${description}`${suffix}"
+                $f | Set-Content -Path $path
+                git add $path
+            }
+            "PowerShellEditorServices" {
+                $path = "PowerShellEditorServices.Common.props"
+                $f = Get-Content -Path $path
+                $f = $f -replace '^(?<prefix>\s+<VersionPrefix>)(.+)(?<suffix></VersionPrefix>)$', "`${prefix}${v}`${suffix}"
+                $f = $f -replace '^(?<prefix>\s+<VersionSuffix>)(.*)(?<suffix></VersionSuffix>)$', "`${prefix}$($Version.PreReleaseLabel)`${suffix}"
+                $f | Set-Content -Path $path
+                git add $path
+
+                $path = "module/PowerShellEditorServices/PowerShellEditorServices.psd1"
+                $f = Get-Content -Path $path
+                $f = $f -replace "^(?<prefix>ModuleVersion = ')(.+)(?<suffix>')`$", "`${prefix}${v}`${suffix}"
+                $f | Set-Content -Path $path
+                git add $path
+            }
         }
+
+        if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
+            git commit -m "Bump version to ``v$Version``"
+        } # TODO: Git reset to unstage
     }
 
-    Update-Branch
-
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/v$Version", "git commit")) {
-        git commit -m "Bump version to ``v$Version``"
-    } # TODO: Git reset to unstage
-
     New-ReleasePR -RepositoryName $RepositoryName
-
-    Pop-Location
 }
 
 <#
@@ -346,17 +383,15 @@ function New-ReleasePR {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
-    # NOTE: This a side effect neccesary for Git operations to work.
-    Push-Location -Path "$PSScriptRoot/../../$RepositoryName"
-
     $Version = Get-Version -RepositoryName $RepositoryName
     $Branch = "release/v$Version"
 
-    Update-Branch -Version $Version
-
-    if ($PSCmdlet.ShouldProcess("$RepositoryName/$Branch", "git push")) {
-        Write-Host "Pushing branch ``$Branch``..."
-        git push origin $Branch
+    Update-Branch -RepositoryName $RepositoryName
+    Use-Repository -RepositoryName $RepositoryName -Script {
+        if ($PSCmdlet.ShouldProcess("$RepositoryName/$Branch", "git push")) {
+            Write-Host "Pushing branch ``$Branch``..."
+            git push origin $Branch
+        }
     }
 
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
@@ -376,8 +411,6 @@ function New-ReleasePR {
     # NOTE: The API is weird. According to GitHub, all PRs are Issues, so this
     # works, but the module doesn't support it as easily as it could.
     $Repo | Add-GitHubIssueLabel -Issue $PR.PullRequestNumber -LabelName "Ignore"
-
-    Pop-Location
 }
 
 <#

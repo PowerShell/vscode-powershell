@@ -18,7 +18,9 @@ function Get-EditorServicesPath {
     } else {
         "$PSScriptRoot/../PowerShellEditorServices/"
     }
-    return Resolve-Path "$psesRepoPath/PowerShellEditorServices.build.ps1"
+    # NOTE: The ErrorActionPreference for both Invoke-Build and Azure DevOps
+    # scripts is Stop, but we want to continue and return false here.
+    return Resolve-Path "$psesRepoPath/PowerShellEditorServices.build.ps1" -ErrorAction Continue
 }
 
 #region Restore tasks
