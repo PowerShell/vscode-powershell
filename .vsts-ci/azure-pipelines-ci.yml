@@ -13,6 +13,14 @@ trigger:
     include:
       - master
 
+resources:
+  repositories:
+  - repository: PowerShellEditorServices
+    type: github
+    endpoint: GitHub
+    name: PowerShell/PowerShellEditorServices
+    ref: master
+
 jobs:
 - job: Win2019
   displayName: Windows Server 2019
