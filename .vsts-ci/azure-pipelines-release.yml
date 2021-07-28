@@ -14,21 +14,71 @@ resources:
   repositories:
   - repository: ComplianceRepo
     type: github
-    endpoint: ComplianceGHRepo
+    endpoint: GitHub
     name: PowerShell/Compliance
+
+  - repository: PowerShellEditorServices
+    type: git
+    name: PowerShellEditorServices
+    ref: release
+
   pipelines:
   - pipeline: PowerShellEditorServices
     source: PowerShellEditorServices
-    trigger: true
+    trigger:
+      branches:
+      - release
 
+stages:
+- stage: Build
+  displayName: Build the release
+  jobs:
+  - job: Build
+    pool:
+      vmImage: windows-2019
+    steps:
+    - template: templates/ci-general.yml
+      parameters:
+        usePipelineArtifact: true
 
-jobs:
-- job: 'ReleaseBuild'
-  displayName: 'Build release'
-  pool:
-    name: '1ES'
-    demands: ImageOverride -equals MMS2019
-  variables:
-  - group: ESRP
-  steps:
-  - template: templates/release-general.yml
+- stage: Sign
+  displayName: Sign the release
+  jobs:
+  - job: Sign
+    pool:
+      name: 1ES
+      demands: ImageOverride -equals MMS2019
+    variables:
+    - group: ESRP
+    steps:
+    - template: templates/release-general.yml
+
+- stage: PublishGitHub
+  displayName: Publish the draft release
+  jobs:
+  - deployment: Publish
+    environment: vscode-powershell-github
+    pool:
+      vmImage: ubuntu-latest
+    variables:
+    - group: Publish
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/publish-github.yml
+
+- stage: PublishMarkets
+  displayName: Publish to marketplace and gallery
+  jobs:
+  - deployment: Publish
+    environment: vscode-powershell-markets
+    pool:
+      vmImage: ubuntu-latest
+    variables:
+    - group: Publish
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: templates/publish-markets.yml

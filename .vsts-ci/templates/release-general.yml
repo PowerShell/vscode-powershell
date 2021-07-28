@@ -1,70 +1,47 @@
 steps:
-- checkout: self
-
-- pwsh: |
-    Get-ChildItem -Path env:
-  displayName: Capture environment
-  condition: succeededOrFailed()
-
-- task: DownloadPipelineArtifact@2
-  displayName: 'Download Artifacts from PowerShellEditorServices'
-  inputs:
-    source: specific
-    project: 'PowerShellEditorServices'
-    pipeline: 36
-    preferTriggeringPipeline: true
-    allowPartiallySucceededBuilds: true
-    artifact: 'PowerShellEditorServices'
-    path: '$(Build.SourcesDirectory)/PowerShellEditorServices/module/'
-
-- pwsh: |
-    New-Item -ItemType Directory $(Build.ArtifactStagingDirectory)/vscode-powershell
-    Install-Module InvokeBuild -Force
-    Invoke-Build Release
-  workingDirectory: '$(Build.SourcesDirectory)/vscode-powershell'
-
-- task: PublishTestResults@2
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: '**/test-results.xml'
-  condition: succeededOrFailed()
+- download: current
+  displayName: Download pipeline artifacts
 
 - checkout: ComplianceRepo
 
 - template: EsrpSign.yml@ComplianceRepo
   parameters:
-    buildOutputPath: '$(Build.ArtifactStagingDirectory)/vscode-powershell'
-    signOutputPath: '$(Build.ArtifactStagingDirectory)/Signed'
-    alwaysCopy: true # So publishing works
-    certificateId: 'CP-230012' # Authenticode certificate
-    useMinimatch: true # This enables the use of globbing
+    buildOutputPath: $(Pipeline.Workspace)/vscode-powershell-unsigned-script-*
+    signOutputPath: $(Pipeline.Workspace)/signed
+    alwaysCopy: true
+    certificateId: CP-230012 # Authenticode certificate
     shouldSign: true # We always want to sign
     # NOTE: Code AKA *.vsix files are not signed
-    pattern: |
-      Install-VSCode.ps1
+    pattern: Install-VSCode.ps1
+
+# NOTE: Because the scan template doesn't copy (unlike the sign template), we do
+# it ourselves so that we can publish one finished artifact.
+- pwsh: Copy-Item -Path $(Pipeline.Workspace)/vscode-powershell-vsix-*/*.vsix -Destination $(Pipeline.Workspace)/signed -Verbose
+  displayName: Copy extension to signed folder
 
 - template: EsrpScan.yml@ComplianceRepo
   parameters:
-      scanPath: $(Build.ArtifactStagingDirectory)/Signed
-      pattern: |
-        *.vsix
+    scanPath: $(Pipeline.Workspace)/signed
+    pattern: powershell-*.vsix
 
-- publish: $(Build.ArtifactStagingDirectory)/Signed
-  artifact: vscode-powershell
-  displayName: 'Publish signed (and unsigned) artifacts'
+- checkout: self
 
 - template: script-module-compliance.yml@ComplianceRepo
   parameters:
     # component-governance
-    sourceScanPath: '$(Build.SourcesDirectory)/vscode-powershell'
+    sourceScanPath: $(Build.SourcesDirectory)/vscode-powershell
     # credscan
-    suppressionsFile: '$(Build.SourcesDirectory)/vscode-powershell/tools/credScan/suppress.json'
+    suppressionsFile: $(Build.SourcesDirectory)/vscode-powershell/tools/credScan/suppress.json
     # TermCheck AKA PoliCheck
-    targetArgument: '$(Build.SourcesDirectory)/vscode-powershell'
-    optionsUEPATH: '$(Build.SourcesDirectory)/vscode-powershell/tools/terms/UserExclusions.xml'
+    targetArgument: $(Build.SourcesDirectory)/vscode-powershell
+    optionsUEPATH: $(Build.SourcesDirectory)/vscode-powershell/tools/terms/UserExclusions.xml
     optionsRulesDBPath: ''
-    optionsFTPath: '$(Build.SourcesDirectory)/vscode-powershell/tools/terms/FileTypeSet.xml'
+    optionsFTPath: $(Build.SourcesDirectory)/vscode-powershell/tools/terms/FileTypeSet.xml
     # tsa-upload
-    codeBaseName: 'PowerShell_PowerShellEditorServices_20210201'
+    codeBaseName: PowerShell_PowerShellEditorServices_20210201
     # We don't use any Windows APIs directly, so we don't need API scan
     APIScan: false
+
+- publish: $(Pipeline.Workspace)/signed
+  artifact: vscode-powershell
+  displayName: Publish signed artifacts

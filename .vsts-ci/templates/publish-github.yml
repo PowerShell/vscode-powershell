@@ -1,0 +1,11 @@
+steps:
+- checkout: self
+
+- download: current
+  artifact: vscode-powershell
+  displayName: Download signed artifacts
+
+- pwsh: |
+    $(Build.SourcesDirectory)/tools/setupReleaseTools.ps1 -Token $(GitHubToken)
+    New-DraftRelease -RepositoryName vscode-powershell -Assets $(Pipeline.Workspace)/vscode-powershell/powershell-*.vsix,$(Pipeline.Workspace)/vscode-powershell/Install-VSCode.ps1
+  displayName: Drafting a GitHub Release
