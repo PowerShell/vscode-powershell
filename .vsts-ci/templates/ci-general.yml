@@ -28,14 +28,3 @@ steps:
       ArtifactName: vscode-powershell
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/vscode-powershell'
 
-  # Rich Navigation
-  - task: RichCodeNavIndexer@0
-    # Note, for now, this is Windows only.
-    condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
-    continueOnError: true
-    inputs:
-      serviceConnection: 'rich-nav'
-      nugetServiceConnection: 'rich-nav-nuget'
-      githubServiceConnection: 'PowerShell'
-      languages: 'typescript,csharp'
-      serviceEndpoint: 'https://prod.richnav.vsengsaas.visualstudio.com'
