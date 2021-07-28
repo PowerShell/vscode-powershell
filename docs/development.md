@@ -67,24 +67,23 @@ Microsoft. The comments are manual steps.
 Import-Module ./tools/ReleaseTools.psm1
 Update-Changelog -RepositoryName PowerShellEditorServices -Version <version>
 Update-Changelog -RepositoryName vscode-powershell -Version <version>
-# Amend changelog as necessary
-# Download and test assets (assert correct PSES is included)
-New-DraftRelease -RepositoryName PowerShellEditorServices -Assets "PowerShellEditorServices.zip"
-New-DraftRelease -RepositoryName vscode-powershell -Assets "powershell-YYYY.M.X.vsix", "Install-VSCode.ps1"
+# Amend changelog as necessary, open PR
+# Push release branches to ADO
+# Permit both pipelines to draft GitHub releases
+# Download and test assets
 # Check telemetry for stability before releasing
 # Publish draft releases and merge (don't squash!) branches
-vsce publish --packagePath ./PowerShell-<version>.vsix
-# Update Install-VSCode.ps1 on gallery
-Publish-Script -Path ./Install-VSCode.ps1 -NuGetApiKey (Get-Secret "PowerShell Gallery API Key" -AsPlainText)
+# Permit vscode-extension pipeline to publish to marketplace
 ```
 
 ### Versioning
 
-For both our repositories we use Git tags in the form `vX.Y.Z` to mark the
-releases in the codebase. We use the GitHub Release feature to create these
-tags. Branches are used in the process of creating a release, e.g.
-`release/vX.Y.Z`, but are deleted after the release is completed (and merged
-into `master`).
+For both our repositories we use Git tags in the form `vX.Y.Z` to mark the releases in the
+codebase. We use the GitHub Release feature to create these tags. The ephemeral branch
+`release` is used in the process of creating a release for each repository, primarily for
+the Pull Requests and for Azure DevOps triggers. Once the release PRs are merged, the
+branch is deleted until used again to prepare the next release. This branch _does not_
+mark any specific release, that is the point of the tags.
 
 For PowerShellEditor Services, we simply follow semantic versioning, e.g.
 `vX.Y.Z`. We do not release previews frequently because this dependency is not
@@ -130,4 +129,3 @@ use the same code which includes dependencies).
 
 * `Update-Changelog` should verify the version is in the correct format
 * `Update-Changelog` could be faster by not downloading _every_ PR
-* A `Publish-Binaries` function could be written to push the binaries out

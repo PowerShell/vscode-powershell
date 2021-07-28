@@ -1,21 +1,40 @@
 name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+
 trigger:
-  # Batch merge builds together while a merge build is running
-  batch: true
   branches:
     include:
     - master
-    - legacy/1.x
 
 pr:
-  branches:
-    include:
-    - master
-    - legacy/1.x
+- master
 
 resources:
-- repo: self
-  clean: true
+  repositories:
+  - repository: ComplianceRepo
+    type: github
+    endpoint: GitHub
+    name: PowerShell/compliance
 
 jobs:
-- template: templates/credscan.yml
+- job: Compliance
+  pool:
+    vmImage: windows-latest
+  steps:
+  - checkout: self
+  - checkout: ComplianceRepo
+  - template: ci-compliance.yml@ComplianceRepo
+# NOTE: This enables our project to work with Visual Studio's Rich Navigation:
+# https://visualstudio.microsoft.com/services/rich-code-navigation/
+- job: RichCodeNav
+  pool:
+    vmImage: windows-latest
+  steps:
+  # TODO: Move to GitHub Action
+  - task: RichCodeNavIndexer@0
+    continueOnError: true
+    inputs:
+      serviceConnection: rich-nav
+      nugetServiceConnection: rich-nav-nuget
+      githubServiceConnection: PowerShell
+      languages: typescript,csharp
+      serviceEndpoint: https://prod.richnav.vsengsaas.visualstudio.com

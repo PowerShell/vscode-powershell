@@ -1,0 +1,17 @@
+steps:
+- checkout: self
+
+- download: current
+  artifact: vscode-powershell
+  displayName: Download signed artifacts
+
+- pwsh: |
+    npm install -g vsce
+    vsce publish --packagePath $(Pipeline.Workspace)/powershell-*.vsix --pat $(VsceToken)
+  displayName: Publishing VSIX to VS Code Marketplace
+
+# NOTE: We rarely update this script, so we can ignore errors from the gallery
+# caused by us trying to re-publish an updated script.
+- pwsh: |
+    Publish-Script -Path $(Pipeline.Workspace)/Install-VSCode.ps1 -ErrorAction Continue -NuGetApiKey $(GalleryToken)
+  displayName: Publishing Install-VSCode.ps1 to PowerShell Gallery

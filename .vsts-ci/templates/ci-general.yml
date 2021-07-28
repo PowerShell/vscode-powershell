@@ -1,55 +1,57 @@
+parameters:
+  - name: usePipelineArtifact
+    type: boolean
+    default: false
+
 steps:
-  # Setup
-  - powershell: |
-      Write-Host "Installing PowerShell Daily..."
+- pwsh: $PSVersionTable
+  displayName: PowerShell version
 
-      # Use `AGENT_TEMPDIRECTORY` to make sure the downloaded PowerShell is cleaned up.
-      $powerShellPath = Join-Path -Path $env:AGENT_TEMPDIRECTORY -ChildPath 'powershell'
-      Invoke-WebRequest -Uri https://aka.ms/install-powershell.ps1 -OutFile ./install-powershell.ps1
+- checkout: self
 
-      ./install-powershell.ps1 -Destination $powerShellPath -Daily
+# NOTE: We either checkout the Git repo for PowerShellEditorServices, or we
+# download a pre-built artifact from the triggering pipeline and extract it to
+# the modules folder. In this way we do not accidentally build a release of the
+# server from this pipeline.
+- checkout: PowerShellEditorServices
+  condition: not(${{ parameters.usePipelineArtifact }})
 
-      # Using `prependpath` to update the PATH just for this build.
-      Write-Host "##vso[task.prependpath]$powerShellPath"
-    continueOnError: true
-    displayName: Install PowerShell Daily
+- task: DownloadPipelineArtifact@2
+  condition: ${{ parameters.usePipelineArtifact }}
+  displayName: Download PowerShellEditorServices
+  inputs:
+    source: specific
+    project: PowerShellEditorServices
+    pipeline: 36
+    preferTriggeringPipeline: true
+    allowPartiallySucceededBuilds: true
+    artifact: PowerShellEditorServices
 
-  - pwsh: '$PSVersionTable'
-    displayName: Display PowerShell version information
+- task: ExtractFiles@1
+  condition: ${{ parameters.usePipelineArtifact }}
+  displayName: Extract PowerShellEditorServices module
+  inputs:
+    archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
+    destinationFolder: $(Build.SourcesDirectory)/vscode-powershell/modules
 
-  - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:BUILD_SOURCEBRANCHNAME-$env:BUILD_SOURCEVERSION-$((get-date).ToString("yyyyMMddhhmmss"))"
-    displayName: Set Build Name for Non-PR
-    condition: ne(variables['Build.Reason'], 'PullRequest')
+- pwsh: |
+    Install-Module InvokeBuild -Scope CurrentUser -Force
+    Invoke-Build
+    Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-*.vsix)"
+  displayName: Build and test
+  workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
 
-    # TODO: Use a submodule or some such so we can actually track a version here.
-  - pwsh: |
-      git clone https://github.com/PowerShell/PowerShellEditorServices.git ../PowerShellEditorServices
-      Install-Module InvokeBuild -Scope CurrentUser -Force
-      Install-Module PlatyPS -Scope CurrentUser -Force
-      New-Item -ItemType Directory $(Build.ArtifactStagingDirectory)/vscode-powershell
+- publish: $(vsixPath)
+  artifact: vscode-powershell-vsix-$(System.JobId)
+  displayName: Publish extension artifact
 
-  # Build
-  - pwsh: Invoke-Build
+- publish: $(Build.SourcesDirectory)/vscode-powershell/scripts/Install-VSCode.ps1
+  artifact: vscode-powershell-unsigned-script-$(System.JobId)
+  displayName: Publish unsigned script artifact
 
-  - task: PublishTestResults@2
-    inputs:
-      testRunner: JUnit
-      testResultsFiles: '**/test-results.xml'
-    condition: succeededOrFailed()
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      ArtifactName: vscode-powershell
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)/vscode-powershell'
-
-  # Rich Navigation
-  - task: RichCodeNavIndexer@0
-    # Note, for now, this is Windows only.
-    condition: and(succeededOrFailed(), eq(variables['Agent.OS'], 'Windows_NT'))
-    continueOnError: true
-    inputs:
-      serviceConnection: 'rich-nav'
-      nugetServiceConnection: 'rich-nav-nuget'
-      githubServiceConnection: 'PowerShell'
-      languages: 'typescript,csharp'
-      serviceEndpoint: 'https://prod.richnav.vsengsaas.visualstudio.com'
+- task: PublishTestResults@2
+  displayName: Publish test results
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: '**/test-results.xml'
+  condition: succeededOrFailed()

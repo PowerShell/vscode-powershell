@@ -9,26 +9,36 @@ variables:
     value: 'true'
 
 trigger:
-  batch: true
   branches:
     include:
       - master
 
+resources:
+  repositories:
+  - repository: PowerShellEditorServices
+    type: github
+    endpoint: GitHub
+    name: PowerShell/PowerShellEditorServices
+    ref: master
+
 jobs:
-- job: Windows
+- job: Win2019
+  displayName: Windows Server 2019
   pool:
-    vmImage: 'windows-2019'
+    vmImage: windows-2019
   steps:
   - template: templates/ci-general.yml
 
 - job: macOS
+  displayName: macOS 10.15
   pool:
-    vmImage: 'macOS-10.15'
+    vmImage: macOS-10.15
   steps:
   - template: templates/ci-general.yml
 
-- job: Linux
+- job: Ubuntu
+  displayName: Ubuntu 20.04
   pool:
-    vmImage: 'Ubuntu-20.04'
+    vmImage: Ubuntu-20.04
   steps:
   - template: templates/ci-general.yml
