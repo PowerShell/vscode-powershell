@@ -327,11 +327,13 @@ function Update-Version {
                     $displayName = "PowerShell Preview"
                     $preview = "true"
                     $description = "(Preview) $d"
+                    $icon = "media/PowerShell_Preview_Icon.png"
                 } else {
                     $name = "powershell"
                     $displayName = "PowerShell"
                     $preview = "false"
                     $description = $d
+                    $icon = "media/PowerShell_Icon.png"
                 }
 
                 $path = "package.json"
@@ -343,6 +345,7 @@ function Update-Version {
                 $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
                 $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
                 $f = $f -replace '^(?<prefix>  "description":\s+")(.+)(?<suffix>",)$', "`${prefix}${description}`${suffix}"
+                $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
                 $f | Set-Content -Path $path
                 git add $path
             }
