@@ -65,9 +65,8 @@ Microsoft. The comments are manual steps.
 
 ```powershell
 Import-Module ./tools/ReleaseTools.psm1
-Update-Changelog -RepositoryName PowerShellEditorServices -Version <version>
-Update-Changelog -RepositoryName vscode-powershell -Version <version>
-# Amend changelog as necessary, open PR
+New-Release -PsesVersion <version> -VsceVersion <version>
+# Amend changelog as necessary
 # Push release branches to ADO
 # Permit both pipelines to draft GitHub releases
 # Download and test assets
