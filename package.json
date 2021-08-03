@@ -16,7 +16,7 @@
     "Snippets",
     "Linters"
   ],
-  "icon": "media/PowerShell_icon.png",
+  "icon": "media/PowerShell_Icon.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"
