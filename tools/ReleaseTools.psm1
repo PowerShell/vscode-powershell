@@ -384,20 +384,19 @@ function New-ReleasePR {
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
-    $Branch = "release/v$Version"
 
     Update-Branch -RepositoryName $RepositoryName
     Use-Repository -RepositoryName $RepositoryName -Script {
-        if ($PSCmdlet.ShouldProcess("$RepositoryName/$Branch", "git push")) {
-            Write-Host "Pushing branch ``$Branch``..."
-            git push origin $Branch
+        if ($PSCmdlet.ShouldProcess("$RepositoryName/release", "git push")) {
+            Write-Host "Pushing release branch..."
+            git push --force-with-lease origin release
         }
     }
 
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
 
     $Params = @{
-        Head  = $Branch
+        Head  = "release"
         Base  = "master"
         Draft = $true
         Title = "Release ``v$Version``"
