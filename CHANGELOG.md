@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2021.8.0-preview
+### Tuesday, August 03, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #3422](https://github.com/PowerShell/vscode-powershell/pull/3493) - Update extension icon (and use a special preview icon).
+- ✨ 👷 [vscode-powershell #2286](https://github.com/PowerShell/vscode-powershell/pull/3461) - Pipeline-ify entire release process.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🔍 [PowerShellEditorServices #1533](https://github.com/PowerShell/PowerShellEditorServices/pull/1533) - Enable and fix many .NET Code Analysis warnings.
+- ✨ 👷 [PowerShellEditorServices #1530](https://github.com/PowerShell/PowerShellEditorServices/pull/1530) - Update release and CI pipelines.
+- ✨ 👷 [PowerShellEditorServices #1528](https://github.com/PowerShell/PowerShellEditorServices/pull/1528) - Automate entire release process.
+- ✨ 🛫 [PowerShellEditorServices #1527](https://github.com/PowerShell/PowerShellEditorServices/pull/1527) - Add stack trace to resolve event handler on debug.
+- ✨ 🛫 [PowerShellEditorServices #1523](https://github.com/PowerShell/PowerShellEditorServices/pull/1526) - Initialize runspaces with `InitialSessionState` object.
+
+
 ## v2021.7.0-preview
 ### Thursday, July 15, 2021
 
