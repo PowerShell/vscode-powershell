@@ -81,7 +81,9 @@
   "scripts": {
     "compile": "tsc -v && tsc -p ./ && tslint -p ./",
     "compile-watch": "tsc -watch -p ./",
-    "test": "node ./out/test/runTests.js"
+    "test": "node ./out/test/runTests.js",
+    "package": "vsce package --no-gitHubIssueLinking",
+    "publish": "vsce publish"
   },
   "contributes": {
     "breakpoints": [

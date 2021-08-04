@@ -27,8 +27,11 @@ task Restore -If { !(Test-Path "$PSScriptRoot/node_modules") } {
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
     # When in a CI build use the --loglevel=error parameter so that
     # package install warnings don't cause PowerShell to throw up
-    $logLevelParam = if ($env:TF_BUILD) { "--loglevel=error" } else { "" }
-    exec { & npm install $logLevelParam }
+    if ($env:TF_BUILD) {
+        exec { & npm ci --loglevel=error }
+    } else {
+        exec { & npm install }
+    }
 }
 
 
@@ -106,7 +109,7 @@ task UpdateReadme -If { $script:IsPreviewExtension } {
 task Package UpdateReadme, {
     assert { Test-Path ./modules/PowerShellEditorServices }
     Write-Host "`n### Packaging $($script:PackageJson.name)-$($script:PackageJson.version).vsix`n" -ForegroundColor Green
-    exec { & node ./node_modules/vsce/out/vsce package --no-gitHubIssueLinking }
+    exec { & npm run package }
 }
 
 #endregion
