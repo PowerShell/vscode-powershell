@@ -1,7 +1,7 @@
 {
   "name": "powershell-preview",
   "displayName": "PowerShell Preview",
-  "version": "2021.7.0",
+  "version": "2021.8.0",
   "preview": true,
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!",
@@ -16,7 +16,7 @@
     "Snippets",
     "Linters"
   ],
-  "icon": "media/PowerShell_Icon.png",
+  "icon": "media/PowerShell_Preview_Icon.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"
@@ -81,7 +81,9 @@
   "scripts": {
     "compile": "tsc -v && tsc -p ./ && tslint -p ./",
     "compile-watch": "tsc -watch -p ./",
-    "test": "node ./out/test/runTests.js"
+    "test": "node ./out/test/runTests.js",
+    "package": "vsce package --no-gitHubIssueLinking",
+    "publish": "vsce publish"
   },
   "contributes": {
     "breakpoints": [

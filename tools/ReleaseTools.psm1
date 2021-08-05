@@ -278,8 +278,6 @@ function Update-Changelog {
             git commit -m "Update CHANGELOG for ``$Version``"
         }
     }
-
-    Update-Version -RepositoryName $RepositoryName
 }
 
 <#
@@ -304,6 +302,7 @@ function Update-Changelog {
     - `name` field has `-preview` appended similarly
     - `displayName` field has ` Preview` appended similarly
     - `description` field has `(Preview) ` prepended similarly
+    - `icon` field has `_Preview ` inserted similarly
 #>
 function Update-Version {
     [CmdletBinding(SupportsShouldProcess)]
@@ -369,8 +368,6 @@ function Update-Version {
             git commit -m "Bump version to ``v$Version``"
         } # TODO: Git reset to unstage
     }
-
-    New-ReleasePR -RepositoryName $RepositoryName
 }
 
 <#
@@ -387,20 +384,19 @@ function New-ReleasePR {
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
-    $Branch = "release/v$Version"
 
     Update-Branch -RepositoryName $RepositoryName
     Use-Repository -RepositoryName $RepositoryName -Script {
-        if ($PSCmdlet.ShouldProcess("$RepositoryName/$Branch", "git push")) {
-            Write-Host "Pushing branch ``$Branch``..."
-            git push origin $Branch
+        if ($PSCmdlet.ShouldProcess("$RepositoryName/release", "git push")) {
+            Write-Host "Pushing release branch..."
+            git push --force-with-lease origin release
         }
     }
 
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
 
     $Params = @{
-        Head  = $Branch
+        Head  = "release"
         Base  = "master"
         Draft = $true
         Title = "Release ``v$Version``"
@@ -414,6 +410,45 @@ function New-ReleasePR {
     # NOTE: The API is weird. According to GitHub, all PRs are Issues, so this
     # works, but the module doesn't support it as easily as it could.
     $Repo | Add-GitHubIssueLabel -Issue $PR.PullRequestNumber -LabelName "Ignore"
+}
+
+<#
+.SYNOPSIS
+  Kicks off the whole release process.
+.DESCRIPTION
+  This first updates the changelog (which creates and checks out the `release`
+  branch), commits the changes, updates the version (and commits), pushes the
+  branch, and then creates a GitHub PR for the release for both repositories.
+
+  This is the function meant to be called by a maintainer as the first manual
+  step to creating a release: it calls the correct functions in order to prepare
+  the release. Each repository's release branch then needs to be pushed to the
+  internal Azure DevOps mirror, at which point the automatic release pipeline
+  will build and sign the assets, and queue up draft GitHub releases (using
+  `New-DraftRelease` below). Those releases need to be manually validated and
+  approved, and finally the last step is to approve the pipeline to publish the
+  assets to the marketplace and gallery.
+#>
+function New-Release {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateScript({ $_.StartsWith("v") })]
+        [string]$PsesVersion,
+
+        [Parameter(Mandatory)]
+        [ValidateScript({ $_.StartsWith("v") })]
+        [string]$VsceVersion
+    )
+    "PowerShellEditorServices", "vscode-powershell" | ForEach-Object {
+        $Version = switch ($_) {
+            "PowerShellEditorServices" { $PsesVersion }
+            "vscode-powershell" { $VsceVersion }
+        }
+        Update-Changelog -RepositoryName $_ -Version $Version
+        Update-Version -RepositoryName $_
+        New-ReleasePR -RepositoryName $_
+    }
 }
 
 <#
