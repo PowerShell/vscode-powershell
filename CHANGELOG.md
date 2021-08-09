@@ -1,5 +1,26 @@
 # PowerShell Extension Release History
 
+## v2021.8.0
+### Monday, August 09, 2021
+
+The first stable release since [v2021.6.2](#v202162), this release includes all the
+changes from [v2021.8.0-preview](#v202180-preview) and
+[v2021.7.0-preview](#v202170-preview) (see below). While the highlights are listed here,
+[please read our blog post](https://devblogs.microsoft.com/powershell/powershell-for-visual-studio-code-august-2021-update/)
+for the full story!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #3422](https://github.com/PowerShell/vscode-powershell/pull/3493) - Update extension icon (and use a special preview icon).
+- ✨ 👷 [vscode-powershell #2286](https://github.com/PowerShell/vscode-powershell/pull/3461) - Pipeline-ify entire release process.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🔍 [PowerShellEditorServices #1533](https://github.com/PowerShell/PowerShellEditorServices/pull/1533) - Enable and fix many .NET Code Analysis warnings.
+- ✨ 👷 [PowerShellEditorServices #1528](https://github.com/PowerShell/PowerShellEditorServices/pull/1528) - Automate entire release process.
+- ✨ 🙏 [PowerShellEditorServices #1493](https://github.com/PowerShell/PowerShellEditorServices/pull/1514) - Load only bundled `PSReadLine`.
+- 🐛 👷 [PowerShellEditorServices #1513](https://github.com/PowerShell/PowerShellEditorServices/pull/1513) - Import `InvokePesterStub.ps1` from `vscode-powershell` (with history).
+
 ## v2021.8.0-preview
 ### Tuesday, August 03, 2021
 
@@ -15,7 +36,6 @@
 - ✨ 👷 [PowerShellEditorServices #1528](https://github.com/PowerShell/PowerShellEditorServices/pull/1528) - Automate entire release process.
 - ✨ 🛫 [PowerShellEditorServices #1527](https://github.com/PowerShell/PowerShellEditorServices/pull/1527) - Add stack trace to resolve event handler on debug.
 - ✨ 🛫 [PowerShellEditorServices #1523](https://github.com/PowerShell/PowerShellEditorServices/pull/1526) - Initialize runspaces with `InitialSessionState` object.
-
 
 ## v2021.7.0-preview
 ### Thursday, July 15, 2021
