@@ -3,7 +3,7 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import Settings = require("../src/settings");
+import Settings = require("../../src/settings");
 
 suite("Settings module", () => {
     test("Settings load without error", () => {
