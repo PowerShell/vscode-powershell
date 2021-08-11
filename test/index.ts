@@ -1,14 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as glob from "glob";
-import * as Mocha from "mocha";
+// NOTE: This code is borrowed under permission from:
+// https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-test-sample/src/test
+
 import * as path from "path";
+import * as Mocha from "mocha";
+import * as glob from "glob";
 
 export function run(): Promise<void> {
     // Create the mocha test
     const mocha = new Mocha({
-        ui: "tdd",         // the TDD UI is being used in extension.test.ts (suite, test, etc.)
+        ui: "tdd",
         color: !process.env.TF_BUILD, // colored output from test results
         reporter: "mocha-multi-reporters",
         timeout: 5000,
@@ -23,17 +26,17 @@ export function run(): Promise<void> {
     const testsRoot = path.resolve(__dirname, "..");
 
     return new Promise((c, e) => {
-        glob("**/**.test.js", { cwd: testsRoot }, (err: any, files: any[]) => {
+        glob("**/**.test.js", { cwd: testsRoot }, (err, files) => {
             if (err) {
                 return e(err);
             }
 
             // Add files to the test suite
-            files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)));
+            files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
             try {
                 // Run the mocha test
-                mocha.run((failures) => {
+                mocha.run(failures => {
                     if (failures > 0) {
                         e(new Error(`${failures} tests failed.`));
                     } else {
@@ -41,6 +44,8 @@ export function run(): Promise<void> {
                     }
                 });
             } catch (err) {
+                // tslint:disable-next-line:no-console
+                console.error(err);
                 e(err);
             }
         });

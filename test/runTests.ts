@@ -1,13 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+// NOTE: This code is borrowed under permission from:
+// https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-test-sample/src/test
+
 import * as path from "path";
 
-import { runTests } from "vscode-test";
-
-// tslint:disable-next-line: no-var-requires
-const PackageJSON: any = require("../../package.json");
-const testExtensionId = `${PackageJSON.publisher}.${PackageJSON.name}`;
+import { runTests } from "@vscode/test-electron";
 
 async function main() {
     try {
@@ -15,24 +14,20 @@ async function main() {
         // Passed to `--extensionDevelopmentPath`
         const extensionDevelopmentPath = path.resolve(__dirname, "../../");
 
-        // The path to the extension test runner script
+        // The path to the extension test script
         // Passed to --extensionTestsPath
-        const extensionTestsPath = path.resolve(__dirname, "./testRunner");
+        const extensionTestsPath = path.resolve(__dirname, "./index");
 
-        // Download VS Code, unzip it and run the integration test from the local directory.
+        // Download VS Code, unzip it and run the integration test
         await runTests({
             extensionDevelopmentPath,
             extensionTestsPath,
-            launchArgs: [
-                "--disable-extensions",
-                "--enable-proposed-api", testExtensionId,
-                "./test"
-            ],
+            launchArgs: ["--disable-extensions", "./test"],
+            // This is necessary because the tests fail if more than once
+            // instance of Code is running.
             version: "insiders"
         });
     } catch (err) {
-        // tslint:disable-next-line:no-console
-        console.error(err);
         // tslint:disable-next-line:no-console
         console.error("Failed to run tests");
         process.exit(1);

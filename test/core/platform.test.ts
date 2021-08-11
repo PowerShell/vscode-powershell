@@ -6,7 +6,7 @@ import mockFS = require("mock-fs");
 import FileSystem = require("mock-fs/lib/filesystem");
 import * as path from "path";
 import * as sinon from "sinon";
-import * as platform from "../src/platform";
+import * as platform from "../../src/platform";
 
 /**
  * Describes a platform on which the PowerShell extension should work,
