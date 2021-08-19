@@ -1,5 +1,24 @@
 # PowerShell Extension Release History
 
+## v2021.8.1-preview
+### Thursday, August 19, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🚨 [vscode-powershell #3506](https://github.com/PowerShell/vscode-powershell/pull/3506) - Update test runner.
+- 🐛#️⃣ 🙏 [vscode-powershell #3499](https://github.com/PowerShell/vscode-powershell/pull/3502) - (#3499) Remove msjsdiag.debugger-for-chrome suggestion. (Thanks @corbob!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🛫 [PowerShellEditorServices #1547](https://github.com/PowerShell/PowerShellEditorServices/pull/1547) - Fix creation of `InitialSessionState` to use `CreateDefault2()`.
+- ✨ 👷 [PowerShellEditorServices #1544](https://github.com/PowerShell/PowerShellEditorServices/pull/1546) - Explicitly disable implicit namespace imports.
+- ✨ 👷 [PowerShellEditorServices #1545](https://github.com/PowerShell/PowerShellEditorServices/pull/1545) - Make `dotnet test` arguments configurable.
+- 🐛 ⏱️ [vscode-powershell #3410](https://github.com/PowerShell/PowerShellEditorServices/pull/1542) - Add regression test for `System.Windows.Forms` bug.
+- 🐛 👷 [PowerShellEditorServices #1541](https://github.com/PowerShell/PowerShellEditorServices/pull/1541) - Update C# language version to 10.0 to fix bug with .NET SDK 6 Preview 7.
+- 🐛 🚨 [PowerShellEditorServices #1442](https://github.com/PowerShell/PowerShellEditorServices/pull/1540) - Fix tests in `Debugging/DebugServiceTests.cs` and simplify faulty script path logic.
+- ✨ 🔍 [PowerShellEditorServices #1532](https://github.com/PowerShell/PowerShellEditorServices/pull/1532) - Make `ExecuteCommandAsync` cancellable .
+
+
 ## v2021.8.0
 ### Monday, August 09, 2021
 
