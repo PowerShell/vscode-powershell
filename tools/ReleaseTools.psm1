@@ -180,8 +180,8 @@ function Update-Branch {
     Use-Repository -RepositoryName $RepositoryName -Script {
         $Branch = git branch --show-current
         if ($Branch -ne "release") {
-            if ($PSCmdlet.ShouldProcess("release", "git checkout -b")) {
-                git checkout -b "release"
+            if ($PSCmdlet.ShouldProcess("release", "git checkout -B")) {
+                git checkout -B "release"
             }
         }
     }
@@ -389,7 +389,7 @@ function New-ReleasePR {
     Use-Repository -RepositoryName $RepositoryName -Script {
         if ($PSCmdlet.ShouldProcess("$RepositoryName/release", "git push")) {
             Write-Host "Pushing release branch..."
-            git push --force-with-lease origin release
+            git push --set-upstream --force-with-lease origin release
         }
     }
 
