@@ -47,6 +47,12 @@
         "${workspaceFolder}/out/**/*.js"
       ],
       "preLaunchTask": "Build"
-    }
+    },
+    {
+      "name": "PowerShell Launch Current File",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${file}",
+    },
   ]
 }
