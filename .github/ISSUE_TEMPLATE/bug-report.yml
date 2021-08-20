@@ -60,9 +60,10 @@ body:
     label: Extension Version
     description: Paste verbatim output from `code --list-extensions --show-versions | Select-String powershell` below.
     render: console
+    placeholder: |
       PS> code --list-extensions --show-versions | Select-String powershell
 
-      ms-vscode.powershell@2021.5.1
+      ms-vscode.powershell@2021.8.0
   validations:
     required: true
 - type: textarea
