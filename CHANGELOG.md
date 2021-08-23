@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2021.8.2-preview
+### Monday, August 23, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #3518](https://github.com/PowerShell/vscode-powershell/pull/3518) - Update build and task configurations.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🔍 [vscode-powershell #3513](https://github.com/PowerShell/PowerShellEditorServices/pull/1555) - Fix debugger regression where console needed input to start/continue.
+
 ## v2021.8.1-preview
 ### Thursday, August 19, 2021
 
@@ -17,7 +28,6 @@
 - 🐛 👷 [PowerShellEditorServices #1541](https://github.com/PowerShell/PowerShellEditorServices/pull/1541) - Update C# language version to 10.0 to fix bug with .NET SDK 6 Preview 7.
 - 🐛 🚨 [PowerShellEditorServices #1442](https://github.com/PowerShell/PowerShellEditorServices/pull/1540) - Fix tests in `Debugging/DebugServiceTests.cs` and simplify faulty script path logic.
 - ✨ 🔍 [PowerShellEditorServices #1532](https://github.com/PowerShell/PowerShellEditorServices/pull/1532) - Make `ExecuteCommandAsync` cancellable .
-
 
 ## v2021.8.0
 ### Monday, August 09, 2021
@@ -72,7 +82,6 @@ for the full story!
 - 🐛 👷 [PowerShellEditorServices #1513](https://github.com/PowerShell/PowerShellEditorServices/pull/1513) - Import `InvokePesterStub.ps1` from `vscode-powershell` (with history).
 - 🐛 🛫 [PowerShellEditorServices #1503](https://github.com/PowerShell/PowerShellEditorServices/pull/1504) - Handle `incomingSettings` and `profileObject` being null. (Thanks @dkattan!)
 
-
 ## v2021.6.2
 ### Thursday, June 24, 2021
 
@@ -83,7 +92,6 @@ for the full story!
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
 - 👷🐛 [PowerShellEditorServices #1509](https://github.com/PowerShell/PowerShellEditorServices/issues/1509) Fix signing of files in release.
-
 
 ## v2021.6.1
 ### Monday, June 21, 2021
@@ -155,7 +163,7 @@ experience.
 - 📖✨ [vscode-powershell #3339](https://github.com/PowerShell/vscode-powershell/pull/3340) - Update Description to reflect that PowerShell is for more than scripting. (Thanks @potatoqualitee!)
 - 📺🐛 [vscode-powershell #3320](https://github.com/PowerShell/vscode-powershell/pull/3329) - Fix duplicated command registrations. (Thanks @MartinGC94!)
 - 📖🐛 [vscode-powershell #2896](https://github.com/PowerShell/vscode-powershell/pull/3322) - Remove "All Rights Reserved" from copyright notices.
--  [vscode-powershell #3179](https://github.com/PowerShell/vscode-powershell/pull/3179) - Update @types/vscode and `StatusBarItem` implementation.
+- [vscode-powershell #3179](https://github.com/PowerShell/vscode-powershell/pull/3179) - Update @types/vscode and `StatusBarItem` implementation.
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
@@ -164,7 +172,6 @@ experience.
 - 🚂✨ [PowerShellEditorServices #1467](https://github.com/PowerShell/PowerShellEditorServices/pull/1467) - Make code more explicit.
 - 📖🐛 [PowerShellEditorServices #1465](https://github.com/PowerShell/PowerShellEditorServices/pull/1466) - Remove "All Rights Reserved" from copyright notices.
 - 👷✨ [PowerShellEditorServices #1463](https://github.com/PowerShell/PowerShellEditorServices/pull/1464) - Enable CodeQL with `codeql-analysis.yml`.
-
 
 ## v2021.4.2-preview
 ### Monday, April 26, 2021
@@ -299,7 +306,7 @@ in the next preview release. See:
 - 👷✨ [vscode-powershell #2889](https://github.com/PowerShell/vscode-powershell/pull/2889) -
   Use spaces instead of tabs for consistency. (Thanks @xtqqczze!)
 - 👷✨ [vscode-powershell #2884](https://github.com/PowerShell/vscode-powershell/pull/2884) -
-  Update copyright header in *.ps1, *.psm1 files. (Thanks @xtqqczze!)
+  Update copyright header in `*.ps1`, `*.psm1` files. (Thanks @xtqqczze!)
 - 🐢🐛 [vscode-powershell #2888](https://github.com/PowerShell/vscode-powershell/pull/2888) -
   Fixed crash when running pester older than 3.4.5. (Thanks @EmmanuelPineiro!)
 - 👷✨ [vscode-powershell #2881](https://github.com/PowerShell/vscode-powershell/pull/2881) -
@@ -810,7 +817,7 @@ You can find the changelog from the old stable fork
 ## v2019.11.0
 ### Friday, November 1, 2019
 
-##### Special Note
+#### Special Note
 In this release of the preview extension,
 we've merged significant architectural work into PowerShell Editor Services.
 After several months of work, PSES now uses the Omnisharp LSP library
@@ -1017,8 +1024,8 @@ As always, [please let us know if you find any issues](https://github.com/PowerS
 
 - [vscode-PowerShell #1865](https://github.com/PowerShell/vscode-powershell/pull/1867) -
   Change casing of `powershell.codeformatting` settings for consistency:
-    - `powershell.codeformatting.WhitespaceInsideBrace` is now `powershell.codeformatting.whitespaceInsideBrace`
-    - `powershell.codeformatting.WhitespaceAroundPipe` is now `powershell.codeformatting.whitespaceAroundPipe`
+  - `powershell.codeformatting.WhitespaceInsideBrace` is now `powershell.codeformatting.whitespaceInsideBrace`
+  - `powershell.codeformatting.WhitespaceAroundPipe` is now `powershell.codeformatting.whitespaceAroundPipe`
 - [vscode-PowerShell #1852](https://github.com/PowerShell/vscode-PowerShell/pull/1852) -
   Turn `powershell.codeformatting.useCorrectCasing` setting off by default until PSSA issues are fixed (Thanks @bergmeister!)
 - [vscode-PowerShell #1838](https://github.com/PowerShell/vscode-PowerShell/pull/1838) -
@@ -1046,11 +1053,11 @@ As always, [please let us know if you find any issues](https://github.com/PowerS
 
 ### Highlights
 
-* `Write-Progress` work in the integrated console ⏰
-* Support for [PSScriptAnalyzer 1.18](https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.18.0) 📝
-* The ability to debug any runspace in any process 🔎
-* PSReadLine enabled by default on Windows 🎨
-* (Bug fix!) You can open untitled workspaces/folders again! 🐛☠️
+- `Write-Progress` work in the integrated console ⏰
+- Support for [PSScriptAnalyzer 1.18](https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.18.0) 📝
+- The ability to debug any runspace in any process 🔎
+- PSReadLine enabled by default on Windows 🎨
+- (Bug fix!) You can open untitled workspaces/folders again! 🐛☠️
 
 There are a lot more goodies in this version. Checkout the changelog below!
 
@@ -1196,7 +1203,7 @@ check out their [documentation](https://docs.microsoft.com/en-us/powershell/modu
 
 To enable PSReadLine support in the Preview version on Windows, please add the following to your user settings:
 
-```
+```json
 "powershell.developer.featureFlags": [ "PSReadLine" ]
 ```
 
@@ -1390,22 +1397,21 @@ As stated above, this version of the PowerShell extension only works with Window
 - [PowerShellEditorServices #726](https://github.com/PowerShell/PowerShellEditorServices/pull/726) -
   Fix comment-based help snippet
 
-
 ## v1.8.3
 ### Wednesday, August 15, 2018
 
 #### [vscode-powershell](https://github.com/powershell/vscode-powershell)
 
--  [PowerShell/vscode-powershell #1480](https://github.com/PowerShell/vscode-powershell/pull/1480) -
-   Use PowerShell signing script in VSTS builds
--  [PowerShell/vscode-powershell #1460](https://github.com/PowerShell/vscode-powershell/pull/1460) -
-   Use newer version for preleases
--  [PowerShell/vscode-powershell #1475](https://github.com/PowerShell/vscode-powershell/pull/1475) -
-   Change resourceLangId to editorLangId so right-click works properly with unsaved files (Thanks @corbob!)
--  [PowerShell/vscode-powershell #1467](https://github.com/PowerShell/vscode-powershell/pull/1467) -
-   Remove region folding from non-region areas (Thanks @glennsarti!)
+- [PowerShell/vscode-powershell #1480](https://github.com/PowerShell/vscode-powershell/pull/1480) -
+  Use PowerShell signing script in VSTS builds
+- [PowerShell/vscode-powershell #1460](https://github.com/PowerShell/vscode-powershell/pull/1460) -
+  Use newer version for preleases
+- [PowerShell/vscode-powershell #1475](https://github.com/PowerShell/vscode-powershell/pull/1475) -
+  Change resourceLangId to editorLangId so right-click works properly with unsaved files (Thanks @corbob!)
+- [PowerShell/vscode-powershell #1467](https://github.com/PowerShell/vscode-powershell/pull/1467) -
+  Remove region folding from non-region areas (Thanks @glennsarti!)
 
- #### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
+#### [PowerShellEditorServices](https://github.com/powershell/PowerShellEditorServices)
 
 - [PowerShell/PowerShellEditorServices #722](https://github.com/PowerShell/PowerShellEditorServices/pull/722) -
   Add VSTS signing step
@@ -2183,12 +2189,11 @@ passed to your script when it is executed.  This is configured using the new
 
 When you launch this configuration you will see a UI popup asking for arguments:
 
-
 ![image](https://cloud.githubusercontent.com/assets/5177512/25560503/e60e9822-2d12-11e7-9837-29464d077082.png)
 
 You can type your arguments to the script as you would in PowerShell:
 
-```
+```powershell
 -Count 5
 ```
 
@@ -2201,7 +2206,7 @@ We've added a new code formatting rule that automatically aligns the equal sign
 in assignments of keys in hash tables or DSC configurations.  It also works with
 nested hash tables! Here's a simple example:
 
-**Before**
+##### Before
 
 ```powershell
 $formatTest = @{
@@ -2214,7 +2219,7 @@ $formatTest = @{
 }
 ```
 
-**After**
+##### After
 
 ```powershell
 
@@ -2231,7 +2236,7 @@ $formatTest = @{
 This formatting rule is enabled by default but can be disabled with the following
 setting:
 
-```
+```json
 "powershell.codeFormatting.alignPropertyValuePairs": false
 ```
 
@@ -2656,7 +2661,7 @@ may not format your code perfectly in all cases.  If you run into any issues,
 please [file an issue](https://github.com/PowerShell/vscode-powershell/issues/new)
 and give us your feedback!
 
-#### Streamlined debugging experience - launch.json is now optional!
+#### Streamlined debugging experience - launch.json is now optional
 
 **NOTE: This improvement depends on VS Code 1.9.0 which is due for release
 early February!** However, you can try it out right now with the [VS Code Insiders](https://code.visualstudio.com/insiders)
@@ -2886,7 +2891,7 @@ number of times.
 ## 0.7.0
 ### Thursday, August 18, 2016
 
-#### Introducing support for Linux and macOS!
+#### Introducing support for Linux and macOS
 
 This release marks the beginning of our support for Linux and macOS via
 the new [cross-platform release of PowerShell](https://github.com/PowerShell/PowerShell).

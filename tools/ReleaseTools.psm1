@@ -255,7 +255,7 @@ function Update-Changelog {
             )
         }
         "PowerShellEditorServices" {
-            @($Bullets)
+            @($Bullets, "")
         }
     }
 
@@ -269,7 +269,6 @@ function Update-Changelog {
             "### $([datetime]::Now.ToString('dddd, MMMM dd, yyyy'))"
             ""
             $NewSection
-            ""
             $CurrentChangelog[2..$CurrentChangelog.Length]
         ) | Set-Content -Encoding utf8NoBOM -Path $ChangelogFile
 
