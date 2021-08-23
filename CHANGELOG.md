@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2021.8.2-preview
+### Monday, August 23, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #3518](https://github.com/PowerShell/vscode-powershell/pull/3518) - Update build and task configurations.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🔍 [vscode-powershell #3513](https://github.com/PowerShell/PowerShellEditorServices/pull/1555) - Fix debugger regression where console needed input to start/continue.
+
+
 ## v2021.8.1-preview
 ### Thursday, August 19, 2021
 
