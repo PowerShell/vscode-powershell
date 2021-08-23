@@ -37,49 +37,32 @@
   },
   "tasks": [
     {
-      "label": "Install",
+      "label": "Restore",
       "type": "shell",
       "command": "Invoke-Build Restore",
-      "problemMatcher": []
-    },
-    {
-      "label": "CleanAll",
-      "type": "shell",
-      "command": "Invoke-Build CleanAll",
-      "problemMatcher": []
     },
     {
       "label": "Clean",
       "type": "shell",
       "command": "Invoke-Build Clean",
-      "problemMatcher": []
-    },
-    {
-      "label": "BuildAll",
-      "type": "shell",
-      "command": "Invoke-Build BuildAll",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": []
     },
     {
       "label": "Build",
       "type": "shell",
       "command": "Invoke-Build Build",
       "group": "build",
-      "problemMatcher": []
     },
     {
       "label": "Test",
       "type": "shell",
       "command": "Invoke-Build Test",
-      "group": {
-        "kind": "test",
-        "isDefault": true
-      },
-      "problemMatcher": []
+      "group": "test",
+    },
+    {
+      "label": "Package",
+      "type": "shell",
+      "command": "Invoke-Build Package",
+      "group": "build"
     }
   ]
 }
