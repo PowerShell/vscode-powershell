@@ -14,7 +14,7 @@
       "outFiles": [
         "${workspaceFolder}/out/src/**/*.js"
       ],
-      "preLaunchTask": "BuildAll"
+      "preLaunchTask": "Build"
     },
     {
       "name": "Launch Extension (Build client only)",

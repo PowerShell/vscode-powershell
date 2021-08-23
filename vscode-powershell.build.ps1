@@ -49,8 +49,6 @@ task CleanEditorServices -If (Get-EditorServicesPath) {
     Invoke-Build Clean (Get-EditorServicesPath)
 }
 
-task CleanAll CleanEditorServices, Clean
-
 #endregion
 #region Build tasks
 
@@ -69,8 +67,6 @@ task Build CopyEditorServices, Restore, {
     exec { & npm run compile }
 }
 
-task BuildAll BuildEditorServices, Build
-
 #endregion
 #region Test tasks
 
@@ -83,8 +79,6 @@ task TestEditorServices -If (Get-EditorServicesPath) {
     Write-Host "`n### Testing PowerShellEditorServices`n" -ForegroundColor Green
     Invoke-Build Test (Get-EditorServicesPath)
 }
-
-task TestAll TestEditorServices, Test
 
 #endregion
 
@@ -106,7 +100,7 @@ task UpdateReadme -If { $script:IsPreviewExtension } {
     }
 }
 
-task Package UpdateReadme, {
+task Package UpdateReadme, Build, {
     assert { Test-Path ./modules/PowerShellEditorServices }
     Write-Host "`n### Packaging $($script:PackageJson.name)-$($script:PackageJson.version).vsix`n" -ForegroundColor Green
     exec { & npm run package }
