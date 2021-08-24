@@ -1,7 +1,25 @@
 # PowerShell Extension Release History
 
-## v2021.8.2-preview
-### Monday, August 23, 2021
+## v2021.8.2
+### Tuesday, August 24, 2021
+
+This release also contains all changes listed in [v2021.8.1-preview](#v202181-preview)
+below. Notably it fixes several major issues when debugging scripts that were caused by
+threading deadlocks in both PowerShell Editor Services and its library, [OmniSharp's C#
+Language Server Protocol][omnisharp] that we resolved by setting the compiler to treat
+[CA2007][] as an error. This allowed us to programmatically fix _every_ awaited task to
+use `.ConfigureAwait(false)` and so avoid deadlocks caused by the introduction of new
+synchronization contexts in user code (such as the use of `System.Windows.Forms`). By
+fixing this through a compiler rule, we effectively prevent the issue from recurring.
+Additionally, we not only added a full regression test for this scenario but also
+re-enabled all the prior `DebugService` unit tests in PowerShell Editor Services.
+
+While there is still much work to do, we are making significant headway on improve the
+debugger's reliability, one of our current project focuses. See the [Debugger Reliability
+Project](https://github.com/PowerShell/vscode-powershell/projects/9) for our progress.
+
+[omnisharp]: https://github.com/OmniSharp/csharp-language-server-protocol
+[CA2007]: https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
 
