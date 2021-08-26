@@ -655,23 +655,37 @@ export class SessionManager implements Middleware {
     }
 
     private setSessionStatus(statusText: string, status: SessionStatus): void {
-        // Set color and icon for 'Running' by default
-        let statusIconText = (semver.gte(vscode.version, "1.56.0"))
-            ? "$(terminal-powershell) "
-            : "$(terminal) ";
-        let statusColor = "#affc74";
-
-        if (status === SessionStatus.Initializing) {
-            statusIconText = "$(sync) ";
-            statusColor = "#f3fc74";
-        } else if (status === SessionStatus.Failed) {
-            statusIconText = "$(alert) ";
-            statusColor = "#fcc174";
-        }
-
         this.sessionStatus = status;
-        this.statusBarItem.color = statusColor;
-        this.statusBarItem.text = statusIconText + statusText;
+        switch (status) {
+            case SessionStatus.Running:
+            case SessionStatus.NeverStarted:
+            case SessionStatus.NotStarted:
+                // This icon is available since 1.56, now our current engine version.
+                this.statusBarItem.text = "$(terminal-powershell)";
+                // These have to be reset because this function mutates state.
+                this.statusBarItem.color = undefined;
+                this.statusBarItem.backgroundColor = undefined;
+                break;
+            case SessionStatus.Initializing:
+            case SessionStatus.Stopping:
+                this.statusBarItem.text = "$(sync)";
+                // The warning colors were added later than our current engine version.
+                // https://code.visualstudio.com/api/references/theme-color#status-bar-colors
+                this.statusBarItem.color = (semver.gte(vscode.version, "1.59.0"))
+                    ? new vscode.ThemeColor("statusBarItem.warningForeground")
+                    : new vscode.ThemeColor("statusBarItem.errorForeground");
+                this.statusBarItem.backgroundColor = (semver.gte(vscode.version, "1.59.0"))
+                    ? new vscode.ThemeColor("statusBarItem.warningBackground")
+                    : new vscode.ThemeColor("statusBarItem.errorBackground");
+                break;
+            case SessionStatus.Failed:
+                this.statusBarItem.text = "$(alert)";
+                // The error colors have been available since 1.53.
+                this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.errorForeground");
+                this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
+                break;
+        }
+        this.statusBarItem.text += " " + statusText;
     }
 
     private setSessionFailure(message: string, ...additionalMessages: string[]) {
