@@ -6,7 +6,7 @@
 [![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/powershell-vscode-discord)
 [![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
+This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode) (VS Code).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
 that Visual Studio Code provides.
 
@@ -21,16 +21,23 @@ not activated by default, but after installing this extension either click "Set 
 Theme" or use the [theme picker](https://code.visualstudio.com/docs/getstarted/themes) and
 select "PowerShell ISE" for a fun and familiar experience.
 
-## Platform support
+## Platform Support
 
-- **Windows 7 through 10** with Windows PowerShell v3 and higher, and PowerShell Core
-- **Linux** with PowerShell Core (all PowerShell-supported distributions)
-- **macOS and OS X** with PowerShell Core
+The extension _should_ work anywhere VS Code itself and PowerShell Core 7 or higher is
+[supported][]. For Windows PowerShell, only version 5.1 is supported. Please note that
+PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
+following:
+
+- **Windows Server 2016 and 2019** with Windows PowerShell 5.1 and PowerShell Core 7.1.4
+- **macOS 10.15** with PowerShell Core 7.1.4
+- **Ubuntu 20.04** with PowerShell Core 7.1.4
+
+[supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle?view=powershell-7.1#supported-platforms
 
 Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
 
-Read the [troubleshooting guide](./docs/troubleshooting.md) for answers to common questions.
+**Read the [troubleshooting guide](./docs/troubleshooting.md) for answers to common questions.**
 
 ## Features
 
@@ -59,12 +66,12 @@ You can also install a VSIX package from our [Releases page](https://github.com/
 instructions. The easiest way is through the command line:
 
 ```powershell
-code --install-extension PowerShell-<version>.vsix
+code --install-extension powershell-<version>.vsix
 ```
 
 > NOTE: If you are using VS Code Insiders, the command will be `code-insiders`.
 
-## Script-based Installation
+### Script-based Installation
 
 If you're on Windows 7 or greater with the [PowerShellGet](https://msdn.microsoft.com/powershell/gallery/readme)
 module installed, you can easily install both Visual Studio Code and the PowerShell
@@ -92,7 +99,7 @@ If you experience any problems with the PowerShell Extension, see
 [the troubleshooting docs](./docs/troubleshooting.md) for information
 on diagnosing and reporting issues.
 
-### Security Note
+## Security Note
 
 For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
 
@@ -106,19 +113,14 @@ how to use them.
 This folder can be found at the following path:
 
 ```powershell
-$HOME/.vscode[-insiders]/extensions/ms-vscode.PowerShell-<version>/examples
+$HOME/.vscode[-insiders]/extensions/ms-vscode.powershell[-preview]-<version>/examples
 ```
 
-or if you're using the preview version of the extension
-
- ```powershell
-$HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-preview-<version>/examples
-```
-
-To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
+To open/view the extension's examples in Visual Studio Code, run the following from your
+PowerShell session:
 
 ```powershell
-code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
+code (Get-ChildItem $HOME/.vscode/extensions/ms-vscode.powershell-*/examples)[-1]
 ```
 
 ## Contributing to the Code
@@ -130,6 +132,13 @@ on how to contribute to this extension!
 
 - [Rob Holt](https://github.com/rjmholt) - [@rjmholt](https://twitter.com/rjmholt)
 - [Andy Schwartzmeyer](https://github.com/andschwa) - [andschwa.com](https://andschwa.com/)
+- [Sydney Smith](https://github.com/SydneyhSmith) - [@SydneyhSmith](https://github.com/SydneyhSmith)
+
+### Emeriti
+
+- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
+- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
+- [David Wilson](https://github.com/daviwil) - [@daviwil](https://twitter.com/daviwil)
 
 ## License
 

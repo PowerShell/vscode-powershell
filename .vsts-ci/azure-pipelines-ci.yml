@@ -22,23 +22,41 @@ resources:
     ref: master
 
 jobs:
-- job: Win2019
-  displayName: Windows Server 2019
+- job: PS51_Win2016
+  displayName: PowerShell 5.1 - Windows Server 2016
+  pool:
+    vmImage: vs2017-win2016
+  steps:
+  - template: templates/ci-general.yml
+    parameters:
+      pwsh: false
+
+- job: PS51_Win2019
+  displayName: PowerShell 5.1 - Windows Server 2019
+  pool:
+    vmImage: windows-2019
+  steps:
+  - template: templates/ci-general.yml
+    parameters:
+      pwsh: false
+
+- job: PS7_Win2019
+  displayName: PowerShell 7 - Windows Server 2019
   pool:
     vmImage: windows-2019
   steps:
   - template: templates/ci-general.yml
 
-- job: macOS
-  displayName: macOS 10.15
+- job: PS7_macOS
+  displayName: PowerShell 7 - macOS 10.15
   pool:
     vmImage: macOS-10.15
   steps:
   - template: templates/ci-general.yml
 
-- job: Ubuntu
-  displayName: Ubuntu 20.04
+- job: PS7_Ubuntu
+  displayName: PowerShell 7 - Ubuntu 20.04
   pool:
-    vmImage: Ubuntu-20.04
+    vmImage: ubuntu-20.04
   steps:
   - template: templates/ci-general.yml
