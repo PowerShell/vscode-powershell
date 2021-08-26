@@ -1,11 +1,18 @@
 parameters:
+  - name: pwsh
+    type: boolean
+    default: true
   - name: usePipelineArtifact
     type: boolean
     default: false
 
 steps:
-- pwsh: $PSVersionTable
+- task: PowerShell@2
   displayName: PowerShell version
+  inputs:
+    targetType: inline
+    script: $PSVersionTable
+    pwsh: ${{ parameters.pwsh }}
 
 - checkout: self
 
@@ -34,12 +41,16 @@ steps:
     archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
     destinationFolder: $(Build.SourcesDirectory)/vscode-powershell/modules
 
-- pwsh: |
-    Install-Module InvokeBuild -Scope CurrentUser -Force
-    Invoke-Build
-    Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-*.vsix)"
+- task: PowerShell@2
   displayName: Build and test
-  workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
+  inputs:
+    targetType: inline
+    script: |
+      Install-Module InvokeBuild -Scope CurrentUser -Force
+      Invoke-Build
+      Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-*.vsix)"
+    workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
+    pwsh: ${{ parameters.pwsh }}
 
 - publish: $(vsixPath)
   artifact: vscode-powershell-vsix-$(System.JobId)

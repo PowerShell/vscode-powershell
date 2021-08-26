@@ -21,16 +21,23 @@ not activated by default, but after installing this extension either click "Set 
 Theme" or use the [theme picker](https://code.visualstudio.com/docs/getstarted/themes) and
 select "PowerShell ISE" for a fun and familiar experience.
 
-## Platform support
+## Platform Support
 
-- **Windows 7 through 10** with Windows PowerShell v3 and higher, and PowerShell Core
-- **Linux** with PowerShell Core (all PowerShell-supported distributions)
-- **macOS and OS X** with PowerShell Core
+The extension _should_ work anywhere VS Code itself and PowerShell Core 7 or higher is
+[supported][]. For Windows PowerShell, only version 5.1 is supported. Please note that
+PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
+following:
+
+- **Windows Server 2016 and 2019** with Windows PowerShell 5.1 and PowerShell Core 7.1.4
+- **macOS 10.15** with PowerShell Core 7.1.4
+- **Ubuntu 20.04** with PowerShell Core 7.1.4
+
+[supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle?view=powershell-7.1#supported-platforms
 
 Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
 
-Read the [troubleshooting guide](./docs/troubleshooting.md) for answers to common questions.
+**Read the [troubleshooting guide](./docs/troubleshooting.md) for answers to common questions.**
 
 ## Features
 
