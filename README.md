@@ -6,7 +6,7 @@
 [![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/powershell-vscode-discord)
 [![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode).
+This extension provides rich PowerShell language support for [Visual Studio Code](https://github.com/Microsoft/vscode) (VS Code).
 Now you can write and debug PowerShell scripts using the excellent IDE-like interface
 that Visual Studio Code provides.
 
@@ -66,12 +66,12 @@ You can also install a VSIX package from our [Releases page](https://github.com/
 instructions. The easiest way is through the command line:
 
 ```powershell
-code --install-extension PowerShell-<version>.vsix
+code --install-extension powershell-<version>.vsix
 ```
 
 > NOTE: If you are using VS Code Insiders, the command will be `code-insiders`.
 
-## Script-based Installation
+### Script-based Installation
 
 If you're on Windows 7 or greater with the [PowerShellGet](https://msdn.microsoft.com/powershell/gallery/readme)
 module installed, you can easily install both Visual Studio Code and the PowerShell
@@ -99,7 +99,7 @@ If you experience any problems with the PowerShell Extension, see
 [the troubleshooting docs](./docs/troubleshooting.md) for information
 on diagnosing and reporting issues.
 
-### Security Note
+## Security Note
 
 For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
 
@@ -113,19 +113,14 @@ how to use them.
 This folder can be found at the following path:
 
 ```powershell
-$HOME/.vscode[-insiders]/extensions/ms-vscode.PowerShell-<version>/examples
+$HOME/.vscode[-insiders]/extensions/ms-vscode.powershell[-preview]-<version>/examples
 ```
 
-or if you're using the preview version of the extension
-
- ```powershell
-$HOME/.vscode[-insiders]/extensions/ms-vscode.powershell-preview-<version>/examples
-```
-
-To open/view the extension's examples in Visual Studio Code, run the following from your PowerShell command prompt:
+To open/view the extension's examples in Visual Studio Code, run the following from your
+PowerShell session:
 
 ```powershell
-code (Get-ChildItem $Home\.vscode\extensions\ms-vscode.PowerShell-*\examples)[-1]
+code (Get-ChildItem $HOME/.vscode/extensions/ms-vscode.powershell-*/examples)[-1]
 ```
 
 ## Contributing to the Code
@@ -137,6 +132,13 @@ on how to contribute to this extension!
 
 - [Rob Holt](https://github.com/rjmholt) - [@rjmholt](https://twitter.com/rjmholt)
 - [Andy Schwartzmeyer](https://github.com/andschwa) - [andschwa.com](https://andschwa.com/)
+- [Sydney Smith](https://github.com/SydneyhSmith) - [@SydneyhSmith](https://github.com/SydneyhSmith)
+
+### Emeriti
+
+- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
+- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
+- [David Wilson](https://github.com/daviwil) - [@daviwil](https://twitter.com/daviwil)
 
 ## License
 
