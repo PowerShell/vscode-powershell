@@ -173,15 +173,16 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- [Rob Holt](https://github.com/rjmholt) - [@rjmholt](https://twitter.com/rjmholt)
-- [Andy Schwartzmeyer](https://github.com/andschwa) - [andschwa.com](https://andschwa.com/)
-- [Sydney Smith](https://github.com/SydneyhSmith) - [@SydneyhSmith](https://github.com/SydneyhSmith)
+- Rob Holt - [@rjmholt](https://github.com/rjmholt)
+- Patrick Meinecke - [@SeeminglyScience](https://github.com/SeeminglyScience)
+- Andy Schwartzmeyer - [@andschwa](https://github.com/andschwa)
+- Sydney Smith - [@SydneyhSmith](https://github.com/SydneyhSmith)
 
 ### Emeriti
 
-- [Keith Hill](https://github.com/rkeithhill) - [@r_keith_hill](http://twitter.com/r_keith_hill)
-- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](http://twitter.com/tylerleonhardt)
-- [David Wilson](https://github.com/daviwil) - [@daviwil](https://twitter.com/daviwil)
+- Keith Hill - [@rkeithhill](https://github.com/rkeithhill)
+- Tyler Leonhardt - [@TylerLeonhardt](https://github.com/TylerLeonhardt)
+- David Wilson - [@daviwil](https://github.com/daviwil)
 
 ## License
 
