@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2021.8.3-preview
+### Monday, August 30, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #2436](https://github.com/PowerShell/vscode-powershell/pull/3531) - Use status bar colors from theme instead of hardcoded values.
+- ✨ 🚨 [vscode-powershell #3529](https://github.com/PowerShell/vscode-powershell/pull/3530) - Extend CI test matrix and update readme(s).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ ‍🕵️ [PowerShellEditorServices #1562](https://github.com/PowerShell/PowerShellEditorServices/pull/1562) - Pin PSScriptAnalyzer to `1.20.0`, Plaster to `1.1.3` and PSReadLine to `2.1.0`.
+
 ## v2021.8.2
 ### Tuesday, August 24, 2021
 
