@@ -263,6 +263,8 @@ In some cases, getting to the bottom of a bug will require looking at the payloa
   ```json
   "powershell editor services.trace.server":"verbose"
   ```
+  
+> NOTE: While VSCode will not recognize and highlight it, it is a valid option and enables tracer logs on the server.
 
 - Restart Visual Studio Code and reproduce the issue.
 
