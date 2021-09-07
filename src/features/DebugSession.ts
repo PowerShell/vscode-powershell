@@ -18,6 +18,9 @@ import { LanguageClientConsumer } from "../languageClientConsumer";
 export const StartDebuggerNotificationType =
     new NotificationType<void>("powerShell/startDebugger");
 
+export const StopDebuggerNotificationType =
+    new NotificationType<void>("powerShell/stopDebugger");
+
 export class DebugSessionFeature extends LanguageClientConsumer
     implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
 
@@ -61,6 +64,12 @@ export class DebugSessionFeature extends LanguageClientConsumer
                     type: "PowerShell",
                     name: "PowerShell Interactive Session",
         }));
+
+        languageClient.onNotification(
+            StopDebuggerNotificationType,
+            () =>
+                vscode.debug.stopDebugging(undefined)
+        );
     }
 
     public async provideDebugConfigurations(

@@ -40,28 +40,33 @@
       "label": "Restore",
       "type": "shell",
       "command": "Invoke-Build Restore",
+      "problemMatcher": []
     },
     {
       "label": "Clean",
       "type": "shell",
       "command": "Invoke-Build Clean",
+      "problemMatcher": []
     },
     {
       "label": "Build",
       "type": "shell",
       "command": "Invoke-Build Build",
-      "group": "build",
+      "problemMatcher": [],
+      "group": "build"
     },
     {
       "label": "Test",
       "type": "shell",
       "command": "Invoke-Build Test",
-      "group": "test",
+      "problemMatcher": [],
+      "group": "test"
     },
     {
       "label": "Package",
       "type": "shell",
       "command": "Invoke-Build Package",
+      "problemMatcher": [],
       "group": "build"
     }
   ]
