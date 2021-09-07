@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2021.9.0-preview
+### Tuesday, September 07, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📖 [vscode-powershell #3544](https://github.com/PowerShell/vscode-powershell/pull/3544) - Document the trace server setting is valid (despite Code's warning). (Thanks @michal037!)
+- #️⃣ 🔍 [vscode-powershell #3522](https://github.com/PowerShell/vscode-powershell/pull/3542) - Allow PowerShell session to start and stop the debugger interface.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 📟 [PowerShellEditorServices #24977523](https://github.com/PowerShell/PowerShellEditorServices/pull/1571) - Implement `LengthInBufferCells` to fix ANSI formatting. (Thanks @SeeminglyScience!)
+- ✨ 🔍 [vscode-powershell #3522](https://github.com/PowerShell/PowerShellEditorServices/pull/1570) -  Send `stopDebugger` notification when appropriate.
+- 🐛 🔍 [vscode-powershell #3537](https://github.com/PowerShell/PowerShellEditorServices/pull/1569) - Fix bug with `ExecuteScriptWithArgsAsync` when `script` is a command.
+
 ## v2021.8.3-preview
 ### Monday, August 30, 2021
 
