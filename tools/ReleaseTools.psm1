@@ -108,7 +108,9 @@ function Get-Bullets {
             'resolved'
         )
 
-        $IssueRegex = '(' + ($CloseKeywords -join '|') + ')\s+(?<repo>\D+)(?<number>\d+)'
+        # NOTE: The URL matcher must be explicit because the body of a PR may
+        # contain other URLs with digits (like an image asset).
+        $IssueRegex = '(' + ($CloseKeywords -join '|') + ')\s+((https://github.com/PowerShell/(?<repo>(' + ([RepoNames]::Values -join '|') + '))/issues/)|#)(?<number>\d+)'
     }
 
     process {
