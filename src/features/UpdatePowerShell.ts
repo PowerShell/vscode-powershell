@@ -3,7 +3,7 @@
 
 import { spawn } from "child_process";
 import * as fs from "fs";
-import fetch, { RequestInit } from "node-fetch";
+import fetch from "node-fetch";
 import * as os from "os";
 import * as path from "path";
 import * as semver from "semver";
@@ -26,31 +26,17 @@ const PowerShellGitHubPrereleasesUrl =
 
 export class GitHubReleaseInformation {
     public static async FetchLatestRelease(preview: boolean): Promise<GitHubReleaseInformation> {
-        const requestConfig: RequestInit = {};
-
-        // For CI. This prevents GitHub from rate limiting us.
-        if (process.env.PS_TEST_GITHUB_API_USERNAME && process.env.PS_TEST_GITHUB_API_PAT) {
-            const authHeaderValue = Buffer
-                .from(`${process.env.PS_TEST_GITHUB_API_USERNAME}:${process.env.PS_TEST_GITHUB_API_PAT}`)
-                .toString("base64");
-            requestConfig.headers = {
-                Authorization: `Basic ${authHeaderValue}`,
-            };
-        }
 
         // Fetch the latest PowerShell releases from GitHub.
-        const response = await fetch(
-            preview ? PowerShellGitHubPrereleasesUrl : PowerShellGitHubReleasesUrl,
-            requestConfig);
+        const response = await fetch(preview ? PowerShellGitHubPrereleasesUrl : PowerShellGitHubReleasesUrl);
 
         if (!response.ok) {
-            const json = await response.json();
-            throw new Error(json.message || json || "response was not ok.");
+            throw new Error(response.statusText || "response was not ok.");
         }
 
         // For preview, we grab all the releases and then grab the first prerelease.
         const releaseJson = preview
-            ? (await response.json()).find((release: any) => release.prerelease)
+            ? (await response.json() as any[]).find((release) => release.prerelease)
             : await response.json();
 
         return new GitHubReleaseInformation(
