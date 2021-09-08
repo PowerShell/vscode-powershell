@@ -46,7 +46,7 @@
     "onView:PowerShellCommands"
   ],
   "dependencies": {
-    "node-fetch": "~2.6.1",
+    "node-fetch": "~2.6.2",
     "semver": "~7.3.5",
     "uuid": "~8.3.2",
     "vscode-extension-telemetry": "~0.3.2",
