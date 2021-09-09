@@ -1,30 +1,34 @@
 # PowerShell Extension Release History
 
-## v2021.9.0-preview
-### Tuesday, September 07, 2021
+## v2021.9.0
+### Thursday, September 09, 2021
+
+This release includes changes from both `v2021.8.3-preview` and `v2021.9.0-preview`.
+
+A new `stopDebugger` notification was added that allows PowerShell Editor Services,
+the LSP module, to stop an attached UI debugger (such as VS Code's)
+for debugger sessions started by executing code with a `PSBreakpoint` attached.
+This may not work in all cases but should improve usability.
+
+The PowerShell status bar indicator no longer uses custom coloring but instead pulls from the user's theme.
+A formatting bug was fixed by community maintainer Patrick Meinecke.
+A regression in the debug launch configuration's `script` parameter was fixed and covered with a test.
+And finally, the bundled [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.20.0)
+was updated to `v1.20.0`.
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
 
 - ✨ 📖 [vscode-powershell #3544](https://github.com/PowerShell/vscode-powershell/pull/3544) - Document the trace server setting is valid (despite Code's warning). (Thanks @michal037!)
 - #️⃣ 🔍 [vscode-powershell #3522](https://github.com/PowerShell/vscode-powershell/pull/3542) - Allow PowerShell session to start and stop the debugger interface.
-
-#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
-
-- 🐛 📟 [PowerShellEditorServices #24977523](https://github.com/PowerShell/PowerShellEditorServices/pull/1571) - Implement `LengthInBufferCells` to fix ANSI formatting. (Thanks @SeeminglyScience!)
-- ✨ 🔍 [vscode-powershell #3522](https://github.com/PowerShell/PowerShellEditorServices/pull/1570) -  Send `stopDebugger` notification when appropriate.
-- 🐛 🔍 [vscode-powershell #3537](https://github.com/PowerShell/PowerShellEditorServices/pull/1569) - Fix bug with `ExecuteScriptWithArgsAsync` when `script` is a command.
-
-## v2021.8.3-preview
-### Monday, August 30, 2021
-
-#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
-
 - ✨ 📺 [vscode-powershell #2436](https://github.com/PowerShell/vscode-powershell/pull/3531) - Use status bar colors from theme instead of hardcoded values.
 - ✨ 🚨 [vscode-powershell #3529](https://github.com/PowerShell/vscode-powershell/pull/3530) - Extend CI test matrix and update readme(s).
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
-- ✨ ‍🕵️ [PowerShellEditorServices #1562](https://github.com/PowerShell/PowerShellEditorServices/pull/1562) - Pin PSScriptAnalyzer to `1.20.0`, Plaster to `1.1.3` and PSReadLine to `2.1.0`.
+- 🐛 📟 [PowerShellEditorServices #24977523](https://github.com/PowerShell/PowerShellEditorServices/pull/1571) - Implement `LengthInBufferCells` to fix ANSI formatting. (Thanks @SeeminglyScience!)
+- ✨ 🔍 [vscode-powershell #3522](https://github.com/PowerShell/PowerShellEditorServices/pull/1570) - Send `stopDebugger` notification when appropriate.
+- 🐛 🔍 [vscode-powershell #3537](https://github.com/PowerShell/PowerShellEditorServices/pull/1569) - Fix bug with `ExecuteScriptWithArgsAsync` when `script` is a command.
+- ✨ ‍🕵️ [PowerShellEditorServices #1562](https://github.com/PowerShell/PowerShellEditorServices/pull/1562) - Pin PSScriptAnalyzer to `v1.20.0`, Plaster to `v1.1.3` and PSReadLine to `v2.1.0`.
 
 ## v2021.8.2
 ### Tuesday, August 24, 2021
