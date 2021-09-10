@@ -73,7 +73,7 @@ into individual strings e.g.:
 
 `"args": [ "-Param1", "foo" "-Recurse" ],`
 
-At runtime these arguments will be concatenated togehter using a space
+At runtime these arguments will be concatenated together using a space
 delimiter so it will result in the same string as the first `args` example.
 
 ### Setting the Working Directory
