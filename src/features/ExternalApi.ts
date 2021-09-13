@@ -125,7 +125,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
 
         // TODO: When we have more than one API version, make sure to include a check here.
         const extension = ExternalApiFeature.registeredExternalExtension.get(uuid);
-        this.log.writeDiagnostic(`Extension '${extension.id}' used command 'PowerShell.GetPowerShellVersionDetails'.`);
+        this.log.writeDiagnostic(`Extension '${extension.id}' called 'getPowerShellVersionDetails'`);
 
         await this.sessionManager.waitUntilStarted();
         const versionDetails = this.sessionManager.getPowerShellVersionDetails();

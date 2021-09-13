@@ -40,9 +40,6 @@
     "onCommand:PowerShell.RestartSession",
     "onCommand:PowerShell.EnableISEMode",
     "onCommand:PowerShell.DisableISEMode",
-    "onCommand:PowerShell.RegisterExternalExtension",
-    "onCommand:PowerShell.UnregisterExternalExtension",
-    "onCommand:PowerShell.GetPowerShellVersionDetails",
     "onView:PowerShellCommands"
   ],
   "dependencies": {
@@ -300,21 +297,6 @@
           "light": "media/resources/light/MovePanelBottom.svg",
           "dark": "media/resources/dark/MovePanelBottom.svg"
         }
-      },
-      {
-        "command": "PowerShell.RegisterExternalExtension",
-        "title": "Register an external extension",
-        "category": "PowerShell"
-      },
-      {
-        "command": "PowerShell.UnregisterExternalExtension",
-        "title": "Unregister an external extension",
-        "category": "PowerShell"
-      },
-      {
-        "command": "PowerShell.GetPowerShellVersionDetails",
-        "title": "Get details about the PowerShell version that the PowerShell extension is using",
-        "category": "PowerShell"
       }
     ],
     "menus": {
