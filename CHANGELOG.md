@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2021.9.1-preview
+### Tuesday, September 14, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 📺 [vscode-powershell #3105](https://github.com/PowerShell/vscode-powershell/pull/3564) - Remove accidentally enabled commands.
+- ✨ 👷 [vscode-powershell #2450](https://github.com/PowerShell/vscode-powershell/pull/3555) - Bundle the extension.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+No changes.
+
 ## v2021.9.0
 ### Thursday, September 09, 2021
 
