@@ -64,7 +64,17 @@ task CopyEditorServices -If { !(Test-Path ./modules/PowerShellEditorServices) -a
 
 task Build CopyEditorServices, Restore, {
     Write-Host "`n### Building vscode-powershell" -ForegroundColor Green
-    exec { & npm run compile }
+    # TODO: TSLint is deprecated and we need to switch to ESLint.
+    # https://github.com/PowerShell/vscode-powershell/pull/3331
+    exec { & npm run lint }
+
+    # TODO: When supported we should use `esbuild` for the tests too. Although
+    # we now use `esbuild` to transpile, bundle, and minify the extension, we
+    # still use `tsc` to transpile everything in `src` and `test` because the VS
+    # Code test runner expects individual files (and globs them at runtime).
+    # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
+    # https://github.com/evanw/esbuild/issues/944
+    exec { & npm run build }
 }
 
 #endregion

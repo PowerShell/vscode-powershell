@@ -36,7 +36,7 @@ import { LanguageClientConsumer } from "./languageClientConsumer";
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires
-const PackageJSON: any = require("../../package.json");
+const PackageJSON: any = require("../package.json");
 
 // the application insights key (also known as instrumentation key) used for telemetry.
 const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
@@ -197,7 +197,7 @@ function checkForUpdatedVersion(context: vscode.ExtensionContext, version: strin
                 if (choice === showReleaseNotes) {
                     vscode.commands.executeCommand(
                         "markdown.showPreview",
-                        vscode.Uri.file(path.resolve(__dirname, "../../CHANGELOG.md")));
+                        vscode.Uri.file(path.resolve(__dirname, "../CHANGELOG.md")));
                 }
             });
     }

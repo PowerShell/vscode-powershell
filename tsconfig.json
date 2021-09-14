@@ -1,16 +1,18 @@
 {
-    "compilerOptions": {
-        "rootDir": ".",
-        "module": "commonjs",
-        "target": "es6",
-        "outDir": "out",
-        "lib": [
-            "es2017",
-            "DOM"
-        ],
-        "sourceMap": true
-    },
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    // NOTE: The TypeScript compiler is only used for building the tests (and
+    // the sources which the tests need). The extension is built with `esbuild`.
+    "module": "commonjs",
+    "outDir": "out",
+    "target": "ES6",
+    "lib": [ "ES6", "DOM" ],
+    "sourceMap": true,
+    "rootDir": ".",
+    // TODO: We need to enable stricter checking...
+    // "strict": true,
+    // "noImplicitReturns": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noUnusedParameters": true
+  },
+  "include": [ "src", "test" ],
 }

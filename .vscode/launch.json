@@ -7,13 +7,11 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "--extensionDevelopmentPath=${workspaceRoot}"
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}"
       ],
-      "stopOnEntry": false,
       "sourceMaps": true,
-      "outFiles": [
-        "${workspaceFolder}/out/src/**/*.js"
-      ],
+      "outFiles": [ "${workspaceFolder}/out/main.js" ],
       "preLaunchTask": "Build"
     },
     {
@@ -22,15 +20,15 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "--disable-extensions",
-        "ms-vscode.powershell-preview",
+        // The tests require Code be opened with a workspace, which exists in
+        // `test`, but this has to be passed as a CLI argument, not just `cwd`.
+        "${workspaceFolder}/test",
+        "--disableExtensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/testRunner.js",
-        "${workspaceFolder}/test"
+        "--extensionTestsPath=${workspaceFolder}/out/test/index.js",
       ],
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "sourceMaps": true,
+      "outFiles": [ "${workspaceFolder}/out/test/**/*.js" ],
       "preLaunchTask": "Build"
     },
     {

@@ -9,7 +9,7 @@ export class ExamplesFeature implements vscode.Disposable {
     private examplesPath: string;
 
     constructor() {
-        this.examplesPath = path.resolve(__dirname, "../../../examples");
+        this.examplesPath = path.resolve(__dirname, "../../examples");
         this.command = vscode.commands.registerCommand("PowerShell.OpenExamplesFolder", () => {
             vscode.commands.executeCommand(
                 "vscode.openFolder",

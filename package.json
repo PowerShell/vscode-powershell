@@ -25,7 +25,6 @@
     "type": "git",
     "url": "https://github.com/PowerShell/vscode-powershell.git"
   },
-  "main": "./out/src/main",
   "activationEvents": [
     "onDebugInitialConfigurations",
     "onDebugResolve:PowerShell",
@@ -65,6 +64,7 @@
     "@types/uuid": "~8.3.1",
     "@types/vscode": "~1.56.0",
     "@vscode/test-electron": "~1.6.2",
+    "esbuild": "^0.12.25",
     "mocha": "~9.1.1",
     "mocha-junit-reporter": "~2.0.0",
     "mocha-multi-reporters": "~1.5.1",
@@ -78,9 +78,10 @@
   "extensionDependencies": [
     "vscode.powershell"
   ],
+  "main": "./out/main.js",
   "scripts": {
-    "compile": "tsc -v && tsc -p ./ && tslint -p ./",
-    "compile-watch": "tsc -watch -p ./",
+    "lint": "tslint --project tsconfig.json",
+    "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --sourcemap --bundle --minify --external:vscode --platform=node",
     "test": "node ./out/test/runTests.js",
     "package": "vsce package --no-gitHubIssueLinking",
     "publish": "vsce publish"
