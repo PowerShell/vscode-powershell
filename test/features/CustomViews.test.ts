@@ -70,7 +70,7 @@ hello
                     content: "console.log('asdf');",
                 },
                 {
-                    fileName: "../../testCustomViews.js",
+                    fileName: "../testCustomViews.js",
                     content: "console.log('asdf');",
                 },
             ],
@@ -78,7 +78,7 @@ hello
             expectedHtmlString: `<html><head></head><body>
 hello
 <script src="${convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.js"))}"></script>
-<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "../../testCustomViews.js"))}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "../testCustomViews.js"))}"></script>
 </body></html>`,
         },
 

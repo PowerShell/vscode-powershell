@@ -45,7 +45,7 @@ export interface IEditorServicesSessionDetails {
 
 export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
 
-const sessionsFolder = path.resolve(__dirname, "..", "..", "sessions/");
+const sessionsFolder = path.resolve(__dirname, "../sessions");
 const sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
 
 // Create the sessions path if it doesn't exist already

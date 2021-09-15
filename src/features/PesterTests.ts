@@ -18,7 +18,7 @@ export class PesterTestsFeature implements vscode.Disposable {
     private invokePesterStubScriptPath: string;
 
     constructor(private sessionManager: SessionManager) {
-        this.invokePesterStubScriptPath = path.resolve(__dirname, "../../modules/PowerShellEditorServices/InvokePesterStub.ps1");
+        this.invokePesterStubScriptPath = path.resolve(__dirname, "../modules/PowerShellEditorServices/InvokePesterStub.ps1");
 
         // File context-menu command - Run Pester Tests
         this.command = vscode.commands.registerCommand(

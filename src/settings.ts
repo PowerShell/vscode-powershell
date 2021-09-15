@@ -157,6 +157,8 @@ export function load(): ISettings {
 
     const defaultDeveloperSettings: IDeveloperSettings = {
         featureFlags: [],
+        // From `<root>/out/main.js` we go to the directory before <root> and
+        // then into the other repo.
         bundledModulesPath: "../../PowerShellEditorServices/module",
         editorServicesLogLevel: "Normal",
         editorServicesWaitForDebugger: false,
@@ -234,7 +236,7 @@ export function load(): ISettings {
         promptToUpdatePackageManagement:
             configuration.get<boolean>("promptToUpdatePackageManagement", true),
         bundledModulesPath:
-            "../modules",
+            "../modules", // Because the extension is always at `<root>/out/main.js`
         useX86Host:
             configuration.get<boolean>("useX86Host", false),
         enableProfileLoading:
