@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import * as fs from "fs";
 import path = require("path");
 import vscode = require("vscode");
 
@@ -15,6 +16,10 @@ export class ExamplesFeature implements vscode.Disposable {
                 "vscode.openFolder",
                 vscode.Uri.file(this.examplesPath),
                 true);
+
+            // Return existence of the path for testing. The `vscode.openFolder`
+            // command should do this, but doesn't (yet).
+            return fs.existsSync(this.examplesPath)
         });
     }
 

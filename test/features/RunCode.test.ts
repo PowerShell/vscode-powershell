@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
+import * as fs from "fs";
+import * as path from "path";
 import rewire = require("rewire");
 import vscode = require("vscode");
 
@@ -35,4 +37,12 @@ suite("RunCode tests", () => {
 
         assert.deepEqual(actual, expected);
     });
+
+    test("Can run Pester tests from file", async () => {
+        const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
+        assert(fs.existsSync(pesterTests));
+        await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(pesterTests));
+        assert(await vscode.commands.executeCommand("PowerShell.RunPesterTestsFromFile"));
+        // Start up can take some time...so set the timeout to 30 seconds.
+    }).timeout(30000);
 });
