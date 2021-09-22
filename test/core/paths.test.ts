@@ -6,29 +6,20 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { before } from "mocha";
-
-// This lets us test the rest of our path assumptions against the baseline of
-// this test file existing at `<root>/out/test/core/paths.test.ts`.
-const rootPath = path.resolve(__dirname, "../../../")
-// tslint:disable-next-line: no-var-requires
-const packageJSON: any = require(path.resolve(rootPath, "package.json"));
-const extensionId = `${packageJSON.publisher}.${packageJSON.name}`;
+import utils = require("../utils");
 
 suite("Path assumptions", () => {
-    before(async () => {
-        const extension = vscode.extensions.getExtension(extensionId);
-        if (!extension.isActive) { await extension.activate(); }
-    });
+    before(async () => { await utils.ensureExtensionIsActivated(); });
 
     test("The examples folder can be opened (and exists)", async () => {
         assert(await vscode.commands.executeCommand("PowerShell.OpenExamplesFolder"));
     });
 
     test("The session folder is created in the right place", async () => {
-        assert(fs.existsSync(path.resolve(rootPath, "sessions")));
+        assert(fs.existsSync(path.resolve(utils.rootPath, "sessions")));
     });
 
     test("The logs folder is created in the right place", async () => {
-        assert(fs.existsSync(path.resolve(rootPath, "logs")));
+        assert(fs.existsSync(path.resolve(utils.rootPath, "logs")));
     });
 });

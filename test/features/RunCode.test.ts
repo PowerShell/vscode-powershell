@@ -4,8 +4,10 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
+import { before } from "mocha";
 import rewire = require("rewire");
 import vscode = require("vscode");
+import utils = require("../utils");
 
 // Setup function that is not exported.
 const customViews = rewire("../../src/features/RunCode");
@@ -17,6 +19,8 @@ enum LaunchType {
 }
 
 suite("RunCode tests", () => {
+    before(async () => { await utils.ensureExtensionIsActivated(); } );
+
     test("Can create the launch config", () => {
         const commandToRun: string = "Invoke-Build";
         const args: string[] = ["Clean"];
