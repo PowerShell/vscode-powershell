@@ -4,7 +4,7 @@
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
-import { before } from "mocha";
+import { suiteSetup } from "mocha";
 import rewire = require("rewire");
 import vscode = require("vscode");
 import utils = require("../utils");
@@ -19,7 +19,7 @@ enum LaunchType {
 }
 
 suite("RunCode tests", () => {
-    before(async () => { await utils.ensureExtensionIsActivated(); } );
+    suiteSetup(utils.ensureExtensionIsActivated);
 
     test("Can create the launch config", () => {
         const commandToRun: string = "Invoke-Build";

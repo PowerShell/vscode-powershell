@@ -3,12 +3,12 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { before } from "mocha";
+import { suiteSetup } from "mocha";
 import { ISECompatibilityFeature } from "../../src/features/ISECompatibility";
 import utils = require("../utils");
 
 suite("ISECompatibility feature", () => {
-    before(async () => { await utils.ensureExtensionIsActivated(); } );
+    suiteSetup(utils.ensureExtensionIsActivated);
 
     test("It sets ISE Settings", async () => {
         await vscode.commands.executeCommand("PowerShell.EnableISEMode");

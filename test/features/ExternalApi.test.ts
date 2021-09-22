@@ -2,13 +2,13 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
-import { before, beforeEach, afterEach } from "mocha";
+import { suiteSetup, setup, teardown } from "mocha";
 import utils = require("../utils");
 import { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 
 suite("ExternalApi feature - Registration API", () => {
     let powerShellExtensionClient: IPowerShellExtensionClient;
-    before(async () => {
+    suiteSetup(async () => {
         const powershellExtension = await utils.ensureExtensionIsActivated();
         powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
     });
@@ -65,16 +65,16 @@ suite("ExternalApi feature - Other APIs", () => {
     let sessionId: string;
     let powerShellExtensionClient: IPowerShellExtensionClient;
 
-    before(async () => {
+    suiteSetup(async () => {
         const powershellExtension = await utils.ensureExtensionIsActivated();
         powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
     });
 
-    beforeEach(() => {
+    setup(() => {
         sessionId = powerShellExtensionClient.registerExternalExtension(utils.extensionId);
     });
 
-    afterEach(() => {
+    teardown(() => {
         powerShellExtensionClient.unregisterExternalExtension(sessionId);
     });
 

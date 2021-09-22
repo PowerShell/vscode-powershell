@@ -5,11 +5,11 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { before } from "mocha";
+import { suiteSetup } from "mocha";
 import utils = require("../utils");
 
 suite("Path assumptions", () => {
-    before(async () => { await utils.ensureExtensionIsActivated(); });
+    suiteSetup(utils.ensureExtensionIsActivated);
 
     test("The examples folder can be opened (and exists)", async () => {
         assert(await vscode.commands.executeCommand("PowerShell.OpenExamplesFolder"));
