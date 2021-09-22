@@ -29,7 +29,7 @@ async function main() {
         });
     } catch (err) {
         // tslint:disable-next-line:no-console
-        console.error("Failed to run tests");
+        console.error(`Failed to run tests: ${err}`);
         process.exit(1);
     }
 }
