@@ -39,7 +39,7 @@ suite("RunCode tests", () => {
 
         const actual: object = createLaunchConfig(LaunchType.Debug, commandToRun, args);
 
-        assert.deepEqual(actual, expected);
+        assert.deepStrictEqual(actual, expected);
     });
 
     test("Can run Pester tests from file", async () => {

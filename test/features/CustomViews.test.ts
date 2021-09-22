@@ -129,7 +129,7 @@ hello
                 styleSheetPaths: cssPaths,
             };
             try {
-                assert.equal(htmlContentView.getContent(), testCase.expectedHtmlString);
+                assert.strictEqual(htmlContentView.getContent(), testCase.expectedHtmlString);
             } finally {
                 jsPaths.forEach((jsPath) => fs.unlinkSync(vscode.Uri.parse(jsPath).fsPath));
                 cssPaths.forEach((cssPath) => fs.unlinkSync(vscode.Uri.parse(cssPath).fsPath));
