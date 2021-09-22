@@ -3,15 +3,16 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { suiteSetup } from "mocha";
+import { suiteSetup, setup, teardown } from "mocha";
 import { ISECompatibilityFeature } from "../../src/features/ISECompatibility";
 import utils = require("../utils");
 
 suite("ISECompatibility feature", () => {
     suiteSetup(utils.ensureExtensionIsActivated);
+    setup(async () => { await vscode.commands.executeCommand("PowerShell.EnableISEMode"); });
+    teardown(async () => { await vscode.commands.executeCommand("PowerShell.DisableISEMode"); });
 
     test("It sets ISE Settings", async () => {
-        await vscode.commands.executeCommand("PowerShell.EnableISEMode");
         for (const iseSetting of ISECompatibilityFeature.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             assert.strictEqual(currently, iseSetting.value);
@@ -31,7 +32,6 @@ suite("ISECompatibility feature", () => {
     }).timeout(10000);
 
     test("It leaves Theme after being changed after enabling ISE Mode", async () => {
-        await vscode.commands.executeCommand("PowerShell.EnableISEMode");
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "PowerShell ISE");
 
         await vscode.workspace.getConfiguration("workbench").update("colorTheme", "Dark+", true);
