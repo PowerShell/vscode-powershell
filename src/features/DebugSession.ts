@@ -25,7 +25,6 @@ export class DebugSessionFeature extends LanguageClientConsumer
     implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
 
     private sessionCount: number = 1;
-    private command: vscode.Disposable;
     private tempDebugProcess: PowerShellProcess;
     private tempSessionDetails: utils.IEditorServicesSessionDetails;
 
@@ -49,10 +48,6 @@ export class DebugSessionFeature extends LanguageClientConsumer
         debugAdapter.start();
 
         return new vscode.DebugAdapterInlineImplementation(debugAdapter);
-    }
-
-    public dispose() {
-        this.command.dispose();
     }
 
     public setLanguageClient(languageClient: LanguageClient) {

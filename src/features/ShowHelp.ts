@@ -11,7 +11,6 @@ export const ShowHelpNotificationType =
 
 export class ShowHelpFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
-    private deprecatedCommand: vscode.Disposable;
 
     constructor(private log: Logger) {
         super();
@@ -34,7 +33,6 @@ export class ShowHelpFeature extends LanguageClientConsumer {
 
     public dispose() {
         this.command.dispose();
-        this.deprecatedCommand.dispose();
     }
 
 }
