@@ -50,6 +50,9 @@ export class DebugSessionFeature extends LanguageClientConsumer
         return new vscode.DebugAdapterInlineImplementation(debugAdapter);
     }
 
+    public dispose() {
+    }
+
     public setLanguageClient(languageClient: LanguageClient) {
         languageClient.onNotification(
             StartDebuggerNotificationType,
