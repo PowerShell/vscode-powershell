@@ -6,12 +6,14 @@
 import fs = require("fs");
 import os = require("os");
 import path = require("path");
+import vscode = require("vscode");
 
 export const PowerShellLanguageId = "powershell";
 
-export function ensurePathExists(targetPath: string) {
+export function ensurePathExists(targetPath: string): void {
     // Ensure that the path exists
     try {
+        // TODO: Use vscode.workspace.fs
         fs.mkdirSync(targetPath);
     } catch (e) {
         // If the exception isn't to indicate that the folder exists already, rethrow it.
@@ -19,6 +21,23 @@ export function ensurePathExists(targetPath: string) {
             throw e;
         }
     }
+}
+
+// Check that the file exists in an asynchronous manner that relies solely on the VS Code API, not Node's fs library.
+export async function fileExists(targetPath: string | vscode.Uri): Promise<boolean> {
+    try {
+            await vscode.workspace.fs.stat(
+                targetPath instanceof vscode.Uri
+                    ? targetPath
+                    : vscode.Uri.file(targetPath));
+        return true;
+    } catch (e) {
+        if (e instanceof vscode.FileSystemError.FileNotFound) {
+            return false;
+        }
+        throw e;
+    }
+
 }
 
 export function getPipePath(pipeName: string) {
@@ -45,7 +64,7 @@ export interface IEditorServicesSessionDetails {
 
 export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
 
-const sessionsFolder = path.resolve(__dirname, "..", "..", "sessions/");
+const sessionsFolder = path.resolve(__dirname, "../sessions");
 const sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
 
 // Create the sessions path if it doesn't exist already

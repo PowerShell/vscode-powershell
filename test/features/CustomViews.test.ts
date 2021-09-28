@@ -70,7 +70,7 @@ hello
                     content: "console.log('asdf');",
                 },
                 {
-                    fileName: "../../testCustomViews.js",
+                    fileName: "../testCustomViews.js",
                     content: "console.log('asdf');",
                 },
             ],
@@ -78,7 +78,7 @@ hello
             expectedHtmlString: `<html><head></head><body>
 hello
 <script src="${convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.js"))}"></script>
-<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "../../testCustomViews.js"))}"></script>
+<script src="${convertToVSCodeResourceScheme(path.join(__dirname, "../testCustomViews.js"))}"></script>
 </body></html>`,
         },
 
@@ -129,7 +129,7 @@ hello
                 styleSheetPaths: cssPaths,
             };
             try {
-                assert.equal(htmlContentView.getContent(), testCase.expectedHtmlString);
+                assert.strictEqual(htmlContentView.getContent(), testCase.expectedHtmlString);
             } finally {
                 jsPaths.forEach((jsPath) => fs.unlinkSync(vscode.Uri.parse(jsPath).fsPath));
                 cssPaths.forEach((cssPath) => fs.unlinkSync(vscode.Uri.parse(cssPath).fsPath));

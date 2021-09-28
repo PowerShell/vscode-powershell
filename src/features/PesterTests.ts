@@ -18,25 +18,25 @@ export class PesterTestsFeature implements vscode.Disposable {
     private invokePesterStubScriptPath: string;
 
     constructor(private sessionManager: SessionManager) {
-        this.invokePesterStubScriptPath = path.resolve(__dirname, "../../modules/PowerShellEditorServices/InvokePesterStub.ps1");
+        this.invokePesterStubScriptPath = path.resolve(__dirname, "../modules/PowerShellEditorServices/InvokePesterStub.ps1");
 
         // File context-menu command - Run Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTestsFromFile",
             (fileUri) => {
-                this.launchAllTestsInActiveEditor(LaunchType.Run, fileUri);
+                return this.launchAllTestsInActiveEditor(LaunchType.Run, fileUri);
             });
         // File context-menu command - Debug Pester Tests
         this.command = vscode.commands.registerCommand(
             "PowerShell.DebugPesterTestsFromFile",
             (fileUri) => {
-                this.launchAllTestsInActiveEditor(LaunchType.Debug, fileUri);
+                return this.launchAllTestsInActiveEditor(LaunchType.Debug, fileUri);
             });
         // This command is provided for usage by PowerShellEditorServices (PSES) only
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunPesterTests",
             (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?, outputPath?) => {
-                this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber, outputPath);
+                return this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber, outputPath);
             });
     }
 
@@ -44,10 +44,13 @@ export class PesterTestsFeature implements vscode.Disposable {
         this.command.dispose();
     }
 
-    private launchAllTestsInActiveEditor(launchType: LaunchType, fileUri: vscode.Uri) {
+    private async launchAllTestsInActiveEditor(
+        launchType: LaunchType,
+        fileUri: vscode.Uri): Promise<boolean> {
+
         const uriString = (fileUri || vscode.window.activeTextEditor.document.uri).toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
-        this.launch(launchConfig);
+        return this.launch(launchConfig);
     }
 
     private async launchTests(
@@ -55,11 +58,11 @@ export class PesterTestsFeature implements vscode.Disposable {
         runInDebugger: boolean,
         describeBlockName?: string,
         describeBlockLineNumber?: number,
-        outputPath?: string) {
+        outputPath?: string): Promise<boolean> {
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
         const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, describeBlockLineNumber, outputPath);
-        this.launch(launchConfig);
+        return this.launch(launchConfig);
     }
 
     private createLaunchConfig(
@@ -126,9 +129,9 @@ export class PesterTestsFeature implements vscode.Disposable {
         return launchConfig;
     }
 
-    private launch(launchConfig) {
+    private async launch(launchConfig): Promise<boolean> {
         // Create or show the interactive console
-        // TODO #367: Check if "newSession" mode is configured
+        // TODO: #367 Check if "newSession" mode is configured
         vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
         // Write out temporary debug session file
@@ -137,6 +140,10 @@ export class PesterTestsFeature implements vscode.Disposable {
             this.sessionManager.getSessionDetails());
 
         // TODO: Update to handle multiple root workspaces.
-        vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
+        //
+        // Ensure the necessary script exists (for testing). The debugger will
+        // start regardless, but we also pass its success along.
+        return utils.fileExists(this.invokePesterStubScriptPath)
+            && vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
     }
 }

@@ -2,27 +2,19 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
-import * as vscode from "vscode";
-import { before, beforeEach, afterEach } from "mocha";
+import { suiteSetup, setup, teardown } from "mocha";
+import utils = require("../utils");
 import { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
-
-// tslint:disable-next-line: no-var-requires
-const PackageJSON: any = require("../../../package.json");
-const testExtensionId = `${PackageJSON.publisher}.${PackageJSON.name}`;
 
 suite("ExternalApi feature - Registration API", () => {
     let powerShellExtensionClient: IPowerShellExtensionClient;
-    before(async () => {
-        const powershellExtension = vscode.extensions.getExtension<IPowerShellExtensionClient>(testExtensionId);
-        if (!powershellExtension.isActive) {
-            powerShellExtensionClient = await powershellExtension.activate();
-            return;
-        }
+    suiteSetup(async () => {
+        const powershellExtension = await utils.ensureExtensionIsActivated();
         powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
     });
 
     test("It can register and unregister an extension", () => {
-        const sessionId: string = powerShellExtensionClient.registerExternalExtension(testExtensionId);
+        const sessionId: string = powerShellExtensionClient.registerExternalExtension(utils.extensionId);
         assert.notStrictEqual(sessionId , "");
         assert.notStrictEqual(sessionId , null);
         assert.strictEqual(
@@ -31,7 +23,7 @@ suite("ExternalApi feature - Registration API", () => {
     });
 
     test("It can register and unregister an extension with a version", () => {
-        const sessionId: string = powerShellExtensionClient.registerExternalExtension(testExtensionId, "v2");
+        const sessionId: string = powerShellExtensionClient.registerExternalExtension(utils.extensionId, "v2");
         assert.notStrictEqual(sessionId , "");
         assert.notStrictEqual(sessionId , null);
         assert.strictEqual(
@@ -48,12 +40,12 @@ suite("ExternalApi feature - Registration API", () => {
     });
 
     test("It can't register the same extension twice", async () => {
-        const sessionId: string = powerShellExtensionClient.registerExternalExtension(testExtensionId);
+        const sessionId: string = powerShellExtensionClient.registerExternalExtension(utils.extensionId);
         try {
             assert.throws(
-                () => powerShellExtensionClient.registerExternalExtension(testExtensionId),
+                () => powerShellExtensionClient.registerExternalExtension(utils.extensionId),
                 {
-                    message: `The extension '${testExtensionId}' is already registered.`
+                    message: `The extension '${utils.extensionId}' is already registered.`
                 });
         } finally {
             powerShellExtensionClient.unregisterExternalExtension(sessionId);
@@ -73,20 +65,16 @@ suite("ExternalApi feature - Other APIs", () => {
     let sessionId: string;
     let powerShellExtensionClient: IPowerShellExtensionClient;
 
-    before(async () => {
-        const powershellExtension = vscode.extensions.getExtension<IPowerShellExtensionClient>(testExtensionId);
-        if (!powershellExtension.isActive) {
-            powerShellExtensionClient = await powershellExtension.activate();
-            return;
-        }
+    suiteSetup(async () => {
+        const powershellExtension = await utils.ensureExtensionIsActivated();
         powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
     });
 
-    beforeEach(() => {
-        sessionId = powerShellExtensionClient.registerExternalExtension(testExtensionId);
+    setup(() => {
+        sessionId = powerShellExtensionClient.registerExternalExtension(utils.extensionId);
     });
 
-    afterEach(() => {
+    teardown(() => {
         powerShellExtensionClient.unregisterExternalExtension(sessionId);
     });
 
@@ -105,6 +93,6 @@ suite("ExternalApi feature - Other APIs", () => {
         assert.notStrictEqual(versionDetails.version, "");
         assert.notStrictEqual(versionDetails.version, null);
 
-        // Start up can take some time... so set the time out to 30s
+        // Start up can take some time...so set the timeout to 30 seconds.
     }).timeout(30000);
 });
