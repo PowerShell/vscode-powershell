@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2021.9.2-preview
+### Wednesday, September 29, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #3593](https://github.com/PowerShell/vscode-powershell/pull/3593) - Remove `mocha-junit-reporter` package by relying on Mocha's xUnit module.
+- #️⃣ 🙏 [vscode-powershell #3592](https://github.com/PowerShell/vscode-powershell/pull/3592) - Remove unused feature commands. (Thanks @CrendKing!)
+- #️⃣ 🙏 [vscode-powershell #3591](https://github.com/PowerShell/vscode-powershell/pull/3591) - Bump dependencies and lockfile.
+- 🐛 🚨 [vscode-powershell #3570](https://github.com/PowerShell/vscode-powershell/pull/3570) - Fix path regressions and cover with tests.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+No changes.
+
 ## v2021.9.1-preview
 ### Tuesday, September 14, 2021
 
