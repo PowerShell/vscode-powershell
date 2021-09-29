@@ -50,6 +50,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         return new vscode.DebugAdapterInlineImplementation(debugAdapter);
     }
 
+    // tslint:disable-next-line:no-empty
     public dispose() {
     }
 
