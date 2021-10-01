@@ -1,0 +1,11 @@
+# NOTE: This requires the build to have been run first.
+steps:
+- pwsh: npm run coverage
+  workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
+  displayName: Analyzing code coverage
+- task: PublishCodeCoverageResults@1
+  displayName: Publish code coverage results
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: $(Build.SourcesDirectory)/vscode-powershell/coverage/cobertura-coverage.xml
+    failIfCoverageEmpty: true
