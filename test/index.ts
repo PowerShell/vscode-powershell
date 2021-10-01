@@ -13,6 +13,8 @@ export function run(): Promise<void> {
     const mocha = new Mocha({
         color: !process.env.TF_BUILD, // colored output from test results
         reporter: "mocha-multi-reporters",
+        // These are used so that `nyc` can do source mapping.
+        require: ["ts-node/register", "source-map-support/register"],
         timeout: 30000, // 30s because PowerShell startup is slow!
         reporterOptions: {
             // NOTE: The XML output by Mocha's xUnit reporter is actually in the

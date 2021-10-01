@@ -84,8 +84,28 @@
     "lint": "tslint --project tsconfig.json",
     "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --sourcemap --bundle --minify --external:vscode --platform=node",
     "test": "node ./out/test/runTests.js",
+    "coverage": "nyc node ./out/test/runTests.js",
     "package": "vsce package --no-gitHubIssueLinking",
     "publish": "vsce publish"
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-typescript",
+    "all": false,
+    "require": ["source-map-support/register"],
+    "check-coverage": false,
+    "show-process-tree": true,
+    "use-spawn-wrap": false,
+    "include": [
+      "out/**/*.js",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      ".vscode-test/**"
+    ],
+    "reporter": [
+      "cobertura",
+      "text"
+    ]
   },
   "contributes": {
     "breakpoints": [
