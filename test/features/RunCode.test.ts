@@ -56,7 +56,6 @@ suite("RunCode tests", () => {
         // it to run, and then kill it for safety's sake.
         assert(await vscode.commands.executeCommand("PowerShell.RunPesterTestsFromFile"));
         assert(vscode.debug.activeDebugSession !== undefined);
-        await sleep(5000);
         await vscode.debug.stopDebugging();
-    }).timeout(30000);
+    });
 });
