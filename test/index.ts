@@ -11,7 +11,6 @@ import * as glob from "glob";
 export function run(): Promise<void> {
     // Create the mocha test
     const mocha = new Mocha({
-        ui: "tdd",
         color: !process.env.TF_BUILD, // colored output from test results
         reporter: "mocha-multi-reporters",
         timeout: 30000, // 30s because PowerShell startup is slow!
