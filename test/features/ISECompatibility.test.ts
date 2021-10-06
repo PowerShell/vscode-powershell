@@ -43,7 +43,7 @@ suite("ISECompatibility feature", () => {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             assert.notStrictEqual(currently, iseSetting.value);
         }
-    }).timeout(10000);
+    });
 
     test("It doesn't change theme when disabled if theme was manually changed after being enabled", async () => {
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "PowerShell ISE");
@@ -58,5 +58,5 @@ suite("ISECompatibility feature", () => {
             assert.notStrictEqual(currently, iseSetting.value);
         }
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "Monokai");
-    }).timeout(10000);
+    });
 });

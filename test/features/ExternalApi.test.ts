@@ -94,5 +94,5 @@ suite("ExternalApi feature - Other APIs", () => {
         assert.notStrictEqual(versionDetails.version, null);
 
         // Start up can take some time...so set the timeout to 30 seconds.
-    }).timeout(30000);
+    });
 });
