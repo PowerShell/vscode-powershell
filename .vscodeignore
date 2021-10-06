@@ -1,8 +1,10 @@
 .github/
+.nyc_output/
 .poshchan/
 .vscode/
 .vscode-test/
 .vsts-ci/
+coverage/
 logs/
 node_modules/
 out/

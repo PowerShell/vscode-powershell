@@ -1,4 +1,6 @@
+.nyc_output
 .vscode-test/
+coverage/
 logs/
 modules/
 node_modules/
