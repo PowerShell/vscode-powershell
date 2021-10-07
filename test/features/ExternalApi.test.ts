@@ -2,18 +2,17 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
-import { suiteSetup, setup, teardown } from "mocha";
 import utils = require("../utils");
 import { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 
-suite("ExternalApi feature - Registration API", () => {
+describe("ExternalApi feature - Registration API", () => {
     let powerShellExtensionClient: IPowerShellExtensionClient;
-    suiteSetup(async () => {
+    before(async () => {
         const powershellExtension = await utils.ensureExtensionIsActivated();
         powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
     });
 
-    test("It can register and unregister an extension", () => {
+    it("It can register and unregister an extension", () => {
         const sessionId: string = powerShellExtensionClient.registerExternalExtension(utils.extensionId);
         assert.notStrictEqual(sessionId , "");
         assert.notStrictEqual(sessionId , null);
@@ -22,7 +21,7 @@ suite("ExternalApi feature - Registration API", () => {
             true);
     });
 
-    test("It can register and unregister an extension with a version", () => {
+    it("It can register and unregister an extension with a version", () => {
         const sessionId: string = powerShellExtensionClient.registerExternalExtension(utils.extensionId, "v2");
         assert.notStrictEqual(sessionId , "");
         assert.notStrictEqual(sessionId , null);
@@ -34,12 +33,12 @@ suite("ExternalApi feature - Registration API", () => {
     /*
         NEGATIVE TESTS
     */
-    test("API fails if not registered", async () => {
+    it("API fails if not registered", async () => {
         assert.rejects(
             async () => await powerShellExtensionClient.getPowerShellVersionDetails(""))
     });
 
-    test("It can't register the same extension twice", async () => {
+    it("It can't register the same extension twice", async () => {
         const sessionId: string = powerShellExtensionClient.registerExternalExtension(utils.extensionId);
         try {
             assert.throws(
@@ -52,7 +51,7 @@ suite("ExternalApi feature - Registration API", () => {
         }
     });
 
-    test("It can't unregister an extension that isn't registered", async () => {
+    it("It can't unregister an extension that isn't registered", async () => {
         assert.throws(
             () => powerShellExtensionClient.unregisterExternalExtension("not-real"),
             {
@@ -61,24 +60,24 @@ suite("ExternalApi feature - Registration API", () => {
         });
 });
 
-suite("ExternalApi feature - Other APIs", () => {
+describe("ExternalApi feature - Other APIs", () => {
     let sessionId: string;
     let powerShellExtensionClient: IPowerShellExtensionClient;
 
-    suiteSetup(async () => {
+    before(async () => {
         const powershellExtension = await utils.ensureExtensionIsActivated();
         powerShellExtensionClient = powershellExtension!.exports as IPowerShellExtensionClient;
     });
 
-    setup(() => {
+    beforeEach(() => {
         sessionId = powerShellExtensionClient.registerExternalExtension(utils.extensionId);
     });
 
-    teardown(() => {
+    afterEach(() => {
         powerShellExtensionClient.unregisterExternalExtension(sessionId);
     });
 
-    test("It can get PowerShell version details", async () => {
+    it("It can get PowerShell version details", async () => {
         const versionDetails: IExternalPowerShellDetails = await powerShellExtensionClient.getPowerShellVersionDetails(sessionId);
 
         assert.notStrictEqual(versionDetails.architecture, "");

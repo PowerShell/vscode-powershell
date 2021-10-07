@@ -6,7 +6,6 @@ import * as fs from "fs";
 import * as path from "path";
 import rewire = require("rewire");
 import vscode = require("vscode");
-import { suiteSetup } from "mocha";
 import utils = require("../utils");
 import { sleep } from "../../src/utils";
 
@@ -19,10 +18,10 @@ enum LaunchType {
     Run,
 }
 
-suite("RunCode tests", () => {
-    suiteSetup(utils.ensureExtensionIsActivated);
+describe("RunCode tests", () => {
+    before(utils.ensureExtensionIsActivated);
 
-    test("Can create the launch config", () => {
+    it("Can create the launch config", () => {
         const commandToRun: string = "Invoke-Build";
         const args: string[] = ["Clean"];
 
@@ -43,7 +42,7 @@ suite("RunCode tests", () => {
         assert.deepStrictEqual(actual, expected);
     });
 
-    test("Can run Pester tests from file", async () => {
+    it("Can run Pester tests from file", async () => {
         const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
         assert(fs.existsSync(pesterTests));
 
