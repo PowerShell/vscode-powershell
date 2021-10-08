@@ -1,5 +1,21 @@
 # PowerShell Extension Release History
 
+## v2021.10.0
+### Friday, October 08, 2021
+
+This is a hot-fix release for an upstream change to the location of the PSScriptAnalyzer
+rules documentation.
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 ‍🕵️ [vscode-powershell #3608](https://github.com/PowerShell/vscode-powershell/pull/3608) - Fix base URI for PSScriptAnalyzer rule documentation. (Thanks @bgold09!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+No changes, but stay tuned for major updates!
+The [pipeline rewrite](https://github.com/PowerShell/vscode-powershell/projects/14)
+work is under review.
+
 ## v2021.9.2
 ### Thursday, September 30, 2021
 
