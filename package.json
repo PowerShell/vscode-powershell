@@ -842,6 +842,11 @@
           "default": true,
           "description": "Use code lens that is compatible with Pester 4. Disabling this will show 'Run Tests' on all It, Describe and Context blocks, and will correctly work only with Pester 5 and newer."
         },
+        "powershell.pester.codeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "This settting enables or disables the 'Run Tests' and 'Debug Tests' codelens that appears near Pester tests."
+        },
         "powershell.pester.outputVerbosity": {
           "type": "string",
           "enum": [
