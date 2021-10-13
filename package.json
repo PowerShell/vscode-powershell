@@ -845,7 +845,7 @@
         "powershell.pester.codeLens": {
           "type": "boolean",
           "default": true,
-          "description": "This settting enables or disables the 'Run Tests' and 'Debug Tests' codelens that appears near Pester tests."
+          "description": "This setting controls the appearance of the 'Run Tests' and 'Debug Tests' CodeLenses that appears above Pester tests."
         },
         "powershell.pester.outputVerbosity": {
           "type": "string",
