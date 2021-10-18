@@ -38,6 +38,11 @@ This will compile the TypeScript files in the project to JavaScript files.
 Invoke-Build Build
 ```
 
+As a developer, you may want to use `Invoke-Build LinkEditorServices` to setup a symbolic
+link to its modules instead of copying the files. This will mean the built extension will
+always have the latest version of your PowerShell Editor Services build, but this cannot
+be used to package the extension into a VSIX. So it is a manual step.
+
 ### Launching the extension
 
 #### From Visual Studio Code
