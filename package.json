@@ -840,7 +840,12 @@
         "powershell.pester.useLegacyCodeLens": {
           "type": "boolean",
           "default": true,
-          "description": "Use code lens that is compatible with Pester 4. Disabling this will show 'Run Tests' on all It, Describe and Context blocks, and will correctly work only with Pester 5 and newer."
+          "description": "Use a CodeLens that is compatible with Pester 4. Disabling this will show 'Run Tests' on all It, Describe and Context blocks, and will correctly work only with Pester 5 and newer."
+        },
+        "powershell.pester.codeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "This setting controls the appearance of the 'Run Tests' and 'Debug Tests' CodeLenses that appears above Pester tests."
         },
         "powershell.pester.outputVerbosity": {
           "type": "string",
