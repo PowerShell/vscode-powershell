@@ -39,7 +39,7 @@ task Restore -If { !(Test-Path "$PSScriptRoot/node_modules") } {
 
 task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
-    Remove-Item ./modules -Exclude "README.md" -Recurse -Force -ErrorAction Ignore
+    Remove-Item ./modules -Recurse -Force -ErrorAction Ignore
     Remove-Item ./out -Recurse -Force -ErrorAction Ignore
     Remove-Item ./node_modules -Recurse -Force -ErrorAction Ignore
 }
@@ -57,9 +57,15 @@ task BuildEditorServices -If (Get-EditorServicesPath) {
     Invoke-Build Build (Get-EditorServicesPath)
 }
 
-task CopyEditorServices -If { !(Test-Path ./modules/PowerShellEditorServices) -and (Get-EditorServicesPath) } BuildEditorServices, {
-    Write-Host "`n### Copying PowerShellEditorServices module files" -ForegroundColor Green
-    Copy-Item -Recurse -Force "$(Split-Path (Get-EditorServicesPath))/module/*" ./modules
+task LinkEditorServices -If (Get-EditorServicesPath) BuildEditorServices, {
+    Write-Host "`n### For developer use only! Creating symbolic link to PSES" -ForegroundColor Green
+    Remove-Item ./modules -Recurse -Force -ErrorAction Ignore
+    New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
+}
+
+task CopyEditorServices -If { !(Test-Path ./modules) -and (Get-EditorServicesPath) } BuildEditorServices, {
+    Write-Host "`n### Copying PSES" -ForegroundColor Green
+    Copy-Item -Recurse -Force "$(Split-Path (Get-EditorServicesPath))/module" ./modules
 }
 
 task Build CopyEditorServices, Restore, {
@@ -111,7 +117,9 @@ task UpdateReadme -If { $script:IsPreviewExtension } {
 }
 
 task Package UpdateReadme, Build, {
-    assert { Test-Path ./modules/PowerShellEditorServices }
+    assert (Test-Path ./modules/PowerShellEditorServices)
+    assert ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
+
     Write-Host "`n### Packaging $($script:PackageJson.name)-$($script:PackageJson.version).vsix`n" -ForegroundColor Green
     exec { & npm run package }
 }
