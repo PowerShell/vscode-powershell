@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2021.10.1-preview
+### Monday, October 18, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 👷 [vscode-powershell #3623](https://github.com/PowerShell/vscode-powershell/pull/3623) - Add `LinkEditorServices` task for developers.
+- ✨️ 🙏 [vscode-powershell #3430](https://github.com/PowerShell/vscode-powershell/pull/3613) - Setting to Disable Pester Code Lens. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 👷 [PowerShellEditorServices #1589](https://github.com/PowerShell/PowerShellEditorServices/pull/1589) - Remove `BinClean` dependency from build task. (Thanks @JustinGrote!)
+- #️⃣ 🙏 [PowerShellEditorServices #1585](https://github.com/PowerShell/PowerShellEditorServices/pull/1585) - Setting to Disable Pester Code Lens. (Thanks @JustinGrote!)
+- #️⃣ 🙏 [PowerShellEditorServices #1578](https://github.com/PowerShell/PowerShellEditorServices/pull/1578) - Fix typo in comments. (Thanks @glennsarti!)
+
 ## v2021.10.0
 ### Friday, October 08, 2021
 
