@@ -1,9 +1,17 @@
 # PowerShell Extension Release History
 
-## v2021.10.1-preview
-### Monday, October 18, 2021
+## v2021.10.1
+### Wednesday, October 20, 2021
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+Check out the new [Pester Tests][] adapter by [Justin Grote][] and inspired by [Tyler
+Leonhardt][]. While still under development, it provides integration with Visual Studio
+Code's new test explorer interface for Pester tests and is quite nice!
+
+[Pester tests]: https://marketplace.visualstudio.com/items?itemName=pspester.pester-test
+[Justin Grote]: https://twitter.com/justinwgrote
+[Tyler Leonhardt]: https://github.com/TylerLeonhardt
 
 - ✨ 👷 [vscode-powershell #3623](https://github.com/PowerShell/vscode-powershell/pull/3623) - Add `LinkEditorServices` task for developers.
 - ✨️ 🙏 [vscode-powershell #3430](https://github.com/PowerShell/vscode-powershell/pull/3613) - Setting to Disable Pester Code Lens. (Thanks @JustinGrote!)
