@@ -1,10 +1,10 @@
 {
-  "name": "powershell-preview",
-  "displayName": "PowerShell Preview",
+  "name": "powershell",
+  "displayName": "PowerShell",
   "version": "2021.10.1",
-  "preview": true,
+  "preview": false,
   "publisher": "ms-vscode",
-  "description": "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!",
+  "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
     "vscode": "^1.56.0"
   },
@@ -16,7 +16,7 @@
     "Snippets",
     "Linters"
   ],
-  "icon": "media/PowerShell_Preview_Icon.png",
+  "icon": "media/PowerShell_Icon.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"
