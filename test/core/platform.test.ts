@@ -467,8 +467,8 @@ function setupTestEnvironment(testPlatform: ITestPlatform) {
     }
 }
 
-describe("Platform module", () => {
-    describe("PlatformDetails", () => {
+describe("Platform module", function() {
+    describe("PlatformDetails", function() {
         const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
         switch (process.platform) {
             case "darwin":
@@ -521,14 +521,14 @@ describe("Platform module", () => {
         }
     });
 
-    describe("Default PowerShell installation", () => {
-        afterEach(() => {
+    describe("Default PowerShell installation", function() {
+        afterEach(function() {
             sinon.restore();
             mockFS.restore();
         });
 
         for (const testPlatform of successTestCases) {
-            it(`Default PowerShell path on ${testPlatform.name}`, () => {
+            it(`Default PowerShell path on ${testPlatform.name}`, function() {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
@@ -542,7 +542,7 @@ describe("Platform module", () => {
         }
 
         for (const testPlatform of errorTestCases) {
-            it(`Extension startup fails gracefully on ${testPlatform.name}`, () => {
+            it(`Extension startup fails gracefully on ${testPlatform.name}`, function() {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
@@ -553,14 +553,14 @@ describe("Platform module", () => {
         }
     });
 
-    describe("Expected PowerShell installation list", () => {
-        afterEach(() => {
+    describe("Expected PowerShell installation list", function() {
+        afterEach(function() {
             sinon.restore();
             mockFS.restore();
         });
 
         for (const testPlatform of successTestCases) {
-            it(`PowerShell installation list on ${testPlatform.name}`, () => {
+            it(`PowerShell installation list on ${testPlatform.name}`, function() {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
@@ -583,7 +583,7 @@ describe("Platform module", () => {
         }
 
         for (const testPlatform of errorTestCases) {
-            it(`Extension startup fails gracefully on ${testPlatform.name}`, () => {
+            it(`Extension startup fails gracefully on ${testPlatform.name}`, function() {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
@@ -594,8 +594,8 @@ describe("Platform module", () => {
         }
     });
 
-    describe("Windows PowerShell path fix", () => {
-        afterEach(() => {
+    describe("Windows PowerShell path fix", function() {
+        afterEach(function() {
             sinon.restore();
             mockFS.restore();
         });
@@ -603,7 +603,7 @@ describe("Platform module", () => {
         for (const testPlatform of successTestCases
                 .filter((tp) => tp.platformDetails.operatingSystem === platform.OperatingSystem.Windows)) {
 
-            it(`Corrects the Windows PowerShell path on ${testPlatform.name}`, () => {
+            it(`Corrects the Windows PowerShell path on ${testPlatform.name}`, function() {
                 setupTestEnvironment(testPlatform);
 
                 function getWinPSPath(systemDir: string) {

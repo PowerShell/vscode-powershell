@@ -30,7 +30,7 @@ function convertToVSCodeResourceScheme(filePath: string): string {
     return vscode.Uri.file(filePath).toString().replace("file://", "vscode-resource://");
 }
 
-describe("CustomViews tests", () => {
+describe("CustomViews tests", function() {
     const testCases: IHtmlContentViewTestCase[] = [
         // Basic test that has no js or css.
         {
@@ -108,7 +108,7 @@ hello
     ];
 
     for (const testCase of testCases) {
-        it(`Can create an HtmlContentView and get its content - ${testCase.name}`, () => {
+        it(`Can create an HtmlContentView and get its content - ${testCase.name}`, function() {
             const htmlContentView = new HtmlContentView();
 
             const jsPaths = testCase.javaScriptFiles.map((jsFile) => {

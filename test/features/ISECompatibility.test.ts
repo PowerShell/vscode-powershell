@@ -6,33 +6,33 @@ import * as vscode from "vscode";
 import { ISECompatibilityFeature } from "../../src/features/ISECompatibility";
 import utils = require("../utils");
 
-describe("ISECompatibility feature", () => {
+describe("ISECompatibility feature", function() {
     let currentTheme: string;
 
-    before(async () => {
+    before(async function() {
         // Save user's current theme.
         currentTheme = await vscode.workspace.getConfiguration("workbench").get("colorTheme");
         await utils.ensureExtensionIsActivated();
     });
 
-    beforeEach(async () => { await vscode.commands.executeCommand("PowerShell.EnableISEMode"); });
+    beforeEach(async function() { await vscode.commands.executeCommand("PowerShell.EnableISEMode"); });
 
-    afterEach(async () => { await vscode.commands.executeCommand("PowerShell.DisableISEMode"); });
+    afterEach(async function() { await vscode.commands.executeCommand("PowerShell.DisableISEMode"); });
 
-    after(async () => {
+    after(async function() {
         // Reset user's current theme.
         await vscode.workspace.getConfiguration("workbench").update("colorTheme", currentTheme, true);
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), currentTheme);
     });
 
-    it("It sets ISE Settings", async () => {
+    it("It sets ISE Settings", async function() {
         for (const iseSetting of ISECompatibilityFeature.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
             assert.strictEqual(currently, iseSetting.value);
         }
     });
 
-    it("It unsets ISE Settings", async () => {
+    it("It unsets ISE Settings", async function() {
         // Change state to something that DisableISEMode will change
         await vscode.workspace.getConfiguration("workbench").update("colorTheme", "PowerShell ISE", true);
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "PowerShell ISE");
@@ -44,7 +44,7 @@ describe("ISECompatibility feature", () => {
         }
     });
 
-    it("It doesn't change theme when disabled if theme was manually changed after being enabled", async () => {
+    it("It doesn't change theme when disabled if theme was manually changed after being enabled", async function() {
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), "PowerShell ISE");
 
         // "Manually" change theme after enabling ISE mode. Use a built-in theme but not the default.
