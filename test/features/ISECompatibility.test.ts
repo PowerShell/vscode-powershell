@@ -15,7 +15,7 @@ describe("ISE compatibility feature", function () {
     before(async function () {
         // Save user's current theme.
         currentTheme = await vscode.workspace.getConfiguration("workbench").get("colorTheme");
-        await utils.ensureExtensionIsActivated();
+        await utils.ensureEditorServicesIsConnected();
     });
 
     after(async function () {

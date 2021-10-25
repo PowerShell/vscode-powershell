@@ -8,7 +8,7 @@ import * as vscode from "vscode";
 import utils = require("../utils");
 
 describe("Path assumptions", function () {
-    before(utils.ensureExtensionIsActivated);
+    before(utils.ensureEditorServicesIsConnected);
 
     // TODO: This is skipped because it intereferes with other tests. Either
     // need to find a way to close the opened folder via a Code API, or find
