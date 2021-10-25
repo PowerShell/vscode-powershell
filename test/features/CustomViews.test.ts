@@ -30,11 +30,10 @@ function convertToVSCodeResourceScheme(filePath: string): string {
     return vscode.Uri.file(filePath).toString().replace("file://", "vscode-resource://");
 }
 
-describe("CustomViews tests", function() {
+describe("CustomViews feature", function () {
     const testCases: IHtmlContentViewTestCase[] = [
-        // Basic test that has no js or css.
         {
-            name: "Basic",
+            name: "with no JavaScript or CSS",
             htmlContent: "hello",
             javaScriptFiles: [],
             cssFiles: [],
@@ -45,7 +44,7 @@ hello
 
         // A test that adds a js file.
         {
-            name: "With JavaScript file",
+            name: "with a JavaScript file but no CSS",
             htmlContent: "hello",
             javaScriptFiles: [
                 {
@@ -62,7 +61,7 @@ hello
 
         // A test that adds a js file in the current directory, and the parent directory.
         {
-            name: "With 2 JavaScript files in two different locations",
+            name: "with two JavaScript files in different locations, but no CSS",
             htmlContent: "hello",
             javaScriptFiles: [
                 {
@@ -84,7 +83,7 @@ hello
 
         // A test that adds a js file and a css file.
         {
-            name: "With JavaScript and CSS file",
+            name: "with a JavaScript and a CSS file",
             htmlContent: "hello",
             javaScriptFiles: [
                 {
@@ -98,8 +97,7 @@ hello
                     content: "body: { background-color: green; }",
                 },
             ],
-            expectedHtmlString: `<html><head><link rel="stylesheet" href="${
-                convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.css"))}">
+            expectedHtmlString: `<html><head><link rel="stylesheet" href="${convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.css"))}">
 </head><body>
 hello
 <script src="${convertToVSCodeResourceScheme(path.join(__dirname, "testCustomViews.js"))}"></script>
@@ -108,7 +106,7 @@ hello
     ];
 
     for (const testCase of testCases) {
-        it(`Can create an HtmlContentView and get its content - ${testCase.name}`, function() {
+        it(`Correctly creates an HtmlContentView ${testCase.name}`, function () {
             const htmlContentView = new HtmlContentView();
 
             const jsPaths = testCase.javaScriptFiles.map((jsFile) => {

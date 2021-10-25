@@ -18,10 +18,10 @@ enum LaunchType {
     Run,
 }
 
-describe("RunCode tests", function() {
+describe("RunCode feature", function () {
     before(utils.ensureExtensionIsActivated);
 
-    it("Can create the launch config", function() {
+    it("Creates the launch config", function () {
         const commandToRun: string = "Invoke-Build";
         const args: string[] = ["Clean"];
 
@@ -42,13 +42,14 @@ describe("RunCode tests", function() {
         assert.deepStrictEqual(actual, expected);
     });
 
-    it("Can run Pester tests from file", async function() {
+    it("Runs Pester tests from a file", async function () {
         const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
         assert(fs.existsSync(pesterTests));
 
         // Open the PowerShell file with Pester tests and then wait a while for
         // the extension to finish connecting to the server.
         await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(pesterTests));
+        // TODO: Find a non-sleep way to wait for the connection to establish.
         await sleep(15000);
 
         // Now run the Pester tests, check the debugger started, wait a bit for
