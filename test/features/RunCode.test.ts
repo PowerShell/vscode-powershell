@@ -18,10 +18,10 @@ enum LaunchType {
     Run,
 }
 
-describe("RunCode tests", () => {
+describe("RunCode tests", function() {
     before(utils.ensureExtensionIsActivated);
 
-    it("Can create the launch config", () => {
+    it("Can create the launch config", function() {
         const commandToRun: string = "Invoke-Build";
         const args: string[] = ["Clean"];
 
@@ -42,7 +42,7 @@ describe("RunCode tests", () => {
         assert.deepStrictEqual(actual, expected);
     });
 
-    it("Can run Pester tests from file", async () => {
+    it("Can run Pester tests from file", async function() {
         const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
         assert(fs.existsSync(pesterTests));
 
