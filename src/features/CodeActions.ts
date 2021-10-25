@@ -34,7 +34,7 @@ export class CodeActionsFeature implements vscode.Disposable {
     }
 
     public showRuleDocumentation(ruleId: string) {
-        const pssaDocBaseURL = "https://github.com/PowerShell/PSScriptAnalyzer/blob/master/docs/Rules";
+        const pssaDocBaseURL = "https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/rules/";
 
         if (!ruleId) {
             this.log.writeWarning("Cannot show documentation for code action, no ruleName was supplied.");
@@ -45,6 +45,6 @@ export class CodeActionsFeature implements vscode.Disposable {
             ruleId = ruleId.substr(2);
         }
 
-        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(pssaDocBaseURL + `/${ruleId}.md`));
+        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(pssaDocBaseURL + `/${ruleId}`));
     }
 }
