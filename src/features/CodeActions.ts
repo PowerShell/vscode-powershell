@@ -45,6 +45,6 @@ export class CodeActionsFeature implements vscode.Disposable {
             ruleId = ruleId.substr(2);
         }
 
-        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(pssaDocBaseURL + `/${ruleId}`));
+        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(pssaDocBaseURL + `${ruleId}`));
     }
 }
