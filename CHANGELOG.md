@@ -1,5 +1,23 @@
 # PowerShell Extension Release History
 
+## v2021.10.2
+### Thursday, October 28, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+The PSScriptAnalyzer rule explanations now open the beautiful published documentation at
+[docs.microsoft.com](https://docs.microsoft.com/powershell/utility-modules/psscriptanalyzer/overview).
+
+- ✨ ‍🕵️ [vscode-powershell #3642](https://github.com/PowerShell/vscode-powershell/pull/3642) - Point PSScriptAnalyzer rules to published documentation. (Thanks @sdwheeler!)
+- ✨ 🚨 [vscode-powershell #3641](https://github.com/PowerShell/vscode-powershell/pull/3641) - Clean up unit tests' descriptions and logical separation.
+- ✨ 🚨 [vscode-powershell #3631](https://github.com/PowerShell/vscode-powershell/pull/3631) - Replace `() =>` arrow lambdas with `function ()` for Mocha.
+- #️⃣ 🙏 [vscode-powershell #3628](https://github.com/PowerShell/vscode-powershell/pull/3628) - Add missing `glob` dev dependency.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+No changes in this release, but the next preview will include PowerShell Editor Services
+v3.0.0, with the pipeline rewrite!
+
 ## v2021.10.1
 ### Wednesday, October 20, 2021
 
@@ -196,7 +214,7 @@ for the full story!
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
-- 👷🐛 [PowerShellEditorServices #1509](https://github.com/PowerShell/PowerShellEditorServices/issues/1509) Fix signing of files in release.
+- 👷🐛 [PowerShellEditorServices #1509](https://github.com/PowerShell/PowerShellEditorServices/issues/1509) - Fix signing of files in release.
 
 ## v2021.6.1
 ### Monday, June 21, 2021
