@@ -1,5 +1,86 @@
 # PowerShell Extension Release History
 
+## v2021.10.3-preview
+### Thursday, October 28, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+No changes! New preview for PowerShell Editor Services v3.0.0!
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+This preview release includes a complete overhaul of the core PowerShell engine
+of PowerShell Editor Services.
+This represents over a year's work,
+tracked in [PSES #1295](https://github.com/PowerShell/PowerShellEditorServices/issues/1295)
+and implemented in [PSES #1459](https://github.com/PowerShell/PowerShellEditorServices/pull/1459),
+and is our answer to many, many issues
+opened by users over the last few years.
+We're hoping you'll see a marked improvement
+in the reliability, performance and footprint
+of the extension as a result.
+
+Previously the Integrated Console was run
+by setting threadpool tasks on a shared main runspace,
+and where LSP servicing was done with PowerShell idle events.
+This lead to overhead, threading issues
+and a complex implementation intended to work around
+the asymmetry between PowerShell as a synchronous,
+single-threaded runtime and a language server
+as an asynchronous, multi-threaded service.
+
+Now, PowerShell Editor Services maintains its own dedicated pipeline thread,
+which is able to service requests similar to JavaScript's event loop,
+meaning we can run everything synchronously on the correct thread.
+We also get more efficiency because we can directly call
+PowerShell APIs and code written in C# from this thread,
+without the overhead of a PowerShell pipeline.
+
+This change has overhauled how we service LSP requests,
+how the Integrated Console works,
+how PSReadLine is integrated,
+how debugging is implemented,
+how remoting is handled,
+and a long tail of other features in PowerShell Editor Services.
+
+Also, in making it, while 6,000 lines of code were added,
+we removed 12,000,
+for a more maintainable, more efficient
+and easier to understand extension backend.
+
+While most of our testing has been re-enabled
+(and we're working on adding more),
+there are bound to be issues with this new implementation.
+Please give this a try and let us know if you run into anything.
+
+We also want to thank [@SeeminglyScience](https://github.com/SeeminglyScience)
+for his help and knowledge as we've made this migration.
+
+Finally, a crude breakdown of the work from the commits:
+
+- An initial dedicated pipeline thread consumer implementation
+- Implement the console REPL
+- Implement PSRL idle handling
+- Implement completions
+- Move to invoking PSRL as a C# delegate
+- Implement cancellation and <kbd>Ctrl</kbd>+<kbd>C</kbd>
+- Make <kbd>F8</kbd> work again
+- Ensure execution policy is set correctly
+- Implement $PROFILE support
+- Make nested prompts work
+- Implement REPL debugging
+- Implement remote debugging in the REPL
+- Hook up the debugging UI
+- Implement a new concurrent priority queue for PowerShell tasks
+- Reimplement the REPL synchronously rather than on its own thread
+- Really get debugging working...
+- Implement DSC breakpoint support
+- Reimplement legacy readline support
+- Ensure stdio is still supported as an LSP transport
+- Remove PowerShellContextService and other defunct code
+- Get integration tests working again (and improve diagnosis of PSES failures)
+- Get unit testing working again (except debug service tests)
+
 ## v2021.10.2
 ### Thursday, October 28, 2021
 
