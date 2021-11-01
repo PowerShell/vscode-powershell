@@ -1,5 +1,6 @@
 .vscode-test/
 logs/
+modules
 modules/
 node_modules/
 out/
