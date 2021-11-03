@@ -1,5 +1,21 @@
 # PowerShell Extension Release History
 
+## v2021.11.0-preview
+### Wednesday, November 03, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🐢 [vscode-powershell #3652](https://github.com/PowerShell/vscode-powershell/issues/3652) - Pester code lens broken in latest preview.
+- 🐛 📟 [vscode-powershell #3653](https://github.com/PowerShell/vscode-powershell/issues/3653) - `$PROFILE` variable has changed type and behavior.
+- 🐛 📟 [vscode-powershell #3650](https://github.com/PowerShell/vscode-powershell/issues/3650) - Profiles not loading in lastest preview.
+- 🐛 📖 [vscode-powershell #3658](https://github.com/PowerShell/vscode-powershell/pull/3658) - Fix typo in settings for 'Force Clear Scrollback Buffer'. (Thanks @PrzemyslawKlys!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🔍 [PowerShellEditorServices #1608](https://github.com/PowerShell/PowerShellEditorServices/pull/1611) - Improve PowerShell command and argument escaping. (Thanks @JustinGrote!)
+- 🐛 📟 [PowerShellEditorServices #1603](https://github.com/PowerShell/PowerShellEditorServices/pull/1606) - Add `LengthInBufferCells` back to `EditorServicesConsolePSHostRawUserInterface`.
+- #️⃣ 🙏 [PowerShellEditorServices #1604](https://github.com/PowerShell/PowerShellEditorServices/pull/1604) - Fix profile loading and `$PROFILE` variable.
+
 ## v2021.10.3-preview
 ### Thursday, October 28, 2021
 
