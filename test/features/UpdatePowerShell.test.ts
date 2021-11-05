@@ -5,6 +5,11 @@ import * as assert from "assert";
 import { GitHubReleaseInformation } from "../../src/features/UpdatePowerShell";
 
 describe("UpdatePowerShell feature", function () {
+    before(function () {
+        // NOTE: GitHub API is rate limited in CI
+        if (process.env.TF_BUILD) { this.skip(); }
+    });
+
     it("Gets the latest version", async function () {
         const release: GitHubReleaseInformation = await GitHubReleaseInformation.FetchLatestRelease(false);
         assert.strictEqual(release.isPreview, false, "expected to not be preview.");
