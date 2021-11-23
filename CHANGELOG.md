@@ -1,5 +1,23 @@
 # PowerShell Extension Release History
 
+## v2021.11.1-preview
+### Monday, November 22, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 👷 [vscode-powershell #3682](https://github.com/PowerShell/vscode-powershell/pull/3682) - Remove Windows Server 2016 from CI.
+- #️⃣ 🙏 [vscode-powershell #3681](https://github.com/PowerShell/vscode-powershell/pull/3681) - Update `vsce` to `2.2.0`.
+- 🐛 🚨 [vscode-powershell #3674](https://github.com/PowerShell/vscode-powershell/pull/3674) - Skip `UpdatePowerShell` tests in CI.
+- ✨ 🚨 [vscode-powershell #3643](https://github.com/PowerShell/vscode-powershell/pull/3643) - Improve test stability with `ensureEditorServicesIsConnected`.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 📖 [PowerShellEditorServices #1631](https://github.com/PowerShell/PowerShellEditorServices/pull/1631) - Add Justin Grote as maintainer.
+- 🐛 🔍 [vscode-powershell #3667](https://github.com/PowerShell/PowerShellEditorServices/pull/1630) - Improve debugger's variable population mechanism. (Thanks @JustinGrote and @SeeminglyScience!)
+- 🐛 👷 [PowerShellEditorServices #1628](https://github.com/PowerShell/PowerShellEditorServices/pull/1628) - Fix build for Apple M1 when running PowerShell 7.2 (arm64).
+- 🐛 👷 [PowerShellEditorServices #1626](https://github.com/PowerShell/PowerShellEditorServices/pull/1626) - Remove Windows Server 2016 from CI.
+- ✨ 👷 [PowerShellEditorServices #1619](https://github.com/PowerShell/PowerShellEditorServices/pull/1619) - Install a single `dotnet` SDK.
+
 ## v2021.11.0-preview
 ### Wednesday, November 03, 2021
 
