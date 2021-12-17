@@ -49,7 +49,7 @@ export class RunCodeFeature implements vscode.Disposable {
             this.sessionManager.getSessionDetails());
 
         // TODO: Update to handle multiple root workspaces.
-        vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], launchConfig);
+        vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
     }
 }
 
