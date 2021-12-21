@@ -42,7 +42,15 @@ export class ISECompatibilityFeature implements vscode.Disposable {
 
     private async EnableISEMode() {
         for (const iseSetting of ISECompatibilityFeature.settings) {
-            await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
+            try {
+                await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
+            } catch {
+                // The `update` call can fail if the setting doesn't exist. This
+                // happens when the extension runs in Azure Data Studio, which
+                // doesn't have a debugger, so the `debug` setting can't be
+                // updated. Unless we catch this exception and allow the
+                // function to continue, it throws an error to the user.
+            }
         }
 
         // Show the PowerShell Command Explorer
