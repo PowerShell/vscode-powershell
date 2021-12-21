@@ -1,5 +1,28 @@
 # PowerShell Extension Release History
 
+## v2021.12.0-preview
+### Monday, December 20, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+We're hard at work continuing to improvo the stability and coverage of the PowerShell
+Preview so we can bring the updates to the regular extension. Most recently we got the unit tests
+covering the debugger back online, which revealed a bug in the ability to set variables
+through the debugger. We're continuing to work to resolve this and re-enable the rest of
+our tests. Please keep using the Preview if you're able and filing bug reports, we
+appreciate it!
+
+- 🐛 🔍 [vscode-powershell #3713](https://github.com/PowerShell/vscode-powershell/pull/3728) - Support debugging without a workspace.
+- 🐛 📺 [vscode-powershell #3709](https://github.com/PowerShell/vscode-powershell/pull/3735) - Fix `EnableISEMode` for Azure Data Studio.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🚂 [vscode-powershell #3718](https://github.com/PowerShell/PowerShellEditorServices/pull/1647) - Create `$psEditor` as a constant.
+- #️⃣ 🙏 [PowerShellEditorServices #1641](https://github.com/PowerShell/PowerShellEditorServices/pull/1641) - Added check to see if `PSModulePath` already contained `BundledModulePath`. (Thanks @dkattan!)
+- #️⃣ 🙏 [PowerShellEditorServices #1640](https://github.com/PowerShell/PowerShellEditorServices/pull/1640) - Implemented `-LanguageServiceOnly` switch. (Thanks @dkattan!)
+- 🐛 🛫 [PowerShellEditorServices #1638](https://github.com/PowerShell/PowerShellEditorServices/pull/1638) - Fix `BundledModulePath` and PSReadLine loading (redux).
+- 🐛 🔍 [PowerShellEditorServices #1635](https://github.com/PowerShell/PowerShellEditorServices/pull/1635) - Re-enable `DebugServiceTests` suite.
+
 ## v2021.11.1-preview
 ### Monday, November 22, 2021
 
