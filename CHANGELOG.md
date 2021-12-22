@@ -1,5 +1,28 @@
 # PowerShell Extension Release History
 
+## v2021.12.0
+### Wednesday, December 22, 2021
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+This release *does not* include the latest major update of PowerShell Editor Services. We
+are updating the stable extension to bring some bug fixes forward. Please try out the
+[PowerShell Preview extension][] for the latest and hopefully greatest experience, and
+help us squash those bugs!
+
+[PowerShell Preview extension]: https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell-Preview
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+This extension update includes PowerShell Editor Services [v2.5.3][], a re-release of
+[v2.5.2][] which was the last version before the major pipeline and threading overhaul was
+merged in [v3.0.0][]. By re-releasing we are able to update the module's signature with a
+renewed certificate.
+
+[v2.5.3]: https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v2.5.3
+[v2.5.2]: https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v2.5.2
+[v3.0.0]: https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.0.0
+
 ## v2021.12.0-preview
 ### Monday, December 20, 2021
 
