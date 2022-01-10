@@ -60,7 +60,7 @@
     "@types/sinon": "~10.0.6",
     "@types/uuid": "~8.3.3",
     "@types/vscode": "~1.56.0",
-    "@vscode/test-electron": "~2.0.1",
+    "@vscode/test-electron": "~2.0.2",
     "esbuild": "^0.14.10",
     "glob": "^7.2.0",
     "mocha": "~9.1.3",
