@@ -20,5 +20,24 @@
     "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        // https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+        "name": "Attach to Editor Services",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "${command:pickProcess}",
+        "justMyCode": false,
+        "suppressJITOptimizations": true,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": true,
+          "searchNuGetOrgSymbolServer": true
+        }
+      }
+    ]
   }
 }
