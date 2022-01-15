@@ -1,9 +1,11 @@
 {
   "folders": [
     {
+      "name": "Client",
       "path": "."
     },
     {
+      "name": "Server",
       "path": "../PowerShellEditorServices"
     }
   ],
@@ -30,6 +32,143 @@
     "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "windows": {
+      "options": {
+        "shell": {
+          "executable": "pwsh.exe",
+          "args": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "linux": {
+      "options": {
+        "shell": {
+          "executable": "pwsh",
+          "args": [
+            "-NoProfile",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "osx": {
+      "options": {
+        "shell": {
+          "executable": "/usr/local/bin/pwsh",
+          "args": [
+            "-NoProfile",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "tasks": [
+      {
+        "label": "Build",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build LinkEditorServices,Build",
+        "problemMatcher": [
+          "$msCompile",
+          "$tsc"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Test Client",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build LinkEditorServices,Test",
+        "problemMatcher": [
+          "$msCompile",
+          "$tsc"
+        ],
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Test Server",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Server}"
+        },
+        "problemMatcher": [
+          "$msCompile"
+        ],
+        "command": "Invoke-Build TestServerPS72",
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Invoke-Build Client",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build ${input:clientBuildCommand}",
+        "group": "build"
+      },
+      {
+        "label": "Invoke-Build Server",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Server}"
+        },
+        "command": "Invoke-Build ${input:serverBuildCommand}",
+        "group": "build"
+      }
+    ],
+    "inputs": [
+      {
+        "type": "pickString",
+        "id": "clientBuildCommand",
+        "description": "Which Invoke-Build Client Task?",
+        "options": [
+          "Restore",
+          "Clean",
+          "LinkEditorServices",
+          "Build",
+          "Test",
+          "Package"
+        ],
+        "default": "Clean"
+      },
+      {
+        "type": "pickString",
+        "id": "serverBuildCommand",
+        "description": "Which Invoke-Build Server Task?",
+        "options": [
+          "SetupDotNet",
+          "BinClean",
+          "Clean",
+          "Build",
+          "Test",
+          "TestServer",
+          "TestServerPS72",
+          "TestE2E",
+        ],
+        "default": "Clean"
+      }
+    ]
   },
   "launch": {
     "version": "0.2.0",
