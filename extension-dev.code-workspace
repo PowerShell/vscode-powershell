@@ -20,11 +20,22 @@
     ]
   },
   "settings": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
     "files.associations": {
+      // Use JSONC instead of JSON because (1) that's how VS Code interprets
+      // snippet files, and (2) it enables better source documentation.
       "**/snippets/*.json": "jsonc",
       "**/.vsts-ci/**/*.yml": "azure-pipelines",
     },
-    "typescript.tsdk": "./node_modules/typescript/lib",
+    // Ignore the Markdown rule:
+    "markdownlint.config": {
+      "MD024": false // no-duplicate-header
+    },
+    // Lock the TypeScript SDK path to the version we use
+    "typescript.tsdk": "${workspaceFolder:Client}/node_modules/typescript/lib",
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
