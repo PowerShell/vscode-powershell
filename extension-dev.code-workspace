@@ -7,6 +7,16 @@
       "path": "../PowerShellEditorServices"
     }
   ],
+  "extensions": {
+    "recommendations": [
+      "davidanson.vscode-markdownlint",
+      "editorconfig.editorconfig",
+      "ms-azure-devops.azure-pipelines",
+      "ms-dotnettools.csharp",
+      "ms-vscode.powershell-preview",
+      "ms-vscode.vscode-typescript-tslint-plugin",
+    ]
+  },
   "settings": {
     "files.associations": {
       "**/snippets/*.json": "jsonc",
