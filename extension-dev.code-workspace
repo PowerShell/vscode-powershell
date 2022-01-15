@@ -186,6 +186,40 @@
           "searchMicrosoftSymbolServer": true,
           "searchNuGetOrgSymbolServer": true
         }
+      },
+      {
+        "name": "Launch Extension",
+        "type": "extensionHost",
+        "request": "launch",
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          "--disable-extensions",
+          "--extensionDevelopmentPath=${workspaceFolder:Client}"
+        ],
+        "sourceMaps": true,
+        "outFiles": [
+          "${workspaceFolder:Client}/out/main.js"
+        ],
+        "preLaunchTask": "Build",
+      },
+      {
+        "name": "Launch Extension Tests",
+        "type": "extensionHost",
+        "request": "launch",
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          // The tests require Code be opened with a workspace, which exists in
+          // `test`, but this has to be passed as a CLI argument, not just `cwd`.
+          "${workspaceFolder:Client}/test",
+          "--disableExtensions",
+          "--extensionDevelopmentPath=${workspaceFolder:Client}",
+          "--extensionTestsPath=${workspaceFolder:Client}/out/test/index.js",
+        ],
+        "sourceMaps": true,
+        "outFiles": [
+          "${workspaceFolder:Client}/out/test/**/*.js"
+        ],
+        "preLaunchTask": "Build"
       }
     ]
   }
