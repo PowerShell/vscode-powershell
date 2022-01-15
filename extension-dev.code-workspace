@@ -1,24 +1,24 @@
 {
-    "folders": [
-        {
-            "path": "."
-        },
-        {
-            "path": "../PowerShellEditorServices"
-        }
-    ],
-    "settings": {
-        "files.associations": {
-            "**/snippets/*.json": "jsonc",
-            "**/.vsts-ci/**/*.yml": "azure-pipelines",
-        },
-        "typescript.tsdk": "./node_modules/typescript/lib",
-        "powershell.codeFormatting.autoCorrectAliases": true,
-        "powershell.codeFormatting.newLineAfterCloseBrace": false,
-        "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
-        "powershell.codeFormatting.useCorrectCasing": true,
-        "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
-        "powershell.codeFormatting.whitespaceBetweenParameters": true,
-        "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../PowerShellEditorServices"
     }
+  ],
+  "settings": {
+    "files.associations": {
+      "**/snippets/*.json": "jsonc",
+      "**/.vsts-ci/**/*.yml": "azure-pipelines",
+    },
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
+    "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+  }
 }
