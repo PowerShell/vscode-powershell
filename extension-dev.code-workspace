@@ -34,15 +34,15 @@
     "markdownlint.config": {
       "MD024": false // no-duplicate-header
     },
-    // Lock the TypeScript SDK path to the version we use
-    "typescript.tsdk": "${workspaceFolder:Client}/node_modules/typescript/lib",
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useCorrectCasing": true,
     "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
-    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    // Lock the TypeScript SDK path to the version we use
+    "typescript.tsdk": "Client/node_modules/typescript/lib"
   },
   "tasks": {
     "version": "2.0.0",
