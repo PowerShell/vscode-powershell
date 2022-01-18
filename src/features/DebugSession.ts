@@ -75,29 +75,31 @@ export class DebugSessionFeature extends LanguageClientConsumer
         folder: WorkspaceFolder | undefined,
         token?: CancellationToken): Promise<DebugConfiguration[]> {
 
-        const launchCurrentFileId  = 0;
-        const launchScriptId       = 1;
-        const interactiveSessionId = 2;
-        const attachHostProcessId  = 3;
+        enum DebugConfig {
+            LaunchCurrentFile,
+            LaunchScript,
+            InteractiveSession,
+            AttachHostProcess,
+        }
 
         const debugConfigPickItems = [
             {
-                id: launchCurrentFileId,
+                id: DebugConfig.LaunchCurrentFile,
                 label: "Launch Current File",
                 description: "Launch and debug the file in the currently active editor window",
             },
             {
-                id: launchScriptId,
+                id: DebugConfig.LaunchScript,
                 label: "Launch Script",
                 description: "Launch and debug the specified file or command",
             },
             {
-                id: interactiveSessionId,
+                id: DebugConfig.InteractiveSession,
                 label: "Interactive Session",
                 description: "Debug commands executed from the Integrated Console",
             },
             {
-                id: attachHostProcessId,
+                id: DebugConfig.AttachHostProcess,
                 label: "Attach",
                 description: "Attach the debugger to a running PowerShell Host Process",
             },
@@ -108,50 +110,46 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 debugConfigPickItems,
                 { placeHolder: "Select a PowerShell debug configuration" });
 
-        if (launchSelection.id === launchCurrentFileId) {
-            return [
-                {
-                    name: "PowerShell: Launch Current File",
-                    type: "PowerShell",
-                    request: "launch",
-                    script: "${file}",
-                    cwd: "${file}",
-                },
-            ];
+        switch (launchSelection.id) {
+            case DebugConfig.LaunchCurrentFile:
+                return [
+                    {
+                        name: "PowerShell: Launch Current File",
+                        type: "PowerShell",
+                        request: "launch",
+                        script: "${file}",
+                        cwd: "${file}",
+                    },
+                ];
+            case DebugConfig.LaunchScript:
+                return [
+                    {
+                        name: "PowerShell: Launch Script",
+                        type: "PowerShell",
+                        request: "launch",
+                        script: "enter path or command to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
+                        cwd: "${workspaceFolder}",
+                    },
+                ];
+            case DebugConfig.InteractiveSession:
+                return [
+                    {
+                        name: "PowerShell: Interactive Session",
+                        type: "PowerShell",
+                        request: "launch",
+                        cwd: "",
+                    },
+                ];
+            case DebugConfig.AttachHostProcess:
+                return [
+                    {
+                        name: "PowerShell: Attach to PowerShell Host Process",
+                        type: "PowerShell",
+                        request: "attach",
+                        runspaceId: 1,
+                    },
+                ];
         }
-
-        if (launchSelection.id === launchScriptId) {
-            return [
-                {
-                    name: "PowerShell: Launch Script",
-                    type: "PowerShell",
-                    request: "launch",
-                    script: "enter path or command to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
-                    cwd: "${workspaceFolder}",
-                },
-            ];
-        }
-
-        if (launchSelection.id === interactiveSessionId) {
-            return [
-                {
-                    name: "PowerShell: Interactive Session",
-                    type: "PowerShell",
-                    request: "launch",
-                    cwd: "",
-                },
-            ];
-        }
-
-        // Last remaining possibility is attach to host process
-        return [
-            {
-                name: "PowerShell: Attach to PowerShell Host Process",
-                type: "PowerShell",
-                request: "attach",
-                runspaceId: 1,
-            },
-        ];
     }
 
     // DebugConfigurationProvider method
@@ -161,6 +159,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         token?: CancellationToken): Promise<DebugConfiguration> {
 
         // Make sure there is a session running before attempting to debug/run a program
+        // TODO: Perhaps this should just wait until it's running or aborted.
         if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
             const msg = "Cannot debug or run a PowerShell script until the PowerShell session has started. " +
                 "Wait for the PowerShell session to finish starting and try again.";
