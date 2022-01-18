@@ -6,5 +6,5 @@ indent_style = space
 indent_size = 4
 insert_final_newline = true
 
-[*.{json,yaml,yml}]
+[*.{json,yaml,yml,code-workspace}]
 indent_size = 2
