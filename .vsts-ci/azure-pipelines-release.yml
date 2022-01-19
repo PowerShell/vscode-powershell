@@ -47,7 +47,7 @@ stages:
   - job: Sign
     pool:
       name: 1ES
-      demands: ImageOverride -equals MMS2019
+      demands: ImageOverride -equals MMSWindows2019-Secure
     variables:
     - group: ESRP
     steps:
