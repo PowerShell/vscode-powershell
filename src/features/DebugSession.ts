@@ -175,10 +175,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
         const settings = Settings.load();
 
         // If the createTemporaryIntegratedConsole field is not specified in the launch config, set the field using
-        // the value from the corresponding setting.  Otherwise, the launch config value overrides the setting.
-        if (config.createTemporaryIntegratedConsole === undefined) {
-            config.createTemporaryIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
-        }
+        // the value from the corresponding setting. Otherwise, the launch config value overrides the setting.
+        config.createTemporaryIntegratedConsole =
+            config.createTemporaryIntegratedConsole ??
+            settings.debugging.createTemporaryIntegratedConsole;
 
         if (config.request === "attach") {
             const platformDetails = getPlatformDetails();
@@ -300,6 +300,9 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 }
             }
 
+            // NOTE: There is a tight coupling to a weird setting in
+            // `package.json` for the Launch Current File configuration where
+            // the default cwd is set to ${file}.
             if ((currentDocument !== undefined) && (config.cwd === "${file}")) {
                 config.cwd = currentDocument.fileName;
             }
