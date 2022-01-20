@@ -2,6 +2,8 @@
 # Licensed under the MIT License.
 
 param(
+    [ValidateSet("Debug", "Release")]
+    [string]$Configuration = "Debug",
     [string]$EditorServicesRepoPath = $null
 )
 
@@ -10,7 +12,7 @@ param(
 # Grab package.json data which is used throughout the build.
 $script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
 $script:IsPreviewExtension = $script:PackageJson.name -like "*preview*" -or $script:PackageJson.displayName -like "*preview*"
-Write-Host "`n### Extension Version: $($script:PackageJson.version) Extension Name: $($script:PackageJson.name)`n" -ForegroundColor Green
+Write-Host "`n### Extension: $($script:PackageJson.name)-$($script:PackageJson.version)`n" -ForegroundColor Green
 
 function Get-EditorServicesPath {
     $psesRepoPath = if ($EditorServicesRepoPath) {
@@ -23,7 +25,9 @@ function Get-EditorServicesPath {
     return Resolve-Path "$psesRepoPath/PowerShellEditorServices.build.ps1" -ErrorAction Continue
 }
 
-task Restore -If { !(Test-Path "$PSScriptRoot/node_modules") } {
+#region Setup tasks
+
+task RestoreNodeModules -If { !(Test-Path ./node_modules) } {
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
     # When in a CI build use the --loglevel=error parameter so that
     # package install warnings don't cause PowerShell to throw up
@@ -34,14 +38,50 @@ task Restore -If { !(Test-Path "$PSScriptRoot/node_modules") } {
     }
 }
 
+task RestoreEditorServices -If (Get-EditorServicesPath) {
+    switch ($Configuration) {
+        "Debug" {
+            # When debugging, we always rebuild PSES and ensure its symlinked so
+            # that developers always have the latest local bits.
+            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne "SymbolicLink") {
+                Write-Host "`n### Creating symbolic link to PSES" -ForegroundColor Green
+                remove ./modules
+                New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
+            }
 
+            Write-Host "`n### Building PSES`n" -ForegroundColor Green
+            Invoke-Build Build (Get-EditorServicesPath)
+        }
+        "Release" {
+            # When releasing, we ensure the bits are not symlinked but copied,
+            # and only if they don't already exist.
+            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq "SymbolicLink") {
+                Write-Host "`n### Deleting PSES symbolic link" -ForegroundColor Green
+                remove ./modules
+            }
+
+            if (!(Test-Path ./modules)) {
+                # We only build if it hasn't been built at all.
+                if (!(Test-Path "$(Split-Path (Get-EditorServicesPath))/module/PowerShellEditorServices/bin")) {
+                    Write-Host "`n### Building PSES`n" -ForegroundColor Green
+                    Invoke-Build Build (Get-EditorServicesPath)
+                }
+
+                Write-Host "`n### Copying PSES`n" -ForegroundColor Green
+                Copy-Item -Recurse -Force "$(Split-Path (Get-EditorServicesPath))/module" ./modules
+            }
+        }
+    }
+}
+
+task Restore RestoreEditorServices, RestoreNodeModules
+
+#endregion
 #region Clean tasks
 
 task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
-    Remove-Item ./modules -Recurse -Force -ErrorAction Ignore
-    Remove-Item ./out -Recurse -Force -ErrorAction Ignore
-    Remove-Item ./node_modules -Recurse -Force -ErrorAction Ignore
+    remove ./modules, ./out, ./node_modules, *.vsix
 }
 
 task CleanEditorServices -If (Get-EditorServicesPath) {
@@ -52,24 +92,10 @@ task CleanEditorServices -If (Get-EditorServicesPath) {
 #endregion
 #region Build tasks
 
-task BuildEditorServices -If (Get-EditorServicesPath) {
-    Write-Host "`n### Building PowerShellEditorServices`n" -ForegroundColor Green
-    Invoke-Build Build (Get-EditorServicesPath)
-}
+task Build Restore, {
+    Write-Host "`n### Building vscode-powershell`n" -ForegroundColor Green
+    assert (Test-Path ./modules/PowerShellEditorServices/bin) "Extension requires PSES"
 
-task LinkEditorServices -If (Get-EditorServicesPath) BuildEditorServices, {
-    Write-Host "`n### For developer use only! Creating symbolic link to PSES" -ForegroundColor Green
-    Remove-Item ./modules -Recurse -Force -ErrorAction Ignore
-    New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
-}
-
-task CopyEditorServices -If { !(Test-Path ./modules) -and (Get-EditorServicesPath) } BuildEditorServices, {
-    Write-Host "`n### Copying PSES" -ForegroundColor Green
-    Copy-Item -Recurse -Force "$(Split-Path (Get-EditorServicesPath))/module" ./modules
-}
-
-task Build CopyEditorServices, Restore, {
-    Write-Host "`n### Building vscode-powershell" -ForegroundColor Green
     # TODO: TSLint is deprecated and we need to switch to ESLint.
     # https://github.com/PowerShell/vscode-powershell/pull/3331
     exec { & npm run lint }
@@ -80,7 +106,10 @@ task Build CopyEditorServices, Restore, {
     # Code test runner expects individual files (and globs them at runtime).
     # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
     # https://github.com/evanw/esbuild/issues/944
-    exec { & npm run build }
+    switch ($Configuration) {
+        "Debug" { exec { & npm run build -- --sourcemap } }
+        "Release" { exec { & npm run build -- --minify } }
+    }
 }
 
 #endregion
@@ -97,7 +126,6 @@ task TestEditorServices -If (Get-EditorServicesPath) {
 }
 
 #endregion
-
 #region Package tasks
 
 task UpdateReadme -If { $script:IsPreviewExtension } {
@@ -117,10 +145,8 @@ task UpdateReadme -If { $script:IsPreviewExtension } {
 }
 
 task Package UpdateReadme, Build, {
-    assert (Test-Path ./modules/PowerShellEditorServices)
-    assert ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
-
     Write-Host "`n### Packaging $($script:PackageJson.name)-$($script:PackageJson.version).vsix`n" -ForegroundColor Green
+    assert ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
     exec { & npm run package }
 }
 
