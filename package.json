@@ -57,7 +57,7 @@
     "@types/node-fetch": "~2.5.12",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.3.9",
-    "@types/sinon": "~10.0.6",
+    "@types/sinon": "~10.0.8",
     "@types/uuid": "~8.3.4",
     "@types/vscode": "~1.56.0",
     "@vscode/test-electron": "~2.1.0",
