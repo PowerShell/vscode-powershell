@@ -88,7 +88,7 @@
         "options": {
           "cwd": "${workspaceFolder:Client}"
         },
-        "command": "Invoke-Build LinkEditorServices,Build",
+        "command": "Invoke-Build Build",
         "problemMatcher": [
           "$msCompile",
           "$tsc"
@@ -104,7 +104,7 @@
         "options": {
           "cwd": "${workspaceFolder:Client}"
         },
-        "command": "Invoke-Build LinkEditorServices,Test",
+        "command": "Invoke-Build Test",
         "problemMatcher": [
           "$msCompile",
           "$tsc"
@@ -156,7 +156,6 @@
         "options": [
           "Restore",
           "Clean",
-          "LinkEditorServices",
           "Build",
           "Test",
           "Package"

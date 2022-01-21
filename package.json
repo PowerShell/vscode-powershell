@@ -78,7 +78,7 @@
   "main": "./out/main.js",
   "scripts": {
     "lint": "tslint --project tsconfig.json",
-    "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --sourcemap --bundle --minify --external:vscode --platform=node",
+    "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --bundle --external:vscode --platform=node",
     "test": "node ./out/test/runTests.js",
     "package": "vsce package --no-gitHubIssueLinking",
     "publish": "vsce publish"
