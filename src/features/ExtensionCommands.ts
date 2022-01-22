@@ -215,16 +215,25 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         });
 
         this.command3 = vscode.commands.registerCommand('PowerShell.ClosePanel',
-            async () => { await vscode.commands.executeCommand('workbench.action.closePanel'); }),
+            () => { vscode.commands.executeCommand('workbench.action.closePanel'); }),
 
         this.command4 = vscode.commands.registerCommand('PowerShell.PositionPanelLeft',
-            async () => { await vscode.commands.executeCommand('workbench.action.positionPanelLeft'); }),
+            () => { vscode.commands.executeCommand('workbench.action.positionPanelLeft'); }),
 
         this.command5 = vscode.commands.registerCommand('PowerShell.PositionPanelBottom',
-            async () => { await vscode.commands.executeCommand('workbench.action.positionPanelBottom'); }),
+            () => { vscode.commands.executeCommand('workbench.action.positionPanelBottom'); }),
 
         this.command6 = vscode.commands.registerCommand('PowerShell.Debug.Start',
-            async () => { await vscode.commands.executeCommand('workbench.action.debug.start'); })
+            () => {
+                // TODO: Use a named debug configuration.
+                vscode.debug.startDebugging(undefined, {
+                    name: "PowerShell: Launch Current File",
+                    type: "PowerShell",
+                    request: "launch",
+                    script: "${file}",
+                    cwd: "${file}",
+                })
+            })
     }
 
     public setLanguageClient(languageclient: LanguageClient) {
