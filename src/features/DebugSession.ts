@@ -35,7 +35,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
         context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory("PowerShell", this))
     }
 
-    createDebugAdapterDescriptor(session: vscode.DebugSession, executable: vscode.DebugAdapterExecutable): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
+    createDebugAdapterDescriptor(
+        session: vscode.DebugSession,
+        _executable: vscode.DebugAdapterExecutable): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
+
         const sessionDetails = session.configuration.createTemporaryIntegratedConsole
             ? this.tempSessionDetails
             : this.sessionManager.getSessionDetails();
@@ -58,10 +61,11 @@ export class DebugSessionFeature extends LanguageClientConsumer
         languageClient.onNotification(
             StartDebuggerNotificationType,
             () =>
+                // TODO: Use a named debug configuration.
                 vscode.debug.startDebugging(undefined, {
                     request: "launch",
                     type: "PowerShell",
-                    name: "PowerShell Interactive Session",
+                    name: "PowerShell: Interactive Session",
         }));
 
         languageClient.onNotification(
@@ -75,29 +79,31 @@ export class DebugSessionFeature extends LanguageClientConsumer
         folder: WorkspaceFolder | undefined,
         token?: CancellationToken): Promise<DebugConfiguration[]> {
 
-        const launchCurrentFileId  = 0;
-        const launchScriptId       = 1;
-        const interactiveSessionId = 2;
-        const attachHostProcessId  = 3;
+        enum DebugConfig {
+            LaunchCurrentFile,
+            LaunchScript,
+            InteractiveSession,
+            AttachHostProcess,
+        }
 
         const debugConfigPickItems = [
             {
-                id: launchCurrentFileId,
+                id: DebugConfig.LaunchCurrentFile,
                 label: "Launch Current File",
                 description: "Launch and debug the file in the currently active editor window",
             },
             {
-                id: launchScriptId,
+                id: DebugConfig.LaunchScript,
                 label: "Launch Script",
                 description: "Launch and debug the specified file or command",
             },
             {
-                id: interactiveSessionId,
+                id: DebugConfig.InteractiveSession,
                 label: "Interactive Session",
                 description: "Debug commands executed from the Integrated Console",
             },
             {
-                id: attachHostProcessId,
+                id: DebugConfig.AttachHostProcess,
                 label: "Attach",
                 description: "Attach the debugger to a running PowerShell Host Process",
             },
@@ -108,59 +114,56 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 debugConfigPickItems,
                 { placeHolder: "Select a PowerShell debug configuration" });
 
-        if (launchSelection.id === launchCurrentFileId) {
-            return [
-                {
-                    name: "PowerShell: Launch Current File",
-                    type: "PowerShell",
-                    request: "launch",
-                    script: "${file}",
-                    cwd: "${file}",
-                },
-            ];
+        // TODO: Make these available in a dictionary and share them.
+        switch (launchSelection.id) {
+            case DebugConfig.LaunchCurrentFile:
+                return [
+                    {
+                        name: "PowerShell: Launch Current File",
+                        type: "PowerShell",
+                        request: "launch",
+                        script: "${file}",
+                        cwd: "${file}",
+                    },
+                ];
+            case DebugConfig.LaunchScript:
+                return [
+                    {
+                        name: "PowerShell: Launch Script",
+                        type: "PowerShell",
+                        request: "launch",
+                        script: "enter path or command to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
+                        cwd: "${workspaceFolder}",
+                    },
+                ];
+            case DebugConfig.InteractiveSession:
+                return [
+                    {
+                        name: "PowerShell: Interactive Session",
+                        type: "PowerShell",
+                        request: "launch",
+                        cwd: "",
+                    },
+                ];
+            case DebugConfig.AttachHostProcess:
+                return [
+                    {
+                        name: "PowerShell: Attach to PowerShell Host Process",
+                        type: "PowerShell",
+                        request: "attach",
+                        runspaceId: 1,
+                    },
+                ];
         }
-
-        if (launchSelection.id === launchScriptId) {
-            return [
-                {
-                    name: "PowerShell: Launch Script",
-                    type: "PowerShell",
-                    request: "launch",
-                    script: "enter path or command to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
-                    cwd: "${workspaceFolder}",
-                },
-            ];
-        }
-
-        if (launchSelection.id === interactiveSessionId) {
-            return [
-                {
-                    name: "PowerShell: Interactive Session",
-                    type: "PowerShell",
-                    request: "launch",
-                    cwd: "",
-                },
-            ];
-        }
-
-        // Last remaining possibility is attach to host process
-        return [
-            {
-                name: "PowerShell: Attach to PowerShell Host Process",
-                type: "PowerShell",
-                request: "attach",
-                runspaceId: 1,
-            },
-        ];
     }
 
     // DebugConfigurationProvider method
     public async resolveDebugConfiguration(
-        folder: WorkspaceFolder | undefined,
+        _folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
-        token?: CancellationToken): Promise<DebugConfiguration> {
-
+        _token?: CancellationToken): Promise<DebugConfiguration> {
         // Make sure there is a session running before attempting to debug/run a program
+        // TODO: Perhaps this should just wait until it's running or aborted.
         if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
             const msg = "Cannot debug or run a PowerShell script until the PowerShell session has started. " +
                 "Wait for the PowerShell session to finish starting and try again.";
@@ -176,10 +179,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
         const settings = Settings.load();
 
         // If the createTemporaryIntegratedConsole field is not specified in the launch config, set the field using
-        // the value from the corresponding setting.  Otherwise, the launch config value overrides the setting.
-        if (config.createTemporaryIntegratedConsole === undefined) {
-            config.createTemporaryIntegratedConsole = settings.debugging.createTemporaryIntegratedConsole;
-        }
+        // the value from the corresponding setting. Otherwise, the launch config value overrides the setting.
+        config.createTemporaryIntegratedConsole =
+            config.createTemporaryIntegratedConsole ??
+            settings.debugging.createTemporaryIntegratedConsole;
 
         if (config.request === "attach") {
             const platformDetails = getPlatformDetails();
@@ -214,10 +217,11 @@ export class DebugSessionFeature extends LanguageClientConsumer
             }
         }
 
+        // TODO: Use a named debug configuration.
         if (generateLaunchConfig) {
             // No launch.json, create the default configuration for both unsaved (Untitled) and saved documents.
             config.type = "PowerShell";
-            config.name = "PowerShell Launch Current File";
+            config.name = "PowerShell: Launch Current File";
             config.request = "launch";
             config.args = [];
 
@@ -241,7 +245,6 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
 
         if (config.request === "launch") {
-
             // For debug launch of "current script" (saved or unsaved), warn before starting the debugger if either
             // A) there is not an active document
             // B) the unsaved document's language type is not PowerShell
@@ -301,6 +304,9 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 }
             }
 
+            // NOTE: There is a tight coupling to a weird setting in
+            // `package.json` for the Launch Current File configuration where
+            // the default cwd is set to ${file}.
             if ((currentDocument !== undefined) && (config.cwd === "${file}")) {
                 config.cwd = currentDocument.fileName;
             }
@@ -353,7 +359,7 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
         this.command.dispose();
     }
 
-    private specifyScriptArguments(): Thenable<string> {
+    private async specifyScriptArguments(): Promise<string> {
         const powerShellDbgScriptArgsKey = "powerShellDebugScriptArgs";
 
         const options: vscode.InputBoxOptions = {
@@ -366,15 +372,13 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
             options.value = prevArgs;
         }
 
-        return vscode.window.showInputBox(options).then((text) => {
-            // When user cancel's the input box (by pressing Esc), the text value is undefined.
-            // Let's not blow away the previous settting.
-            if (text !== undefined) {
-                this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
-            }
-
-            return text;
-        });
+        const text = await vscode.window.showInputBox(options);
+        // When user cancel's the input box (by pressing Esc), the text value is undefined.
+        // Let's not blow away the previous settting.
+        if (text !== undefined) {
+            this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
+        }
+        return text;
     }
 }
 
@@ -400,7 +404,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private waitingForClientToken: vscode.CancellationTokenSource;
-    private getLanguageClientResolve: (value?: LanguageClient | Thenable<LanguageClient>) => void;
+    private getLanguageClientResolve: (value?: LanguageClient | Promise<LanguageClient>) => void;
 
     constructor() {
         super();
@@ -425,7 +429,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         this.command.dispose();
     }
 
-    private getLanguageClient(): Thenable<LanguageClient> {
+    private getLanguageClient(): Promise<LanguageClient> {
         if (this.languageClient) {
             return Promise.resolve(this.languageClient);
         } else {
@@ -464,46 +468,38 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         }
     }
 
-    private pickPSHostProcess(): Thenable<string> {
-        return this.languageClient.sendRequest(GetPSHostProcessesRequestType, {}).then((hostProcesses) => {
-            // Start with the current PowerShell process in the list.
-            const items: IProcessItem[] = [{
-                label: "Current",
-                description: "The current PowerShell Integrated Console process.",
-                pid: "current",
-            }];
-
-            for (const p in hostProcesses) {
-                if (hostProcesses.hasOwnProperty(p)) {
-                    let windowTitle = "";
-                    if (hostProcesses[p].mainWindowTitle) {
-                        windowTitle = `, Title: ${hostProcesses[p].mainWindowTitle}`;
-                    }
-
-                    items.push({
-                        label: hostProcesses[p].processName,
-                        description: `PID: ${hostProcesses[p].processId.toString()}${windowTitle}`,
-                        pid: hostProcesses[p].processId,
-                    });
+    private async pickPSHostProcess(): Promise<string> {
+        const hostProcesses = await this.languageClient.sendRequest(GetPSHostProcessesRequestType, {});
+        // Start with the current PowerShell process in the list.
+        const items: IProcessItem[] = [{
+            label: "Current",
+            description: "The current PowerShell Integrated Console process.",
+            pid: "current",
+        }];
+        for (const p in hostProcesses) {
+            if (hostProcesses.hasOwnProperty(p)) {
+                let windowTitle = "";
+                if (hostProcesses[p].mainWindowTitle) {
+                    windowTitle = `, Title: ${hostProcesses[p].mainWindowTitle}`;
                 }
+
+                items.push({
+                    label: hostProcesses[p].processName,
+                    description: `PID: ${hostProcesses[p].processId.toString()}${windowTitle}`,
+                    pid: hostProcesses[p].processId,
+                });
             }
-
-            if (items.length === 0) {
-                return Promise.reject("There are no PowerShell host processes to attach to.");
-            }
-
-            const options: vscode.QuickPickOptions = {
-                placeHolder: "Select a PowerShell host process to attach to",
-                matchOnDescription: true,
-                matchOnDetail: true,
-            };
-
-            return vscode.window.showQuickPick(items, options).then((item) => {
-                // Return undefined when user presses Esc.
-                // This prevents VSCode from opening launch.json in this case which happens if we return "".
-                return item ? `${item.pid}` : undefined;
-            });
-        });
+        }
+        if (items.length === 0) {
+            return Promise.reject("There are no PowerShell host processes to attach to.");
+        }
+        const options: vscode.QuickPickOptions = {
+            placeHolder: "Select a PowerShell host process to attach to",
+            matchOnDescription: true,
+            matchOnDetail: true,
+        };
+        const item = await vscode.window.showQuickPick(items, options);
+        return item ? `${item.pid}` : undefined;
     }
 
     private clearWaitingToken() {
@@ -531,7 +527,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private waitingForClientToken: vscode.CancellationTokenSource;
-    private getLanguageClientResolve: (value?: LanguageClient | Thenable<LanguageClient>) => void;
+    private getLanguageClientResolve: (value?: LanguageClient | Promise<LanguageClient>) => void;
 
     constructor() {
         super();
@@ -555,7 +551,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         this.command.dispose();
     }
 
-    private getLanguageClient(): Thenable<LanguageClient> {
+    private getLanguageClient(): Promise<LanguageClient> {
         if (this.languageClient) {
             return Promise.resolve(this.languageClient);
         } else {
@@ -594,36 +590,29 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         }
     }
 
-    private pickRunspace(processId): Thenable<string> {
-        return this.languageClient.sendRequest(GetRunspaceRequestType, { processId }).then((response) => {
-            const items: IRunspaceItem[] = [];
-
-            for (const runspace of response) {
-                // Skip default runspace
-                if ((runspace.id === 1 || runspace.name === "PSAttachRunspace")
-                    && processId === "current") {
-                    continue;
-                }
-
-                items.push({
-                    label: runspace.name,
-                    description: `ID: ${runspace.id} - ${runspace.availability}`,
-                    id: runspace.id.toString(),
-                });
+    private async pickRunspace(processId: string): Promise<string> {
+        const response = await this.languageClient.sendRequest(GetRunspaceRequestType, { processId });
+        const items: IRunspaceItem[] = [];
+        for (const runspace of response) {
+            // Skip default runspace
+            if ((runspace.id === 1 || runspace.name === "PSAttachRunspace")
+                && processId === "current") {
+                continue;
             }
 
-            const options: vscode.QuickPickOptions = {
-                placeHolder: "Select PowerShell runspace to debug",
-                matchOnDescription: true,
-                matchOnDetail: true,
-            };
-
-            return vscode.window.showQuickPick(items, options).then((item) => {
-                // Return undefined when user presses Esc.
-                // This prevents VSCode from opening launch.json in this case which happens if we return "".
-                return item ? `${item.id}` : undefined;
+            items.push({
+                label: runspace.name,
+                description: `ID: ${runspace.id} - ${runspace.availability}`,
+                id: runspace.id.toString(),
             });
-        });
+        }
+        const options: vscode.QuickPickOptions = {
+            placeHolder: "Select PowerShell runspace to debug",
+            matchOnDescription: true,
+            matchOnDetail: true,
+        };
+        const item = await vscode.window.showQuickPick(items, options);
+        return item ? `${item.id}` : undefined;
     }
 
     private clearWaitingToken() {

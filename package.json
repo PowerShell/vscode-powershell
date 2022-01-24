@@ -442,7 +442,7 @@
               "type": "PowerShell",
               "request": "launch",
               "script": "^\"\\${file}\"",
-              "cwd": "^\"\\${workspaceFolder}\""
+              "cwd": "^\"\\${file}\""
             }
           },
           {
