@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2022.1.1-preview
+### Monday, January 24, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 📺 [vscode-powershell #3710](https://github.com/PowerShell/vscode-powershell/pull/3772) - Fix `PowerShell.Debug.Start` to just launch current file.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- #️⃣ 💎 [PowerShellEditorServices #1676](https://github.com/PowerShell/PowerShellEditorServices/pull/1676) - Use EditorConfig for dotnet build and suppress existing issues. (Thanks @JustinGrote!)
+- 🐛 🔍 [PowerShellEditorServices #1672](https://github.com/PowerShell/PowerShellEditorServices/pull/1670) - Handle `debuggerResult` being null in `ProcessDebuggerResult`.
+- 🐛 🙏 [PowerShellEditorServices #1663](https://github.com/PowerShell/PowerShellEditorServices/pull/1669) - Fix off-by-one error in validation within `GetOffsetAtPosition`.
+- 🐛 📟 [PowerShellEditorServices #1667](https://github.com/PowerShell/PowerShellEditorServices/pull/1668) - Fix `Write-Host -NoNewLine` and `-*Color`. (Thanks @SeeminglyScience!)
+- 🐛 🔍 [PowerShellEditorServices #1661](https://github.com/PowerShell/PowerShellEditorServices/pull/1664) - Fix `DebuggerSetsVariablesWithConversion` test.
+- ✨ 🙏 [vscode-powershell #2800](https://github.com/PowerShell/PowerShellEditorServices/pull/1662) - Enable resolution of an alias to its function definition.
+- ✨ 🔍 [PowerShellEditorServices #1633](https://github.com/PowerShell/PowerShellEditorServices/pull/1634) - Display `IEnumerables` and `IDictionaries` in debugger prettily (with "Raw View" available). (Thanks @JustinGrote!)
+
 ## v2022.1.0-preview
 ### Monday, January 10, 2022
 
