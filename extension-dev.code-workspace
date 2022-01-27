@@ -1,24 +1,236 @@
 {
-    "folders": [
-        {
-            "path": "."
-        },
-        {
-            "path": "../PowerShellEditorServices"
-        }
-    ],
-    "settings": {
-        "files.associations": {
-            "**/snippets/*.json": "jsonc",
-            "**/.vsts-ci/**/*.yml": "azure-pipelines",
-        },
-        "typescript.tsdk": "./node_modules/typescript/lib",
-        "powershell.codeFormatting.autoCorrectAliases": true,
-        "powershell.codeFormatting.newLineAfterCloseBrace": false,
-        "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
-        "powershell.codeFormatting.useCorrectCasing": true,
-        "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
-        "powershell.codeFormatting.whitespaceBetweenParameters": true,
-        "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+  "folders": [
+    {
+      "name": "Client",
+      "path": "."
+    },
+    {
+      "name": "Server",
+      "path": "../PowerShellEditorServices"
     }
+  ],
+  "extensions": {
+    "recommendations": [
+      "davidanson.vscode-markdownlint",
+      "editorconfig.editorconfig",
+      "ms-azure-devops.azure-pipelines",
+      "ms-dotnettools.csharp",
+      "ms-vscode.powershell-preview",
+      "ms-vscode.vscode-typescript-tslint-plugin",
+    ]
+  },
+  "settings": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.associations": {
+      // Use JSONC instead of JSON because (1) that's how VS Code interprets
+      // snippet files, and (2) it enables better source documentation.
+      "**/snippets/*.json": "jsonc",
+      "**/.vsts-ci/**/*.yml": "azure-pipelines",
+    },
+    // Ignore the Markdown rule:
+    "markdownlint.config": {
+      "MD024": false // no-duplicate-header
+    },
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
+    "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    // Lock the TypeScript SDK path to the version we use
+    "typescript.tsdk": "Client/node_modules/typescript/lib"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "windows": {
+      "options": {
+        "shell": {
+          "executable": "pwsh.exe",
+          "args": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "linux": {
+      "options": {
+        "shell": {
+          "executable": "pwsh",
+          "args": [
+            "-NoProfile",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "osx": {
+      "options": {
+        "shell": {
+          "executable": "/usr/local/bin/pwsh",
+          "args": [
+            "-NoProfile",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "tasks": [
+      {
+        "label": "Build",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build Build",
+        "problemMatcher": [
+          "$msCompile",
+          "$tsc"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Test Client",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build Test",
+        "problemMatcher": [
+          "$msCompile",
+          "$tsc"
+        ],
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Test Server",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Server}"
+        },
+        "problemMatcher": [
+          "$msCompile"
+        ],
+        "command": "Invoke-Build TestServerPS72",
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Invoke-Build Client",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build ${input:clientBuildCommand}",
+        "group": "build"
+      },
+      {
+        "label": "Invoke-Build Server",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Server}"
+        },
+        "command": "Invoke-Build ${input:serverBuildCommand}",
+        "group": "build"
+      }
+    ],
+    "inputs": [
+      {
+        "type": "pickString",
+        "id": "clientBuildCommand",
+        "description": "Which Invoke-Build Client Task?",
+        "options": [
+          "Restore",
+          "Clean",
+          "Build",
+          "Test",
+          "Package"
+        ],
+        "default": "Clean"
+      },
+      {
+        "type": "pickString",
+        "id": "serverBuildCommand",
+        "description": "Which Invoke-Build Server Task?",
+        "options": [
+          "SetupDotNet",
+          "BinClean",
+          "Clean",
+          "Build",
+          "Test",
+          "TestServer",
+          "TestServerPS72",
+          "TestE2E",
+        ],
+        "default": "Clean"
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        // https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+        "name": "Attach to Editor Services",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "${command:pickProcess}",
+        "justMyCode": false,
+        "suppressJITOptimizations": true,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": true,
+          "searchNuGetOrgSymbolServer": true
+        }
+      },
+      {
+        "name": "Launch Extension",
+        "type": "extensionHost",
+        "request": "launch",
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          "--disable-extensions",
+          "--extensionDevelopmentPath=${workspaceFolder:Client}"
+        ],
+        "sourceMaps": true,
+        "outFiles": [
+          "${workspaceFolder:Client}/out/main.js"
+        ],
+        "preLaunchTask": "Build",
+      },
+      {
+        "name": "Launch Extension Tests",
+        "type": "extensionHost",
+        "request": "launch",
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          // The tests require Code be opened with a workspace, which exists in
+          // `test`, but this has to be passed as a CLI argument, not just `cwd`.
+          "${workspaceFolder:Client}/test",
+          "--disableExtensions",
+          "--extensionDevelopmentPath=${workspaceFolder:Client}",
+          "--extensionTestsPath=${workspaceFolder:Client}/out/test/index.js",
+        ],
+        "sourceMaps": true,
+        "outFiles": [
+          "${workspaceFolder:Client}/out/test/**/*.js"
+        ],
+        "preLaunchTask": "Build"
+      }
+    ]
+  }
 }

@@ -1,10 +1,10 @@
 {
-  "name": "powershell",
-  "displayName": "PowerShell",
-  "version": "2021.10.1",
-  "preview": false,
+  "name": "powershell-preview",
+  "displayName": "PowerShell Preview",
+  "version": "2022.1.1",
+  "preview": true,
   "publisher": "ms-vscode",
-  "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
+  "description": "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
     "vscode": "^1.56.0"
   },
@@ -16,7 +16,7 @@
     "Snippets",
     "Linters"
   ],
-  "icon": "media/PowerShell_Icon.png",
+  "icon": "media/PowerShell_Preview_Icon.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"
@@ -42,39 +42,35 @@
     "onView:PowerShellCommands"
   ],
   "dependencies": {
-    "node-fetch": "~2.6.5",
+    "node-fetch": "~2.6.7",
     "semver": "~7.3.5",
     "uuid": "~8.3.2",
-    "vscode-extension-telemetry": "~0.4.2",
+    "vscode-extension-telemetry": "~0.4.5",
     "vscode-languageclient": "~7.0.0",
     "vscode-languageserver-protocol": "~3.16.0"
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/glob": "~7.2.0",
-    "@types/mocha": "~9.0.0",
+    "@types/mocha": "~9.1.0",
     "@types/mock-fs": "~4.13.1",
     "@types/node": "~14.17.4",
     "@types/node-fetch": "~2.5.12",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.3.9",
-    "@types/sinon": "~10.0.4",
-    "@types/uuid": "~8.3.1",
+    "@types/sinon": "~10.0.8",
+    "@types/uuid": "~8.3.4",
     "@types/vscode": "~1.56.0",
-    "@vscode/test-electron": "~1.6.2",
-    "esbuild": "^0.13.8",
+    "@vscode/test-electron": "~2.1.1",
+    "esbuild": "^0.14.14",
     "glob": "^7.2.0",
-    "mocha": "~9.1.3",
+    "mocha": "~9.2.0",
     "mocha-multi-reporters": "~1.5.1",
-    "mock-fs": "~5.1.1",
-    "nyc": "^15.1.0",
-    "rewire": "~5.0.0",
-    "sinon": "~11.1.2",
-    "source-map-support": "^0.5.20",
-    "ts-node": "^10.2.1",
+    "mock-fs": "~5.1.2",
+    "rewire": "~6.0.0",
+    "sinon": "~12.0.1",
     "tslint": "~6.1.3",
-    "typescript": "~4.4.4",
-    "vsce": "~1.100.1"
+    "typescript": "~4.5.5",
+    "vsce": "~2.6.4"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -82,30 +78,10 @@
   "main": "./out/main.js",
   "scripts": {
     "lint": "tslint --project tsconfig.json",
-    "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --sourcemap --bundle --minify --external:vscode --platform=node",
+    "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --bundle --external:vscode --platform=node",
     "test": "node ./out/test/runTests.js",
-    "coverage": "nyc node ./out/test/runTests.js",
     "package": "vsce package --no-gitHubIssueLinking",
     "publish": "vsce publish"
-  },
-  "nyc": {
-    "extends": "@istanbuljs/nyc-config-typescript",
-    "all": false,
-    "require": ["source-map-support/register"],
-    "check-coverage": false,
-    "show-process-tree": true,
-    "use-spawn-wrap": false,
-    "include": [
-      "out/**/*.js",
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      ".vscode-test/**"
-    ],
-    "reporter": [
-      "cobertura",
-      "text"
-    ]
   },
   "contributes": {
     "breakpoints": [
@@ -466,7 +442,7 @@
               "type": "PowerShell",
               "request": "launch",
               "script": "^\"\\${file}\"",
-              "cwd": "^\"\\${workspaceFolder}\""
+              "cwd": "^\"\\${file}\""
             }
           },
           {
@@ -819,7 +795,7 @@
         },
         "powershell.integratedConsole.forceClearScrollbackBuffer": {
           "type": "boolean",
-          "description": "Use the vscode API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're use to 'Clear-Host' clearing scroll history as wellclear-terminal-via-lsp."
+          "description": "Use the vscode API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're used to 'Clear-Host' clearing scroll history as well as clear-terminal-via-lsp."
         },
         "powershell.integratedConsole.suppressStartupBanner": {
           "type": "boolean",

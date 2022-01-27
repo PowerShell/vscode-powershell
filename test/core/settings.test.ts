@@ -5,36 +5,38 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import Settings = require("../../src/settings");
 
-describe("Settings module", () => {
-    it("Settings load without error", () => {
+describe("Settings module", function () {
+    it("Loads without error", function () {
         assert.doesNotThrow(Settings.load);
     });
 
-    it("Settings update correctly", async () => {
-        // then syntax
+    it("Updates correctly with 'then' syntax", async function () {
         Settings.change("helpCompletion", "BlockComment", false).then(() =>
             assert.strictEqual(Settings.load().helpCompletion, "BlockComment"));
+    });
 
-        // async/await syntax
+    it("Updates correctly with 'async/await' syntax", async function () {
         await Settings.change("helpCompletion", "LineComment", false);
         assert.strictEqual(Settings.load().helpCompletion, "LineComment");
     });
 
-    it("Settings that can only be user settings update correctly", async () => {
-        // set to false means it's set as a workspace-level setting so this should throw.
+    describe("User-only settings", async function () {
         const psExeDetails = [{
             versionName: "My PowerShell",
             exePath: "dummyPath",
         }];
 
-        assert.rejects(async () => await Settings.change("powerShellAdditionalExePaths", psExeDetails, false));
+        it("Throws when updating at workspace-level", async function () {
+            assert.rejects(async () => await Settings.change("powerShellAdditionalExePaths", psExeDetails, false /* workspace-level */));
+        });
 
-        // set to true means it's a user-level setting so this should not throw.
-        await Settings.change("powerShellAdditionalExePaths", psExeDetails, true);
-        assert.strictEqual(Settings.load().powerShellAdditionalExePaths[0].versionName, psExeDetails[0].versionName);
+        it("Doesn't throw when updating at user-level", async function () {
+            await Settings.change("powerShellAdditionalExePaths", psExeDetails, true /* user-level */);
+            assert.strictEqual(Settings.load().powerShellAdditionalExePaths[0].versionName, psExeDetails[0].versionName);
+        });
     });
 
-    it("Can get effective configuration target", async () => {
+    it("Gets the effective configuration target", async function () {
         await Settings.change("helpCompletion", "LineComment", false);
         let target = await Settings.getEffectiveConfigurationTarget("helpCompletion");
         assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);

@@ -18,6 +18,7 @@ export interface IPowerShellExtensionClient {
     registerExternalExtension(id: string, apiVersion?: string): string;
     unregisterExternalExtension(uuid: string): boolean;
     getPowerShellVersionDetails(uuid: string): Promise<IExternalPowerShellDetails>;
+    waitUntilStarted(uuid: string): Promise<void>;
 }
 
 /*
@@ -99,6 +100,16 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         return true;
     }
 
+    private getRegisteredExtension(uuid: string = ""): IExternalExtension {
+        if (!ExternalApiFeature.registeredExternalExtension.has(uuid)) {
+            throw new Error(
+                "UUID provided was invalid, make sure you ran the 'powershellExtensionClient.registerExternalExtension(extensionId)' method and pass in the UUID that it returns to subsequent methods.");
+        }
+
+        // TODO: When we have more than one API version, make sure to include a check here.
+        return ExternalApiFeature.registeredExternalExtension.get(uuid);
+    }
+
     /*
     DESCRIPTION:
         This will fetch the version details of the PowerShell used to start
@@ -118,13 +129,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         }
     */
     public async getPowerShellVersionDetails(uuid: string = ""): Promise<IExternalPowerShellDetails> {
-        if (!ExternalApiFeature.registeredExternalExtension.has(uuid)) {
-            throw new Error(
-                "UUID provided was invalid, make sure you ran the 'powershellExtensionClient.registerExternalExtension(extensionId)' method and pass in the UUID that it returns to subsequent methods.");
-        }
-
-        // TODO: When we have more than one API version, make sure to include a check here.
-        const extension = ExternalApiFeature.registeredExternalExtension.get(uuid);
+        const extension = this.getRegisteredExtension(uuid);
         this.log.writeDiagnostic(`Extension '${extension.id}' called 'getPowerShellVersionDetails'`);
 
         await this.sessionManager.waitUntilStarted();
@@ -136,6 +141,25 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
             displayName: this.sessionManager.PowerShellExeDetails.displayName, // comes from the Session Menu
             architecture: versionDetails.architecture
         };
+    }
+    /*
+    DESCRIPTION:
+        This will wait until the extension's PowerShell session is started.
+
+    USAGE:
+        powerShellExtensionClient.waitUntilStarted(
+            "uuid"); // the uuid from above for tracking purposes
+
+    RETURNS:
+        A void promise that resolves only once the extension is started.
+
+        If the extension is not started by some mechanism
+        then this will wait indefinitely.
+    */
+    public async waitUntilStarted(uuid: string = ""): Promise<void> {
+        const extension = this.getRegisteredExtension(uuid);
+        this.log.writeDiagnostic(`Extension '${extension.id}' called 'waitUntilStarted'`);
+        return this.sessionManager.waitUntilStarted();
     }
 
     public dispose() {

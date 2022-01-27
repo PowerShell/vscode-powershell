@@ -12,6 +12,8 @@ body:
       required: true
     - label: I have read the [troubleshooting](https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md) guide.
       required: true
+    - label: I am sure this issue is with the _extension itself_ and does not reproduce in a standalone [PowerShell](https://github.com/PowerShell/PowerShell/issues/new/choose) instance.
+      required: true
     - label: I have verified that I am using the latest version of Visual Studio Code and the PowerShell extension.
       required: true
 - type: textarea

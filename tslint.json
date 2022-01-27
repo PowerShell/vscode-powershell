@@ -8,6 +8,7 @@
         "indent": [true, "spaces", 4],
         "max-classes-per-file": false,
         "object-literal-sort-keys": false,
+        "only-arrow-functions": false,
         "file-header": [
           true,
           {

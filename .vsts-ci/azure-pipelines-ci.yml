@@ -22,15 +22,6 @@ resources:
     ref: master
 
 jobs:
-- job: PS51_Win2016
-  displayName: PowerShell 5.1 - Windows Server 2016
-  pool:
-    vmImage: vs2017-win2016
-  steps:
-  - template: templates/ci-general.yml
-    parameters:
-      pwsh: false
-
 - job: PS51_Win2019
   displayName: PowerShell 5.1 - Windows Server 2019
   pool:
