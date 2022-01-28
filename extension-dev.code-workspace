@@ -210,7 +210,7 @@
         "outFiles": [
           "${workspaceFolder:Client}/out/main.js"
         ],
-        "preLaunchTask": "Build",
+        "preLaunchTask": "${defaultBuildTask}",
       },
       {
         "name": "Launch Extension Tests",
@@ -229,7 +229,8 @@
         "outFiles": [
           "${workspaceFolder:Client}/out/test/**/*.js"
         ],
-        "preLaunchTask": "Build"
+        "preLaunchTask": "${defaultBuildTask}",
+        "internalConsoleOptions": "openOnSessionStart"
       }
     ]
   }
