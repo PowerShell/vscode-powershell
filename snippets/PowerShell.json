@@ -561,6 +561,25 @@
         ],
         "description": "Comment-based help for an advanced function snippet"
     },
+    "Function-Help": {
+        "prefix": "help-function",
+        "body": [
+            "<#",
+            ".SYNOPSIS",
+            "\t${1:A short one-line action-based description, e.g. 'Tests if a function is valid'}",
+            ".DESCRIPTION",
+            "\t${2:A longer description of the function, its purpose, common use cases, etc.}",
+            ".NOTES",
+            "\t${3:Information or caveats about the function e.g. 'This function is not supported in Linux'}",
+            ".LINK",
+            "\t${4:Specify a URI to a help page, this will show when Get-Help -Online is used.}",
+            ".EXAMPLE",
+            "\t${5:Test-MyTestFunction -Verbose}",
+            "\t${6:Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines}",
+            "#>"
+        ],
+        "description": "Comment-based help for an advanced function snippet"
+    },
     "Parameter": {
         "prefix": "parameter",
         "body": [
