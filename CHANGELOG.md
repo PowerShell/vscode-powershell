@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2022.2.0-preview
+### Wednesday, February 02, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+Just including several PSES fixes, namely around the F5 and F8 bugs.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 📟 [vscode-powershell #3786](https://github.com/PowerShell/PowerShellEditorServices/pull/1691) - Print prompt and command when `WriteInputToHost` is true.
+- 🐛 📟 [vscode-powershell #3685](https://github.com/PowerShell/PowerShellEditorServices/pull/1690) - Display prompt after `F8` finishes.
+- 🐛 🔍 [vscode-powershell #3522](https://github.com/PowerShell/PowerShellEditorServices/pull/1685) - Synchronize PowerShell debugger and DAP server state.
+- ✨ 🔍 [PowerShellEditorServices #1680](https://github.com/PowerShell/PowerShellEditorServices/pull/1680) - Display `DictionaryEntry` as key/value pairs in debugger. (Thanks @JustinGrote!)
+
 ## v2022.1.1-preview
 ### Monday, January 24, 2022
 
