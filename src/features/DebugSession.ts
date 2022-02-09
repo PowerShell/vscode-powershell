@@ -378,7 +378,13 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
         if (text !== undefined) {
             this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
         }
-        return text;
+
+        // Add magic marker to denote we won't escape this argument, enabling it
+        // to be a multi-argument string. This is necessary because Code's API
+        // means that this command can only return a string, not a list of
+        // strings, and so multiple arguments will exist in a single string and
+        // we need PSES to not quote the string due to it containing spaces.
+        return "__psEditorServices_NoEscape_" + text;
     }
 }
 
