@@ -147,8 +147,13 @@ and you can ask for new features [in their repository](https://github.com/Micros
   - Document formatting is provided by [PSScriptAnalyzer], but there
     may be opportunities to improve our integration with it in the
     [PowerShell Extension] too.
-
-## Reporting an issue
+- PSReadLine throws an error ever so often [#3701](https://github.com/PowerShell/vscode-powershell/issues/3701)
+  - This is a known issue due to the
+    `OnPowerShellIdle` function
+    waiting to process events unknown we know the rest of the startup process has finished. ##
+    Reporting an issue
+  - A known work around includes unregistering from this event. `Get-EventSubscriber -Force -SourceIdentifier PowerShell.OnIdle -EA 0 | Unregister-Event -Force` can be added to your profile to help prevent this issue.
+  - Related Issues [#3091](https://github.com/PowerShell/PSReadLine/issues/3091) [#16585](https://github.com/Azure/azure-powershell/issues/16586)
 
 If you experience a problem with the [PowerShell Extension]:
 
