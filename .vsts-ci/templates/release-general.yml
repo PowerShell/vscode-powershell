@@ -26,6 +26,14 @@ steps:
 
 - checkout: self
 
+- template: Sbom.yml@ComplianceRepo
+  parameters:
+    BuildDropPath: $(Pipeline.Workspace)/Signed
+    Build_Repository_Uri: https://github.com/PowerShell/vscode-powershell.git
+    packageName: vscode-powershell
+    packageVersion: $(System.JobId)
+    sourceScanPath: $(Build.SourcesDirectory)/vscode-powershell
+
 - template: script-module-compliance.yml@ComplianceRepo
   parameters:
     # component-governance
