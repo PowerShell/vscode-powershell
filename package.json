@@ -54,7 +54,7 @@
     "@types/mocha": "~9.1.0",
     "@types/mock-fs": "~4.13.1",
     "@types/node": "~14.17.4",
-    "@types/node-fetch": "~2.5.12",
+    "@types/node-fetch": "~2.6.0",
     "@types/rewire": "~2.5.28",
     "@types/semver": "~7.3.9",
     "@types/sinon": "~10.0.11",
