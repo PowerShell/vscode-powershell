@@ -147,6 +147,17 @@ and you can ask for new features [in their repository](https://github.com/Micros
   - Document formatting is provided by [PSScriptAnalyzer], but there
     may be opportunities to improve our integration with it in the
     [PowerShell Extension] too.
+- PSReadLine throws an error ever so often - [#3701](https://github.com/PowerShell/vscode-powershell/issues/3701)
+  - This is a known issue due to the PowerShell eventing framework running registered
+    `OnIdle` events outside of PowerShell Editor Service's dedicated PowerShell execution
+    pipeline. Until we can disable event registration, you will need to avoid registering
+    events in the first place.
+  - A known work around includes unregistering from this event.
+    `Get-EventSubscriber -Force -SourceIdentifier PowerShell.OnIdle -EA 0 | Unregister-Event -Force`
+    can be run manually (or added to your profile) to avoid this bug.
+  * Related issues: [PowerShell Editor Services #1591](https://github.com/PowerShell/PowerShellEditorServices/issues/1591),
+    [PSReadLine #3091](https://github.com/PowerShell/PSReadLine/issues/3091),
+    [Azure PowerShell #16585](https://github.com/Azure/azure-powershell/issues/16586)
 
 ## Reporting an issue
 
@@ -263,7 +274,7 @@ In some cases, getting to the bottom of a bug will require looking at the payloa
   ```json
   "powershell editor services.trace.server":"verbose"
   ```
-  
+
 > NOTE: While VSCode will not recognize and highlight it, it is a valid option and enables tracer logs on the server.
 
 - Restart Visual Studio Code and reproduce the issue.
