@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2022.2.1-preview
+### Wednesday, February 16, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #3824](https://github.com/PowerShell/vscode-powershell/pull/3824) - Add known `PowerShell.OnIdle` event bug to `troubleshooting.md`. (Thanks @StevenBucher98!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🔍 [vscode-powershell #3832](https://github.com/PowerShell/PowerShellEditorServices/pull/1712) - Avoid stopping the debugger when canceling other tasks in a debug session.
+- 🐛 📟 [PowerShellEditorServices #1607](https://github.com/PowerShell/PowerShellEditorServices/pull/1711) - Redirect `EditorServicesConsolePSHost.PrivateData` to `_internalHost`.
+- 🐛 📟 [PowerShellEditorServices #1699](https://github.com/PowerShell/PowerShellEditorServices/pull/1710) - Handle edge case where `prompt` is undefined.
+- 🐛 🔍 [PowerShellEditorServices #1704](https://github.com/PowerShell/PowerShellEditorServices/pull/1704) - Avoid recording debugger commands in the history.
+- ✨ 🔍 [PowerShellEditorServices #1703](https://github.com/PowerShell/PowerShellEditorServices/pull/1703) - Use `static readonly` for default `ExecutionOptions`.
+- 🐛 🔍 [vscode-powershell #3655](https://github.com/PowerShell/PowerShellEditorServices/pull/1702) - Fix running untitled scripts with arguments (but break line breakpoints) .
+- ✨ 🙏 [PowerShellEditorServices #1694](https://github.com/PowerShell/PowerShellEditorServices/pull/1694) - Add `Thread.Sleep(100)` to throttle REPL when it's non-interactive. (Thanks @colinblaise!)
+
 ## v2022.2.0-preview
 ### Wednesday, February 02, 2022
 
