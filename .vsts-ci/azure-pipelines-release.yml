@@ -35,7 +35,8 @@ stages:
   jobs:
   - job: Build
     pool:
-      vmImage: windows-2019
+      name: 1ES
+      demands: ImageOverride -equals PSMMS2019-Secure
     steps:
     - template: templates/ci-general.yml
       parameters:
@@ -47,7 +48,7 @@ stages:
   - job: Sign
     pool:
       name: 1ES
-      demands: ImageOverride -equals MMSWindows2019-Secure
+      demands: ImageOverride -equals PSMMS2019-Secure
     variables:
     - group: ESRP
     steps:
@@ -59,7 +60,8 @@ stages:
   - deployment: Publish
     environment: vscode-powershell-github
     pool:
-      vmImage: ubuntu-latest
+      name: 1ES
+      demands: ImageOverride -equals PSMMSUbuntu20.04-Secure
     variables:
     - group: Publish
     strategy:
@@ -74,7 +76,8 @@ stages:
   - deployment: Publish
     environment: vscode-powershell-markets
     pool:
-      vmImage: ubuntu-latest
+      name: 1ES
+      demands: ImageOverride -equals PSMMSUbuntu20.04-Secure
     variables:
     - group: Publish
     strategy:
