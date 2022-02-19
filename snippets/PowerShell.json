@@ -1,29 +1,11 @@
 // The "Requires *" snippets should be removed if-and-when intellisense is implemented for the script requirement directive syntax.
 {
-  "ArgumentCompleterAttribute ScriptBlock": {
-    "prefix": "completer-scriptblock",
-    "description": "ArgumentCompleter parameter attribute script block definition",
-    "body": [
-      "{",
-      "\t[OutputType([System.Management.Automation.CompletionResult])]  # zero to many",
-      "\tparam(",
-      "\t\t[string] \\$CommandName,",
-      "\t\t[string] \\$ParameterName,",
-      "\t\t[string] \\$WordToComplete,",
-      "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
-      "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
-      "\t)",
-      "\t",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
-  },
-  "ArgumentCompleterAttribute with ScriptBlock": {
-    "prefix": "completer-attribute",
-    "description": "ArgumentCompleter parameter attribute with script block definition",
+  "ArgumentCompleterAttribute": {
+    "prefix": "argumentcompleter",
+    "description": "The ArgumentCompleter attribute allows you to add tab completion values to a specific parameter by writing a scriptblock that generates zero or more CompletionResult objects. More: Get-Help -Online about_functions_argument_completion",
     "body": [
       "[ArgumentCompleter({",
-      "\t[OutputType([System.Management.Automation.CompletionResult])]  # zero to many",
+      "\t[OutputType([System.Management.Automation.CompletionResult])]",
       "\tparam(",
       "\t\t[string] \\$CommandName,",
       "\t\t[string] \\$ParameterName,",
@@ -32,8 +14,9 @@
       "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
       "\t)",
       "\t",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "})]"
+      "\t${1:$TM_SELECTED_TEXT}",
+      "\t#Output one or more of these objects: [Management.Automation.CompletionResult]'MyPotentialResult'",
+      "})]${0}"
     ]
   },
   "CalculatedProperty": {
@@ -625,7 +608,7 @@
   },
   "function": {
     "prefix": "function",
-    "description": "Function definition snippet that contains a param block",
+    "description": "A simple function with a parameter block to specify function arguments",
     "body": [
       "function ${1:FunctionName} {",
       "\tparam (",
