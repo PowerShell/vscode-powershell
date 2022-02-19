@@ -1,69 +1,280 @@
 // The "Requires *" snippets should be removed if-and-when intellisense is implemented for the script requirement directive syntax.
 {
-    "ModuleManifest": {
-        "prefix": "manifest",
+    "ArgumentCompleterAttribute ScriptBlock": {
+      "prefix": "completer-scriptblock",
+      "description": "ArgumentCompleter parameter attribute script block definition",
         "body": [
-          "@{",
-          "\t# If authoring a script module, the RootModule is the name of your .psm1 file",
-          "\tRootModule = '${module:MyModule}.psm1'",
-          "",
-          "\tAuthor = '${author:Cool Person <coolperson@email.local>}'",
-          "",
-          "\tCompanyName = '${company:Contoso Inc.}'",
-          "",
-          "\tModuleVersion = '${ModuleVersion:0.1}'",
-          "",
-          "\t# Use the New-Guid command to generate a GUID, and copy/paste into the next line",
-          "\tGUID = '<pasteNewGUIDhere>'",
-          "",
-          "\tCopyright = '2017 ${company:Copyright Holder}'",
-          "",
-          "\tDescription = '${Description:What does this module do?}'",
-          "",
-          "\t# Minimum PowerShell version supported by this module (optional, recommended)",
-          "\t# PowerShellVersion = ''",
-          "",
-          "\t# Which PowerShell Editions does this module work with? (Core, Desktop)",
-          "\tCompatiblePSEditions = @('Desktop', 'Core')",
-          "",
-          "\t# Which PowerShell functions are exported from your module? (eg. Get-CoolObject)",
-          "\tFunctionsToExport = @('')",
-          "",
-          "\t# Which PowerShell aliases are exported from your module? (eg. gco)",
-          "\tAliasesToExport = @('')",
-          "",
-          "\t# Which PowerShell variables are exported from your module? (eg. Fruits, Vegetables)",
-          "\tVariablesToExport = @('')",
-          "",
-          "\t# PowerShell Gallery: Define your module's metadata",
-          "\tPrivateData = @{",
-          "\t\tPSData = @{",
-          "\t\t\t# What keywords represent your PowerShell module? (eg. cloud, tools, framework, vendor)",
-          "\t\t\tTags = @('${tag1:cooltag1}', '${tag2:cooltag2}')",
-          "",
-          "\t\t\t# What software license is your code being released under? (see https://opensource.org/licenses)",
-          "\t\t\tLicenseUri = ''",
-          "",
-          "\t\t\t# What is the URL to your project's website?",
-          "\t\t\tProjectUri = ''",
-          "",
-          "\t\t\t# What is the URI to a custom icon file for your project? (optional)",
-          "\t\t\tIconUri = ''",
-          "",
-          "\t\t\t# What new features, bug fixes, or deprecated features, are part of this release?",
-          "\t\t\tReleaseNotes = @'",
-          "'@",
-          "\t\t}",
-          "\t}",
-          "",
-          "\t# If your module supports updateable help, what is the URI to the help archive? (optional)",
-          "\t# HelpInfoURI = ''",
-          "}"
-        ],
-        "description": "Basic skeleton for a PowerShell module manifest, complete with PowerShell Gallery metadata."
+            "{",
+            "\t[OutputType([System.Management.Automation.CompletionResult])]  # zero to many",
+            "\tparam(",
+            "\t\t[string] \\$CommandName,",
+            "\t\t[string] \\$ParameterName,",
+            "\t\t[string] \\$WordToComplete,",
+            "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
+            "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
+            "\t)",
+            "\t",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+          ]
+        },
+        "ArgumentCompleterAttribute with ScriptBlock": {
+          "prefix": "completer-attribute",
+          "description": "ArgumentCompleter parameter attribute with script block definition",
+          "body": [
+            "[ArgumentCompleter({",
+            "\t[OutputType([System.Management.Automation.CompletionResult])]  # zero to many",
+            "\tparam(",
+            "\t\t[string] \\$CommandName,",
+            "\t\t[string] \\$ParameterName,",
+            "\t\t[string] \\$WordToComplete,",
+            "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
+            "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
+            "\t)",
+            "\t",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "})]"
+          ]
+        },
+        "CalculatedProperty": {
+          "prefix": "Calculated-Property",
+          "description": "Creates a Calculated Property typically used with Select-Object.",
+          "body": [
+            "@{name='${1:PropertyName}';expression={${2:${TM_SELECTED_TEXT:\\$_.PropertyValue}}}}$0"
+          ]
+        },
+        "Class": {
+          "prefix": "class",
+          "description": "Class definition snippet",
+          "body": [
+            "class ${1:ClassName} {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+          ]
+        },
+        "comment block": {
+          "prefix": "comment",
+          "description": "Comment block snippet",
+          "body": [
+            "<#",
+            " # ${0:$TM_SELECTED_TEXT}",
+            " #>"
+          ]
+        },
+        "Comment-Help": {
+          "prefix": "comment-help",
+          "description": "Comment-based help for an advanced function snippet",
+          "body": [
+            "<#",
+            ".SYNOPSIS",
+            "\tShort description",
+            ".DESCRIPTION",
+            "\tLong description",
+            ".EXAMPLE",
+            "\tPS C:\\> <example usage>",
+            "\tExplanation of what the example does",
+            ".INPUTS",
+            "\tInputs (if any)",
+            ".OUTPUTS",
+            "\tOutput (if any)",
+            ".NOTES",
+            "\tGeneral notes",
+            "#>"
+          ]
+        },
+        "Constructor": {
+          "prefix": "ctor",
+          "description": "Class constructor definition snippet",
+          "body": [
+            "${1:ClassName}(${2:OptionalParameters}) {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+          ]
+        },
+        "do-until": {
+          "prefix": "do-until",
+          "description": "do-until loop snippet",
+          "body": [
+            "do {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "} until (${1:condition})"
+          ]
+        },
+        "do-while": {
+          "prefix": "do-while",
+          "description": "do-while loop snippet",
+          "body": [
+            "do {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "} while (${1:condition})"
+          ]
+        },
+        "DSC Ensure Enum": {
+          "prefix": "DSC Ensure enum",
+          "description": "DSC Ensure enum definition snippet",
+          "body": [
+            "enum Ensure {",
+            "\tAbsent",
+            "\tPresent",
+            "}"
+          ]
+        },
+        "DSC Resource Provider (class-based)": {
+          "prefix": "DSC resource provider (class-based)",
+          "description": "Class-based DSC resource provider snippet",
+          "body": [
+            "[DscResource()]",
+            "class ${ResourceName:NameOfResource} {",
+            "\t[DscProperty(Key)]",
+            "\t[string] $${PropertyName:KeyName}",
+            "\t",
+            "\t# Gets the resource's current state.",
+            "\t[${ResourceName:NameOfResource}] Get() {",
+            "\t\t${0:$TM_SELECTED_TEXT}",
+            "\t\treturn \\$this",
+            "\t}",
+            "\t",
+            "\t# Sets the desired state of the resource.",
+            "\t[void] Set() {",
+            "\t\t",
+            "\t}",
+            "\t",
+            "\t# Tests if the resource is in the desired state.",
+            "\t[bool] Test() {",
+            "\t\t",
+            "\t}",
+            "}"
+          ]
+        },
+        "DSC Resource Provider (function-based)": {
+          "prefix": "DSC resource provider (function-based)",
+          "description": "Function-based DSC resource provider snippet",
+          "body": [
+            "function Get-TargetResource {",
+            "\tparam (",
+            "\t)",
+            "\t",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}",
+            "function Set-TargetResource {",
+            "\tparam (",
+            "\t)",
+            "\t",
+            "}",
+            "function Test-TargetResource {",
+            "\tparam (",
+            "\t)",
+            "\t",
+            "}"
+          ]
+        },
+        "else": {
+          "prefix": "else",
+          "description": "else statement snippet",
+          "body": [
+            "else {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+          ]
+        },
+        "elseif": {
+          "prefix": "elseif",
+          "description": "elseif statement snippet",
+          "body": [
+            "elseif (${1:condition}) {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+          ]
+        },
+        "Enum": {
+          "prefix": "enum",
+          "description": "Enum definition snippet",
+          "body": [
+            "enum ${1:EnumName} {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+          ]
+        },
+        "Example-Advanced Workflow": {
+          "prefix": "ex-advanced workflow",
+          "description": "Example: advanced workflow snippet",
+          "body": [
+            "<#",
+            ".Synopsis",
+            "\tShort description",
+            ".DESCRIPTION",
+            "\tLong description",
+            ".EXAMPLE",
+            "\tExample of how to use this workflow",
+            ".EXAMPLE",
+            "\tAnother example of how to use this workflow",
+            ".INPUTS",
+            "\tInputs to this workflow (if any)",
+            ".OUTPUTS",
+            "\tOutput from this workflow (if any)",
+            ".NOTES",
+            "\tGeneral notes",
+            ".FUNCTIONALITY",
+            "\tThe functionality that best describes this workflow",
+            "#>",
+            "workflow ${name:Verb-Noun} {",
+            "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
+            "\t               HelpUri = 'http://www.microsoft.com/',",
+            "\t               ConfirmImpact='Medium')]",
+            "\t[Alias()]",
+            "\t[OutputType([String])]",
+            "\tparam (",
+            "\t\t# Param1 help description",
+            "\t\t[Parameter(Mandatory=\\$true, ",
+            "\t\t           Position=0,",
+            "\t\t           ParameterSetName='Parameter Set 1')]",
+            "\t\t[ValidateNotNull()]",
+            "\t\t[Alias(\"p1\")] ",
+            "\t\t\\$Param1,",
+            "",
+            "\t\t# Param2 help description",
+            "\t\t[int]",
+            "\t\t\\$Param2",
+            "\t)",
+            "",
+            "\t# Saves (persists) the current workflow state and output",
+            "\t# Checkpoint-Workflow",
+            "\t# Suspends the workflow",
+            "\t# Suspend-Workflow",
+            "",
+            "\t# Workflow common parameters are available as variables such as:",
+            "\t\\$PSPersist ",
+            "\t\\$PSComputerName",
+            "\t\\$PSCredential",
+            "\t\\$PSUseSsl",
+            "\t\\$PSAuthentication",
+            "",
+            "\t# Workflow runtime information can be accessed by using the following variables:",
+            "\t\\$Input",
+            "\t\\$PSSenderInfo",
+            "\t\\$PSWorkflowRoot",
+            "\t\\$JobCommandName",
+            "\t\\$ParentCommandName",
+            "\t\\$JobId",
+            "\t\\$ParentJobId",
+            "\t\\$WorkflowInstanceId",
+            "\t\\$JobInstanceId",
+            "\t\\$ParentJobInstanceId",
+            "\t\\$JobName",
+            "\t\\$ParentJobName",
+            "",
+            "\t# Set the progress message ParentActivityId",
+            "\t\\$PSParentActivityId",
+            "",
+            "\t# Preference variables that control runtime behavior",
+            "\t\\$PSRunInProcessPreference",
+            "\t\\$PSPersistPreference",
+            "}"
+        ]
     },
     "Example-Class": {
         "prefix": "ex-class",
+        "description": "Example: class snippet with a constructor, property and a method",
         "body": [
             "class ${1:MyClass} {",
             "\t# Property: Holds name",
@@ -80,11 +291,11 @@
             "\t\t\\$this.Name = \"DefaultName\"",
             "\t}",
             "}"
-        ],
-        "description": "Example: class snippet with a constructor, property and a method"
+        ]
     },
     "Example-Cmdlet": {
         "prefix": "ex-cmdlet",
+        "description": "Example: script cmdlet snippet with all attributes and inline help fields",
         "body": [
             "<#",
             ".SYNOPSIS",
@@ -161,11 +372,11 @@
             "\tend {",
             "\t}",
             "}"
-        ],
-        "description": "Example: script cmdlet snippet with all attributes and inline help fields"
+        ]
     },
     "Example-DSC Configuration": {
         "prefix": "ex-DSC config",
+        "description": "Example: DSC configuration snippet that uses built-in resource providers",
         "body": [
             "configuration Name {",
             "\t# One can evaluate expressions to get the node list",
@@ -190,11 +401,11 @@
             "\t\t}",
             "\t}",
             "}"
-        ],
-        "description": "Example: DSC configuration snippet that uses built-in resource providers"
+        ]
     },
     "Example-DSC Resource Provider (class-based)": {
         "prefix": "ex-DSC resource provider (class-based)",
+        "description": "Example: class-based DSC resource provider snippet",
         "body": [
             "# Defines the values for the resource's Ensure property.",
             "enum Ensure {",
@@ -242,11 +453,11 @@
             "\t\t return \\$true",
             "\t}",
             "}"
-        ],
-        "description": "Example: class-based DSC resource provider snippet"
+        ]
     },
     "Example-DSC Resource Provider (function based)": {
         "prefix": "ex-DSC resource provider (function based)",
+        "description": "Example: function-based DSC resource provider snippet",
         "body": [
             "function Get-TargetResource {",
             "\t# TODO: Add parameters here",
@@ -269,30 +480,11 @@
             "\tparam (",
             "\t)",
             "}"
-        ],
-        "description": "Example: function-based DSC resource provider snippet"
-    },
-    "Example-Path Processing for Non-Existing Paths": {
-        "prefix": "ex-path processing for non-existing paths",
-        "body": [
-            "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=\\$true)]",
-            "\\$paths = @()",
-            "foreach (\\$aPath in \\$Path) {",
-            "\t# Resolve any relative paths",
-            "\t\\$paths += \\$psCmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath(\\$aPath)",
-            "}",
-            "",
-            "foreach (\\$aPath in \\$paths) {",
-            "\tif (\\$pscmdlet.ShouldProcess(\\$aPath, 'Operation')) {",
-            "\t\t# Process each path",
-            "\t\t$0",
-            "\t}",
-            "}"
-        ],
-        "description": "Example: processing non-existing paths typically used in New-* commands (for use in process block). See parameter-path snippet."
+        ]
     },
     "Example-Path Processing for No Wildcards Allowed": {
-        "prefix": "ex-path processing for no wildcards allowed",
+      "prefix": "ex-path processing for no wildcards allowed",
+      "description": "Example: processing non-wildcard paths that must exist (for use in process block). See parameter-path snippets.",
         "body": [
             "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=\\$true)]",
             "\\$paths = @()",
@@ -315,11 +507,30 @@
             "\t\t$0",
             "\t}",
             "}"
-        ],
-        "description": "Example: processing non-wildcard paths that must exist (for use in process block). See parameter-path snippets."
+        ]
+    },
+    "Example-Path Processing for Non-Existing Paths": {
+      "prefix": "ex-path processing for non-existing paths",
+      "description": "Example: processing non-existing paths typically used in New-* commands (for use in process block). See parameter-path snippet.",
+        "body": [
+            "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=\\$true)]",
+            "\\$paths = @()",
+            "foreach (\\$aPath in \\$Path) {",
+            "\t# Resolve any relative paths",
+            "\t\\$paths += \\$psCmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath(\\$aPath)",
+            "}",
+            "",
+            "foreach (\\$aPath in \\$paths) {",
+            "\tif (\\$pscmdlet.ShouldProcess(\\$aPath, 'Operation')) {",
+            "\t\t# Process each path",
+            "\t\t$0",
+            "\t}",
+            "}"
+        ]
     },
     "Example-Path Processing for Wildcards Allowed": {
         "prefix": "ex-path processing for wildcards allowed",
+        "description": "Example: processing wildcard paths that must exist (for use in process block). See parameter-path-wildcards and parameter-literalpath snippets.",
         "body": [
             "# Modify [CmdletBinding()] to [CmdletBinding(SupportsShouldProcess=\\$true, DefaultParameterSetName='Path')]",
             "\\$paths = @()",
@@ -359,22 +570,22 @@
             "\t\t$0",
             "\t}",
             "}"
-        ],
-        "description": "Example: processing wildcard paths that must exist (for use in process block). See parameter-path-wildcards and parameter-literalpath snippets."
+        ]
     },
     "Example-Splatting": {
         "prefix": "ex-splat",
+        "description": "Example: PowerShell splatting technique snippet",
         "body": [
             "\\$Params = @{",
             "\tModule = '*'",
             "\tVerb = 'Get'",
             "}",
             "Get-Command @Params"
-        ],
-        "description": "Example: PowerShell splatting technique snippet"
+        ]
     },
     "Example-Switch": {
         "prefix": "ex-switch",
+        "description": "Example: switch statement snippet",
         "body": [
             "switch (${variable:\\$x})",
             "{",
@@ -383,141 +594,53 @@
             "\t'value3' {}",
             "\tDefault {}",
             "}"
-        ],
-        "description": "Example: switch statement snippet"
+        ]
     },
-    "Example-Advanced Workflow": {
-        "prefix": "ex-advanced workflow",
+    "for": {
+      "prefix": "for",
+      "description": "for loop snippet",
         "body": [
-            "<#",
-            ".Synopsis",
-            "\tShort description",
-            ".DESCRIPTION",
-            "\tLong description",
-            ".EXAMPLE",
-            "\tExample of how to use this workflow",
-            ".EXAMPLE",
-            "\tAnother example of how to use this workflow",
-            ".INPUTS",
-            "\tInputs to this workflow (if any)",
-            ".OUTPUTS",
-            "\tOutput from this workflow (if any)",
-            ".NOTES",
-            "\tGeneral notes",
-            ".FUNCTIONALITY",
-            "\tThe functionality that best describes this workflow",
-            "#>",
-            "workflow ${name:Verb-Noun} {",
-            "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
-            "\t               HelpUri = 'http://www.microsoft.com/',",
-            "\t               ConfirmImpact='Medium')]",
-            "\t[Alias()]",
-            "\t[OutputType([String])]",
+            "for ($${1:i} = 0; $${1:i} -lt $${2:array}.Count; $${1:i}++) {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+        ]
+    },
+    "for-reversed": {
+      "prefix": "forr",
+      "description": "reversed for loop snippet",
+        "body": [
+            "for ($${1:i} = $${2:array}.Count - 1; $${1:i} -ge 0 ; $${1:i}--) {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+        ]
+    },
+    "foreach": {
+      "prefix": "foreach",
+      "description": "foreach loop snippet",
+        "body": [
+            "foreach ($${1:item} in $${2:collection}) {",
+            "\t${0:$TM_SELECTED_TEXT}",
+            "}"
+        ]
+    },
+    "function": {
+      "prefix": "function",
+      "description": "Function definition snippet that contains a param block",
+        "body": [
+            "function ${1:FunctionName} {",
             "\tparam (",
-            "\t\t# Param1 help description",
-            "\t\t[Parameter(Mandatory=\\$true, ",
-            "\t\t           Position=0,",
-            "\t\t           ParameterSetName='Parameter Set 1')]",
-            "\t\t[ValidateNotNull()]",
-            "\t\t[Alias(\"p1\")] ",
-            "\t\t\\$Param1,",
-            "",
-            "\t\t# Param2 help description",
-            "\t\t[int]",
-            "\t\t\\$Param2",
+            "\t\t${2:OptionalParameters}",
             "\t)",
-            "",
-            "\t# Saves (persists) the current workflow state and output",
-            "\t# Checkpoint-Workflow",
-            "\t# Suspends the workflow",
-            "\t# Suspend-Workflow",
-            "",
-            "\t# Workflow common parameters are available as variables such as:",
-            "\t\\$PSPersist ",
-            "\t\\$PSComputerName",
-            "\t\\$PSCredential",
-            "\t\\$PSUseSsl",
-            "\t\\$PSAuthentication",
-            "",
-            "\t# Workflow runtime information can be accessed by using the following variables:",
-            "\t\\$Input",
-            "\t\\$PSSenderInfo",
-            "\t\\$PSWorkflowRoot",
-            "\t\\$JobCommandName",
-            "\t\\$ParentCommandName",
-            "\t\\$JobId",
-            "\t\\$ParentJobId",
-            "\t\\$WorkflowInstanceId",
-            "\t\\$JobInstanceId",
-            "\t\\$ParentJobInstanceId",
-            "\t\\$JobName",
-            "\t\\$ParentJobName",
-            "",
-            "\t# Set the progress message ParentActivityId",
-            "\t\\$PSParentActivityId",
-            "",
-            "\t# Preference variables that control runtime behavior",
-            "\t\\$PSRunInProcessPreference",
-            "\t\\$PSPersistPreference",
-            "}"
-        ],
-        "description": "Example: advanced workflow snippet"
-    },
-    "Class": {
-        "prefix": "class",
-        "body": [
-            "class ${1:ClassName} {",
             "\t${0:$TM_SELECTED_TEXT}",
             "}"
-        ],
-        "description": "Class definition snippet"
-    },
-    "Constructor": {
-        "prefix": "ctor",
-        "body": [
-            "${1:ClassName}(${2:OptionalParameters}) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Class constructor definition snippet"
-    },
-    "Hidden Property": {
-        "prefix": "proph",
-        "body": [
-            "hidden [${1:string}] $${0:PropertyName}"
-        ],
-        "description": "Class hidden property definition snippet"
-    },
-    "Property": {
-        "prefix": "prop",
-        "body": [
-            "[${1:string}] $${0:PropertyName}"
-        ],
-        "description": "Class property definition snippet"
-    },
-    "Method": {
-        "prefix": "method",
-        "body": [
-            "[${1:void}] ${2:MethodName}($${3:OptionalParameters}) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Class method definition snippet"
-    },
-    "Enum": {
-        "prefix": "enum",
-        "body": [
-            "enum ${1:EnumName} {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Enum definition snippet"
+        ]
     },
     "Function-Advanced": {
         "prefix": [
             "function-advanced",
             "cmdlet"
         ],
+        "description": "Script advanced function definition snippet",
         "body": [
             "function ${1:Verb-Noun} {",
             "\t[CmdletBinding()]",
@@ -537,32 +660,11 @@
             "\t\t",
             "\t}",
             "}"
-        ],
-        "description": "Script advanced function definition snippet"
-    },
-    "Comment-Help": {
-        "prefix": "comment-help",
-        "body": [
-            "<#",
-            ".SYNOPSIS",
-            "\tShort description",
-            ".DESCRIPTION",
-            "\tLong description",
-            ".EXAMPLE",
-            "\tPS C:\\> <example usage>",
-            "\tExplanation of what the example does",
-            ".INPUTS",
-            "\tInputs (if any)",
-            ".OUTPUTS",
-            "\tOutput (if any)",
-            ".NOTES",
-            "\tGeneral notes",
-            "#>"
-        ],
-        "description": "Comment-based help for an advanced function snippet"
+        ]
     },
     "Function-Help": {
         "prefix": "help-function",
+        "description": "Comment-based help for an advanced function snippet",
         "body": [
             "<#",
             ".SYNOPSIS",
@@ -577,32 +679,187 @@
             "\t${5:Test-MyTestFunction -Verbose}",
             "\t${6:Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines}",
             "#>"
-        ],
-        "description": "Comment-based help for an advanced function snippet"
+        ]
+      },
+      "Function-Inline": {
+        "prefix": "Function-Inline",
+        "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other languages",
+        "body": [
+          "function ${1:FunctionName} (${2:OptionalParameters}) {",
+          "\t${0:$TM_SELECTED_TEXT}",
+          "}"
+        ]
+      },
+      "Hashtable": {
+        "prefix": "Hashtable",
+        "description": "Creates a Hashtable",
+        "body": [
+          "\\$${1:Var} = @{",
+          "\t${2:Name} = ${3:Value}",
+          "}"
+        ]
+      },
+      "Hidden Property": {
+        "prefix": "proph",
+        "description": "Class hidden property definition snippet",
+        "body": [
+          "hidden [${1:string}] $${0:PropertyName}"
+        ]
+      },
+      "IArgumentCompleter Class": {
+        "prefix": "completer-class",
+        "description": "IArgumentCompleter implementation class definition",
+        "body": [
+          "class ${1:ArgumentCompleter} : System.Management.Automation.IArgumentCompleter {",
+          "\t[System.Collections.Generic.IEnumerable[System.Management.Automation.CompletionResult]] CompleteArgument(",
+          "\t\t[string] \\$CommandName,",
+          "\t\t[string] \\$ParameterName,",
+          "\t\t[string] \\$WordToComplete,",
+          "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
+          "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
+          "\t) {",
+          "\t\t\\$CompletionResults = [System.Collections.Generic.List[System.Management.Automation.CompletionResult]]::new()",
+          "\t\t",
+          "\t\t${0:$TM_SELECTED_TEXT}",
+          "\t\t",
+          "\t\treturn \\$CompletionResults",
+          "\t}",
+          "}"
+        ]
+      },
+      "if": {
+        "prefix": "if",
+        "description": "if statement snippet",
+        "body": [
+          "if (${1:condition}) {",
+          "\t${0:$TM_SELECTED_TEXT}",
+          "}"
+        ]
+      },
+      "IfShouldProcess": {
+        "prefix": "IfShouldProcess",
+        "description": "Creates ShouldProcess block",
+        "body": [
+          "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
+          "\t${0:$TM_SELECTED_TEXT}",
+          "}"
+        ]
+      },
+      "Method": {
+        "prefix": "method",
+        "description": "Class method definition snippet",
+        "body": [
+          "[${1:void}] ${2:MethodName}($${3:OptionalParameters}) {",
+          "\t${0:$TM_SELECTED_TEXT}",
+          "}"
+        ]
+      },
+      "ModuleManifest": {
+        "prefix": "manifest",
+        "description": "Basic skeleton for a PowerShell module manifest, complete with PowerShell Gallery metadata.",
+        "body": [
+          "@{",
+          "\t# If authoring a script module, the RootModule is the name of your .psm1 file",
+          "\tRootModule = '${module:MyModule}.psm1'",
+          "",
+          "\tAuthor = '${author:Cool Person <coolperson@email.local>}'",
+          "",
+          "\tCompanyName = '${company:Contoso Inc.}'",
+          "",
+          "\tModuleVersion = '${ModuleVersion:0.1}'",
+          "",
+          "\t# Use the New-Guid command to generate a GUID, and copy/paste into the next line",
+          "\tGUID = '<pasteNewGUIDhere>'",
+          "",
+          "\tCopyright = '2017 ${company:Copyright Holder}'",
+          "",
+          "\tDescription = '${Description:What does this module do?}'",
+          "",
+          "\t# Minimum PowerShell version supported by this module (optional, recommended)",
+          "\t# PowerShellVersion = ''",
+          "",
+          "\t# Which PowerShell Editions does this module work with? (Core, Desktop)",
+          "\tCompatiblePSEditions = @('Desktop', 'Core')",
+          "",
+          "\t# Which PowerShell functions are exported from your module? (eg. Get-CoolObject)",
+          "\tFunctionsToExport = @('')",
+          "",
+          "\t# Which PowerShell aliases are exported from your module? (eg. gco)",
+          "\tAliasesToExport = @('')",
+          "",
+          "\t# Which PowerShell variables are exported from your module? (eg. Fruits, Vegetables)",
+          "\tVariablesToExport = @('')",
+          "",
+          "\t# PowerShell Gallery: Define your module's metadata",
+          "\tPrivateData = @{",
+          "\t\tPSData = @{",
+          "\t\t\t# What keywords represent your PowerShell module? (eg. cloud, tools, framework, vendor)",
+          "\t\t\tTags = @('${tag1:cooltag1}', '${tag2:cooltag2}')",
+          "",
+          "\t\t\t# What software license is your code being released under? (see https://opensource.org/licenses)",
+          "\t\t\tLicenseUri = ''",
+          "",
+          "\t\t\t# What is the URL to your project's website?",
+          "\t\t\tProjectUri = ''",
+          "",
+          "\t\t\t# What is the URI to a custom icon file for your project? (optional)",
+          "\t\t\tIconUri = ''",
+          "",
+          "\t\t\t# What new features, bug fixes, or deprecated features, are part of this release?",
+          "\t\t\tReleaseNotes = @'",
+          "'@",
+          "\t\t}",
+          "\t}",
+          "",
+          "\t# If your module supports updateable help, what is the URI to the help archive? (optional)",
+          "\t# HelpInfoURI = ''",
+          "}"
+        ]
     },
     "Parameter": {
         "prefix": "parameter",
+        "description": "Parameter declaration snippet",
         "body": [
             "# ${1:Parameter help description}",
             "[Parameter(${2:AttributeValues})]",
             "[${3:ParameterType}]",
             "$${0:ParameterName}"
-        ],
-        "description": "Parameter declaration snippet"
+        ]
     },
-    "Parameter_Block" : {
+    "Parameter_Block": {
         "prefix": "param-block",
-        "body": ["[CmdletBinding()]",
+        "description": "A Parameter block to get you started.",
+        "body": [
+          "[CmdletBinding()]",
             "param (",
             "    [Parameter()]",
             "    [${1:TypeName}]",
             "    $${2:ParameterName}$0",
             ")"
-	],
-        "description": "A Parameter block to get you started."
+        ]
+      },
+      "Parameter-LiteralPath": {
+        "prefix": "parameter-literalpath",
+        "description": "Parameter declaration snippet for a LiteralPath parameter",
+        "body": [
+          "# Specifies a path to one or more locations. Unlike the Path parameter, the value of the LiteralPath parameter is",
+          "# used exactly as it is typed. No characters are interpreted as wildcards. If the path includes escape characters,",
+          "# enclose it in single quotation marks. Single quotation marks tell Windows PowerShell not to interpret any",
+          "# characters as escape sequences.",
+          "[Parameter(Mandatory=\\$true,",
+          "           Position=${1:0},",
+          "           ParameterSetName=\"${2:LiteralPath}\",",
+          "           ValueFromPipelineByPropertyName=\\$true,",
+          "           HelpMessage=\"Literal path to one or more locations.\")]",
+          "[Alias(\"PSPath\")]",
+          "[ValidateNotNullOrEmpty()]",
+          "[string[]]",
+          "$${2:LiteralPath}$0"
+        ]
     },
     "Parameter-Path": {
         "prefix": "parameter-path",
+        "description": "Parameter declaration snippet for Path parameter that does not accept wildcards. Do not use with parameter-literalpath.",
         "body": [
             "# Specifies a path to one or more locations.",
             "[Parameter(Mandatory=\\$true,",
@@ -615,11 +872,11 @@
             "[ValidateNotNullOrEmpty()]",
             "[string[]]",
             "$${3:ParameterName}$0"
-        ],
-        "description": "Parameter declaration snippet for Path parameter that does not accept wildcards. Do not use with parameter-literalpath."
+        ]
     },
     "Parameter-Path-Wildcards": {
         "prefix": "parameter-path-wildcards",
+        "description": "Parameter declaration snippet for Path parameter that accepts wildcards. Add parameter-literalpath to handle paths with embedded wildcard chars.",
         "body": [
             "# Specifies a path to one or more locations. Wildcards are permitted.",
             "[Parameter(Mandatory=\\$true,",
@@ -632,210 +889,178 @@
             "[SupportsWildcards()]",
             "[string[]]",
             "$${3:ParameterName}$0"
-        ],
-        "description": "Parameter declaration snippet for Path parameter that accepts wildcards. Add parameter-literalpath to handle paths with embedded wildcard chars."
+        ]
     },
-    "Parameter-LiteralPath": {
-        "prefix": "parameter-literalpath",
+    "PesterContext": {
+      "prefix": "Context-Pester",
+      "description": "Pester - Context block",
         "body": [
-            "# Specifies a path to one or more locations. Unlike the Path parameter, the value of the LiteralPath parameter is",
-            "# used exactly as it is typed. No characters are interpreted as wildcards. If the path includes escape characters,",
-            "# enclose it in single quotation marks. Single quotation marks tell Windows PowerShell not to interpret any",
-            "# characters as escape sequences.",
-            "[Parameter(Mandatory=\\$true,",
-            "           Position=${1:0},",
-            "           ParameterSetName=\"${2:LiteralPath}\",",
-            "           ValueFromPipelineByPropertyName=\\$true,",
-            "           HelpMessage=\"Literal path to one or more locations.\")]",
-            "[Alias(\"PSPath\")]",
-            "[ValidateNotNullOrEmpty()]",
-            "[string[]]",
-            "$${2:LiteralPath}$0"
-        ],
-        "description": "Parameter declaration snippet for a LiteralPath parameter"
-    },
-    "DSC Ensure Enum": {
-        "prefix": "DSC Ensure enum",
-        "body": [
-            "enum Ensure {",
-            "\tAbsent",
-            "\tPresent",
+            "Context \"${1:ContextName}\" {",
+            "\t${0:$TM_SELECTED_TEXT}",
             "}"
-        ],
-        "description": "DSC Ensure enum definition snippet"
+        ]
     },
-    "DSC Resource Provider (class-based)": {
-        "prefix": "DSC resource provider (class-based)",
+    "PesterContextIt": {
+      "prefix": "Context-It-Pester",
+      "description": "Pester - Context block with nested It block",
         "body": [
-            "[DscResource()]",
-            "class ${ResourceName:NameOfResource} {",
-            "\t[DscProperty(Key)]",
-            "\t[string] $${PropertyName:KeyName}",
-            "\t",
-            "\t# Gets the resource's current state.",
-            "\t[${ResourceName:NameOfResource}] Get() {",
-            "\t\t${0:$TM_SELECTED_TEXT}",
-            "\t\treturn \\$this",
-            "\t}",
-            "\t",
-            "\t# Sets the desired state of the resource.",
-            "\t[void] Set() {",
-            "\t\t",
-            "\t}",
-            "\t",
-            "\t# Tests if the resource is in the desired state.",
-            "\t[bool] Test() {",
-            "\t\t",
+            "Context \"${1:ContextName}\" {",
+            "\tIt \"${2:ItName}\" {",
+            "\t\t${3:${TM_SELECTED_TEXT:Assertion}}",
+            "\t}$0",
+            "}"
+        ]
+    },
+    "PesterDescribeBlock": {
+      "prefix": "Describe-Pester",
+      "description": "Pester Describe block",
+        "body": [
+            "Describe \"${1:DescribeName}\" {",
+            "\t${0:TM_SELECTED_TEXT}",
+            "}"
+        ]
+    },
+    "PesterDescribeContextIt": {
+      "prefix": "Describe-Context-It-Pester",
+      "description": "Pester Describe block with nested Context & It blocks",
+        "body": [
+            "Describe \"${1:DescribeName}\" {",
+            "\tContext \"${2:ContextName}\" {",
+            "\t\tIt \"${3:ItName}\" {",
+            "\t\t\t${4:${TM_SELECTED_TEXT:Assertion}}",
+            "\t\t}$0",
             "\t}",
             "}"
-        ],
-        "description": "Class-based DSC resource provider snippet"
+          ]
     },
-    "DSC Resource Provider (function-based)": {
-        "prefix": "DSC resource provider (function-based)",
+    "PesterIt": {
+      "prefix": "It-Pester",
+      "description": "Pester - It block",
         "body": [
-            "function Get-TargetResource {",
-            "\tparam (",
-            "\t)",
-            "\t",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}",
-            "function Set-TargetResource {",
-            "\tparam (",
-            "\t)",
-            "\t",
-            "}",
-            "function Test-TargetResource {",
-            "\tparam (",
-            "\t)",
-            "\t",
+            "It \"${1:ItName}\" {",
+            "\t${2:${TM_SELECTED_TEXT:Assertion}}",
+            "}$0"
+          ]
+    },
+    "Property": {
+      "prefix": "prop",
+      "description": "Class property definition snippet",
+        "body": [
+            "[${1:string}] $${0:PropertyName}"
+          ]
+    },
+    "PSCustomObject": {
+      "prefix": "[PSCustomObject]",
+      "description": "Creates a PSCustomObject",
+        "body": [
+            "[PSCustomObject]@{",
+            "\t${1:Name} = ${2:Value}",
             "}"
-        ],
-        "description": "Function-based DSC resource provider snippet"
+        ]
     },
-    "comment block": {
-        "prefix": "comment",
+    "Region Block": {
+      "prefix": "#region",
+      "description": "Region Block for organizing and folding of your code",
         "body": [
-            "<#",
-            " # ${0:$TM_SELECTED_TEXT}",
-            " #>"
-        ],
-        "description": "Comment block snippet"
+            "#region ${1}",
+            "${0:$TM_SELECTED_TEXT}",
+            "#endregion"
+          ]
+        },
+        "Requires Assembly": {
+          "prefix": "requires-assembly",
+          "description": "Requires an assembly (by name) in order to execute the containing script file.",
+          "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'"
+        },
+        "Requires Assembly Path": {
+          "prefix": "requires-assembly-path",
+          "description": "Requires an assembly (by relative or absolute path) in order to execute the containing script file.",
+          "body": "#Requires -Assembly ${0:${TM_SELECTED_TEXT:path/to/assembly.dll}}"
+        },
+        "Requires Assembly Version": {
+          "prefix": "requires-assembly-version",
+          "description": "Requires an assembly (by name and minimum version) in order to execute the containing script file.",
+          "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}, Version=${2:1.0.0.0}'"
+        },
+        "Requires Module": {
+          "prefix": "requires-module",
+          "description": "Requires a module (by name) in order to execute the containing script file.",
+          "body": "#Requires -Module ${0:${TM_SELECTED_TEXT:fully-qualified-name}}"
+        },
+        "Requires Module RequiredVersion": {
+          "prefix": "requires-module-required-version",
+          "description": "Requires a module (by name and exact version) in order to execute the containing script file.",
+          "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; RequiredVersion = '${2:exact-required-version}' }"
+        },
+        "Requires Module Version": {
+          "prefix": "requires-module-version",
+          "description": "Requires a module (by name and minimum version) in order to execute the containing script file.",
+          "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; ModuleVersion = '${2:minimum-acceptable-version}' }"
+        },
+        "Requires PSEdition": {
+          "prefix": "requires-ps-edition",
+          "description": "Requires a specific edition of PowerShell in order to execute the containing script file.",
+          "body": "#Requires -PSEdition ${1|Core,Desktop|}"
+        },
+        "Requires PSSnapin": {
+          "prefix": "requires-ps-snapin",
+          "description": "Requires a PowerShell snap-in (by name) in order to execute the containing script file.",
+          "body": "#Requires -PSSnapin ${0:${TM_SELECTED_TEXT:fully-qualified-name}}"
     },
-    "do-until": {
-        "prefix": "do-until",
-        "body": [
-            "do {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "} until (${1:condition})"
-        ],
-        "description": "do-until loop snippet"
+    "Requires PSSnapin Version": {
+      "prefix": "requires-ps-snapin-version",
+      "description": "Requires a PowerShell snap-in (by name and minimum version) in order to execute the containing script file.",
+      "body": "#Requires -PSSnapin ${1:${TM_SELECTED_TEXT:fully-qualified-name}} -Version ${2:minimum-acceptable-version}"
     },
-    "do-while": {
-        "prefix": "do-while",
-        "body": [
-            "do {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "} while (${1:condition})"
-        ],
-        "description": "do-while loop snippet"
+    "Requires RunAsAdministrator": {
+      "prefix": "requires-run-as-administrator",
+      "description": "Requires elevated user rights in order to execute the containing script file. Ignored on non-Windows systems. On Windows systems, it requires that the PowerShell session in which the containing script file is run must have been started with elevated user rights (\"Run as Administrator\").",
+      "body": "#Requires -RunAsAdministrator"
     },
-    "while": {
-        "prefix": "while",
-        "body": [
-            "while (${1:condition}) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "while loop snippet"
+    "Requires ShellId": {
+      "prefix": "requires-shell-id",
+      "description": "Requires a specific shell id in order to execute the containing script file. The current shell id may be determined by querying the $ShellId automatic variable.",
+      "body": "#Requires -ShellId ${0:${TM_SELECTED_TEXT:shell-id}}"
     },
-    "for": {
-        "prefix": "for",
-        "body": [
-            "for ($${1:i} = 0; $${1:i} -lt $${2:array}.Count; $${1:i}++) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "for loop snippet"
+    "Requires Version": {
+      "prefix": "requires-version",
+      "description": "Requires a minimum version of PowerShell in order to execute the containing script file.",
+      "body": "#Requires -Version ${0:${TM_SELECTED_TEXT:minimum-acceptable-version}}"
     },
-    "for-reversed": {
-        "prefix": "forr",
+    "Suppress PSScriptAnalyzer Rule": {
+      "prefix": "suppress-message-rule",
+      "description": "Suppress a built-in PSScriptAnalyzer rule using the SuppressMessageAttribute",
         "body": [
-            "for ($${1:i} = $${2:array}.Count - 1; $${1:i} -ge 0 ; $${1:i}--) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "reversed for loop snippet"
+            "[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '')]"
+          ]
     },
-    "foreach": {
-        "prefix": "foreach",
+    "Suppress PSScriptAnalyzer Rule in Scope": {
+      "prefix": "suppress-message-rule-for-scope",
+      "description": "Suppress a built-in PSScriptAnalyzer rule for functions or classes in a specific scope using the SuppressMessageAttribute",
         "body": [
-            "foreach ($${1:item} in $${2:collection}) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "foreach loop snippet"
+            "[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '', Scope='Function', Target='${2:*}')]"
+          ]
     },
-    "function": {
-        "prefix": "function",
+    "Suppress PSScriptAnalyzer Rule on Parameter": {
+      "prefix": "suppress-message-rule-for-parameter",
+      "description": "Suppress a built-in PSScriptAnalyzer rule on a parameter using the SuppressMessageAttribute",
         "body": [
-            "function ${1:FunctionName} {",
-            "\tparam (",
-            "\t\t${2:OptionalParameters}",
-            "\t)",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Function definition snippet that contains a param block"
-    },
-    "Function-Inline": {
-        "prefix": "Function-Inline",
-        "body": [
-            "function ${1:FunctionName} (${2:OptionalParameters}) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other languages"
-    },
-    "if": {
-        "prefix": "if",
-        "body": [
-            "if (${1:condition}) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "if statement snippet"
-    },
-    "elseif": {
-        "prefix": "elseif",
-        "body": [
-            "elseif (${1:condition}) {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "elseif statement snippet"
-    },
-    "else": {
-        "prefix": "else",
-        "body": [
-            "else {",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "else statement snippet"
+            "[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '${2:ParamName}')]"
+          ]
     },
     "switch": {
         "prefix": "switch",
+        "description": "switch statement snippet",
         "body": [
             "switch (${1:\\$x}) {",
             "\t${2:condition} { ${0:$TM_SELECTED_TEXT} }",
             "\tDefault {}",
             "}"
-        ],
-        "description": "switch statement snippet"
+        ]
     },
     "try-catch": {
         "prefix": "try",
+        "description": "try-catch snippet",
         "body": [
             "try {",
             "\t${0:$TM_SELECTED_TEXT}",
@@ -843,11 +1068,11 @@
             "catch {",
             "\t",
             "}"
-        ],
-        "description": "try-catch snippet"
+        ]
     },
     "try-catch-finally": {
         "prefix": "trycf",
+        "description": "try-catch-finally snippet",
         "body": [
             "try {",
             "\t${0:$TM_SELECTED_TEXT}",
@@ -858,11 +1083,11 @@
             "finally {",
             "\t",
             "}"
-        ],
-        "description": "try-catch-finally snippet"
+        ]
     },
     "try-finally": {
         "prefix": "tryf",
+        "description": "try-finally snippet",
         "body": [
             "try {",
             "\t${0:$TM_SELECTED_TEXT}",
@@ -870,11 +1095,20 @@
             "finally {",
             "\t",
             "}"
-        ],
-        "description": "try-finally snippet"
+        ]
+      },
+      "while": {
+        "prefix": "while",
+        "description": "while loop snippet",
+        "body": [
+          "while (${1:condition}) {",
+          "\t${0:$TM_SELECTED_TEXT}",
+          "}"
+        ]
     },
     "Workflow": {
         "prefix": "workflow",
+        "description": "workflow snippet",
         "body": [
             "workflow ${name:Verb-Noun} {",
             "\tparam (",
@@ -882,275 +1116,42 @@
             "",
             "\t${0:$TM_SELECTED_TEXT}",
             "}"
-        ],
-        "description": "workflow snippet"
+        ]
     },
     "Workflow ForEachParallel": {
         "prefix": "workflow foreach-parallel",
+        "description": "foreach-parallel snippet (for use inside a workflow)",
         "body": [
             "foreach -parallel ($${variable:item} in $${collection:collection}) {",
             "\t${0:$TM_SELECTED_TEXT}",
             "}"
-        ],
-        "description": "foreach-parallel snippet (for use inside a workflow)"
+        ]
     },
     "Workflow InlineScript": {
         "prefix": "workflow inlinescript",
+        "description": "inlinescript snippet (for use inside a workflow)",
         "body": [
             "inlineScript {",
             "\t${0:$TM_SELECTED_TEXT}",
             "}"
-        ],
-        "description": "inlinescript snippet (for use inside a workflow)"
+        ]
     },
     "Workflow Parallel": {
         "prefix": "workflow parallel",
+        "description": "parallel snippet (for use inside a workflow)",
         "body": [
             "parallel {",
             "\t${0:$TM_SELECTED_TEXT}",
             "}"
-        ],
-        "description": "parallel snippet (for use inside a workflow)"
+        ]
     },
     "Workflow Sequence": {
         "prefix": "workflow sequence",
+        "description": "sequence snippet (for use inside a workflow)",
         "body": [
             "sequence {",
             "\t${0:$TM_SELECTED_TEXT}",
             "}"
-        ],
-        "description": "sequence snippet (for use inside a workflow)"
-    },
-    "Suppress PSScriptAnalyzer Rule": {
-		"prefix": "suppress-message-rule",
-		"description": "Suppress a built-in PSScriptAnalyzer rule using the SuppressMessageAttribute",
-		"body": [
-			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '')]"
-		]
-	},
-    "Suppress PSScriptAnalyzer Rule on Parameter": {
-		"prefix": "suppress-message-rule-for-parameter",
-		"description": "Suppress a built-in PSScriptAnalyzer rule on a parameter using the SuppressMessageAttribute",
-		"body": [
-			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSUseDeclaredVarsMoreThanAssignments}', '${2:ParamName}')]"
-		]
-	},
-	"Suppress PSScriptAnalyzer Rule in Scope": {
-		"prefix": "suppress-message-rule-for-scope",
-		"description": "Suppress a built-in PSScriptAnalyzer rule for functions or classes in a specific scope using the SuppressMessageAttribute",
-		"body": [
-			"[Diagnostics.CodeAnalysis.SuppressMessageAttribute('${1:PSProvideDefaultParameterValue}', '', Scope='Function', Target='${2:*}')]"
-		]
-    },
-    "PSCustomObject": {
-        "prefix": "[PSCustomObject]",
-        "body": [
-            "[PSCustomObject]@{",
-            "\t${1:Name} = ${2:Value}",
-            "}"
-        ],
-        "description": "Creates a PSCustomObject"
-    },
-    "Hashtable": {
-        "prefix": "Hashtable",
-        "body": [
-            "\\$${1:Var} = @{",
-            "\t${2:Name} = ${3:Value}",
-            "}"
-        ],
-        "description": "Creates a Hashtable"
-    },
-    "Region Block": {
-        "prefix": "#region",
-        "body": [
-            "#region ${1}",
-            "${0:$TM_SELECTED_TEXT}",
-            "#endregion"
-        ],
-        "description": "Region Block for organizing and folding of your code"
-    },
-    "IfShouldProcess": {
-        "prefix": "IfShouldProcess",
-        "body": [
-            "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
-                "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Creates ShouldProcess block"
-    },
-    "CalculatedProperty": {
-        "prefix": "Calculated-Property",
-        "body": [
-            "@{name='${1:PropertyName}';expression={${2:${TM_SELECTED_TEXT:\\$_.PropertyValue}}}}$0"
-        ],
-        "description": "Creates a Calculated Property typically used with Select-Object."
-    },
-    "PesterDescribeContextIt": {
-        "prefix": "Describe-Context-It-Pester",
-        "body": [
-            "Describe \"${1:DescribeName}\" {",
-                "\tContext \"${2:ContextName}\" {",
-                    "\t\tIt \"${3:ItName}\" {",
-                        "\t\t\t${4:${TM_SELECTED_TEXT:Assertion}}",
-                    "\t\t}$0",
-                "\t}",
-            "}"
-        ],
-        "description": "Pester Describe block with nested Context & It blocks"
-    },
-    "PesterDescribeBlock": {
-        "prefix": "Describe-Pester",
-        "body": [
-            "Describe \"${1:DescribeName}\" {",
-                "\t${0:TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Pester Describe block"
-    },
-    "PesterContextIt": {
-        "prefix": "Context-It-Pester",
-        "body": [
-            "Context \"${1:ContextName}\" {",
-                "\tIt \"${2:ItName}\" {",
-                    "\t\t${3:${TM_SELECTED_TEXT:Assertion}}",
-                "\t}$0",
-            "}"
-        ],
-        "description": "Pester - Context block with nested It block"
-    },
-    "PesterContext": {
-        "prefix": "Context-Pester",
-        "body": [
-            "Context \"${1:ContextName}\" {",
-                "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "Pester - Context block"
-    },
-    "PesterIt": {
-        "prefix": "It-Pester",
-        "body": [
-            "It \"${1:ItName}\" {",
-                "\t${2:${TM_SELECTED_TEXT:Assertion}}",
-            "}$0"
-        ],
-        "description": "Pester - It block"
-    },
-    "ArgumentCompleterAttribute with ScriptBlock": {
-        "prefix": "completer-attribute",
-        "body": [
-            "[ArgumentCompleter({",
-            "\t[OutputType([System.Management.Automation.CompletionResult])]  # zero to many",
-            "\tparam(",
-            "\t\t[string] \\$CommandName,",
-            "\t\t[string] \\$ParameterName,",
-            "\t\t[string] \\$WordToComplete,",
-            "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
-            "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
-            "\t)",
-            "\t",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "})]"
-        ],
-        "description": "ArgumentCompleter parameter attribute with script block definition"
-    },
-    "ArgumentCompleterAttribute ScriptBlock": {
-        "prefix": "completer-scriptblock",
-        "body": [
-            "{",
-            "\t[OutputType([System.Management.Automation.CompletionResult])]  # zero to many",
-            "\tparam(",
-            "\t\t[string] \\$CommandName,",
-            "\t\t[string] \\$ParameterName,",
-            "\t\t[string] \\$WordToComplete,",
-            "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
-            "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
-            "\t)",
-            "\t",
-            "\t${0:$TM_SELECTED_TEXT}",
-            "}"
-        ],
-        "description": "ArgumentCompleter parameter attribute script block definition"
-    },
-    "IArgumentCompleter Class": {
-        "prefix": "completer-class",
-        "body": [
-            "class ${1:ArgumentCompleter} : System.Management.Automation.IArgumentCompleter {",
-            "\t[System.Collections.Generic.IEnumerable[System.Management.Automation.CompletionResult]] CompleteArgument(",
-            "\t\t[string] \\$CommandName,",
-            "\t\t[string] \\$ParameterName,",
-            "\t\t[string] \\$WordToComplete,",
-            "\t\t[System.Management.Automation.Language.CommandAst] \\$CommandAst,",
-            "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
-            "\t) {",
-            "\t\t\\$CompletionResults = [System.Collections.Generic.List[System.Management.Automation.CompletionResult]]::new()",
-            "\t\t",
-            "\t\t${0:$TM_SELECTED_TEXT}",
-            "\t\t",
-            "\t\treturn \\$CompletionResults",
-            "\t}",
-            "}"
-        ],
-        "description": "IArgumentCompleter implementation class definition"
-    },
-    "Requires Assembly": {
-        "prefix": "requires-assembly",
-        "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'",
-        "description": "Requires an assembly (by name) in order to execute the containing script file."
-    },
-    "Requires Assembly Path": {
-        "prefix": "requires-assembly-path",
-        "body": "#Requires -Assembly ${0:${TM_SELECTED_TEXT:path/to/assembly.dll}}",
-        "description": "Requires an assembly (by relative or absolute path) in order to execute the containing script file."
-    },
-    "Requires Assembly Version": {
-        "prefix": "requires-assembly-version",
-        "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}, Version=${2:1.0.0.0}'",
-        "description": "Requires an assembly (by name and minimum version) in order to execute the containing script file."
-    },
-    "Requires Module": {
-        "prefix": "requires-module",
-        "body": "#Requires -Module ${0:${TM_SELECTED_TEXT:fully-qualified-name}}",
-        "description": "Requires a module (by name) in order to execute the containing script file."
-    },
-    "Requires Module RequiredVersion": {
-        "prefix": "requires-module-required-version",
-        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; RequiredVersion = '${2:exact-required-version}' }",
-        "description": "Requires a module (by name and exact version) in order to execute the containing script file."
-    },
-    "Requires Module Version": {
-        "prefix": "requires-module-version",
-        "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; ModuleVersion = '${2:minimum-acceptable-version}' }",
-        "description": "Requires a module (by name and minimum version) in order to execute the containing script file."
-    },
-    "Requires PSEdition": {
-        "prefix": "requires-ps-edition",
-        "body": "#Requires -PSEdition ${1|Core,Desktop|}",
-        "description": "Requires a specific edition of PowerShell in order to execute the containing script file."
-    },
-    "Requires PSSnapin": {
-        "prefix": "requires-ps-snapin",
-        "body": "#Requires -PSSnapin ${0:${TM_SELECTED_TEXT:fully-qualified-name}}",
-        "description": "Requires a PowerShell snap-in (by name) in order to execute the containing script file."
-    },
-    "Requires PSSnapin Version": {
-        "prefix": "requires-ps-snapin-version",
-        "body": "#Requires -PSSnapin ${1:${TM_SELECTED_TEXT:fully-qualified-name}} -Version ${2:minimum-acceptable-version}",
-        "description": "Requires a PowerShell snap-in (by name and minimum version) in order to execute the containing script file."
-    },
-    "Requires RunAsAdministrator": {
-        "prefix": "requires-run-as-administrator",
-        "body": "#Requires -RunAsAdministrator",
-        "description": "Requires elevated user rights in order to execute the containing script file. Ignored on non-Windows systems. On Windows systems, it requires that the PowerShell session in which the containing script file is run must have been started with elevated user rights (\"Run as Administrator\")."
-    },
-    "Requires ShellId": {
-        "prefix": "requires-shell-id",
-        "body": "#Requires -ShellId ${0:${TM_SELECTED_TEXT:shell-id}}",
-        "description": "Requires a specific shell id in order to execute the containing script file. The current shell id may be determined by querying the $ShellId automatic variable."
-    },
-    "Requires Version": {
-        "prefix": "requires-version",
-        "body": "#Requires -Version ${0:${TM_SELECTED_TEXT:minimum-acceptable-version}}",
-        "description": "Requires a minimum version of PowerShell in order to execute the containing script file."
+        ]
     }
 }
