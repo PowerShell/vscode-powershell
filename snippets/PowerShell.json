@@ -33,7 +33,7 @@
   },
   "Class": {
     "prefix": "class",
-    "description": "Class definition snippet",
+    "description": "A class declaration is a blueprint used to create instances of objects at run time. More: Get-Help about_Classes",
     "body": [
       "class ${1:ClassName} {",
       "\t${0:$TM_SELECTED_TEXT}",
