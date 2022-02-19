@@ -49,27 +49,6 @@
       " #>"
     ]
   },
-  "Comment-Help": {
-    "prefix": "comment-help",
-    "description": "Comment-based help for an advanced function snippet",
-    "body": [
-      "<#",
-      ".SYNOPSIS",
-      "\tShort description",
-      ".DESCRIPTION",
-      "\tLong description",
-      ".EXAMPLE",
-      "\tPS C:\\> <example usage>",
-      "\tExplanation of what the example does",
-      ".INPUTS",
-      "\tInputs (if any)",
-      ".OUTPUTS",
-      "\tOutput (if any)",
-      ".NOTES",
-      "\tGeneral notes",
-      "#>"
-    ]
-  },
   "Constructor": {
     "prefix": "ctor",
     "description": "Class constructor definition snippet",
