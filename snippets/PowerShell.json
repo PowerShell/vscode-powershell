@@ -1,8 +1,11 @@
 // The "Requires *" snippets should be removed if-and-when intellisense is implemented for the script requirement directive syntax.
 {
   "ArgumentCompleterAttribute": {
-    "prefix": "argumentcompleter",
-    "description": "The ArgumentCompleter attribute allows you to add tab completion values to a specific parameter by writing a scriptblock that generates zero or more CompletionResult objects. More: Get-Help -Online about_functions_argument_completion",
+    "prefix": [
+      "argumentcompleter",
+      "[ArgumentCompleter("
+    ],
+    "description": "ArgumentCompleter attribute allows you to add tab completion values to a specific parameter by writing a scriptblock that generates zero or more CompletionResult objects. More: Get-Help about_Functions_Argument_Completion",
     "body": [
       "[ArgumentCompleter({",
       "\t[OutputType([System.Management.Automation.CompletionResult])]",
@@ -15,15 +18,17 @@
       "\t)",
       "\t",
       "\t${1:$TM_SELECTED_TEXT}",
-      "\t#Output one or more of these objects: [Management.Automation.CompletionResult]'MyPotentialResult'",
       "})]${0}"
     ]
   },
   "CalculatedProperty": {
-    "prefix": "Calculated-Property",
-    "description": "Creates a Calculated Property typically used with Select-Object.",
+    "prefix": [
+      "calculated-property",
+      "@{Name"
+    ],
+    "description": "Calculated Property typically used with Select-Object or Sort-Object. More: Get-Help about_Calculated_Properties",
     "body": [
-      "@{name='${1:PropertyName}';expression={${2:${TM_SELECTED_TEXT:\\$_.PropertyValue}}}}$0"
+      "@{Name='${1:PropertyName}';Expression={${2:${TM_SELECTED_TEXT:\\$_.PropertyValue}}}}$0"
     ]
   },
   "Class": {
