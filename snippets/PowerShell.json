@@ -1,11 +1,8 @@
 // The "Requires *" snippets should be removed if-and-when intellisense is implemented for the script requirement directive syntax.
 {
   "ArgumentCompleterAttribute": {
-    "prefix": [
-      "argumentcompleter",
-      "[ArgumentCompleter("
-    ],
-    "description": "ArgumentCompleter attribute allows you to add tab completion values to a specific parameter by writing a scriptblock that generates zero or more CompletionResult objects. More: Get-Help about_Functions_Argument_Completion",
+    "prefix": "argument-completer",
+    "description": "Allows you to add tab completion values to a specific parameter by writing a scriptblock that generates zero or more CompletionResult objects. More: Get-Help about_Functions_Argument_Completion",
     "body": [
       "[ArgumentCompleter({",
       "\t[OutputType([System.Management.Automation.CompletionResult])]",
@@ -17,63 +14,73 @@
       "\t\t[System.Collections.IDictionary] \\$FakeBoundParameters",
       "\t)",
       "\t",
-      "\t${1:$TM_SELECTED_TEXT}",
-      "})]${0}"
+      "\t\\$CompletionResults = [System.Collections.Generic.List[System.Management.Automation.CompletionResult]]::new()",
+      "\t",
+      "\t${0:$TM_SELECTED_TEXT}",
+      "\t",
+      "\treturn \\$CompletionResults",
+      "})]"
     ]
   },
-  "CalculatedProperty": {
-    "prefix": [
-      "calculated-property",
-      "@{Name"
-    ],
-    "description": "Calculated Property typically used with Select-Object or Sort-Object. More: Get-Help about_Calculated_Properties",
+  "Calculated Property": {
+    "prefix": "calculated-property",
+    "description": "Typically used with Select-Object or Sort-Object. More: Get-Help about_Calculated_Properties",
     "body": [
       "@{Name='${1:PropertyName}';Expression={${2:${TM_SELECTED_TEXT:\\$_.PropertyValue}}}}$0"
     ]
   },
   "Class": {
     "prefix": "class",
-    "description": "A class declaration is a blueprint used to create instances of objects at run time. More: Get-Help about_Classes",
+    "description": "A blueprint used to create instances of objects at run time. More: Get-Help about_Classes",
     "body": [
       "class ${1:ClassName} {",
-      "\t${0:$TM_SELECTED_TEXT}",
+      "\t${0:${TM_SELECTED_TEXT:#Define the class. Try constructors, properties, or methods}}",
       "}"
     ]
   },
-  "comment block": {
-    "prefix": "comment",
-    "description": "Comment block snippet",
-    "body": [
-      "<#",
-      " # ${0:$TM_SELECTED_TEXT}",
-      " #>"
-    ]
-  },
-  "Constructor": {
-    "prefix": "ctor",
-    "description": "Class constructor definition snippet",
+  "Class Constructor": {
+    "prefix": [
+      "ctor-class",
+      "class-constructor"
+    ],
+    "description": "Set default values and validate object logic at the moment of creating the instance of the class. Constructors have the same name as the class. Constructors might have arguments, to initialize the data members of the new object. More: Get-Help about_Classes",
     "body": [
       "${1:ClassName}(${2:OptionalParameters}) {",
-      "\t${0:$TM_SELECTED_TEXT}",
+      "\t${0:${TM_SELECTED_TEXT:#Initialize the class. Use \\$this to reference the properties of the instance you are creating}}",
       "}"
+    ]
+  },
+  "Comment Block": {
+    "prefix": [
+      "block-comment"
+    ],
+    "description": "A multi-line comment.",
+    "body": [
+      "$BLOCK_COMMENT_START",
+      " # ${{0:$TM_SELECTED_TEXT:Enter a comment or description}}",
+      "$BLOCK_COMMENT_END"
     ]
   },
   "do-until": {
     "prefix": "do-until",
-    "description": "do-until loop snippet",
+    "description": "Runs a statement list repeatedly until a condition is met More: Get-Help about_Do",
     "body": [
       "do {",
       "\t${0:$TM_SELECTED_TEXT}",
-      "} until (${1:condition})"
+      "} until (",
+      "\t${1:#Condition that stops the loop if it returns true}",
+      ")"
     ]
   },
   "do-while": {
     "prefix": "do-while",
-    "description": "do-while loop snippet",
+    "description": "Runs a statement list repeatedly as long as a condition is met. More: Get-Help about_Do",
     "body": [
       "do {",
       "\t${0:$TM_SELECTED_TEXT}",
-      "} while (${1:condition})"
+      "} while (",
+      "\t${1:#Condition that stops the loop if it returns false})",
+      ")"
     ]
   },
   "DSC Ensure Enum": {
@@ -83,7 +90,8 @@
       "enum Ensure {",
       "\tAbsent",
       "\tPresent",
-      "}"
+      "}",
+      "$0"
     ]
   },
   "DSC Resource Provider (class-based)": {
@@ -137,7 +145,7 @@
   },
   "else": {
     "prefix": "else",
-    "description": "else statement snippet",
+    "description": "else defines what is done when all if and elseif conditions are false. More: Get-Help about_If",
     "body": [
       "else {",
       "\t${0:$TM_SELECTED_TEXT}",
@@ -146,7 +154,7 @@
   },
   "elseif": {
     "prefix": "elseif",
-    "description": "elseif statement snippet",
+    "description": "elseif provides an alternative path when an if condition is false. More: Get-Help about_If",
     "body": [
       "elseif (${1:condition}) {",
       "\t${0:$TM_SELECTED_TEXT}",
@@ -155,87 +163,10 @@
   },
   "Enum": {
     "prefix": "enum",
-    "description": "Enum definition snippet",
+    "description": "An enumeration is a distinct type that consists of a set of named labels called the enumerator list. More: Get-Help about_Enum",
     "body": [
       "enum ${1:EnumName} {",
       "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
-  },
-  "Example-Advanced Workflow": {
-    "prefix": "ex-advanced workflow",
-    "description": "Example: advanced workflow snippet",
-    "body": [
-      "<#",
-      ".Synopsis",
-      "\tShort description",
-      ".DESCRIPTION",
-      "\tLong description",
-      ".EXAMPLE",
-      "\tExample of how to use this workflow",
-      ".EXAMPLE",
-      "\tAnother example of how to use this workflow",
-      ".INPUTS",
-      "\tInputs to this workflow (if any)",
-      ".OUTPUTS",
-      "\tOutput from this workflow (if any)",
-      ".NOTES",
-      "\tGeneral notes",
-      ".FUNCTIONALITY",
-      "\tThe functionality that best describes this workflow",
-      "#>",
-      "workflow ${name:Verb-Noun} {",
-      "\t[CmdletBinding(DefaultParameterSetName='Parameter Set 1',",
-      "\t               HelpUri = 'http://www.microsoft.com/',",
-      "\t               ConfirmImpact='Medium')]",
-      "\t[Alias()]",
-      "\t[OutputType([String])]",
-      "\tparam (",
-      "\t\t# Param1 help description",
-      "\t\t[Parameter(Mandatory=\\$true, ",
-      "\t\t           Position=0,",
-      "\t\t           ParameterSetName='Parameter Set 1')]",
-      "\t\t[ValidateNotNull()]",
-      "\t\t[Alias(\"p1\")] ",
-      "\t\t\\$Param1,",
-      "",
-      "\t\t# Param2 help description",
-      "\t\t[int]",
-      "\t\t\\$Param2",
-      "\t)",
-      "",
-      "\t# Saves (persists) the current workflow state and output",
-      "\t# Checkpoint-Workflow",
-      "\t# Suspends the workflow",
-      "\t# Suspend-Workflow",
-      "",
-      "\t# Workflow common parameters are available as variables such as:",
-      "\t\\$PSPersist ",
-      "\t\\$PSComputerName",
-      "\t\\$PSCredential",
-      "\t\\$PSUseSsl",
-      "\t\\$PSAuthentication",
-      "",
-      "\t# Workflow runtime information can be accessed by using the following variables:",
-      "\t\\$Input",
-      "\t\\$PSSenderInfo",
-      "\t\\$PSWorkflowRoot",
-      "\t\\$JobCommandName",
-      "\t\\$ParentCommandName",
-      "\t\\$JobId",
-      "\t\\$ParentJobId",
-      "\t\\$WorkflowInstanceId",
-      "\t\\$JobInstanceId",
-      "\t\\$ParentJobInstanceId",
-      "\t\\$JobName",
-      "\t\\$ParentJobName",
-      "",
-      "\t# Set the progress message ParentActivityId",
-      "\t\\$PSParentActivityId",
-      "",
-      "\t# Preference variables that control runtime behavior",
-      "\t\\$PSRunInProcessPreference",
-      "\t\\$PSPersistPreference",
       "}"
     ]
   },
@@ -590,6 +521,15 @@
       "}"
     ]
   },
+  "ForEach-Object -Parallel": {
+    "prefix": "foreach-parallel",
+    "description": "[PS 7+] Process multiple objects in parallel using runspaces. This has some limitations compared to a regular ForEach-Object. More: Get-Help ForEach-Object",
+    "body": [
+      "${1:\\$collection} | Foreach-Object -ThrottleLimit ${2:5} -Parallel {",
+      "  ${0:${TM_SELECTED_TEXT:#Reference items via \\$PSItem and bring in outside variables with \\$USING:varname}}",
+      "}"
+    ]
+  },
   "function": {
     "prefix": "function",
     "description": "A simple function with a parameter block to specify function arguments",
@@ -600,6 +540,30 @@
       "\t)",
       "\t${0:$TM_SELECTED_TEXT}",
       "}"
+    ]
+  },
+  "Function Help": {
+    "prefix": [
+      "help-function",
+      "comment-help"
+    ],
+    "description": "Comment-based help for an advanced function. More: Get-Help about_Comment_Based_Help",
+    "body": [
+      "<#",
+      ".SYNOPSIS",
+      "\t${1:A short one-line action-based description, e.g. 'Tests if a function is valid'}",
+      ".DESCRIPTION",
+      "\t${2:A longer description of the function, its purpose, common use cases, etc.}",
+      ".NOTES",
+      "\t${3:Information or caveats about the function e.g. 'This function is not supported in Linux'}",
+      ".LINK",
+      "\t${4:Specify a URI to a help page, this will show when Get-Help -Online is used.}",
+      ".EXAMPLE",
+      "\t${5:Test-MyTestFunction -Verbose}",
+      "\t${6:Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines}",
+      "#>",
+      "",
+      "{0}"
     ]
   },
   "Function-Advanced": {
@@ -658,8 +622,11 @@
     ]
   },
   "Hashtable": {
-    "prefix": "Hashtable",
-    "description": "Creates a Hashtable",
+    "prefix": [
+      "Hashtable",
+      "@{"
+    ],
+    "description": "A key/value store that are very effecient for finding and retrieving data. More: Get-Help about_Hash_Tables",
     "body": [
       "\\$${1:Var} = @{",
       "\t${2:Name} = ${3:Value}",
@@ -667,15 +634,15 @@
     ]
   },
   "Hidden Property": {
-    "prefix": "proph",
-    "description": "Class hidden property definition snippet",
+    "prefix": "class-proph",
+    "description": "Useful for creating properties and methods within a class that you do not necessarily want other users of the class to see, or readily be able to edit. More: about_Hidden",
     "body": [
       "hidden [${1:string}] $${0:PropertyName}"
     ]
   },
   "IArgumentCompleter Class": {
-    "prefix": "completer-class",
-    "description": "IArgumentCompleter implementation class definition",
+    "prefix": "iargument-completer",
+    "description": "Implementation of the IArgumentCompleter interface that can be directly attached to parameters (e.g. [MyCustomArgumentCompleter])",
     "body": [
       "class ${1:ArgumentCompleter} : System.Management.Automation.IArgumentCompleter {",
       "\t[System.Collections.Generic.IEnumerable[System.Management.Automation.CompletionResult]] CompleteArgument(",
@@ -704,7 +671,7 @@
     ]
   },
   "IfShouldProcess": {
-    "prefix": "IfShouldProcess",
+    "prefix": "if-Should-Process",
     "description": "Creates ShouldProcess block",
     "body": [
       "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
@@ -783,9 +750,33 @@
       "}"
     ]
   },
+  "Parallel Pipeline Function": {
+    "prefix": "function-parallel-pipeline",
+    "description": "Collects everything in the process block and does work in the end block. Useful when making a 'fan out' function that acts on multiple items simultaneously because the pipeline only does one item at a time in the process block.",
+    "body": [
+      "function $1 {",
+      "  [CmdletBinding()]",
+      "  param(",
+      "    [parameter(ValueFromPipeline)]$$2",
+      "  )",
+      "",
+      "  begin {",
+      "    [Collections.ArrayList]\\$inputObjects = @()",
+      "  }",
+      "  process {",
+      "    [void]\\$inputObjects.Add($$2)",
+      "  }",
+      "  end {",
+      "    \\$inputObjects | Foreach -Parallel {",
+      "      $0",
+      "    }",
+      "  }",
+      "}"
+    ]
+  },
   "Parameter": {
     "prefix": "parameter",
-    "description": "Parameter declaration snippet",
+    "description": "A parameter definition for a method or function. More: Get-Help about_Functions",
     "body": [
       "# ${1:Parameter help description}",
       "[Parameter(${2:AttributeValues})]",
@@ -794,8 +785,8 @@
     ]
   },
   "Parameter_Block": {
-    "prefix": "param-block",
-    "description": "A Parameter block to get you started.",
+    "prefix": "param-block-advanced-function",
+    "description": "A parameter block for an advanced function. More: Get-Help about_Functions_Advanced",
     "body": [
       "[CmdletBinding()]",
       "param (",
@@ -858,57 +849,74 @@
       "$${3:ParameterName}$0"
     ]
   },
-  "PesterContext": {
-    "prefix": "Context-Pester",
-    "description": "Pester - Context block",
+  "Pipeline Function": {
+    "prefix": "function-pipeline",
+    "description": "Basic function that accepts pipeline input \nReference: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines?view=powershell-7.2",
     "body": [
-      "Context \"${1:ContextName}\" {",
-      "\t${0:$TM_SELECTED_TEXT}",
+      "function $1 {",
+      "  [CmdletBinding()]",
+      "  param(",
+      "    [parameter(ValueFromPipeline)]$2",
+      "  )",
+      "",
+      "  process {",
+      "    $0",
+      "  }",
       "}"
     ]
   },
-  "PesterContextIt": {
-    "prefix": "Context-It-Pester",
-    "description": "Pester - Context block with nested It block",
-    "body": [
-      "Context \"${1:ContextName}\" {",
-      "\tIt \"${2:ItName}\" {",
-      "\t\t${3:${TM_SELECTED_TEXT:Assertion}}",
-      "\t}$0",
-      "}"
-    ]
-  },
-  "PesterDescribeBlock": {
-    "prefix": "Describe-Pester",
-    "description": "Pester Describe block",
-    "body": [
-      "Describe \"${1:DescribeName}\" {",
-      "\t${0:TM_SELECTED_TEXT}",
-      "}"
-    ]
-  },
-  "PesterDescribeContextIt": {
-    "prefix": "Describe-Context-It-Pester",
-    "description": "Pester Describe block with nested Context & It blocks",
-    "body": [
-      "Describe \"${1:DescribeName}\" {",
-      "\tContext \"${2:ContextName}\" {",
-      "\t\tIt \"${3:ItName}\" {",
-      "\t\t\t${4:${TM_SELECTED_TEXT:Assertion}}",
-      "\t\t}$0",
-      "\t}",
-      "}"
-    ]
-  },
-  "PesterIt": {
-    "prefix": "It-Pester",
-    "description": "Pester - It block",
-    "body": [
-      "It \"${1:ItName}\" {",
-      "\t${2:${TM_SELECTED_TEXT:Assertion}}",
-      "}$0"
-    ]
-  },
+  // Pester is no longer bundled with PowerShell Core, but is available as a NuGet package.
+  // "PesterContext": {
+  //   "prefix": "Context-Pester",
+  //   "description": "Pester - Context block",
+  //   "body": [
+  //     "Context \"${1:ContextName}\" {",
+  //     "\t${0:$TM_SELECTED_TEXT}",
+  //     "}"
+  //   ]
+  // },
+  // "PesterContextIt": {
+  //   "prefix": "Context-It-Pester",
+  //   "description": "Pester - Context block with nested It block",
+  //   "body": [
+  //     "Context \"${1:ContextName}\" {",
+  //     "\tIt \"${2:ItName}\" {",
+  //     "\t\t${3:${TM_SELECTED_TEXT:Assertion}}",
+  //     "\t}$0",
+  //     "}"
+  //   ]
+  // },
+  // "PesterDescribeBlock": {
+  //   "prefix": "Describe-Pester",
+  //   "description": "Pester Describe block",
+  //   "body": [
+  //     "Describe \"${1:DescribeName}\" {",
+  //     "\t${0:TM_SELECTED_TEXT}",
+  //     "}"
+  //   ]
+  // },
+  // "PesterDescribeContextIt": {
+  //   "prefix": "Describe-Context-It-Pester",
+  //   "description": "Pester Describe block with nested Context & It blocks",
+  //   "body": [
+  //     "Describe \"${1:DescribeName}\" {",
+  //     "\tContext \"${2:ContextName}\" {",
+  //     "\t\tIt \"${3:ItName}\" {",
+  //     "\t\t\t${4:${TM_SELECTED_TEXT:Assertion}}",
+  //     "\t\t}$0",
+  //     "\t}",
+  //     "}"
+  //   ]
+  // },
+  // "PesterIt": {
+  //   "prefix": "It-Pester",
+  //   "description": "Pester - It block",
+  //   "body": [
+  //     "It \"${1:ItName}\" {",
+  //     "\t${2:${TM_SELECTED_TEXT:Assertion}}",
+  //     "}$0"
+  //   ]
+  // },
   "Property": {
     "prefix": "prop",
     "description": "Class property definition snippet",
@@ -933,66 +941,6 @@
       "${0:$TM_SELECTED_TEXT}",
       "#endregion"
     ]
-  },
-  "Requires Assembly": {
-    "prefix": "requires-assembly",
-    "description": "Requires an assembly (by name) in order to execute the containing script file.",
-    "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'"
-  },
-  "Requires Assembly Path": {
-    "prefix": "requires-assembly-path",
-    "description": "Requires an assembly (by relative or absolute path) in order to execute the containing script file.",
-    "body": "#Requires -Assembly ${0:${TM_SELECTED_TEXT:path/to/assembly.dll}}"
-  },
-  "Requires Assembly Version": {
-    "prefix": "requires-assembly-version",
-    "description": "Requires an assembly (by name and minimum version) in order to execute the containing script file.",
-    "body": "#Requires -Assembly '${1:${TM_SELECTED_TEXT:fully-qualified-name}}, Version=${2:1.0.0.0}'"
-  },
-  "Requires Module": {
-    "prefix": "requires-module",
-    "description": "Requires a module (by name) in order to execute the containing script file.",
-    "body": "#Requires -Module ${0:${TM_SELECTED_TEXT:fully-qualified-name}}"
-  },
-  "Requires Module RequiredVersion": {
-    "prefix": "requires-module-required-version",
-    "description": "Requires a module (by name and exact version) in order to execute the containing script file.",
-    "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; RequiredVersion = '${2:exact-required-version}' }"
-  },
-  "Requires Module Version": {
-    "prefix": "requires-module-version",
-    "description": "Requires a module (by name and minimum version) in order to execute the containing script file.",
-    "body": "#Requires -Module @{ ModuleName = '${1:${TM_SELECTED_TEXT:fully-qualified-name}}'; ModuleVersion = '${2:minimum-acceptable-version}' }"
-  },
-  "Requires PSEdition": {
-    "prefix": "requires-ps-edition",
-    "description": "Requires a specific edition of PowerShell in order to execute the containing script file.",
-    "body": "#Requires -PSEdition ${1|Core,Desktop|}"
-  },
-  "Requires PSSnapin": {
-    "prefix": "requires-ps-snapin",
-    "description": "Requires a PowerShell snap-in (by name) in order to execute the containing script file.",
-    "body": "#Requires -PSSnapin ${0:${TM_SELECTED_TEXT:fully-qualified-name}}"
-  },
-  "Requires PSSnapin Version": {
-    "prefix": "requires-ps-snapin-version",
-    "description": "Requires a PowerShell snap-in (by name and minimum version) in order to execute the containing script file.",
-    "body": "#Requires -PSSnapin ${1:${TM_SELECTED_TEXT:fully-qualified-name}} -Version ${2:minimum-acceptable-version}"
-  },
-  "Requires RunAsAdministrator": {
-    "prefix": "requires-run-as-administrator",
-    "description": "Requires elevated user rights in order to execute the containing script file. Ignored on non-Windows systems. On Windows systems, it requires that the PowerShell session in which the containing script file is run must have been started with elevated user rights (\"Run as Administrator\").",
-    "body": "#Requires -RunAsAdministrator"
-  },
-  "Requires ShellId": {
-    "prefix": "requires-shell-id",
-    "description": "Requires a specific shell id in order to execute the containing script file. The current shell id may be determined by querying the $ShellId automatic variable.",
-    "body": "#Requires -ShellId ${0:${TM_SELECTED_TEXT:shell-id}}"
-  },
-  "Requires Version": {
-    "prefix": "requires-version",
-    "description": "Requires a minimum version of PowerShell in order to execute the containing script file.",
-    "body": "#Requires -Version ${0:${TM_SELECTED_TEXT:minimum-acceptable-version}}"
   },
   "Suppress PSScriptAnalyzer Rule": {
     "prefix": "suppress-message-rule",
@@ -1025,100 +973,96 @@
       "}"
     ]
   },
+  "Ternary Operator": {
+    "prefix": "ternary",
+    "description": "[PS 7+] Simplified version of if-else popular in other languages that works in Powershell. More: about_If",
+    "body": [
+      "(${TM_SELECTED_TEXT:${1:condition}}) ? $(${2:actionIfTrue}) : $(${3:actionIfFalse})",
+      "$0"
+    ]
+  },
   "try-catch": {
-    "prefix": "try",
-    "description": "try-catch snippet",
+    "prefix": "try-catch",
+    "description": "Attempt a block of code and if a terminating exception occurs, perform another block of code rather than terminate the program More: about_Try_Catch_Finally",
     "body": [
       "try {",
       "\t${0:$TM_SELECTED_TEXT}",
       "}",
       "catch {",
-      "\t",
+      "\t{1:Do this if a terminating exception happens}",
       "}"
     ]
   },
   "try-catch-finally": {
-    "prefix": "trycf",
-    "description": "try-catch-finally snippet",
+    "prefix": "try-catch-finally",
+    "description": "Attempt a block of code and if a terminating exception occurs, perform another block of code, finally performing a final block of code regardless of the outcome. More: about_Try_Catch_Finally",
     "body": [
       "try {",
       "\t${0:$TM_SELECTED_TEXT}",
       "}",
       "catch {",
-      "\t",
+      "\t{1:Do this if a terminating exception happens}",
       "}",
       "finally {",
-      "\t",
+      "\t{2:Do this after the try block regardless of whether an exception occurred or not}",
       "}"
     ]
   },
   "try-finally": {
-    "prefix": "tryf",
-    "description": "try-finally snippet",
+    "prefix": "try-finally",
+    "description": "Attempt a block of code and perform an action regardless of the outcome. Useful for cleanup or gracefully disconnecting active sessions even if there was a terminating error. More: about_Try_Catch_Finally",
     "body": [
       "try {",
       "\t${0:$TM_SELECTED_TEXT}",
       "}",
       "finally {",
-      "\t",
+      "\t{2:Do this after the try block regardless of whether an exception occurred or not}",
       "}"
     ]
   },
   "while": {
     "prefix": "while",
-    "description": "while loop snippet",
+    "description": "Repeatedly perform an action after verifying a condition is true first.",
     "body": [
       "while (${1:condition}) {",
       "\t${0:$TM_SELECTED_TEXT}",
       "}"
     ]
   },
-  "Workflow": {
-    "prefix": "workflow",
-    "description": "workflow snippet",
+  "splat": {
+    "prefix": "splat",
+    "description": "Use a hashtable to capture the parameters of a function and then pass them to a function in a concise way. More: about_Splatting",
     "body": [
-      "workflow ${name:Verb-Noun} {",
-      "\tparam (",
-      "\t)",
-      "",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
+      "$${1/[^\\w]/_/}Params = @{",
+      "\t${2:Parameter} = ${0:Value}",
+      "}",
+      "${1:${TM_SELECTED_TEXT}} @${1/[^\\w]/_/}Params"
     ]
   },
-  "Workflow ForEachParallel": {
-    "prefix": "workflow foreach-parallel",
-    "description": "foreach-parallel snippet (for use inside a workflow)",
+  "Here-String": {
+    "prefix": [
+      "hs",
+      "here-string"
+    ],
     "body": [
-      "foreach -parallel ($${variable:item} in $${collection:collection}) {",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
+      "@\"",
+      "${0:TM_SELECTED_TEXT}",
+      "\"@",
+      ""
+    ],
+    "description": "Escape all text but evaluate variables. More: Get-Help about_Quoting_Rules"
   },
-  "Workflow InlineScript": {
-    "prefix": "workflow inlinescript",
-    "description": "inlinescript snippet (for use inside a workflow)",
+  "Here-String (Literal)": {
+    "prefix": [
+      "hsl",
+      "literal-here-string"
+    ],
     "body": [
-      "inlineScript {",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
-  },
-  "Workflow Parallel": {
-    "prefix": "workflow parallel",
-    "description": "parallel snippet (for use inside a workflow)",
-    "body": [
-      "parallel {",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
-  },
-  "Workflow Sequence": {
-    "prefix": "workflow sequence",
-    "description": "sequence snippet (for use inside a workflow)",
-    "body": [
-      "sequence {",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
+      "@'",
+      "${0:TM_SELECTED_TEXT}",
+      "'@",
+      ""
+    ],
+    "description": "Escape all text regardless. More: Get-Help about_Quoting_Rules"
   }
 }
