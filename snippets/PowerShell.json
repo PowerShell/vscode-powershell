@@ -49,6 +49,74 @@
       "}"
     ]
   },
+  "Class Method": {
+    "prefix": "class-method",
+    "description": "Defines the actions that a class can perform. Methods may take parameters that provide input data. Methods can return output. Data returned by a method can be any defined data type. More: Get-Help about_Classes",
+    "body": [
+      "[${1:void}] ${2:MethodName}($${3:OptionalParameters}) {",
+      "\t${0:${TM_SELECTED_TEXT:<# Action to perform. You can use $$this to reference the current instance of this class #>}}",
+      "}"
+    ]
+  },
+  // Pester is no longer bundled with PowerShell Core, but is available as a NuGet package.
+  // "PesterContext": {
+  //   "prefix": "Context-Pester",
+  //   "description": "Pester - Context block",
+  //   "body": [
+  //     "Context \"${1:ContextName}\" {",
+  //     "\t${0:$TM_SELECTED_TEXT}",
+  //     "}"
+  //   ]
+  // },
+  // "PesterContextIt": {
+  //   "prefix": "Context-It-Pester",
+  //   "description": "Pester - Context block with nested It block",
+  //   "body": [
+  //     "Context \"${1:ContextName}\" {",
+  //     "\tIt \"${2:ItName}\" {",
+  //     "\t\t${3:${TM_SELECTED_TEXT:Assertion}}",
+  //     "\t}$0",
+  //     "}"
+  //   ]
+  // },
+  // "PesterDescribeBlock": {
+  //   "prefix": "Describe-Pester",
+  //   "description": "Pester Describe block",
+  //   "body": [
+  //     "Describe \"${1:DescribeName}\" {",
+  //     "\t${0:TM_SELECTED_TEXT}",
+  //     "}"
+  //   ]
+  // },
+  // "PesterDescribeContextIt": {
+  //   "prefix": "Describe-Context-It-Pester",
+  //   "description": "Pester Describe block with nested Context & It blocks",
+  //   "body": [
+  //     "Describe \"${1:DescribeName}\" {",
+  //     "\tContext \"${2:ContextName}\" {",
+  //     "\t\tIt \"${3:ItName}\" {",
+  //     "\t\t\t${4:${TM_SELECTED_TEXT:Assertion}}",
+  //     "\t\t}$0",
+  //     "\t}",
+  //     "}"
+  //   ]
+  // },
+  // "PesterIt": {
+  //   "prefix": "It-Pester",
+  //   "description": "Pester - It block",
+  //   "body": [
+  //     "It \"${1:ItName}\" {",
+  //     "\t${2:${TM_SELECTED_TEXT:Assertion}}",
+  //     "}$0"
+  //   ]
+  // },
+  "Class Property": {
+    "prefix": "class-property",
+    "description": "Properties are variables declared at class scope. A property may be of any built-in type or an instance of another class. Classes have no restriction in the number of properties they have. More: Get-Help about_Classes",
+    "body": [
+      "[${1:propertyType}] $${0:PropertyName}"
+    ]
+  },
   "Comment Block": {
     "prefix": [
       "block-comment"
@@ -610,6 +678,19 @@
       "}"
     ]
   },
+  "Function: Suppress PSScriptAnalyzer Rule": {
+    "prefix": [
+      "suppress-message-rule-function",
+      "[SuppressMessageAttribute]"
+    ],
+    "description": "Suppress a PSScriptAnalyzer rule for a function. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
+    "body": [
+      "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
+      "\t<#Category#>'${1:PSProvideDefaultParameterValue}', <#CheckId>\\$null, Scope='Function',",
+      "\tJustification = '${0:${TM_SELECTED_TEXT:Reason for suppressing}}'",
+      ")]"
+    ]
+  },
   "Hashtable": {
     "prefix": "Hashtable",
     "description": "A key/value store that are very effecient for finding and retrieving data. More: Get-Help about_Hash_Tables",
@@ -619,9 +700,35 @@
       "}"
     ]
   },
+  "Here-String": {
+    "prefix": [
+      "hs",
+      "here-string"
+    ],
+    "description": "Escape all text but evaluate variables. More: Get-Help about_Quoting_Rules",
+    "body": [
+      "@\"",
+      "${0:TM_SELECTED_TEXT}",
+      "\"@",
+      ""
+    ]
+  },
+  "Here-String (Literal)": {
+    "prefix": [
+      "hsl",
+      "literal-here-string"
+    ],
+    "description": "Escape all text regardless. More: Get-Help about_Quoting_Rules",
+    "body": [
+      "@'",
+      "${0:TM_SELECTED_TEXT}",
+      "'@",
+      ""
+    ]
+  },
   "Hidden Property": {
     "prefix": "class-proph-hidden",
-    "description": "Useful for creating properties and methods within a class that you do not necessarily want other users of the class to see, or readily be able to edit. More: about_Hidden",
+    "description": "Useful for creating properties and methods within a class that you do not necessarily want other users of the class to see, or readily be able to edit. More: Get-Help about_Hidden",
     "body": [
       "hidden [${1:string}] $${0:PropertyName}"
     ]
@@ -661,15 +768,6 @@
     "description": "Defines a condition that only executes if -WhatIf is not set, and returns a message otherwise. More: https://docs.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-shouldprocess",
     "body": [
       "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
-  },
-  "Method": {
-    "prefix": "method",
-    "description": "Class method definition snippet",
-    "body": [
-      "[${1:void}] ${2:MethodName}($${3:OptionalParameters}) {",
       "\t${0:$TM_SELECTED_TEXT}",
       "}"
     ]
@@ -835,9 +933,22 @@
       "$${3:ParameterName}$0"
     ]
   },
+  "Parameter: Suppress PSScriptAnalyzer Rule": {
+    "prefix": [
+      "suppress-message-rule-parameter",
+      "[SuppressMessageAttribute]"
+    ],
+    "description": "Suppress a PSScriptAnalyzer rule on a parameter. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
+    "body": [
+      "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(<#Category#>'${1:PSUseDeclaredVarsMoreThanAssignments}',",
+      "\t<#ParameterName#>'${0:${TM_SELECTED_TEXT:ParamName}}",
+      "\tJustification = '${0:${TM_SELECTED_TEXT:Reason for suppressing}}'",
+      ")]"
+    ]
+  },
   "Pipeline Function": {
     "prefix": "function-pipeline",
-    "description": "Basic function that accepts pipeline input \nReference: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines?view=powershell-7.2",
+    "description": "Basic function that accepts pipeline input. More: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines?view=powershell-7.2",
     "body": [
       "function $1 {",
       "  [CmdletBinding()]",
@@ -851,68 +962,12 @@
       "}"
     ]
   },
-  // Pester is no longer bundled with PowerShell Core, but is available as a NuGet package.
-  // "PesterContext": {
-  //   "prefix": "Context-Pester",
-  //   "description": "Pester - Context block",
-  //   "body": [
-  //     "Context \"${1:ContextName}\" {",
-  //     "\t${0:$TM_SELECTED_TEXT}",
-  //     "}"
-  //   ]
-  // },
-  // "PesterContextIt": {
-  //   "prefix": "Context-It-Pester",
-  //   "description": "Pester - Context block with nested It block",
-  //   "body": [
-  //     "Context \"${1:ContextName}\" {",
-  //     "\tIt \"${2:ItName}\" {",
-  //     "\t\t${3:${TM_SELECTED_TEXT:Assertion}}",
-  //     "\t}$0",
-  //     "}"
-  //   ]
-  // },
-  // "PesterDescribeBlock": {
-  //   "prefix": "Describe-Pester",
-  //   "description": "Pester Describe block",
-  //   "body": [
-  //     "Describe \"${1:DescribeName}\" {",
-  //     "\t${0:TM_SELECTED_TEXT}",
-  //     "}"
-  //   ]
-  // },
-  // "PesterDescribeContextIt": {
-  //   "prefix": "Describe-Context-It-Pester",
-  //   "description": "Pester Describe block with nested Context & It blocks",
-  //   "body": [
-  //     "Describe \"${1:DescribeName}\" {",
-  //     "\tContext \"${2:ContextName}\" {",
-  //     "\t\tIt \"${3:ItName}\" {",
-  //     "\t\t\t${4:${TM_SELECTED_TEXT:Assertion}}",
-  //     "\t\t}$0",
-  //     "\t}",
-  //     "}"
-  //   ]
-  // },
-  // "PesterIt": {
-  //   "prefix": "It-Pester",
-  //   "description": "Pester - It block",
-  //   "body": [
-  //     "It \"${1:ItName}\" {",
-  //     "\t${2:${TM_SELECTED_TEXT:Assertion}}",
-  //     "}$0"
-  //   ]
-  // },
-  "Property": {
-    "prefix": "prop",
-    "description": "Class property definition snippet",
-    "body": [
-      "[${1:string}] $${0:PropertyName}"
-    ]
-  },
   "PSCustomObject": {
-    "prefix": "[PSCustomObject]",
-    "description": "Creates a PSCustomObject",
+    "prefix": [
+      "pscustomobject",
+      "[PSCustomObject]"
+    ],
+    "description": "Create a custom object from a hashtable of properties. More: Get-Help about_PSCustomObject",
     "body": [
       "[PSCustomObject]@{",
       "\t${1:Name} = ${2:Value}",
@@ -928,37 +983,7 @@
       "#endregion"
     ]
   },
-  "Suppress PSScriptAnalyzer Rule": {
-    "prefix": "suppress-message-rule",
-    "description": "Suppress a PSScriptAnalyzer rule. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
-    "body": [
-      "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
-      "\t<#Category#>'${1:PSUseDeclaredVarsMoreThanAssignments}',<#CheckId#>\\$null,",
-      "\tJustification = '${0:${TM_SELECTED_TEXT:Reason for suppressing}}'",
-      ")]"
-    ]
-  },
-  "Suppress PSScriptAnalyzer Rule in Function": {
-    "prefix": "suppress-message-rule-function",
-    "description": "Suppress a PSScriptAnalyzer rule for a function. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
-    "body": [
-      "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
-      "\t<#Category#>'${1:PSProvideDefaultParameterValue}', <#CheckId>\\$null, Scope='Function',",
-      "\tJustification = '${0:${TM_SELECTED_TEXT:Reason for suppressing}}'",
-      ")]"
-    ]
-  },
-  "Suppress PSScriptAnalyzer Rule on Parameter": {
-    "prefix": "suppress-message-rule-parameter",
-    "description": "Suppress a PSScriptAnalyzer rule on a parameter. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
-    "body": [
-      "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(<#Category#>'${1:PSUseDeclaredVarsMoreThanAssignments}',",
-      "\t<#ParameterName#>'${0:${TM_SELECTED_TEXT:ParamName}}",
-      "\tJustification = '${0:${TM_SELECTED_TEXT:Reason for suppressing}}'",
-      ")]"
-    ]
-  },
-  "Suppress PSScriptAnalyzer Rule on a specific Scope": {
+  "Scope: Suppress PSScriptAnalyzer Rule": {
     "prefix": "suppress-message-rule-scope",
     "description": "Suppress a PSScriptAnaylzer rule based on a function/parameter/class/variable/object's name by setting the SuppressMessageAttribute's Target property to a regular expression or a glob pattern. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
     "body": [
@@ -966,6 +991,29 @@
       "\t<#Category#>'${1:PSUseDeclaredVarsMoreThanAssignments}', <#CheckId#>\\$null, Scope='Function',",
       "\tTarget='${1:${TM_SELECTED_TEXT:RegexOrGlobPatternToMatchName}}'",
       "\tJustification = '${0:Reason for suppressing}}'",
+      ")]"
+    ]
+  },
+  "splat": {
+    "prefix": "splat",
+    "description": "Use a hashtable to capture the parameters of a function and then pass them to a function in a concise way. More: about_Splatting",
+    "body": [
+      "$${1/[^\\w]/_/}Params = @{",
+      "\t${2:Parameter} = ${0:Value}",
+      "}",
+      "${1:${TM_SELECTED_TEXT}} @${1/[^\\w]/_/}Params"
+    ]
+  },
+  "Suppress PSScriptAnalyzer Rule": {
+    "prefix": [
+      "suppress-message-rule",
+      "[SuppressMessageAttribute]"
+    ],
+    "description": "Suppress a PSScriptAnalyzer rule. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
+    "body": [
+      "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
+      "\t<#Category#>'${1:PSUseDeclaredVarsMoreThanAssignments}',<#CheckId#>\\$null,",
+      "\tJustification = '${0:${TM_SELECTED_TEXT:Reason for suppressing}}'",
       ")]"
     ]
   },
@@ -1027,47 +1075,11 @@
   },
   "while": {
     "prefix": "while",
-    "description": "Repeatedly perform an action after verifying a condition is true first.",
+    "description": "Repeatedly perform an action after verifying a condition is true first. More: Get-Help about_While",
     "body": [
       "while (${1:condition}) {",
       "\t${0:$TM_SELECTED_TEXT}",
       "}"
     ]
-  },
-  "splat": {
-    "prefix": "splat",
-    "description": "Use a hashtable to capture the parameters of a function and then pass them to a function in a concise way. More: about_Splatting",
-    "body": [
-      "$${1/[^\\w]/_/}Params = @{",
-      "\t${2:Parameter} = ${0:Value}",
-      "}",
-      "${1:${TM_SELECTED_TEXT}} @${1/[^\\w]/_/}Params"
-    ]
-  },
-  "Here-String": {
-    "prefix": [
-      "hs",
-      "here-string"
-    ],
-    "body": [
-      "@\"",
-      "${0:TM_SELECTED_TEXT}",
-      "\"@",
-      ""
-    ],
-    "description": "Escape all text but evaluate variables. More: Get-Help about_Quoting_Rules"
-  },
-  "Here-String (Literal)": {
-    "prefix": [
-      "hsl",
-      "literal-here-string"
-    ],
-    "body": [
-      "@'",
-      "${0:TM_SELECTED_TEXT}",
-      "'@",
-      ""
-    ],
-    "description": "Escape all text regardless. More: Get-Help about_Quoting_Rules"
   }
 }
