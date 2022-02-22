@@ -41,6 +41,22 @@ steps:
     archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
     destinationFolder: $(Build.SourcesDirectory)/vscode-powershell/modules
 
+- task: UseDotNet@2
+  condition: not(${{ parameters.usePipelineArtifact }})
+  displayName: Install .NET 6.0.x SDK
+  inputs:
+    packageType: sdk
+    version: 6.0.x
+    performMultiLevelLookup: true
+
+- task: UseDotNet@2
+  condition: not(${{ parameters.usePipelineArtifact }})
+  displayName: Install .NET 3.1.x runtime
+  inputs:
+    packageType: runtime
+    version: 3.1.x
+    performMultiLevelLookup: true
+
 - task: PowerShell@2
   displayName: Build and test
   inputs:
@@ -48,6 +64,7 @@ steps:
     script: |
       Get-Module -ListAvailable Pester
       Install-Module InvokeBuild -Scope CurrentUser -Force
+      Install-Module platyPS -Scope CurrentUser -Force
       Invoke-Build -Configuration Release
       Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-*.vsix)"
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
