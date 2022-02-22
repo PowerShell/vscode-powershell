@@ -13,6 +13,7 @@
     "recommendations": [
       "davidanson.vscode-markdownlint",
       "editorconfig.editorconfig",
+      "josefpihrt-vscode.roslynator",
       "ms-azure-devops.azure-pipelines",
       "ms-dotnettools.csharp",
       "ms-vscode.powershell-preview",
