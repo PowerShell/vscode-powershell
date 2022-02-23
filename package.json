@@ -61,7 +61,7 @@
     "@types/uuid": "~8.3.4",
     "@types/vscode": "~1.56.0",
     "@vscode/test-electron": "~2.1.2",
-    "esbuild": "^0.14.22",
+    "esbuild": "^0.14.23",
     "glob": "^7.2.0",
     "mocha": "~9.2.1",
     "mocha-multi-reporters": "~1.5.1",
