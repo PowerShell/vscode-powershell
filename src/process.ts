@@ -73,7 +73,6 @@ export class PowerShellProcess {
         }
 
         powerShellArgs.push("-NoProfile");
-        powerShellArgs.push("-NonInteractive");
 
         // Only add ExecutionPolicy param on Windows
         if (utils.isWindows) {
