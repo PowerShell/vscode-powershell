@@ -91,11 +91,7 @@ export class PesterTestsFeature implements vscode.Disposable {
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: (launchType === LaunchType.Run),
-            createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
-            cwd:
-                currentDocument.isUntitled
-                    ? vscode.workspace.rootPath
-                    : path.dirname(currentDocument.fileName),
+            createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole
         };
 
         if (lineNum) {
