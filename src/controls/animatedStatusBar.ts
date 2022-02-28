@@ -7,7 +7,8 @@ import {
     StatusBarItem,
     ThemeColor,
     window,
-    Command} from "vscode";
+    Command,
+    AccessibilityInformation} from "vscode";
 
 export function showAnimatedStatusBarMessage(text: string, hideWhenDone: Thenable<any>): Disposable {
     const animatedStatusBarItem: AnimatedStatusBarItem = new AnimatedStatusBarItem(text);
@@ -26,6 +27,18 @@ class AnimatedStatusBarItem implements StatusBarItem {
     private intervalId: NodeJS.Timer;
     private suffixStates: string[];
 
+    public get id(): string {
+        return this.statusBarItem.id;
+    }
+
+    public get name(): string {
+        return this.statusBarItem.name;
+    }
+
+    public get accessibilityInformation(): AccessibilityInformation {
+        return this.statusBarItem.accessibilityInformation;
+    }
+
     public get alignment(): StatusBarAlignment {
         return this.statusBarItem.alignment;
     }
@@ -43,7 +56,7 @@ class AnimatedStatusBarItem implements StatusBarItem {
     }
 
     public get tooltip(): string {
-        return this.statusBarItem.tooltip;
+        return this.statusBarItem.tooltip.toString();
     }
 
     public set tooltip(value: string) {
