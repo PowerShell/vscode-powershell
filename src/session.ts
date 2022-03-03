@@ -660,7 +660,6 @@ export class SessionManager implements Middleware {
             case SessionStatus.Running:
             case SessionStatus.NeverStarted:
             case SessionStatus.NotStarted:
-                // This icon is available since 1.56, now our current engine version.
                 this.statusBarItem.text = "$(terminal-powershell)";
                 // These have to be reset because this function mutates state.
                 this.statusBarItem.color = undefined;
@@ -669,18 +668,11 @@ export class SessionManager implements Middleware {
             case SessionStatus.Initializing:
             case SessionStatus.Stopping:
                 this.statusBarItem.text = "$(sync)";
-                // The warning colors were added later than our current engine version.
-                // https://code.visualstudio.com/api/references/theme-color#status-bar-colors
-                this.statusBarItem.color = (semver.gte(vscode.version, "1.59.0"))
-                    ? new vscode.ThemeColor("statusBarItem.warningForeground")
-                    : new vscode.ThemeColor("statusBarItem.errorForeground");
-                this.statusBarItem.backgroundColor = (semver.gte(vscode.version, "1.59.0"))
-                    ? new vscode.ThemeColor("statusBarItem.warningBackground")
-                    : new vscode.ThemeColor("statusBarItem.errorBackground");
+                this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.warningForeground");
+                this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
                 break;
             case SessionStatus.Failed:
                 this.statusBarItem.text = "$(alert)";
-                // The error colors have been available since 1.53.
                 this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.errorForeground");
                 this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
                 break;
