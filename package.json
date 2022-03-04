@@ -94,7 +94,7 @@
         {
           "id": "PowerShellCommandExplorer",
           "title": "(Preview) PowerShell Command Explorer",
-          "icon": "media/pwsh.svg"
+          "icon": "$(terminal-powershell)"
         }
       ]
     },
@@ -155,19 +155,13 @@
       {
         "command": "PowerShell.RefreshCommandsExplorer",
         "title": "Refresh Command Explorer",
-        "icon": {
-          "light": "media/resources/light/sync.svg",
-          "dark": "media/resources/dark/sync.svg"
-        },
+        "icon": "$(sync)",
         "category": "PowerShell"
       },
       {
         "command": "PowerShell.InsertCommand",
         "title": "Insert Command",
-        "icon": {
-          "light": "media/resources/light/pencil.svg",
-          "dark": "media/resources/dark/pencil.svg"
-        },
+        "icon": "$(pencil)",
         "category": "PowerShell"
       },
       {
@@ -178,29 +172,20 @@
       {
         "command": "PowerShell.ShowHelp",
         "title": "Get Help for Command",
-        "icon": {
-          "light": "media/resources/light/question.svg",
-          "dark": "media/resources/dark/question.svg"
-        },
+        "icon": "$(question)",
         "category": "PowerShell"
       },
       {
         "command": "PowerShell.Debug.Start",
         "title": "Run",
         "category": "PowerShell",
-        "icon": {
-          "light": "media/resources/light/run.svg",
-          "dark": "media/resources/dark/run.svg"
-        }
+        "icon": "$(run)"
       },
       {
         "command": "PowerShell.RunSelection",
         "title": "Run Selection",
         "category": "PowerShell",
-        "icon": {
-          "light": "media/resources/light/play.svg",
-          "dark": "media/resources/dark/play.svg"
-        }
+        "icon": "$(debug-line-by-line)"
       },
       {
         "command": "PowerShell.RestartSession",
