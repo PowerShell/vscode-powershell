@@ -53,8 +53,8 @@ export class ISECompatibilityFeature implements vscode.Disposable {
             }
         }
 
-        // Show the PowerShell Command Explorer
-        await vscode.commands.executeCommand("workbench.view.extension.PowerShellCommandExplorer");
+        // Show the PowerShell view container which has the Command Explorer view
+        await vscode.commands.executeCommand("workbench.view.extension.PowerShell");
 
         if (!Settings.load().sideBar.CommandExplorerVisibility) {
             // Hide the explorer if the setting says so.
