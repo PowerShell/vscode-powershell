@@ -2,9 +2,7 @@
 // Licensed under the MIT License.
 
 import cp = require("child_process");
-import fs = require("fs");
-import net = require("net");
-import os = require("os");
+import * as semver from "semver";
 import path = require("path");
 import vscode = require("vscode");
 import { Logger } from "./logging";
@@ -104,14 +102,20 @@ export class PowerShellProcess {
         utils.deleteSessionFile(this.sessionFilePath);
 
         // Launch PowerShell in the integrated terminal
-        this.consoleTerminal =
-            vscode.window.createTerminal({
-                name: this.title,
-                shellPath: this.exePath,
-                shellArgs: powerShellArgs,
-                hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
-                cwd: this.sessionSettings.cwd
-            });
+        const terminalOptions: vscode.TerminalOptions = {
+            name: this.title,
+            shellPath: this.exePath,
+            shellArgs: powerShellArgs,
+            hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
+            cwd: this.sessionSettings.cwd,
+        };
+
+        // This API is available only in newer versions of VS Code.
+        if (semver.gte(vscode.version, "1.65.0")) {
+            (terminalOptions as any).isTransient = true;
+        }
+
+        this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
 
         const pwshName = path.basename(this.exePath);
         this.log.write(`${pwshName} started.`);
