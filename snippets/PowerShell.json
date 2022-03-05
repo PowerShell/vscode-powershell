@@ -1,7 +1,7 @@
 {
   "ArgumentCompleterAttribute": {
     "prefix": "argument-completer",
-    "description": "Allows you to add tab completion values to a specific parameter by writing a scriptblock that generates zero or more CompletionResult objects. More: Get-Help about_Functions_Argument_Completion",
+    "description": "Allows you to add tab completion values to a specific parameter by writing a script block that generates zero or more CompletionResult objects. More: Get-Help about_Functions_Argument_Completion",
     "body": [
       "[ArgumentCompleter({",
       "\t[OutputType([System.Management.Automation.CompletionResult])]",
@@ -563,7 +563,7 @@
   // },
   "for": {
     "prefix": "for",
-    "description": "Creates a loop that runs commands in a command block while a specified condition evaluates to $true. A typical use of the For loop is to iterate an array of values and to operate on a subset of these values. More: Get-Help about_For",
+    "description": "Creates a loop that runs commands in a command block while a specified condition evaluates to $true. A typical use of the for loop is to iterate an array of values and to operate on a subset of these values. More: Get-Help about_For",
     "body": [
       "for ($${1:i} = 0; $${1:i} -lt $${2:array}.Count; $${1:i}++) {",
       "\t${0:${TM_SELECTED_TEXT:<# Action that will repeat until the condition is met #>}}",
@@ -608,7 +608,7 @@
   },
   "function": {
     "prefix": "function",
-    "description": "A simple function with a parameter block to specify function arguments",
+    "description": "A simple function with a parameter block to specify function arguments. More: Get-Help about_Functions",
     "body": [
       "function ${1:FunctionName} {",
       "\tparam (",
@@ -647,7 +647,7 @@
       "function-advanced",
       "cmdlet"
     ],
-    "description": "Script advanced function definition snippet",
+    "description": "Script advanced function definition snippet. More: Get-Help about_Functions_Advanced",
     "body": [
       "function ${1:Verb-Noun} {",
       "\t[CmdletBinding()]",
@@ -671,7 +671,7 @@
   },
   "Function-Inline": {
     "prefix": "Function-Inline",
-    "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other languages",
+    "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other languages. More: Get-Help about_Functions",
     "body": [
       "function ${1:FunctionName} (${2:OptionalParameters}) {",
       "\t${0:$TM_SELECTED_TEXT}",
@@ -693,7 +693,7 @@
   },
   "Hashtable": {
     "prefix": "Hashtable",
-    "description": "A key/value store that are very effecient for finding and retrieving data. More: Get-Help about_Hash_Tables",
+    "description": "A key/value store that are very efficient for finding and retrieving data. More: Get-Help about_Hash_Tables",
     "body": [
       "\\$${1:Var} = @{",
       "\t${2:Name} = ${3:Value}",
@@ -718,7 +718,7 @@
       "hsl",
       "literal-here-string"
     ],
-    "description": "Escape all text regardless. More: Get-Help about_Quoting_Rules",
+    "description": "Escape all text literally. More: Get-Help about_Quoting_Rules",
     "body": [
       "@'",
       "${0:TM_SELECTED_TEXT}",
@@ -728,14 +728,14 @@
   },
   "Hidden Property": {
     "prefix": "class-proph-hidden",
-    "description": "Useful for creating properties and methods within a class that you do not necessarily want other users of the class to see, or readily be able to edit. More: Get-Help about_Hidden",
+    "description": "Useful for creating internal properties and methods within a class that are hidden from users. More: Get-Help about_Hidden",
     "body": [
       "hidden [${1:string}] $${0:PropertyName}"
     ]
   },
   "IArgumentCompleter Class": {
     "prefix": "iargument-completer",
-    "description": "Implementation of the IArgumentCompleter interface that can be directly attached to parameters (e.g. [MyCustomArgumentCompleter])",
+    "description": "Implementation of the IArgumentCompleter interface that can be directly attached to parameters (e.g. [MyCustomArgumentCompleter]). More: Get-Help about_Functions_Argument_Completion",
     "body": [
       "class ${1:ArgumentCompleter} : System.Management.Automation.IArgumentCompleter {",
       "\t[System.Collections.Generic.IEnumerable[System.Management.Automation.CompletionResult]] CompleteArgument(",
@@ -774,7 +774,7 @@
   },
   "ModuleManifest": {
     "prefix": "manifest",
-    "description": "Basic skeleton for a PowerShell module manifest, complete with PowerShell Gallery metadata.",
+    "description": "Basic skeleton for a PowerShell module manifest, complete with PowerShell Gallery metadata. More: https://docs.microsoft.com/en-us/powershell/scripting/developer/module/how-to-write-a-powershell-module-manifest",
     "body": [
       "@{",
       "\t# If authoring a script module, the RootModule is the name of your .psm1 file",
@@ -829,14 +829,14 @@
       "\t\t}",
       "\t}",
       "",
-      "\t# If your module supports updateable help, what is the URI to the help archive? (optional)",
+      "\t# If your module supports updatable help, what is the URI to the help archive? (optional)",
       "\t# HelpInfoURI = ''",
       "}"
     ]
   },
   "Parallel Pipeline Function": {
     "prefix": "function-parallel-pipeline",
-    "description": "Collects everything in the process block and does work in the end block. Useful when making a 'fan out' function that acts on multiple items simultaneously because the pipeline only does one item at a time in the process block.",
+    "description": "Collects everything in the process block and does work in the end block. Useful when making a 'fan out' function that acts on multiple items simultaneously because the pipeline only does one item at a time in the process block. More: Get-Help about_Functions_Advanced",
     "body": [
       "function $1 {",
       "  [CmdletBinding()]",
@@ -948,7 +948,7 @@
   },
   "Pipeline Function": {
     "prefix": "function-pipeline",
-    "description": "Basic function that accepts pipeline input. More: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines?view=powershell-7.2",
+    "description": "Basic function that accepts pipeline input. More: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pipelines",
     "body": [
       "function $1 {",
       "  [CmdletBinding()]",
@@ -976,7 +976,7 @@
   },
   "Region Block": {
     "prefix": "#region",
-    "description": "Region Block for organizing and folding of your code",
+    "description": "Region block for organizing and folding of your code",
     "body": [
       "#region ${1}",
       "${0:$TM_SELECTED_TEXT}",
@@ -985,7 +985,7 @@
   },
   "Scope: Suppress PSScriptAnalyzer Rule": {
     "prefix": "suppress-message-rule-scope",
-    "description": "Suppress a PSScriptAnaylzer rule based on a function/parameter/class/variable/object's name by setting the SuppressMessageAttribute's Target property to a regular expression or a glob pattern. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
+    "description": "Suppress a PSScriptAnalyzer rule based on a function/parameter/class/variable/object's name by setting the SuppressMessageAttribute's Target property to a regular expression or a glob pattern. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
     "body": [
       "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
       "\t<#Category#>'${1:PSUseDeclaredVarsMoreThanAssignments}', <#CheckId#>\\$null, Scope='Function',",
@@ -996,7 +996,7 @@
   },
   "splat": {
     "prefix": "splat",
-    "description": "Use a hashtable to capture the parameters of a function and then pass them to a function in a concise way. More: about_Splatting",
+    "description": "Use a hashtable to capture the parameters of a function and then pass them to a function in a concise way. More: Get-Help about_Splatting",
     "body": [
       "$${1/[^\\w]/_/}Params = @{",
       "\t${2:Parameter} = ${0:Value}",
@@ -1019,7 +1019,7 @@
   },
   "switch": {
     "prefix": "switch",
-    "description": "Equivalent to a series of if statements, but it is simpler. The switch statement lists each condition and an optional action. If a condition obtains, the action is performed. More: about_Switch",
+    "description": "Equivalent to a series of if statements, but it is simpler. The switch statement lists each condition and an optional action. If a condition obtains, the action is performed. More: Get-Help about_Switch",
     "body": [
       "switch (${1:\\$x}) {",
       "\t${2:condition} { ${0:$TM_SELECTED_TEXT} }",
@@ -1029,14 +1029,14 @@
   },
   "Ternary Operator": {
     "prefix": "ternary",
-    "description": "[PS 7+] Simplified version of if-else popular in other languages that works in Powershell. More: about_If",
+    "description": "[PS 7+] Simplified version of if-else popular in other languages that works in Powershell. More: Get-Help about_If",
     "body": [
       "(${1:${TM_SELECTED_TEXT:condition}}) ? $(${2:<#Action if True#>}) : $(${0:<#Action If False#>})"
     ]
   },
   "try-catch": {
     "prefix": "try-catch",
-    "description": "Attempt a block of code and if a terminating exception occurs, perform another block of code rather than terminate the program More: about_Try_Catch_Finally",
+    "description": "Attempt a block of code and if a terminating exception occurs, perform another block of code rather than terminate the program More: Get-Help about_Try_Catch_Finally",
     "body": [
       "try {",
       "\t${0:$TM_SELECTED_TEXT}",
@@ -1048,7 +1048,7 @@
   },
   "try-catch-finally": {
     "prefix": "try-catch-finally",
-    "description": "Attempt a block of code and if a terminating exception occurs, perform another block of code, finally performing a final block of code regardless of the outcome. More: about_Try_Catch_Finally",
+    "description": "Attempt a block of code and if a terminating exception occurs, perform another block of code, finally performing a final block of code regardless of the outcome. More: Get-Help about_Try_Catch_Finally",
     "body": [
       "try {",
       "\t${0:$TM_SELECTED_TEXT}",
@@ -1063,7 +1063,7 @@
   },
   "try-finally": {
     "prefix": "try-finally",
-    "description": "Attempt a block of code and perform an action regardless of the outcome. Useful for cleanup or gracefully disconnecting active sessions even if there was a terminating error. More: about_Try_Catch_Finally",
+    "description": "Attempt a block of code and perform an action regardless of the outcome. Useful for cleanup or gracefully disconnecting active sessions even if there was a terminating error. More: Get-Help about_Try_Catch_Finally",
     "body": [
       "try {",
       "\t${0:$TM_SELECTED_TEXT}",
