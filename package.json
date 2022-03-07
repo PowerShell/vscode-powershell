@@ -92,17 +92,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "PowerShellCommandExplorer",
-          "title": "(Preview) PowerShell Command Explorer",
+          "id": "PowerShell",
+          "title": "PowerShell",
           "icon": "$(terminal-powershell)"
         }
       ]
     },
     "views": {
-      "PowerShellCommandExplorer": [
+      "PowerShell": [
         {
           "id": "PowerShellCommands",
-          "name": "PowerShell Commands",
+          "name": "Command Explorer",
           "when": "config.powershell.sideBar.CommandExplorerVisibility"
         }
       ]
