@@ -579,7 +579,8 @@
           "type": "string",
           "default": "",
           "scope": "machine",
-          "description": "REMOVED. Please use the \"powershell.powerShellDefaultVersion\" setting instead."
+          "description": "REMOVED. Please use the \"powershell.powerShellDefaultVersion\" setting instead.",
+          "deprecationMessage": "Please use the \"powershell.powerShellDefaultVersion\" setting instead."
         },
         "powershell.promptToUpdatePowerShell": {
           "type": "boolean",
@@ -589,7 +590,8 @@
         "powershell.promptToUpdatePackageManagement": {
           "type": "boolean",
           "description": "Specifies whether you should be prompted to update your version of PackageManagement if it's under 1.4.6.",
-          "default": true
+          "default": true,
+          "deprecationMessage": "This prompt has been removed as it's no longer strictly necessary to upgrade the PackageManagement module."
         },
         "powershell.startAsLoginShell.osx": {
           "type": "boolean",
@@ -731,7 +733,8 @@
         "powershell.codeFormatting.whitespaceAroundPipe": {
           "type": "boolean",
           "default": true,
-          "description": "REMOVED. Please use the \"powershell.codeFormatting.addWhitespaceAroundPipe\" setting instead. If you've used this setting before, we have moved it for you automatically."
+          "description": "REMOVED. Please use the \"powershell.codeFormatting.addWhitespaceAroundPipe\" setting instead. If you've used this setting before, we have moved it for you automatically.",
+          "deprecationMessage": "Please use the \"powershell.codeFormatting.addWhitespaceAroundPipe\" setting instead. If you've used this setting before, we have moved it for you automatically."
         },
         "powershell.codeFormatting.addWhitespaceAroundPipe": {
           "type": "boolean",
