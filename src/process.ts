@@ -110,9 +110,9 @@ export class PowerShellProcess {
             cwd: this.sessionSettings.cwd,
         };
 
-        // This API is available only in newer versions of VS Code.
         if (semver.gte(vscode.version, "1.65.0")) {
-            (terminalOptions as any).isTransient = true;
+            // @ts-ignore TODO: Don't ignore after we update our engine.
+            terminalOptions.isTransient = true;
         }
 
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
