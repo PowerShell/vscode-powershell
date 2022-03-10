@@ -62,9 +62,10 @@ function Get-Bullets {
             'andschwa'
             'daxian-dbw'
             'PaulHigin'
-            'rjmholt'
+            'SeeminglyScience'
             'SteveL-MSFT'
-            'TylerLeonhardt'
+            'StevenBucher98'
+            'SydneyhSmith'
         )
 
         $IssueEmojis = @{
@@ -390,7 +391,7 @@ function New-ReleasePR {
     Use-Repository -RepositoryName $RepositoryName -Script {
         if ($PSCmdlet.ShouldProcess("$RepositoryName/release", "git push")) {
             Write-Host "Pushing release branch..."
-            git push --set-upstream --force-with-lease origin release
+            git push --force-with-lease origin release
         }
     }
 

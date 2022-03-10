@@ -1,5 +1,25 @@
 # PowerShell Extension Release History
 
+## v2022.3.0-preview
+### Thursday, March 10, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #2499](https://github.com/PowerShell/vscode-powershell/pull/3869) - Use Code's new Language Status API.
+- ✨ 📺 [vscode-powershell #3866](https://github.com/PowerShell/vscode-powershell/pull/3866) - Fix title of PowerShell Command Explorer pane.
+- ✨ 📺 [vscode-powershell #3865](https://github.com/PowerShell/vscode-powershell/pull/3865) - Replace custom graphics with updated Codicons.
+- ✨ 🔧 [vscode-powershell #3858](https://github.com/PowerShell/vscode-powershell/pull/3859) - Deprecate `promptToUpdatePackageManagement`.
+- 🐛 📟 [vscode-powershell #3360](https://github.com/PowerShell/vscode-powershell/pull/3854) - Use new `isTransient` API to prevent duplicate integrated consoles.
+- 🐛 🔍 [vscode-powershell #3259](https://github.com/PowerShell/vscode-powershell/pull/3852) - Fix Pester `Test/Debug` code lenses to now change directory.
+- ✨ ✂️ [vscode-powershell #3839](https://github.com/PowerShell/vscode-powershell/pull/3839) - Modernize built-in snippets. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🧠 [vscode-powershell #3364](https://github.com/PowerShell/PowerShellEditorServices/pull/1738) - Improve completion logic (more icons!).
+- 🐛 🛫 [PowerShellEditorServices #1576](https://github.com/PowerShell/PowerShellEditorServices/pull/1735) - Remove `PackageManagement` module update prompt.
+- 🐛 📟 [PowerShellEditorServices #1734](https://github.com/PowerShell/PowerShellEditorServices/pull/1734) - Finish redirection of `$Host.PrivateData`.
+- 🐛 📟 [PowerShellEditorServices #1639](https://github.com/PowerShell/PowerShellEditorServices/pull/1732) - Redirect `PSHost.Notify*Application` methods.
+
 ## v2022.2.2-preview
 ### Thursday, February 24, 2022
 
