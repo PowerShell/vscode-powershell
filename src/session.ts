@@ -45,6 +45,8 @@ export class SessionManager implements Middleware {
     private focusConsoleOnExecute: boolean;
     private platformDetails: IPlatformDetails;
     private languageClientConsumers: LanguageClientConsumer[] = [];
+    // @ts-ignore TODO: Don't ignore after we update our engine.
+    private languageStatusItem: vscode.LanguageStatusItem;
     private statusBarItem: vscode.StatusBarItem;
     private languageServerProcess: PowerShellProcess;
     private debugSessionProcess: PowerShellProcess;
@@ -59,11 +61,7 @@ export class SessionManager implements Middleware {
     // Initialized by the start() method, since this requires settings
     private powershellExeFinder: PowerShellExeFinder;
 
-    // When in development mode, VS Code's session ID is a fake
-    // value of "someValue.machineId".  Use that to detect dev
-    // mode for now until Microsoft/vscode#10272 gets implemented.
-    public readonly InDevelopmentMode =
-        vscode.env.sessionId === "someValue.sessionId";
+    public readonly InDevelopmentMode = vscode.ExtensionMode.Development;
 
     constructor(
         private log: Logger,
@@ -398,7 +396,6 @@ export class SessionManager implements Middleware {
     }
 
     private setStatusBarVersionString(runspaceDetails: IRunspaceDetails) {
-
         const psVersion = runspaceDetails.powerShellVersion;
 
         let versionString =
@@ -410,9 +407,7 @@ export class SessionManager implements Middleware {
             versionString += ` [${runspaceDetails.connectionString}]`;
         }
 
-        this.setSessionStatus(
-            versionString,
-            SessionStatus.Running);
+        this.setSessionStatus(versionString, SessionStatus.Running);
     }
 
     private registerCommands(): void {
@@ -426,10 +421,7 @@ export class SessionManager implements Middleware {
     }
 
     private startPowerShell() {
-
-        this.setSessionStatus(
-            "Starting PowerShell...",
-            SessionStatus.Initializing);
+        this.setSessionStatus("Starting...", SessionStatus.Initializing);
 
         const sessionFilePath =
             utils.getSessionFilePath(
@@ -448,7 +440,7 @@ export class SessionManager implements Middleware {
         this.languageServerProcess.onExited(
             () => {
                 if (this.sessionStatus === SessionStatus.Running) {
-                    this.setSessionStatus("Session exited", SessionStatus.Failed);
+                    this.setSessionStatus("Session Exited", SessionStatus.Failed);
                     this.promptForRestart();
                 }
             });
@@ -632,7 +624,14 @@ export class SessionManager implements Middleware {
     }
 
     private createStatusBarItem() {
-        if (this.statusBarItem === undefined) {
+        const statusTitle: string = "Show PowerShell Session Menu";
+        // TODO: Remove old status bar logic when we update our engine.
+        if (semver.gte(vscode.version, "1.65.0") && this.languageStatusItem === undefined) {
+            // @ts-ignore
+            this.languageStatusItem = vscode.languages.createLanguageStatusItem("powershell", this.documentSelector);
+            this.languageStatusItem.command = { title: statusTitle, command: this.ShowSessionMenuCommandName };
+            this.languageStatusItem.text = "$(terminal-powershell)";
+        } else if (this.statusBarItem === undefined) {
             // Create the status bar item and place it right next
             // to the language indicator
             this.statusBarItem =
@@ -641,7 +640,7 @@ export class SessionManager implements Middleware {
                     1);
 
             this.statusBarItem.command = this.ShowSessionMenuCommandName;
-            this.statusBarItem.tooltip = "Show PowerShell Session Menu";
+            this.statusBarItem.tooltip = statusTitle;
             this.statusBarItem.show();
             vscode.window.onDidChangeActiveTextEditor((textEditor) => {
                 if (textEditor === undefined
@@ -656,36 +655,58 @@ export class SessionManager implements Middleware {
 
     private setSessionStatus(statusText: string, status: SessionStatus): void {
         this.sessionStatus = status;
-        switch (status) {
-            case SessionStatus.Running:
-            case SessionStatus.NeverStarted:
-            case SessionStatus.NotStarted:
-                this.statusBarItem.text = "$(terminal-powershell)";
-                // These have to be reset because this function mutates state.
-                this.statusBarItem.color = undefined;
-                this.statusBarItem.backgroundColor = undefined;
-                break;
-            case SessionStatus.Initializing:
-            case SessionStatus.Stopping:
-                this.statusBarItem.text = "$(sync)";
-                this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.warningForeground");
-                this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
-                break;
-            case SessionStatus.Failed:
-                this.statusBarItem.text = "$(alert)";
-                this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.errorForeground");
-                this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
-                break;
+        // TODO: Remove old status bar logic when we update our engine.
+        if (semver.gte(vscode.version, "1.65.0")) {
+            this.languageStatusItem.detail = "PowerShell " + statusText;
+            switch (status) {
+                case SessionStatus.Running:
+                case SessionStatus.NeverStarted:
+                case SessionStatus.NotStarted:
+                    this.languageStatusItem.busy = false;
+                    // @ts-ignore
+                    this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Information;
+                    break;
+                case SessionStatus.Initializing:
+                case SessionStatus.Stopping:
+                    this.languageStatusItem.busy = true;
+                    // @ts-ignore
+                    this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Warning;
+                    break;
+                case SessionStatus.Failed:
+                    this.languageStatusItem.busy = false;
+                    // @ts-ignore
+                    this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Error;
+                    break;
+            }
+        } else {
+            switch (status) {
+                case SessionStatus.Running:
+                case SessionStatus.NeverStarted:
+                case SessionStatus.NotStarted:
+                    this.statusBarItem.text = "$(terminal-powershell)";
+                    // These have to be reset because this function mutates state.
+                    this.statusBarItem.color = undefined;
+                    this.statusBarItem.backgroundColor = undefined;
+                    break;
+                case SessionStatus.Initializing:
+                case SessionStatus.Stopping:
+                    this.statusBarItem.text = "$(sync)";
+                    this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.warningForeground");
+                    this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
+                    break;
+                case SessionStatus.Failed:
+                    this.statusBarItem.text = "$(alert)";
+                    this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.errorForeground");
+                    this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
+                    break;
+            }
+            this.statusBarItem.text += " " + statusText;
         }
-        this.statusBarItem.text += " " + statusText;
     }
 
     private setSessionFailure(message: string, ...additionalMessages: string[]) {
         this.log.writeAndShowError(message, ...additionalMessages);
-
-        this.setSessionStatus(
-            "Initialization Error",
-            SessionStatus.Failed);
+        this.setSessionStatus("Initialization Error", SessionStatus.Failed);
     }
 
     private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
