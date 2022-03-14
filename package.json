@@ -70,7 +70,7 @@
     "sinon": "~13.0.1",
     "tslint": "~6.1.3",
     "typescript": "~4.6.2",
-    "vsce": "~2.6.7"
+    "vsce": "~2.7.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
