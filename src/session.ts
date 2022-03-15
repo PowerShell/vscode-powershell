@@ -407,7 +407,7 @@ export class SessionManager implements Middleware {
             versionString += ` [${runspaceDetails.connectionString}]`;
         }
 
-        this.setSessionStatus(versionString, SessionStatus.Running);
+        this.setSessionVersion(versionString);
     }
 
     private registerCommands(): void {
@@ -566,11 +566,10 @@ export class SessionManager implements Middleware {
                                         { powershellVersion: versionDetails.version });
                                 }
 
-                                this.setSessionStatus(
+                                this.setSessionVersion(
                                     this.versionDetails.architecture === "x86"
                                         ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
-                                        : this.versionDetails.displayVersion,
-                                    SessionStatus.Running);
+                                        : this.versionDetails.displayVersion);
 
                                 // If the user opted to not check for updates, then don't.
                                 if (!this.sessionSettings.promptToUpdatePowerShell) { return; }
@@ -702,6 +701,14 @@ export class SessionManager implements Middleware {
             }
             this.statusBarItem.text += " " + statusText;
         }
+    }
+
+    private setSessionVersion(version: string): void {
+        // TODO: Accept a VersionDetails object instead of a string.
+        if (semver.gte(vscode.version, "1.65.0")) {
+            this.languageStatusItem.text = "$(terminal-powershell) " + version;
+        }
+        this.setSessionStatus(version, SessionStatus.Running);
     }
 
     private setSessionFailure(message: string, ...additionalMessages: string[]) {
