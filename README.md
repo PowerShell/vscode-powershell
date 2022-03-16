@@ -28,11 +28,11 @@ The extension _should_ work anywhere VS Code itself and PowerShell Core 7 or hig
 PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
 following:
 
-- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.1.5
-- **macOS 10.15** with PowerShell Core 7.1.5
-- **Ubuntu 20.04** with PowerShell Core 7.1.5
+- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.1
+- **macOS 10.15** with PowerShell Core 7.2.1
+- **Ubuntu 20.04** with PowerShell Core 7.2.1
 
-[supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle?view=powershell-7.1#supported-platforms
+[supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle
 
 Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
@@ -130,7 +130,6 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- Rob Holt - [@rjmholt](https://github.com/rjmholt)
 - Patrick Meinecke - [@SeeminglyScience](https://github.com/SeeminglyScience)
 - Andy Schwartzmeyer - [@andschwa](https://github.com/andschwa)
 - Sydney Smith - [@SydneyhSmith](https://github.com/SydneyhSmith)
@@ -138,6 +137,7 @@ on how to contribute to this extension!
 ### Emeriti
 
 - Keith Hill - [@rkeithhill](https://github.com/rkeithhill)
+- Rob Holt - [@rjmholt](https://github.com/rjmholt)
 - Tyler Leonhardt - [@TylerLeonhardt](https://github.com/TylerLeonhardt)
 - David Wilson - [@daviwil](https://github.com/daviwil)
 
