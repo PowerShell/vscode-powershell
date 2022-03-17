@@ -37,6 +37,10 @@
     "onCommand:PowerShell.ShowSessionConsole",
     "onCommand:PowerShell.ShowSessionMenu",
     "onCommand:PowerShell.RestartSession",
+    "onCommand:PowerShell.ShowLogs",
+    "onCommand:PowerShell.OpenLogFolder",
+    "onCommand:PowerShell.GenerateBugReport",
+    "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.EnableISEMode",
     "onCommand:PowerShell.DisableISEMode",
     "onView:PowerShellCommands"
@@ -621,7 +625,7 @@
         "powershell.bugReporting.project": {
           "type": "string",
           "default": "https://github.com/PowerShell/vscode-powershell",
-          "description": "Specifies the url of the GitHub project in which to generate bug reports."
+          "description": "Specifies the URL of the GitHub project in which to generate bug reports."
         },
         "powershell.helpCompletion": {
           "type": "string",
