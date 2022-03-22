@@ -6,7 +6,7 @@ import net = require("net");
 import path = require("path");
 import * as semver from "semver";
 import vscode = require("vscode");
-import TelemetryReporter from "vscode-extension-telemetry";
+import TelemetryReporter from "@vscode/extension-telemetry";
 import { Message } from "vscode-jsonrpc";
 import { Logger } from "./logging";
 import { PowerShellProcess } from "./process";
