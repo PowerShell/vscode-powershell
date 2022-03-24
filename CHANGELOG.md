@@ -1,5 +1,18 @@
 # PowerShell Extension Release History
 
+## v2022.3.1-preview
+### Thursday, March 24, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 📺 [vscode-powershell #3878](https://github.com/PowerShell/vscode-powershell/pull/3883) - Add several more commands to activation events.
+- 🐛 📖 [vscode-powershell #3857](https://github.com/PowerShell/vscode-powershell/pull/3879) - Update troubleshooting guide etc.
+- 🐛 📺 [vscode-powershell #3874](https://github.com/PowerShell/vscode-powershell/pull/3877) - Add PowerShell version to language status item.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- #️⃣ 🙏 [PowerShellEditorServices #1746](https://github.com/PowerShell/PowerShellEditorServices/pull/1746) - Replace `_consoleHostUI` with `_underlyingHostUI`.
+
 ## v2022.3.0-preview
 ### Thursday, March 10, 2022
 
