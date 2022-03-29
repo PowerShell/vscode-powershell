@@ -106,8 +106,9 @@ export class PowerShellProcess {
             name: this.title,
             shellPath: this.exePath,
             shellArgs: powerShellArgs,
-            hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
             cwd: this.sessionSettings.cwd,
+            hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
+            iconPath: new vscode.ThemeIcon("terminal-powershell"),
         };
 
         if (semver.gte(vscode.version, "1.65.0")) {
@@ -147,7 +148,6 @@ export class PowerShellProcess {
     }
 
     public dispose() {
-
         // Clean up the session file
         utils.deleteSessionFile(this.sessionFilePath);
 
