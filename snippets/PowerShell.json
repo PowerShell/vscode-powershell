@@ -234,7 +234,7 @@
     ]
   },
   "Function-Inline": {
-    "prefix": "Function-Inline",
+    "prefix": "function-inline",
     "description": "Function definition snippet that does not contain a param block, but defines parameters inline. This syntax is commonly used in other languages. More: Get-Help about_Functions",
     "body": [
       "function ${1:FunctionName} (${2:OptionalParameters}) {",
@@ -256,7 +256,7 @@
     ]
   },
   "Hashtable": {
-    "prefix": "Hashtable",
+    "prefix": "hashtable",
     "description": "A key/value store that are very efficient for finding and retrieving data. More: Get-Help about_Hash_Tables",
     "body": [
       "\\$${1:Var} = @{",
@@ -328,7 +328,7 @@
     ]
   },
   "IfShouldProcess": {
-    "prefix": "if-Should-Process",
+    "prefix": "if-should-process",
     "description": "Defines a condition that only executes if -WhatIf is not set, and returns a message otherwise. More: https://docs.microsoft.com/en-us/powershell/scripting/learn/deep-dives/everything-about-shouldprocess",
     "body": [
       "if (\\$PSCmdlet.ShouldProcess(\"${1:Target}\", \"${2:Operation}\")) {",
@@ -539,7 +539,7 @@
     ]
   },
   "Region Block": {
-    "prefix": "#region",
+    "prefix": "region",
     "description": "Region block for organizing and folding of your code",
     "body": [
       "#region ${1}",
