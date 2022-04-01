@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as assert from "assert";
+import assert from "assert";
 import * as path from "path";
 import rewire = require("rewire");
 import vscode = require("vscode");

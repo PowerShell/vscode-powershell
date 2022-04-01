@@ -220,7 +220,13 @@ export class SessionManager implements Middleware {
     }
 
     public getSessionDetails(): IEditorServicesSessionDetails | undefined {
-        return this.sessionDetails;
+        const sessionDetails = this.sessionDetails;
+        if (sessionDetails != undefined) {
+            return sessionDetails;
+        } else {
+            void this.logger.writeAndShowError("Editor Services session details are not available yet.");
+            return undefined;
+        }
     }
 
     public getSessionStatus(): SessionStatus {

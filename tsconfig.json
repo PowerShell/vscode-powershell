@@ -17,6 +17,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "esModuleInterop": true
   },
   "include": [ "src", "test" ],
 }

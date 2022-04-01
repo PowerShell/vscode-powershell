@@ -1,21 +1,29 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import vscode = require("vscode");
+import vscode from "vscode";
 import {
-    CancellationToken, DebugConfiguration, DebugConfigurationProvider,
-    ExtensionContext, WorkspaceFolder
+    CancellationToken,
+    DebugAdapterDescriptor,
+    DebugAdapterDescriptorFactory,
+    DebugAdapterExecutable,
+    DebugAdapterNamedPipeServer,
+    DebugConfiguration,
+    DebugConfigurationProvider,
+    DebugSession,
+    ExtensionContext,
+    WorkspaceFolder
 } from "vscode";
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { getPlatformDetails, OperatingSystem } from "../platform";
+import { LanguageClientConsumer } from "../languageClientConsumer";
+import { ILogger } from "../logging";
+import { OperatingSystem, getPlatformDetails } from "../platform";
 import { PowerShellProcess } from "../process";
 import { IEditorServicesSessionDetails, SessionManager, SessionStatus } from "../session";
 import { getSettings } from "../settings";
-import { ILogger } from "../logging";
-import { LanguageClientConsumer } from "../languageClientConsumer";
-import path = require("path");
-import utils = require("../utils");
+import path from "path";
+import { checkIfFileExists } from "../utils";
 
 export const StartDebuggerNotificationType =
     new NotificationType<void>("powerShell/startDebugger");
@@ -23,72 +31,64 @@ export const StartDebuggerNotificationType =
 export const StopDebuggerNotificationType =
     new NotificationType<void>("powerShell/stopDebugger");
 
-enum DebugConfig {
+export enum DebugConfig {
     LaunchCurrentFile,
     LaunchScript,
     InteractiveSession,
     AttachHostProcess,
 }
 
+/** Make the implicit behavior of undefined and null in the debug api more explicit  */
+type PREVENT_DEBUG_START = undefined;
+type PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG = null;
+type ResolveDebugConfigurationResult = DebugConfiguration | PREVENT_DEBUG_START | PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
+
+const PREVENT_DEBUG_START = undefined;
+const PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG = null;
+
+
+export const defaultDebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
+    [DebugConfig.LaunchCurrentFile]: {
+        name: "PowerShell: Launch Current File",
+        type: "PowerShell",
+        request: "launch",
+        script: "${file}",
+        args: [],
+    },
+    [DebugConfig.LaunchScript]: {
+        name: "PowerShell: Launch Script",
+        type: "PowerShell",
+        request: "launch",
+        script: "Enter path or command to execute, for example: \"${workspaceFolder}/src/foo.ps1\" or \"Invoke-Pester\"",
+        args: [],
+    },
+    [DebugConfig.InteractiveSession]: {
+        name: "PowerShell: Interactive Session",
+        type: "PowerShell",
+        request: "launch",
+    },
+    [DebugConfig.AttachHostProcess]: {
+        name: "PowerShell: Attach to PowerShell Host Process",
+        type: "PowerShell",
+        request: "attach",
+        runspaceId: 1,
+    }
+};
+
 export class DebugSessionFeature extends LanguageClientConsumer
-    implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
+    implements DebugConfigurationProvider, DebugAdapterDescriptorFactory {
 
     private sessionCount = 1;
     private tempDebugProcess: PowerShellProcess | undefined;
     private tempSessionDetails: IEditorServicesSessionDetails | undefined;
     private handlers: vscode.Disposable[] = [];
-    private configs: Record<DebugConfig, DebugConfiguration> = {
-        [DebugConfig.LaunchCurrentFile]: {
-            name: "PowerShell: Launch Current File",
-            type: "PowerShell",
-            request: "launch",
-            script: "${file}",
-            args: [],
-        },
-        [DebugConfig.LaunchScript]: {
-            name: "PowerShell: Launch Script",
-            type: "PowerShell",
-            request: "launch",
-            script: "Enter path or command to execute, for example: \"${workspaceFolder}/src/foo.ps1\" or \"Invoke-Pester\"",
-            args: [],
-        },
-        [DebugConfig.InteractiveSession]: {
-            name: "PowerShell: Interactive Session",
-            type: "PowerShell",
-            request: "launch",
-        },
-        [DebugConfig.AttachHostProcess]: {
-            name: "PowerShell: Attach to PowerShell Host Process",
-            type: "PowerShell",
-            request: "attach",
-            runspaceId: 1,
-        },
-    };
+    private configs = defaultDebugConfigurations;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: ILogger) {
         super();
-        // Register a debug configuration provider
+        // This "activates" the debug adapter for use with vscode. You can only do this once.
         context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("PowerShell", this));
         context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory("PowerShell", this));
-    }
-
-    createDebugAdapterDescriptor(
-        session: vscode.DebugSession,
-        _executable: vscode.DebugAdapterExecutable | undefined): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
-
-        const sessionDetails = session.configuration.createTemporaryIntegratedConsole
-            ? this.tempSessionDetails
-            : this.sessionManager.getSessionDetails();
-
-        if (sessionDetails === undefined) {
-            void this.logger.writeAndShowError(`PowerShell session details not available for ${session.name}`);
-            return;
-        }
-
-        this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
-        this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration)}`);
-
-        return new vscode.DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
     }
 
     public dispose(): void {
@@ -153,31 +153,12 @@ export class DebugSessionFeature extends LanguageClientConsumer
         return [this.configs[DebugConfig.LaunchCurrentFile]];
     }
 
-    // DebugConfigurationProvider methods
     public async resolveDebugConfiguration(
         _folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
-        _token?: CancellationToken): Promise<DebugConfiguration | undefined> {
-
-        // Prevent the Debug Console from opening
-        config.internalConsoleOptions = "neverOpen";
+        _token?: CancellationToken): Promise<ResolveDebugConfigurationResult> {
 
         // NOTE: We intentionally do not touch the `cwd` setting of the config.
-
-        // If the createTemporaryIntegratedConsole field is not specified in the
-        // launch config, set the field using the value from the corresponding
-        // setting. Otherwise, the launch config value overrides the setting.
-        //
-        // Also start the temporary process and console for this configuration.
-        const settings = getSettings();
-        config.createTemporaryIntegratedConsole =
-            config.createTemporaryIntegratedConsole ??
-            settings.debugging.createTemporaryIntegratedConsole;
-
-        if (config.createTemporaryIntegratedConsole) {
-            this.tempDebugProcess = await this.sessionManager.createDebugSessionProcess(settings);
-            this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
-        }
 
         if (!config.request) {
             // No launch.json, create the default configuration for both unsaved
@@ -189,8 +170,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
         if (config.script === "${file}" || config.script === "${relativeFile}") {
             if (vscode.window.activeTextEditor === undefined) {
-                void this.logger.writeAndShowError("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
-                return undefined;
+                await this.logger.writeAndShowError("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
+                return PREVENT_DEBUG_START;
             }
             config.current_document = true;
             // Special case using the URI for untitled documents.
@@ -207,31 +188,55 @@ export class DebugSessionFeature extends LanguageClientConsumer
     public async resolveDebugConfigurationWithSubstitutedVariables(
         _folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
-        _token?: CancellationToken): Promise<DebugConfiguration | undefined | null> {
+        _token?: CancellationToken): Promise<ResolveDebugConfigurationResult> {
 
-        let resolvedConfig: DebugConfiguration | undefined | null;
+        let resolvedConfig: ResolveDebugConfigurationResult;
+
+        // Prevent the Debug Console from opening
+        config.internalConsoleOptions = "neverOpen";
+
+        const settings = getSettings();
+        config.createTemporaryIntegratedConsole ??= settings.debugging.createTemporaryIntegratedConsole;
         if (config.request === "attach") {
             resolvedConfig = await this.resolveAttachDebugConfiguration(config);
         } else if (config.request === "launch") {
             resolvedConfig = await this.resolveLaunchDebugConfiguration(config);
         } else {
             void this.logger.writeAndShowError(`PowerShell debug configuration's request type was invalid: '${config.request}'.`);
-            return null;
-        }
-
-        if (resolvedConfig) {
-            // Start the PowerShell session if needed.
-            if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
-                await this.sessionManager.start();
-            }
-            // Create or show the debug terminal (either temporary or session).
-            this.sessionManager.showDebugTerminal(true);
+            return PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
         }
 
         return resolvedConfig;
     }
 
-    private async resolveLaunchDebugConfiguration(config: DebugConfiguration): Promise<DebugConfiguration | undefined> {
+    // This is our factory entrypoint hook to when a debug session starts, and where we will lazy initialize everything needed to do the debugging such as a temporary console if required
+    public async createDebugAdapterDescriptor(
+        session: DebugSession,
+        _executable: DebugAdapterExecutable | undefined): Promise<DebugAdapterDescriptor | undefined> {
+        // NOTE: A Promise meets the shape of a ProviderResult, which allows us to make this method async.
+
+        if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
+            await this.sessionManager.start();
+        }
+
+        const sessionDetails = session.configuration.createTemporaryIntegratedConsole
+            ? await this.createTemporaryIntegratedConsole(session)
+            : this.sessionManager.getSessionDetails();
+
+        if (sessionDetails === undefined) {
+            return undefined;
+        }
+
+        // Create or show the debug terminal (either temporary or session).
+        this.sessionManager.showDebugTerminal(true);
+
+        this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
+        this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration)}`);
+
+        return new DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
+    }
+
+    private async resolveLaunchDebugConfiguration(config: DebugConfiguration): Promise<ResolveDebugConfigurationResult> {
         // Check the languageId and file extension only for current documents
         // (which includes untitled documents). This prevents accidentally
         // running the debugger for an open non-PowerShell file.
@@ -239,39 +244,135 @@ export class DebugSessionFeature extends LanguageClientConsumer
             const currentDocument = vscode.window.activeTextEditor?.document;
             if (currentDocument?.languageId !== "powershell") {
                 void this.logger.writeAndShowError(`PowerShell does not support debugging this language mode: '${currentDocument?.languageId}'.`);
-                return undefined;
+                return PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
             }
 
-            if (await utils.checkIfFileExists(config.script)) {
+            if (await checkIfFileExists(config.script)) {
                 const ext = path.extname(config.script).toLowerCase();
                 if (!(ext === ".ps1" || ext === ".psm1")) {
                     void this.logger.writeAndShowError(`PowerShell does not support debugging this file type: '${path.basename(config.script)}'.`);
-                    return undefined;
+                    return PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
                 }
             }
         }
 
-        // Check the temporary console setting for untitled documents only.
         if (config.untitled_document && config.createTemporaryIntegratedConsole) {
             void this.logger.writeAndShowError("PowerShell does not support debugging untitled files in a temporary console.");
-            return undefined;
+            return PREVENT_DEBUG_START;
+        }
+
+        if (!config.createTemporaryIntegratedConsole && config.attachDotnetDebugger) {
+            void this.logger.writeAndShowError("dotnet debugging without using a temporary console is currently not supported. Please updated your launch config to include createTemporaryIntegratedConsole: true.");
+            return PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
+        }
+
+        if (config.attachDotnetDebugger) {
+            return this.resolveAttachDotnetDebugConfiguration(config);
         }
 
         return config;
     }
 
-    private async resolveAttachDebugConfiguration(config: DebugConfiguration): Promise<DebugConfiguration | undefined | null> {
+    private resolveAttachDotnetDebugConfiguration(config: DebugConfiguration): ResolveDebugConfigurationResult {
+        if (!vscode.extensions.getExtension("ms-dotnettools.csharp")) {
+            void this.logger.writeAndShowError("You specified attachDotnetDebugger in your PowerShell Launch configuration but the C# extension is not installed. Please install the C# extension and try again.");
+            return PREVENT_DEBUG_START;
+        }
+
+        const dotnetDebuggerConfig = this.getDotnetNamedConfigOrDefault(config.dotnetDebuggerConfigName);
+
+        if (dotnetDebuggerConfig === undefined) {
+            void this.logger.writeAndShowError(`You specified dotnetDebuggerConfigName in your PowerShell Launch configuration but a matching launch config was not found. Please ensure you have a coreclr attach config with the name ${config.dotnetDebuggerConfigName} in your launch.json file or remove dotnetDebuggerConfigName from your PowerShell Launch configuration to use the defaults`);
+            return PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
+        }
+
+        config.dotnetAttachConfig = dotnetDebuggerConfig;
+        return config;
+    }
+
+    private async createTemporaryIntegratedConsole(session: DebugSession): Promise<IEditorServicesSessionDetails | undefined> {
+        const settings = getSettings();
+        this.tempDebugProcess = await this.sessionManager.createDebugSessionProcess(settings);
+        this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
+
+        // NOTE: Dotnet attach debugging is only currently supported if a temporary debug terminal is used, otherwise we get lots of lock conflicts from loading the assemblies.
+        if (session.configuration.attachDotnetDebugger) {
+            const dotnetAttachConfig = session.configuration.dotnetAttachConfig;
+
+            // Will wait until the process is started and available before attaching
+            const pid = await this.tempDebugProcess.getPid();
+            if (pid === undefined) {
+                void this.logger.writeAndShowError("Attach Dotnet Debugger was specified but the PowerShell temporary debug session failed to start. This is probably a bug.");
+                return PREVENT_DEBUG_START;
+            }
+            dotnetAttachConfig.processId = pid;
+
+            // Ensure the .NET session stops before the PowerShell session so that the .NET debug session doesn't emit an error about the process unexpectedly terminating.
+            const startDebugEvent = vscode.debug.onDidStartDebugSession((dotnetAttachSession) => {
+                // Makes the event one-time
+                // HACK: This seems like you would be calling a method on a variable not assigned yet, but it does work in the flow.
+                // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
+                startDebugEvent.dispose();
+                this.logger.write(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
+                if (dotnetAttachSession.configuration.name == dotnetAttachConfig.name) {
+                    const stopDebugEvent = vscode.debug.onDidTerminateDebugSession(async (terminatedDebugSession) => {
+                        // Makes the event one-time
+                        stopDebugEvent.dispose();
+
+                        this.logger.write(`Debugger session stopped: ${terminatedDebugSession.name} (${terminatedDebugSession.id})`);
+
+                        if (terminatedDebugSession === session) {
+                            this.logger.write("Terminating dotnet debugger session associated with PowerShell debug session");
+                            await vscode.debug.stopDebugging(dotnetAttachSession);
+                        }
+                    });
+                }
+            });
+
+            // Start a child debug session to attach the dotnet debugger
+            // TODO: Accomodate multi-folder workspaces if the C# code is in a different workspace folder
+            await vscode.debug.startDebugging(undefined, dotnetAttachConfig, session);
+            this.logger.writeVerbose(`Dotnet Attach Debug configuration: ${JSON.stringify(dotnetAttachConfig)}`);
+            this.logger.write(`Attached dotnet debugger to process ${pid}`);
+        }
+        return this.tempSessionDetails;
+    }
+
+    private getDotnetNamedConfigOrDefault(configName?: string): ResolveDebugConfigurationResult {
+        if (configName) {
+            const debugConfigs = vscode.workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
+            return debugConfigs.find(({ type, request, name, dotnetDebuggerConfigName }) =>
+                type === "coreclr" &&
+                request === "attach" &&
+                name === dotnetDebuggerConfigName
+            );
+        }
+
+        // Default debugger config if none provided
+        // TODO: Type this appropriately from the C# extension?
+        return {
+            name: "Dotnet Debugger: Temporary Extension Terminal",
+            type: "coreclr",
+            request: "attach",
+            processId: undefined,
+            logging: {
+                moduleLoad: false
+            }
+        };
+    }
+
+    private async resolveAttachDebugConfiguration(config: DebugConfiguration): Promise<ResolveDebugConfigurationResult> {
         const platformDetails = getPlatformDetails();
         const versionDetails = this.sessionManager.getPowerShellVersionDetails();
         if (versionDetails === undefined) {
             void this.logger.writeAndShowError(`PowerShell session version details were not found for '${config.name}'.`);
-            return null;
+            return PREVENT_DEBUG_START;
         }
 
         // Cross-platform attach to process was added in 6.2.0-preview.4.
         if (versionDetails.version < "7.0.0" && platformDetails.operatingSystem !== OperatingSystem.Windows) {
-            void this.logger.writeAndShowError(`Attaching to a PowerShell Host Process on ${OperatingSystem[platformDetails.operatingSystem]} requires PowerShell 7.0 or higher.`);
-            return undefined;
+            void this.logger.writeAndShowError(`Attaching to a PowerShell Host Process on ${OperatingSystem[platformDetails.operatingSystem]} requires PowerShell 7.0 or higher (Current Version: ${versionDetails.version}).`);
+            return PREVENT_DEBUG_START;
         }
 
         // If nothing is set, prompt for the processId.
@@ -279,7 +380,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
             // No process selected. Cancel attach.
             if (!config.processId) {
-                return null;
+                return PREVENT_DEBUG_START;
             }
         }
 
@@ -287,7 +388,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
             // No runspace selected. Cancel attach.
             if (!config.runspaceId) {
-                return null;
+                return PREVENT_DEBUG_START;
             }
         }
 

@@ -90,10 +90,12 @@
     "@types/rewire": "2.5.28",
     "@types/semver": "7.3.13",
     "@types/sinon": "10.0.13",
+    "@types/ungap__structured-clone": "^0.3.0",
     "@types/uuid": "9.0.1",
     "@types/vscode": "1.67.0",
     "@typescript-eslint/eslint-plugin": "5.57.0",
     "@typescript-eslint/parser": "5.57.1",
+    "@ungap/structured-clone": "^1.0.2",
     "@vscode/test-electron": "2.3.0",
     "@vscode/vsce": "2.18.0",
     "esbuild": "0.17.15",
@@ -521,6 +523,16 @@
               "createTemporaryIntegratedConsole": {
                 "type": "boolean",
                 "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
+                "default": false
+              },
+              "attachDotnetDebugger": {
+                "type": "boolean",
+                "description": "If specified, a C# debug session will be started and attached to the new temporary extension terminal. This does nothing unless 'powershell.debugging.createTemporaryIntegratedConsole' is also specified.",
+                "default": false
+              },
+              "dotnetDebuggerConfigName": {
+                "type": "string",
+                "description": "If you would like to use a custom coreclr attach debug launch configuration for the debug session, specify the name here. Otherwise a default basic config will be used. The config must be a coreclr attach config. Launch configs are not supported.",
                 "default": false
               }
             }
