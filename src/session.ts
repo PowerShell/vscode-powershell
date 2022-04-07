@@ -34,6 +34,9 @@ export enum SessionStatus {
     Failed,
 }
 
+export const SendKeyPressNotificationType =
+    new NotificationType<void>("powerShell/sendKeyPress");
+
 export class SessionManager implements Middleware {
     public HostName: string;
     public HostVersion: string;
@@ -605,6 +608,14 @@ export class SessionManager implements Middleware {
                     this.languageServerClient.onNotification(
                         RunspaceChangedEventType,
                         (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); });
+
+                    // NOTE: This fixes a quirk where PSES has a thread stuck on
+                    // Console.ReadKey, since it's not cancellable. On
+                    // "cancellation" the server asks us to send pretend to
+                    // press a key, thus mitigating all the quirk.
+                    this.languageServerClient.onNotification(
+                        SendKeyPressNotificationType,
+                        () => { this.languageServerProcess.sendKeyPress(); });
                 },
                 (reason) => {
                     this.setSessionFailure("Could not start language service: ", reason);
