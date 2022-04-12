@@ -163,6 +163,10 @@ export class PowerShellProcess {
         }
     }
 
+    public sendKeyPress() {
+        this.consoleTerminal.sendText("\0", false);
+    }
+
     private logTerminalPid(pid: number, exeName: string) {
         this.log.write(`${exeName} PID: ${pid}`);
     }
