@@ -1,5 +1,25 @@
 # PowerShell Extension Release History
 
+## v2022.4.0-preview
+### Tuesday, April 12, 2022
+
+We delayed moving the preview branch to stable in order to fix issues surrounding our
+`ReadKey` / `ReadLine` logic. This preview contains a new minor release of PowerShell
+Editor Services with an entire rewrite of that logic, utilizing what we hope is a much
+better workaround for the underlying issue in .NET's `Console.ReadKey`. Please give this
+release a thorough testing, especially in the console with PSReadLine.
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🙏 [vscode-powershell #3911](https://github.com/PowerShell/vscode-powershell/pull/3911) - Add `sendKeyPress` notification used to "cancel" `Console.ReadKey`.
+- 🐛 ✂️ [vscode-powershell #3276](https://github.com/PowerShell/vscode-powershell/pull/3900) - Fix snippet prefixes (especially `#region`).
+- ✨ 📺 [vscode-powershell #3897](https://github.com/PowerShell/vscode-powershell/pull/3897) - Add PowerShell icon to Integrated Console.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🙏 [PowerShellEditorServices #1751](https://github.com/PowerShell/PowerShellEditorServices/pull/1751) - Re-workaround uncancellable `Console.ReadKey`.
+- 🐛 ‍🕵️ [PowerShellEditorServices #1749](https://github.com/PowerShell/PowerShellEditorServices/pull/1749) - Correctly map `SuggestedCorrection` to `MarkerCorrection`. (Thanks @bergmeister!)
+
 ## v2022.3.1-preview
 ### Thursday, March 24, 2022
 
