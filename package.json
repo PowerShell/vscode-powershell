@@ -549,6 +549,9 @@
         },
         "powershell.sideBar.CommandExplorerExcludeFilter": {
           "type": "array",
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "description": "Specify array of Modules to exclude from Command Explorer listing."
         },
@@ -822,7 +825,10 @@
         },
         "powershell.developer.featureFlags": {
           "type": "array",
-          "default": null,
+          "items": {
+            "type": "string"
+          },
+          "default": [],
           "description": "An array of strings that enable experimental features in the PowerShell extension."
         },
         "powershell.developer.waitForSessionFileTimeoutSeconds": {
