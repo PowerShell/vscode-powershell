@@ -75,7 +75,7 @@ export class PowerShellExeFinder {
     private readonly platformDetails: IPlatformDetails;
 
     // Additional configured PowerShells
-    private readonly additionalPSExeSettings: Iterable<IPowerShellAdditionalExePathSettings>;
+    private readonly additionalPSExeSettings: IPowerShellAdditionalExePathSettings;
 
     private winPS: IPossiblePowerShellExe;
 
@@ -88,10 +88,10 @@ export class PowerShellExeFinder {
      */
     constructor(
         platformDetails?: IPlatformDetails,
-        additionalPowerShellExes?: Iterable<IPowerShellAdditionalExePathSettings>) {
+        additionalPowerShellExes?: IPowerShellAdditionalExePathSettings) {
 
         this.platformDetails = platformDetails || getPlatformDetails();
-        this.additionalPSExeSettings = additionalPowerShellExes || [];
+        this.additionalPSExeSettings = additionalPowerShellExes || {};
     }
 
     /**
@@ -217,8 +217,13 @@ export class PowerShellExeFinder {
      * without checking for their existence.
      */
     private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
-        for (const additionalPwshSetting of this.additionalPSExeSettings) {
-            yield new PossiblePowerShellExe(additionalPwshSetting.exePath, additionalPwshSetting.versionName);
+        for (const versionName in this.additionalPSExeSettings) {
+            if (Object.prototype.hasOwnProperty.call(this.additionalPSExeSettings, versionName)) {
+                const exePath = this.additionalPSExeSettings[versionName];
+                if (exePath) {
+                    yield new PossiblePowerShellExe(exePath, versionName);
+                }
+            }
         }
     }
 

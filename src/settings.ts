@@ -27,8 +27,7 @@ export enum CommentType {
 }
 
 export interface IPowerShellAdditionalExePathSettings {
-    versionName: string;
-    exePath: string;
+    [versionName: string]: string;
 }
 
 export interface IBugReportingSettings {
@@ -79,7 +78,7 @@ export interface IDeveloperSettings {
 }
 
 export interface ISettings {
-    powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings[];
+    powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings;
     powerShellDefaultVersion?: string;
     // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
@@ -225,7 +224,7 @@ export function load(): ISettings {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
         powerShellAdditionalExePaths:
-            configuration.get<IPowerShellAdditionalExePathSettings[]>("powerShellAdditionalExePaths", undefined),
+            configuration.get<IPowerShellAdditionalExePathSettings>("powerShellAdditionalExePaths", undefined),
         powerShellDefaultVersion:
             configuration.get<string>("powerShellDefaultVersion", undefined),
         powerShellExePath:
