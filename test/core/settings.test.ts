@@ -21,10 +21,9 @@ describe("Settings module", function () {
     });
 
     describe("User-only settings", async function () {
-        const psExeDetails = [{
-            versionName: "My PowerShell",
-            exePath: "dummyPath",
-        }];
+        const psExeDetails = {
+            "My PowerShell": "dummyPath",
+        };
 
         it("Throws when updating at workspace-level", async function () {
             assert.rejects(async () => await Settings.change("powerShellAdditionalExePaths", psExeDetails, false /* workspace-level */));
@@ -32,7 +31,9 @@ describe("Settings module", function () {
 
         it("Doesn't throw when updating at user-level", async function () {
             await Settings.change("powerShellAdditionalExePaths", psExeDetails, true /* user-level */);
-            assert.strictEqual(Settings.load().powerShellAdditionalExePaths[0].versionName, psExeDetails[0].versionName);
+            const result = Settings.load().powerShellAdditionalExePaths["My PowerShell"];
+            assert.notStrictEqual(result, undefined);
+            assert.strictEqual(result, psExeDetails["My PowerShell"]);
         });
     });
 

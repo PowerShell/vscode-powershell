@@ -556,26 +556,10 @@
           "description": "Specify array of Modules to exclude from Command Explorer listing."
         },
         "powershell.powerShellAdditionalExePaths": {
-          "type": "array",
-          "description": "Specifies an array of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
-          "scope": "machine",
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "required": [
-              "versionName",
-              "exePath"
-            ],
-            "properties": {
-              "versionName": {
-                "type": "string",
-                "description": "Specifies the version name of this PowerShell executable. The version name can be referenced via the powershell.powerShellDefaultVersion setting."
-              },
-              "exePath": {
-                "type": "string",
-                "description": "Specifies the path to the PowerShell executable. Typically this is a path to a non-standard install location."
-              }
-            }
+          "type": "object",
+          "description": "Specifies a list of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
+          "additionalProperties": {
+            "type": "string"
           }
         },
         "powershell.powerShellDefaultVersion": {

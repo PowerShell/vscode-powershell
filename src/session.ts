@@ -808,7 +808,7 @@ export class SessionManager implements Middleware {
 
             new SessionMenuItem(
                 "Modify 'powerShell.powerShellAdditionalExePaths' in Settings",
-                () => { vscode.commands.executeCommand("workbench.action.openSettingsJson"); }),
+                () => { vscode.commands.executeCommand("workbench.action.openSettings", "powershell.powerShellAdditionalExePaths"); }),
         ];
 
         vscode
