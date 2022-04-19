@@ -1,5 +1,24 @@
 # PowerShell Extension Release History
 
+## v2022.4.1-preview
+### Monday, April 18, 2022
+
+This is our first Release Candidate. We've merged a set of major fixes to the debugger so
+that attaching to remote processes / runspaces now works again. While the extension is not
+perfect (yet), we believe at this point the preview far exceeds the stable extension in
+terms of usability and stability, and it is time to roll this out. Please give this a
+thorough testing, as we hope to roll it into the stable extension next week.
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #3919](https://github.com/PowerShell/vscode-powershell/pull/3919) - Improve Settings Editor experience in a few places. (Thanks @TylerLeonhardt!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- #️⃣ 🙏 [PowerShellEditorServices #1757](https://github.com/PowerShell/PowerShellEditorServices/pull/1757) - Enable code analysis and formatting as errors on build.
+- ✨ 🚂 [PowerShellEditorServices #1755](https://github.com/PowerShell/PowerShellEditorServices/pull/1755) - Apply automatic fixes (manually).
+- 🐛 🔍 [PowerShellEditorServices #1736](https://github.com/PowerShell/PowerShellEditorServices/pull/1752) - Fix attach to process debugging.
+
 ## v2022.4.0-preview
 ### Tuesday, April 12, 2022
 
