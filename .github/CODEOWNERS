@@ -4,13 +4,12 @@
 * @PowerShell/extension
 
 # Developer files
-# We exclude *.psd1 and *.props as they change on release
-*.ts @PowerShell/extension-dev
-*.xml @PowerShell/extension-dev
 src/ @PowerShell/extension-dev
 test/ @PowerShell/extension-dev
 tools/ @PowerShell/extension-dev
 .editorconfig @PowerShell/extension-dev
+.gitattributes @PowerShell/extension-dev
 .gitignore @PowerShell/extension-dev
+extension-dev.code-workspace @PowerShell/extension-dev
 package-lock.json @PowerShell/extension-dev
 vscode-powershell.build.ps1 @PowerShell/extension-dev
