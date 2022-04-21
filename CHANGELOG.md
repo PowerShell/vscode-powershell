@@ -1,5 +1,21 @@
 # PowerShell Extension Release History
 
+## v2022.4.2-preview
+### Wednesday, April 20, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+Just including updates to PowerShell Editor Services. This is the second Release
+Candidate! Please give it a thorough test.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 👷 [PowerShellEditorServices #1761](https://github.com/PowerShell/PowerShellEditorServices/pull/1766) - Bump `net461` to `net462` due to upcoming end of support.
+- 🐛 💎 [vscode-powershell #3928](https://github.com/PowerShell/PowerShellEditorServices/pull/1764) - Fix formatting handlers and PSScriptAnalyzer loading.
+- 🐛 🔍 [PowerShellEditorServices #1762](https://github.com/PowerShell/PowerShellEditorServices/pull/1762) - Fix prompt spam and general debugger reliability improvements.
+- ✨ 🙏 [PowerShellEditorServices #1479](https://github.com/PowerShell/PowerShellEditorServices/pull/1759) - Enable IDE0005 (unneccessary using statements) as error.
+- 🐛 🙏 [PowerShellEditorServices #1754](https://github.com/PowerShell/PowerShellEditorServices/pull/1758) - With a fix in PSReadLine, we don't have to return a "null" key press.
+
 ## v2022.4.1-preview
 ### Monday, April 18, 2022
 
