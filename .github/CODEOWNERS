@@ -1,0 +1,15 @@
+# https://help.github.com/articles/about-codeowners/
+
+# Global pattern
+* @PowerShell/extension
+
+# Developer files
+src/ @PowerShell/extension-dev
+test/ @PowerShell/extension-dev
+tools/ @PowerShell/extension-dev
+.editorconfig @PowerShell/extension-dev
+.gitattributes @PowerShell/extension-dev
+.gitignore @PowerShell/extension-dev
+extension-dev.code-workspace @PowerShell/extension-dev
+package-lock.json @PowerShell/extension-dev
+vscode-powershell.build.ps1 @PowerShell/extension-dev
