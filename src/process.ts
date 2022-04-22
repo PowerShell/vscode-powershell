@@ -164,7 +164,11 @@ export class PowerShellProcess {
     }
 
     public sendKeyPress() {
-        this.consoleTerminal.sendText("\0", false);
+        // NOTE: This is a regular character instead of something like \0
+        // because non-printing characters can cause havoc with different
+        // languages and terminal settings. We discard the character server-side
+        // anyway, so it doesn't matter what we send.
+        this.consoleTerminal.sendText("p", false);
     }
 
     private logTerminalPid(pid: number, exeName: string) {
