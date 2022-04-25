@@ -12,4 +12,5 @@ tools/ @PowerShell/extension-dev
 .gitignore @PowerShell/extension-dev
 extension-dev.code-workspace @PowerShell/extension-dev
 package-lock.json @PowerShell/extension-dev
+package.json @PowerShell/extension-dev
 vscode-powershell.build.ps1 @PowerShell/extension-dev
