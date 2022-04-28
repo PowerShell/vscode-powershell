@@ -1,5 +1,24 @@
 # PowerShell Extension Release History
 
+## v2022.4.3-preview
+### Thursday, April 28, 2022
+
+Third release candidate. Our recent debugger and `ReadKey` overhauls revealed some other
+bugs that needed squashing! Please test this thoroughly. We're gaining confidence!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🙏 [vscode-powershell #3939](https://github.com/PowerShell/vscode-powershell/pull/3939) - Send `p` instead of `\0` for `sendKeyPress`.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🛫 [PowerShellEditorServices #1782](https://github.com/PowerShell/PowerShellEditorServices/pull/1782) - Fix ordering of startup tasks so `psEditor` is defined before profiles are loaded.
+- 🐛 📟 [PowerShellEditorServices #1781](https://github.com/PowerShell/PowerShellEditorServices/pull/1781) - Bring back `WriteWithPrompt()`.
+- 🐛 📟 [vscode-powershell #3937](https://github.com/PowerShell/PowerShellEditorServices/pull/1779) - Update to latest PSReadLine beta (with fix for race condition).
+- 🐛 🔍 [PowerShellEditorServices #1778](https://github.com/PowerShell/PowerShellEditorServices/pull/1778) - Fix extra prompting and manual debugger commands.
+- ✨ 🚂 [PowerShellEditorServices #1777](https://github.com/PowerShell/PowerShellEditorServices/pull/1777) - Consolidate `InterruptCurrentForeground` and `MustRunInForeground`.
+- ✨ 🚂 [PowerShellEditorServices #1776](https://github.com/PowerShell/PowerShellEditorServices/pull/1776) - Don't cancel on disposal of `CancellationScope`.
+
 ## v2022.4.2-preview
 ### Wednesday, April 20, 2022
 
