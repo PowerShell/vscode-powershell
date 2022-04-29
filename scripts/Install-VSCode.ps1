@@ -134,7 +134,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 #>
-[CmdletBinding(SupportsShouldProcess=$true)]
+[CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [parameter()]
     [ValidateSet('64-bit', '32-bit')]
@@ -172,7 +172,7 @@ type=rpm-md
 gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 "@
-
+#region    Helper_Functions
 function Test-IsOsArchX64 {
     if ($PSVersionTable.PSVersion.Major -lt 6) {
         return (Get-CimInstance -ClassName Win32_OperatingSystem).OSArchitecture -match '64'
@@ -180,9 +180,7 @@ function Test-IsOsArchX64 {
 
     return [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq [System.Runtime.InteropServices.Architecture]::X64
 }
-
-function Get-AvailablePackageManager
-{
+function Get-AvailablePackageManager {
     if (Get-Command 'apt' -ErrorAction SilentlyContinue) {
         return 'apt'
     }
@@ -199,15 +197,14 @@ function Get-AvailablePackageManager
         return 'zypper'
     }
 }
-
 function Get-CodePlatformInformation {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('32-bit', '64-bit')]
         [string]
         $Bitness,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [ValidateSet('Stable-System', 'Stable-User', 'Insider-System', 'Insider-User')]
         [string]
         $BuildEdition
@@ -215,14 +212,11 @@ function Get-CodePlatformInformation {
 
     if ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) {
         $os = 'Windows'
-    }
-    elseif ($IsLinux) {
+    } elseif ($IsLinux) {
         $os = 'Linux'
-    }
-    elseif ($IsMacOS) {
+    } elseif ($IsMacOS) {
         $os = 'MacOS'
-    }
-    else {
+    } else {
         throw 'Could not identify operating system'
     }
 
@@ -267,7 +261,7 @@ function Get-CodePlatformInformation {
                     break
                 }
 
-                { 'dnf','yum','zypper' -contains $_ } {
+                { 'dnf', 'yum', 'zypper' -contains $_ } {
                     $platform = 'linux-rpm-x64'
                     $ext = 'rpm'
                     break
@@ -376,11 +370,11 @@ function Get-CodePlatformInformation {
     }
 
     $info = @{
-        AppName = $appName
-        ExePath = $exePath
-        Platform = $platform
-        Channel = $channel
-        FileUri = "https://update.code.visualstudio.com/latest/$platform/$channel"
+        AppName   = $appName
+        ExePath   = $exePath
+        Platform  = $platform
+        Channel   = $channel
+        FileUri   = "https://update.code.visualstudio.com/latest/$platform/$channel"
         Extension = $ext
     }
 
@@ -390,18 +384,17 @@ function Get-CodePlatformInformation {
 
     return $info
 }
-
 function Save-WithBitsTransfer {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $FileUri,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Destination,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $AppName
     )
@@ -428,10 +421,9 @@ function Save-WithBitsTransfer {
         }
     }
 }
-
 function Install-VSCodeFromTar {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $TarPath,
 
@@ -448,8 +440,7 @@ function Install-VSCodeFromTar {
         Push-Location $tarDir
         tar xf $TarPath
         Move-Item -LiteralPath "$tarDir/VSCode-linux-x64" $destDir
-    }
-    finally {
+    } finally {
         Pop-Location
     }
 
@@ -460,6 +451,7 @@ function Install-VSCodeFromTar {
 
     ln -s "$destDir/code" /usr/bin/code
 }
+#endregion Helper_Functions
 
 # We need to be running as elevated on *nix
 if (($IsLinux -or $IsMacOS) -and (id -u) -ne 0) {
@@ -478,7 +470,7 @@ try {
     # Get information required for installation
     $codePlatformInfo = Get-CodePlatformInformation -Bitness $Architecture -BuildEdition $BuildEdition
 
-    # Download the installer
+    #region    Download_the_installer
     $tmpdir = [System.IO.Path]::GetTempPath()
 
     $ext = $codePlatformInfo.Extension
@@ -495,8 +487,9 @@ try {
             Invoke-WebRequest -Uri $codePlatformInfo.FileUri -OutFile $installerPath
         }
     }
+    #endregion Download_the_installer
 
-    # Install VSCode
+    #region    Install_VSCode
     switch ($codePlatformInfo.Extension) {
         # On Debian-like Linux distros
         'deb' {
@@ -589,24 +582,25 @@ try {
     }
 
     $codeExePath = $codePlatformInfo.ExePath
+    #endregion Install_VSCode
 
-    # Install any extensions
+    #region    Install_any_extensions
     $extensions = @("ms-vscode.PowerShell") + $AdditionalExtensions
     if ($PSCmdlet.ShouldProcess(($extensions -join ','), "$codeExePath --install-extension")) {
         if ($IsLinux -or $IsMacOS) {
             # On *nix we need to install extensions as the user -- VSCode refuses root
             $extsSlashes = $extensions -join '/'
             sudo -H -u $env:SUDO_USER pwsh -c "`$exts = '$extsSlashes' -split '/'; foreach (`$e in `$exts) { $codeExePath --install-extension `$e }"
-        }
-        else {
+        } else {
             foreach ($extension in $extensions) {
                 Write-Host "`nInstalling extension $extension..." -ForegroundColor Yellow
                 & $codeExePath --install-extension $extension
             }
         }
     }
+    #endregion Install_any_extensions
 
-    # Launch if requested
+    #region    Launch_if_requested
     if ($LaunchWhenDone) {
         $appName = $codePlatformInfo.AppName
 
@@ -622,7 +616,8 @@ try {
     if ($PSCmdlet.ShouldProcess('Installation complete!', 'Write-Host')) {
         Write-Host "`nInstallation complete!`n`n" -ForegroundColor Green
     }
-}
-finally {
+    #endregion Launch_if_requested
+} finally {
+    [System.GC]::Collect()
     $ProgressPreference = $prevProgressPreference
 }
