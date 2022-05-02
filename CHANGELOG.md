@@ -1,9 +1,21 @@
 # PowerShell Extension Release History
 
+## v2022.5.0-preview
+### Monday, May 02, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+Fourth Release Candidate! Thanks for finding bugs and helping us squash them!
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 📟 [PowerShellEditorServices #1785](https://github.com/PowerShell/PowerShellEditorServices/pull/1785) - Add `IHostUISupportsMultipleChoiceSelection` implementation.
+- 🐛 🔍 [PowerShellEditorServices #1784](https://github.com/PowerShell/PowerShellEditorServices/pull/1784) - Do not exit from `DebuggerStop` unless resuming.
+
 ## v2022.4.3-preview
 ### Thursday, April 28, 2022
 
-Third release candidate. Our recent debugger and `ReadKey` overhauls revealed some other
+Third Release Candidate. Our recent debugger and `ReadKey` overhauls revealed some other
 bugs that needed squashing! Please test this thoroughly. We're gaining confidence!
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
