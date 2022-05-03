@@ -1,5 +1,38 @@
 # PowerShell Extension Release History
 
+## v2022.5.0
+### Tuesday, May 03, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+Welcome to the new and improved PowerShell for Visual Studio Code!
+
+This update represents a complete overhaul of the core PowerShell engine of PowerShell
+Editor Services, intending to create a more reliable and stable user experience. This
+release represents nearly two years' work, tracked in PSES
+[#1295](https://github.com/PowerShell/PowerShellEditorServices/issues/1295) and
+implemented in PSES
+[#1459](https://github.com/PowerShell/PowerShellEditorServices/pull/1459). It is our
+response to many issues opened by users over the last several years.
+
+Thank you to all of the community members who opened issues which helped motivate this
+major update.
+
+These major updates have also been tested over the last 6 months, in 13 releases of our
+[PowerShell Preview extension for Visual Studio
+Code](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell-preview). A
+huge thank you to all of the community members who have tested these changes to the
+extension and have worked with us to polish the extension before releasing it through our
+stable channel.
+
+Please see our
+[blog](https://devblogs.microsoft.com/powershell/major-update-to-the-powershell-extension-for-visual-studio-code)
+for more details!
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🙏 [PowerShellEditorServices #1787](https://github.com/PowerShell/PowerShellEditorServices/pull/1787) - Bump PSReadLine to `v2.2.5`.
+
 ## v2022.5.0-preview
 ### Monday, May 02, 2022
 
