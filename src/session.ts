@@ -270,6 +270,20 @@ export class SessionManager implements Middleware {
                 sessionPath,
                 sessionSettings);
 
+        // Similar to the regular integrated console, we need to send a key
+        // press to the process spawned for temporary integrated consoles when
+        // the server requests a cancellation os Console.ReadKey.
+        //
+        // TODO: There may be multiple sessions running in parallel, so we need
+        // to track a process per session, but that already isn't being done.
+        vscode.debug.onDidReceiveDebugSessionCustomEvent(
+            e => {
+                if (e.event === "powerShell/sendKeyPress") {
+                    this.debugSessionProcess.sendKeyPress();
+                }
+            }
+        );
+
         return this.debugSessionProcess;
     }
 
