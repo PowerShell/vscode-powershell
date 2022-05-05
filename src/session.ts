@@ -34,9 +34,6 @@ export enum SessionStatus {
     Failed,
 }
 
-export const SendKeyPressNotificationType =
-    new NotificationType<void>("powerShell/sendKeyPress");
-
 export class SessionManager implements Middleware {
     public HostName: string;
     public HostVersion: string;
@@ -797,7 +794,7 @@ export class SessionManager implements Middleware {
             new SessionMenuItem(
                 "Restart Current Session",
                 () => {
-                    // We pass in the display name so we guarentee that the session
+                    // We pass in the display name so we guarantee that the session
                     // will be the same PowerShell.
                     this.restartSession(this.PowerShellExeDetails.displayName);
                 }),
@@ -827,6 +824,9 @@ class SessionMenuItem implements vscode.QuickPickItem {
         public readonly callback: () => void = () => {}) {
     }
 }
+
+export const SendKeyPressNotificationType =
+    new NotificationType<void>("powerShell/sendKeyPress");
 
 export const PowerShellVersionRequestType =
     new RequestType0<IPowerShellVersionDetails, void>(

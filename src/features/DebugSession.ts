@@ -11,7 +11,6 @@ import { PowerShellProcess} from "../process";
 import { SessionManager, SessionStatus } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
-import { NamedPipeDebugAdapter } from "../debugAdapter";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -37,20 +36,16 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
     createDebugAdapterDescriptor(
         session: vscode.DebugSession,
-        _executable: vscode.DebugAdapterExecutable): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
+        _executable: vscode.DebugAdapterExecutable | undefined): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
 
         const sessionDetails = session.configuration.createTemporaryIntegratedConsole
             ? this.tempSessionDetails
             : this.sessionManager.getSessionDetails();
 
-        // Establish connection before setting up the session
         this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
         this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration)}`);
 
-        const debugAdapter = new NamedPipeDebugAdapter(sessionDetails.debugServicePipeName, this.logger);
-        debugAdapter.start();
-
-        return new vscode.DebugAdapterInlineImplementation(debugAdapter);
+        return new vscode.DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
     }
 
     // tslint:disable-next-line:no-empty
@@ -60,19 +55,16 @@ export class DebugSessionFeature extends LanguageClientConsumer
     public setLanguageClient(languageClient: LanguageClient) {
         languageClient.onNotification(
             StartDebuggerNotificationType,
-            () =>
-                // TODO: Use a named debug configuration.
-                vscode.debug.startDebugging(undefined, {
-                    request: "launch",
-                    type: "PowerShell",
-                    name: "PowerShell: Interactive Session",
-        }));
+            // TODO: Use a named debug configuration.
+            () => vscode.debug.startDebugging(undefined, {
+                request: "launch",
+                type: "PowerShell",
+                name: "PowerShell: Interactive Session"
+            }));
 
         languageClient.onNotification(
             StopDebuggerNotificationType,
-            () =>
-                vscode.debug.stopDebugging(undefined)
-        );
+            () => vscode.debug.stopDebugging(undefined));
     }
 
     public async provideDebugConfigurations(
@@ -374,7 +366,7 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
 
         const text = await vscode.window.showInputBox(options);
         // When user cancel's the input box (by pressing Esc), the text value is undefined.
-        // Let's not blow away the previous settting.
+        // Let's not blow away the previous setting.
         if (text !== undefined) {
             this.context.workspaceState.update(powerShellDbgScriptArgsKey, text);
         }
