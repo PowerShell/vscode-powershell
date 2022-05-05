@@ -25,6 +25,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
     private sessionCount: number = 1;
     private tempDebugProcess: PowerShellProcess;
+    private tempDebugEventHandler: vscode.Disposable;
     private tempSessionDetails: utils.IEditorServicesSessionDetails;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: Logger) {
@@ -313,18 +314,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
         const sessionFilePath = utils.getDebugSessionFilePath();
 
         if (config.createTemporaryIntegratedConsole) {
-            if (this.tempDebugProcess) {
-                this.tempDebugProcess.dispose();
-            }
-
-            this.tempDebugProcess =
-                this.sessionManager.createDebugSessionProcess(
-                    sessionFilePath,
-                    settings);
-
+            // TODO: This should be cleaned up to support multiple temporary consoles.
+            this.tempDebugProcess = this.sessionManager.createDebugSessionProcess(sessionFilePath, settings);
             this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
             utils.writeSessionFile(sessionFilePath, this.tempSessionDetails);
-
         } else {
             utils.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
         }
