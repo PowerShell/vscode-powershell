@@ -50,6 +50,7 @@ export class SessionManager implements Middleware {
     private statusBarItem: vscode.StatusBarItem;
     private languageServerProcess: PowerShellProcess;
     private debugSessionProcess: PowerShellProcess;
+    private debugEventHandler: vscode.Disposable;
     private versionDetails: IPowerShellVersionDetails;
     private registeredCommands: vscode.Disposable[] = [];
     private languageServerClient: LanguageClient = undefined;
@@ -228,9 +229,10 @@ export class SessionManager implements Middleware {
             this.languageServerClient = undefined;
         }
 
-        // Kill the PowerShell proceses we spawned
+        // Kill the PowerShell process we spawned
         if (this.debugSessionProcess) {
             this.debugSessionProcess.dispose();
+            this.debugEventHandler.dispose();
         }
         if (this.languageServerProcess) {
             this.languageServerProcess.dispose();
@@ -260,6 +262,15 @@ export class SessionManager implements Middleware {
         sessionPath: string,
         sessionSettings: Settings.ISettings): PowerShellProcess {
 
+        // NOTE: We only support one temporary integrated console at a time. To
+        // support more, we need to track each separately, and tie the session
+        // for the event handler to the right process (and dispose of the event
+        // handler when the process is disposed).
+        if (this.debugSessionProcess) {
+            this.debugSessionProcess.dispose()
+            this.debugEventHandler.dispose();
+        }
+
         this.debugSessionProcess =
             new PowerShellProcess(
                 this.PowerShellExeDetails.exePath,
@@ -273,10 +284,7 @@ export class SessionManager implements Middleware {
         // Similar to the regular integrated console, we need to send a key
         // press to the process spawned for temporary integrated consoles when
         // the server requests a cancellation os Console.ReadKey.
-        //
-        // TODO: There may be multiple sessions running in parallel, so we need
-        // to track a process per session, but that already isn't being done.
-        vscode.debug.onDidReceiveDebugSessionCustomEvent(
+        this.debugEventHandler = vscode.debug.onDidReceiveDebugSessionCustomEvent(
             e => {
                 if (e.event === "powerShell/sendKeyPress") {
                     this.debugSessionProcess.sendKeyPress();
