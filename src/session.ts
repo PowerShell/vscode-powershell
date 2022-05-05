@@ -34,9 +34,6 @@ export enum SessionStatus {
     Failed,
 }
 
-export const SendKeyPressNotificationType =
-    new NotificationType<void>("powerShell/sendKeyPress");
-
 export class SessionManager implements Middleware {
     public HostName: string;
     public HostVersion: string;
@@ -272,6 +269,20 @@ export class SessionManager implements Middleware {
                 this.editorServicesArgs + "-DebugServiceOnly ",
                 sessionPath,
                 sessionSettings);
+
+        // Similar to the regular integrated console, we need to send a key
+        // press to the process spawned for temporary integrated consoles when
+        // the server requests a cancellation os Console.ReadKey.
+        //
+        // TODO: There may be multiple sessions running in parallel, so we need
+        // to track a process per session, but that already isn't being done.
+        vscode.debug.onDidReceiveDebugSessionCustomEvent(
+            e => {
+                if (e.event === "powerShell/sendKeyPress") {
+                    this.debugSessionProcess.sendKeyPress();
+                }
+            }
+        );
 
         return this.debugSessionProcess;
     }
@@ -797,7 +808,7 @@ export class SessionManager implements Middleware {
             new SessionMenuItem(
                 "Restart Current Session",
                 () => {
-                    // We pass in the display name so we guarentee that the session
+                    // We pass in the display name so we guarantee that the session
                     // will be the same PowerShell.
                     this.restartSession(this.PowerShellExeDetails.displayName);
                 }),
@@ -827,6 +838,9 @@ class SessionMenuItem implements vscode.QuickPickItem {
         public readonly callback: () => void = () => {}) {
     }
 }
+
+export const SendKeyPressNotificationType =
+    new NotificationType<void>("powerShell/sendKeyPress");
 
 export const PowerShellVersionRequestType =
     new RequestType0<IPowerShellVersionDetails, void>(
