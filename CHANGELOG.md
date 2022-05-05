@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2022.5.1-preview
+### Thursday, May 05, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🔍 [vscode-powershell #3950](https://github.com/PowerShell/vscode-powershell/pull/3951) - Handle `sendKeyPress` events for temporary integrated consoles.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🔍 [vscode-powershell #3950](https://github.com/PowerShell/PowerShellEditorServices/pull/1791) - Send `sendKeyPress` event across DAP for temporary integrated consoles.
+
 ## v2022.5.0
 ### Tuesday, May 03, 2022
 
