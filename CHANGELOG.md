@@ -1,7 +1,7 @@
 # PowerShell Extension Release History
 
-## v2022.5.1-preview
-### Thursday, May 05, 2022
+## v2022.5.1
+### Friday, May 06, 2022
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
 
