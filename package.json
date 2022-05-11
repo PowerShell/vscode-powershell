@@ -51,7 +51,7 @@
     "semver": "~7.3.7",
     "uuid": "~8.3.2",
     "vscode-languageclient": "~7.0.0",
-    "vscode-languageserver-protocol": "~3.16.0"
+    "vscode-languageserver-protocol": "~3.17.0"
   },
   "devDependencies": {
     "@types/glob": "~7.2.0",
