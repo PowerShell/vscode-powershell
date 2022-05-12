@@ -508,7 +508,7 @@ export class SessionManager implements Middleware {
 
     private promptForRestart() {
         vscode.window.showErrorMessage(
-            "The PowerShell session has terminated due to an error, would you like to restart it?",
+            "The PowerShell session has terminated due to an error, would you like to restart it? Intellisense will not work unless the PSIC is active and unblocked.",
             "Yes", "No")
             .then((answer) => { if (answer === "Yes") { this.restartSession(); }});
     }
