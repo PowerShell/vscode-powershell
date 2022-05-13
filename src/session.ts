@@ -508,7 +508,7 @@ export class SessionManager implements Middleware {
 
     private promptForRestart() {
         vscode.window.showErrorMessage(
-            "The PowerShell Integrated Console has stopped, would you like to restart it? (IntelliSense will not work unless the PSIC is active and unblocked.)",
+            "The PowerShell Integrated Console (PSIC) has stopped, would you like to restart it? (IntelliSense will not work unless the PSIC is active and unblocked.)",
             "Yes", "No")
             .then((answer) => { if (answer === "Yes") { this.restartSession(); }});
     }
