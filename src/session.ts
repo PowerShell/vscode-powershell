@@ -542,8 +542,8 @@ export class SessionManager implements Middleware {
                 },
                 // NOTE: Some settings are only applicable on startup, so we send them during initialization.
                 initializationOptions: {
-                    EnableProfileLoading: this.sessionSettings.enableProfileLoading,
-                    InitialWorkingDirectory: this.sessionSettings.cwd,
+                    enableProfileLoading: this.sessionSettings.enableProfileLoading,
+                    initialWorkingDirectory: this.sessionSettings.cwd,
                 },
                 errorHandler: {
                     // Override the default error handler to prevent it from
