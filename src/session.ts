@@ -540,6 +540,11 @@ export class SessionManager implements Middleware {
                     configurationSection: [ utils.PowerShellLanguageId, "files", "search" ],
                     // fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
                 },
+                // NOTE: Some settings are only applicable on startup, so we send them during initialization.
+                initializationOptions: {
+                    EnableProfileLoading: this.sessionSettings.enableProfileLoading,
+                    InitialWorkingDirectory: this.sessionSettings.cwd,
+                },
                 errorHandler: {
                     // Override the default error handler to prevent it from
                     // closing the LanguageClient incorrectly when the socket

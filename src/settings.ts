@@ -268,7 +268,7 @@ export function load(): ISettings {
             //   is the reason terminals on macOS typically run login shells by default which set up
             //   the environment. See http://unix.stackexchange.com/a/119675/115410"
             configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
-        cwd:
+        cwd: // TODO: Should we resolve this path and/or default to a workspace folder?
             configuration.get<string>("cwd", null),
     };
 }
