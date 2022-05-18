@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2022.5.2-preview
+### Tuesday, May 17, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🛫 [vscode-powershell #3986](https://github.com/PowerShell/vscode-powershell/pull/3986) - Pass `EnableProfileLoading` and `InitialWorkingDirectory` as `initializationOptions`.
+- ✨ 📺 [vscode-powershell #3976](https://github.com/PowerShell/vscode-powershell/pull/3976) - Add warning about intellisense to PSIC terminate dialog. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🔍 [vscode-powershell #3965](https://github.com/PowerShell/PowerShellEditorServices/pull/1804) - Wrap untitled script with newlines.
+- 🐛 🔍 [vscode-powershell #3980](https://github.com/PowerShell/PowerShellEditorServices/pull/1803) - Fix execution of debug prompt commands.
+- 🐛 📟 [PowerShellEditorServices #1802](https://github.com/PowerShell/PowerShellEditorServices/pull/1802) - Set `EnableProfileLoading` default to `true`.
+- 🐛 🙏 [PowerShellEditorServices #1695](https://github.com/PowerShell/PowerShellEditorServices/pull/1801) - Re-enable stdio clients by fixing initialization sequence.
+- ✨ 🧠 [PowerShellEditorServices #1799](https://github.com/PowerShell/PowerShellEditorServices/pull/1799) - Fix a lot of IntelliSense issues.
+- #️⃣ 🙏 [vscode-powershell #3962](https://github.com/PowerShell/PowerShellEditorServices/pull/1797) - Increase stack size for PowerShell 5. (Thanks @nohwnd!)
+
 ## v2022.5.1
 ### Friday, May 06, 2022
 
