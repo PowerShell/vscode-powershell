@@ -1,5 +1,15 @@
 # PowerShell Extension Release History
 
+## v2022.5.4-preview
+### Thursday, May 19, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🛫 [PowerShellEditorServices #1807](https://github.com/PowerShell/PowerShellEditorServices/pull/1807) - Fix startup bug when zero profiles are present.
+
 ## v2022.5.3-preview
 ### Thursday, May 19, 2022
 
