@@ -118,6 +118,8 @@ task Build Restore, {
 task Test -If (!($env:TF_BUILD -and $global:IsLinux)) Build, {
     Write-Host "`n### Running extension tests" -ForegroundColor Green
     exec { & npm run test }
+    # Reset the state of files modified by tests
+    exec { git checkout package.json test/.vscode/settings.json}
 }
 
 task TestEditorServices -If (Get-EditorServicesPath) {
