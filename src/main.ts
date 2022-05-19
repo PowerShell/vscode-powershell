@@ -127,6 +127,7 @@ export function activate(context: vscode.ExtensionContext): IPowerShellExtension
 
     sessionManager =
         new SessionManager(
+            context,
             logger,
             documentSelector,
             PackageJSON.displayName,
@@ -145,7 +146,7 @@ export function activate(context: vscode.ExtensionContext): IPowerShellExtension
         new SpecifyScriptArgsFeature(context),
     ]
 
-    const externalApi = new ExternalApiFeature(sessionManager, logger);
+    const externalApi = new ExternalApiFeature(context, sessionManager, logger);
 
     // Features and command registrations that require language client
     languageClientConsumers = [
