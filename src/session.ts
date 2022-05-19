@@ -62,9 +62,8 @@ export class SessionManager implements Middleware {
     // Initialized by the start() method, since this requires settings
     private powershellExeFinder: PowerShellExeFinder;
 
-    public readonly InDevelopmentMode = vscode.ExtensionMode.Development;
-
     constructor(
+        private extensionContext: vscode.ExtensionContext,
         private log: Logger,
         private documentSelector: DocumentSelector,
         hostName: string,
@@ -167,7 +166,7 @@ export class SessionManager implements Middleware {
 
         this.bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
 
-        if (this.InDevelopmentMode) {
+        if (this.extensionContext.extensionMode === vscode.ExtensionMode.Development) {
             const devBundledModulesPath =
                 path.resolve(
                     __dirname,
@@ -571,7 +570,7 @@ export class SessionManager implements Middleware {
             // This enables handling Semantic Highlighting messages in PowerShell Editor Services
             this.languageServerClient.registerProposedFeatures();
 
-            if (!this.InDevelopmentMode) {
+            if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
                 this.languageServerClient.onTelemetry((event) => {
                     const eventName: string = event.eventName ? event.eventName : "PSESEvent";
                     const data: any = event.data ? event.data : event
@@ -588,7 +587,7 @@ export class SessionManager implements Middleware {
                                 this.versionDetails = versionDetails;
                                 this.started = true;
 
-                                if (!this.InDevelopmentMode) {
+                                if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
                                     this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
                                         { powershellVersion: versionDetails.version });
                                 }

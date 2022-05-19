@@ -35,7 +35,10 @@ NOTE: At some point, we should release a helper npm package that wraps the API a
 export class ExternalApiFeature extends LanguageClientConsumer implements IPowerShellExtensionClient {
     private static readonly registeredExternalExtension: Map<string, IExternalExtension> = new Map<string, IExternalExtension>();
 
-    constructor(private sessionManager: SessionManager, private log: Logger) {
+    constructor(
+        private extensionContext: vscode.ExtensionContext,
+        private sessionManager: SessionManager,
+        private log: Logger) {
         super();
     }
 
@@ -67,8 +70,9 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
             throw new Error(`No extension installed with id '${id}'. You must use a valid extension id.`);
         }
 
-        // If we're in development mode, we allow these to be used for testing purposes.
-        if (!this.sessionManager.InDevelopmentMode && (id === "ms-vscode.PowerShell" || id === "ms-vscode.PowerShell-Preview")) {
+        // These are only allowed to be used in our unit tests.
+        if ((id === "ms-vscode.powershell" || id === "ms-vscode.powershell-preview")
+            && !(this.extensionContext.extensionMode === vscode.ExtensionMode.Test)) {
             throw new Error("You can't use the PowerShell extension's id in this registration.");
         }
 
