@@ -1,10 +1,22 @@
 # PowerShell Extension Release History
 
+## v2022.5.5-preview
+### Friday, May 20, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+No changes.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🧠 [PowerShellEditorServices #1809](https://github.com/PowerShell/PowerShellEditorServices/pull/1809) - Additional IntelliSense fixes and ToolTip overhaul.
+
 ## v2022.5.4-preview
 ### Thursday, May 19, 2022
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
 
+No changes.
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
