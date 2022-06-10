@@ -101,7 +101,7 @@ on diagnosing and reporting issues.
 
 ## Security Note
 
-For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
+For any security issues, please see [here](./SECURITY.md).
 
 ## Example Scripts
 
