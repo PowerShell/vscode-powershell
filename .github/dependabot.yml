@@ -4,7 +4,7 @@ updates:
   directory: "/"
   schedule:
     interval: daily
-    time: "05:00"
-    timezone: America/Los_Angeles
-  reviewers:
-    - "andschwa"
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+      interval: daily
