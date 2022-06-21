@@ -1,5 +1,39 @@
 # PowerShell Extension Release History
 
+## v2022.6.1
+### Tuesday, June 21, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+New stable release with all changes below since `v2022.5.1`:
+
+- 🐛 📖 [vscode-powershell #4018](https://github.com/PowerShell/vscode-powershell/pull/4018) - Fix outdated link to security guidelines. (Thanks @rklec!)
+- 🐛 👷 [vscode-powershell #3993](https://github.com/PowerShell/vscode-powershell/pull/3993) - Revert modifications caused by Code's test run.
+- 🐛 🚂 [vscode-powershell #3992](https://github.com/PowerShell/vscode-powershell/pull/3992) - Fix how we check extension mode.
+- 🐛 🛫 [vscode-powershell #3986](https://github.com/PowerShell/vscode-powershell/pull/3986) - Pass `EnableProfileLoading` and `InitialWorkingDirectory` as `initializationOptions`.
+- ✨ 📺 [vscode-powershell #3976](https://github.com/PowerShell/vscode-powershell/pull/3976) - Add warning about intellisense to PSIC terminate dialog. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+Includes `v3.4.3` with all changes below since `v3.3.5`:
+
+- ✨ 📟 [PowerShellEditorServices #1823](https://github.com/PowerShell/PowerShellEditorServices/pull/1823) - Utilize the `AddToHistory` delegate from PSRL proxy.
+- ✨ 🛫 [PowerShellEditorServices #1821](https://github.com/PowerShell/PowerShellEditorServices/pull/1821) - Add regression test for no defined profiles.
+- ✨ 👷 [PowerShellEditorServices #1820](https://github.com/PowerShell/PowerShellEditorServices/pull/1820) - Add Emacs regression tests for PSES.
+- 🐛 🧠 [PowerShellEditorServices #1819](https://github.com/PowerShell/PowerShellEditorServices/pull/1819) - Remove bad UX of commit characters for paths.
+- 🐛 🔍 [PowerShellEditorServices #1818](https://github.com/PowerShell/PowerShellEditorServices/pull/1818) - Exit debugger stop early if cause is PSE.
+- ✨ 👷 [PowerShellEditorServices #1817](https://github.com/PowerShell/PowerShellEditorServices/pull/1817) - Fix build script to support Windows on Arm64.
+- 🐛 🔍 [PowerShellEditorServices #1815](https://github.com/PowerShell/PowerShellEditorServices/pull/1815) - Set `IsDebuggingRemoteRunspace` sooner for attach.
+- 🐛 🙏 [PowerShellEditorServices #1814](https://github.com/PowerShell/PowerShellEditorServices/pull/1814) - Fix error when piping `IFilePosition` to `ConvertTo-ScriptExtent`.
+- ✨ 🧠 [PowerShellEditorServices #1809](https://github.com/PowerShell/PowerShellEditorServices/pull/1809) - Additional IntelliSense fixes and ToolTip overhaul.
+- 🐛 🛫 [PowerShellEditorServices #1807](https://github.com/PowerShell/PowerShellEditorServices/pull/1807) - Fix startup bug when zero profiles are present.
+- 🐛 🔍 [vscode-powershell #3965](https://github.com/PowerShell/PowerShellEditorServices/pull/1804) - Wrap untitled script with newlines.
+- 🐛 🔍 [vscode-powershell #3980](https://github.com/PowerShell/PowerShellEditorServices/pull/1803) - Fix execution of debug prompt commands.
+- 🐛 📟 [PowerShellEditorServices #1802](https://github.com/PowerShell/PowerShellEditorServices/pull/1802) - Set `EnableProfileLoading` default to `true`.
+- 🐛 🙏 [PowerShellEditorServices #1695](https://github.com/PowerShell/PowerShellEditorServices/pull/1801) - Re-enable stdio clients by fixing initialization sequence.
+- ✨ 🧠 [PowerShellEditorServices #1799](https://github.com/PowerShell/PowerShellEditorServices/pull/1799) - Fix a lot of IntelliSense issues.
+- #️⃣ 🙏 [vscode-powershell #3962](https://github.com/PowerShell/PowerShellEditorServices/pull/1797) - Increase stack size for PowerShell 5. (Thanks @nohwnd!)
+
 ## v2022.6.1-preview
 ### Monday, June 13, 2022
 
