@@ -86,7 +86,6 @@ export interface ISettings {
     bundledModulesPath?: string;
     startAsLoginShell?: IStartAsLoginShellSettings;
     startAutomatically?: boolean;
-    useX86Host?: boolean;
     enableProfileLoading?: boolean;
     helpCompletion: string;
     scriptAnalysis?: IScriptAnalysisSettings;
@@ -233,8 +232,6 @@ export function load(): ISettings {
             configuration.get<boolean>("promptToUpdatePowerShell", true),
         bundledModulesPath:
             "../modules", // Because the extension is always at `<root>/out/main.js`
-        useX86Host:
-            configuration.get<boolean>("useX86Host", false),
         enableProfileLoading:
             configuration.get<boolean>("enableProfileLoading", false),
         helpCompletion:

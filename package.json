@@ -564,14 +564,14 @@
         },
         "powershell.powerShellDefaultVersion": {
           "type": "string",
-          "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 6 (x64)\". You can specify additional PowerShell executables by using the \"powershell.powerShellAdditionalExePaths\" setting."
+          "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 7 (x64)\". You can specify additional PowerShell executables by using the \"powershell.powerShellAdditionalExePaths\" setting."
         },
         "powershell.powerShellExePath": {
           "type": "string",
           "default": "",
           "scope": "machine",
-          "description": "REMOVED. Please use the \"powershell.powerShellDefaultVersion\" setting instead.",
-          "deprecationMessage": "Please use the \"powershell.powerShellDefaultVersion\" setting instead."
+          "description": "REMOVED: Please use the \"powershell.powerShellAdditionalExePaths\" setting instead.",
+          "deprecationMessage": "Please use the \"powershell.powerShellAdditionalExePaths\" setting instead."
         },
         "powershell.promptToUpdatePowerShell": {
           "type": "boolean",
@@ -580,8 +580,8 @@
         },
         "powershell.promptToUpdatePackageManagement": {
           "type": "boolean",
-          "description": "Specifies whether you should be prompted to update your version of PackageManagement if it's under 1.4.6.",
-          "default": true,
+          "description": "REMOVED: Specifies whether you should be prompted to update your version of PackageManagement if it's under 1.4.6.",
+          "default": false,
           "deprecationMessage": "This prompt has been removed as it's no longer strictly necessary to upgrade the PackageManagement module."
         },
         "powershell.startAsLoginShell.osx": {
@@ -602,7 +602,8 @@
         "powershell.useX86Host": {
           "type": "boolean",
           "default": false,
-          "description": "Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration."
+          "description": "REMOVED: Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration.",
+          "deprecationMessage": "This setting was removed when the PowerShell installation searcher was added. Please use the \"powershell.powerShellAdditionalExePaths\" setting instead."
         },
         "powershell.enableProfileLoading": {
           "type": "boolean",
