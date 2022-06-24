@@ -1,6 +1,6 @@
 # PowerShell Language Support for Azure Data Studio
 
-[![Build Status](https://dev.azure.com/powershell/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=master)](https://dev.azure.com/powershell/vscode-powershell/_build/latest?definitionId=51&branchName=master)
+[![Build Status](https://dev.azure.com/powershell/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=main)](https://dev.azure.com/powershell/vscode-powershell/_build/latest?definitionId=51&branchName=main)
 [![Version](https://vsmarketplacebadge.apphb.com/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
 [![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/powershell-vscode-discord)
@@ -28,9 +28,9 @@ The extension _should_ work anywhere ADS itself and PowerShell Core 7 or higher 
 PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
 following:
 
-- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.1.5
-- **macOS 10.15** with PowerShell Core 7.1.5
-- **Ubuntu 20.04** with PowerShell Core 7.1.5
+- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.4
+- **macOS 10.15** with PowerShell Core 7.2.5
+- **Ubuntu 20.04** with PowerShell Core 7.2.4
 
 [supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle?view=powershell-7.1#supported-platforms
 
@@ -61,7 +61,7 @@ in the [Azure Data Studio documentation](https://docs.microsoft.com/en-us/sql/az
 In the Extensions pane, search for "PowerShell" extension and install it there.  You will
 get notified automatically about any future extension updates!
 
-You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
+You can also install a VSIX package from our [releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
 [Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions. The easiest way is through the command line:
 
@@ -69,9 +69,15 @@ instructions. The easiest way is through the command line:
 azuredatastudio --install-extension powershell-<version>.vsix
 ```
 
+## Reporting Problems
+
+If you experience any problems with the PowerShell Extension, see
+[the troubleshooting docs](./docs/troubleshooting.md) for information
+on diagnosing and reporting issues.
+
 ## Security Note
 
-For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
+For any security issues, please see [here](./SECURITY.md).
 
 ## Example Scripts
 
@@ -138,7 +144,7 @@ Name                 Status           Size     Space  Recovery Compat. Owner
                                             Available  Model     Level
 ----                 ------           ---- ---------- -------- ------- -----
 AdventureWorks2017   Normal      336.00 MB   57.01 MB Simple       140 sa
-master               Normal        6.00 MB  368.00 KB Simple       140 sa
+main               Normal        6.00 MB  368.00 KB Simple       140 sa
 model                Normal       16.00 MB    5.53 MB Full         140 sa
 msdb                 Normal       48.44 MB    1.70 MB Simple       140 sa
 PBIRS                Normal      144.00 MB   55.95 MB Full         140 sa
@@ -173,7 +179,6 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- Rob Holt - [@rjmholt](https://github.com/rjmholt)
 - Patrick Meinecke - [@SeeminglyScience](https://github.com/SeeminglyScience)
 - Andy Schwartzmeyer - [@andschwa](https://github.com/andschwa)
 - Sydney Smith - [@SydneyhSmith](https://github.com/SydneyhSmith)
@@ -181,6 +186,7 @@ on how to contribute to this extension!
 ### Emeriti
 
 - Keith Hill - [@rkeithhill](https://github.com/rkeithhill)
+- Rob Holt - [@rjmholt](https://github.com/rjmholt)
 - Tyler Leonhardt - [@TylerLeonhardt](https://github.com/TylerLeonhardt)
 - David Wilson - [@daviwil](https://github.com/daviwil)
 
@@ -198,4 +204,4 @@ For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [open
 [conduct-code]: http://opensource.microsoft.com/codeofconduct/
 [conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
 [conduct-email]: mailto:opencode@microsoft.com
-[conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/master/CODE_OF_CONDUCT.md
+[conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/main/CODE_OF_CONDUCT.md

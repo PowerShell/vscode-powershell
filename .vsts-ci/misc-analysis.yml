@@ -3,10 +3,10 @@ name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
 trigger:
   branches:
     include:
-    - master
+    - main
 
 pr:
-- master
+- main
 
 resources:
   repositories:

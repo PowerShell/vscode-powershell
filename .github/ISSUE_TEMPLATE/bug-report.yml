@@ -9,10 +9,10 @@ body:
     - label: I have written a descriptive issue title.
       required: true
     - label: I have searched all [issues](https://github.com/PowerShell/vscode-powershell/issues?q=is%3Aissue) to ensure it has not already been reported.
-    - label: I have read the [troubleshooting](https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md) guide.
+    - label: I have read the [troubleshooting](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md) guide.
     - label: I am sure this issue is with the _extension itself_ and does not reproduce in a standalone [PowerShell](https://github.com/PowerShell/PowerShell/issues/new/choose) instance.
     - label: I have verified that I am using the latest version of Visual Studio Code and the PowerShell extension.
-    - label: If this is a security issue, I have read the [security issue reporting guidance](https://github.com/PowerShell/vscode-powershell/blob/master/SECURITY.md).
+    - label: If this is a security issue, I have read the [security issue reporting guidance](https://github.com/PowerShell/vscode-powershell/blob/main/SECURITY.md).
 - type: textarea
   attributes:
     label: Summary
@@ -78,4 +78,4 @@ body:
 - type: textarea
   attributes:
     label: Logs
-    description: Please upload logs collected by following these [instructions](https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md#logs) in the area below. Be careful to scrub sensitive information!
+    description: Please upload logs collected by following these [instructions](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md#logs) in the area below. Be careful to scrub sensitive information!

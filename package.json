@@ -9,7 +9,7 @@
     "vscode": "^1.59.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
-  "homepage": "https://github.com/PowerShell/vscode-powershell/blob/master/README.md",
+  "homepage": "https://github.com/PowerShell/vscode-powershell/blob/main/README.md",
   "categories": [
     "Debuggers",
     "Programming Languages",

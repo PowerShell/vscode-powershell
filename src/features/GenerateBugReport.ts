@@ -39,7 +39,7 @@ I am experiencing a problem with...
 Attached Logs
 =====
 
-Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell/blob/master/docs/troubleshooting.md) about
+Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md) about
 capturing and sending logs.
 
 Environment Information

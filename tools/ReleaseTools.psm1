@@ -399,7 +399,7 @@ function New-ReleasePR {
 
     $Params = @{
         Head  = "release"
-        Base  = "master"
+        Base  = "main"
         Draft = $true
         Title = "Release ``v$Version``"
         Body  = "Automated PR for new release!"
