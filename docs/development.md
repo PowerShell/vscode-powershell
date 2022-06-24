@@ -59,7 +59,7 @@ code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
 ## Contributing Snippets
 
 For more information on contributing snippets please read our
-[snippet requirements](https://github.com/PowerShell/vscode-powershell/blob/master/docs/community_snippets.md#contributing).
+[snippet requirements](https://github.com/PowerShell/vscode-powershell/blob/main/docs/community_snippets.md#contributing).
 
 ## Creating a Release
 

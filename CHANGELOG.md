@@ -1294,7 +1294,7 @@ for features to come out in the following stable release.
 
 You may also notice that the history of the changelog has changed.
 For a full list of changes between this release and the previous stable release,
-see [here](https://github.com/PowerShell/vscode-powershell/blob/master/docs/preview_to_stable_changelog.md).
+see [here](https://github.com/PowerShell/vscode-powershell/blob/main/docs/preview_to_stable_changelog.md).
 You can find the changelog from the old stable fork
 [here](https://github.com/PowerShell/vscode-powershell/blob/legacy/1.x/CHANGELOG.md).
 
@@ -1887,8 +1887,8 @@ As stated above, this version of the PowerShell extension only works with Window
 #### [vscode-PowerShell](https://github.com/PowerShell/vscode-PowerShell)
 
 - [vscode-PowerShell #1632](https://github.com/PowerShell/vscode-powershell/pull/1632) -
-  Started [a document for ISE-like configuration of VSCode](https://github.com/PowerShell/vscode-powershell/blob/master/docs/ise_compatibility.md).
-  Please help us build it out by [contirbuting an edit](https://github.com/PowerShell/vscode-powershell/edit/master/docs/ise_compatibility.md).
+  Started [a document for ISE-like configuration of VSCode](https://github.com/PowerShell/vscode-powershell/blob/main/docs/ise_compatibility.md).
+  Please help us build it out by [contirbuting an edit](https://github.com/PowerShell/vscode-powershell/edit/main/docs/ise_compatibility.md).
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
@@ -1929,7 +1929,7 @@ As stated above, this version of the PowerShell extension only works with Window
   Add <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> (<kbd>Cmd</kbd>+<kbd>Alt</kbd>+<kbd>J</kbd> on macOS)
   keybinding to open up list of available snippets
 - [vscode-PowerShell #1597](https://github.com/PowerShell/vscode-powershell/pull/1597) -
-  Make `Install-VSCode.ps1` work on macOS and Linux. Get the script [here](https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1)
+  Make `Install-VSCode.ps1` work on macOS and Linux. Get the script [here](https://github.com/PowerShell/vscode-powershell/blob/main/scripts/Install-VSCode.ps1)
 - [vscode-PowerShell #1580](https://github.com/PowerShell/vscode-powershell/pull/1580) -
   `New-EditorFile` works on non-PowerShell untitled files
 - [vscode-PowerShell #1557](https://github.com/PowerShell/vscode-powershell/pull/1557) -
@@ -2619,14 +2619,14 @@ Thanks to new PowerShell Editor Services co-maintainer [Patrick Meinecke](https:
 we've gained a new set of useful commands for interacting with the $psEditor APIs
 within the Integrated Console:
 
-- [Find-Ast](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Find-Ast.md)
-- [Get-Token](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Get-Token.md)
-- [ConvertFrom-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/ConvertFrom-ScriptExtent.md)
-- [ConvertTo-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/ConvertTo-ScriptExtent.md)
-- [Set-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Set-ScriptExtent.md)
-- [Join-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Join-ScriptExtent.md)
-- [Test-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Test-ScriptExtent.md)
-- [Import-EditorCommand](https://github.com/PowerShell/PowerShellEditorServices/blob/master/module/docs/Import-EditorCommand.md)
+- [Find-Ast](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/Find-Ast.md)
+- [Get-Token](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/Get-Token.md)
+- [ConvertFrom-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/ConvertFrom-ScriptExtent.md)
+- [ConvertTo-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/ConvertTo-ScriptExtent.md)
+- [Set-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/Set-ScriptExtent.md)
+- [Join-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/Join-ScriptExtent.md)
+- [Test-ScriptExtent](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/Test-ScriptExtent.md)
+- [Import-EditorCommand](https://github.com/PowerShell/PowerShellEditorServices/blob/main/module/docs/Import-EditorCommand.md)
 
 This should also resolve the issues some people were seeing when we tried
 to load the unsigned temporary script containing `Register-EditorCommand`

@@ -11,7 +11,7 @@ variables:
 trigger:
   branches:
     include:
-      - master
+      - main
 
 resources:
   repositories:
@@ -19,7 +19,7 @@ resources:
     type: github
     endpoint: GitHub
     name: PowerShell/PowerShellEditorServices
-    ref: master
+    ref: main
 
 jobs:
 - job: PS51_Win2019

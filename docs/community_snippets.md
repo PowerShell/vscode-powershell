@@ -811,7 +811,7 @@ To optimize snippet usability and discoverability for end users we will only shi
 - Must be substantially different from existing snippets or intellisense
 - Must not violate any intellectual property rights
 
-If your snippet does not meet these requirements but would still be useful to customers we will include it in our list of [Awesome Community Snippets](https://github.com/PowerShell/vscode-powershell/blob/master/docs/community_snippets.md). Additionally, snippet creators can publish snippet libraries as standalone extensions in the [VSCode Marketplace](https://code.visualstudio.com/api/working-with-extensions/publishing-extension).
+If your snippet does not meet these requirements but would still be useful to customers we will include it in our list of [Awesome Community Snippets](https://github.com/PowerShell/vscode-powershell/blob/main/docs/community_snippets.md). Additionally, snippet creators can publish snippet libraries as standalone extensions in the [VSCode Marketplace](https://code.visualstudio.com/api/working-with-extensions/publishing-extension).
 
 If you'd like a snippet to be considered for addition to the list, [open a pull request](https://opensource.guide/how-to-contribute/#opening-a-pull-request) with the following changes:
 

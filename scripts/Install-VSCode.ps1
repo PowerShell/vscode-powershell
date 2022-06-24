@@ -12,9 +12,9 @@
 
 .TAGS install vscode installer
 
-.LICENSEURI https://github.com/PowerShell/vscode-powershell/blob/master/LICENSE.txt
+.LICENSEURI https://github.com/PowerShell/vscode-powershell/blob/main/LICENSE.txt
 
-.PROJECTURI https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1
+.PROJECTURI https://github.com/PowerShell/vscode-powershell/blob/main/scripts/Install-VSCode.ps1
 
 .ICONURI
 
@@ -62,7 +62,7 @@
 
     Please contribute improvements to this script on GitHub!
 
-    https://github.com/PowerShell/vscode-powershell/blob/master/scripts/Install-VSCode.ps1
+    https://github.com/PowerShell/vscode-powershell/blob/main/scripts/Install-VSCode.ps1
 
 .PARAMETER Architecture
     A validated string defining the bit version to download. Values can be either 64-bit or 32-bit.
