@@ -1,0 +1,1256 @@
+{
+  "version": "1.0",
+  "tasks": [
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssuesOnlyResponder",
+      "version": "1.0",
+      "config": {
+        "taskName": "Add Needs: Triage to new issues",
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "opened"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isPartOfProject",
+                  "parameters": {}
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "addedToMilestone",
+                  "parameters": {
+                    "permissions": "admin"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Needs: Triage :mag:"
+            }
+          }
+        ],
+        "eventType": "issue",
+        "eventNames": [
+          "issues",
+          "project_card"
+        ]
+      },
+      "id": "wb27zxsNF",
+      "disabled": false
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "config": {
+        "taskName": "Switch Needs: Author Feedback with Needs: Attention",
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Needs: Author Feedback 👂"
+              }
+            },
+            {
+              "name": "isActivitySender",
+              "parameters": {
+                "permissions": "write",
+                "association": "MEMBER",
+                "user": {
+                  "type": "author"
+                }
+              }
+            }
+          ]
+        },
+        "actions": [
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Needs: Attention :wave:"
+            }
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Needs: Author Feedback 👂"
+            }
+          }
+        ],
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ]
+      },
+      "id": "KOnW3U-UvG",
+      "disabled": false
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "taskName": "Close inactive and Needs: Author Feedback",
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -8
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Needs: Author Feedback 👂"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 8
+            }
+          }
+        ],
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue was closed automatically as author feedback was indicated as needed, but there has been no activity in over a week. Please feel free to reopen with any available information!"
+            }
+          }
+        ]
+      },
+      "id": "CEeIcUnrzC",
+      "disabled": false
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "taskName": "Close Resolution-Duplicate",
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -8
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -8
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isIssue",
+            "parameters": {}
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Resolution-Duplicate"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 1
+            }
+          }
+        ],
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue has been marked as duplicate and has not had any activity in a day. It has been closed for housekeeping purposes."
+            }
+          },
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      },
+      "id": "U32muIxAQ",
+      "disabled": false
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "id": "9ct_0ABfU",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Resolution-Answered"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 1
+            }
+          }
+        ],
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue has been marked as answered and has not had any activity in a day. It has been automatically closed for housekeeping purposes."
+            }
+          }
+        ],
+        "taskName": "Close Resolution-Answered"
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "id": "HbpjWuzw2",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Needs: Repro Info 🤔"
+            }
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 8
+            }
+          }
+        ],
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue was closed automatically as repro info was indicated as needed, but there has been no activity in over a week. Please feel free to reopen with any available information!"
+            }
+          },
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ],
+        "taskName": "Close inactive and Needs: Repro Info"
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "id": "BjQlknfVu",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              1,
+              4,
+              7,
+              10,
+              13,
+              16,
+              19,
+              22
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Resolution-External"
+            }
+          }
+        ],
+        "taskName": "Close Resolution-External",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue has been marked as external. It has been automatically closed for housekeeping purposes."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "id": "NB1J0hCsX",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              0,
+              3,
+              6,
+              9,
+              12,
+              15,
+              18,
+              21
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Resolution-Fixed"
+            }
+          }
+        ],
+        "taskName": "Close Resolution-Fixed",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue has been marked as fixed. It has been automatically closed for housekeeping purposes."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "LabelSync",
+      "subCapability": "LabelSync",
+      "version": "1.0",
+      "id": "l9RjpwGON",
+      "config": {
+        "taskName": "Sync 'Issue' and 'Area' labels",
+        "labelPatterns": [
+          {
+            "pattern": "Issue-*"
+          },
+          {
+            "pattern": "Area-*"
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "id": "7HKiOG22Ia4YDpXsWPu9H",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              2,
+              5,
+              8,
+              11,
+              14,
+              17,
+              20,
+              23
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "hasLabel",
+            "parameters": {
+              "label": "Resolution-Inactive"
+            }
+          }
+        ],
+        "taskName": "Close Resolution-Inactive",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "This issue has been marked as inactive. It has been automatically closed for housekeeping purposes."
+            }
+          },
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isOpen",
+                  "parameters": {}
+                }
+              ]
+            },
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "name": "hasLabel",
+              "parameters": {
+                "label": "Needs: Author Feedback 👂"
+              }
+            },
+            {
+              "name": "isActivitySender",
+              "parameters": {
+                "user": {
+                  "type": "author"
+                },
+                "association": "MEMBER"
+              }
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "For issues closed due to inactivity, re-open an issue if issue author posts a reply",
+        "actions": [
+          {
+            "name": "reopenIssue",
+            "parameters": {}
+          },
+          {
+            "name": "removeLabel",
+            "parameters": {
+              "label": "Needs: Author Feedback 👂"
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "Needs: Attention :wave:"
+            }
+          }
+        ]
+      },
+      "id": "MAY-qIPxRrOU1j2Hdk5X5"
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "IssueResponder",
+      "subCapability": "IssueCommentResponder",
+      "version": "1.0",
+      "config": {
+        "conditions": {
+          "operator": "and",
+          "operands": [
+            {
+              "name": "isAction",
+              "parameters": {
+                "action": "created"
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isOpen",
+                  "parameters": {}
+                }
+              ]
+            },
+            {
+              "name": "noActivitySince",
+              "parameters": {
+                "days": 8
+              }
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "isActivitySender",
+                  "parameters": {
+                    "user": {
+                      "type": "author"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "operator": "not",
+              "operands": [
+                {
+                  "name": "activitySenderHasAssociation",
+                  "parameters": {
+                    "association": "COLLABORATOR"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "eventType": "issue",
+        "eventNames": [
+          "issue_comment"
+        ],
+        "taskName": "For issues closed with no activity over a week, ask non-collaborator to consider opening a new issue instead.",
+        "actions": [
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "Thank you for your comment, but please note that this issue has been closed for over a week. For better visibility, consider opening a new issue with a link to this instead."
+            }
+          }
+        ]
+      },
+      "id": "j5QVoNbHa_b0sNzzGVtXs"
+    },
+    {
+      "taskType": "trigger",
+      "capabilityId": "EmailCleanser",
+      "subCapability": "EmailCleanser",
+      "version": "1.0",
+      "id": "iviwn9qyLK2uaDUrDAe2B",
+      "config": {
+        "taskName": "Clean emails"
+      }
+    }
+  ],
+  "userGroups": []
+}
