@@ -28,9 +28,9 @@ The extension _should_ work anywhere ADS itself and PowerShell Core 7 or higher 
 PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
 following:
 
-- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.1.5
-- **macOS 10.15** with PowerShell Core 7.1.5
-- **Ubuntu 20.04** with PowerShell Core 7.1.5
+- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.4
+- **macOS 10.15** with PowerShell Core 7.2.5
+- **Ubuntu 20.04** with PowerShell Core 7.2.4
 
 [supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle?view=powershell-7.1#supported-platforms
 
@@ -61,7 +61,7 @@ in the [Azure Data Studio documentation](https://docs.microsoft.com/en-us/sql/az
 In the Extensions pane, search for "PowerShell" extension and install it there.  You will
 get notified automatically about any future extension updates!
 
-You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
+You can also install a VSIX package from our [releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
 [Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions. The easiest way is through the command line:
 
@@ -69,9 +69,15 @@ instructions. The easiest way is through the command line:
 azuredatastudio --install-extension powershell-<version>.vsix
 ```
 
+## Reporting Problems
+
+If you experience any problems with the PowerShell Extension, see
+[the troubleshooting docs](./docs/troubleshooting.md) for information
+on diagnosing and reporting issues.
+
 ## Security Note
 
-For any security issues, please see [here](./docs/troubleshooting.md#note-on-security).
+For any security issues, please see [here](./SECURITY.md).
 
 ## Example Scripts
 
@@ -173,7 +179,6 @@ on how to contribute to this extension!
 
 ## Maintainers
 
-- Rob Holt - [@rjmholt](https://github.com/rjmholt)
 - Patrick Meinecke - [@SeeminglyScience](https://github.com/SeeminglyScience)
 - Andy Schwartzmeyer - [@andschwa](https://github.com/andschwa)
 - Sydney Smith - [@SydneyhSmith](https://github.com/SydneyhSmith)
@@ -181,6 +186,7 @@ on how to contribute to this extension!
 ### Emeriti
 
 - Keith Hill - [@rkeithhill](https://github.com/rkeithhill)
+- Rob Holt - [@rjmholt](https://github.com/rjmholt)
 - Tyler Leonhardt - [@TylerLeonhardt](https://github.com/TylerLeonhardt)
 - David Wilson - [@daviwil](https://github.com/daviwil)
 

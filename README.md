@@ -28,9 +28,9 @@ The extension _should_ work anywhere VS Code itself and PowerShell Core 7 or hig
 PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
 following:
 
-- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.1
-- **macOS 10.15** with PowerShell Core 7.2.1
-- **Ubuntu 20.04** with PowerShell Core 7.2.1
+- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.4
+- **macOS 10.15** with PowerShell Core 7.2.5
+- **Ubuntu 20.04** with PowerShell Core 7.2.4
 
 [supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle
 
@@ -61,7 +61,7 @@ in the [Visual Studio Code documentation](https://code.visualstudio.com/docs/edi
 In the Extensions pane, search for "PowerShell" extension and install it there. You will
 get notified automatically about any future extension updates!
 
-You can also install a VSIX package from our [Releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
+You can also install a VSIX package from our [releases page](https://github.com/PowerShell/vscode-powershell/releases) by following the
 [Install from a VSIX](https://code.visualstudio.com/docs/editor/extension-gallery#_install-from-a-vsix)
 instructions. The easiest way is through the command line:
 
