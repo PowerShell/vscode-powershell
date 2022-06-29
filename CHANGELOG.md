@@ -1,5 +1,18 @@
 # PowerShell Extension Release History
 
+## v2022.6.3-preview
+### Wednesday, June 29, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📖 [vscode-powershell #4046](https://github.com/PowerShell/vscode-powershell/pull/4046) - Update tooling and READMEs for branch rename.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🙏 [PowerShellEditorServices #1844](https://github.com/PowerShell/PowerShellEditorServices/pull/1845) - Update PSReadLine to v2.2.6.
+- ✨ 📖 [PowerShellEditorServices #1843](https://github.com/PowerShell/PowerShellEditorServices/pull/1843) - Find/replace of `master` to `main` for branch rename.
+- 🐛 📟 [vscode-powershell #3683](https://github.com/PowerShell/PowerShellEditorServices/pull/1841) - Add command to PSReadLine history before cancellation.
+
 ## v2022.6.2-preview
 ### Wednesday, June 22, 2022
 
