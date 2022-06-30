@@ -1,5 +1,26 @@
 # PowerShell Extension Release History
 
+## v2022.6.3
+### Wednesday, June 30, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📖 [vscode-powershell #4046](https://github.com/PowerShell/vscode-powershell/pull/4046) - Update tooling and READMEs for branch rename.
+- ✨ 🔧 [vscode-powershell #4033](https://github.com/PowerShell/vscode-powershell/pull/4034) - Mark unused `useX86Host` setting as deprecated.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- ✨ 🙏 [PowerShellEditorServices #1844](https://github.com/PowerShell/PowerShellEditorServices/pull/1845) - Update PSReadLine to v2.2.6.
+- ✨ 📖 [PowerShellEditorServices #1843](https://github.com/PowerShell/PowerShellEditorServices/pull/1843) - Find/replace of `master` to `main` for branch rename.
+- 🐛 📟 [vscode-powershell #3683](https://github.com/PowerShell/PowerShellEditorServices/pull/1841) - Add command to PSReadLine history before cancellation.
+- 🐛 🔍 [PowerShellEditorServices #1839](https://github.com/PowerShell/PowerShellEditorServices/pull/1839) - Fix logic checking for untitled or raw scripts.
+- 🐛 🔍 [PowerShellEditorServices #1838](https://github.com/PowerShell/PowerShellEditorServices/pull/1838) - Don't use `RunContinuationsAsynchronously` for our `TaskCompletionSource`.
+- 🐛 📟 [vscode-powershell #4021](https://github.com/PowerShell/PowerShellEditorServices/pull/1836) - Fix piping to native commands for Windows PowerShell.
+- ✨ 📖 [PowerShellEditorServices #1831](https://github.com/PowerShell/PowerShellEditorServices/pull/1833) - Add readme about `ReadKey` workarounds.
+- ✨ 🚨 [PowerShellEditorServices #1832](https://github.com/PowerShell/PowerShellEditorServices/pull/1832) - Improve `$PROFILE` variable and profile loading test.
+- ✨ 🚨 [PowerShellEditorServices #1830](https://github.com/PowerShell/PowerShellEditorServices/pull/1830) - Add regression test for untitled scripts in Windows PowerShell.
+- ✨ 🚨 [PowerShellEditorServices #1828](https://github.com/PowerShell/PowerShellEditorServices/pull/1828) - Add regression test for accidentally allowing removal of `$psEditor`.
+
 ## v2022.6.3-preview
 ### Wednesday, June 29, 2022
 
