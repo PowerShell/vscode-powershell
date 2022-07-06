@@ -36,6 +36,19 @@ Script analysis is provided by the [PSScriptAnalyzer][] project on GitHub. If th
 message starts with `[PSScriptAnalyzer]` or if you are getting faulty script diagnostics
 (red and green squiggly lines under PowerShell in scripts) please [open an issue there][].
 
+## Completions aren't appearing
+
+First, please ensure that the extension itself has properly started. Do this by opening
+the PowerShell Integrated Console and checking the value of the variable `$psEditor`,
+it should return a version and other fields. If it does not, you're probably in a
+different "PowerShell" terminal in VS Code, and not the extension's integrated console.
+So please open a bug about your extension failing to start instead.
+
+If the extension _is_ started and the PSIC functional, completions should appear! Please
+double-check that your `editor.suggest.showFunctions` VS Code setting is `true`, as
+setting it to `false` _will_ disable completions (from all extensions). You may also want
+to check other related settings under "Text Editor -> Suggestions" in VS Code.
+
 ## Double-click isn't selecting the whole variable
 
 VS Code provides a default set of word separators, that is, characters that split words
