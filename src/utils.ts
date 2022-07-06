@@ -109,6 +109,16 @@ export function checkIfFileExists(filePath: string): boolean {
     }
 }
 
+export function checkIfDirectoryExists(directoryPath: string): boolean {
+    try {
+        // tslint:disable-next-line:no-bitwise
+        fs.accessSync(directoryPath, fs.constants.R_OK | fs.constants.O_DIRECTORY);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 export function getTimestampString() {
     const time = new Date();
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;
