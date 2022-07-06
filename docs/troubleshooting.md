@@ -46,7 +46,7 @@ So please open a bug about your extension failing to start instead.
 
 If the extension _is_ started and the PSIC functional, completions should appear! Please
 double-check that your `editor.suggest.showFunctions` VS Code setting is `true`, as
-setting it to `fals`e _will_ disable completions (from all extensions). You may also want
+setting it to `false` _will_ disable completions (from all extensions). You may also want
 to check other related settings under "Text Editor -> Suggestions" in VS Code.
 
 ## Double-click isn't selecting the whole variable
