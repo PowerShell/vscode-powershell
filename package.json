@@ -540,7 +540,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "PowerShell Configuration",
+      "title": "PowerShell",
       "properties": {
         "powershell.sideBar.CommandExplorerVisibility": {
           "type": "boolean",
