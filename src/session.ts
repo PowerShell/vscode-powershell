@@ -103,8 +103,10 @@ export class SessionManager implements Middleware {
         this.languageClientConsumers = languageClientConsumers;
     }
 
-    public start(exeNameOverride?: string) {
+    public async start(exeNameOverride?: string) {
+        await Settings.validateCwdSetting();
         this.sessionSettings = Settings.load();
+
         if (exeNameOverride) {
             this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
         }
@@ -240,9 +242,9 @@ export class SessionManager implements Middleware {
         this.sessionStatus = SessionStatus.NotStarted;
     }
 
-    public restartSession(exeNameOverride?: string) {
+    public async restartSession(exeNameOverride?: string) {
         this.stop();
-        this.start(exeNameOverride);
+        await this.start(exeNameOverride);
     }
 
     public getSessionDetails(): utils.IEditorServicesSessionDetails {
@@ -387,14 +389,16 @@ export class SessionManager implements Middleware {
         }
     }
 
-    private onConfigurationUpdated() {
+    private async onConfigurationUpdated() {
         const settings = Settings.load();
 
         this.focusConsoleOnExecute = settings.integratedConsole.focusConsoleOnExecute;
 
         // Detect any setting changes that would affect the session
         if (!this.suppressRestartPrompt &&
-            (settings.powerShellDefaultVersion.toLowerCase() !==
+            (settings.cwd.toLowerCase() !==
+                this.sessionSettings.cwd.toLowerCase() ||
+                settings.powerShellDefaultVersion.toLowerCase() !==
                 this.sessionSettings.powerShellDefaultVersion.toLowerCase() ||
              settings.developer.editorServicesLogLevel.toLowerCase() !==
                 this.sessionSettings.developer.editorServicesLogLevel.toLowerCase() ||
@@ -403,14 +407,13 @@ export class SessionManager implements Middleware {
             settings.integratedConsole.useLegacyReadLine !==
                 this.sessionSettings.integratedConsole.useLegacyReadLine)) {
 
-            vscode.window.showInformationMessage(
+            const response: string = await vscode.window.showInformationMessage(
                 "The PowerShell runtime configuration has changed, would you like to start a new session?",
-                "Yes", "No")
-                .then((response) => {
+                "Yes", "No");
+
                     if (response === "Yes") {
-                        this.restartSession();
+                        await this.restartSession();
                     }
-                });
         }
     }
 
@@ -433,7 +436,7 @@ export class SessionManager implements Middleware {
         this.registeredCommands = [
             vscode.commands.registerCommand("PowerShell.RestartSession", () => { this.restartSession(); }),
             vscode.commands.registerCommand(this.ShowSessionMenuCommandName, () => { this.showSessionMenu(); }),
-            vscode.workspace.onDidChangeConfiguration(() => this.onConfigurationUpdated()),
+            vscode.workspace.onDidChangeConfiguration(async () => { await this.onConfigurationUpdated(); }),
             vscode.commands.registerCommand(
                 "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionConsole(isExecute); }),
         ];
@@ -457,10 +460,10 @@ export class SessionManager implements Middleware {
                 this.sessionSettings);
 
         this.languageServerProcess.onExited(
-            () => {
+            async () => {
                 if (this.sessionStatus === SessionStatus.Running) {
                     this.setSessionStatus("Session Exited", SessionStatus.Failed);
-                    this.promptForRestart();
+                    await this.promptForRestart();
                 }
             });
 
@@ -503,11 +506,14 @@ export class SessionManager implements Middleware {
             });
     }
 
-    private promptForRestart() {
-        vscode.window.showErrorMessage(
+    private async promptForRestart() {
+        const response: string = await vscode.window.showErrorMessage(
             "The PowerShell Integrated Console (PSIC) has stopped, would you like to restart it? (IntelliSense will not work unless the PSIC is active and unblocked.)",
-            "Yes", "No")
-            .then((answer) => { if (answer === "Yes") { this.restartSession(); }});
+            "Yes", "No");
+
+        if (response === "Yes") {
+            await this.restartSession();
+        }
     }
 
     private startLanguageClient(sessionDetails: utils.IEditorServicesSessionDetails) {
@@ -756,7 +762,7 @@ export class SessionManager implements Middleware {
         // rather than pull from the settings. The issue we prevent here is when a
         // workspace setting is defined which gets priority over user settings which
         // is what the change above sets.
-        this.restartSession(exePath.displayName);
+        await this.restartSession(exePath.displayName);
     }
 
     private showSessionConsole(isExecute?: boolean) {
@@ -817,10 +823,10 @@ export class SessionManager implements Middleware {
 
             new SessionMenuItem(
                 "Restart Current Session",
-                () => {
+                async () => {
                     // We pass in the display name so we guarantee that the session
                     // will be the same PowerShell.
-                    this.restartSession(this.PowerShellExeDetails.displayName);
+                    await this.restartSession(this.PowerShellExeDetails.displayName);
                 }),
 
             new SessionMenuItem(

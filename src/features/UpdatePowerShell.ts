@@ -164,9 +164,9 @@ export async function InvokePowerShellUpdateCheck(
                 // Invoke the MSI via cmd.
                 const msi = spawn("msiexec", ["/i", msiDownloadPath]);
 
-                msi.on("close", (code) => {
+                msi.on("close", async () => {
                     // Now that the MSI is finished, start the Integrated Console session.
-                    sessionManager.start();
+                    await sessionManager.start();
                     fs.unlinkSync(msiDownloadPath);
                 });
 

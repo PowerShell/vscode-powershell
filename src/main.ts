@@ -172,7 +172,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
     if (extensionSettings.startAutomatically) {
-        sessionManager.start();
+        await sessionManager.start();
     }
 
     return {

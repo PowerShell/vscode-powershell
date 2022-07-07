@@ -5,6 +5,7 @@
 
 import vscode = require("vscode");
 import utils = require("./utils");
+import os = require("os");
 
 enum CodeFormattingPreset {
     Custom,
@@ -333,7 +334,7 @@ export async function validateCwdSetting(): Promise<string> {
         // If there were no workspace folders, or somehow they don't exist, use
         // the home directory.
         if (cwd === undefined || !utils.checkIfDirectoryExists(cwd)) {
-            return process.cwd();
+            return os.homedir();
         }
         return cwd;
     }
