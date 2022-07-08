@@ -541,6 +541,7 @@ export class SessionManager implements Middleware {
                 initializationOptions: {
                     enableProfileLoading: this.sessionSettings.enableProfileLoading,
                     initialWorkingDirectory: this.sessionSettings.cwd,
+                    supportsBreakpointSync: true,
                 },
                 errorHandler: {
                     // Override the default error handler to prevent it from

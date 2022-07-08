@@ -33,6 +33,7 @@ import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
+import { BreakpointManager } from "./features/BreakpointManager";
 
 // The most reliable way to get the name and version of the current extension.
 // tslint:disable-next-line: no-var-requires
@@ -163,6 +164,7 @@ export function activate(context: vscode.ExtensionContext): IPowerShellExtension
         new HelpCompletionFeature(logger),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
+        new BreakpointManager(),
         externalApi
     ];
 
