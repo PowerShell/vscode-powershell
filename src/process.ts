@@ -51,7 +51,7 @@ export class PowerShellProcess {
                 : "";
 
         this.startPsesArgs +=
-            `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath)}' ` +
+            `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath.fsPath)}' ` +
             `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 

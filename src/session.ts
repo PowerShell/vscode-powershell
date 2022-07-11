@@ -111,7 +111,7 @@ export class SessionManager implements Middleware {
             this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
         }
 
-        this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
+        await this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
 
         // Create the PowerShell executable finder now
         this.powershellExeFinder = new PowerShellExeFinder(
