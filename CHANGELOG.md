@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2022.7.0-preview
+### Monday, July 11, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #4063](https://github.com/PowerShell/vscode-powershell/pull/4063) - Change configuration title to just `PowerShell`.
+- ✨ 📖 [vscode-powershell #4062](https://github.com/PowerShell/vscode-powershell/pull/4062) - Add note about accidentally disabling completions.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
+
+- 🐛 🛫 [PowerShellEditorServices #1849](https://github.com/PowerShell/PowerShellEditorServices/pull/1851) - Add `Directory.Exists()` check to `SetInitialWorkingDirectoryAsync()`.
+- ✨ 🚨 [PowerShellEditorServices #1850](https://github.com/PowerShell/PowerShellEditorServices/pull/1850) - Catch `OperationCanceledException` in both command loops.
+- ✨ 🚨 [PowerShellEditorServices #1793](https://github.com/PowerShell/PowerShellEditorServices/pull/1848) - Improve CI stability.
+- ✨ 🚨 [PowerShellEditorServices #1846](https://github.com/PowerShell/PowerShellEditorServices/pull/1846) - Add end-to-end Pester unit test.
+
 ## v2022.6.3
 ### Wednesday, June 30, 2022
 
