@@ -14,16 +14,16 @@ export const rootPath = path.resolve(__dirname, "../../")
 const packageJSON: any = require(path.resolve(rootPath, "package.json"));
 export const extensionId = `${packageJSON.publisher}.${packageJSON.name}`;
 
-export async function ensureExtensionIsActivated(): Promise<vscode.Extension<any>> {
+export async function ensureExtensionIsActivated(): Promise<IPowerShellExtensionClient> {
     const extension = vscode.extensions.getExtension(extensionId);
     if (!extension.isActive) { await extension.activate(); }
-    return extension;
+    return extension!.exports as IPowerShellExtensionClient;
 }
 
-export async function ensureEditorServicesIsConnected(): Promise<void> {
-    const powershellExtension = await ensureExtensionIsActivated();
-    const client = powershellExtension!.exports as IPowerShellExtensionClient;
-    const sessionId = client.registerExternalExtension(extensionId);
-    await client.waitUntilStarted(sessionId);
-    client.unregisterExternalExtension(sessionId);
+export async function ensureEditorServicesIsConnected(): Promise<IPowerShellExtensionClient> {
+    const extension = await ensureExtensionIsActivated();
+    const sessionId = extension.registerExternalExtension(extensionId);
+    await extension.waitUntilStarted(sessionId);
+    extension.unregisterExternalExtension(sessionId);
+    return extension;
 }

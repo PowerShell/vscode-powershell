@@ -5,10 +5,15 @@ import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import utils = require("../utils");
 
 describe("Path assumptions", function () {
-    before(utils.ensureEditorServicesIsConnected);
+    let storageUri: vscode.Uri;
+    before(async () => {
+        const extension: IPowerShellExtensionClient = await utils.ensureEditorServicesIsConnected();
+        storageUri = extension.getStorageUri();
+    });
 
     // TODO: This is skipped because it interferes with other tests. Either
     // need to find a way to close the opened folder via a Code API, or find
@@ -22,6 +27,6 @@ describe("Path assumptions", function () {
     });
 
     it("Creates the log folder at the correct path", function () {
-        assert(fs.existsSync(path.resolve(utils.rootPath, "logs")));
+        assert(fs.existsSync(vscode.Uri.joinPath(storageUri, "logs").fsPath));
     });
 });
