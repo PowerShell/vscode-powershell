@@ -19,6 +19,7 @@ export interface IPowerShellExtensionClient {
     unregisterExternalExtension(uuid: string): boolean;
     getPowerShellVersionDetails(uuid: string): Promise<IExternalPowerShellDetails>;
     waitUntilStarted(uuid: string): Promise<void>;
+    getStorageUri(): vscode.Uri;
 }
 
 /*
@@ -164,6 +165,10 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         const extension = this.getRegisteredExtension(uuid);
         this.log.writeDiagnostic(`Extension '${extension.id}' called 'waitUntilStarted'`);
         return this.sessionManager.waitUntilStarted();
+    }
+
+    public getStorageUri(): vscode.Uri {
+        return this.extensionContext.storageUri;
     }
 
     public dispose() {

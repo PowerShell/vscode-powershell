@@ -125,7 +125,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         });
 
     // Setup the logger.
-    logger = new Logger();
+    logger = new Logger(context.storageUri);
     logger.MinimumLogLevel = LogLevel[extensionSettings.developer.editorServicesLogLevel];
 
     sessionManager =
@@ -180,6 +180,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         unregisterExternalExtension: uuid => externalApi.unregisterExternalExtension(uuid),
         getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
         waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
+        getStorageUri: () => externalApi.getStorageUri(),
     };
 }
 

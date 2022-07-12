@@ -13,6 +13,7 @@ export enum LogLevel {
     Normal,
     Warning,
     Error,
+    None,
 }
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
@@ -29,19 +30,24 @@ export interface ILogger {
 
 export class Logger implements ILogger {
 
-    public logBasePath: string;
-    public logSessionPath: string;
+    public logBasePath: vscode.Uri;
+    public logSessionPath: vscode.Uri;
     public MinimumLogLevel: LogLevel = LogLevel.Normal;
 
     private commands: vscode.Disposable[];
     private logChannel: vscode.OutputChannel;
-    private logFilePath: string;
+    private logFilePath: vscode.Uri;
 
-    constructor() {
+    constructor(logBasePath: vscode.Uri) {
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
 
-        this.logBasePath = path.resolve(__dirname, "../logs");
-        utils.ensurePathExists(this.logBasePath);
+        if (logBasePath === undefined) {
+            // No workspace, we have to use another folder.
+            this.logBasePath = vscode.Uri.file(path.resolve(__dirname, "../logs"));
+            utils.ensurePathExists(this.logBasePath.fsPath);
+        } else {
+            this.logBasePath = vscode.Uri.joinPath(logBasePath, "logs");
+        }
 
         this.commands = [
             vscode.commands.registerCommand(
@@ -59,8 +65,8 @@ export class Logger implements ILogger {
         this.logChannel.dispose();
     }
 
-    public getLogFilePath(baseName: string): string {
-        return path.resolve(this.logSessionPath, `${baseName}.log`);
+    public getLogFilePath(baseName: string): vscode.Uri {
+        return vscode.Uri.joinPath(this.logSessionPath, `${baseName}.log`);
     }
 
     public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]) {
@@ -136,17 +142,16 @@ export class Logger implements ILogger {
         }
     }
 
-    public startNewLog(minimumLogLevel: string = "Normal") {
+    public async startNewLog(minimumLogLevel: string = "Normal") {
         this.MinimumLogLevel = this.logLevelNameToValue(minimumLogLevel.trim());
 
         this.logSessionPath =
-            path.resolve(
+            vscode.Uri.joinPath(
                 this.logBasePath,
                 `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
 
         this.logFilePath = this.getLogFilePath("vscode-powershell");
-
-        utils.ensurePathExists(this.logSessionPath);
+        await vscode.workspace.fs.createDirectory(this.logSessionPath);
     }
 
     private logLevelNameToValue(logLevelName: string): LogLevel {
@@ -156,6 +161,7 @@ export class Logger implements ILogger {
             case "normal": return LogLevel.Normal;
             case "warning": return LogLevel.Warning;
             case "error": return LogLevel.Error;
+            case "none": return LogLevel.None;
             default: return LogLevel.Normal;
         }
     }
@@ -168,10 +174,7 @@ export class Logger implements ILogger {
         if (this.logSessionPath) {
             // Open the folder in VS Code since there isn't an easy way to
             // open the folder in the platform's file browser
-            vscode.commands.executeCommand(
-                "vscode.openFolder",
-                vscode.Uri.file(this.logSessionPath),
-                true);
+            vscode.commands.executeCommand("vscode.openFolder", this.logSessionPath, true);
         }
     }
 
@@ -181,9 +184,9 @@ export class Logger implements ILogger {
             `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}`;
 
         this.logChannel.appendLine(timestampedMessage);
-        if (this.logFilePath) {
+        if (this.logFilePath && this.MinimumLogLevel !== LogLevel.None) {
             fs.appendFile(
-                this.logFilePath,
+                this.logFilePath.fsPath,
                 timestampedMessage + os.EOL,
                 (err) => {
                     if (err) {

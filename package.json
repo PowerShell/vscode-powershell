@@ -798,10 +798,11 @@
             "Verbose",
             "Normal",
             "Warning",
-            "Error"
+            "Error",
+            "None"
           ],
           "default": "Normal",
-          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Diagnostic', 'Verbose', 'Normal', 'Warning', and 'Error'"
+          "description": "Sets the logging verbosity level for the PowerShell Editor Services host executable.  Valid values are 'Diagnostic', 'Verbose', 'Normal', 'Warning', 'Error', and 'None'"
         },
         "powershell.developer.editorServicesWaitForDebugger": {
           "type": "boolean",
