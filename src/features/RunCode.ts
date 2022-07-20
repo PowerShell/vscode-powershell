@@ -40,7 +40,7 @@ export class RunCodeFeature implements vscode.Disposable {
 
     private async launch(launchConfig: string | vscode.DebugConfiguration) {
         // Create or show the interactive console
-        // TODO #367: Check if "newSession" mode is configured
+        // TODO: #367: Check if "newSession" mode is configured
         await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
         // Write out temporary debug session file

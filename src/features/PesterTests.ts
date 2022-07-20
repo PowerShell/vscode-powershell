@@ -128,7 +128,7 @@ export class PesterTestsFeature implements vscode.Disposable {
     private async launch(launchConfig): Promise<boolean> {
         // Create or show the interactive console
         // TODO: #367 Check if "newSession" mode is configured
-        vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+        await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
         // Write out temporary debug session file
         await this.sessionManager.writeSessionFile(
