@@ -317,9 +317,9 @@ export class DebugSessionFeature extends LanguageClientConsumer
             // TODO: This should be cleaned up to support multiple temporary consoles.
             this.tempDebugProcess = this.sessionManager.createDebugSessionProcess(sessionFilePath, settings);
             this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
-            utils.writeSessionFile(sessionFilePath, this.tempSessionDetails);
+            await utils.writeSessionFile(sessionFilePath, this.tempSessionDetails);
         } else {
-            utils.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
+            await utils.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
         }
 
         return config;

@@ -10,19 +10,6 @@ import vscode = require("vscode");
 
 export const PowerShellLanguageId = "powershell";
 
-export function ensurePathExists(targetPath: string): void {
-    // Ensure that the path exists
-    try {
-        // TODO: Use vscode.workspace.fs
-        fs.mkdirSync(targetPath);
-    } catch (e) {
-        // If the exception isn't to indicate that the folder exists already, rethrow it.
-        if (e.code !== "EEXIST") {
-            throw e;
-        }
-    }
-}
-
 // Check that the file exists in an asynchronous manner that relies solely on the VS Code API, not Node's fs library.
 export async function fileExists(targetPath: string | vscode.Uri): Promise<boolean> {
     try {
@@ -67,9 +54,6 @@ export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) 
 const sessionsFolder = path.resolve(__dirname, "../sessions");
 const sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
 
-// Create the sessions path if it doesn't exist already
-ensurePathExists(sessionsFolder);
-
 export function getSessionFilePath(uniqueId: number) {
     return `${sessionFilePathPrefix}-${uniqueId}`;
 }
@@ -78,8 +62,8 @@ export function getDebugSessionFilePath() {
     return `${sessionFilePathPrefix}-Debug`;
 }
 
-export function writeSessionFile(sessionFilePath: string, sessionDetails: IEditorServicesSessionDetails) {
-    ensurePathExists(sessionsFolder);
+export async function writeSessionFile(sessionFilePath: string, sessionDetails: IEditorServicesSessionDetails) {
+    await vscode.workspace.fs.createDirectory(vscode.Uri.file(sessionsFolder));
 
     const writeStream = fs.createWriteStream(sessionFilePath);
     writeStream.write(JSON.stringify(sessionDetails));

@@ -131,7 +131,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
         // Write out temporary debug session file
-        utils.writeSessionFile(
+        await utils.writeSessionFile(
             utils.getDebugSessionFilePath(),
             this.sessionManager.getSessionDetails());
 
