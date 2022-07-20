@@ -43,11 +43,6 @@ export class RunCodeFeature implements vscode.Disposable {
         // TODO: #367: Check if "newSession" mode is configured
         await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
-        // Write out temporary debug session file
-        await this.sessionManager.writeSessionFile(
-            this.sessionManager.getDebugSessionFilePath(),
-            this.sessionManager.getSessionDetails());
-
         // TODO: Update to handle multiple root workspaces.
         await vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
     }

@@ -31,7 +31,7 @@ export class PowerShellProcess {
         private title: string,
         private log: Logger,
         private startPsesArgs: string,
-        private sessionFilePath: string,
+        private sessionFilePath: vscode.Uri,
         private sessionSettings: Settings.ISettings) {
 
         this.onExited = this.onExitedEmitter.event;
@@ -53,7 +53,7 @@ export class PowerShellProcess {
 
         this.startPsesArgs +=
             `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath.fsPath)}' ` +
-            `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath)}' ` +
+        `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 
         if (this.sessionSettings.integratedConsole.useLegacyReadLine) {
@@ -197,7 +197,7 @@ export class PowerShellProcess {
 
         // Check every 2 seconds
         for (let i = numOfTries; i > 0; i--) {
-            if (utils.checkIfFileExists(this.sessionFilePath)) {
+            if (utils.checkIfFileExists(this.sessionFilePath.fsPath)) {
                 this.log.write("Session file found");
                 const sessionDetails = SessionManager.readSessionFile(this.sessionFilePath);
                 SessionManager.deleteSessionFile(this.sessionFilePath);
