@@ -16,13 +16,15 @@ import utils = require("./utils");
 import {
     CloseAction, DocumentSelector, ErrorAction, LanguageClientOptions,
     Middleware, NotificationType, RequestType0,
-    ResolveCodeLensSignature, RevealOutputChannelOn } from "vscode-languageclient";
+    ResolveCodeLensSignature, RevealOutputChannelOn
+} from "vscode-languageclient";
 import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
 
 import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./features/UpdatePowerShell";
 import {
     getPlatformDetails, IPlatformDetails, IPowerShellExeDetails,
-    OperatingSystem, PowerShellExeFinder } from "./platform";
+    OperatingSystem, PowerShellExeFinder
+} from "./platform";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
 export enum SessionStatus {
@@ -287,20 +289,6 @@ export class SessionManager implements Middleware {
         return vscode.Uri.joinPath(this.sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID + "-" + uniqueId + ".json");
     }
 
-    public static readSessionFile(sessionFilePath: vscode.Uri): IEditorServicesSessionDetails {
-        // TODO: Use vscode.workspace.fs.readFile instead of fs.readFileSync.
-        const fileContents = fs.readFileSync(sessionFilePath.fsPath, "utf-8");
-        return JSON.parse(fileContents);
-    }
-
-    public static async deleteSessionFile(sessionFilePath: vscode.Uri) {
-        try {
-            await vscode.workspace.fs.delete(sessionFilePath);
-        } catch (e) {
-            // TODO: Be more specific about what we're catching
-        }
-    }
-
     public createDebugSessionProcess(sessionSettings: Settings.ISettings): PowerShellProcess {
 
         // NOTE: We only support one temporary integrated console at a time. To
@@ -337,7 +325,7 @@ export class SessionManager implements Middleware {
     }
 
     public async waitUntilStarted(): Promise<void> {
-        while(!this.started) {
+        while (!this.started) {
             await utils.sleep(300);
         }
     }
@@ -348,43 +336,43 @@ export class SessionManager implements Middleware {
         codeLens: vscode.CodeLens,
         token: vscode.CancellationToken,
         next: ResolveCodeLensSignature): vscode.ProviderResult<vscode.CodeLens> {
-            const resolvedCodeLens = next(codeLens, token);
-            const resolveFunc =
-                (codeLensToFix: vscode.CodeLens): vscode.CodeLens => {
-                    if (codeLensToFix.command?.command === "editor.action.showReferences") {
-                        const oldArgs = codeLensToFix.command.arguments;
+        const resolvedCodeLens = next(codeLens, token);
+        const resolveFunc =
+            (codeLensToFix: vscode.CodeLens): vscode.CodeLens => {
+                if (codeLensToFix.command?.command === "editor.action.showReferences") {
+                    const oldArgs = codeLensToFix.command.arguments;
 
-                        // Our JSON objects don't get handled correctly by
-                        // VS Code's built in editor.action.showReferences
-                        // command so we need to convert them into the
-                        // appropriate types to send them as command
-                        // arguments.
+                    // Our JSON objects don't get handled correctly by
+                    // VS Code's built in editor.action.showReferences
+                    // command so we need to convert them into the
+                    // appropriate types to send them as command
+                    // arguments.
 
-                        codeLensToFix.command.arguments = [
-                            vscode.Uri.parse(oldArgs[0]),
-                            new vscode.Position(oldArgs[1].line, oldArgs[1].character),
-                            oldArgs[2].map((position) => {
-                                return new vscode.Location(
-                                    vscode.Uri.parse(position.uri),
-                                    new vscode.Range(
-                                        position.range.start.line,
-                                        position.range.start.character,
-                                        position.range.end.line,
-                                        position.range.end.character));
-                            }),
-                        ];
-                    }
+                    codeLensToFix.command.arguments = [
+                        vscode.Uri.parse(oldArgs[0]),
+                        new vscode.Position(oldArgs[1].line, oldArgs[1].character),
+                        oldArgs[2].map((position) => {
+                            return new vscode.Location(
+                                vscode.Uri.parse(position.uri),
+                                new vscode.Range(
+                                    position.range.start.line,
+                                    position.range.start.character,
+                                    position.range.end.line,
+                                    position.range.end.character));
+                        }),
+                    ];
+                }
 
-                    return codeLensToFix;
-                };
+                return codeLensToFix;
+            };
 
-            if ((resolvedCodeLens as Thenable<vscode.CodeLens>).then) {
-                return (resolvedCodeLens as Thenable<vscode.CodeLens>).then(resolveFunc);
-            } else if (resolvedCodeLens as vscode.CodeLens) {
-                return resolveFunc(resolvedCodeLens as vscode.CodeLens);
-            }
+        if ((resolvedCodeLens as Thenable<vscode.CodeLens>).then) {
+            return (resolvedCodeLens as Thenable<vscode.CodeLens>).then(resolveFunc);
+        } else if (resolvedCodeLens as vscode.CodeLens) {
+            return resolveFunc(resolvedCodeLens as vscode.CodeLens);
+        }
 
-            return resolvedCodeLens;
+        return resolvedCodeLens;
     }
 
     // Move old setting codeFormatting.whitespaceAroundPipe to new setting codeFormatting.addWhitespaceAroundPipe
@@ -440,9 +428,9 @@ export class SessionManager implements Middleware {
                 this.sessionSettings.cwd.toLowerCase() ||
                 settings.powerShellDefaultVersion.toLowerCase() !==
                 this.sessionSettings.powerShellDefaultVersion.toLowerCase() ||
-             settings.developer.editorServicesLogLevel.toLowerCase() !==
+            settings.developer.editorServicesLogLevel.toLowerCase() !==
                 this.sessionSettings.developer.editorServicesLogLevel.toLowerCase() ||
-             settings.developer.bundledModulesPath.toLowerCase() !==
+            settings.developer.bundledModulesPath.toLowerCase() !==
                 this.sessionSettings.developer.bundledModulesPath.toLowerCase() ||
             settings.integratedConsole.useLegacyReadLine !==
                 this.sessionSettings.integratedConsole.useLegacyReadLine)) {
@@ -451,9 +439,9 @@ export class SessionManager implements Middleware {
                 "The PowerShell runtime configuration has changed, would you like to start a new session?",
                 "Yes", "No");
 
-                    if (response === "Yes") {
-                        await this.restartSession();
-                    }
+            if (response === "Yes") {
+                await this.restartSession();
+            }
         }
     }
 
@@ -567,7 +555,7 @@ export class SessionManager implements Middleware {
                             "connect",
                             () => {
                                 this.log.write("Language service connected.");
-                                resolve({writer: socket, reader: socket});
+                                resolve({ writer: socket, reader: socket });
                             });
                     });
             };
@@ -576,7 +564,7 @@ export class SessionManager implements Middleware {
                 documentSelector: this.documentSelector,
                 synchronize: {
                     // backend uses "files" and "search" to ignore references.
-                    configurationSection: [ utils.PowerShellLanguageId, "files", "search" ],
+                    configurationSection: [utils.PowerShellLanguageId, "files", "search"],
                     // fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
                 },
                 // NOTE: Some settings are only applicable on startup, so we send them during initialization.
@@ -819,8 +807,8 @@ export class SessionManager implements Middleware {
             case SessionStatus.NeverStarted:
             case SessionStatus.Stopping:
                 const currentPowerShellExe =
-                availablePowerShellExes
-                    .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails.displayName.toLowerCase());
+                    availablePowerShellExes
+                        .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails.displayName.toLowerCase());
 
                 const powerShellSessionName =
                     currentPowerShellExe ?
@@ -887,7 +875,7 @@ class SessionMenuItem implements vscode.QuickPickItem {
     constructor(
         public readonly label: string,
         // tslint:disable-next-line:no-empty
-        public readonly callback: () => void = () => {}) {
+        public readonly callback: () => void = () => { }) {
     }
 }
 

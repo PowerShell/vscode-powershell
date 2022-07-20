@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+import fs = require("fs");
 import cp = require("child_process");
 import * as semver from "semver";
 import path = require("path");
@@ -100,7 +101,7 @@ export class PowerShellProcess {
             "    PowerShell Editor Services args: " + startEditorServices);
 
         // Make sure no old session file exists
-        SessionManager.deleteSessionFile(this.sessionFilePath);
+        await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
 
         // Launch PowerShell in the integrated terminal
         const terminalOptions: vscode.TerminalOptions = {
@@ -150,7 +151,7 @@ export class PowerShellProcess {
 
     public dispose() {
         // Clean up the session file
-        SessionManager.deleteSessionFile(this.sessionFilePath);
+        PowerShellProcess.deleteSessionFile(this.sessionFilePath);
 
         if (this.consoleCloseSubscription) {
             this.consoleCloseSubscription.dispose();
@@ -190,6 +191,20 @@ export class PowerShellProcess {
         return true;
     }
 
+    private static readSessionFile(sessionFilePath: vscode.Uri): IEditorServicesSessionDetails {
+        // TODO: Use vscode.workspace.fs.readFile instead of fs.readFileSync.
+        const fileContents = fs.readFileSync(sessionFilePath.fsPath, "utf-8");
+        return JSON.parse(fileContents);
+    }
+
+    private static async deleteSessionFile(sessionFilePath: vscode.Uri) {
+        try {
+            await vscode.workspace.fs.delete(sessionFilePath);
+        } catch (e) {
+            // TODO: Be more specific about what we're catching
+        }
+    }
+
     private async waitForSessionFile(): Promise<IEditorServicesSessionDetails> {
         // Determine how many tries by dividing by 2000 thus checking every 2 seconds.
         const numOfTries = this.sessionSettings.developer.waitForSessionFileTimeoutSeconds / 2;
@@ -199,8 +214,8 @@ export class PowerShellProcess {
         for (let i = numOfTries; i > 0; i--) {
             if (utils.checkIfFileExists(this.sessionFilePath.fsPath)) {
                 this.log.write("Session file found");
-                const sessionDetails = SessionManager.readSessionFile(this.sessionFilePath);
-                SessionManager.deleteSessionFile(this.sessionFilePath);
+                const sessionDetails = PowerShellProcess.readSessionFile(this.sessionFilePath);
+                PowerShellProcess.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
             }
 
