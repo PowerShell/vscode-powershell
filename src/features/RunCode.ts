@@ -45,7 +45,7 @@ export class RunCodeFeature implements vscode.Disposable {
 
         // Write out temporary debug session file
         await utils.writeSessionFile(
-            utils.getDebugSessionFilePath(),
+            this.sessionManager.getDebugSessionFilePath(),
             this.sessionManager.getSessionDetails());
 
         // TODO: Update to handle multiple root workspaces.

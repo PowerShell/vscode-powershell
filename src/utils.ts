@@ -52,15 +52,6 @@ export interface IEditorServicesSessionDetails {
 export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
 
 const sessionsFolder = path.resolve(__dirname, "../sessions");
-const sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
-
-export function getSessionFilePath(uniqueId: number) {
-    return `${sessionFilePathPrefix}-${uniqueId}`;
-}
-
-export function getDebugSessionFilePath() {
-    return `${sessionFilePathPrefix}-Debug`;
-}
 
 export async function writeSessionFile(sessionFilePath: string, sessionDetails: IEditorServicesSessionDetails) {
     await vscode.workspace.fs.createDirectory(vscode.Uri.file(sessionsFolder));

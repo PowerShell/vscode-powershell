@@ -311,7 +311,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         // Create or show the interactive console
         vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
-        const sessionFilePath = utils.getDebugSessionFilePath();
+        const sessionFilePath = this.sessionManager.getDebugSessionFilePath();
 
         if (config.createTemporaryIntegratedConsole) {
             // TODO: This should be cleaned up to support multiple temporary consoles.

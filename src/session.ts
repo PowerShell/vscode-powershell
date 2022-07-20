@@ -56,6 +56,8 @@ export class SessionManager implements Middleware {
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
     private sessionDetails: utils.IEditorServicesSessionDetails;
+    private sessionsFolder = path.resolve(__dirname, "../sessions");
+    private sessionFilePathPrefix = path.resolve(this.sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
     private bundledModulesPath: string;
     private started: boolean = false;
 
@@ -259,6 +261,14 @@ export class SessionManager implements Middleware {
         return this.versionDetails;
     }
 
+    private getSessionFilePath(uniqueId: number): string {
+        return `${this.sessionFilePathPrefix}-${uniqueId}`;
+    }
+
+    public getDebugSessionFilePath(): string {
+        return `${this.sessionFilePathPrefix}-Debug`;
+    }
+
     public createDebugSessionProcess(
         sessionPath: string,
         sessionSettings: Settings.ISettings): PowerShellProcess {
@@ -446,7 +456,7 @@ export class SessionManager implements Middleware {
         this.setSessionStatus("Starting...", SessionStatus.Initializing);
 
         const sessionFilePath =
-            utils.getSessionFilePath(
+            this.getSessionFilePath(
                 Math.floor(100000 + Math.random() * 900000));
 
         this.languageServerProcess =
