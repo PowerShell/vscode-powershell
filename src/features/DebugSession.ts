@@ -8,9 +8,8 @@ import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess} from "../process";
-import { SessionManager, SessionStatus } from "../session";
+import { IEditorServicesSessionDetails, SessionManager, SessionStatus } from "../session";
 import Settings = require("../settings");
-import utils = require("../utils");
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -25,8 +24,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
     private sessionCount: number = 1;
     private tempDebugProcess: PowerShellProcess;
-    private tempDebugEventHandler: vscode.Disposable;
-    private tempSessionDetails: utils.IEditorServicesSessionDetails;
+    private tempSessionDetails: IEditorServicesSessionDetails;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: Logger) {
         super();
@@ -314,12 +312,11 @@ export class DebugSessionFeature extends LanguageClientConsumer
         const sessionFilePath = this.sessionManager.getDebugSessionFilePath();
 
         if (config.createTemporaryIntegratedConsole) {
-            // TODO: This should be cleaned up to support multiple temporary consoles.
             this.tempDebugProcess = this.sessionManager.createDebugSessionProcess(sessionFilePath, settings);
             this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
-            await utils.writeSessionFile(sessionFilePath, this.tempSessionDetails);
+            await this.sessionManager.writeSessionFile(sessionFilePath, this.tempSessionDetails);
         } else {
-            await utils.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
+            await this.sessionManager.writeSessionFile(sessionFilePath, this.sessionManager.getSessionDetails());
         }
 
         return config;

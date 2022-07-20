@@ -8,10 +8,11 @@ import vscode = require("vscode");
 import { Logger } from "./logging";
 import Settings = require("./settings");
 import utils = require("./utils");
+import { IEditorServicesSessionDetails, SessionManager } from "./session";
 
 export class PowerShellProcess {
-    public static escapeSingleQuotes(pspath: string): string {
-        return pspath.replace(new RegExp("'", "g"), "''");
+    public static escapeSingleQuotes(psPath: string): string {
+        return psPath.replace(new RegExp("'", "g"), "''");
     }
 
     // This is used to warn the user that the extension is taking longer than expected to startup.
@@ -36,7 +37,7 @@ export class PowerShellProcess {
         this.onExited = this.onExitedEmitter.event;
     }
 
-    public async start(logFileName: string): Promise<utils.IEditorServicesSessionDetails> {
+    public async start(logFileName: string): Promise<IEditorServicesSessionDetails> {
         const editorServicesLogPath = this.log.getLogFilePath(logFileName);
 
         const psesModulePath =
@@ -99,7 +100,7 @@ export class PowerShellProcess {
             "    PowerShell Editor Services args: " + startEditorServices);
 
         // Make sure no old session file exists
-        utils.deleteSessionFile(this.sessionFilePath);
+        SessionManager.deleteSessionFile(this.sessionFilePath);
 
         // Launch PowerShell in the integrated terminal
         const terminalOptions: vscode.TerminalOptions = {
@@ -149,7 +150,7 @@ export class PowerShellProcess {
 
     public dispose() {
         // Clean up the session file
-        utils.deleteSessionFile(this.sessionFilePath);
+        SessionManager.deleteSessionFile(this.sessionFilePath);
 
         if (this.consoleCloseSubscription) {
             this.consoleCloseSubscription.dispose();
@@ -189,7 +190,7 @@ export class PowerShellProcess {
         return true;
     }
 
-    private async waitForSessionFile(): Promise<utils.IEditorServicesSessionDetails> {
+    private async waitForSessionFile(): Promise<IEditorServicesSessionDetails> {
         // Determine how many tries by dividing by 2000 thus checking every 2 seconds.
         const numOfTries = this.sessionSettings.developer.waitForSessionFileTimeoutSeconds / 2;
         const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
@@ -198,8 +199,8 @@ export class PowerShellProcess {
         for (let i = numOfTries; i > 0; i--) {
             if (utils.checkIfFileExists(this.sessionFilePath)) {
                 this.log.write("Session file found");
-                const sessionDetails = utils.readSessionFile(this.sessionFilePath);
-                utils.deleteSessionFile(this.sessionFilePath);
+                const sessionDetails = SessionManager.readSessionFile(this.sessionFilePath);
+                SessionManager.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
             }
 

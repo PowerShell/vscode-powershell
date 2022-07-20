@@ -34,6 +34,20 @@ export enum SessionStatus {
     Failed,
 }
 
+export interface IEditorServicesSessionDetails {
+    status: string;
+    reason: string;
+    detail: string;
+    powerShellVersion: string;
+    channel: string;
+    languageServicePort: number;
+    debugServicePort: number;
+    languageServicePipeName: string;
+    debugServicePipeName: string;
+}
+
+export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
+
 export class SessionManager implements Middleware {
     public HostName: string;
     public HostVersion: string;
@@ -55,7 +69,7 @@ export class SessionManager implements Middleware {
     private registeredCommands: vscode.Disposable[] = [];
     private languageServerClient: LanguageClient = undefined;
     private sessionSettings: Settings.ISettings = undefined;
-    private sessionDetails: utils.IEditorServicesSessionDetails;
+    private sessionDetails: IEditorServicesSessionDetails;
     private sessionsFolder = path.resolve(__dirname, "../sessions");
     private sessionFilePathPrefix = path.resolve(this.sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
     private bundledModulesPath: string;
@@ -249,7 +263,7 @@ export class SessionManager implements Middleware {
         await this.start(exeNameOverride);
     }
 
-    public getSessionDetails(): utils.IEditorServicesSessionDetails {
+    public getSessionDetails(): IEditorServicesSessionDetails {
         return this.sessionDetails;
     }
 
@@ -267,6 +281,29 @@ export class SessionManager implements Middleware {
 
     public getDebugSessionFilePath(): string {
         return `${this.sessionFilePathPrefix}-Debug`;
+    }
+
+    public async writeSessionFile(sessionFilePath: string, sessionDetails: IEditorServicesSessionDetails) {
+        await vscode.workspace.fs.createDirectory(vscode.Uri.file(this.sessionsFolder));
+
+        const writeStream = fs.createWriteStream(sessionFilePath);
+        writeStream.write(JSON.stringify(sessionDetails));
+        writeStream.close();
+    }
+
+    public static readSessionFile(sessionFilePath: string): IEditorServicesSessionDetails {
+        // TODO: Use vscode.workspace.fs.readFile instead of fs.readFileSync.
+        const fileContents = fs.readFileSync(sessionFilePath, "utf-8");
+        return JSON.parse(fileContents);
+    }
+
+    public static async deleteSessionFile(sessionFilePath: string) {
+        try {
+            await vscode.workspace.fs.delete(vscode.Uri.file(sessionFilePath));
+            // fs.unlinkSync(sessionFilePath);
+        } catch (e) {
+            // TODO: Be more specific about what we're catching
+        }
     }
 
     public createDebugSessionProcess(
@@ -526,7 +563,7 @@ export class SessionManager implements Middleware {
         }
     }
 
-    private startLanguageClient(sessionDetails: utils.IEditorServicesSessionDetails) {
+    private startLanguageClient(sessionDetails: IEditorServicesSessionDetails) {
         // Log the session details object
         this.log.write(JSON.stringify(sessionDetails));
 

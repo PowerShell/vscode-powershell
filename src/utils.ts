@@ -37,44 +37,6 @@ export function getPipePath(pipeName: string) {
     }
 }
 
-export interface IEditorServicesSessionDetails {
-    status: string;
-    reason: string;
-    detail: string;
-    powerShellVersion: string;
-    channel: string;
-    languageServicePort: number;
-    debugServicePort: number;
-    languageServicePipeName: string;
-    debugServicePipeName: string;
-}
-
-export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
-
-const sessionsFolder = path.resolve(__dirname, "../sessions");
-
-export async function writeSessionFile(sessionFilePath: string, sessionDetails: IEditorServicesSessionDetails) {
-    await vscode.workspace.fs.createDirectory(vscode.Uri.file(sessionsFolder));
-
-    const writeStream = fs.createWriteStream(sessionFilePath);
-    writeStream.write(JSON.stringify(sessionDetails));
-    writeStream.close();
-}
-
-
-export function readSessionFile(sessionFilePath: string): IEditorServicesSessionDetails {
-    const fileContents = fs.readFileSync(sessionFilePath, "utf-8");
-    return JSON.parse(fileContents);
-}
-
-export function deleteSessionFile(sessionFilePath: string) {
-    try {
-        fs.unlinkSync(sessionFilePath);
-    } catch (e) {
-        // TODO: Be more specific about what we're catching
-    }
-}
-
 export function checkIfFileExists(filePath: string): boolean {
     try {
         fs.accessSync(filePath, fs.constants.R_OK);

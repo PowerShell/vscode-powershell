@@ -44,7 +44,7 @@ export class RunCodeFeature implements vscode.Disposable {
         await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
         // Write out temporary debug session file
-        await utils.writeSessionFile(
+        await this.sessionManager.writeSessionFile(
             this.sessionManager.getDebugSessionFilePath(),
             this.sessionManager.getSessionDetails());
 
