@@ -85,11 +85,13 @@ export class SessionManager implements Middleware {
         version: string,
         private telemetryReporter: TelemetryReporter) {
 
+        // Create a folder for the session files.
         if (extensionContext.storageUri !== undefined) {
             this.sessionsFolder = vscode.Uri.joinPath(extensionContext.storageUri, "sessions");
         } else {
             this.sessionsFolder = vscode.Uri.file(path.resolve(__dirname, "../sessions"));
         }
+        vscode.workspace.fs.createDirectory(this.sessionsFolder);
 
         this.platformDetails = getPlatformDetails();
 
@@ -285,14 +287,6 @@ export class SessionManager implements Middleware {
         return vscode.Uri.joinPath(this.sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID + "-" + uniqueId + ".json");
     }
 
-    public async writeSessionFile(sessionFilePath: vscode.Uri, sessionDetails: IEditorServicesSessionDetails) {
-        await vscode.workspace.fs.createDirectory(this.sessionsFolder);
-
-        const writeStream = fs.createWriteStream(sessionFilePath.fsPath);
-        writeStream.write(JSON.stringify(sessionDetails));
-        writeStream.close();
-    }
-
     public static readSessionFile(sessionFilePath: vscode.Uri): IEditorServicesSessionDetails {
         // TODO: Use vscode.workspace.fs.readFile instead of fs.readFileSync.
         const fileContents = fs.readFileSync(sessionFilePath.fsPath, "utf-8");
@@ -307,9 +301,7 @@ export class SessionManager implements Middleware {
         }
     }
 
-    public createDebugSessionProcess(
-        sessionPath: vscode.Uri,
-        sessionSettings: Settings.ISettings): PowerShellProcess {
+    public createDebugSessionProcess(sessionSettings: Settings.ISettings): PowerShellProcess {
 
         // NOTE: We only support one temporary integrated console at a time. To
         // support more, we need to track each separately, and tie the session
@@ -327,7 +319,7 @@ export class SessionManager implements Middleware {
                 "[TEMP] PowerShell Integrated Console",
                 this.log,
                 this.editorServicesArgs + "-DebugServiceOnly ",
-                sessionPath,
+                this.getNewSessionFilePath(),
                 sessionSettings);
 
         // Similar to the regular integrated console, we need to send a key
@@ -493,8 +485,6 @@ export class SessionManager implements Middleware {
     private startPowerShell() {
         this.setSessionStatus("Starting...", SessionStatus.Initializing);
 
-        const sessionFilePath = this.getNewSessionFilePath();
-
         this.languageServerProcess =
             new PowerShellProcess(
                 this.PowerShellExeDetails.exePath,
@@ -502,7 +492,7 @@ export class SessionManager implements Middleware {
                 "PowerShell Integrated Console",
                 this.log,
                 this.editorServicesArgs,
-                sessionFilePath,
+                this.getNewSessionFilePath(),
                 this.sessionSettings);
 
         this.languageServerProcess.onExited(
