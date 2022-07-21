@@ -35,21 +35,16 @@ export class RunCodeFeature implements vscode.Disposable {
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
         const launchConfig = createLaunchConfig(launchType, scriptToRun, args);
-        this.launch(launchConfig);
+        await this.launch(launchConfig);
     }
 
-    private launch(launchConfig) {
+    private async launch(launchConfig: string | vscode.DebugConfiguration) {
         // Create or show the interactive console
-        // TODO #367: Check if "newSession" mode is configured
-        vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
-
-        // Write out temporary debug session file
-        utils.writeSessionFile(
-            utils.getDebugSessionFilePath(),
-            this.sessionManager.getSessionDetails());
+        // TODO: #367: Check if "newSession" mode is configured
+        await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
 
         // TODO: Update to handle multiple root workspaces.
-        vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
+        await vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
     }
 }
 

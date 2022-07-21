@@ -23,7 +23,7 @@ describe("Path assumptions", function () {
     });
 
     it("Creates the session folder at the correct path", function () {
-        assert(fs.existsSync(path.resolve(utils.rootPath, "sessions")));
+        assert(fs.existsSync(vscode.Uri.joinPath(storageUri, "sessions").fsPath));
     });
 
     it("Creates the log folder at the correct path", function () {

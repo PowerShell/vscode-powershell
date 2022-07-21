@@ -5,7 +5,6 @@ import fs = require("fs");
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
-import utils = require("./utils");
 
 export enum LogLevel {
     Diagnostic,
@@ -44,7 +43,6 @@ export class Logger implements ILogger {
         if (logBasePath === undefined) {
             // No workspace, we have to use another folder.
             this.logBasePath = vscode.Uri.file(path.resolve(__dirname, "../logs"));
-            utils.ensurePathExists(this.logBasePath.fsPath);
         } else {
             this.logBasePath = vscode.Uri.joinPath(logBasePath, "logs");
         }
