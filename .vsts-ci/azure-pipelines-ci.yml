@@ -8,11 +8,6 @@ variables:
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
     value: 'true'
 
-trigger:
-  branches:
-    include:
-      - main
-
 resources:
   repositories:
   - repository: PowerShellEditorServices
@@ -22,8 +17,24 @@ resources:
     ref: main
 
 jobs:
-- job: PS51_Win2019
-  displayName: PowerShell 5.1 - Windows Server 2019
+- job: windows2022
+  displayName: Windows 2022 PowerShell 5.1
+  pool:
+    vmImage: windows-2022
+  steps:
+  - template: templates/ci-general.yml
+    parameters:
+      pwsh: false
+
+- job: windows2022pwsh
+  displayName: Windows 2022 PowerShell 7
+  pool:
+    vmImage: windows-2022
+  steps:
+  - template: templates/ci-general.yml
+
+- job: windows2019
+  displayName: Windows 2019 PowerShell 5.1
   pool:
     vmImage: windows-2019
   steps:
@@ -31,22 +42,22 @@ jobs:
     parameters:
       pwsh: false
 
-- job: PS7_Win2019
-  displayName: PowerShell 7 - Windows Server 2019
+- job: windows2019pwsh
+  displayName: Windows 2019 PowerShell 7
   pool:
     vmImage: windows-2019
   steps:
   - template: templates/ci-general.yml
 
-- job: PS7_macOS
-  displayName: PowerShell 7 - macOS 10.15
+- job: macOS11
+  displayName: macOS 11
   pool:
-    vmImage: macOS-10.15
+    vmImage: macOS-11
   steps:
   - template: templates/ci-general.yml
 
-- job: PS7_Ubuntu
-  displayName: PowerShell 7 - Ubuntu 20.04
+- job: ubuntu2004
+  displayName: Ubuntu 20.04
   pool:
     vmImage: ubuntu-20.04
   steps:
