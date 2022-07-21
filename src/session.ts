@@ -424,8 +424,8 @@ export class SessionManager implements Middleware {
 
         // Detect any setting changes that would affect the session
         if (!this.suppressRestartPrompt &&
-            (settings.cwd.toLowerCase() !==
-                this.sessionSettings.cwd.toLowerCase() ||
+            (settings.cwd?.toLowerCase() !==
+                this.sessionSettings.cwd?.toLowerCase() ||
                 settings.powerShellDefaultVersion.toLowerCase() !==
                 this.sessionSettings.powerShellDefaultVersion.toLowerCase() ||
             settings.developer.editorServicesLogLevel.toLowerCase() !==
