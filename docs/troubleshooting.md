@@ -39,12 +39,12 @@ message starts with `[PSScriptAnalyzer]` or if you are getting faulty script dia
 ## Completions aren't appearing
 
 First, please ensure that the extension itself has properly started. Do this by opening
-the PowerShell Integrated Console and checking the value of the variable `$psEditor`,
+the PowerShell Extension Terminal and checking the value of the variable `$psEditor`,
 it should return a version and other fields. If it does not, you're probably in a
-different "PowerShell" terminal in VS Code, and not the extension's integrated console.
+different "PowerShell" terminal in VS Code, and not the PowerShell Extension Terminal.
 So please open a bug about your extension failing to start instead.
 
-If the extension _is_ started and the PSIC functional, completions should appear! Please
+If the extension _is_ started and the Extension Terminal functional, completions should appear! Please
 double-check that your `editor.suggest.showFunctions` VS Code setting is `true`, as
 setting it to `false` _will_ disable completions (from all extensions). You may also want
 to check other related settings under "Text Editor -> Suggestions" in VS Code.
@@ -308,7 +308,7 @@ these messages. To do this:
 
 ### Visual Studio Code version
 
-[Your VS Code version][] can be obtained from the Integrated Console or any terminal:
+[Your VS Code version][] can be obtained from the Extension Terminal or any terminal:
 
 ```powershell
 code --version
@@ -353,7 +353,7 @@ Extensions` and list your extensions.
 
 ### Editor Services version
 
-To get the [PowerShell Editor Services][] version, in the Integrated Console, enter:
+To get the [PowerShell Editor Services][] version, in the Extension Terminal, enter:
 
 ```powershell
 > $psEditor.EditorServicesVersion
@@ -364,7 +364,7 @@ Major  Minor  Build  Revision
 
 ### PowerShell version table
 
-You can get [your PowerShell version table][] from the Integrated Console through the
+You can get [your PowerShell version table][] from the Extension Terminal through the
 variable `$PSVersionTable`:
 
 ```powershell

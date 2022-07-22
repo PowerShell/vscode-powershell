@@ -51,7 +51,7 @@ to get more details on how to use the extension on these platforms.
 - Run selected selection of PowerShell code using <kbd>F8</kbd>
 - Launch online help for the symbol under the cursor using <kbd>Ctrl</kbd>+<kbd>F1</kbd>
 - Local script debugging
-- Integrated console support
+- Extension Terminal support
 - PowerShell ISE color theme
 
 ## Installing the Extension

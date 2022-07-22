@@ -124,7 +124,7 @@ export class PowerShellProcess {
         this.log.write(`${pwshName} started.`);
 
         if (this.sessionSettings.integratedConsole.showOnStartup) {
-            // We still need to run this to set the active terminal to the Integrated Console.
+            // We still need to run this to set the active terminal to the extension terminal.
             this.consoleTerminal.show(true);
         }
 

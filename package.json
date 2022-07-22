@@ -233,7 +233,7 @@
       },
       {
         "command": "PowerShell.ShowSessionConsole",
-        "title": "Show Integrated Console",
+        "title": "Show Extension Terminal",
         "category": "PowerShell"
       },
       {
@@ -447,7 +447,7 @@
           },
           {
             "label": "PowerShell: Interactive Session",
-            "description": "Debug commands executed from the Integrated Console",
+            "description": "Debug commands executed from the Extension Terminal",
             "body": {
               "name": "PowerShell Interactive Session",
               "type": "PowerShell",
@@ -498,7 +498,7 @@
               },
               "createTemporaryIntegratedConsole": {
                 "type": "boolean",
-                "description": "Determines whether a temporary PowerShell Integrated Console is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
+                "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
                 "default": false
               }
             }
@@ -597,7 +597,7 @@
         "powershell.startAutomatically": {
           "type": "boolean",
           "default": true,
-          "description": "Starts PowerShell extension features automatically when a PowerShell file opens. If false, to start the extension, use the 'PowerShell: Restart Current Session' command. IntelliSense, code navigation, integrated console, code formatting, and other features are not enabled until the extension starts."
+          "description": "Starts PowerShell extension features automatically when a PowerShell file opens. If false, to start the extension, use the 'PowerShell: Restart Current Session' command. IntelliSense, code navigation, Extension Terminal, code formatting, and other features are not enabled until the extension starts."
         },
         "powershell.useX86Host": {
           "type": "boolean",
@@ -628,7 +628,7 @@
         "powershell.cwd": {
           "type": "string",
           "default": null,
-          "description": "An explicit start path where the Powershell Integrated Console will be launched. Both the PowerShell process and the shell's location will be set to this directory. Predefined variables can be used (i.e. ${fileDirname} to use the current opened file's directory)."
+          "description": "An explicit start path where the PowerShell Extension Terminal will be launched. Both the PowerShell process and the shell's location will be set to this directory. Predefined variables can be used (i.e. ${fileDirname} to use the current opened file's directory)."
         },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
@@ -761,7 +761,7 @@
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
           "default": true,
-          "description": "Shows the integrated console when the PowerShell extension is initialized."
+          "description": "Shows the Extension Terminal when the PowerShell extension is initialized."
         },
         "powershell.integratedConsole.focusConsoleOnExecute": {
           "type": "boolean",
@@ -771,7 +771,7 @@
         "powershell.integratedConsole.useLegacyReadLine": {
           "type": "boolean",
           "default": false,
-          "description": "Falls back to the legacy (lightweight) ReadLine experience. This will disable the use of PSReadLine in the PowerShell Integrated Console."
+          "description": "Falls back to the legacy ReadLine experience. This will disable the use of PSReadLine in the PowerShell Extension Terminal."
         },
         "powershell.integratedConsole.forceClearScrollbackBuffer": {
           "type": "boolean",
@@ -780,12 +780,12 @@
         "powershell.integratedConsole.suppressStartupBanner": {
           "type": "boolean",
           "default": false,
-          "description": "Do not show the Powershell Integrated Console banner on launch"
+          "description": "Do not show the Powershell Extension Terminal banner on launch"
         },
         "powershell.debugging.createTemporaryIntegratedConsole": {
           "type": "boolean",
           "default": false,
-          "description": "Determines whether a temporary PowerShell Integrated Console is created for each debugging session, useful for debugging PowerShell classes and binary modules."
+          "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session. Useful for debugging PowerShell classes and binary modules."
         },
         "powershell.developer.bundledModulesPath": {
           "type": "string",

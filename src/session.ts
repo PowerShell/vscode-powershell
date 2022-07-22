@@ -220,7 +220,7 @@ export class SessionManager implements Middleware {
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
         } else {
-            const startupBanner = `=====> ${this.HostName} Integrated Console v${this.HostVersion} <=====
+            const startupBanner = `=====> ${this.HostName} Extension v${this.HostVersion} <=====
 `;
             this.editorServicesArgs += `-StartupBanner '${startupBanner}' `;
         }
@@ -291,7 +291,7 @@ export class SessionManager implements Middleware {
 
     public createDebugSessionProcess(sessionSettings: Settings.ISettings): PowerShellProcess {
 
-        // NOTE: We only support one temporary integrated console at a time. To
+        // NOTE: We only support one temporary Extension Terminal at a time. To
         // support more, we need to track each separately, and tie the session
         // for the event handler to the right process (and dispose of the event
         // handler when the process is disposed).
@@ -304,14 +304,14 @@ export class SessionManager implements Middleware {
             new PowerShellProcess(
                 this.PowerShellExeDetails.exePath,
                 this.bundledModulesPath,
-                "[TEMP] PowerShell Integrated Console",
+                "[TEMP] PowerShell Extension",
                 this.log,
                 this.editorServicesArgs + "-DebugServiceOnly ",
                 this.getNewSessionFilePath(),
                 sessionSettings);
 
-        // Similar to the regular integrated console, we need to send a key
-        // press to the process spawned for temporary integrated consoles when
+        // Similar to the regular Extension Terminal, we need to send a key
+        // press to the process spawned for temporary Extension Terminals when
         // the server requests a cancellation os Console.ReadKey.
         this.debugEventHandler = vscode.debug.onDidReceiveDebugSessionCustomEvent(
             e => {
@@ -477,7 +477,7 @@ export class SessionManager implements Middleware {
             new PowerShellProcess(
                 this.PowerShellExeDetails.exePath,
                 this.bundledModulesPath,
-                "PowerShell Integrated Console",
+                "PowerShell Extension",
                 this.log,
                 this.editorServicesArgs,
                 this.getNewSessionFilePath(),
@@ -532,7 +532,7 @@ export class SessionManager implements Middleware {
 
     private async promptForRestart() {
         const response: string = await vscode.window.showErrorMessage(
-            "The PowerShell Integrated Console (PSIC) has stopped, would you like to restart it? (IntelliSense will not work unless the PSIC is active and unblocked.)",
+            "The PowerShell Extension Terminal has stopped, would you like to restart it? IntelliSense and other features will not work without it!",
             "Yes", "No");
 
         if (response === "Yes") {

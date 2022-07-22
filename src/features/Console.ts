@@ -207,8 +207,8 @@ export class ConsoleFeature extends LanguageClientConsumer {
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
 
                 if (vscode.window.activeTerminal &&
-                    vscode.window.activeTerminal.name !== "PowerShell Integrated Console") {
-                    this.log.write("PSIC is not active terminal. Running in active terminal using 'runSelectedText'");
+                    vscode.window.activeTerminal.name !== "PowerShell Extension") {
+                    this.log.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'");
                     await vscode.commands.executeCommand("workbench.action.terminal.runSelectedText");
 
                     // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
@@ -236,7 +236,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
                     expression: editor.document.getText(selectionRange),
                 });
 
-                // Show the integrated console if it isn't already visible and
+                // Show the Extension Terminal if it isn't already visible and
                 // scroll terminal to bottom so new output is visible
                 await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
                 await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
