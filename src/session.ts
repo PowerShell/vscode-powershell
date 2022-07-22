@@ -220,9 +220,13 @@ export class SessionManager implements Middleware {
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
         } else {
-            const startupBanner = `=====> ${this.HostName} Extension v${this.HostVersion} <=====
+            const startupBanner = `${this.HostName} Extension v${this.HostVersion}
+Copyright (c) Microsoft Corporation.
+
+https://aka.ms/vscode-powershell
+Type 'help' to get help.
 `;
-            this.editorServicesArgs += `-StartupBanner '${startupBanner}' `;
+            this.editorServicesArgs += `-StartupBanner "${startupBanner}" `;
         }
 
         if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
