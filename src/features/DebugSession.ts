@@ -91,7 +91,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             {
                 id: DebugConfig.InteractiveSession,
                 label: "Interactive Session",
-                description: "Debug commands executed from the Integrated Console",
+                description: "Debug commands executed from the PowerShell Extension Terminal",
             },
             {
                 id: DebugConfig.AttachHostProcess,
@@ -230,7 +230,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                         : currentDocument.fileName;
 
             } else {
-                // If the non-temp integrated console is being used, default to the current working dir.
+                // If the non-temp Extension Terminal is being used, default to the current working dir.
                 config.cwd = "";
             }
         }
@@ -450,7 +450,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         // Start with the current PowerShell process in the list.
         const items: IProcessItem[] = [{
             label: "Current",
-            description: "The current PowerShell Integrated Console process.",
+            description: "The current PowerShell Extension process.",
             pid: "current",
         }];
         for (const p in hostProcesses) {

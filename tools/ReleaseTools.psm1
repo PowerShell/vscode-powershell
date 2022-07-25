@@ -82,7 +82,7 @@ function Get-Bullets {
             'Area-Documentation'        = '📖'
             'Area-Engine'               = '🚂'
             'Area-Folding'              = '📚'
-            'Area-Integrated Console'   = '📟'
+            'Area-Extension Terminal'   = '📟'
             'Area-IntelliSense'         = '🧠'
             'Area-Logging'              = '💭'
             'Area-Pester'               = '🐢'
