@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2022.7.2-preview
+### Tuesday, July 26, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 💭 [vscode-powershell #4093](https://github.com/PowerShell/vscode-powershell/pull/4093) - Change `storageUri` to `globalStorageUri` for log and session files.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.4.7
+
+No changes.
+
 ## v2022.7.1-preview
 ### Monday, July 25, 2022
 
