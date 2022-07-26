@@ -168,7 +168,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     }
 
     public getStorageUri(): vscode.Uri {
-        return this.extensionContext.storageUri;
+        return this.extensionContext.globalStorageUri;
     }
 
     public dispose() {
