@@ -252,7 +252,7 @@ function Update-Changelog {
                 ""
                 $Bullets
                 ""
-                "#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)"
+                "#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v$(Get-Version -RepositoryName PowerShellEditorServices)"
                 ""
                 (Get-FirstChangelog -RepositoryName "PowerShellEditorServices").Where({ $_.StartsWith("- ") }, "SkipUntil")
             )
