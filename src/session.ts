@@ -88,11 +88,7 @@ export class SessionManager implements Middleware {
         private telemetryReporter: TelemetryReporter) {
 
         // Create a folder for the session files.
-        if (extensionContext.storageUri !== undefined) {
-            this.sessionsFolder = vscode.Uri.joinPath(extensionContext.storageUri, "sessions");
-        } else {
-            this.sessionsFolder = vscode.Uri.file(path.resolve(__dirname, "../sessions"));
-        }
+        this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri, "sessions");
         vscode.workspace.fs.createDirectory(this.sessionsFolder);
 
         this.platformDetails = getPlatformDetails();

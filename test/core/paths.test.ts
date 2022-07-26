@@ -9,10 +9,10 @@ import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import utils = require("../utils");
 
 describe("Path assumptions", function () {
-    let storageUri: vscode.Uri;
+    let globalStorageUri: vscode.Uri;
     before(async () => {
         const extension: IPowerShellExtensionClient = await utils.ensureEditorServicesIsConnected();
-        storageUri = extension.getStorageUri();
+        globalStorageUri = extension.getStorageUri();
     });
 
     // TODO: This is skipped because it interferes with other tests. Either
@@ -23,10 +23,10 @@ describe("Path assumptions", function () {
     });
 
     it("Creates the session folder at the correct path", function () {
-        assert(fs.existsSync(vscode.Uri.joinPath(storageUri, "sessions").fsPath));
+        assert(fs.existsSync(vscode.Uri.joinPath(globalStorageUri, "sessions").fsPath));
     });
 
     it("Creates the log folder at the correct path", function () {
-        assert(fs.existsSync(vscode.Uri.joinPath(storageUri, "logs").fsPath));
+        assert(fs.existsSync(vscode.Uri.joinPath(globalStorageUri, "logs").fsPath));
     });
 });

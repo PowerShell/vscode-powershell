@@ -39,13 +39,7 @@ export class Logger implements ILogger {
 
     constructor(logBasePath: vscode.Uri) {
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
-
-        if (logBasePath === undefined) {
-            // No workspace, we have to use another folder.
-            this.logBasePath = vscode.Uri.file(path.resolve(__dirname, "../logs"));
-        } else {
-            this.logBasePath = vscode.Uri.joinPath(logBasePath, "logs");
-        }
+        this.logBasePath = vscode.Uri.joinPath(logBasePath, "logs");
 
         this.commands = [
             vscode.commands.registerCommand(
