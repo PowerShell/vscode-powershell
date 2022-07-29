@@ -1,5 +1,31 @@
 # PowerShell Extension Release History
 
+## v2022.7.2
+### Friday, July 29, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 💭 [vscode-powershell #4093](https://github.com/PowerShell/vscode-powershell/pull/4093) - Change `storageUri` to `globalStorageUri` for log and session files.
+- ✨ 📟 [vscode-powershell #4053](https://github.com/PowerShell/vscode-powershell/pull/4090) - Rename "Integrated Console" to "Extension Terminal".
+- ✨ 🚨 [vscode-powershell #4089](https://github.com/PowerShell/vscode-powershell/pull/4089) - Update and extend CI matrix.
+- ✨ 🚂 [vscode-powershell #4088](https://github.com/PowerShell/vscode-powershell/pull/4088) - Use `context.storageUri` for session file (and refactor).
+- ✨ 🔧 [vscode-powershell #4067](https://github.com/PowerShell/vscode-powershell/pull/4071) - Use `context.storageUri` for logs and support `None` level.
+- ✨ 🔧 [vscode-powershell #4064](https://github.com/PowerShell/vscode-powershell/pull/4064) - Add multi-root choice experience to `powershell.cwd`.
+- ✨ 📺 [vscode-powershell #4063](https://github.com/PowerShell/vscode-powershell/pull/4063) - Change configuration title to just `PowerShell`.
+- ✨ 📖 [vscode-powershell #4062](https://github.com/PowerShell/vscode-powershell/pull/4062) - Add note about accidentally disabling completions.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.4.7
+
+- ✨ 🚨 [PowerShellEditorServices #1861](https://github.com/PowerShell/PowerShellEditorServices/pull/1861) - Add `DebuggerBreaksInUntitledScript` unit test.
+- ✨ 📟 [PowerShellEditorServices #1860](https://github.com/PowerShell/PowerShellEditorServices/pull/1860) - Rename "Integrated Console" to "Extension Terminal".
+- ✨ 🚨 [PowerShellEditorServices #1859](https://github.com/PowerShell/PowerShellEditorServices/pull/1859) - Update and extend CI matrix.
+- ✨ 🚨 [PowerShellEditorServices #1858](https://github.com/PowerShell/PowerShellEditorServices/pull/1858) - Add regression test for debugging script with dot-source operator.
+- ✨ 🚨 [PowerShellEditorServices #1857](https://github.com/PowerShell/PowerShellEditorServices/pull/1857) - Add regression test for `$PSDebugContext` in `prompt` function.
+- 🐛 🛫 [PowerShellEditorServices #1849](https://github.com/PowerShell/PowerShellEditorServices/pull/1851) - Add `Directory.Exists()` check to `SetInitialWorkingDirectoryAsync()`.
+- ✨ 🚨 [PowerShellEditorServices #1850](https://github.com/PowerShell/PowerShellEditorServices/pull/1850) - Catch `OperationCanceledException` in both command loops.
+- ✨ 🚨 [PowerShellEditorServices #1793](https://github.com/PowerShell/PowerShellEditorServices/pull/1848) - Improve CI stability.
+- ✨ 🚨 [PowerShellEditorServices #1846](https://github.com/PowerShell/PowerShellEditorServices/pull/1846) - Add end-to-end Pester unit test.
+
 ## v2022.7.2-preview
 ### Tuesday, July 26, 2022
 

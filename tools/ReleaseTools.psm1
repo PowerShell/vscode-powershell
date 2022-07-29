@@ -442,6 +442,7 @@ function New-Release {
         [ValidateScript({ $_.StartsWith("v") })]
         [string]$Version
     )
+    # TODO: Automate rolling a preview to a stable release.
     Update-Changelog -RepositoryName $RepositoryName -Version $Version
     Update-Version -RepositoryName $RepositoryName
     New-ReleasePR -RepositoryName $RepositoryName
