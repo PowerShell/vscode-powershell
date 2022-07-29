@@ -109,7 +109,6 @@ export class PowerShellProcess {
             shellPath: this.exePath,
             shellArgs: powerShellArgs,
             cwd: this.sessionSettings.cwd,
-            hideFromUser: !this.sessionSettings.integratedConsole.showOnStartup,
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
         };
 
