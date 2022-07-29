@@ -317,7 +317,7 @@ export async function validateCwdSetting(): Promise<string> {
     let cwd: string = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd", null);
 
     // Only use the cwd setting if it exists.
-    if (utils.checkIfDirectoryExists(cwd)) {
+    if (await utils.checkIfDirectoryExists(cwd)) {
         return cwd;
     } else {
         // Otherwise use a workspace folder, prompting if necessary.
@@ -333,7 +333,7 @@ export async function validateCwdSetting(): Promise<string> {
         }
         // If there were no workspace folders, or somehow they don't exist, use
         // the home directory.
-        if (cwd === undefined || !utils.checkIfDirectoryExists(cwd)) {
+        if (cwd === undefined || !await utils.checkIfDirectoryExists(cwd)) {
             return os.homedir();
         }
         return cwd;
