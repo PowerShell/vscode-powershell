@@ -64,9 +64,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
             "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
     }
 
-    // This displays a popup and a changelog after an update.
-    checkForUpdatedVersion(context, PackageJSON.version);
-
     // Load and validate settings (will prompt for 'cwd' if necessary).
     await Settings.validateCwdSetting();
     const extensionSettings = Settings.load();
@@ -182,35 +179,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
         getStorageUri: () => externalApi.getStorageUri(),
     };
-}
-
-function checkForUpdatedVersion(context: vscode.ExtensionContext, version: string) {
-
-    const showReleaseNotes = "Show Release Notes";
-    const powerShellExtensionVersionKey = "powerShellExtensionVersion";
-
-    const storedVersion = context.globalState.get(powerShellExtensionVersionKey);
-
-    if (!storedVersion) {
-        // TODO: Prompt to show User Guide for first-time install
-    } else if (version !== storedVersion) {
-        vscode
-            .window
-            .showInformationMessage(
-                `The PowerShell extension has been updated to version ${version}!`,
-                showReleaseNotes)
-            .then((choice) => {
-                if (choice === showReleaseNotes) {
-                    vscode.commands.executeCommand(
-                        "markdown.showPreview",
-                        vscode.Uri.file(path.resolve(__dirname, "../CHANGELOG.md")));
-                }
-            });
-    }
-
-    context.globalState.update(
-        powerShellExtensionVersionKey,
-        version);
 }
 
 export function deactivate(): void {
