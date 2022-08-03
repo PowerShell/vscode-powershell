@@ -1,5 +1,21 @@
 # PowerShell Extension Release History
 
+## v2022.8.0-preview
+### Wednesday, August 03, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #4100](https://github.com/PowerShell/vscode-powershell/pull/4105) - Remove popup when extension updates.
+- 🐛 📁 [vscode-powershell #4102](https://github.com/PowerShell/vscode-powershell/pull/4104) - Fix edge case for workspaces defined with zero folders.
+- 🐛 📁 [vscode-powershell #4098](https://github.com/PowerShell/vscode-powershell/pull/4099) - Fix `checkIfDirectoryExists()` so `validateCwdSetting()` works.
+- ✨ 📟 [vscode-powershell #2523](https://github.com/PowerShell/vscode-powershell/pull/4096) - Don't hide extension terminal entirely.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.4.8
+
+- ✨ 🚨 [PowerShellEditorServices #1867](https://github.com/PowerShell/PowerShellEditorServices/pull/1867) - Add regression test for when `prompt` is undefined.
+- 🐛 🛫 [vscode-powershell #4073](https://github.com/PowerShell/PowerShellEditorServices/pull/1866) - Fix bug where error in `prompt` function crashed REPL.
+- #️⃣ 🙏 [vscode-powershell #2697](https://github.com/PowerShell/PowerShellEditorServices/pull/1864) - Use `HostInfo.BundledModulePath` to find PSScriptAnalyzer.
+
 ## v2022.7.2
 ### Friday, July 29, 2022
 
