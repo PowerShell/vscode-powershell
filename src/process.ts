@@ -211,7 +211,7 @@ export class PowerShellProcess {
 
         // Check every 2 seconds
         for (let i = numOfTries; i > 0; i--) {
-            if (utils.checkIfFileExists(this.sessionFilePath.fsPath)) {
+            if (await utils.checkIfFileExists(this.sessionFilePath)) {
                 this.log.write("Session file found");
                 const sessionDetails = PowerShellProcess.readSessionFile(this.sessionFilePath);
                 PowerShellProcess.deleteSessionFile(this.sessionFilePath);

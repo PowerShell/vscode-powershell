@@ -37,20 +37,19 @@ export function getPipePath(pipeName: string) {
     }
 }
 
-export function checkIfFileExists(filePath: string): boolean {
+export async function checkIfFileExists(filePath: vscode.Uri): Promise<boolean> {
     try {
-        fs.accessSync(filePath, fs.constants.R_OK);
-        return true;
+        const stat: vscode.FileStat = await vscode.workspace.fs.stat(filePath);
+        return stat.type === vscode.FileType.File;
     } catch (e) {
         return false;
     }
 }
 
-export function checkIfDirectoryExists(directoryPath: string): boolean {
+export async function checkIfDirectoryExists(directoryPath: string): Promise<boolean> {
     try {
-        // tslint:disable-next-line:no-bitwise
-        fs.accessSync(directoryPath, fs.constants.R_OK | fs.constants.O_DIRECTORY);
-        return true;
+        const stat: vscode.FileStat = await vscode.workspace.fs.stat(vscode.Uri.file(directoryPath));
+        return stat.type === vscode.FileType.Directory;
     } catch (e) {
         return false;
     }
