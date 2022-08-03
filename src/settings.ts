@@ -320,16 +320,21 @@ export async function validateCwdSetting(): Promise<string> {
     if (await utils.checkIfDirectoryExists(cwd)) {
         return cwd;
     } else {
-        // Otherwise use a workspace folder, prompting if necessary.
-        if (vscode.workspace.workspaceFolders?.length > 1) {
+        // If there is no workspace, or there is but it has no folders, fallback.
+        if (vscode.workspace.workspaceFolders === undefined
+            || vscode.workspace.workspaceFolders?.length === 0) {
+            cwd = undefined;
+            // If there is exactly one workspace folder, use that.
+        } if (vscode.workspace.workspaceFolders?.length === 1) {
+            cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+            // If there is more than one workspace folder, prompt the user.
+        } else if (vscode.workspace.workspaceFolders?.length > 1) {
             const options: vscode.WorkspaceFolderPickOptions = {
                 placeHolder: "Select a folder to use as the PowerShell extension's working directory.",
             }
             cwd = (await vscode.window.showWorkspaceFolderPick(options))?.uri.fsPath;
             // Save the picked 'cwd' to the workspace settings.
             await change("cwd", cwd);
-        } else {
-            cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
         }
         // If there were no workspace folders, or somehow they don't exist, use
         // the home directory.
