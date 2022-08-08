@@ -83,16 +83,10 @@ export class PowerShellProcess {
             PowerShellProcess.escapeSingleQuotes(psesModulePath) +
             "'; Start-EditorServices " + this.startPsesArgs;
 
-        if (utils.isWindows) {
-            powerShellArgs.push(
-                "-Command",
-                startEditorServices);
-        } else {
-            // Use -EncodedCommand for better quote support on non-Windows
-            powerShellArgs.push(
-                "-EncodedCommand",
-                Buffer.from(startEditorServices, "utf16le").toString("base64"));
-        }
+        // Use -EncodedCommand to avoid quoting issues
+        powerShellArgs.push(
+            "-EncodedCommand",
+            Buffer.from(startEditorServices, "utf16le").toString("base64"));
 
         this.log.write(
             "Language server starting --",
