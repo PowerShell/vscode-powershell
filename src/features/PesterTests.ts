@@ -134,7 +134,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         //
         // Ensure the necessary script exists (for testing). The debugger will
         // start regardless, but we also pass its success along.
-        return utils.fileExists(this.invokePesterStubScriptPath)
+        return utils.checkIfFileExists(this.invokePesterStubScriptPath)
             && vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
     }
 }

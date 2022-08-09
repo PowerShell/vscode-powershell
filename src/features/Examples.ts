@@ -15,7 +15,7 @@ export class ExamplesFeature implements vscode.Disposable {
             vscode.commands.executeCommand("vscode.openFolder", this.examplesPath, true);
             // Return existence of the path for testing. The `vscode.openFolder`
             // command should do this, but doesn't (yet).
-            return utils.fileExists(this.examplesPath);
+            return utils.checkIfFileExists(this.examplesPath);
         });
     }
 
