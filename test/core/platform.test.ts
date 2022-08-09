@@ -521,19 +521,19 @@ describe("Platform module", function () {
         }
     });
 
-    describe("Default PowerShell installation", function () {
+    describe("Default PowerShell installation", async function () {
         afterEach(function () {
             sinon.restore();
             mockFS.restore();
         });
 
         for (const testPlatform of successTestCases) {
-            it(`Finds it on ${testPlatform.name}`, function () {
+            it(`Finds it on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const defaultPowerShell = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 const expectedPowerShell = testPlatform.expectedPowerShellSequence[0];
 
                 assert.strictEqual(defaultPowerShell.exePath, expectedPowerShell.exePath);
@@ -542,12 +542,12 @@ describe("Platform module", function () {
         }
 
         for (const testPlatform of errorTestCases) {
-            it(`Fails gracefully on ${testPlatform.name}`, function () {
+            it(`Fails gracefully on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const defaultPowerShell = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 assert.strictEqual(defaultPowerShell, undefined);
             });
         }
@@ -560,12 +560,12 @@ describe("Platform module", function () {
         });
 
         for (const testPlatform of successTestCases) {
-            it(`Finds them on ${testPlatform.name}`, function () {
+            it(`Finds them on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const foundPowerShells = powerShellExeFinder.getAllAvailablePowerShellInstallations();
+                const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
 
                 for (let i = 0; i < testPlatform.expectedPowerShellSequence.length; i++) {
                     const foundPowerShell = foundPowerShells[i];
@@ -583,12 +583,12 @@ describe("Platform module", function () {
         }
 
         for (const testPlatform of errorTestCases) {
-            it(`Fails gracefully on ${testPlatform.name}`, function () {
+            it(`Fails gracefully on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
                 const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const foundPowerShells = powerShellExeFinder.getAllAvailablePowerShellInstallations();
+                const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
                 assert.strictEqual(foundPowerShells.length, 0);
             });
         }
