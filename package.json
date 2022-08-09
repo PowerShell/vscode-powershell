@@ -42,6 +42,7 @@
     "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.EnableISEMode",
     "onCommand:PowerShell.DisableISEMode",
+    "onCommand:PowerShell.ToggleISEMode",
     "onView:PowerShellCommands"
   ],
   "dependencies": {
@@ -153,6 +154,11 @@
       {
         "command": "PowerShell.DisableISEMode",
         "title": "Disable ISE Mode (restore to defaults)",
+        "category": "PowerShell"
+      },
+      {
+        "command": "PowerShell.ToggleISEMode",
+        "title": "Toggle ISE Mode",
         "category": "PowerShell"
       },
       {

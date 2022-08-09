@@ -11,6 +11,7 @@ describe("ISE compatibility feature", function () {
 
     async function enableISEMode() { await vscode.commands.executeCommand("PowerShell.EnableISEMode"); }
     async function disableISEMode() { await vscode.commands.executeCommand("PowerShell.DisableISEMode"); }
+    async function toggleISEMode() { await vscode.commands.executeCommand("PowerShell.ToggleISEMode"); }
 
     before(async function () {
         // Save user's current theme.
@@ -24,7 +25,7 @@ describe("ISE compatibility feature", function () {
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), currentTheme);
     });
 
-    describe("EnableISEMode command", async function () {
+    describe("Enable ISE Mode updates expected settings", async function () {
         before(enableISEMode);
         after(disableISEMode);
         for (const iseSetting of ISECompatibilityFeature.settings) {
@@ -35,13 +36,38 @@ describe("ISE compatibility feature", function () {
         }
     });
 
-    describe("DisableISEMode command", async function () {
+    describe("Disable ISE Mode reverts expected settings", async function () {
         before(enableISEMode);
         before(disableISEMode);
+        after(disableISEMode);
         for (const iseSetting of ISECompatibilityFeature.settings) {
-            it(`Unsets ${iseSetting.name} correctly`, function () {
+            it(`Reverts ${iseSetting.name} correctly`, function () {
                 const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
                 assert.notStrictEqual(currently, iseSetting.value);
+            });
+        }
+    });
+
+    describe("Toggle switches from enabled to disabled", async function () {
+        before(enableISEMode);
+        before(toggleISEMode);
+        after(disableISEMode);
+        for (const iseSetting of ISECompatibilityFeature.settings) {
+            it(`Reverts ${iseSetting.name} correctly`, function () {
+                const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
+                assert.notStrictEqual(currently, iseSetting.value);
+            });
+        }
+    });
+
+    describe("Toggle switches from disabled to enabled", async function () {
+        before(disableISEMode);
+        before(toggleISEMode);
+        after(disableISEMode);
+        for (const iseSetting of ISECompatibilityFeature.settings) {
+            it(`Sets ${iseSetting.name} correctly`, function () {
+                const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
+                assert.strictEqual(currently, iseSetting.value);
             });
         }
     });
