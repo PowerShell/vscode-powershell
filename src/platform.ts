@@ -38,6 +38,7 @@ export interface IPlatformDetails {
 export interface IPowerShellExeDetails {
     readonly displayName: string;
     readonly exePath: string;
+    readonly supportsProperArguments: boolean;
 }
 
 export function getPlatformDetails(): IPlatformDetails {
@@ -266,6 +267,7 @@ export class PowerShellExeFinder {
 
         const dotnetGlobalToolExePath: string = path.join(os.homedir(), ".dotnet", "tools", exeName);
 
+        // The dotnet installed version of PowerShell does not support proper argument parsing, and so it fails with our multi-line startup banner.
         return new PossiblePowerShellExe(dotnetGlobalToolExePath, ".NET Core PowerShell Global Tool", undefined, false);
     }
 

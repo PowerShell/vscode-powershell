@@ -215,6 +215,13 @@ export class SessionManager implements Middleware {
 
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
+        } else if (utils.isWindows && !this.PowerShellExeDetails.supportsProperArguments) {
+            // NOTE: On Windows we don't Base64 encode the startup command
+            // because it annoys some poorly implemented anti-virus scanners.
+            // Unfortunately this means that for some installs of PowerShell
+            // (such as through the `dotnet` package manager), we can't include
+            // a multi-line startup banner as the quotes break the command.
+            this.editorServicesArgs += `-StartupBanner '${this.HostName} Extension v${this.HostVersion}' `;
         } else {
             const startupBanner = `${this.HostName} Extension v${this.HostVersion}
 Copyright (c) Microsoft Corporation.
