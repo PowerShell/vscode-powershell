@@ -94,7 +94,7 @@
       "do {",
       "\t${0:$TM_SELECTED_TEXT}",
       "} while (",
-      "\t${1:<# Condition that stops the loop if it returns false #>})",
+      "\t${1:<# Condition that stops the loop if it returns false #>}",
       ")"
     ]
   },
