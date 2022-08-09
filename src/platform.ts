@@ -6,7 +6,9 @@ import * as os from "os";
 import * as path from "path";
 import * as process from "process";
 import { IPowerShellAdditionalExePathSettings } from "./settings";
-import { checkIfFileExists, checkIfDirectoryExists } from "./utils";
+// This uses require so we can rewire it in unit tests!
+// tslint:disable-next-line:no-var-requires
+const utils = require("./utils")
 
 const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
 const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
@@ -276,7 +278,7 @@ export class PowerShellExeFinder {
         // Find the base directory for MSIX application exe shortcuts
         const msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
 
-        if (!await checkIfDirectoryExists(msixAppDir)) {
+        if (!await utils.checkIfDirectoryExists(msixAppDir)) {
             return null;
         }
 
@@ -319,7 +321,7 @@ export class PowerShellExeFinder {
         const powerShellInstallBaseDir = path.join(programFilesPath, "PowerShell");
 
         // Ensure the base directory exists
-        if (!await checkIfDirectoryExists(powerShellInstallBaseDir)) {
+        if (!await utils.checkIfDirectoryExists(powerShellInstallBaseDir)) {
             return null;
         }
 
@@ -365,7 +367,7 @@ export class PowerShellExeFinder {
 
             // Now look for the file
             const exePath = path.join(powerShellInstallBaseDir, item, "pwsh.exe");
-            if (!await checkIfFileExists(exePath)) {
+            if (!await utils.checkIfFileExists(exePath)) {
                 continue;
             }
 
@@ -491,7 +493,7 @@ class PossiblePowerShellExe implements IPossiblePowerShellExe {
 
     public async exists(): Promise<boolean> {
         if (this.knownToExist === undefined) {
-            this.knownToExist = await checkIfFileExists(this.exePath);
+            this.knownToExist = await utils.checkIfFileExists(this.exePath);
         }
         return this.knownToExist;
     }

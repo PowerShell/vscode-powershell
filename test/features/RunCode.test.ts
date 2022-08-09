@@ -7,7 +7,6 @@ import * as path from "path";
 import rewire = require("rewire");
 import vscode = require("vscode");
 import utils = require("../utils");
-import { sleep } from "../../src/utils";
 
 // Setup function that is not exported.
 const customViews = rewire("../../src/features/RunCode");

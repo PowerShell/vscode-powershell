@@ -5,8 +5,29 @@ import * as assert from "assert";
 import mockFS = require("mock-fs");
 import FileSystem = require("mock-fs/lib/filesystem");
 import * as path from "path";
+import rewire = require("rewire");
 import * as sinon from "sinon";
 import * as platform from "../../src/platform";
+import * as fs from "fs";
+import * as vscode from "vscode";
+
+// We have to rewire the platform module so that mock-fs can be used, as it
+// overrides the fs module but not the vscode.workspace.fs module.
+const platformMock = rewire("../../src/platform");
+
+async function fakeCheckIfFileOrDirectoryExists(targetPath: string | vscode.Uri): Promise<boolean> {
+    try {
+        fs.lstatSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+const utilsMock = {
+    checkIfFileExists: fakeCheckIfFileOrDirectoryExists,
+    checkIfDirectoryExists: fakeCheckIfFileOrDirectoryExists
+}
+platformMock.__set__("utils", utilsMock);
 
 /**
  * Describes a platform on which the PowerShell extension should work,
@@ -469,7 +490,7 @@ function setupTestEnvironment(testPlatform: ITestPlatform) {
 
 describe("Platform module", function () {
     it("Gets the correct platform details", function () {
-        const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
+        const platformDetails: platform.IPlatformDetails = platformMock.getPlatformDetails();
         switch (process.platform) {
             case "darwin":
                 assert.strictEqual(
@@ -521,7 +542,7 @@ describe("Platform module", function () {
         }
     });
 
-    describe("Default PowerShell installation", async function () {
+    describe("Default PowerShell installation", function () {
         afterEach(function () {
             sinon.restore();
             mockFS.restore();
@@ -531,7 +552,7 @@ describe("Platform module", function () {
             it(`Finds it on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
                 const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 const expectedPowerShell = testPlatform.expectedPowerShellSequence[0];
@@ -545,7 +566,7 @@ describe("Platform module", function () {
             it(`Fails gracefully on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
                 const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 assert.strictEqual(defaultPowerShell, undefined);
@@ -563,7 +584,7 @@ describe("Platform module", function () {
             it(`Finds them on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
                 const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
 
@@ -586,7 +607,7 @@ describe("Platform module", function () {
             it(`Fails gracefully on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
                 const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
                 assert.strictEqual(foundPowerShells.length, 0);
@@ -626,7 +647,7 @@ describe("Platform module", function () {
                     altWinPSPath = null;
                 }
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
                 assert.strictEqual(powerShellExeFinder.fixWindowsPowerShellPath(winPSPath), winPSPath);
 
