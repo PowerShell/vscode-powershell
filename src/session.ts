@@ -148,9 +148,9 @@ export class SessionManager implements Middleware {
         this.migrateWhitespaceAroundPipeSetting();
 
         try {
-            let powerShellExeDetails;
+            let powerShellExeDetails: IPowerShellExeDetails;
             if (this.sessionSettings.powerShellDefaultVersion) {
-                for (const details of this.powershellExeFinder.enumeratePowerShellInstallations()) {
+                for await (const details of this.powershellExeFinder.enumeratePowerShellInstallations()) {
                     // Need to compare names case-insensitively, from https://stackoverflow.com/a/2140723
                     const wantedName = this.sessionSettings.powerShellDefaultVersion;
                     if (wantedName.localeCompare(details.displayName, undefined, { sensitivity: "accent" }) === 0) {
@@ -161,7 +161,7 @@ export class SessionManager implements Middleware {
             }
 
             this.PowerShellExeDetails = powerShellExeDetails ||
-                this.powershellExeFinder.getFirstAvailablePowerShellInstallation();
+                await this.powershellExeFinder.getFirstAvailablePowerShellInstallation();
 
         } catch (e) {
             this.log.writeError(`Error occurred while searching for a PowerShell executable:\n${e}`);
@@ -215,6 +215,13 @@ export class SessionManager implements Middleware {
 
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
             this.editorServicesArgs += "-StartupBanner '' ";
+        } else if (utils.isWindows && !this.PowerShellExeDetails.supportsProperArguments) {
+            // NOTE: On Windows we don't Base64 encode the startup command
+            // because it annoys some poorly implemented anti-virus scanners.
+            // Unfortunately this means that for some installs of PowerShell
+            // (such as through the `dotnet` package manager), we can't include
+            // a multi-line startup banner as the quotes break the command.
+            this.editorServicesArgs += `-StartupBanner '${this.HostName} Extension v${this.HostVersion}' `;
         } else {
             const startupBanner = `${this.HostName} Extension v${this.HostVersion}
 Copyright (c) Microsoft Corporation.
@@ -463,7 +470,7 @@ Type 'help' to get help.
     private registerCommands(): void {
         this.registeredCommands = [
             vscode.commands.registerCommand("PowerShell.RestartSession", () => { this.restartSession(); }),
-            vscode.commands.registerCommand(this.ShowSessionMenuCommandName, () => { this.showSessionMenu(); }),
+            vscode.commands.registerCommand(this.ShowSessionMenuCommandName, async () => { await this.showSessionMenu(); }),
             vscode.workspace.onDidChangeConfiguration(async () => { await this.onConfigurationUpdated(); }),
             vscode.commands.registerCommand(
                 "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionConsole(isExecute); }),
@@ -795,8 +802,8 @@ Type 'help' to get help.
         }
     }
 
-    private showSessionMenu() {
-        const availablePowerShellExes = this.powershellExeFinder.getAllAvailablePowerShellInstallations();
+    private async showSessionMenu() {
+        const availablePowerShellExes = await this.powershellExeFinder.getAllAvailablePowerShellInstallations();
 
         let sessionText: string;
 

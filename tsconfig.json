@@ -4,8 +4,11 @@
     // the sources which the tests need). The extension is built with `esbuild`.
     "module": "commonjs",
     "outDir": "out",
-    "target": "ES6",
-    "lib": [ "ES6", "DOM" ],
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
     "sourceMap": true,
     "rootDir": ".",
     // TODO: We need to enable stricter checking...

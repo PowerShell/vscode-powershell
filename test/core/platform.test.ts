@@ -5,8 +5,29 @@ import * as assert from "assert";
 import mockFS = require("mock-fs");
 import FileSystem = require("mock-fs/lib/filesystem");
 import * as path from "path";
+import rewire = require("rewire");
 import * as sinon from "sinon";
 import * as platform from "../../src/platform";
+import * as fs from "fs";
+import * as vscode from "vscode";
+
+// We have to rewire the platform module so that mock-fs can be used, as it
+// overrides the fs module but not the vscode.workspace.fs module.
+const platformMock = rewire("../../src/platform");
+
+async function fakeCheckIfFileOrDirectoryExists(targetPath: string | vscode.Uri): Promise<boolean> {
+    try {
+        fs.lstatSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+const utilsMock = {
+    checkIfFileExists: fakeCheckIfFileOrDirectoryExists,
+    checkIfDirectoryExists: fakeCheckIfFileOrDirectoryExists
+}
+platformMock.__set__("utils", utilsMock);
 
 /**
  * Describes a platform on which the PowerShell extension should work,
@@ -56,34 +77,42 @@ if (process.platform === "win32") {
                 {
                     exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
                     displayName: "PowerShell (x64)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
                     displayName: "PowerShell (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: pwshMsixPath,
                     displayName: "PowerShell (Store)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x64)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: pwshPreviewMsixPath,
                     displayName: "PowerShell Preview (Store)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x64)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true
                 },
             ],
             filesystem: {
@@ -135,10 +164,12 @@ if (process.platform === "win32") {
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x64)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true
                 },
             ],
             filesystem: {
@@ -166,34 +197,42 @@ if (process.platform === "win32") {
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
                     displayName: "PowerShell (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
                     displayName: "PowerShell (x64)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: pwshMsixPath,
                     displayName: "PowerShell (Store)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: pwshPreviewMsixPath,
                     displayName: "PowerShell Preview (Store)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\Program Files\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x64)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x64)",
+                    supportsProperArguments: true
                 },
             ],
             filesystem: {
@@ -245,10 +284,12 @@ if (process.platform === "win32") {
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\WINDOWS\\Sysnative\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x64)",
+                    supportsProperArguments: true
                 },
             ],
             filesystem: {
@@ -276,22 +317,27 @@ if (process.platform === "win32") {
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
                     displayName: "PowerShell (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: pwshMsixPath,
                     displayName: "PowerShell (Store)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
                     displayName: "PowerShell Preview (x86)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: pwshPreviewMsixPath,
                     displayName: "PowerShell Preview (Store)",
+                    supportsProperArguments: true
                 },
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true
                 },
             ],
             filesystem: {
@@ -332,11 +378,49 @@ if (process.platform === "win32") {
                 {
                     exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true
                 },
             ],
             filesystem: {
                 "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
                     "powershell.exe": "",
+                },
+            },
+        },
+        {
+            name: "Windows (dotnet)",
+            platformDetails: {
+                operatingSystem: platform.OperatingSystem.Windows,
+                isOS64Bit: true,
+                isProcess64Bit: true,
+            },
+            environmentVars: {
+                "USERNAME": "test",
+                "USERPROFILE": "C:\\Users\\test",
+                "ProgramFiles": "C:\\Program Files",
+                "ProgramFiles(x86)": "C:\\Program Files (x86)",
+                "windir": "C:\\WINDOWS",
+            },
+            expectedPowerShellSequence: [
+                {
+                    exePath: "C:\\Users\\test\\.dotnet\\tools\\pwsh.exe",
+                    displayName: ".NET Core PowerShell Global Tool",
+                    supportsProperArguments: false
+                },
+                {
+                    exePath: "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                    displayName: "Windows PowerShell (x64)",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
+                    displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true
+                },
+            ],
+            filesystem: {
+                "C:\\Users\\test\\.dotnet\\tools": {
+                    "pwsh.exe": "",
                 },
             },
         },
@@ -351,10 +435,26 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             expectedPowerShellSequence: [
-                { exePath: "/usr/bin/pwsh", displayName: "PowerShell" },
-                { exePath: "/snap/bin/pwsh", displayName: "PowerShell Snap" },
-                { exePath: "/usr/bin/pwsh-preview", displayName: "PowerShell Preview" },
-                { exePath: "/snap/bin/pwsh-preview", displayName: "PowerShell Preview Snap" },
+                {
+                    exePath: "/usr/bin/pwsh",
+                    displayName: "PowerShell",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/snap/bin/pwsh",
+                    displayName: "PowerShell Snap",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/usr/bin/pwsh-preview",
+                    displayName: "PowerShell Preview",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/snap/bin/pwsh-preview",
+                    displayName: "PowerShell Preview Snap",
+                    supportsProperArguments: true
+                },
             ],
             filesystem: {
                 "/usr/bin": {
@@ -375,8 +475,16 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             expectedPowerShellSequence: [
-                { exePath: "/usr/local/bin/pwsh", displayName: "PowerShell" },
-                { exePath: "/usr/local/bin/pwsh-preview", displayName: "PowerShell Preview" },
+                {
+                    exePath: "/usr/local/bin/pwsh",
+                    displayName: "PowerShell",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/usr/local/bin/pwsh-preview",
+                    displayName: "PowerShell Preview",
+                    supportsProperArguments: true
+                },
             ],
             filesystem: {
                 "/usr/local/bin": {
@@ -393,7 +501,11 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             expectedPowerShellSequence: [
-                { exePath: "/usr/bin/pwsh", displayName: "PowerShell" },
+                {
+                    exePath: "/usr/bin/pwsh",
+                    displayName: "PowerShell",
+                    supportsProperArguments: true
+                },
             ],
             filesystem: {
                 "/usr/bin": {
@@ -409,7 +521,11 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             expectedPowerShellSequence: [
-                { exePath: "/snap/bin/pwsh", displayName: "PowerShell Snap" },
+                {
+                    exePath: "/snap/bin/pwsh",
+                    displayName: "PowerShell Snap",
+                    supportsProperArguments: true
+                },
             ],
             filesystem: {
                 "/snap/bin": {
@@ -425,10 +541,62 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             expectedPowerShellSequence: [
-                { exePath: "/usr/local/bin/pwsh", displayName: "PowerShell" },
+                {
+                    exePath: "/usr/local/bin/pwsh",
+                    displayName: "PowerShell",
+                    supportsProperArguments: true
+                },
             ],
             filesystem: {
                 "/usr/local/bin": {
+                    pwsh: "",
+                },
+            },
+        },
+        {
+            name: "MacOS (dotnet)",
+            platformDetails: {
+                operatingSystem: platform.OperatingSystem.MacOS,
+                isOS64Bit: true,
+                isProcess64Bit: true,
+            },
+            environmentVars: {
+                "USER": "test",
+                "HOME": "/Users/test",
+            },
+            expectedPowerShellSequence: [
+                {
+                    exePath: "/Users/test/.dotnet/tools/pwsh",
+                    displayName: ".NET Core PowerShell Global Tool",
+                    supportsProperArguments: false
+                },
+            ],
+            filesystem: {
+                "/Users/test/.dotnet/tools": {
+                    pwsh: "",
+                },
+            },
+        },
+        {
+            name: "Linux (dotnet)",
+            platformDetails: {
+                operatingSystem: platform.OperatingSystem.Linux,
+                isOS64Bit: true,
+                isProcess64Bit: true,
+            },
+            environmentVars: {
+                "USER": "test",
+                "HOME": "/home/test",
+            },
+            expectedPowerShellSequence: [
+                {
+                    exePath: "/home/test/.dotnet/tools/pwsh",
+                    displayName: ".NET Core PowerShell Global Tool",
+                    supportsProperArguments: false
+                },
+            ],
+            filesystem: {
+                "/home/test/.dotnet/tools": {
                     pwsh: "",
                 },
             },
@@ -469,7 +637,7 @@ function setupTestEnvironment(testPlatform: ITestPlatform) {
 
 describe("Platform module", function () {
     it("Gets the correct platform details", function () {
-        const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
+        const platformDetails: platform.IPlatformDetails = platformMock.getPlatformDetails();
         switch (process.platform) {
             case "darwin":
                 assert.strictEqual(
@@ -528,26 +696,27 @@ describe("Platform module", function () {
         });
 
         for (const testPlatform of successTestCases) {
-            it(`Finds it on ${testPlatform.name}`, function () {
+            it(`Finds it on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const defaultPowerShell = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 const expectedPowerShell = testPlatform.expectedPowerShellSequence[0];
 
                 assert.strictEqual(defaultPowerShell.exePath, expectedPowerShell.exePath);
                 assert.strictEqual(defaultPowerShell.displayName, expectedPowerShell.displayName);
+                assert.strictEqual(defaultPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
             });
         }
 
         for (const testPlatform of errorTestCases) {
-            it(`Fails gracefully on ${testPlatform.name}`, function () {
+            it(`Fails gracefully on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const defaultPowerShell = powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 assert.strictEqual(defaultPowerShell, undefined);
             });
         }
@@ -560,12 +729,12 @@ describe("Platform module", function () {
         });
 
         for (const testPlatform of successTestCases) {
-            it(`Finds them on ${testPlatform.name}`, function () {
+            it(`Finds them on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const foundPowerShells = powerShellExeFinder.getAllAvailablePowerShellInstallations();
+                const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
 
                 for (let i = 0; i < testPlatform.expectedPowerShellSequence.length; i++) {
                     const foundPowerShell = foundPowerShells[i];
@@ -573,6 +742,7 @@ describe("Platform module", function () {
 
                     assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell.exePath);
                     assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell.displayName);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
                 }
 
                 assert.strictEqual(
@@ -583,12 +753,12 @@ describe("Platform module", function () {
         }
 
         for (const testPlatform of errorTestCases) {
-            it(`Fails gracefully on ${testPlatform.name}`, function () {
+            it(`Fails gracefully on ${testPlatform.name}`, async function () {
                 setupTestEnvironment(testPlatform);
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
-                const foundPowerShells = powerShellExeFinder.getAllAvailablePowerShellInstallations();
+                const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
                 assert.strictEqual(foundPowerShells.length, 0);
             });
         }
@@ -626,7 +796,7 @@ describe("Platform module", function () {
                     altWinPSPath = null;
                 }
 
-                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails);
+                const powerShellExeFinder = new platformMock.PowerShellExeFinder(testPlatform.platformDetails);
 
                 assert.strictEqual(powerShellExeFinder.fixWindowsPowerShellPath(winPSPath), winPSPath);
 

@@ -9,7 +9,7 @@ import vscode = require("vscode");
 import { Logger } from "./logging";
 import Settings = require("./settings");
 import utils = require("./utils");
-import { IEditorServicesSessionDetails, SessionManager } from "./session";
+import { IEditorServicesSessionDetails } from "./session";
 
 export class PowerShellProcess {
     public static escapeSingleQuotes(psPath: string): string {
@@ -83,12 +83,14 @@ export class PowerShellProcess {
             PowerShellProcess.escapeSingleQuotes(psesModulePath) +
             "'; Start-EditorServices " + this.startPsesArgs;
 
+        // On Windows we unfortunately can't Base64 encode the startup command
+        // because it annoys some poorly implemented anti-virus scanners.
         if (utils.isWindows) {
             powerShellArgs.push(
                 "-Command",
                 startEditorServices);
         } else {
-            // Use -EncodedCommand for better quote support on non-Windows
+            // Otherwise use -EncodedCommand for better quote support.
             powerShellArgs.push(
                 "-EncodedCommand",
                 Buffer.from(startEditorServices, "utf16le").toString("base64"));

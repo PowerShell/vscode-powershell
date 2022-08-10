@@ -3,29 +3,11 @@
 
 "use strict";
 
-import fs = require("fs");
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
 
 export const PowerShellLanguageId = "powershell";
-
-// Check that the file exists in an asynchronous manner that relies solely on the VS Code API, not Node's fs library.
-export async function fileExists(targetPath: string | vscode.Uri): Promise<boolean> {
-    try {
-            await vscode.workspace.fs.stat(
-                targetPath instanceof vscode.Uri
-                    ? targetPath
-                    : vscode.Uri.file(targetPath));
-        return true;
-    } catch (e) {
-        if (e instanceof vscode.FileSystemError.FileNotFound) {
-            return false;
-        }
-        throw e;
-    }
-
-}
 
 export function getPipePath(pipeName: string) {
     if (os.platform() === "win32") {
@@ -37,22 +19,28 @@ export function getPipePath(pipeName: string) {
     }
 }
 
-export async function checkIfFileExists(filePath: vscode.Uri): Promise<boolean> {
+// Check that the file or directory exists in an asynchronous manner that relies
+// solely on the VS Code API, not Node's fs library, ignoring symlinks.
+async function checkIfFileOrDirectoryExists(targetPath: string | vscode.Uri, type: vscode.FileType): Promise<boolean> {
     try {
-        const stat: vscode.FileStat = await vscode.workspace.fs.stat(filePath);
-        return stat.type === vscode.FileType.File;
-    } catch (e) {
+        const stat: vscode.FileStat = await vscode.workspace.fs.stat(
+            targetPath instanceof vscode.Uri
+                ? targetPath
+                : vscode.Uri.file(targetPath));
+        // tslint:disable-next-line:no-bitwise
+        return (stat.type & type) !== 0;
+    } catch {
+        // TODO: Maybe throw if it's not a FileNotFound exception.
         return false;
     }
 }
 
-export async function checkIfDirectoryExists(directoryPath: string): Promise<boolean> {
-    try {
-        const stat: vscode.FileStat = await vscode.workspace.fs.stat(vscode.Uri.file(directoryPath));
-        return stat.type === vscode.FileType.Directory;
-    } catch (e) {
-        return false;
-    }
+export async function checkIfFileExists(filePath: string | vscode.Uri): Promise<boolean> {
+    return await checkIfFileOrDirectoryExists(filePath, vscode.FileType.File);
+}
+
+export async function checkIfDirectoryExists(directoryPath: string | vscode.Uri): Promise<boolean> {
+    return await checkIfFileOrDirectoryExists(directoryPath, vscode.FileType.Directory);
 }
 
 export function getTimestampString() {
