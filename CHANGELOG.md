@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2022.8.1-preview
+### Thursday, August 11, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #3266](https://github.com/PowerShell/vscode-powershell/pull/4125) - Fix debugger to start language client when necessary.
+- 🐛 🛫 [vscode-powershell #4111](https://github.com/PowerShell/vscode-powershell/pull/4121) - Use `vscode.workspace.fs` and suppress startup banner for `dotnet` installs of PowerShell.
+- 🐛 ✂️ [vscode-powershell #4120](https://github.com/PowerShell/vscode-powershell/pull/4120) - fixes #4119. (Thanks @ncook-hxgn!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.4.9
+
+- ✨ 🚨 [PowerShellEditorServices #1874](https://github.com/PowerShell/PowerShellEditorServices/pull/1874) - Add end-to-end integration test with Vim.
+- 🐛 ‍🕵️ [vscode-powershell #4112](https://github.com/PowerShell/PowerShellEditorServices/pull/1873) - Fix (and test) regression with PSScriptAnalyzer default rules.
+- ✨ 🚨 [PowerShellEditorServices #1872](https://github.com/PowerShell/PowerShellEditorServices/pull/1872) - Add regression tests for parse error DiagnosticMarkers. (Thanks @fflaten!)
+- ✨ 🚨 [PowerShellEditorServices #1870](https://github.com/PowerShell/PowerShellEditorServices/pull/1870) - Add `DoesNotDuplicateScriptMarkersAsync` regression test.
+- 🐛 ‍🕵️ [PowerShellEditorServices #1869](https://github.com/PowerShell/PowerShellEditorServices/pull/1869) - Fix duplicate DiagnosticMarkers when reopening a file. (Thanks @fflaten!)
+
 ## v2022.8.0-preview
 ### Wednesday, August 03, 2022
 
