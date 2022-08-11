@@ -153,13 +153,9 @@ export class DebugSessionFeature extends LanguageClientConsumer
         _folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
         _token?: CancellationToken): Promise<DebugConfiguration> {
-        // Make sure there is a session running before attempting to debug/run a program
-        // TODO: Perhaps this should just wait until it's running or aborted.
+
         if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
-            const msg = "Cannot debug or run a PowerShell script until the PowerShell session has started. " +
-                "Wait for the PowerShell session to finish starting and try again.";
-            vscode.window.showWarningMessage(msg);
-            return undefined;
+            await this.sessionManager.start();
         }
 
         // Starting a debug session can be done when there is no document open e.g. attach to PS host process

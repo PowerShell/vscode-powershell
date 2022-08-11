@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import fs = require("fs");
 import net = require("net");
 import path = require("path");
 import * as semver from "semver";
@@ -143,9 +142,9 @@ export class SessionManager implements Middleware {
 
         this.createStatusBarItem();
 
-        this.promptPowerShellExeSettingsCleanup();
+        await this.promptPowerShellExeSettingsCleanup();
 
-        this.migrateWhitespaceAroundPipeSetting();
+        await this.migrateWhitespaceAroundPipeSetting();
 
         try {
             let powerShellExeDetails: IPowerShellExeDetails;
@@ -175,7 +174,7 @@ export class SessionManager implements Middleware {
                 + " You can also configure custom PowerShell installations"
                 + " with the 'powershell.powerShellAdditionalExePaths' setting.";
 
-            this.log.writeAndShowErrorWithActions(message, [
+            await this.log.writeAndShowErrorWithActions(message, [
                 {
                     prompt: "Get PowerShell",
                     action: async () => {
@@ -196,7 +195,7 @@ export class SessionManager implements Middleware {
                     this.sessionSettings.developer.bundledModulesPath);
 
             // Make sure the module's bin path exists
-            if (fs.existsSync(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
+            if (await utils.checkIfDirectoryExists(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
                 this.bundledModulesPath = devBundledModulesPath;
             } else {
                 this.log.write(
@@ -239,7 +238,7 @@ Type 'help' to get help.
             this.editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
         }
 
-        this.startPowerShell();
+        await this.startPowerShell();
     }
 
     public stop() {
@@ -477,7 +476,7 @@ Type 'help' to get help.
         ];
     }
 
-    private startPowerShell() {
+    private async startPowerShell() {
         this.setSessionStatus("Starting...", SessionStatus.Initializing);
 
         this.languageServerProcess =
@@ -498,43 +497,37 @@ Type 'help' to get help.
                 }
             });
 
-        this.languageServerProcess
-            .start("EditorServices")
-            .then(
-                (sessionDetails) => {
-                    this.sessionDetails = sessionDetails;
+        try {
+            this.sessionDetails = await this.languageServerProcess.start("EditorServices");
+        } catch (error) {
+            this.log.write("PowerShell process failed to start.");
+            this.setSessionFailure("PowerShell process failed to start: ", error);
+        }
 
-                    if (sessionDetails.status === "started") {
-                        this.log.write("Language server started.");
-
-                        // Start the language service client
-                        this.startLanguageClient(sessionDetails);
-                    } else if (sessionDetails.status === "failed") {
-                        if (sessionDetails.reason === "unsupported") {
-                            this.setSessionFailure(
-                                "PowerShell language features are only supported on PowerShell version 5.1 and 6.1" +
-                                ` and above. The current version is ${sessionDetails.powerShellVersion}.`);
-                        } else if (sessionDetails.reason === "languageMode") {
-                            this.setSessionFailure(
-                                "PowerShell language features are disabled due to an unsupported LanguageMode: " +
-                                `${sessionDetails.detail}`);
-                        } else {
-                            this.setSessionFailure(
-                                `PowerShell could not be started for an unknown reason '${sessionDetails.reason}'`);
-                        }
-                    } else {
-                        // TODO: Handle other response cases
-                    }
-                },
-                (error) => {
-                    this.log.write("Language server startup failed.");
-                    this.setSessionFailure("The language service could not be started: ", error);
-                },
-            )
-            .catch((error) => {
-                this.log.write("Language server startup failed.");
-                this.setSessionFailure("The language server could not be started: ", error);
-            });
+        if (this.sessionDetails.status === "started") {
+            this.log.write("Language server started.");
+            try {
+                await this.startLanguageClient(this.sessionDetails);
+            } catch (error) {
+                this.log.write("Language client failed to start.");
+                this.setSessionFailure("Language client failed to start: ", error);
+            }
+        } else if (this.sessionDetails.status === "failed") {
+            if (this.sessionDetails.reason === "unsupported") {
+                this.setSessionFailure(
+                    "PowerShell language features are only supported on PowerShell version 5.1 and 7+. " +
+                    `The current version is ${this.sessionDetails.powerShellVersion}.`);
+            } else if (this.sessionDetails.reason === "languageMode") {
+                this.setSessionFailure(
+                    "PowerShell language features are disabled due to an unsupported LanguageMode: " +
+                    `${this.sessionDetails.detail}`);
+            } else {
+                this.setSessionFailure(
+                    `PowerShell could not be started for an unknown reason '${this.sessionDetails.reason}'`);
+            }
+        } else {
+            // TODO: Handle other response cases
+        }
     }
 
     private async promptForRestart() {
@@ -547,148 +540,140 @@ Type 'help' to get help.
         }
     }
 
-    private startLanguageClient(sessionDetails: IEditorServicesSessionDetails) {
+    private async startLanguageClient(sessionDetails: IEditorServicesSessionDetails) {
         // Log the session details object
         this.log.write(JSON.stringify(sessionDetails));
+        this.log.write(`Connecting to language service on pipe ${sessionDetails.languageServicePipeName}...`);
+
+        const connectFunc = () => {
+            return new Promise<StreamInfo>(
+                (resolve, _reject) => {
+                    const socket = net.connect(sessionDetails.languageServicePipeName);
+                    socket.on(
+                        "connect",
+                        () => {
+                            this.log.write("Language service connected.");
+                            resolve({ writer: socket, reader: socket });
+                        });
+                });
+        };
+
+        const clientOptions: LanguageClientOptions = {
+            documentSelector: this.documentSelector,
+            synchronize: {
+                // backend uses "files" and "search" to ignore references.
+                configurationSection: [utils.PowerShellLanguageId, "files", "search"],
+                // fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
+            },
+            // NOTE: Some settings are only applicable on startup, so we send them during initialization.
+            initializationOptions: {
+                enableProfileLoading: this.sessionSettings.enableProfileLoading,
+                initialWorkingDirectory: this.sessionSettings.cwd,
+            },
+            errorHandler: {
+                // Override the default error handler to prevent it from
+                // closing the LanguageClient incorrectly when the socket
+                // hangs up (ECONNRESET errors).
+                error: (_error: any, _message: Message, _count: number): ErrorAction => {
+                    // TODO: Is there any error worth terminating on?
+                    return ErrorAction.Continue;
+                },
+                closed: () => {
+                    // We have our own restart experience
+                    return CloseAction.DoNotRestart;
+                },
+            },
+            revealOutputChannelOn: RevealOutputChannelOn.Never,
+            middleware: this,
+        };
+
+        this.languageServerClient = new LanguageClient("PowerShell Editor Services", connectFunc, clientOptions);
+
+        // This enables handling Semantic Highlighting messages in PowerShell Editor Services
+        this.languageServerClient.registerProposedFeatures();
+
+        if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
+            this.languageServerClient.onTelemetry((event) => {
+                const eventName: string = event.eventName ? event.eventName : "PSESEvent";
+                const data: any = event.data ? event.data : event
+                this.telemetryReporter.sendTelemetryEvent(eventName, data);
+            });
+        }
 
         try {
-            this.log.write(`Connecting to language service on pipe ${sessionDetails.languageServicePipeName}...`);
-
-            const connectFunc = () => {
-                return new Promise<StreamInfo>(
-                    (resolve, reject) => {
-                        const socket = net.connect(sessionDetails.languageServicePipeName);
-                        socket.on(
-                            "connect",
-                            () => {
-                                this.log.write("Language service connected.");
-                                resolve({ writer: socket, reader: socket });
-                            });
-                    });
-            };
-
-            const clientOptions: LanguageClientOptions = {
-                documentSelector: this.documentSelector,
-                synchronize: {
-                    // backend uses "files" and "search" to ignore references.
-                    configurationSection: [utils.PowerShellLanguageId, "files", "search"],
-                    // fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
-                },
-                // NOTE: Some settings are only applicable on startup, so we send them during initialization.
-                initializationOptions: {
-                    enableProfileLoading: this.sessionSettings.enableProfileLoading,
-                    initialWorkingDirectory: this.sessionSettings.cwd,
-                },
-                errorHandler: {
-                    // Override the default error handler to prevent it from
-                    // closing the LanguageClient incorrectly when the socket
-                    // hangs up (ECONNRESET errors).
-                    error: (error: any, message: Message, count: number): ErrorAction => {
-                        // TODO: Is there any error worth terminating on?
-                        return ErrorAction.Continue;
-                    },
-                    closed: () => {
-                        // We have our own restart experience
-                        return CloseAction.DoNotRestart;
-                    },
-                },
-                revealOutputChannelOn: RevealOutputChannelOn.Never,
-                middleware: this,
-            };
-
-            this.languageServerClient =
-                new LanguageClient(
-                    "PowerShell Editor Services",
-                    connectFunc,
-                    clientOptions);
-
-            // This enables handling Semantic Highlighting messages in PowerShell Editor Services
-            this.languageServerClient.registerProposedFeatures();
-
-            if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
-                this.languageServerClient.onTelemetry((event) => {
-                    const eventName: string = event.eventName ? event.eventName : "PSESEvent";
-                    const data: any = event.data ? event.data : event
-                    this.telemetryReporter.sendTelemetryEvent(eventName, data);
-                });
-            }
-
-            this.languageServerClient.onReady().then(
-                () => {
-                    this.languageServerClient
-                        .sendRequest(PowerShellVersionRequestType)
-                        .then(
-                            async (versionDetails) => {
-                                this.versionDetails = versionDetails;
-                                this.started = true;
-
-                                if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
-                                    this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
-                                        { powershellVersion: versionDetails.version });
-                                }
-
-                                this.setSessionVersion(
-                                    this.versionDetails.architecture === "x86"
-                                        ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
-                                        : this.versionDetails.displayVersion);
-
-                                // If the user opted to not check for updates, then don't.
-                                if (!this.sessionSettings.promptToUpdatePowerShell) { return; }
-
-                                try {
-                                    const localVersion = semver.parse(this.versionDetails.version);
-                                    if (semver.lt(localVersion, "6.0.0")) {
-                                        // Skip prompting when using Windows PowerShell for now.
-                                        return;
-                                    }
-
-                                    // Fetch the latest PowerShell releases from GitHub.
-                                    const isPreRelease = !!semver.prerelease(localVersion);
-                                    const release: GitHubReleaseInformation =
-                                        await GitHubReleaseInformation.FetchLatestRelease(isPreRelease);
-
-                                    await InvokePowerShellUpdateCheck(
-                                        this,
-                                        this.languageServerClient,
-                                        localVersion,
-                                        this.versionDetails.architecture,
-                                        release);
-                                } catch (e) {
-                                    // best effort. This probably failed to fetch the data from GitHub.
-                                    this.log.writeWarning(e.message);
-                                }
-                            });
-
-                    // Send the new LanguageClient to extension features
-                    // so that they can register their message handlers
-                    // before the connection is established.
-                    this.updateLanguageClientConsumers(this.languageServerClient);
-                    this.languageServerClient.onNotification(
-                        RunspaceChangedEventType,
-                        (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); });
-
-                    // NOTE: This fixes a quirk where PSES has a thread stuck on
-                    // Console.ReadKey, since it's not cancellable. On
-                    // "cancellation" the server asks us to send pretend to
-                    // press a key, thus mitigating all the quirk.
-                    this.languageServerClient.onNotification(
-                        SendKeyPressNotificationType,
-                        () => { this.languageServerProcess.sendKeyPress(); });
-                },
-                (reason) => {
-                    this.setSessionFailure("Could not start language service: ", reason);
-                });
-
             this.languageServerClient.start();
-        } catch (e) {
-            this.setSessionFailure("The language service could not be started: ", e);
+        } catch (error) {
+            this.setSessionFailure("Could not start language service: ", error);
+            return;
         }
+
+        await this.languageServerClient.onReady();
+
+        this.versionDetails = await this.languageServerClient.sendRequest(PowerShellVersionRequestType);
+        this.started = true;
+
+        if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
+            this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
+                { powershellVersion: this.versionDetails.version });
+        }
+
+        this.setSessionVersion(this.versionDetails.architecture === "x86"
+            ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
+            : this.versionDetails.displayVersion);
+
+        await this.checkForPowerShellUpdate();
+
+        // Send the new LanguageClient to extension features
+        // so that they can register their message handlers
+        // before the connection is established.
+        this.updateLanguageClientConsumers(this.languageServerClient);
+        this.languageServerClient.onNotification(
+            RunspaceChangedEventType,
+            (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); });
+
+        // NOTE: This fixes a quirk where PSES has a thread stuck on
+        // Console.ReadKey, since it's not cancellable. On
+        // "cancellation" the server asks us to send pretend to
+        // press a key, thus mitigating all the quirk.
+        this.languageServerClient.onNotification(
+            SendKeyPressNotificationType,
+            () => { this.languageServerProcess.sendKeyPress(); });
     }
 
     private updateLanguageClientConsumers(languageClient: LanguageClient) {
         this.languageClientConsumers.forEach((feature) => {
             feature.setLanguageClient(languageClient);
         });
+    }
+
+    private async checkForPowerShellUpdate() {
+        // If the user opted to not check for updates, then don't.
+        if (!this.sessionSettings.promptToUpdatePowerShell) {
+            return;
+        }
+
+        const localVersion = semver.parse(this.versionDetails.version);
+        if (semver.lt(localVersion, "6.0.0")) {
+            // Skip prompting when using Windows PowerShell for now.
+            return;
+        }
+
+        try {
+            // Fetch the latest PowerShell releases from GitHub.
+            const isPreRelease = !!semver.prerelease(localVersion);
+            const release: GitHubReleaseInformation =
+                await GitHubReleaseInformation.FetchLatestRelease(isPreRelease);
+
+            await InvokePowerShellUpdateCheck(
+                this,
+                this.languageServerClient,
+                localVersion,
+                this.versionDetails.architecture,
+                release);
+        } catch (error) {
+            // Best effort. This probably failed to fetch the data from GitHub.
+            this.log.writeWarning(error.message);
+        }
     }
 
     private createStatusBarItem() {

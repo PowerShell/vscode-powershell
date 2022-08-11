@@ -26,7 +26,6 @@
     "url": "https://github.com/PowerShell/vscode-powershell.git"
   },
   "activationEvents": [
-    "onDebugInitialConfigurations",
     "onDebugResolve:PowerShell",
     "onLanguage:powershell",
     "onCommand:PowerShell.NewProjectFromTemplate",
