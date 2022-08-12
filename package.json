@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.62.0"
+    "vscode": "^1.65.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/main/README.md",
@@ -62,7 +62,7 @@
     "@types/semver": "~7.3.12",
     "@types/sinon": "~10.0.13",
     "@types/uuid": "~8.3.4",
-    "@types/vscode": "~1.62.0",
+    "@types/vscode": "~1.65.0",
     "@vscode/test-electron": "~2.1.5",
     "esbuild": "^0.15.1",
     "glob": "^8.0.3",

@@ -111,12 +111,8 @@ export class PowerShellProcess {
             shellArgs: powerShellArgs,
             cwd: this.sessionSettings.cwd,
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
+            isTransient: true,
         };
-
-        if (semver.gte(vscode.version, "1.65.0")) {
-            // @ts-ignore TODO: Don't ignore after we update our engine.
-            terminalOptions.isTransient = true;
-        }
 
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
 

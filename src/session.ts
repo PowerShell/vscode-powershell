@@ -91,9 +91,7 @@ export class SessionManager implements Middleware {
     private focusConsoleOnExecute: boolean;
     private platformDetails: IPlatformDetails;
     private languageClientConsumers: LanguageClientConsumer[] = [];
-    // @ts-ignore TODO: Don't ignore after we update our engine.
     private languageStatusItem: vscode.LanguageStatusItem;
-    private statusBarItem: vscode.StatusBarItem;
     private languageServerProcess: PowerShellProcess;
     private debugSessionProcess: PowerShellProcess;
     private debugEventHandler: vscode.Disposable;
@@ -711,90 +709,43 @@ Type 'help' to get help.
 
     private createStatusBarItem() {
         const statusTitle: string = "Show PowerShell Session Menu";
-        // TODO: Remove old status bar logic when we update our engine.
-        if (semver.gte(vscode.version, "1.65.0") && this.languageStatusItem === undefined) {
-            // @ts-ignore
-            this.languageStatusItem = vscode.languages.createLanguageStatusItem("powershell", this.documentSelector);
-            this.languageStatusItem.command = { title: statusTitle, command: this.ShowSessionMenuCommandName };
-            this.languageStatusItem.text = "$(terminal-powershell)";
-        } else if (this.statusBarItem === undefined) {
-            // Create the status bar item and place it right next
-            // to the language indicator
-            this.statusBarItem =
-                vscode.window.createStatusBarItem(
-                    vscode.StatusBarAlignment.Right,
-                    1);
-
-            this.statusBarItem.command = this.ShowSessionMenuCommandName;
-            this.statusBarItem.tooltip = statusTitle;
-            this.statusBarItem.show();
-            vscode.window.onDidChangeActiveTextEditor((textEditor) => {
-                if (textEditor === undefined
-                    || textEditor.document.languageId !== "powershell") {
-                    this.statusBarItem.hide();
-                } else {
-                    this.statusBarItem.show();
-                }
-            });
+        if (this.languageStatusItem !== undefined) {
+            return;
         }
+        this.languageStatusItem = vscode.languages.createLanguageStatusItem("powershell", this.documentSelector);
+        this.languageStatusItem.command = { title: statusTitle, command: this.ShowSessionMenuCommandName };
+        this.languageStatusItem.text = "$(terminal-powershell)";
     }
 
     private setSessionStatus(statusText: string, status: SessionStatus): void {
         this.sessionStatus = status;
-        // TODO: Remove old status bar logic when we update our engine.
-        if (semver.gte(vscode.version, "1.65.0")) {
-            this.languageStatusItem.detail = "PowerShell " + statusText;
-            switch (status) {
-                case SessionStatus.Running:
-                case SessionStatus.NeverStarted:
-                case SessionStatus.NotStarted:
-                    this.languageStatusItem.busy = false;
-                    // @ts-ignore
-                    this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Information;
-                    break;
-                case SessionStatus.Initializing:
-                case SessionStatus.Stopping:
-                    this.languageStatusItem.busy = true;
-                    // @ts-ignore
-                    this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Warning;
-                    break;
-                case SessionStatus.Failed:
-                    this.languageStatusItem.busy = false;
-                    // @ts-ignore
-                    this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Error;
-                    break;
-            }
-        } else {
-            switch (status) {
-                case SessionStatus.Running:
-                case SessionStatus.NeverStarted:
-                case SessionStatus.NotStarted:
-                    this.statusBarItem.text = "$(terminal-powershell)";
-                    // These have to be reset because this function mutates state.
-                    this.statusBarItem.color = undefined;
-                    this.statusBarItem.backgroundColor = undefined;
-                    break;
-                case SessionStatus.Initializing:
-                case SessionStatus.Stopping:
-                    this.statusBarItem.text = "$(sync)";
-                    this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.warningForeground");
-                    this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
-                    break;
-                case SessionStatus.Failed:
-                    this.statusBarItem.text = "$(alert)";
-                    this.statusBarItem.color = new vscode.ThemeColor("statusBarItem.errorForeground");
-                    this.statusBarItem.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
-                    break;
-            }
-            this.statusBarItem.text += " " + statusText;
+        this.languageStatusItem.detail = "PowerShell " + statusText;
+        switch (status) {
+            case SessionStatus.Running:
+            case SessionStatus.NeverStarted:
+            case SessionStatus.NotStarted:
+                this.languageStatusItem.busy = false;
+                // @ts-ignore
+                this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Information;
+                break;
+            case SessionStatus.Initializing:
+            case SessionStatus.Stopping:
+                this.languageStatusItem.busy = true;
+                // @ts-ignore
+                this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Warning;
+                break;
+            case SessionStatus.Failed:
+                this.languageStatusItem.busy = false;
+                // @ts-ignore
+                this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Error;
+                break;
         }
+
     }
 
     private setSessionVersion(version: string): void {
         // TODO: Accept a VersionDetails object instead of a string.
-        if (semver.gte(vscode.version, "1.65.0")) {
-            this.languageStatusItem.text = "$(terminal-powershell) " + version;
-        }
+        this.languageStatusItem.text = "$(terminal-powershell) " + version;
         this.setSessionStatus(version, SessionStatus.Running);
     }
 
