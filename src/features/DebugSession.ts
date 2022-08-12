@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+"use strict";
+
 import vscode = require("vscode");
 import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
     ExtensionContext, WorkspaceFolder } from "vscode";
@@ -25,6 +27,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
     private sessionCount: number = 1;
     private tempDebugProcess: PowerShellProcess;
     private tempSessionDetails: IEditorServicesSessionDetails;
+    private handlers: vscode.Disposable[];
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: Logger) {
         super();
@@ -47,28 +50,32 @@ export class DebugSessionFeature extends LanguageClientConsumer
         return new vscode.DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
     }
 
-    // tslint:disable-next-line:no-empty
     public dispose() {
+        for (const handler of this.handlers) {
+            handler.dispose();
+        }
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
-        languageClient.onNotification(
-            StartDebuggerNotificationType,
-            // TODO: Use a named debug configuration.
-            () => vscode.debug.startDebugging(undefined, {
-                request: "launch",
-                type: "PowerShell",
-                name: "PowerShell: Interactive Session"
-            }));
+        this.handlers = [
+            languageClient.onNotification(
+                StartDebuggerNotificationType,
+                // TODO: Use a named debug configuration.
+                async () => await vscode.debug.startDebugging(undefined, {
+                    request: "launch",
+                    type: "PowerShell",
+                    name: "PowerShell: Interactive Session"
+                })),
 
-        languageClient.onNotification(
-            StopDebuggerNotificationType,
-            () => vscode.debug.stopDebugging(undefined));
+            languageClient.onNotification(
+                StopDebuggerNotificationType,
+                async () => await vscode.debug.stopDebugging(undefined))
+        ];
     }
 
     public async provideDebugConfigurations(
-        folder: WorkspaceFolder | undefined,
-        token?: CancellationToken): Promise<DebugConfiguration[]> {
+        _folder: WorkspaceFolder | undefined,
+        _token?: CancellationToken): Promise<DebugConfiguration[]> {
 
         enum DebugConfig {
             LaunchCurrentFile,

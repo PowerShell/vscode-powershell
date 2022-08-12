@@ -130,15 +130,12 @@ export class PowerShellProcess {
         }
 
         // Start the language client
-        this.log.write("Waiting for session file");
         const sessionDetails = await this.waitForSessionFile();
 
         // Subscribe a log event for when the terminal closes
-        this.log.write("Registering terminal close callback");
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
 
         // Log that the PowerShell terminal process has been started
-        this.log.write("Registering terminal PID log callback");
         this.consoleTerminal.processId.then((pid) => this.logTerminalPid(pid, pwshName));
 
         return sessionDetails;
@@ -212,9 +209,10 @@ export class PowerShellProcess {
         const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
 
         // Check every 2 seconds
+        this.log.write("Waiting for session file...");
         for (let i = numOfTries; i > 0; i--) {
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
-                this.log.write("Session file found");
+                this.log.write("Session file found!");
                 const sessionDetails = PowerShellProcess.readSessionFile(this.sessionFilePath);
                 PowerShellProcess.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
@@ -229,7 +227,7 @@ export class PowerShellProcess {
             await utils.sleep(2000);
         }
 
-        const err = "Timed out waiting for session file to appear.";
+        const err = "Timed out waiting for session file to appear!";
         this.log.write(err);
         throw new Error(err);
     }

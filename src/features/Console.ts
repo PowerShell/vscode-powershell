@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+"use strict";
+
 import vscode = require("vscode");
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
@@ -16,11 +18,11 @@ export const ExecutionStatusChangedNotificationType =
 
 export const ShowChoicePromptRequestType =
     new RequestType<IShowChoicePromptRequestArgs,
-                    IShowChoicePromptResponseBody, string>("powerShell/showChoicePrompt");
+        IShowChoicePromptResponseBody, string>("powerShell/showChoicePrompt");
 
 export const ShowInputPromptRequestType =
     new RequestType<IShowInputPromptRequestArgs,
-                    IShowInputPromptResponseBody, string>("powerShell/showInputPrompt");
+        IShowInputPromptResponseBody, string>("powerShell/showInputPrompt");
 
 export interface IEvaluateRequestArguments {
     expression: string;
@@ -133,24 +135,16 @@ function showChoicePrompt(
 
         resultThenable =
             showCheckboxQuickPick(
-                    checkboxQuickPickItems,
-                    { confirmPlaceHolder: promptDetails.message })
+                checkboxQuickPickItems,
+                { confirmPlaceHolder: promptDetails.message })
                 .then(onItemsSelected);
     }
 
     return resultThenable;
 }
 
-function showInputPrompt(
-    promptDetails: IShowInputPromptRequestArgs,
-    client: LanguageClient): Thenable<IShowInputPromptResponseBody> {
-
-    const resultThenable =
-        vscode.window.showInputBox({
-            placeHolder: promptDetails.name + ": ",
-        }).then(onInputEntered);
-
-    return resultThenable;
+function showInputPrompt(promptDetails: IShowInputPromptRequestArgs): Thenable<IShowInputPromptResponseBody> {
+    return vscode.window.showInputBox({ placeHolder: promptDetails.name + ": " }).then(onInputEntered);
 }
 
 function onItemsSelected(chosenItems: ICheckboxQuickPickItem[]): IShowChoicePromptResponseBody {
@@ -199,13 +193,13 @@ function onInputEntered(responseText: string): IShowInputPromptResponseBody {
 
 export class ConsoleFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
+    private handlers: vscode.Disposable[];
     private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 
     constructor(private log: Logger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
-
                 if (vscode.window.activeTerminal &&
                     vscode.window.activeTerminal.name !== "PowerShell Extension") {
                     this.log.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'");
@@ -224,15 +218,12 @@ export class ConsoleFeature extends LanguageClientConsumer {
                 let selectionRange: vscode.Range;
 
                 if (!editor.selection.isEmpty) {
-                    selectionRange =
-                        new vscode.Range(
-                            editor.selection.start,
-                            editor.selection.end);
+                    selectionRange = new vscode.Range(editor.selection.start, editor.selection.end);
                 } else {
                     selectionRange = editor.document.lineAt(editor.selection.start.line).range;
                 }
 
-                this.languageClient.sendRequest(EvaluateRequestType, {
+                await this.languageClient.sendRequest(EvaluateRequestType, {
                     expression: editor.document.getText(selectionRange),
                 });
 
@@ -247,51 +238,58 @@ export class ConsoleFeature extends LanguageClientConsumer {
     public dispose() {
         // Make sure we cancel any status bar
         this.clearStatusBar();
-        this.commands.forEach((command) => command.dispose());
+        for (const command of this.commands) {
+            command.dispose();
+        }
+        for (const handler of this.handlers) {
+            handler.dispose();
+        }
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
-        this.languageClient.onRequest(
-            ShowChoicePromptRequestType,
-            (promptDetails) => showChoicePrompt(promptDetails, this.languageClient));
+        this.handlers = [
+            this.languageClient.onRequest(
+                ShowChoicePromptRequestType,
+                (promptDetails) => showChoicePrompt(promptDetails, this.languageClient)),
 
-        this.languageClient.onRequest(
-            ShowInputPromptRequestType,
-            (promptDetails) => showInputPrompt(promptDetails, this.languageClient));
+            this.languageClient.onRequest(
+                ShowInputPromptRequestType,
+                (promptDetails) => showInputPrompt(promptDetails)),
 
-        // Set up status bar alerts for when PowerShell is executing a script
-        this.languageClient.onNotification(
-            ExecutionStatusChangedNotificationType,
-            (executionStatusDetails) => {
-                switch (executionStatusDetails.executionStatus) {
-                    // If execution has changed to running, make a notification
-                    case ExecutionStatus.Running:
-                        this.showExecutionStatus("PowerShell");
-                        break;
+            // TODO: We're not receiving these events from the server any more.
+            // Set up status bar alerts for when PowerShell is executing a script.
+            this.languageClient.onNotification(
+                ExecutionStatusChangedNotificationType,
+                (executionStatusDetails) => {
+                    switch (executionStatusDetails.executionStatus) {
+                        // If execution has changed to running, make a notification
+                        case ExecutionStatus.Running:
+                            this.showExecutionStatus("PowerShell");
+                            break;
 
-                    // If the execution has stopped, destroy the previous notification
-                    case ExecutionStatus.Completed:
-                    case ExecutionStatus.Aborted:
-                    case ExecutionStatus.Failed:
-                        this.clearStatusBar();
-                        break;
-                }
-            });
-
+                        // If the execution has stopped, destroy the previous notification
+                        case ExecutionStatus.Completed:
+                        case ExecutionStatus.Aborted:
+                        case ExecutionStatus.Failed:
+                            this.clearStatusBar();
+                            break;
+                    }
+                })
+        ]
     }
 
     private showExecutionStatus(message: string) {
         vscode.window.withProgress({
-                location: vscode.ProgressLocation.Window,
-            }, (progress) => {
-                return new Promise((resolve, reject) => {
-                    this.clearStatusBar();
+            location: vscode.ProgressLocation.Window,
+        }, (progress) => {
+            return new Promise((resolve, _reject) => {
+                this.clearStatusBar();
 
-                    this.resolveStatusBarPromise = resolve;
-                    progress.report({ message });
-                });
+                this.resolveStatusBarPromise = resolve;
+                progress.report({ message });
             });
+        });
     }
 
     private clearStatusBar() {

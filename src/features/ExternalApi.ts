@@ -164,7 +164,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     public async waitUntilStarted(uuid: string = ""): Promise<void> {
         const extension = this.getRegisteredExtension(uuid);
         this.log.writeDiagnostic(`Extension '${extension.id}' called 'waitUntilStarted'`);
-        return this.sessionManager.waitUntilStarted();
+        await this.sessionManager.waitUntilStarted();
     }
 
     public getStorageUri(): vscode.Uri {
