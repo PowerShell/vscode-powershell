@@ -8,7 +8,7 @@ import * as path from "path";
 import rewire = require("rewire");
 import * as sinon from "sinon";
 import * as platform from "../../src/platform";
-import * as fs from "fs";
+import * as fs from "fs"; // NOTE: Necessary for mock-fs.
 import * as vscode from "vscode";
 
 // We have to rewire the platform module so that mock-fs can be used, as it
@@ -23,10 +23,17 @@ async function fakeCheckIfFileOrDirectoryExists(targetPath: string | vscode.Uri)
         return false;
     }
 }
+
+async function fakeReadDirectory(targetPath: string | vscode.Uri): Promise<string[]> {
+    return fs.readdirSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
+}
+
 const utilsMock = {
     checkIfFileExists: fakeCheckIfFileOrDirectoryExists,
-    checkIfDirectoryExists: fakeCheckIfFileOrDirectoryExists
+    checkIfDirectoryExists: fakeCheckIfFileOrDirectoryExists,
+    readDirectory: fakeReadDirectory
 }
+
 platformMock.__set__("utils", utilsMock);
 
 /**

@@ -3,7 +3,7 @@
 
 "use strict";
 
-import fs = require("fs");
+import utils = require("./utils");
 import os = require("os");
 import vscode = require("vscode");
 
@@ -62,7 +62,7 @@ export class Logger implements ILogger {
         return vscode.Uri.joinPath(this.logSessionPath, `${baseName}.log`);
     }
 
-    public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
+    private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
         if (logLevel >= this.MinimumLogLevel) {
             this.writeLine(message, logLevel);
 
@@ -170,22 +170,26 @@ export class Logger implements ILogger {
         }
     }
 
-    private writeLine(message: string, level: LogLevel = LogLevel.Normal): void {
+    // TODO: Should we await this function above?
+    private async writeLine(message: string, level: LogLevel = LogLevel.Normal): Promise<void> {
         const now = new Date();
         const timestampedMessage =
-            `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}`;
+            `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}${os.EOL}`;
 
         this.logChannel.appendLine(timestampedMessage);
         if (this.logFilePath && this.MinimumLogLevel !== LogLevel.None) {
-            fs.appendFile(
-                this.logFilePath.fsPath,
-                timestampedMessage + os.EOL,
-                (err) => {
-                    if (err) {
-                        // tslint:disable-next-line:no-console
-                        console.log(`Error writing to vscode-powershell log file: ${err}`);
-                    }
-                });
+            try {
+                let log = new Uint8Array();
+                if (await utils.checkIfFileExists(this.logFilePath)) {
+                    log = await vscode.workspace.fs.readFile(this.logFilePath);
+                }
+                await vscode.workspace.fs.writeFile(
+                    this.logFilePath,
+                    Buffer.concat([log, Buffer.from(timestampedMessage)]));
+            } catch (e) {
+                // tslint:disable-next-line:no-console
+                console.log(`Error writing to vscode-powershell log file: ${e}`)
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import fs = require("fs");
 import cp = require("child_process");
 import * as semver from "semver";
 import path = require("path");
@@ -189,10 +188,9 @@ export class PowerShellProcess {
         return true;
     }
 
-    private static readSessionFile(sessionFilePath: vscode.Uri): IEditorServicesSessionDetails {
-        // TODO: Use vscode.workspace.fs.readFile instead of fs.readFileSync.
-        const fileContents = fs.readFileSync(sessionFilePath.fsPath, "utf-8");
-        return JSON.parse(fileContents);
+    private static async readSessionFile(sessionFilePath: vscode.Uri): Promise<IEditorServicesSessionDetails> {
+        const fileContents = await vscode.workspace.fs.readFile(sessionFilePath);
+        return JSON.parse(fileContents.toString());
     }
 
     private static async deleteSessionFile(sessionFilePath: vscode.Uri) {
@@ -213,7 +211,7 @@ export class PowerShellProcess {
         for (let i = numOfTries; i > 0; i--) {
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
                 this.log.write("Session file found!");
-                const sessionDetails = PowerShellProcess.readSessionFile(this.sessionFilePath);
+                const sessionDetails = await PowerShellProcess.readSessionFile(this.sessionFilePath);
                 PowerShellProcess.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
             }

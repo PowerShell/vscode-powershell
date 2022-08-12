@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
-import * as fs from "fs";
 import * as vscode from "vscode";
 import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import utils = require("../utils");
+import { checkIfDirectoryExists } from "../../src/utils"
 
 describe("Path assumptions", function () {
     let globalStorageUri: vscode.Uri;
@@ -21,11 +21,11 @@ describe("Path assumptions", function () {
         assert(await vscode.commands.executeCommand("PowerShell.OpenExamplesFolder"));
     });
 
-    it("Creates the session folder at the correct path", function () {
-        assert(fs.existsSync(vscode.Uri.joinPath(globalStorageUri, "sessions").fsPath));
+    it("Creates the session folder at the correct path", async function () {
+        assert(await checkIfDirectoryExists(vscode.Uri.joinPath(globalStorageUri, "sessions")));
     });
 
-    it("Creates the log folder at the correct path", function () {
-        assert(fs.existsSync(vscode.Uri.joinPath(globalStorageUri, "logs").fsPath));
+    it("Creates the log folder at the correct path", async function () {
+        assert(await checkIfDirectoryExists(vscode.Uri.joinPath(globalStorageUri, "logs")));
     });
 });

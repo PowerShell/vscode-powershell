@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as process from "process";
 import { IPowerShellAdditionalExePathSettings } from "./settings";
+
 // This uses require so we can rewire it in unit tests!
 // tslint:disable-next-line:no-var-requires
 const utils = require("./utils")
@@ -290,11 +290,10 @@ export class PowerShellExeFinder {
             : { pwshMsixDirRegex: PowerShellExeFinder.PwshMsixRegex, pwshMsixName: "PowerShell (Store)" };
 
         // We should find only one such application, so return on the first one
-        // TODO: Use VS Code async fs API for this.
-        for (const subdir of fs.readdirSync(msixAppDir)) {
-            if (pwshMsixDirRegex.test(subdir)) {
-                const pwshMsixPath = path.join(msixAppDir, subdir, "pwsh.exe");
-                return new PossiblePowerShellExe(pwshMsixPath, pwshMsixName);
+        for (const name of await utils.readDirectory(msixAppDir)) {
+            // tslint:disable-next-line:no-bitwise
+            if (pwshMsixDirRegex.test(name)) {
+                return new PossiblePowerShellExe(path.join(msixAppDir, name, "pwsh.exe"), pwshMsixName);
             }
         }
 
@@ -329,8 +328,7 @@ export class PowerShellExeFinder {
 
         let highestSeenVersion: number = -1;
         let pwshExePath: string = null;
-        for (const item of fs.readdirSync(powerShellInstallBaseDir)) {
-
+        for (const item of await utils.readDirectory(powerShellInstallBaseDir)) {
             let currentVersion: number = -1;
             if (findPreview) {
                 // We are looking for something like "7-preview"

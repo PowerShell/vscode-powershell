@@ -3,7 +3,6 @@
 
 // TODO: This file needs some TLC to use strict mode.
 
-import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -530,15 +529,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         // Write it to the new document path
         try {
-            // TODO: Change this to be asynchronous
-            await new Promise<void>((resolve, reject) => {
-                fs.writeFile(destinationAbsolutePath, oldDocument.getText(), (err) => {
-                    if (err) {
-                        return reject(err);
-                    }
-                    return resolve();
-                });
-            });
+            await vscode.workspace.fs.writeFile(
+                vscode.Uri.file(destinationAbsolutePath),
+                Buffer.from(oldDocument.getText()));
         } catch (e) {
             this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
                 `Unable to save file to path '${destinationAbsolutePath}': ${e}`);

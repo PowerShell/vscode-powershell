@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
-import * as fs from "fs";
 import * as path from "path";
 import rewire = require("rewire");
 import vscode = require("vscode");
 import utils = require("../utils");
+import { checkIfFileExists } from "../../src/utils"
 
 // Setup function that is not exported.
 const customViews = rewire("../../src/features/RunCode");
@@ -43,7 +43,7 @@ describe("RunCode feature", function () {
 
     it("Runs Pester tests from a file", async function () {
         const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
-        assert(fs.existsSync(pesterTests));
+        assert(checkIfFileExists(pesterTests));
 
         // Open the PowerShell file with Pester tests and then wait a while for
         // the extension to finish connecting to the server.
