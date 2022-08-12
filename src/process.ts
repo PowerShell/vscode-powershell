@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import fs = require("fs");
 import cp = require("child_process");
 import * as semver from "semver";
 import path = require("path");
@@ -112,12 +111,8 @@ export class PowerShellProcess {
             shellArgs: powerShellArgs,
             cwd: this.sessionSettings.cwd,
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
+            isTransient: true,
         };
-
-        if (semver.gte(vscode.version, "1.65.0")) {
-            // @ts-ignore TODO: Don't ignore after we update our engine.
-            terminalOptions.isTransient = true;
-        }
 
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
 
@@ -130,15 +125,12 @@ export class PowerShellProcess {
         }
 
         // Start the language client
-        this.log.write("Waiting for session file");
         const sessionDetails = await this.waitForSessionFile();
 
         // Subscribe a log event for when the terminal closes
-        this.log.write("Registering terminal close callback");
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
 
         // Log that the PowerShell terminal process has been started
-        this.log.write("Registering terminal PID log callback");
         this.consoleTerminal.processId.then((pid) => this.logTerminalPid(pid, pwshName));
 
         return sessionDetails;
@@ -192,10 +184,9 @@ export class PowerShellProcess {
         return true;
     }
 
-    private static readSessionFile(sessionFilePath: vscode.Uri): IEditorServicesSessionDetails {
-        // TODO: Use vscode.workspace.fs.readFile instead of fs.readFileSync.
-        const fileContents = fs.readFileSync(sessionFilePath.fsPath, "utf-8");
-        return JSON.parse(fileContents);
+    private static async readSessionFile(sessionFilePath: vscode.Uri): Promise<IEditorServicesSessionDetails> {
+        const fileContents = await vscode.workspace.fs.readFile(sessionFilePath);
+        return JSON.parse(fileContents.toString());
     }
 
     private static async deleteSessionFile(sessionFilePath: vscode.Uri) {
@@ -212,10 +203,11 @@ export class PowerShellProcess {
         const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
 
         // Check every 2 seconds
+        this.log.write("Waiting for session file...");
         for (let i = numOfTries; i > 0; i--) {
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
-                this.log.write("Session file found");
-                const sessionDetails = PowerShellProcess.readSessionFile(this.sessionFilePath);
+                this.log.write("Session file found!");
+                const sessionDetails = await PowerShellProcess.readSessionFile(this.sessionFilePath);
                 PowerShellProcess.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
             }
@@ -229,7 +221,7 @@ export class PowerShellProcess {
             await utils.sleep(2000);
         }
 
-        const err = "Timed out waiting for session file to appear.";
+        const err = "Timed out waiting for session file to appear!";
         this.log.write(err);
         throw new Error(err);
     }

@@ -22,7 +22,9 @@ export class CustomViewsFeature extends LanguageClientConsumer {
     }
 
     public dispose() {
-        this.commands.forEach((d) => d.dispose());
+        for (const command of this.commands) {
+            command.dispose();
+        }
     }
 
     public setLanguageClient(languageClient: LanguageClient) {
@@ -177,23 +179,17 @@ class HtmlContentView extends CustomView {
         let styleTags = "";
         if (this.htmlContent.styleSheetPaths &&
             this.htmlContent.styleSheetPaths.length > 0) {
-            this.htmlContent.styleSheetPaths.forEach(
-                (styleSheetPath) => {
-                    styleTags += `<link rel="stylesheet" href="${
-                        styleSheetPath.toString().replace("file://", "vscode-resource://")
-                    }">\n`;
-                });
+            for (const styleSheetPath of this.htmlContent.styleSheetPaths) {
+                styleTags += `<link rel="stylesheet" href="${styleSheetPath.toString().replace("file://", "vscode-resource://")}">\n`;
+            }
         }
 
         let scriptTags = "";
         if (this.htmlContent.javaScriptPaths &&
             this.htmlContent.javaScriptPaths.length > 0) {
-            this.htmlContent.javaScriptPaths.forEach(
-                (javaScriptPath) => {
-                    scriptTags += `<script src="${
-                        javaScriptPath.toString().replace("file://", "vscode-resource://")
-                    }"></script>\n`;
-                });
+            for (const javaScriptPath of this.htmlContent.javaScriptPaths) {
+                scriptTags += `<script src="${javaScriptPath.toString().replace("file://", "vscode-resource://")}"></script>\n`;
+            }
         }
 
         // Return an HTML page with the specified content

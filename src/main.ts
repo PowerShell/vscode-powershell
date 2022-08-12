@@ -183,13 +183,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
 export function deactivate(): void {
     // Clean up all extension features
-    languageClientConsumers.forEach((languageClientConsumer) => {
+    for (const languageClientConsumer of languageClientConsumers) {
         languageClientConsumer.dispose();
-    });
+    };
 
-    commandRegistrations.forEach((commandRegistration) => {
+    for (const commandRegistration of commandRegistrations) {
         commandRegistration.dispose();
-    });
+    };
 
     // Dispose of the current session
     sessionManager.dispose();

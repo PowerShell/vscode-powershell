@@ -38,11 +38,12 @@ function getQuickPickItems(items: ICheckboxQuickPickItem[]): vscode.QuickPickIte
     const quickPickItems: vscode.QuickPickItem[] = [];
     quickPickItems.push({ label: confirmItemLabel, description: "" });
 
-    items.forEach((item) =>
+    for (const item of items) {
         quickPickItems.push({
-                label: convertToCheckBox(item),
-                description: item.description,
-        }));
+            label: convertToCheckBox(item),
+            description: item.description,
+        });
+    }
 
     return quickPickItems;
 }

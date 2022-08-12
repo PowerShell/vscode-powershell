@@ -43,6 +43,14 @@ export async function checkIfDirectoryExists(directoryPath: string | vscode.Uri)
     return await checkIfFileOrDirectoryExists(directoryPath, vscode.FileType.Directory);
 }
 
+export async function readDirectory(directoryPath: string | vscode.Uri): Promise<string[]> {
+    const items = await vscode.workspace.fs.readDirectory(
+        directoryPath instanceof vscode.Uri
+            ? directoryPath
+            : vscode.Uri.file(directoryPath));
+    return items.map(([name, _type]) => name);
+}
+
 export function getTimestampString() {
     const time = new Date();
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;

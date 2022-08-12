@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { spawn } from "child_process";
-import * as fs from "fs";
+import * as fs from "fs"; // TODO: Remove, but it's for a stream.
 import fetch, { RequestInit } from "node-fetch";
 import * as os from "os";
 import * as path from "path";

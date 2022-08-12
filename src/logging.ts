@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import fs = require("fs");
+"use strict";
+
+import utils = require("./utils");
 import os = require("os");
-import path = require("path");
 import vscode = require("vscode");
 
 export enum LogLevel {
@@ -19,16 +20,15 @@ export enum LogLevel {
  *  This will allow for easy mocking of the logger during unit tests.
  */
 export interface ILogger {
-    write(message: string, ...additionalMessages: string[]);
-    writeDiagnostic(message: string, ...additionalMessages: string[]);
-    writeVerbose(message: string, ...additionalMessages: string[]);
-    writeWarning(message: string, ...additionalMessages: string[]);
-    writeAndShowWarning(message: string, ...additionalMessages: string[]);
-    writeError(message: string, ...additionalMessages: string[]);
+    write(message: string, ...additionalMessages: string[]): void;
+    writeDiagnostic(message: string, ...additionalMessages: string[]): void;
+    writeVerbose(message: string, ...additionalMessages: string[]): void;
+    writeWarning(message: string, ...additionalMessages: string[]): void;
+    writeAndShowWarning(message: string, ...additionalMessages: string[]): void;
+    writeError(message: string, ...additionalMessages: string[]): void;
 }
 
 export class Logger implements ILogger {
-
     public logBasePath: vscode.Uri;
     public logSessionPath: vscode.Uri;
     public MinimumLogLevel: LogLevel = LogLevel.Normal;
@@ -40,7 +40,6 @@ export class Logger implements ILogger {
     constructor(logBasePath: vscode.Uri) {
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
         this.logBasePath = vscode.Uri.joinPath(logBasePath, "logs");
-
         this.commands = [
             vscode.commands.registerCommand(
                 "PowerShell.ShowLogs",
@@ -48,46 +47,48 @@ export class Logger implements ILogger {
 
             vscode.commands.registerCommand(
                 "PowerShell.OpenLogFolder",
-                () => { this.openLogFolder(); }),
+                async () => { await this.openLogFolder(); }),
         ];
     }
 
     public dispose() {
-        this.commands.forEach((command) => { command.dispose(); });
         this.logChannel.dispose();
+        for (const command of this.commands) {
+            command.dispose();
+        }
     }
 
     public getLogFilePath(baseName: string): vscode.Uri {
         return vscode.Uri.joinPath(this.logSessionPath, `${baseName}.log`);
     }
 
-    public writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]) {
+    private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
         if (logLevel >= this.MinimumLogLevel) {
             this.writeLine(message, logLevel);
 
-            additionalMessages.forEach((line) => {
-                this.writeLine(line, logLevel);
-            });
+            for (const additionalMessage of additionalMessages) {
+                this.writeLine(additionalMessage, logLevel);
+            };
         }
     }
 
-    public write(message: string, ...additionalMessages: string[]) {
+    public write(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Normal, message, ...additionalMessages);
     }
 
-    public writeDiagnostic(message: string, ...additionalMessages: string[]) {
+    public writeDiagnostic(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Diagnostic, message, ...additionalMessages);
     }
 
-    public writeVerbose(message: string, ...additionalMessages: string[]) {
+    public writeVerbose(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Verbose, message, ...additionalMessages);
     }
 
-    public writeWarning(message: string, ...additionalMessages: string[]) {
+    public writeWarning(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Warning, message, ...additionalMessages);
     }
 
-    public writeAndShowWarning(message: string, ...additionalMessages: string[]) {
+    public writeAndShowWarning(message: string, ...additionalMessages: string[]): void {
         this.writeWarning(message, ...additionalMessages);
 
         vscode.window.showWarningMessage(message, "Show Logs").then((selection) => {
@@ -97,23 +98,22 @@ export class Logger implements ILogger {
         });
     }
 
-    public writeError(message: string, ...additionalMessages: string[]) {
+    public writeError(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Error, message, ...additionalMessages);
     }
 
-    public writeAndShowError(message: string, ...additionalMessages: string[]) {
+    public async writeAndShowError(message: string, ...additionalMessages: string[]): Promise<void> {
         this.writeError(message, ...additionalMessages);
 
-        vscode.window.showErrorMessage(message, "Show Logs").then((selection) => {
-            if (selection !== undefined) {
-                this.showLogPanel();
-            }
-        });
+        const choice = await vscode.window.showErrorMessage(message, "Show Logs");
+        if (choice !== undefined) {
+            this.showLogPanel();
+        }
     }
 
     public async writeAndShowErrorWithActions(
         message: string,
-        actions: { prompt: string; action: () => Promise<void> }[]) {
+        actions: { prompt: string; action: () => Promise<void> }[]): Promise<void> {
         this.writeError(message);
 
         const fullActions = [
@@ -134,7 +134,7 @@ export class Logger implements ILogger {
         }
     }
 
-    public async startNewLog(minimumLogLevel: string = "Normal") {
+    public async startNewLog(minimumLogLevel: string = "Normal"): Promise<void> {
         this.MinimumLogLevel = this.logLevelNameToValue(minimumLogLevel.trim());
 
         this.logSessionPath =
@@ -158,34 +158,38 @@ export class Logger implements ILogger {
         }
     }
 
-    private showLogPanel() {
+    private showLogPanel(): void {
         this.logChannel.show();
     }
 
-    private openLogFolder() {
+    private async openLogFolder(): Promise<void> {
         if (this.logSessionPath) {
             // Open the folder in VS Code since there isn't an easy way to
             // open the folder in the platform's file browser
-            vscode.commands.executeCommand("vscode.openFolder", this.logSessionPath, true);
+            await vscode.commands.executeCommand("vscode.openFolder", this.logSessionPath, true);
         }
     }
 
-    private writeLine(message: string, level: LogLevel = LogLevel.Normal) {
+    // TODO: Should we await this function above?
+    private async writeLine(message: string, level: LogLevel = LogLevel.Normal): Promise<void> {
         const now = new Date();
         const timestampedMessage =
-            `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}`;
+            `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}${os.EOL}`;
 
         this.logChannel.appendLine(timestampedMessage);
         if (this.logFilePath && this.MinimumLogLevel !== LogLevel.None) {
-            fs.appendFile(
-                this.logFilePath.fsPath,
-                timestampedMessage + os.EOL,
-                (err) => {
-                    if (err) {
-                        // tslint:disable-next-line:no-console
-                        console.log(`Error writing to vscode-powershell log file: ${err}`);
-                    }
-                });
+            try {
+                let log = new Uint8Array();
+                if (await utils.checkIfFileExists(this.logFilePath)) {
+                    log = await vscode.workspace.fs.readFile(this.logFilePath);
+                }
+                await vscode.workspace.fs.writeFile(
+                    this.logFilePath,
+                    Buffer.concat([log, Buffer.from(timestampedMessage)]));
+            } catch (e) {
+                // tslint:disable-next-line:no-console
+                console.log(`Error writing to vscode-powershell log file: ${e}`)
+            }
         }
     }
 }
