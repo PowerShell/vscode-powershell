@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2022.8.2-preview
+### Friday, August 12, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🛫 [vscode-powershell #4128](https://github.com/PowerShell/vscode-powershell/pull/4131) - Update `vscode-languageclient` and refactor (a lot of TLC).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.4.10
+
+- Just dependency updates.
+
 ## v2022.8.1-preview
 ### Thursday, August 11, 2022
 
@@ -7,7 +18,7 @@
 
 - ✨ 📺 [vscode-powershell #3266](https://github.com/PowerShell/vscode-powershell/pull/4125) - Fix debugger to start language client when necessary.
 - 🐛 🛫 [vscode-powershell #4111](https://github.com/PowerShell/vscode-powershell/pull/4121) - Use `vscode.workspace.fs` and suppress startup banner for `dotnet` installs of PowerShell.
-- 🐛 ✂️ [vscode-powershell #4120](https://github.com/PowerShell/vscode-powershell/pull/4120) - fixes #4119. (Thanks @ncook-hxgn!)
+- 🐛 ✂️ [vscode-powershell #4120](https://github.com/PowerShell/vscode-powershell/pull/4120) - Remove extraneous `)` from the do-while snippet. (Thanks @ncook-hxgn!)
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.4.9
 
