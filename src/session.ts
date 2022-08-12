@@ -98,7 +98,6 @@ export class SessionManager implements Middleware {
     private debugSessionProcess: PowerShellProcess;
     private debugEventHandler: vscode.Disposable;
     private versionDetails: IPowerShellVersionDetails;
-    // TODO: Perhaps consumers should also register their handler disposables.
     private registeredHandlers: vscode.Disposable[] = [];
     private registeredCommands: vscode.Disposable[] = [];
     private languageClient: LanguageClient = undefined;
@@ -536,7 +535,7 @@ Type 'help' to get help.
             this.sessionDetails = await this.languageServerProcess.start("EditorServices");
         } catch (error) {
             this.log.write("PowerShell process failed to start.");
-            this.setSessionFailure("PowerShell process failed to start: ", error);
+            await this.setSessionFailure("PowerShell process failed to start: ", error);
         }
 
         if (this.sessionDetails.status === "started") {
@@ -544,19 +543,19 @@ Type 'help' to get help.
             try {
                 await this.startLanguageClient(this.sessionDetails);
             } catch (error) {
-                this.setSessionFailure("Language client failed to start: ", error);
+                await this.setSessionFailure("Language client failed to start: ", error);
             }
         } else if (this.sessionDetails.status === "failed") {
             if (this.sessionDetails.reason === "unsupported") {
-                this.setSessionFailure(
+                await this.setSessionFailure(
                     "PowerShell language features are only supported on PowerShell version 5.1 and 7+. " +
                     `The current version is ${this.sessionDetails.powerShellVersion}.`);
             } else if (this.sessionDetails.reason === "languageMode") {
-                this.setSessionFailure(
+                await this.setSessionFailure(
                     "PowerShell language features are disabled due to an unsupported LanguageMode: " +
                     `${this.sessionDetails.detail}`);
             } else {
-                this.setSessionFailure(
+                await this.setSessionFailure(
                     `PowerShell could not be started for an unknown reason '${this.sessionDetails.reason}'`);
             }
         } else {
@@ -658,7 +657,7 @@ Type 'help' to get help.
         try {
             await this.languageClient.start();
         } catch (error) {
-            this.setSessionFailure("Could not start language service: ", error);
+            await this.setSessionFailure("Could not start language service: ", error);
             return;
         }
 
@@ -799,9 +798,9 @@ Type 'help' to get help.
         this.setSessionStatus(version, SessionStatus.Running);
     }
 
-    private setSessionFailure(message: string, ...additionalMessages: string[]) {
-        this.log.writeAndShowError(message, ...additionalMessages);
+    private async setSessionFailure(message: string, ...additionalMessages: string[]) {
         this.setSessionStatus("Initialization Error", SessionStatus.Failed);
+        await this.log.writeAndShowError(message, ...additionalMessages);
     }
 
     private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {

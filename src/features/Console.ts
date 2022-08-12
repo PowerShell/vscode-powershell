@@ -129,9 +129,9 @@ function showChoicePrompt(
             });
 
         // Select the defaults
-        promptDetails.defaultChoices.forEach((choiceIndex) => {
-            checkboxQuickPickItems[choiceIndex].isSelected = true;
-        });
+        for (const choice of promptDetails.defaultChoices) {
+            checkboxQuickPickItems[choice].isSelected = true;
+        };
 
         resultThenable =
             showCheckboxQuickPick(

@@ -447,7 +447,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             case "file":
                 // If the file to save can't be found, just complete the request
                 if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
-                    this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
+                    await this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
                     return EditorOperationResponse.Completed;
                 }
 
