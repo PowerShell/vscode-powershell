@@ -261,6 +261,11 @@
         "category": "PowerShell"
       },
       {
+        "command": "PowerShell.WalkthroughTelemetry",
+        "title": "Walkthrough Telemetry",
+        "category": "PowerShell"
+      },
+      {
         "command": "PowerShell.ClosePanel",
         "title": "Close panel",
         "category": "PowerShell",
