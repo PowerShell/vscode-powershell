@@ -7,7 +7,7 @@ import net = require("net");
 import path = require("path");
 import * as semver from "semver";
 import vscode = require("vscode");
-import TelemetryReporter from "@vscode/extension-telemetry";
+import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
 import { Message } from "vscode-jsonrpc";
 import { Logger } from "./logging";
 import { PowerShellProcess } from "./process";
@@ -505,6 +505,11 @@ Type 'help' to get help.
             vscode.workspace.onDidChangeConfiguration(async () => { await this.onConfigurationUpdated(); }),
             vscode.commands.registerCommand(
                 "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionConsole(isExecute); }),
+            vscode.commands.registerCommand(
+                "PowerShell.WalkthroughTelemetry", (satisfaction: number) => {
+                    this.sendTelemetryEvent("powershellWalkthroughSatisfaction", null, { level: satisfaction });
+                }
+            )
         ];
     }
 
@@ -571,6 +576,12 @@ Type 'help' to get help.
         }
     }
 
+    private async sendTelemetryEvent(eventName: string, properties?: TelemetryEventProperties, measures?: TelemetryEventMeasurements) {
+        if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
+            this.telemetryReporter.sendTelemetryEvent(eventName, properties, measures);
+        }
+    }
+
     private async startLanguageClient(sessionDetails: IEditorServicesSessionDetails) {
         this.log.write(`Connecting to language service on pipe: ${sessionDetails.languageServicePipeName}`);
         this.log.write("Session details: " + JSON.stringify(sessionDetails));
@@ -622,13 +633,11 @@ Type 'help' to get help.
         // This enables handling Semantic Highlighting messages in PowerShell Editor Services
         this.languageClient.registerProposedFeatures();
 
-        if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
-            this.languageClient.onTelemetry((event) => {
-                const eventName: string = event.eventName ? event.eventName : "PSESEvent";
-                const data: any = event.data ? event.data : event
-                this.telemetryReporter.sendTelemetryEvent(eventName, data);
-            });
-        }
+        this.languageClient.onTelemetry((event) => {
+            const eventName: string = event.eventName ? event.eventName : "PSESEvent";
+            const data: any = event.data ? event.data : event
+            this.sendTelemetryEvent(eventName, data);
+        });
 
         // Send the new LanguageClient to extension features
         // so that they can register their message handlers
@@ -661,10 +670,7 @@ Type 'help' to get help.
 
         this.versionDetails = await this.languageClient.sendRequest(PowerShellVersionRequestType);
 
-        if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
-            this.telemetryReporter.sendTelemetryEvent("powershellVersionCheck",
-                { powershellVersion: this.versionDetails.version });
-        }
+        this.sendTelemetryEvent("powershellVersionCheck", { powershellVersion: this.versionDetails.version });
 
         this.setSessionVersion(this.versionDetails.architecture === "x86"
             ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
