@@ -25,22 +25,29 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         { path: "editor", name: "wordSeparators", value: "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?" },
         { path: "powershell.buttons", name: "showPanelMovementButtons", value: true }
     ];
-    private iseCommandRegistration: vscode.Disposable;
-    private defaultCommandRegistration: vscode.Disposable;
+
+    private _commandRegistrations: vscode.Disposable[] = [];
+    private _iseModeEnabled: boolean;
 
     constructor() {
-        this.iseCommandRegistration = vscode.commands.registerCommand(
-            "PowerShell.EnableISEMode", this.EnableISEMode);
-        this.defaultCommandRegistration = vscode.commands.registerCommand(
-            "PowerShell.DisableISEMode", this.DisableISEMode);
+        // TODO: This test isn't great.
+        const testSetting = ISECompatibilityFeature.settings[ISECompatibilityFeature.settings.length - 1];
+        this._iseModeEnabled = vscode.workspace.getConfiguration(testSetting.path).get(testSetting.name) === testSetting.value;
+        this._commandRegistrations = [
+            vscode.commands.registerCommand("PowerShell.EnableISEMode", async () => { await this.EnableISEMode(); }),
+            vscode.commands.registerCommand("PowerShell.DisableISEMode", async () => { await this.DisableISEMode(); }),
+            vscode.commands.registerCommand("PowerShell.ToggleISEMode", async () => { await this.ToggleISEMode(); })
+        ]
     }
 
     public dispose() {
-        this.iseCommandRegistration.dispose();
-        this.defaultCommandRegistration.dispose();
+        for (const command of this._commandRegistrations) {
+            command.dispose();
+        }
     }
 
     private async EnableISEMode() {
+        this._iseModeEnabled = true;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             try {
                 await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
@@ -63,11 +70,20 @@ export class ISECompatibilityFeature implements vscode.Disposable {
     }
 
     private async DisableISEMode() {
+        this._iseModeEnabled = false;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             const currently = vscode.workspace.getConfiguration(iseSetting.path).get<string | boolean>(iseSetting.name);
             if (currently === iseSetting.value) {
                 await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, undefined, true);
             }
+        }
+    }
+
+    private async ToggleISEMode() {
+        if (this._iseModeEnabled) {
+            await this.DisableISEMode();
+        } else {
+            await this.EnableISEMode();
         }
     }
 }
