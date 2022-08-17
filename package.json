@@ -609,6 +609,11 @@
           "default": true,
           "description": "Loads user and system-wide PowerShell profiles (profile.ps1 and Microsoft.VSCode_profile.ps1) into the PowerShell session. This affects IntelliSense and interactive script execution, but it does not affect the debugger."
         },
+        "powershell.enableReferencesCodeLens": {
+          "type": "boolean",
+          "default": false,
+          "description": "Displays a code lens above function definitions showing the number of times the function is referenced in the workspace. Enabling this setting can have a high impact on performance in large workspaces."
+        },
         "powershell.bugReporting.project": {
           "type": "string",
           "default": "https://github.com/PowerShell/vscode-powershell",

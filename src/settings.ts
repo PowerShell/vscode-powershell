@@ -101,6 +101,7 @@ export interface ISettings {
     buttons?: IButtonSettings;
     cwd?: string;
     notebooks?: INotebooksSettings;
+    enableReferencesCodeLens?: boolean;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -268,6 +269,8 @@ export function load(): ISettings {
             configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
         cwd: // NOTE: This must be validated at startup via `validateCwdSetting()`. There's probably a better way to do this.
             configuration.get<string>("cwd", undefined),
+        enableReferencesCodeLens:
+            configuration.get<boolean>("enableReferencesCodeLens", false),
     };
 }
 
