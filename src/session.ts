@@ -621,7 +621,10 @@ Type 'help' to get help.
                 },
                 closed: (): CloseHandlerResult => {
                     // We have our own restart experience
-                    return { action: CloseAction.DoNotRestart };
+                    return {
+                        action: CloseAction.DoNotRestart,
+                        message: "Connection to PowerShell Editor Services (the Extension Terminal) was closed. See below prompt to restart!"
+                    };
                 },
             },
             revealOutputChannelOn: RevealOutputChannelOn.Never,
