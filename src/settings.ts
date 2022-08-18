@@ -295,6 +295,7 @@ export async function change(
     configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
 
     const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+    // TODO: Consider wrapping with try/catch, but we can't log the error.
     await configuration.update(settingName, newValue, configurationTarget);
 }
 
@@ -313,34 +314,46 @@ function getWorkspaceSettingsWithDefaults<TSettings>(
     return defaultSettings;
 }
 
+// We don't want to query the user more than once, so this is idempotent.
+let hasPrompted: boolean = false;
+
 export async function validateCwdSetting(): Promise<string> {
-    let cwd: string = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd", null);
+    let cwd: string = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd", undefined);
 
     // Only use the cwd setting if it exists.
     if (await utils.checkIfDirectoryExists(cwd)) {
         return cwd;
-    } else {
-        // If there is no workspace, or there is but it has no folders, fallback.
-        if (vscode.workspace.workspaceFolders === undefined
-            || vscode.workspace.workspaceFolders?.length === 0) {
-            cwd = undefined;
-            // If there is exactly one workspace folder, use that.
-        } if (vscode.workspace.workspaceFolders?.length === 1) {
-            cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-            // If there is more than one workspace folder, prompt the user.
-        } else if (vscode.workspace.workspaceFolders?.length > 1) {
-            const options: vscode.WorkspaceFolderPickOptions = {
-                placeHolder: "Select a folder to use as the PowerShell extension's working directory.",
-            }
-            cwd = (await vscode.window.showWorkspaceFolderPick(options))?.uri.fsPath;
-            // Save the picked 'cwd' to the workspace settings.
-            await change("cwd", cwd);
-        }
-        // If there were no workspace folders, or somehow they don't exist, use
-        // the home directory.
-        if (cwd === undefined || !await utils.checkIfDirectoryExists(cwd)) {
-            return os.homedir();
-        }
-        return cwd;
     }
+
+    // If there is no workspace, or there is but it has no folders, fallback.
+    if (vscode.workspace.workspaceFolders === undefined
+        || vscode.workspace.workspaceFolders?.length === 0) {
+        cwd = undefined;
+        // If there is exactly one workspace folder, use that.
+    } if (vscode.workspace.workspaceFolders?.length === 1) {
+        cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+        // If there is more than one workspace folder, prompt the user once.
+    } else if (vscode.workspace.workspaceFolders?.length > 1 && !hasPrompted) {
+        hasPrompted = true;
+        const options: vscode.WorkspaceFolderPickOptions = {
+            placeHolder: "Select a folder to use as the PowerShell extension's working directory.",
+        }
+        cwd = (await vscode.window.showWorkspaceFolderPick(options))?.uri.fsPath;
+        // Save the picked 'cwd' to the workspace settings.
+        // We have to check again because the user may not have picked.
+        if (await utils.checkIfDirectoryExists(cwd)) {
+            try {
+                await change("cwd", cwd);
+            } catch {
+                // Could fail if workspace file is invalid.
+            }
+        }
+    }
+
+    // If there were no workspace folders, or somehow they don't exist, use
+    // the home directory.
+    if (cwd === undefined || !await utils.checkIfDirectoryExists(cwd)) {
+        return os.homedir();
+    }
+    return cwd;
 }
