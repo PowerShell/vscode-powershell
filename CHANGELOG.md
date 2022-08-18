@@ -1,5 +1,23 @@
 # PowerShell Extension Release History
 
+## v2022.8.3-preview
+### Thursday, August 18, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🚂🙏 [vscode-powershell #4141](https://github.com/PowerShell/vscode-powershell/pull/4141) - Improve language client library close action message.
+- 🐛 🛫 [vscode-powershell #4136](https://github.com/PowerShell/vscode-powershell/pull/4140) - Handle edge case where user closes `cwd` picker.
+- ✨ 🙏 [vscode-powershell #4117](https://github.com/PowerShell/vscode-powershell/pull/4117) - Add `ToggleISEMode` command with tests.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.0
+
+- 🐛 📁 [PowerShellEditorServices #1901](https://github.com/PowerShell/PowerShellEditorServices/pull/1902) - Fix file close in workspace service for Linux. (Thanks @fflaten!)
+- ✨ 🐢 [PowerShellEditorServices #1892](https://github.com/PowerShell/PowerShellEditorServices/pull/1899) - Add symbols for Pester setup and teardown blocks. (Thanks @fflaten!)
+- 🐛 🔍 [PowerShellEditorServices #1897](https://github.com/PowerShell/PowerShellEditorServices/pull/1898) - Add artificial stack frame to represent contexts without one.
+- 🐛 🔍 [PowerShellEditorServices #1894](https://github.com/PowerShell/PowerShellEditorServices/pull/1894) - Fix stepping while watch expressions or interactive pipeline is running.
+- ✨ 🐢 [PowerShellEditorServices #1891](https://github.com/PowerShell/PowerShellEditorServices/pull/1893) - Fix whitespace in Pester symbol and add test. (Thanks @fflaten!)
+- 🐛 🙏 [PowerShellEditorServices #1887](https://github.com/PowerShell/PowerShellEditorServices/pull/1890) - Fix symbol highlight when hovering function name. (Thanks @fflaten!)
+
 ## v2022.8.2-preview
 ### Friday, August 12, 2022
 
