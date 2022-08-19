@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2022.8.4-preview
+### Friday, August 19, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📖 [vscode-powershell #4080](https://github.com/PowerShell/vscode-powershell/pull/4147) - Create a walkthrough experience for PowerShell. (Thanks @S-Hakim!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.0
+
+No update.
+
 ## v2022.8.3-preview
 ### Thursday, August 18, 2022
 
