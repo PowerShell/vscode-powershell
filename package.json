@@ -43,7 +43,8 @@
     "onCommand:PowerShell.EnableISEMode",
     "onCommand:PowerShell.DisableISEMode",
     "onCommand:PowerShell.ToggleISEMode",
-    "onView:PowerShellCommands"
+    "onView:PowerShellCommands",
+    "onWalkthrough:PowerShell"
   ],
   "dependencies": {
     "@vscode/extension-telemetry": "^0.6.2",
@@ -870,12 +871,12 @@
         "powershell.buttons.showRunButtons": {
           "type": "boolean",
           "default": true,
-          "description": "Show the Run and Run Selection buttons in the editor titlebar."
+          "description": "Show the Run and Run Selection buttons in the editor title-bar."
         },
         "powershell.buttons.showPanelMovementButtons": {
           "type": "boolean",
           "default": false,
-          "description": "Show buttons in the editor titlebar for moving the panel around."
+          "description": "Show buttons in the editor title-bar for moving the panel around."
         }
       }
     },
@@ -896,6 +897,77 @@
         "label": "PowerShell ISE",
         "uiTheme": "vs",
         "path": "./themes/theme-psise/theme.json"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "PowerShell",
+        "title": "Get Started with PowerShell",
+        "description": "Set up your environment and see what the PowerShell Extension in Visual Studio Code can help you achieve!",
+        "steps": [
+          {
+            "id": "version",
+            "title": "Choose a version of PowerShell",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "There are multiple versions of PowerShell that you can use with the extension! Choose the version that best fits your needs here.\nFor the newest version of PowerShell, install PowerShell 7 or run ``iex \"& { $(irm https://aka.ms/install-powershell.ps1) } -UseMSI\"``\n[Install PowerShell 7](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.2)\n⭐️ Latest version ― if you want the latest and greatest capabilities.\n💻 Can be used to manage multiple operating systems.\n👥 [Open Source](https://github.com/powershell/powershell) and community-focused!"
+          },
+          {
+            "id": "file",
+            "title": "Create a PowerShell file",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "[Create](command:toSide:workbench.action.files.newUntitledFile?%7B%22languageId%22%3A%22powershell%22%7D) or [open](command:toSide:workbench.action.files.openFolder) a PowerShell file, make sure to save it as ``.ps1``\n[Create a File](command:toSide:workbench.action.files.newUntitledFile?%7B%22languageId%22%3A%22powershell%22%7D)\n**Tip:** Use keyboard shortcut ``Ctrl+N`` to open a new script file or ``Ctrl+O`` to open a file."
+          },
+          {
+            "id": "sessions",
+            "title": "Switch sessions",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "To switch between PowerShell 7 and Windows PowerShell 5.1, use the menu:\n[Open PowerShell Sessions Menu](command:PowerShell.ShowSessionMenu)\nYou can pin the [PowerShell Language Status Icon](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md#how-do-i-change-the-powershell-version) to the status bar in the bottom right-hand corner to easily switch sessions.",
+            "completionEvents": [
+              "onCommand:PowerShell.ShowSessionConsole"
+            ]
+          },
+          {
+            "id": "ise",
+            "title": "Try ISE mode",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "If you are familiar with the Windows PowerShell ISE and would like to configure your settings to simulate the ISE Experience, try the ISE Mode.\n[Toggle ISE Mode](command:PowerShell.ToggleISEMode)",
+            "completionEvents": [
+              "onCommand:PowerShell.ToggleISEMode"
+            ]
+          },
+          {
+            "id": "terminal",
+            "title": "Open the PowerShell Extension Terminal",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "The PowerShell Extension Terminal will run whenever the extension starts in order to enable the its features.\n[Show Panel](command:PowerShell.ShowSessionConsole)\nIf you don't want the terminal panel to open on startup, you can keep the panel closed by configuring ``powershell.integratedConsole.showOnStartup`` in your settings.\n[Close Panel](command:PowerShell.ClosePanel)\n**Tip:** Use keyboard shortcut ``Ctrl+``` to open and close terminal."
+          },
+          {
+            "id": "explore",
+            "title": "Explore more resources",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "Now you are ready to start using the PowerShell Extension on your own and explore more resources!\n📚 See the PowerShell Extension's [documentation](https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode?view=powershell-7.2)\nℹ️ View Visual Studio Code's [documentation](https://code.visualstudio.com/docs/languages/powershell)\n🔌 Plug into the [PowerShell Community](https://docs.microsoft.com/en-us/powershell/scripting/community/community-support?view=powershell-7.2)\n📄 Take a look at our [Release Notes](https://docs.microsoft.com/en-us/powershell/scripting/whats-new/what-s-new-in-powershell-73?view=powershell-7.2)"
+          },
+          {
+            "id": "feedback",
+            "title": "Share your feedback",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "How has this walkthrough affected your confidence level when using the PowerShell Extension?\n[I feel less confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A3%7D)\n[My confidence has not been affected](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A2%7D)\n[I feel more confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A1%7D)"
+          }
+        ]
       }
     ]
   },
