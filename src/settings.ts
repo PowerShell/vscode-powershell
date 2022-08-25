@@ -110,6 +110,7 @@ export interface IStartAsLoginShellSettings {
 
 export interface IIntegratedConsoleSettings {
     showOnStartup?: boolean;
+    startInBackground?: boolean;
     focusConsoleOnExecute?: boolean;
     useLegacyReadLine?: boolean;
     forceClearScrollbackBuffer?: boolean;
@@ -196,6 +197,7 @@ export function load(): ISettings {
 
     const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
         showOnStartup: true,
+        startInBackground: false,
         focusConsoleOnExecute: true,
         useLegacyReadLine: false,
         forceClearScrollbackBuffer: false,

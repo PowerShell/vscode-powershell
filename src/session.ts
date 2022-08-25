@@ -462,17 +462,12 @@ Type 'help' to get help.
 
         // Detect any setting changes that would affect the session
         if (!this.suppressRestartPrompt &&
-            (settings.cwd?.toLowerCase() !==
-                this.sessionSettings.cwd?.toLowerCase() ||
-                settings.powerShellDefaultVersion.toLowerCase() !==
-                this.sessionSettings.powerShellDefaultVersion.toLowerCase() ||
-            settings.developer.editorServicesLogLevel.toLowerCase() !==
-                this.sessionSettings.developer.editorServicesLogLevel.toLowerCase() ||
-            settings.developer.bundledModulesPath.toLowerCase() !==
-                this.sessionSettings.developer.bundledModulesPath.toLowerCase() ||
-            settings.integratedConsole.useLegacyReadLine !==
-                this.sessionSettings.integratedConsole.useLegacyReadLine)) {
-
+            (settings.cwd?.toLowerCase() !== this.sessionSettings.cwd?.toLowerCase()
+                || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
+                || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
+                || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
+                || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
+                || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground)) {
             const response: string = await vscode.window.showInformationMessage(
                 "The PowerShell runtime configuration has changed, would you like to start a new session?",
                 "Yes", "No");
