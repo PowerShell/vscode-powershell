@@ -112,6 +112,7 @@ export class PowerShellProcess {
             cwd: this.sessionSettings.cwd,
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
             isTransient: true,
+            hideFromUser: this.sessionSettings.integratedConsole.startInBackground,
         };
 
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
@@ -119,7 +120,8 @@ export class PowerShellProcess {
         const pwshName = path.basename(this.exePath);
         this.log.write(`${pwshName} started.`);
 
-        if (this.sessionSettings.integratedConsole.showOnStartup) {
+        if (this.sessionSettings.integratedConsole.showOnStartup
+            && !this.sessionSettings.integratedConsole.startInBackground) {
             // We still need to run this to set the active terminal to the extension terminal.
             this.consoleTerminal.show(true);
         }

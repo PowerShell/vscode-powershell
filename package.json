@@ -772,7 +772,12 @@
         "powershell.integratedConsole.showOnStartup": {
           "type": "boolean",
           "default": true,
-          "description": "Shows the Extension Terminal when the PowerShell extension is initialized."
+          "description": "Shows the Extension Terminal when the PowerShell extension is initialized. When disabled, the pane is not opened on startup, but the Extension Terminal is still created in order to power the extension's features."
+        },
+        "powershell.integratedConsole.startInBackground": {
+          "type": "boolean",
+          "default": false,
+          "description": "Starts the Extension Terminal in the background. WARNING: If this is enabled, to access the terminal you must run the 'Show Extension Terminal' command, and once shown it cannot be put back into the background. This option completely hides the Extension Terminal from the terminals pane. You are probably looking for the 'showOnStartup' option instead."
         },
         "powershell.integratedConsole.focusConsoleOnExecute": {
           "type": "boolean",
