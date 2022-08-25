@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2022.8.5-preview
+### Thursday, August 25, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🔧 [vscode-powershell #4151](https://github.com/PowerShell/vscode-powershell/pull/4152) - Add `integratedConsole.startInBackground` to completely hide the terminal.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.1
+
+- 🐛 ‍🕵️ [PowerShellEditorServices #1906](https://github.com/PowerShell/PowerShellEditorServices/pull/1907) - Remove `null` markers to avoid `NullReferenceException`.
+
 ## v2022.8.4-preview
 ### Friday, August 19, 2022
 
