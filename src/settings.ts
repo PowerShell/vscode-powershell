@@ -270,7 +270,7 @@ export function load(): ISettings {
         cwd: // NOTE: This must be validated at startup via `validateCwdSetting()`. There's probably a better way to do this.
             configuration.get<string>("cwd", undefined),
         enableReferencesCodeLens:
-            configuration.get<boolean>("enableReferencesCodeLens", false),
+            configuration.get<boolean>("enableReferencesCodeLens", true),
     };
 }
 
