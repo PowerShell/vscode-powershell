@@ -611,8 +611,8 @@
         },
         "powershell.enableReferencesCodeLens": {
           "type": "boolean",
-          "default": false,
-          "description": "Displays a code lens above function definitions showing the number of times the function is referenced in the workspace. Enabling this setting can have a high impact on performance in large workspaces."
+          "default": true,
+          "description": "Displays a code lens above function definitions showing the number of times the function is referenced in the workspace. Large workspaces should disable this setting due to high performance impact."
         },
         "powershell.bugReporting.project": {
           "type": "string",
