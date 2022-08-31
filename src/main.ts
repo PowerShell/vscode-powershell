@@ -181,7 +181,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     };
 }
 
-export function deactivate(): void {
+export async function deactivate(): Promise<void> {
     // Clean up all extension features
     for (const languageClientConsumer of languageClientConsumers) {
         languageClientConsumer.dispose();
@@ -192,11 +192,11 @@ export function deactivate(): void {
     };
 
     // Dispose of the current session
-    sessionManager.dispose();
+    await sessionManager.dispose();
 
     // Dispose of the logger
     logger.dispose();
 
     // Dispose of telemetry reporter
-    telemetryReporter.dispose();
+    await telemetryReporter.dispose();
 }

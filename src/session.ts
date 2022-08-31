@@ -103,6 +103,7 @@ export class SessionManager implements Middleware {
     private sessionDetails: IEditorServicesSessionDetails;
     private sessionsFolder: vscode.Uri;
     private bundledModulesPath: string;
+    private starting: boolean = false;
     private started: boolean = false;
 
     // Initialized by the start() method, since this requires settings
@@ -160,6 +161,19 @@ export class SessionManager implements Middleware {
     }
 
     public async start(exeNameOverride?: string) {
+        // A simple lock because this function isn't re-entrant.
+        if (this.started || this.starting) {
+            return await this.waitUntilStarted();
+        }
+        try {
+            this.starting = true;
+            await this._start(exeNameOverride);
+        } finally {
+            this.starting = false;
+        }
+    }
+
+    private async _start(exeNameOverride?: string) {
         await Settings.validateCwdSetting();
         this.sessionSettings = Settings.load();
 
@@ -275,31 +289,41 @@ Type 'help' to get help.
     public async stop() {
         this.log.write("Shutting down language client...");
 
-        if (this.sessionStatus === SessionStatus.Failed) {
-            // Before moving further, clear out the client and process if
-            // the process is already dead (i.e. it crashed).
-            this.languageClient = undefined;
-            this.languageServerProcess = undefined;
-        }
+        try {
+            if (this.sessionStatus === SessionStatus.Failed) {
+                // Before moving further, clear out the client and process if
+                // the process is already dead (i.e. it crashed).
+                this.languageClient.dispose();
+                this.languageClient = undefined;
+                this.languageServerProcess.dispose();
+                this.languageServerProcess = undefined;
+            }
 
-        this.sessionStatus = SessionStatus.Stopping;
+            this.sessionStatus = SessionStatus.Stopping;
 
-        // Stop the language client.
-        if (this.languageClient !== undefined) {
-            await this.languageClient.stop();
-            this.languageClient = undefined;
-        }
+            // Stop the language client.
+            if (this.languageClient !== undefined) {
+                await this.languageClient.stop();
+                this.languageClient.dispose();
+                this.languageClient = undefined;
+            }
 
-        // Kill the PowerShell process(es) we spawned.
-        if (this.debugSessionProcess) {
-            this.debugSessionProcess.dispose();
-            this.debugEventHandler.dispose();
-        }
-        if (this.languageServerProcess) {
-            this.languageServerProcess.dispose();
-        }
+            // Kill the PowerShell process(es) we spawned.
+            if (this.debugSessionProcess) {
+                this.debugSessionProcess.dispose();
+                this.debugSessionProcess = undefined;
+                this.debugEventHandler.dispose();
+                this.debugEventHandler = undefined;
+            }
 
-        this.sessionStatus = SessionStatus.NotStarted;
+            if (this.languageServerProcess) {
+                this.languageServerProcess.dispose();
+                this.languageServerProcess = undefined;
+            }
+        } finally {
+            this.sessionStatus = SessionStatus.NotStarted;
+            this.started = false;
+        }
     }
 
     public async restartSession(exeNameOverride?: string) {
