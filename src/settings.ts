@@ -102,6 +102,7 @@ export interface ISettings {
     cwd?: string;
     notebooks?: INotebooksSettings;
     enableReferencesCodeLens?: boolean;
+    analyzeOpenDocumentsOnly?: boolean;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -273,6 +274,8 @@ export function load(): ISettings {
             configuration.get<string>("cwd", undefined),
         enableReferencesCodeLens:
             configuration.get<boolean>("enableReferencesCodeLens", true),
+        analyzeOpenDocumentsOnly:
+            configuration.get<boolean>("analyzeOpenDocumentsOnly", true),
     };
 }
 
