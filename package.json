@@ -644,7 +644,7 @@
         "powershell.cwd": {
           "type": "string",
           "default": null,
-          "description": "An explicit start path where the PowerShell Extension Terminal will be launched. Both the PowerShell process and the shell's location will be set to this directory. Predefined variables can be used (i.e. ${fileDirname} to use the current opened file's directory)."
+          "description": "An explicit start path where the PowerShell Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. A real path must be provided!"
         },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
