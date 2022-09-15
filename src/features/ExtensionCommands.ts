@@ -222,7 +222,6 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                         type: "PowerShell",
                         request: "launch",
                         script: "${file}",
-                        cwd: "${file}",
                     })
                 })
         ]

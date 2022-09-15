@@ -27,17 +27,15 @@ describe("RunCode feature", function () {
         const expected: object = {
             request: "launch",
             type: "PowerShell",
-            name: "PowerShell Run Code",
-            script: commandToRun,
-            args,
+            name: "PowerShell: Run Code",
             internalConsoleOptions: "neverOpen",
             noDebug: false,
             createTemporaryIntegratedConsole: false,
-            cwd: vscode.workspace.rootPath,
+            script: commandToRun,
+            args,
         };
 
         const actual: object = createLaunchConfig(LaunchType.Debug, commandToRun, args);
-
         assert.deepStrictEqual(actual, expected);
     });
 

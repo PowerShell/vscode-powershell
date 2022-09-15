@@ -442,7 +442,7 @@
               "type": "PowerShell",
               "request": "launch",
               "script": "^\"\\${file}\"",
-              "cwd": "^\"\\${file}\""
+              "cwd": "^\"\\${cwd}\""
             }
           },
           {
@@ -453,7 +453,7 @@
               "type": "PowerShell",
               "request": "launch",
               "script": "^\"enter path or command to execute e.g.: \\${workspaceFolder}/src/foo.ps1 or Invoke-Pester\"",
-              "cwd": "^\"\\${workspaceFolder}\""
+              "cwd": "^\"\\${cwd}\""
             }
           },
           {
@@ -463,7 +463,7 @@
               "name": "PowerShell Interactive Session",
               "type": "PowerShell",
               "request": "launch",
-              "cwd": ""
+              "cwd": "^\"\\${cwd}\""
             }
           },
           {

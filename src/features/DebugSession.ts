@@ -14,6 +14,7 @@ import { IEditorServicesSessionDetails, SessionManager, SessionStatus } from "..
 import Settings = require("../settings");
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import path = require("path");
 
 export const StartDebuggerNotificationType =
     new NotificationType<void>("powerShell/startDebugger");
@@ -121,7 +122,6 @@ export class DebugSessionFeature extends LanguageClientConsumer
                         type: "PowerShell",
                         request: "launch",
                         script: "${file}",
-                        cwd: "${file}",
                     },
                 ];
             case DebugConfig.LaunchScript:
@@ -130,8 +130,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                         name: "PowerShell: Launch Script",
                         type: "PowerShell",
                         request: "launch",
-                        script: "enter path or command to execute e.g.: ${workspaceFolder}/src/foo.ps1 or Invoke-Pester",
-                        cwd: "${workspaceFolder}",
+                        script: "Enter path or command to execute, for example: \"${workspaceFolder}/src/foo.ps1\" or \"Invoke-Pester\"",
                     },
                 ];
             case DebugConfig.InteractiveSession:
@@ -140,7 +139,6 @@ export class DebugSessionFeature extends LanguageClientConsumer
                         name: "PowerShell: Interactive Session",
                         type: "PowerShell",
                         request: "launch",
-                        cwd: "",
                     },
                 ];
             case DebugConfig.AttachHostProcess:
@@ -155,168 +153,133 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
     }
 
-    // DebugConfigurationProvider method
+    // DebugConfigurationProvider methods
     public async resolveDebugConfiguration(
         _folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
         _token?: CancellationToken): Promise<DebugConfiguration> {
 
-        if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
-            await this.sessionManager.start();
-        }
-
-        // Starting a debug session can be done when there is no document open e.g. attach to PS host process
-        const currentDocument = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.document : undefined;
-        const debugCurrentScript = (config.script === "${file}") || !config.request;
-        const generateLaunchConfig = !config.request;
-
-        const settings = Settings.load();
-
-        // If the createTemporaryIntegratedConsole field is not specified in the launch config, set the field using
-        // the value from the corresponding setting. Otherwise, the launch config value overrides the setting.
-        config.createTemporaryIntegratedConsole =
-            config.createTemporaryIntegratedConsole ??
-            settings.debugging.createTemporaryIntegratedConsole;
-
-        if (config.request === "attach") {
-            const platformDetails = getPlatformDetails();
-            const versionDetails = this.sessionManager.getPowerShellVersionDetails();
-
-            // Cross-platform attach to process was added in 6.2.0-preview.4
-            if (versionDetails.version < "6.2.0" && platformDetails.operatingSystem !== OperatingSystem.Windows) {
-                const msg = `Attaching to a PowerShell Host Process on ${
-                    OperatingSystem[platformDetails.operatingSystem] } requires PowerShell 6.2 or higher.`;
-                return vscode.window.showErrorMessage(msg).then((_) => {
-                    return undefined;
-                });
-            }
-
-            // if nothing is set, prompt for the processId
-            if (!config.customPipeName && !config.processId) {
-                config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
-
-                // No process selected. Cancel attach.
-                if (!config.processId) {
-                    return null;
-                }
-            }
-
-            if (!config.runspaceId && !config.runspaceName) {
-                config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
-
-                // No runspace selected. Cancel attach.
-                if (!config.runspaceId) {
-                    return null;
-                }
-            }
-        }
-
-        // TODO: Use a named debug configuration.
-        if (generateLaunchConfig) {
-            // No launch.json, create the default configuration for both unsaved (Untitled) and saved documents.
-            config.type = "PowerShell";
-            config.name = "PowerShell: Launch Current File";
-            config.request = "launch";
-            config.args = [];
-
-            config.script =
-                currentDocument.isUntitled
-                    ? currentDocument.uri.toString()
-                    : currentDocument.fileName;
-
-            if (config.createTemporaryIntegratedConsole) {
-                // For a folder-less workspace, vscode.workspace.rootPath will be undefined.
-                // PSES will convert that undefined to a reasonable working dir.
-                config.cwd =
-                    currentDocument.isUntitled
-                        ? vscode.workspace.rootPath
-                        : currentDocument.fileName;
-
-            } else {
-                // If the non-temp Extension Terminal is being used, default to the current working dir.
-                config.cwd = "";
-            }
-        }
-
-        if (config.request === "launch") {
-            // For debug launch of "current script" (saved or unsaved), warn before starting the debugger if either
-            // A) there is not an active document
-            // B) the unsaved document's language type is not PowerShell
-            // C) the saved document's extension is a type that PowerShell can't debug.
-            if (debugCurrentScript) {
-
-                if (currentDocument === undefined) {
-                    const msg = "To debug the \"Current File\", you must first open a " +
-                                "PowerShell script file in the editor.";
-                    vscode.window.showErrorMessage(msg);
-                    return;
-                }
-
-                if (currentDocument.isUntitled) {
-                    if (config.createTemporaryIntegratedConsole) {
-                        const msg = "Debugging Untitled files in a temporary console is currently not supported.";
-                        vscode.window.showErrorMessage(msg);
-                        return;
-                    }
-
-                    if (currentDocument.languageId === "powershell") {
-                        if (!generateLaunchConfig) {
-                            // Cover the case of existing launch.json but unsaved (Untitled) document.
-                            // In this case, vscode.workspace.rootPath will not be undefined.
-                            config.script = currentDocument.uri.toString();
-                            config.cwd = vscode.workspace.rootPath;
-                        }
-                    } else {
-                        const msg = "To debug '" + currentDocument.fileName + "', change the document's " +
-                                    "language mode to PowerShell or save the file with a PowerShell extension.";
-                        vscode.window.showErrorMessage(msg);
-                        return;
-                    }
-                } else {
-                    let isValidExtension = false;
-                    const extIndex = currentDocument.fileName.lastIndexOf(".");
-                    if (extIndex !== -1) {
-                        const ext = currentDocument.fileName.substr(extIndex + 1).toUpperCase();
-                        isValidExtension = (ext === "PS1" || ext === "PSM1");
-                    }
-
-                    if ((currentDocument.languageId !== "powershell") || !isValidExtension) {
-                        let docPath = currentDocument.fileName;
-                        const workspaceRootPath = vscode.workspace.rootPath;
-                        if (currentDocument.fileName.startsWith(workspaceRootPath)) {
-                            docPath = currentDocument.fileName.substring(vscode.workspace.rootPath.length + 1);
-                        }
-
-                        const msg = "PowerShell does not support debugging this file type: '" + docPath + "'.";
-                        vscode.window.showErrorMessage(msg);
-                        return;
-                    }
-
-                    if (config.script === "${file}") {
-                        config.script = currentDocument.fileName;
-                    }
-                }
-            }
-
-            // NOTE: There is a tight coupling to a weird setting in
-            // `package.json` for the Launch Current File configuration where
-            // the default cwd is set to ${file}.
-            if ((currentDocument !== undefined) && (config.cwd === "${file}")) {
-                config.cwd = currentDocument.fileName;
-            }
-        }
-
         // Prevent the Debug Console from opening
         config.internalConsoleOptions = "neverOpen";
 
-        // Create or show the interactive console
-        vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+        // NOTE: We intentionally do not touch the `cwd` setting of the config.
+
+        // If the createTemporaryIntegratedConsole field is not specified in the
+        // launch config, set the field using the value from the corresponding
+        // setting. Otherwise, the launch config value overrides the setting.
+        //
+        // Also start the temporary process and console for this configuration.
+        const settings = Settings.load();
+        config.createTemporaryIntegratedConsole =
+            config.createTemporaryIntegratedConsole ??
+            settings.debugging.createTemporaryIntegratedConsole;
 
         if (config.createTemporaryIntegratedConsole) {
             this.tempDebugProcess = this.sessionManager.createDebugSessionProcess(settings);
             this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
         }
 
+        if (!config.request) {
+            // No launch.json, create the default configuration for both unsaved
+            // (Untitled) and saved documents.
+            config.current_document = true;
+            config.type = "PowerShell";
+            config.name = "PowerShell: Launch Current File";
+            config.request = "launch";
+            config.args = [];
+            config.script = "${file}"
+        }
+
+        if (config.script === "${file}" || config.script === "${relativeFile}") {
+            if (vscode.window.activeTextEditor === undefined) {
+                vscode.window.showErrorMessage("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
+                return undefined;
+            }
+            config.current_document = true;
+            // Special case using the URI for untitled documents.
+            const currentDocument = vscode.window.activeTextEditor.document;
+            if (currentDocument.isUntitled) {
+                config.untitled_document = true;
+                config.script = currentDocument.uri.toString();
+            }
+        }
+
+        return config;
+    }
+
+    public async resolveDebugConfigurationWithSubstitutedVariables(
+        _folder: WorkspaceFolder | undefined,
+        config: DebugConfiguration,
+        _token?: CancellationToken): Promise<DebugConfiguration> {
+
+        if (config.request === "attach") {
+            config = await this.resolveAttachDebugConfiguration(config);
+        } else if (config.request === "launch") {
+            config = await this.resolveLaunchDebugConfiguration(config);
+        } else {
+            vscode.window.showErrorMessage(`The request type was invalid: '${config.request}'`);
+            return null;
+        }
+
+        // Start the PowerShell session if needed.
+        if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
+            await this.sessionManager.start();
+        }
+        // Create or show the Extension Terminal.
+        vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+
+        return config;
+    }
+
+    private async resolveLaunchDebugConfiguration(config: DebugConfiguration): Promise<DebugConfiguration> {
+        // Check the languageId only for current documents (which includes untitled documents).
+        if (config.current_document) {
+            const currentDocument = vscode.window.activeTextEditor.document;
+            if (currentDocument.languageId !== "powershell") {
+                vscode.window.showErrorMessage("Please change the current document's language mode to PowerShell.");
+                return undefined;
+            }
+        }
+        // Check the temporary console setting for untitled documents only, and
+        // check the document extension for everything else.
+        if (config.untitled_document) {
+            if (config.createTemporaryIntegratedConsole) {
+                vscode.window.showErrorMessage("Debugging untitled files in a temporary console is not supported.");
+                return undefined;
+            }
+        } else {
+            const ext = path.extname(config.script).toLowerCase();
+            if (!(ext === ".ps1" || ext === ".psm1")) {
+                vscode.window.showErrorMessage(`PowerShell does not support debugging this file type: '${path.basename(config.script)}'`);
+                return undefined;
+            }
+        }
+        return config;
+    }
+
+    private async resolveAttachDebugConfiguration(config: DebugConfiguration): Promise<DebugConfiguration> {
+        const platformDetails = getPlatformDetails();
+        const versionDetails = this.sessionManager.getPowerShellVersionDetails();
+        // Cross-platform attach to process was added in 6.2.0-preview.4.
+        if (versionDetails.version < "7.0.0" && platformDetails.operatingSystem !== OperatingSystem.Windows) {
+            vscode.window.showErrorMessage(`Attaching to a PowerShell Host Process on ${OperatingSystem[platformDetails.operatingSystem]} requires PowerShell 7.0 or higher.`);
+            return undefined;
+        }
+        // If nothing is set, prompt for the processId.
+        if (!config.customPipeName && !config.processId) {
+            config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
+            // No process selected. Cancel attach.
+            if (!config.processId) {
+                return null;
+            }
+        }
+        if (!config.runspaceId && !config.runspaceName) {
+            config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
+            // No runspace selected. Cancel attach.
+            if (!config.runspaceId) {
+                return null;
+            }
+        }
         return config;
     }
 }
