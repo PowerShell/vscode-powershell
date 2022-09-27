@@ -1,5 +1,23 @@
 # PowerShell Extension Release History
 
+## v2022.9.0-preview
+### Tuesday, September 27, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🔍 [vscode-powershell #4082](https://github.com/PowerShell/vscode-powershell/pull/4172) - Refactor the debug launch configuration resolvers.
+- 🐛 📁 [vscode-powershell #4163](https://github.com/PowerShell/vscode-powershell/pull/4171) - Fix incorrect docstring for `powershell.cwd`.
+- #️⃣ 🙏 [vscode-powershell #4170](https://github.com/PowerShell/vscode-powershell/pull/4170) - Add setting to only analyze open documents for references.
+- 🐛 🛫 [vscode-powershell #4160](https://github.com/PowerShell/vscode-powershell/pull/4161) - Lock `SessionManager.start()` so only one session is started.
+- ✨ 🔧 [vscode-powershell #4139](https://github.com/PowerShell/vscode-powershell/pull/4139) - Add setting to control the references code lens.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.2
+
+- 🐛 🛫 [vscode-powershell #4048](https://github.com/PowerShell/PowerShellEditorServices/pull/1918) - Created a nested PowerShell for the top-level loop.
+- #️⃣ 🙏 [PowerShellEditorServices #1917](https://github.com/PowerShell/PowerShellEditorServices/pull/1917) - Overhaul workspace search for symbol references.
+- ✨ 🚨 [PowerShellEditorServices #1914](https://github.com/PowerShell/PowerShellEditorServices/pull/1914) - Add regression tests for F5 and F8 saving to history.
+- ✨ 🙏 [PowerShellEditorServices #1900](https://github.com/PowerShell/PowerShellEditorServices/pull/1900) - Add setting to control references code lens.
+
 ## v2022.8.5
 ### Tuesday, August 30, 2022
 
