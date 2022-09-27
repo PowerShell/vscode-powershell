@@ -626,6 +626,11 @@
           "default": true,
           "description": "Displays a code lens above function definitions showing the number of times the function is referenced in the workspace. Large workspaces should disable this setting due to high performance impact."
         },
+        "powershell.analyzeOpenDocumentsOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only search for references within open documents. Enable this in large workspaces if memory is limited."
+        },
         "powershell.bugReporting.project": {
           "type": "string",
           "default": "https://github.com/PowerShell/vscode-powershell",
