@@ -132,7 +132,7 @@ on how to contribute to this extension!
 ## Maintainers
 
 - Patrick Meinecke - [@SeeminglyScience](https://github.com/SeeminglyScience)
-- Andy Schwartzmeyer - [@andschwa](https://github.com/andschwa)
+- Andy Jordan - [@andschwa](https://github.com/andschwa)
 - Sydney Smith - [@SydneyhSmith](https://github.com/SydneyhSmith)
 
 ### Emeriti
