@@ -51,23 +51,15 @@ export class RunCodeFeature implements vscode.Disposable {
 function createLaunchConfig(launchType: LaunchType, commandToRun: string, args: string[]) {
     const settings = Settings.load();
 
-    let cwd: string = vscode.workspace.rootPath;
-    if (vscode.window.activeTextEditor
-        && vscode.window.activeTextEditor.document
-        && !vscode.window.activeTextEditor.document.isUntitled) {
-        cwd = path.dirname(vscode.window.activeTextEditor.document.fileName);
-    }
-
     const launchConfig = {
         request: "launch",
         type: "PowerShell",
-        name: "PowerShell Run Code",
+        name: "PowerShell: Run Code",
         internalConsoleOptions: "neverOpen",
         noDebug: (launchType === LaunchType.Run),
         createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole,
         script: commandToRun,
         args,
-        cwd,
     };
 
     return launchConfig;
