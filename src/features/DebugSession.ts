@@ -247,7 +247,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 vscode.window.showErrorMessage("Debugging untitled files in a temporary console is not supported.");
                 return undefined;
             }
-        } else {
+        } else if (config.script) {
             const ext = path.extname(config.script).toLowerCase();
             if (!(ext === ".ps1" || ext === ".psm1")) {
                 vscode.window.showErrorMessage(`PowerShell does not support debugging this file type: '${path.basename(config.script)}'`);
