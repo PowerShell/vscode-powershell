@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2022.9.1-preview
+### Wednesday, September 28, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #3954](https://github.com/PowerShell/vscode-powershell/pull/4187) - Re-implement indicator when running registered editor commands.
+- 🐛 🔍 [vscode-powershell #4185](https://github.com/PowerShell/vscode-powershell/pull/4186) - Only check a script's extension if a script was given.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.3
+
+- ✨ 🙏 [PowerShellEditorServices #1924](https://github.com/PowerShell/PowerShellEditorServices/pull/1924) - Re-implement indicator when running registered editor commands.
+
 ## v2022.9.0-preview
 ### Tuesday, September 27, 2022
 
