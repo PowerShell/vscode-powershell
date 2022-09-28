@@ -14,7 +14,7 @@ import { LanguageClientConsumer } from "../languageClientConsumer";
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody>("output");
 export const ExecutionStatusChangedNotificationType =
-    new NotificationType<IExecutionStatusDetails>("powerShell/executionStatusChanged");
+    new NotificationType<ExecutionStatus>("powerShell/executionStatusChanged");
 
 export const ShowChoicePromptRequestType =
     new RequestType<IShowChoicePromptRequestArgs,
@@ -31,12 +31,6 @@ export interface IEvaluateRequestArguments {
 export interface IOutputNotificationBody {
     category: string;
     output: string;
-}
-
-interface IExecutionStatusDetails {
-    executionOptions: IExecutionOptions;
-    executionStatus: ExecutionStatus;
-    hadErrors: boolean;
 }
 
 interface IChoiceDetails {
@@ -73,13 +67,6 @@ enum ExecutionStatus {
     Failed,
     Aborted,
     Completed,
-}
-
-interface IExecutionOptions {
-    writeOutputToHost: boolean;
-    writeErrorsToHost: boolean;
-    addToHistory: boolean;
-    interruptCommandPrompt: boolean;
 }
 
 function showChoicePrompt(
@@ -257,12 +244,12 @@ export class ConsoleFeature extends LanguageClientConsumer {
                 ShowInputPromptRequestType,
                 (promptDetails) => showInputPrompt(promptDetails)),
 
-            // TODO: We're not receiving these events from the server any more.
             // Set up status bar alerts for when PowerShell is executing a script.
             this.languageClient.onNotification(
                 ExecutionStatusChangedNotificationType,
                 (executionStatusDetails) => {
-                    switch (executionStatusDetails.executionStatus) {
+                    switch (executionStatusDetails) {
+                        // TODO: Use the new language status bar item.
                         // If execution has changed to running, make a notification
                         case ExecutionStatus.Running:
                             this.showExecutionStatus("PowerShell");
