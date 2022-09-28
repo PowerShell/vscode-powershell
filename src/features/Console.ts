@@ -10,6 +10,7 @@ import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/check
 import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import { SessionManager } from "../session";
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody>("output");
@@ -183,7 +184,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
     private handlers: vscode.Disposable[];
     private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 
-    constructor(private log: Logger) {
+    constructor(private log: Logger, private sessionManager: SessionManager) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
@@ -223,8 +224,6 @@ export class ConsoleFeature extends LanguageClientConsumer {
     }
 
     public dispose() {
-        // Make sure we cancel any status bar
-        this.clearStatusBar();
         for (const command of this.commands) {
             command.dispose();
         }
@@ -249,39 +248,16 @@ export class ConsoleFeature extends LanguageClientConsumer {
                 ExecutionStatusChangedNotificationType,
                 (executionStatusDetails) => {
                     switch (executionStatusDetails) {
-                        // TODO: Use the new language status bar item.
-                        // If execution has changed to running, make a notification
                         case ExecutionStatus.Running:
-                            this.showExecutionStatus("PowerShell");
+                            this.sessionManager.setSessionBusyStatus();
                             break;
-
-                        // If the execution has stopped, destroy the previous notification
                         case ExecutionStatus.Completed:
                         case ExecutionStatus.Aborted:
                         case ExecutionStatus.Failed:
-                            this.clearStatusBar();
+                            this.sessionManager.setSessionRunningStatus();
                             break;
                     }
                 })
         ]
-    }
-
-    private showExecutionStatus(message: string) {
-        vscode.window.withProgress({
-            location: vscode.ProgressLocation.Window,
-        }, (progress) => {
-            return new Promise((resolve, _reject) => {
-                this.clearStatusBar();
-
-                this.resolveStatusBarPromise = resolve;
-                progress.report({ message });
-            });
-        });
-    }
-
-    private clearStatusBar() {
-        if (this.resolveStatusBarPromise) {
-            this.resolveStatusBarPromise();
-        }
     }
 }

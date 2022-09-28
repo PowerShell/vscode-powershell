@@ -3,7 +3,6 @@
 
 "use strict";
 
-import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter from "@vscode/extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
@@ -150,7 +149,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     // Features and command registrations that require language client
     languageClientConsumers = [
-        new ConsoleFeature(logger),
+        new ConsoleFeature(logger, sessionManager),
         new ExpandAliasFeature(logger),
         new GetCommandsFeature(logger),
         new ShowHelpFeature(logger),
