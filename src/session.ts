@@ -33,6 +33,7 @@ export enum SessionStatus {
     NotStarted,
     Initializing,
     Running,
+    Busy,
     Stopping,
     Failed,
 }
@@ -75,10 +76,6 @@ export const SendKeyPressNotificationType =
 export const PowerShellVersionRequestType =
     new RequestType0<IPowerShellVersionDetails, void>(
         "powerShell/getVersion");
-
-export const RunspaceChangedEventType =
-    new NotificationType<IRunspaceDetails>(
-        "powerShell/runspaceChanged");
 
 export class SessionManager implements Middleware {
     public HostName: string;
@@ -502,21 +499,6 @@ Type 'help' to get help.
         }
     }
 
-    private setStatusBarVersionString(runspaceDetails: IRunspaceDetails) {
-        const psVersion = runspaceDetails.powerShellVersion;
-
-        let versionString =
-            this.versionDetails.architecture === "x86"
-                ? `${psVersion.displayVersion} (${psVersion.architecture})`
-                : psVersion.displayVersion;
-
-        if (runspaceDetails.runspaceType !== RunspaceType.Local) {
-            versionString += ` [${runspaceDetails.connectionString}]`;
-        }
-
-        this.setSessionVersion(versionString);
-    }
-
     private registerCommands(): void {
         this.registeredCommands = [
             vscode.commands.registerCommand("PowerShell.RestartSession", async () => { await this.restartSession(); }),
@@ -676,11 +658,6 @@ Type 'help' to get help.
             this.languageClient.onNotification(
                 SendKeyPressNotificationType,
                 () => { this.languageServerProcess.sendKeyPress(); }),
-
-            // TODO: I'm not sure we're still receiving these notifications...
-            this.languageClient.onNotification(
-                RunspaceChangedEventType,
-                (runspaceDetails) => { this.setStatusBarVersionString(runspaceDetails); }),
         ]
 
         try {
@@ -691,12 +668,8 @@ Type 'help' to get help.
         }
 
         this.versionDetails = await this.languageClient.sendRequest(PowerShellVersionRequestType);
-
+        this.setSessionRunningStatus(); // This requires the version details to be set.
         this.sendTelemetryEvent("powershellVersionCheck", { powershellVersion: this.versionDetails.version });
-
-        this.setSessionVersion(this.versionDetails.architecture === "x86"
-            ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
-            : this.versionDetails.displayVersion);
 
         // We haven't "started" until we're done getting the version information.
         this.started = true;
@@ -753,28 +726,36 @@ Type 'help' to get help.
             case SessionStatus.NeverStarted:
             case SessionStatus.NotStarted:
                 this.languageStatusItem.busy = false;
-                // @ts-ignore
+                this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Information;
+                break;
+            case SessionStatus.Busy:
+                this.languageStatusItem.busy = true;
                 this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Information;
                 break;
             case SessionStatus.Initializing:
             case SessionStatus.Stopping:
                 this.languageStatusItem.busy = true;
-                // @ts-ignore
                 this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Warning;
                 break;
             case SessionStatus.Failed:
                 this.languageStatusItem.busy = false;
-                // @ts-ignore
                 this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Error;
                 break;
         }
 
     }
 
-    private setSessionVersion(version: string): void {
-        // TODO: Accept a VersionDetails object instead of a string.
+    public setSessionRunningStatus(): void {
+        const version = this.versionDetails.architecture === "x86"
+            ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
+            : this.versionDetails.displayVersion;
+
         this.languageStatusItem.text = "$(terminal-powershell) " + version;
         this.setSessionStatus(version, SessionStatus.Running);
+    }
+
+    public setSessionBusyStatus(): void {
+        this.setSessionStatus("Executing...", SessionStatus.Busy);
     }
 
     private async setSessionFailure(message: string, ...additionalMessages: string[]) {
