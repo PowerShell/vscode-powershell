@@ -1,5 +1,18 @@
 # PowerShell Extension Release History
 
+## v2022.9.2-preview
+### Friday, September 30, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📺 [vscode-powershell #4193](https://github.com/PowerShell/vscode-powershell/pull/4193) - Handle busy notification for all PowerShell tasks.
+- ✨ ‍🕵️ [vscode-powershell #4164](https://github.com/PowerShell/vscode-powershell/pull/4164) - Enable new PSScriptAnalyzer option `avoidSemicolonsAsLineTerminators`. (Thanks @bergmeister!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.4
+
+- ✨ 🚂 [PowerShellEditorServices #1928](https://github.com/PowerShell/PowerShellEditorServices/pull/1928) - Generalize the execution busy status to all PowerShell tasks.
+- ✨ ‍🕵️ [PowerShellEditorServices #1916](https://github.com/PowerShell/PowerShellEditorServices/pull/1916) - Upgrade PSScriptAnalyzer to 1.21.0. (Thanks @bergmeister!)
+
 ## v2022.9.1-preview
 ### Wednesday, September 28, 2022
 
