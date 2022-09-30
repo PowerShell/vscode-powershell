@@ -10,12 +10,9 @@ import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/check
 import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
-import { SessionManager } from "../session";
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody>("output");
-export const ExecutionStatusChangedNotificationType =
-    new NotificationType<ExecutionStatus>("powerShell/executionStatusChanged");
 
 export const ShowChoicePromptRequestType =
     new RequestType<IShowChoicePromptRequestArgs,
@@ -62,13 +59,6 @@ interface IShowInputPromptResponseBody {
     promptCancelled: boolean;
 }
 
-enum ExecutionStatus {
-    Pending,
-    Running,
-    Failed,
-    Aborted,
-    Completed,
-}
 
 function showChoicePrompt(
     promptDetails: IShowChoicePromptRequestArgs,
@@ -182,9 +172,8 @@ function onInputEntered(responseText: string): IShowInputPromptResponseBody {
 export class ConsoleFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
     private handlers: vscode.Disposable[];
-    private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
 
-    constructor(private log: Logger, private sessionManager: SessionManager) {
+    constructor(private log: Logger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
@@ -242,22 +231,6 @@ export class ConsoleFeature extends LanguageClientConsumer {
             this.languageClient.onRequest(
                 ShowInputPromptRequestType,
                 (promptDetails) => showInputPrompt(promptDetails)),
-
-            // Set up status bar alerts for when PowerShell is executing a script.
-            this.languageClient.onNotification(
-                ExecutionStatusChangedNotificationType,
-                (executionStatusDetails) => {
-                    switch (executionStatusDetails) {
-                        case ExecutionStatus.Running:
-                            this.sessionManager.setSessionBusyStatus();
-                            break;
-                        case ExecutionStatus.Completed:
-                        case ExecutionStatus.Aborted:
-                        case ExecutionStatus.Failed:
-                            this.sessionManager.setSessionRunningStatus();
-                            break;
-                    }
-                })
         ]
     }
 }
