@@ -676,6 +676,11 @@
           "default": false,
           "description": "Replaces aliases with their aliased name."
         },
+        "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": {
+          "type": "boolean",
+          "default": false,
+          "description": "Removes redundant semicolon(s) at the end of a line where a line terminator is sufficient."
+        },
         "powershell.codeFormatting.preset": {
           "type": "string",
           "enum": [

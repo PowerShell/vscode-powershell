@@ -42,6 +42,7 @@ export interface ICodeFoldingSettings {
 
 export interface ICodeFormattingSettings {
     autoCorrectAliases: boolean;
+    avoidSemicolonsAsLineTerminators: boolean;
     preset: CodeFormattingPreset;
     openBraceOnSameLine: boolean;
     newLineAfterOpenBrace: boolean;
@@ -173,6 +174,7 @@ export function load(): ISettings {
 
     const defaultCodeFormattingSettings: ICodeFormattingSettings = {
         autoCorrectAliases: false,
+        avoidSemicolonsAsLineTerminators: false,
         preset: CodeFormattingPreset.Custom,
         openBraceOnSameLine: true,
         newLineAfterOpenBrace: true,
