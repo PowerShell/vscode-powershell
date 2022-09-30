@@ -73,6 +73,9 @@ export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) 
 export const SendKeyPressNotificationType =
     new NotificationType<void>("powerShell/sendKeyPress");
 
+export const ExecutionBusyStatusNotificationType =
+    new NotificationType<boolean>("powerShell/executionBusyStatus");
+
 export const PowerShellVersionRequestType =
     new RequestType0<IPowerShellVersionDetails, void>(
         "powerShell/getVersion");
@@ -530,7 +533,7 @@ Type 'help' to get help.
         this.languageServerProcess.onExited(
             async () => {
                 if (this.sessionStatus === SessionStatus.Running) {
-                    this.setSessionStatus("Session Exited", SessionStatus.Failed);
+                    this.setSessionStatus("Session Exited!", SessionStatus.Failed);
                     await this.promptForRestart();
                 }
             });
@@ -658,6 +661,14 @@ Type 'help' to get help.
             this.languageClient.onNotification(
                 SendKeyPressNotificationType,
                 () => { this.languageServerProcess.sendKeyPress(); }),
+
+            this.languageClient.onNotification(
+                ExecutionBusyStatusNotificationType,
+                (isBusy: boolean) => {
+                    if (isBusy) { this.setSessionBusyStatus(); }
+                    else { this.setSessionRunningStatus(); }
+                }
+            ),
         ]
 
         try {
@@ -668,7 +679,7 @@ Type 'help' to get help.
         }
 
         this.versionDetails = await this.languageClient.sendRequest(PowerShellVersionRequestType);
-        this.setSessionRunningStatus(); // This requires the version details to be set.
+        this.setSessionRunningStatus();
         this.sendTelemetryEvent("powershellVersionCheck", { powershellVersion: this.versionDetails.version });
 
         // We haven't "started" until we're done getting the version information.
@@ -716,11 +727,26 @@ Type 'help' to get help.
         this.languageStatusItem = vscode.languages.createLanguageStatusItem("powershell", this.documentSelector);
         this.languageStatusItem.command = { title: statusTitle, command: this.ShowSessionMenuCommandName };
         this.languageStatusItem.text = "$(terminal-powershell)";
+        this.languageStatusItem.detail = "PowerShell";
     }
 
     private setSessionStatus(statusText: string, status: SessionStatus): void {
         this.sessionStatus = status;
-        this.languageStatusItem.detail = "PowerShell " + statusText;
+        this.languageStatusItem.detail = "PowerShell";
+
+        if (this.versionDetails !== undefined) {
+            const version = this.versionDetails.architecture === "x86"
+                ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
+                : this.versionDetails.displayVersion;
+
+            this.languageStatusItem.text = "$(terminal-powershell) " + version;
+            this.languageStatusItem.detail += " " + version;
+        }
+
+        if (statusText) {
+            this.languageStatusItem.detail += ": " + statusText;
+        }
+
         switch (status) {
             case SessionStatus.Running:
             case SessionStatus.NeverStarted:
@@ -745,21 +771,16 @@ Type 'help' to get help.
 
     }
 
-    public setSessionRunningStatus(): void {
-        const version = this.versionDetails.architecture === "x86"
-            ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
-            : this.versionDetails.displayVersion;
-
-        this.languageStatusItem.text = "$(terminal-powershell) " + version;
-        this.setSessionStatus(version, SessionStatus.Running);
+    private setSessionRunningStatus(): void {
+        this.setSessionStatus("", SessionStatus.Running);
     }
 
-    public setSessionBusyStatus(): void {
+    private setSessionBusyStatus(): void {
         this.setSessionStatus("Executing...", SessionStatus.Busy);
     }
 
     private async setSessionFailure(message: string, ...additionalMessages: string[]) {
-        this.setSessionStatus("Initialization Error", SessionStatus.Failed);
+        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
         await this.log.writeAndShowError(message, ...additionalMessages);
     }
 
