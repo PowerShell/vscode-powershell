@@ -66,9 +66,10 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
 
                 return vscode.window
                     .showTextDocument(doc)
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+                    .then((_) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
                     .then((_) => innerCloseFiles());
             }
+            return undefined;
         }
 
         innerCloseFiles();

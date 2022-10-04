@@ -101,7 +101,7 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
         return element;
     }
 
-    public getChildren(element?: Command): Thenable<Command[]> {
+    public getChildren(_element?: Command): Thenable<Command[]> {
         return Promise.resolve(this.powerShellCommands || []);
     }
 }
@@ -135,7 +135,7 @@ class Command extends vscode.TreeItem {
         };
     }
 
-    public async getChildren(element?): Promise<Command[]> {
+    public async getChildren(_element?): Promise<Command[]> {
         return [];
         // Returning an empty array because we need to return something.
     }

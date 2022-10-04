@@ -89,6 +89,7 @@ ${this.generateExtensionTable(extensions)}
             if (e.packageJSON.isBuiltin === false) {
                 return `|${e.packageJSON.name}|${e.packageJSON.publisher}|${e.packageJSON.version}|`;
             }
+            return undefined;
         }).join("\n");
 
         const extensionTable = `

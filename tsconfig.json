@@ -13,9 +13,9 @@
     "rootDir": ".",
     // TODO: We need to enable stricter checking...
     // "strict": true,
-    // "noImplicitReturns": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noUnusedParameters": true
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedParameters": true
   },
   "include": [ "src", "test" ],
 }

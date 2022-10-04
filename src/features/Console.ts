@@ -60,9 +60,7 @@ interface IShowInputPromptResponseBody {
 }
 
 
-function showChoicePrompt(
-    promptDetails: IShowChoicePromptRequestArgs,
-    client: LanguageClient): Thenable<IShowChoicePromptResponseBody> {
+function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable<IShowChoicePromptResponseBody> {
 
     let resultThenable: Thenable<IShowChoicePromptResponseBody>;
 
@@ -226,7 +224,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
         this.handlers = [
             this.languageClient.onRequest(
                 ShowChoicePromptRequestType,
-                (promptDetails) => showChoicePrompt(promptDetails, this.languageClient)),
+                (promptDetails) => showChoicePrompt(promptDetails)),
 
             this.languageClient.onRequest(
                 ShowInputPromptRequestType,

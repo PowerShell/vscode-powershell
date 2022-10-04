@@ -104,6 +104,7 @@ export class PowerShellExeFinder {
         for await (const pwsh of this.enumeratePowerShellInstallations()) {
             return pwsh;
         }
+        return undefined;
     }
 
     /**
@@ -244,6 +245,9 @@ export class PowerShellExeFinder {
 
             case OperatingSystem.Windows:
                 return await this.findPSCoreWindowsInstallation();
+
+            case OperatingSystem.Unknown:
+                return undefined;
         }
     }
 
@@ -257,6 +261,9 @@ export class PowerShellExeFinder {
 
             case OperatingSystem.Windows:
                 return await this.findPSCoreWindowsInstallation({ findPreview: true });
+
+            case OperatingSystem.Unknown:
+                return undefined;
         }
     }
 

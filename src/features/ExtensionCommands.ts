@@ -320,12 +320,12 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 a.name.localeCompare(b.name));
     }
 
-    private showExtensionCommands(client: LanguageClient): Thenable<IInvokeExtensionCommandRequestArguments> {
+    private showExtensionCommands(client: LanguageClient): Thenable<void> {
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
             vscode.window.showInformationMessage(
                 "No extension commands have been loaded into the current session.");
-            return;
+            return undefined;
         }
 
         const quickPickItems =
@@ -337,7 +337,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 };
             });
 
-        vscode.window
+        return vscode.window
             .showQuickPick(
                 quickPickItems,
                 { placeHolder: "Select a command" })
@@ -418,7 +418,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             promise =
                 vscode.workspace.openTextDocument(filePath)
                     .then((doc) => vscode.window.showTextDocument(doc))
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+                    .then((_) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
                     .then((_) => EditorOperationResponse.Completed);
         } else {
             promise = Promise.resolve(EditorOperationResponse.Completed);
