@@ -12,6 +12,7 @@
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/main/README.md",
   "categories": [
     "Debuggers",
+    "Formatters",
     "Programming Languages",
     "Snippets",
     "Linters"
