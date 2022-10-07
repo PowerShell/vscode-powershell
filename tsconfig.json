@@ -13,6 +13,8 @@
     "rootDir": ".",
     // TODO: We need to enable stricter checking...
     // "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true
