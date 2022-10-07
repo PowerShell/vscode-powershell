@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2022.10.0-preview
+### Friday, October 07, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 ✂️ [vscode-powershell #4195](https://github.com/PowerShell/vscode-powershell/pull/4195) - Fix Function Help snippet. (Thanks @okhoel!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.4
+
+No changes.
+
 ## v2022.9.2-preview
 ### Friday, September 30, 2022
 
