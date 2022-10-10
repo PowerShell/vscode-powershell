@@ -1,11 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as path from "path";
 import vscode = require("vscode");
 import { SessionManager } from "../session";
 import Settings = require("../settings");
-import utils = require("../utils");
 
 enum LaunchType {
     Debug,
@@ -41,7 +39,7 @@ export class RunCodeFeature implements vscode.Disposable {
     private async launch(launchConfig: string | vscode.DebugConfiguration) {
         // Create or show the interactive console
         // TODO: #367: Check if "newSession" mode is configured
-        await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+        this.sessionManager.showDebugTerminal(true);
 
         // TODO: Update to handle multiple root workspaces.
         await vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
