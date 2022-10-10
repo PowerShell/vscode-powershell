@@ -16,7 +16,7 @@ export const extensionId = `${packageJSON.publisher}.${packageJSON.name}`;
 
 export async function ensureExtensionIsActivated(): Promise<IPowerShellExtensionClient> {
     const extension = vscode.extensions.getExtension(extensionId);
-    if (!extension.isActive) { await extension.activate(); }
+    if (!extension!.isActive) { await extension!.activate(); }
     return extension!.exports as IPowerShellExtensionClient;
 }
 

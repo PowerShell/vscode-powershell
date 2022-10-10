@@ -14,11 +14,11 @@ const issuesUrl: string = `${project}/issues/new`;
 
 const extensions =
     vscode.extensions.all.filter((element) => element.packageJSON.isBuiltin === false)
-        .sort((leftside, rightside): number => {
-            if (leftside.packageJSON.name.toLowerCase() < rightside.packageJSON.name.toLowerCase()) {
+        .sort((leftSide, rightSide): number => {
+            if (leftSide.packageJSON.name.toLowerCase() < rightSide.packageJSON.name.toLowerCase()) {
                 return -1;
             }
-            if (leftside.packageJSON.name.toLowerCase() > rightside.packageJSON.name.toLowerCase()) {
+            if (leftSide.packageJSON.name.toLowerCase() > rightSide.packageJSON.name.toLowerCase()) {
                 return 1;
             }
             return 0;

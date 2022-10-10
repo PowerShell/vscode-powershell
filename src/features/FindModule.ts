@@ -15,7 +15,7 @@ export const InstallModuleRequestType =
 export class FindModuleFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
-    private cancelFindToken: vscode.CancellationTokenSource;
+    private cancelFindToken?: vscode.CancellationTokenSource;
 
     constructor() {
         super();
@@ -56,14 +56,14 @@ export class FindModuleFeature extends LanguageClientConsumer {
     }
 
     private pickPowerShellModule(): Thenable<string> {
-        return this.languageClient.sendRequest(FindModuleRequestType, null).then((modules) => {
+        return this.languageClient.sendRequest(FindModuleRequestType, undefined).then((modules) => {
             const items: QuickPickItem[] = [];
 
             // We've got the modules info, let's cancel the timeout unless it's already been cancelled
             if (this.cancelFindToken) {
                 this.clearCancelFindToken();
             } else {
-                // Already timed out, would be weird to dislay modules after we said it timed out.
+                // Already timed out, would be weird to display modules after we said it timed out.
                 return Promise.resolve("");
             }
 
@@ -90,9 +90,7 @@ export class FindModuleFeature extends LanguageClientConsumer {
     }
 
     private clearCancelFindToken() {
-        if (this.cancelFindToken) {
-            this.cancelFindToken.dispose();
-            this.cancelFindToken = undefined;
-        }
+        this.cancelFindToken?.dispose();
+        this.cancelFindToken = undefined;
     }
 }

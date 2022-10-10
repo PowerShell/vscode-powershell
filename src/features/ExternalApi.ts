@@ -112,7 +112,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         }
 
         // TODO: When we have more than one API version, make sure to include a check here.
-        return ExternalApiFeature.registeredExternalExtension.get(uuid);
+        return ExternalApiFeature.registeredExternalExtension.get(uuid)!;
     }
 
     /*

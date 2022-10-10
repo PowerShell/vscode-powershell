@@ -150,9 +150,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     // Features and command registrations that require language client
     languageClientConsumers = [
         new ConsoleFeature(logger),
-        new ExpandAliasFeature(logger),
+        new ExpandAliasFeature(),
         new GetCommandsFeature(logger),
-        new ShowHelpFeature(logger),
+        new ShowHelpFeature(),
         new FindModuleFeature(),
         new ExtensionCommandsFeature(logger),
         new NewFileOrProjectFeature(),

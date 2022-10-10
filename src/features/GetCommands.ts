@@ -73,8 +73,12 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         });
     }
 
-    private InsertCommand(item) {
+    private InsertCommand(item: { Name: string; }) {
         const editor = vscode.window.activeTextEditor;
+        if (editor === undefined) {
+            return;
+        }
+
         const sls = editor.selection.start;
         const sle = editor.selection.end;
         const range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);

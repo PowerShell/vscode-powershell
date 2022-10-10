@@ -31,7 +31,7 @@ describe("Settings module", function () {
 
         it("Doesn't throw when updating at user-level", async function () {
             await Settings.change("powerShellAdditionalExePaths", psExeDetails, true /* user-level */);
-            const result = Settings.load().powerShellAdditionalExePaths["My PowerShell"];
+            const result = Settings.load().powerShellAdditionalExePaths!["My PowerShell"];
             assert.notStrictEqual(result, undefined);
             assert.strictEqual(result, psExeDetails["My PowerShell"]);
         });
@@ -44,6 +44,6 @@ describe("Settings module", function () {
 
         await Settings.change("helpCompletion", undefined, false);
         target = await Settings.getEffectiveConfigurationTarget("helpCompletion");
-        assert.strictEqual(target, null);
+        assert.strictEqual(target, undefined);
     });
 });

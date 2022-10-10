@@ -50,12 +50,12 @@ interface IShowChoicePromptRequestArgs {
 }
 
 interface IShowChoicePromptResponseBody {
-    responseText: string;
+    responseText: string | undefined;
     promptCancelled: boolean;
 }
 
 interface IShowInputPromptResponseBody {
-    responseText: string;
+    responseText: string | undefined;
     promptCancelled: boolean;
 }
 
@@ -119,11 +119,12 @@ function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable
     return resultThenable;
 }
 
-function showInputPrompt(promptDetails: IShowInputPromptRequestArgs): Thenable<IShowInputPromptResponseBody> {
-    return vscode.window.showInputBox({ placeHolder: promptDetails.name + ": " }).then(onInputEntered);
+async function showInputPrompt(promptDetails: IShowInputPromptRequestArgs): Promise<IShowInputPromptResponseBody> {
+    const responseText = await vscode.window.showInputBox({ placeHolder: promptDetails.name + ": " });
+    return onInputEntered(responseText);
 }
 
-function onItemsSelected(chosenItems: ICheckboxQuickPickItem[]): IShowChoicePromptResponseBody {
+function onItemsSelected(chosenItems: ICheckboxQuickPickItem[] | undefined): IShowChoicePromptResponseBody {
     if (chosenItems !== undefined) {
         return {
             promptCancelled: false,
@@ -138,7 +139,7 @@ function onItemsSelected(chosenItems: ICheckboxQuickPickItem[]): IShowChoiceProm
     }
 }
 
-function onItemSelected(chosenItem: vscode.QuickPickItem): IShowChoicePromptResponseBody {
+function onItemSelected(chosenItem: vscode.QuickPickItem | undefined): IShowChoicePromptResponseBody {
     if (chosenItem !== undefined) {
         return {
             promptCancelled: false,
@@ -153,7 +154,7 @@ function onItemSelected(chosenItem: vscode.QuickPickItem): IShowChoicePromptResp
     }
 }
 
-function onInputEntered(responseText: string): IShowInputPromptResponseBody {
+function onInputEntered(responseText: string | undefined): IShowInputPromptResponseBody {
     if (responseText !== undefined) {
         return {
             promptCancelled: false,
@@ -190,6 +191,10 @@ export class ConsoleFeature extends LanguageClientConsumer {
                 }
 
                 const editor = vscode.window.activeTextEditor;
+                if (editor === undefined) {
+                    return;
+                }
+
                 let selectionRange: vscode.Range;
 
                 if (!editor.selection.isEmpty) {

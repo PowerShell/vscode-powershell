@@ -48,7 +48,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         launchType: LaunchType,
         fileUri: vscode.Uri): Promise<boolean> {
 
-        const uriString = (fileUri || vscode.window.activeTextEditor.document.uri).toString();
+        const uriString = (fileUri || vscode.window.activeTextEditor?.document.uri).toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
         return this.launch(launchConfig);
     }
@@ -133,7 +133,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         //
         // Ensure the necessary script exists (for testing). The debugger will
         // start regardless, but we also pass its success along.
-        return utils.checkIfFileExists(this.invokePesterStubScriptPath)
+        return await utils.checkIfFileExists(this.invokePesterStubScriptPath)
             && vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
     }
 }

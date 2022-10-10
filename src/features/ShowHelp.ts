@@ -3,7 +3,6 @@
 
 import vscode = require("vscode");
 import { NotificationType } from "vscode-languageclient";
-import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const ShowHelpNotificationType =
@@ -12,12 +11,15 @@ export const ShowHelpNotificationType =
 export class ShowHelpFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
 
-    constructor(private log: Logger) {
+    constructor() {
         super();
         this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", (item?) => {
             if (!item || !item.Name) {
 
                 const editor = vscode.window.activeTextEditor;
+                if (editor === undefined) {
+                    return;
+                }
 
                 const selection = editor.selection;
                 const doc = editor.document;

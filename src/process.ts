@@ -21,8 +21,8 @@ export class PowerShellProcess {
     public onExited: vscode.Event<void>;
     private onExitedEmitter = new vscode.EventEmitter<void>();
 
-    private consoleTerminal: vscode.Terminal = undefined;
-    private consoleCloseSubscription: vscode.Disposable;
+    private consoleTerminal?: vscode.Terminal;
+    private consoleCloseSubscription?: vscode.Disposable;
 
     constructor(
         public exePath: string,
@@ -59,7 +59,7 @@ export class PowerShellProcess {
             this.startPsesArgs += "-UseLegacyReadLine";
         }
 
-        const powerShellArgs = [];
+        const powerShellArgs: string[] = [];
 
         const useLoginShell: boolean =
             (utils.isMacOS && this.sessionSettings.startAsLoginShell.osx)
@@ -132,7 +132,7 @@ export class PowerShellProcess {
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
 
         // Log that the PowerShell terminal process has been started
-        this.consoleTerminal.processId.then((pid) => this.logTerminalPid(pid, pwshName));
+        this.consoleTerminal.processId.then((pid) => this.logTerminalPid(pid ?? 0, pwshName));
 
         return sessionDetails;
     }
@@ -143,18 +143,15 @@ export class PowerShellProcess {
 
     public dispose() {
         // Clean up the session file
+        this.log.write("Terminating PowerShell process...");
+
         PowerShellProcess.deleteSessionFile(this.sessionFilePath);
 
-        if (this.consoleCloseSubscription) {
-            this.consoleCloseSubscription.dispose();
-            this.consoleCloseSubscription = undefined;
-        }
+        this.consoleCloseSubscription?.dispose();
+        this.consoleCloseSubscription = undefined;
 
-        if (this.consoleTerminal) {
-            this.log.write("Terminating PowerShell process...");
-            this.consoleTerminal.dispose();
-            this.consoleTerminal = undefined;
-        }
+        this.consoleTerminal?.dispose();
+        this.consoleTerminal = undefined;
     }
 
     public sendKeyPress() {
@@ -162,7 +159,7 @@ export class PowerShellProcess {
         // because non-printing characters can cause havoc with different
         // languages and terminal settings. We discard the character server-side
         // anyway, so it doesn't matter what we send.
-        this.consoleTerminal.sendText("p", false);
+        this.consoleTerminal?.sendText("p", false);
     }
 
     private logTerminalPid(pid: number, exeName: string) {

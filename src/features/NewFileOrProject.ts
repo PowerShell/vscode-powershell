@@ -10,7 +10,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
     private readonly loadIcon = "  $(sync)  ";
     private command: vscode.Disposable;
-    private waitingForClientToken: vscode.CancellationTokenSource;
+    private waitingForClientToken?: vscode.CancellationTokenSource;
 
     constructor() {
         super();
@@ -68,9 +68,11 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
                 { placeHolder: "Choose a template to create a new project",
                   ignoreFocusOut: true })
             .then((template) => {
-                if (template.label.startsWith(this.loadIcon)) {
+                if (template === undefined) {
+                    return;
+                } else if (template.label.startsWith(this.loadIcon)) {
                     this.showProjectTemplates(true);
-                } else {
+                } else if (template.template) {
                     this.createProjectFromTemplate(template.template);
                 }
             });
@@ -164,15 +166,13 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
     }
 
     private clearWaitingToken() {
-        if (this.waitingForClientToken) {
-            this.waitingForClientToken.dispose();
-            this.waitingForClientToken = undefined;
-        }
+        this.waitingForClientToken?.dispose();
+        this.waitingForClientToken = undefined;
     }
 }
 
 interface ITemplateQuickPickItem extends vscode.QuickPickItem {
-    template: ITemplateDetails;
+    template?: ITemplateDetails;
 }
 
 interface ITemplateDetails {

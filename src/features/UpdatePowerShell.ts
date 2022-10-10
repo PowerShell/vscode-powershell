@@ -62,7 +62,7 @@ export class GitHubReleaseInformation {
     public assets: any[];
 
     public constructor(version: string | semver.SemVer, assets: any[] = []) {
-        this.version = semver.parse(version);
+        this.version = semver.parse(version)!;
 
         if (semver.prerelease(this.version)) {
             this.isPreview = true;

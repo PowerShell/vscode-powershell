@@ -59,11 +59,12 @@ interface ITestPlatformSuccessCase extends ITestPlatform {
 // Platform configurations where we expect to find a set of PowerShells
 let successTestCases: ITestPlatformSuccessCase[];
 
-let msixAppDir = null;
-let pwshMsixPath = null;
-let pwshPreviewMsixPath = null;
+let msixAppDir: string;
+let pwshMsixPath: string;
+let pwshPreviewMsixPath: string;
+
 if (process.platform === "win32") {
-    msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
+    msixAppDir = path.join(process.env.LOCALAPPDATA!, "Microsoft", "WindowsApps");
     pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
     pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
 
@@ -785,7 +786,7 @@ describe("Platform module", function () {
 
                 function getWinPSPath(systemDir: string) {
                     return path.join(
-                        testPlatform.environmentVars.windir,
+                        testPlatform.environmentVars!.windir,
                         systemDir,
                         "WindowsPowerShell",
                         "v1.0",
