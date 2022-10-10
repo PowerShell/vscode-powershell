@@ -225,8 +225,9 @@ export class DebugSessionFeature extends LanguageClientConsumer
         if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
             await this.sessionManager.start();
         }
-        // Create or show the Extension Terminal.
-        vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+
+        // Create or show the debug terminal (either temporary or session).
+        this.sessionManager.showDebugTerminal(true);
 
         return config;
     }

@@ -139,7 +139,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new GenerateBugReportFeature(sessionManager),
         new ISECompatibilityFeature(),
         new OpenInISEFeature(),
-        new PesterTestsFeature(),
+        new PesterTestsFeature(sessionManager),
         new RunCodeFeature(sessionManager),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
