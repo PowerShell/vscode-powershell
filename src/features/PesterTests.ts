@@ -3,6 +3,7 @@
 
 import * as path from "path";
 import vscode = require("vscode");
+import { SessionManager } from "../session";
 import Settings = require("../settings");
 import utils = require("../utils");
 
@@ -16,7 +17,7 @@ export class PesterTestsFeature implements vscode.Disposable {
     private command: vscode.Disposable;
     private invokePesterStubScriptPath: string;
 
-    constructor() {
+    constructor(private sessionManager: SessionManager) {
         this.invokePesterStubScriptPath = path.resolve(__dirname, "../modules/PowerShellEditorServices/InvokePesterStub.ps1");
 
         // File context-menu command - Run Pester Tests
@@ -126,7 +127,7 @@ export class PesterTestsFeature implements vscode.Disposable {
     private async launch(launchConfig: vscode.DebugConfiguration): Promise<boolean> {
         // Create or show the interactive console
         // TODO: #367 Check if "newSession" mode is configured
-        await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
+        this.sessionManager.showDebugTerminal(true);
 
         // TODO: Update to handle multiple root workspaces.
         //

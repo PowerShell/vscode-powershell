@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import cp = require("child_process");
-import * as semver from "semver";
 import path = require("path");
 import vscode = require("vscode");
 import { Logger } from "./logging";
@@ -138,10 +137,8 @@ export class PowerShellProcess {
         return sessionDetails;
     }
 
-    public showConsole(preserveFocus: boolean) {
-        if (this.consoleTerminal) {
-            this.consoleTerminal.show(preserveFocus);
-        }
+    public showTerminal(preserveFocus?: boolean) {
+        this.consoleTerminal?.show(preserveFocus);
     }
 
     public dispose() {

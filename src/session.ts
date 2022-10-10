@@ -88,7 +88,7 @@ export class SessionManager implements Middleware {
     private editorServicesArgs: string;
     private sessionStatus: SessionStatus = SessionStatus.NeverStarted;
     private suppressRestartPrompt: boolean;
-    private focusConsoleOnExecute: boolean;
+    private focusTerminalOnExecute: boolean;
     private platformDetails: IPlatformDetails;
     private languageClientConsumers: LanguageClientConsumer[] = [];
     private languageStatusItem: vscode.LanguageStatusItem;
@@ -188,7 +188,7 @@ export class SessionManager implements Middleware {
             this.platformDetails,
             this.sessionSettings.powerShellAdditionalExePaths);
 
-        this.focusConsoleOnExecute = this.sessionSettings.integratedConsole.focusConsoleOnExecute;
+        this.focusTerminalOnExecute = this.sessionSettings.integratedConsole.focusConsoleOnExecute;
 
         this.createStatusBarItem();
 
@@ -482,7 +482,7 @@ Type 'help' to get help.
     private async onConfigurationUpdated() {
         const settings = Settings.load();
 
-        this.focusConsoleOnExecute = settings.integratedConsole.focusConsoleOnExecute;
+        this.focusTerminalOnExecute = settings.integratedConsole.focusConsoleOnExecute;
 
         // Detect any setting changes that would affect the session
         if (!this.suppressRestartPrompt &&
@@ -508,7 +508,7 @@ Type 'help' to get help.
             vscode.commands.registerCommand(this.ShowSessionMenuCommandName, async () => { await this.showSessionMenu(); }),
             vscode.workspace.onDidChangeConfiguration(async () => { await this.onConfigurationUpdated(); }),
             vscode.commands.registerCommand(
-                "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionConsole(isExecute); }),
+                "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionTerminal(isExecute); }),
             vscode.commands.registerCommand(
                 "PowerShell.WalkthroughTelemetry", (satisfaction: number) => {
                     this.sendTelemetryEvent("powershellWalkthroughSatisfaction", null, { level: satisfaction });
@@ -795,10 +795,18 @@ Type 'help' to get help.
         await this.restartSession(exePath.displayName);
     }
 
-    private showSessionConsole(isExecute?: boolean) {
-        if (this.languageServerProcess) {
-            this.languageServerProcess.showConsole(isExecute && !this.focusConsoleOnExecute);
+    // Shows the temp debug terminal if it exists, otherwise the session terminal.
+    public showDebugTerminal(isExecute?: boolean) {
+        if (this.debugSessionProcess) {
+            this.debugSessionProcess.showTerminal(isExecute && !this.focusTerminalOnExecute);
+        } else {
+            this.languageServerProcess?.showTerminal(isExecute && !this.focusTerminalOnExecute)
         }
+    }
+
+    // Always shows the session terminal.
+    public showSessionTerminal(isExecute?: boolean) {
+        this.languageServerProcess?.showTerminal(isExecute && !this.focusTerminalOnExecute);
     }
 
     private async showSessionMenu() {
