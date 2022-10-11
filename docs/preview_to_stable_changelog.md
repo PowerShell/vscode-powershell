@@ -314,7 +314,7 @@ By having a preview channel, in addition to our existing stable channel, we can 
 
 ##### How to Get/Use the PowerShell Preview extension
 
-If you dont already have VSCode, start [here](https://code.visualstudio.com/Docs/setup/setup-overview).
+If you don't already have VSCode, start [here](https://code.visualstudio.com/Docs/setup/setup-overview).
 
 Once you have VSCode open, click `Clt+Shift+X` to open the extensions marketplace.
 Next, type `PowerShell Preview` in the search bar.
