@@ -44,8 +44,7 @@ export class FindModuleFeature extends LanguageClientConsumer {
 
             this.pickPowerShellModule().then((moduleName) => {
                 if (moduleName) {
-                    // vscode.window.setStatusBarMessage("Installing PowerShell Module " + moduleName, 1500);
-                    this.languageClient.sendRequest(InstallModuleRequestType, moduleName);
+                    this.languageClient?.sendRequest(InstallModuleRequestType, moduleName);
                 }
             });
         });
@@ -55,37 +54,38 @@ export class FindModuleFeature extends LanguageClientConsumer {
         this.command.dispose();
     }
 
-    private pickPowerShellModule(): Thenable<string> {
-        return this.languageClient.sendRequest(FindModuleRequestType, undefined).then((modules) => {
-            const items: QuickPickItem[] = [];
+    private async pickPowerShellModule(): Promise<string | undefined> {
+        const modules = await this.languageClient?.sendRequest(FindModuleRequestType, undefined);
+        const items: QuickPickItem[] = [];
 
-            // We've got the modules info, let's cancel the timeout unless it's already been cancelled
-            if (this.cancelFindToken) {
-                this.clearCancelFindToken();
-            } else {
-                // Already timed out, would be weird to display modules after we said it timed out.
-                return Promise.resolve("");
-            }
+        // We've got the modules info, let's cancel the timeout unless it's already been cancelled
+        if (this.cancelFindToken) {
+            this.clearCancelFindToken();
+        } else {
+            // Already timed out, would be weird to display modules after we said it timed out.
+            return Promise.resolve("");
+        }
 
+        if (modules !== undefined) {
             for (const item in modules) {
                 if (modules.hasOwnProperty(item)) {
                     items.push({ label: modules[item].name, description: modules[item].description });
                 }
             }
+        }
 
-            if (items.length === 0) {
-                return Promise.reject("No PowerShell modules were found.");
-            }
+        if (items.length === 0) {
+            return Promise.reject("No PowerShell modules were found.");
+        }
 
-            const options: vscode.QuickPickOptions = {
-                placeHolder: "Select a PowerShell module to install",
-                matchOnDescription: true,
-                matchOnDetail: true,
-            };
+        const options: vscode.QuickPickOptions = {
+            placeHolder: "Select a PowerShell module to install",
+            matchOnDescription: true,
+            matchOnDetail: true,
+        };
 
-            return vscode.window.showQuickPick(items, options).then((item) => {
-                return item ? item.label : "";
-            });
+        return vscode.window.showQuickPick(items, options).then((item) => {
+            return item ? item.label : "";
         });
     }
 

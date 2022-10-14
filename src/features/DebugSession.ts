@@ -33,9 +33,9 @@ export class DebugSessionFeature extends LanguageClientConsumer
     implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
 
     private sessionCount: number = 1;
-    private tempDebugProcess: PowerShellProcess;
-    private tempSessionDetails: IEditorServicesSessionDetails;
-    private handlers: vscode.Disposable[];
+    private tempDebugProcess: PowerShellProcess | undefined;
+    private tempSessionDetails: IEditorServicesSessionDetails | undefined;
+    private handlers: vscode.Disposable[] = [];
     private configs: Record<DebugConfig, DebugConfiguration> = {
         [DebugConfig.LaunchCurrentFile]: {
             name: "PowerShell: Launch Current File",
@@ -68,7 +68,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         super();
         // Register a debug configuration provider
         context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("PowerShell", this));
-        context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory("PowerShell", this))
+        context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory("PowerShell", this));
     }
 
     createDebugAdapterDescriptor(
@@ -78,6 +78,11 @@ export class DebugSessionFeature extends LanguageClientConsumer
         const sessionDetails = session.configuration.createTemporaryIntegratedConsole
             ? this.tempSessionDetails
             : this.sessionManager.getSessionDetails();
+
+        if (sessionDetails === undefined) {
+            this.logger.writeAndShowError(`No session details available for ${session.name}`);
+            return;
+        }
 
         this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
         this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration)}`);
@@ -234,6 +239,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 return undefined;
             }
         }
+
         // Check the temporary console setting for untitled documents only, and
         // check the document extension for everything else.
         if (config.untitled_document) {
@@ -248,17 +254,24 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 return undefined;
             }
         }
+
         return config;
     }
 
     private async resolveAttachDebugConfiguration(config: DebugConfiguration): Promise<DebugConfiguration | undefined | null> {
         const platformDetails = getPlatformDetails();
         const versionDetails = this.sessionManager.getPowerShellVersionDetails();
+        if (versionDetails === undefined) {
+            vscode.window.showErrorMessage(`Session version details were not found for ${config.name}`)
+            return null;
+        }
+
         // Cross-platform attach to process was added in 6.2.0-preview.4.
         if (versionDetails.version < "7.0.0" && platformDetails.operatingSystem !== OperatingSystem.Windows) {
             vscode.window.showErrorMessage(`Attaching to a PowerShell Host Process on ${OperatingSystem[platformDetails.operatingSystem]} requires PowerShell 7.0 or higher.`);
             return undefined;
         }
+
         // If nothing is set, prompt for the processId.
         if (!config.customPipeName && !config.processId) {
             config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
@@ -267,6 +280,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 return null;
             }
         }
+
         if (!config.runspaceId && !config.runspaceName) {
             config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
             // No runspace selected. Cancel attach.
@@ -274,6 +288,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 return null;
             }
         }
+
         return config;
     }
 }
@@ -341,7 +356,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private waitingForClientToken?: vscode.CancellationTokenSource;
-    private getLanguageClientResolve: (value: LanguageClient) => void;
+    private getLanguageClientResolve?: (value: LanguageClient) => void;
 
     constructor() {
         super();
@@ -356,7 +371,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
     public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
 
-        if (this.waitingForClientToken) {
+        if (this.waitingForClientToken && this.getLanguageClientResolve) {
             this.getLanguageClientResolve(this.languageClient);
             this.clearWaitingToken();
         }
@@ -367,7 +382,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
     }
 
     private getLanguageClient(): Promise<LanguageClient> {
-        if (this.languageClient) {
+        if (this.languageClient !== undefined) {
             return Promise.resolve(this.languageClient);
         } else {
             // If PowerShell isn't finished loading yet, show a loading message
@@ -406,13 +421,14 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
     }
 
     private async pickPSHostProcess(): Promise<string | undefined> {
-        const hostProcesses = await this.languageClient.sendRequest(GetPSHostProcessesRequestType, {});
         // Start with the current PowerShell process in the list.
         const items: IProcessItem[] = [{
             label: "Current",
             description: "The current PowerShell Extension process.",
             pid: "current",
         }];
+
+        const hostProcesses = await this.languageClient?.sendRequest(GetPSHostProcessesRequestType, {});
         for (const p in hostProcesses) {
             if (hostProcesses.hasOwnProperty(p)) {
                 let windowTitle = "";
@@ -427,15 +443,18 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
                 });
             }
         }
+
         if (items.length === 0) {
             return Promise.reject("There are no PowerShell host processes to attach to.");
         }
+
         const options: vscode.QuickPickOptions = {
             placeHolder: "Select a PowerShell host process to attach to",
             matchOnDescription: true,
             matchOnDetail: true,
         };
         const item = await vscode.window.showQuickPick(items, options);
+
         return item ? `${item.pid}` : undefined;
     }
 
@@ -462,7 +481,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
 
     private command: vscode.Disposable;
     private waitingForClientToken?: vscode.CancellationTokenSource;
-    private getLanguageClientResolve: (value: LanguageClient) => void;
+    private getLanguageClientResolve?: (value: LanguageClient) => void;
 
     constructor() {
         super();
@@ -476,7 +495,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
     public setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
 
-        if (this.waitingForClientToken) {
+        if (this.waitingForClientToken && this.getLanguageClientResolve) {
             this.getLanguageClientResolve(this.languageClient);
             this.clearWaitingToken();
         }
@@ -526,9 +545,9 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
     }
 
     private async pickRunspace(processId: string): Promise<string | undefined> {
-        const response = await this.languageClient.sendRequest(GetRunspaceRequestType, { processId });
+        const response = await this.languageClient?.sendRequest(GetRunspaceRequestType, { processId });
         const items: IRunspaceItem[] = [];
-        for (const runspace of response) {
+        for (const runspace of response ?? []) {
             // Skip default runspace
             if ((runspace.id === 1 || runspace.name === "PSAttachRunspace")
                 && processId === "current") {
@@ -541,12 +560,14 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
                 id: runspace.id.toString(),
             });
         }
+
         const options: vscode.QuickPickOptions = {
             placeHolder: "Select PowerShell runspace to debug",
             matchOnDescription: true,
             matchOnDetail: true,
         };
         const item = await vscode.window.showQuickPick(items, options);
+
         return item ? `${item.id}` : undefined;
     }
 

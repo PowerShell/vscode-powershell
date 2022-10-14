@@ -158,7 +158,7 @@ class HtmlContentView extends CustomView {
         styleSheetPaths: [],
     };
 
-    private webviewPanel: vscode.WebviewPanel;
+    private webviewPanel: vscode.WebviewPanel | undefined;
 
     constructor(
         id: string,
@@ -196,9 +196,7 @@ class HtmlContentView extends CustomView {
     }
 
     public showContent(viewColumn: vscode.ViewColumn): void {
-        if (this.webviewPanel) {
-            this.webviewPanel.dispose();
-        }
+        this.webviewPanel?.dispose();
 
         let localResourceRoots: vscode.Uri[] = [];
         if (this.htmlContent.javaScriptPaths) {

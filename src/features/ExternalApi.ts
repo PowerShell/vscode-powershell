@@ -141,10 +141,10 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         const versionDetails = this.sessionManager.getPowerShellVersionDetails();
 
         return {
-            exePath: this.sessionManager.PowerShellExeDetails.exePath,
-            version: versionDetails.version,
-            displayName: this.sessionManager.PowerShellExeDetails.displayName, // comes from the Session Menu
-            architecture: versionDetails.architecture
+            exePath: this.sessionManager.PowerShellExeDetails?.exePath ?? "unknown",
+            version: versionDetails?.version ?? "unknown",
+            displayName: this.sessionManager.PowerShellExeDetails?.displayName ?? "unknown", // comes from the Session Menu
+            architecture: versionDetails?.architecture ?? "unknown"
         };
     }
     /*

@@ -30,12 +30,12 @@ export interface ILogger {
 
 export class Logger implements ILogger {
     public logBasePath: vscode.Uri;
-    public logSessionPath: vscode.Uri;
+    public logSessionPath: vscode.Uri | undefined;
     public MinimumLogLevel: LogLevel = LogLevel.Normal;
 
     private commands: vscode.Disposable[];
     private logChannel: vscode.OutputChannel;
-    private logFilePath: vscode.Uri;
+    private logFilePath: vscode.Uri | undefined;
 
     constructor(logBasePath: vscode.Uri) {
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
@@ -59,7 +59,7 @@ export class Logger implements ILogger {
     }
 
     public getLogFilePath(baseName: string): vscode.Uri {
-        return vscode.Uri.joinPath(this.logSessionPath, `${baseName}.log`);
+        return vscode.Uri.joinPath(this.logSessionPath!, `${baseName}.log`);
     }
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {

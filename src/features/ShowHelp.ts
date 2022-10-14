@@ -26,9 +26,9 @@ export class ShowHelpFeature extends LanguageClientConsumer {
                 const cwr = doc.getWordRangeAtPosition(selection.active);
                 const text = doc.getText(cwr);
 
-                this.languageClient.sendNotification(ShowHelpNotificationType, { text });
+                this.languageClient?.sendNotification(ShowHelpNotificationType, { text });
             } else {
-                this.languageClient.sendNotification(ShowHelpNotificationType, { text: item.Name } );
+                this.languageClient?.sendNotification(ShowHelpNotificationType, { text: item.Name } );
             }
         });
     }

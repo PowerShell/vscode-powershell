@@ -80,9 +80,9 @@ export class PowerShellExeFinder {
     // Additional configured PowerShells
     private readonly additionalPSExeSettings: IPowerShellAdditionalExePathSettings;
 
-    private winPS: IPossiblePowerShellExe;
+    private winPS: IPossiblePowerShellExe | undefined;
 
-    private alternateBitnessWinPS: IPossiblePowerShellExe;
+    private alternateBitnessWinPS: IPossiblePowerShellExe | undefined;
 
     /**
      * Create a new PowerShellFinder object to discover PowerShell installations.

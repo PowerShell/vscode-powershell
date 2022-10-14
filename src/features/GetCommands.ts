@@ -66,7 +66,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         }
         this.languageClient.sendRequest(GetCommandRequestType).then((result) => {
             const SidebarConfig = vscode.workspace.getConfiguration("powershell.sideBar");
-            const excludeFilter = (SidebarConfig.CommandExplorerExcludeFilter).map((filter) => filter.toLowerCase());
+            const excludeFilter = (SidebarConfig.CommandExplorerExcludeFilter).map((filter: string) => filter.toLowerCase());
             result = result.filter((command) => (excludeFilter.indexOf(command.moduleName.toLowerCase()) === -1));
             this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
             this.commandsExplorerProvider.refresh();
@@ -90,7 +90,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
 
 class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     public readonly onDidChangeTreeData: vscode.Event<Command | undefined>;
-    public powerShellCommands: Command[];
+    public powerShellCommands: Command[] = [];
     private didChangeTreeData: vscode.EventEmitter<Command | undefined> = new vscode.EventEmitter<Command>();
 
     constructor() {

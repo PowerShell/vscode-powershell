@@ -24,8 +24,8 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
             const sls = selection.start;
             const sle = selection.end;
 
-            let text;
-            let range;
+            let text: string | any[];
+            let range: vscode.Range | vscode.Position;
 
             if ((sls.character === sle.character) && (sls.line === sle.line)) {
                 text = document.getText();
@@ -35,7 +35,7 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
                 range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
             }
 
-            this.languageClient.sendRequest(ExpandAliasRequestType, { text }).then((result) => {
+            this.languageClient?.sendRequest(ExpandAliasRequestType, { text }).then((result) => {
                 editor.edit((editBuilder) => {
                     editBuilder.replace(range, result.text);
                 });

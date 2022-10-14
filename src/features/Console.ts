@@ -170,7 +170,7 @@ function onInputEntered(responseText: string | undefined): IShowInputPromptRespo
 
 export class ConsoleFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
-    private handlers: vscode.Disposable[];
+    private handlers: vscode.Disposable[] = [];
 
     constructor(private log: Logger) {
         super();
@@ -203,7 +203,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
                     selectionRange = editor.document.lineAt(editor.selection.start.line).range;
                 }
 
-                await this.languageClient.sendRequest(EvaluateRequestType, {
+                await this.languageClient?.sendRequest(EvaluateRequestType, {
                     expression: editor.document.getText(selectionRange),
                 });
 

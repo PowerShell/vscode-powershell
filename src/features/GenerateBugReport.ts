@@ -79,7 +79,7 @@ ${this.generateExtensionTable(extensions)}
         this.command.dispose();
     }
 
-    private generateExtensionTable(installedExtensions): string {
+    private generateExtensionTable(installedExtensions: vscode.Extension<any>[]): string {
         if (!installedExtensions.length) {
             return "none";
         }
@@ -105,8 +105,7 @@ ${tableHeader}\n${table};
     }
 
     private getRuntimeInfo() {
-
-        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
+        const powerShellExePath = this.sessionManager.PowerShellExeDetails?.exePath;
         const powerShellArgs = [
             "-NoProfile",
             "-Command",

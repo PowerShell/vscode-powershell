@@ -83,31 +83,31 @@ export const PowerShellVersionRequestType =
 export class SessionManager implements Middleware {
     public HostName: string;
     public HostVersion: string;
-    public PowerShellExeDetails: IPowerShellExeDetails;
+    public PowerShellExeDetails: IPowerShellExeDetails | undefined;
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
-    private editorServicesArgs: string;
+    private editorServicesArgs: string | undefined;
     private sessionStatus: SessionStatus = SessionStatus.NeverStarted;
-    private suppressRestartPrompt: boolean;
-    private focusTerminalOnExecute: boolean;
+    private suppressRestartPrompt: boolean | undefined;
+    private focusTerminalOnExecute: boolean | undefined;
     private platformDetails: IPlatformDetails;
     private languageClientConsumers: LanguageClientConsumer[] = [];
-    private languageStatusItem: vscode.LanguageStatusItem;
+    private languageStatusItem: vscode.LanguageStatusItem | undefined;
     private languageServerProcess: PowerShellProcess | undefined;
     private debugSessionProcess: PowerShellProcess | undefined;
     private debugEventHandler: vscode.Disposable | undefined;
-    private versionDetails: IPowerShellVersionDetails;
+    private versionDetails: IPowerShellVersionDetails | undefined;
     private registeredHandlers: vscode.Disposable[] = [];
     private registeredCommands: vscode.Disposable[] = [];
     private languageClient: LanguageClient | undefined;
-    private sessionSettings: Settings.ISettings;
-    private sessionDetails: IEditorServicesSessionDetails;
+    private sessionSettings: Settings.ISettings | undefined;
+    private sessionDetails: IEditorServicesSessionDetails | undefined;
     private sessionsFolder: vscode.Uri;
-    private bundledModulesPath: string;
+    private bundledModulesPath: string | undefined;
     private starting: boolean = false;
     private started: boolean = false;
 
     // Initialized by the start() method, since this requires settings
-    private powershellExeFinder: PowerShellExeFinder;
+    private powershellExeFinder: PowerShellExeFinder | undefined;
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
@@ -328,7 +328,7 @@ Type 'help' to get help.
         await this.start(exeNameOverride);
     }
 
-    public getSessionDetails(): IEditorServicesSessionDetails {
+    public getSessionDetails(): IEditorServicesSessionDetails | undefined {
         return this.sessionDetails;
     }
 
@@ -336,7 +336,7 @@ Type 'help' to get help.
         return this.sessionStatus;
     }
 
-    public getPowerShellVersionDetails(): IPowerShellVersionDetails {
+    public getPowerShellVersionDetails(): IPowerShellVersionDetails | undefined {
         return this.versionDetails;
     }
 
@@ -355,8 +355,8 @@ Type 'help' to get help.
 
         this.debugSessionProcess =
             new PowerShellProcess(
-                this.PowerShellExeDetails.exePath,
-                this.bundledModulesPath,
+                this.PowerShellExeDetails!.exePath,
+                this.bundledModulesPath!,
                 "[TEMP] PowerShell Extension",
                 this.log,
                 this.editorServicesArgs + "-DebugServiceOnly ",

@@ -172,14 +172,16 @@ interface IInvokeRegisteredEditorCommandParameter {
 
 export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
-    private handlers: vscode.Disposable[];
+    private handlers: vscode.Disposable[] = [];
     private extensionCommands: IExtensionCommand[] = [];
 
     constructor(private log: Logger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", async () => {
-                await this.showExtensionCommands(this.languageClient);
+                if (this.languageClient !== undefined) {
+                    await this.showExtensionCommands(this.languageClient);
+                }
             }),
 
             vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
@@ -191,7 +193,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     const commandToExecute = this.extensionCommands.find((x) => x.name === param.commandName);
 
                     if (commandToExecute) {
-                        await this.languageClient.sendRequest(
+                        await this.languageClient?.sendRequest(
                             InvokeExtensionCommandRequestType,
                             {
                                 name: commandToExecute.name,
@@ -340,10 +342,10 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
     private onCommandSelected(
         chosenItem: IExtensionCommandQuickPickItem | undefined,
-        client: LanguageClient) {
+        client: LanguageClient | undefined) {
 
         if (chosenItem !== undefined) {
-            client.sendRequest(
+            client?.sendRequest(
                 InvokeExtensionCommandRequestType,
                 {
                     name: chosenItem.command.name,
