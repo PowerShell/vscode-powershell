@@ -450,17 +450,16 @@ export class SessionManager implements Middleware {
 
         try {
             this.sessionDetails = await languageServerProcess.start("EditorServices");
-        } catch (error) {
-            this.log.write("PowerShell process failed to start.");
-            await this.setSessionFailure("PowerShell process failed to start: ", error);
+        } catch (err) {
+            await this.setSessionFailure("PowerShell process failed to start: ", err instanceof Error ? err.message : "unknown");
         }
 
         if (this.sessionDetails?.status === "started") {
             this.log.write("Language server started.");
             try {
                 await this.startLanguageClient(this.sessionDetails);
-            } catch (error) {
-                await this.setSessionFailure("Language client failed to start: ", error);
+            } catch (err) {
+                await this.setSessionFailure("Language client failed to start: ", err instanceof Error ? err.message : "unknown");
             }
         } else if (this.sessionDetails?.status === "failed") {
             if (this.sessionDetails.reason === "unsupported") {
@@ -687,8 +686,8 @@ Type 'help' to get help.
 
         try {
             await this.languageClient.start();
-        } catch (error) {
-            await this.setSessionFailure("Could not start language service: ", error);
+        } catch (err) {
+            await this.setSessionFailure("Could not start language service: ", err instanceof Error ? err.message : "unknown");
             return;
         }
 
@@ -727,9 +726,9 @@ Type 'help' to get help.
                 localVersion!,
                 this.versionDetails!.architecture,
                 release);
-        } catch (error) {
+        } catch (err) {
             // Best effort. This probably failed to fetch the data from GitHub.
-            this.log.writeWarning(error.message);
+            this.log.writeWarning(err instanceof Error ? err.message : "unknown");
         }
     }
 
