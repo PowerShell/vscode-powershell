@@ -88,7 +88,7 @@ export interface ISettings {
     bundledModulesPath: string;
     startAsLoginShell: IStartAsLoginShellSettings;
     startAutomatically?: boolean;
-    enableProfileLoading?: boolean;
+    enableProfileLoading: boolean;
     helpCompletion: string;
     scriptAnalysis?: IScriptAnalysisSettings;
     debugging: IDebuggingSettings;
@@ -114,7 +114,7 @@ export interface IStartAsLoginShellSettings {
 export interface IIntegratedConsoleSettings {
     showOnStartup?: boolean;
     startInBackground?: boolean;
-    focusConsoleOnExecute?: boolean;
+    focusConsoleOnExecute: boolean;
     useLegacyReadLine?: boolean;
     forceClearScrollbackBuffer?: boolean;
     suppressStartupBanner?: boolean;

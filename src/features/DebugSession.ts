@@ -174,7 +174,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             settings.debugging.createTemporaryIntegratedConsole;
 
         if (config.createTemporaryIntegratedConsole) {
-            this.tempDebugProcess = this.sessionManager.createDebugSessionProcess(settings);
+            this.tempDebugProcess = await this.sessionManager.createDebugSessionProcess(settings);
             this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
         }
 

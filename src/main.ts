@@ -65,7 +65,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     // Load and validate settings (will prompt for 'cwd' if necessary).
     await Settings.validateCwdSetting();
-    const extensionSettings = Settings.load();
+    const settings = Settings.load();
 
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -122,16 +122,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     // Setup the logger.
     logger = new Logger(context.globalStorageUri);
-    logger.MinimumLogLevel = LogLevel[extensionSettings.developer.editorServicesLogLevel];
+    logger.MinimumLogLevel = LogLevel[settings.developer.editorServicesLogLevel];
 
-    sessionManager =
-        new SessionManager(
-            context,
-            logger,
-            documentSelector,
-            PackageJSON.displayName,
-            PackageJSON.version,
-            telemetryReporter);
+    sessionManager = new SessionManager(
+        context,
+        settings,
+        logger,
+        documentSelector,
+        PackageJSON.displayName,
+        PackageJSON.version,
+        telemetryReporter);
 
     // Register commands that do not require Language client
     commandRegistrations = [
@@ -167,7 +167,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
-    if (extensionSettings.startAutomatically) {
+    if (settings.startAutomatically) {
         await sessionManager.start();
     }
 
