@@ -25,7 +25,7 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
 
         if (this.settings.helpCompletion !== Settings.CommentType.Disabled) {
             this.helpCompletionProvider = new HelpCompletionProvider();
-            const subscriptions = [];
+            const subscriptions: Disposable[] = [];
             workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
             this.disposable = Disposable.from(...subscriptions);
         }

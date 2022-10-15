@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import net = require("net");
 import path = require("path");
 import * as semver from "semver";

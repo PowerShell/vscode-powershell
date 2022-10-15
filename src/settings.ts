@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");

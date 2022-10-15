@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import vscode = require("vscode");
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";

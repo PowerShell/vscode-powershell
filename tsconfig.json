@@ -11,13 +11,7 @@
     ],
     "sourceMap": true,
     "rootDir": ".",
-    // TODO: We need to enable stricter checking...
-    // "strict": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "useUnknownInCatchVariables": true,
+    "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedParameters": true

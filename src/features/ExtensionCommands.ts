@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// TODO: This file needs some TLC to use strict mode.
-
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";

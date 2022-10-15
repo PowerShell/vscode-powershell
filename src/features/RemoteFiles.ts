@@ -60,7 +60,7 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         const remoteDocuments =
             vscode.workspace.textDocuments.filter((doc) => this.isDocumentRemote(doc));
 
-        async function innerCloseFiles() {
+        async function innerCloseFiles(): Promise<void> {
             const doc = remoteDocuments.pop();
             if (doc === undefined) {
                 return;

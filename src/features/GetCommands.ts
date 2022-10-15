@@ -139,7 +139,7 @@ class Command extends vscode.TreeItem {
         };
     }
 
-    public async getChildren(_element?): Promise<Command[]> {
+    public async getChildren(_element?: any): Promise<Command[]> {
         return [];
         // Returning an empty array because we need to return something.
     }

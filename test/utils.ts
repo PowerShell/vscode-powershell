@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import * as path from "path";
 import * as vscode from "vscode";
 import { IPowerShellExtensionClient } from "../src/features/ExternalApi";

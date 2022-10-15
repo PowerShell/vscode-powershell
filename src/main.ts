@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import vscode = require("vscode");
 import TelemetryReporter from "@vscode/extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
@@ -122,7 +120,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     // Setup the logger.
     logger = new Logger(context.globalStorageUri);
-    logger.MinimumLogLevel = LogLevel[settings.developer.editorServicesLogLevel];
+    logger.MinimumLogLevel = Logger.logLevelNameToValue(settings.developer.editorServicesLogLevel);
 
     sessionManager = new SessionManager(
         context,
