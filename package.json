@@ -69,7 +69,7 @@
     "@vscode/test-electron": "~2.1.5",
     "esbuild": "^0.15.11",
     "glob": "^8.0.3",
-    "mocha": "~10.0.0",
+    "mocha": "~10.1.0",
     "mocha-multi-reporters": "~1.5.1",
     "mock-fs": "~5.1.4",
     "rewire": "~6.0.0",
