@@ -44,7 +44,7 @@ interface ITestPlatform {
     name: string;
     platformDetails: platform.IPlatformDetails;
     filesystem: FileSystem.DirectoryItems;
-    environmentVars?: Record<string, string>;
+    environmentVars: Record<string, string>;
 }
 
 /**
@@ -442,6 +442,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/bin/pwsh",
@@ -482,6 +483,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/local/bin/pwsh",
@@ -508,6 +510,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/bin/pwsh",
@@ -528,6 +531,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/snap/bin/pwsh",
@@ -548,6 +552,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/local/bin/pwsh",
@@ -620,6 +625,7 @@ const errorTestCases: ITestPlatform[] = [
             isOS64Bit: true,
             isProcess64Bit: true,
         },
+        environmentVars: {},
         filesystem: {},
     },
     {
@@ -629,6 +635,7 @@ const errorTestCases: ITestPlatform[] = [
             isOS64Bit: true,
             isProcess64Bit: true,
         },
+        environmentVars: {},
         filesystem: {},
     },
 ];
@@ -636,10 +643,8 @@ const errorTestCases: ITestPlatform[] = [
 function setupTestEnvironment(testPlatform: ITestPlatform) {
     mockFS(testPlatform.filesystem);
 
-    if (testPlatform.environmentVars) {
-        for (const envVar of Object.keys(testPlatform.environmentVars)) {
-            sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
-        }
+    for (const envVar of Object.keys(testPlatform.environmentVars)) {
+        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
     }
 }
 
@@ -712,9 +717,9 @@ describe("Platform module", function () {
                 const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 const expectedPowerShell = testPlatform.expectedPowerShellSequence[0];
 
-                assert.strictEqual(defaultPowerShell.exePath, expectedPowerShell.exePath);
-                assert.strictEqual(defaultPowerShell.displayName, expectedPowerShell.displayName);
-                assert.strictEqual(defaultPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
+                assert.strictEqual(defaultPowerShell.exePath, expectedPowerShell!.exePath);
+                assert.strictEqual(defaultPowerShell.displayName, expectedPowerShell!.displayName);
+                assert.strictEqual(defaultPowerShell.supportsProperArguments, expectedPowerShell!.supportsProperArguments);
             });
         }
 
@@ -748,9 +753,9 @@ describe("Platform module", function () {
                     const foundPowerShell = foundPowerShells[i];
                     const expectedPowerShell = testPlatform.expectedPowerShellSequence[i];
 
-                    assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell.exePath);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell.displayName);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell!.exePath);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell!.displayName);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.supportsProperArguments, expectedPowerShell!.supportsProperArguments);
                 }
 
                 assert.strictEqual(
@@ -786,7 +791,7 @@ describe("Platform module", function () {
 
                 function getWinPSPath(systemDir: string) {
                     return path.join(
-                        testPlatform.environmentVars!.windir,
+                        testPlatform.environmentVars.windir!,
                         systemDir,
                         "WindowsPowerShell",
                         "v1.0",
