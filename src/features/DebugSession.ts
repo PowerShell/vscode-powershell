@@ -344,11 +344,7 @@ interface IPSHostProcessInfo {
 }
 
 export const GetPSHostProcessesRequestType =
-    new RequestType<any, IGetPSHostProcessesResponseBody, string>("powerShell/getPSHostProcesses");
-
-interface IGetPSHostProcessesResponseBody {
-    hostProcesses: IPSHostProcessInfo[];
-}
+    new RequestType<any, IPSHostProcessInfo[], string>("powerShell/getPSHostProcesses");
 
 export class PickPSHostProcessFeature extends LanguageClientConsumer {
 
@@ -427,17 +423,17 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         }];
 
         const response = await this.languageClient?.sendRequest(GetPSHostProcessesRequestType, {});
-        for (const process of response?.hostProcesses ?? []) {
-                let windowTitle = "";
-                if (process.mainWindowTitle) {
-                    windowTitle = `, Title: ${process.mainWindowTitle}`;
-                }
+        for (const process of response ?? []) {
+            let windowTitle = "";
+            if (process.mainWindowTitle) {
+                windowTitle = `, Title: ${process.mainWindowTitle}`;
+            }
 
-                items.push({
-                    label: process.processName,
-                    description: `PID: ${process.processId.toString()}${windowTitle}`,
-                    pid: process.processId,
-                });
+            items.push({
+                label: process.processName,
+                description: `PID: ${process.processId.toString()}${windowTitle}`,
+                pid: process.processId,
+            });
         }
 
         if (items.length === 0) {
