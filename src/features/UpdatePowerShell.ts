@@ -20,7 +20,7 @@ import { EvaluateRequestType } from "./Console";
 const streamPipeline = util.promisify(stream.pipeline);
 
 const PowerShellGitHubReleasesUrl =
-        "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
+    "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
 const PowerShellGitHubPrereleasesUrl =
     "https://api.github.com/repos/PowerShell/PowerShell/releases";
 
@@ -62,7 +62,7 @@ export class GitHubReleaseInformation {
     public assets: any[];
 
     public constructor(version: string | semver.SemVer, assets: any[] = []) {
-        this.version = semver.parse(version);
+        this.version = semver.parse(version)!;
 
         if (semver.prerelease(this.version)) {
             this.isPreview = true;
@@ -102,11 +102,9 @@ export async function InvokePowerShellUpdateCheck(
         return;
     }
 
-    const commonText: string = `You have an old version of PowerShell (${
-        localVersion.raw
-    }). The current latest release is ${
-        release.version.raw
-    }.`;
+    const commonText: string = `You have an old version of PowerShell (${localVersion.raw
+        }). The current latest release is ${release.version.raw
+        }.`;
 
     if (process.platform === "linux") {
         await window.showInformationMessage(
@@ -115,9 +113,8 @@ export async function InvokePowerShellUpdateCheck(
     }
 
     const result = await window.showInformationMessage(
-        `${commonText} Would you like to update the version? ${
-            isMacOS ? "(Homebrew is required on macOS)"
-                : "(This will close ALL pwsh terminals running in this Visual Studio Code session)"
+        `${commonText} Would you like to update the version? ${isMacOS ? "(Homebrew is required on macOS)"
+            : "(This will close ALL pwsh terminals running in this Visual Studio Code session)"
         }`, ...options);
 
     // If the user cancels the notification.
@@ -144,10 +141,10 @@ export async function InvokePowerShellUpdateCheck(
                     location: ProgressLocation.Notification,
                     cancellable: false,
                 },
-                async () => {
-                    // Streams the body of the request to a file.
-                    await streamPipeline(res.body, fs.createWriteStream(msiDownloadPath));
-                });
+                    async () => {
+                        // Streams the body of the request to a file.
+                        await streamPipeline(res.body, fs.createWriteStream(msiDownloadPath));
+                    });
 
                 // Stop the session because Windows likes to hold on to files.
                 sessionManager.stop();

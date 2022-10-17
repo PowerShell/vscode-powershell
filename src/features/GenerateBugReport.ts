@@ -14,11 +14,11 @@ const issuesUrl: string = `${project}/issues/new`;
 
 const extensions =
     vscode.extensions.all.filter((element) => element.packageJSON.isBuiltin === false)
-        .sort((leftside, rightside): number => {
-            if (leftside.packageJSON.name.toLowerCase() < rightside.packageJSON.name.toLowerCase()) {
+        .sort((leftSide, rightSide): number => {
+            if (leftSide.packageJSON.name.toLowerCase() < rightSide.packageJSON.name.toLowerCase()) {
                 return -1;
             }
-            if (leftside.packageJSON.name.toLowerCase() > rightside.packageJSON.name.toLowerCase()) {
+            if (leftSide.packageJSON.name.toLowerCase() > rightSide.packageJSON.name.toLowerCase()) {
                 return 1;
             }
             return 0;
@@ -79,7 +79,7 @@ ${this.generateExtensionTable(extensions)}
         this.command.dispose();
     }
 
-    private generateExtensionTable(installedExtensions): string {
+    private generateExtensionTable(installedExtensions: vscode.Extension<any>[]): string {
         if (!installedExtensions.length) {
             return "none";
         }
@@ -89,6 +89,7 @@ ${this.generateExtensionTable(extensions)}
             if (e.packageJSON.isBuiltin === false) {
                 return `|${e.packageJSON.name}|${e.packageJSON.publisher}|${e.packageJSON.version}|`;
             }
+            return undefined;
         }).join("\n");
 
         const extensionTable = `
@@ -104,8 +105,7 @@ ${tableHeader}\n${table};
     }
 
     private getRuntimeInfo() {
-
-        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
+        const powerShellExePath = this.sessionManager.PowerShellExeDetails?.exePath;
         const powerShellArgs = [
             "-NoProfile",
             "-Command",

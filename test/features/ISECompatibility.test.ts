@@ -7,7 +7,7 @@ import { ISECompatibilityFeature } from "../../src/features/ISECompatibility";
 import utils = require("../utils");
 
 describe("ISE compatibility feature", function () {
-    let currentTheme: string;
+    let currentTheme: string | undefined;
 
     async function enableISEMode() { await vscode.commands.executeCommand("PowerShell.EnableISEMode"); }
     async function disableISEMode() { await vscode.commands.executeCommand("PowerShell.DisableISEMode"); }

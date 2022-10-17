@@ -9,11 +9,13 @@ export class OpenInISEFeature implements vscode.Disposable {
 
     constructor() {
         this.command = vscode.commands.registerCommand("PowerShell.OpenInISE", () => {
-
             const editor = vscode.window.activeTextEditor;
+            if (editor === undefined) {
+                return;
+            }
+
             const document = editor.document;
             const uri = document.uri;
-
             let ISEPath = process.env.windir;
 
             if (process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")) {

@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import vscode = require("vscode");
 import TelemetryReporter from "@vscode/extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
@@ -27,7 +25,7 @@ import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { RunCodeFeature } from "./features/RunCode";
 import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
-import { Logger, LogLevel } from "./logging";
+import { Logger } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";
@@ -65,7 +63,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     // Load and validate settings (will prompt for 'cwd' if necessary).
     await Settings.validateCwdSetting();
-    const extensionSettings = Settings.load();
+    const settings = Settings.load();
 
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -122,16 +120,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     // Setup the logger.
     logger = new Logger(context.globalStorageUri);
-    logger.MinimumLogLevel = LogLevel[extensionSettings.developer.editorServicesLogLevel];
+    logger.MinimumLogLevel = Logger.logLevelNameToValue(settings.developer.editorServicesLogLevel);
 
-    sessionManager =
-        new SessionManager(
-            context,
-            logger,
-            documentSelector,
-            PackageJSON.displayName,
-            PackageJSON.version,
-            telemetryReporter);
+    sessionManager = new SessionManager(
+        context,
+        settings,
+        logger,
+        documentSelector,
+        PackageJSON.displayName,
+        PackageJSON.version,
+        telemetryReporter);
 
     // Register commands that do not require Language client
     commandRegistrations = [
@@ -150,9 +148,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     // Features and command registrations that require language client
     languageClientConsumers = [
         new ConsoleFeature(logger),
-        new ExpandAliasFeature(logger),
+        new ExpandAliasFeature(),
         new GetCommandsFeature(logger),
-        new ShowHelpFeature(logger),
+        new ShowHelpFeature(),
         new FindModuleFeature(),
         new ExtensionCommandsFeature(logger),
         new NewFileOrProjectFeature(),
@@ -167,7 +165,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
-    if (extensionSettings.startAutomatically) {
+    if (settings.startAutomatically) {
         await sessionManager.start();
     }
 

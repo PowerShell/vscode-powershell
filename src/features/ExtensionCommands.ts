@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// TODO: This file needs some TLC to use strict mode.
-
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -32,8 +30,8 @@ export interface IEditorContext {
     currentFileContent: string;
     currentFileLanguage: string;
     currentFilePath: string;
-    cursorPosition: Position;
-    selectionRange: Range;
+    cursorPosition: Position | undefined | null;
+    selectionRange: Range | undefined | null;
 }
 
 export interface IInvokeExtensionCommandRequestArguments {
@@ -50,16 +48,16 @@ export interface IExtensionCommandAddedNotificationBody {
     displayName: string;
 }
 
-function asRange(value: vscode.Range): Range {
+function asRange(value: vscode.Range): Range | undefined | null {
     if (value === undefined) {
         return undefined;
     } else if (value === null) {
         return null;
     }
-    return { start: asPosition(value.start), end: asPosition(value.end) };
+    return { start: asPosition(value.start)!, end: asPosition(value.end)! };
 }
 
-function asPosition(value: vscode.Position): Position {
+function asPosition(value: vscode.Position): Position | undefined | null {
     if (value === undefined) {
         return undefined;
     } else if (value === null) {
@@ -68,16 +66,7 @@ function asPosition(value: vscode.Position): Position {
     return { line: value.line, character: value.character };
 }
 
-function asCodeRange(value: Range): vscode.Range {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
-    return new vscode.Range(asCodePosition(value.start), asCodePosition(value.end));
-}
-
-function asCodePosition(value: Position): vscode.Position {
+function asCodePosition(value: Position): vscode.Position | undefined | null {
     if (value === undefined) {
         return undefined;
     } else if (value === null) {
@@ -172,19 +161,16 @@ interface IInvokeRegisteredEditorCommandParameter {
 
 export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
-    private handlers: vscode.Disposable[];
+    private handlers: vscode.Disposable[] = [];
     private extensionCommands: IExtensionCommand[] = [];
 
     constructor(private log: Logger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", async () => {
-                const editor = vscode.window.activeTextEditor;
-                let start = editor.selection.start;
-                if (editor.selection.isEmpty) {
-                    start = new vscode.Position(start.line, 0);
+                if (this.languageClient !== undefined) {
+                    await this.showExtensionCommands(this.languageClient);
                 }
-                await this.showExtensionCommands(this.languageClient);
             }),
 
             vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
@@ -196,7 +182,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     const commandToExecute = this.extensionCommands.find((x) => x.name === param.commandName);
 
                     if (commandToExecute) {
-                        await this.languageClient.sendRequest(
+                        await this.languageClient?.sendRequest(
                             InvokeExtensionCommandRequestType,
                             {
                                 name: commandToExecute.name,
@@ -227,7 +213,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         ]
     }
 
-    public setLanguageClient(languageclient: LanguageClient) {
+    public override setLanguageClient(languageclient: LanguageClient) {
         // Clear the current list of extension commands since they were
         // only relevant to the previous session
         this.extensionCommands = [];
@@ -320,7 +306,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 a.name.localeCompare(b.name));
     }
 
-    private showExtensionCommands(client: LanguageClient): Thenable<IInvokeExtensionCommandRequestArguments> {
+    private async showExtensionCommands(client: LanguageClient): Promise<void> {
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
             vscode.window.showInformationMessage(
@@ -337,19 +323,18 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 };
             });
 
-        vscode.window
-            .showQuickPick(
-                quickPickItems,
-                { placeHolder: "Select a command" })
-            .then((command) => this.onCommandSelected(command, client));
+        const selectedCommand = await vscode.window.showQuickPick(
+            quickPickItems,
+            { placeHolder: "Select a command" });
+        return this.onCommandSelected(selectedCommand, client);
     }
 
     private onCommandSelected(
-        chosenItem: IExtensionCommandQuickPickItem,
-        client: LanguageClient) {
+        chosenItem: IExtensionCommandQuickPickItem | undefined,
+        client: LanguageClient | undefined) {
 
         if (chosenItem !== undefined) {
-            client.sendRequest(
+            client?.sendRequest(
                 InvokeExtensionCommandRequestType,
                 {
                     name: chosenItem.command.name,
@@ -379,7 +364,11 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         return EditorOperationResponse.Completed;
     }
 
-    private getEditorContext(): IEditorContext {
+    private getEditorContext(): IEditorContext | undefined {
+        if (vscode.window.activeTextEditor === undefined) {
+            return undefined;
+        }
+
         return {
             currentFileContent: vscode.window.activeTextEditor.document.getText(),
             currentFileLanguage: vscode.window.activeTextEditor.document.languageId,
@@ -418,7 +407,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             promise =
                 vscode.workspace.openTextDocument(filePath)
                     .then((doc) => vscode.window.showTextDocument(doc))
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+                    .then((_) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
                     .then((_) => EditorOperationResponse.Completed);
         } else {
             promise = Promise.resolve(EditorOperationResponse.Completed);
@@ -549,7 +538,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             // Make sure the file path is absolute
             if (!path.win32.isAbsolute(filePath)) {
                 filePath = path.win32.resolve(
-                    vscode.workspace.rootPath,
+                    vscode.workspace.rootPath!,
                     filePath);
             }
 
@@ -559,7 +548,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             // Make sure the file path is absolute
             if (!path.isAbsolute(filePath)) {
                 filePath = path.resolve(
-                    vscode.workspace.rootPath,
+                    vscode.workspace.rootPath!,
                     filePath);
             }
 
@@ -590,31 +579,30 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     }
 
     private setSelection(details: ISetSelectionRequestArguments): EditorOperationResponse {
-        vscode.window.activeTextEditor.selections = [
-            new vscode.Selection(
-                asCodePosition(details.selectionRange.start),
-                asCodePosition(details.selectionRange.end)),
-        ];
+        if (vscode.window.activeTextEditor !== undefined) {
+            vscode.window.activeTextEditor.selections = [
+                new vscode.Selection(
+                    asCodePosition(details.selectionRange.start)!,
+                    asCodePosition(details.selectionRange.end)!),
+            ];
+        }
 
         return EditorOperationResponse.Completed;
     }
 
-    private showInformationMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-            .showInformationMessage(message)
-            .then((_) => EditorOperationResponse.Completed);
+    private async showInformationMessage(message: string): Promise<EditorOperationResponse> {
+        await vscode.window.showInformationMessage(message);
+        return EditorOperationResponse.Completed;
     }
 
-    private showErrorMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-            .showErrorMessage(message)
-            .then((_) => EditorOperationResponse.Completed);
+    private async showErrorMessage(message: string): Promise<EditorOperationResponse> {
+        await vscode.window.showErrorMessage(message);
+        return EditorOperationResponse.Completed;
     }
 
-    private showWarningMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-            .showWarningMessage(message)
-            .then((_) => EditorOperationResponse.Completed);
+    private async showWarningMessage(message: string): Promise<EditorOperationResponse> {
+        await vscode.window.showWarningMessage(message);
+        return EditorOperationResponse.Completed;
     }
 
     private setStatusBarMessage(messageDetails: IStatusBarMessageDetails): EditorOperationResponse {

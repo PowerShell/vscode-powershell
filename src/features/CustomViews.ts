@@ -27,7 +27,7 @@ export class CustomViewsFeature extends LanguageClientConsumer {
         }
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
 
         languageClient.onRequest(
             NewCustomViewRequestType,
@@ -72,7 +72,6 @@ export class CustomViewsFeature extends LanguageClientConsumer {
 
 class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
 
-    private count: number = 1;
     private viewIndex: { [id: string]: CustomView } = {};
     private didChangeEvent: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
 
@@ -100,13 +99,12 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
 
     public closeView(id: string) {
         const uriString = this.getUri(id);
-        const view: CustomView = this.viewIndex[uriString];
 
         vscode.workspace.textDocuments.some((doc) => {
             if (doc.uri.toString() === uriString) {
                 vscode.window
                     .showTextDocument(doc)
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"));
+                    .then((_) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"));
 
                 return true;
             }
@@ -159,7 +157,7 @@ class HtmlContentView extends CustomView {
         styleSheetPaths: [],
     };
 
-    private webviewPanel: vscode.WebviewPanel;
+    private webviewPanel: vscode.WebviewPanel | undefined;
 
     constructor(
         id: string,
@@ -197,9 +195,7 @@ class HtmlContentView extends CustomView {
     }
 
     public showContent(viewColumn: vscode.ViewColumn): void {
-        if (this.webviewPanel) {
-            this.webviewPanel.dispose();
-        }
+        this.webviewPanel?.dispose();
 
         let localResourceRoots: vscode.Uri[] = [];
         if (this.htmlContent.javaScriptPaths) {

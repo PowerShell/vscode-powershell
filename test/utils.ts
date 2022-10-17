@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import * as path from "path";
 import * as vscode from "vscode";
 import { IPowerShellExtensionClient } from "../src/features/ExternalApi";
@@ -16,7 +14,7 @@ export const extensionId = `${packageJSON.publisher}.${packageJSON.name}`;
 
 export async function ensureExtensionIsActivated(): Promise<IPowerShellExtensionClient> {
     const extension = vscode.extensions.getExtension(extensionId);
-    if (!extension.isActive) { await extension.activate(); }
+    if (!extension!.isActive) { await extension!.activate(); }
     return extension!.exports as IPowerShellExtensionClient;
 }
 
