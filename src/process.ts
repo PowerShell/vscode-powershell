@@ -52,7 +52,7 @@ export class PowerShellProcess {
 
         this.startPsesArgs +=
             `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath.fsPath)}' ` +
-        `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
+            `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 
         if (this.sessionSettings.integratedConsole.useLegacyReadLine) {

@@ -24,9 +24,9 @@ export class FindModuleFeature extends LanguageClientConsumer {
             this.cancelFindToken = new vscode.CancellationTokenSource();
             vscode.window
                 .showQuickPick(
-                ["Cancel"],
-                { placeHolder: "Please wait, retrieving list of PowerShell modules. This can take some time..." },
-                this.cancelFindToken.token)
+                    ["Cancel"],
+                    { placeHolder: "Please wait, retrieving list of PowerShell modules. This can take some time..." },
+                    this.cancelFindToken.token)
                 .then((response) => {
                     if (response === "Cancel") { this.clearCancelFindToken(); }
                 });

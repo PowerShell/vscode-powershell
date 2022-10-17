@@ -286,7 +286,7 @@ export async function getEffectiveConfigurationTarget(settingName: string): Prom
     const detail = configuration.inspect(settingName);
     if (detail === undefined) {
         return undefined;
-    } else if ( typeof detail.workspaceFolderValue !== "undefined") {
+    } else if (typeof detail.workspaceFolderValue !== "undefined") {
         return vscode.ConfigurationTarget.WorkspaceFolder;
     }
     else if (typeof detail.workspaceValue !== "undefined") {

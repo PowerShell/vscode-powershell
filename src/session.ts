@@ -838,8 +838,8 @@ Type 'help' to get help.
             case SessionStatus.Stopping:
                 if (this.PowerShellExeDetails && this.versionDetails) {
                     const currentPowerShellExe =
-                    availablePowerShellExes
-                        .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails!.displayName.toLowerCase());
+                        availablePowerShellExes
+                            .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails!.displayName.toLowerCase());
 
                     const powerShellSessionName =
                         currentPowerShellExe ?

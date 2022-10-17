@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Disposable, EndOfLine, Range, SnippetString,
-    TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
+import {
+    Disposable, EndOfLine, Range, SnippetString,
+    TextDocument, TextDocumentChangeEvent, window, workspace
+} from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
@@ -95,8 +97,8 @@ class TriggerFinder {
 
             case SearchState.Locked:
                 if (document === this.document &&
-                        changeText.length === 1 &&
-                        changeText[0] === this.triggerCharacters[this.count]) {
+                    changeText.length === 1 &&
+                    changeText[0] === this.triggerCharacters[this.count]) {
                     this.count++;
                     if (this.count === this.triggerCharacters.length) {
                         this.state = SearchState.Found;

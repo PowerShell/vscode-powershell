@@ -28,7 +28,7 @@ export class ShowHelpFeature extends LanguageClientConsumer {
 
                 this.languageClient?.sendNotification(ShowHelpNotificationType, { text });
             } else {
-                this.languageClient?.sendNotification(ShowHelpNotificationType, { text: item.Name } );
+                this.languageClient?.sendNotification(ShowHelpNotificationType, { text: item.Name });
             }
         });
     }

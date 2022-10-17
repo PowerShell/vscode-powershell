@@ -35,13 +35,13 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
                     // Cancel the loading prompt after 60 seconds
                     setTimeout(() => {
-                            if (this.waitingForClientToken) {
-                                this.clearWaitingToken();
+                        if (this.waitingForClientToken) {
+                            this.clearWaitingToken();
 
-                                vscode.window.showErrorMessage(
-                                    "New Project: PowerShell session took too long to start.");
-                            }
-                        }, 60000);
+                            vscode.window.showErrorMessage(
+                                "New Project: PowerShell session took too long to start.");
+                        }
+                    }, 60000);
                 } else {
                     this.showProjectTemplates();
                 }

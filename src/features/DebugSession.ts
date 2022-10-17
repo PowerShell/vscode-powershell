@@ -2,12 +2,14 @@
 // Licensed under the MIT License.
 
 import vscode = require("vscode");
-import { CancellationToken, DebugConfiguration, DebugConfigurationProvider,
-    ExtensionContext, WorkspaceFolder } from "vscode";
+import {
+    CancellationToken, DebugConfiguration, DebugConfigurationProvider,
+    ExtensionContext, WorkspaceFolder
+} from "vscode";
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { getPlatformDetails, OperatingSystem } from "../platform";
-import { PowerShellProcess} from "../process";
+import { PowerShellProcess } from "../process";
 import { IEditorServicesSessionDetails, SessionManager, SessionStatus } from "../session";
 import Settings = require("../settings");
 import { Logger } from "../logging";
@@ -358,7 +360,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         this.command =
             vscode.commands.registerCommand("PowerShell.PickPSHostProcess", () => {
                 return this.getLanguageClient()
-                           .then((_) => this.pickPSHostProcess(), (_) => undefined);
+                    .then((_) => this.pickPSHostProcess(), (_) => undefined);
             });
     }
 
@@ -480,7 +482,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         this.command =
             vscode.commands.registerCommand("PowerShell.PickRunspace", (processId) => {
                 return this.getLanguageClient()
-                           .then((_) => this.pickRunspace(processId), (_) => undefined);
+                    .then((_) => this.pickRunspace(processId), (_) => undefined);
             }, this);
     }
 

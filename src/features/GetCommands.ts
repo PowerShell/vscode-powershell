@@ -39,7 +39,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
             { treeDataProvider: this.commandsExplorerProvider });
 
         // Refresh the command explorer when the view is visible
-        this.commandsExplorerTreeView.onDidChangeVisibility( (e) => {
+        this.commandsExplorerTreeView.onDidChangeVisibility((e) => {
             if (e.visible) {
                 this.CommandExplorerRefresh();
             }
