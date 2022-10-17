@@ -14,7 +14,8 @@
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": true
+    "noImplicitOverride": true,
+    "noUnusedParameters": true,
   },
   "include": [ "src", "test" ],
 }

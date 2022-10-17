@@ -52,7 +52,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
         this.command.dispose();
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
 
         if (this.waitingForClientToken) {

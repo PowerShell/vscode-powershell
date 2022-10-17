@@ -27,7 +27,7 @@ export class CustomViewsFeature extends LanguageClientConsumer {
         }
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
 
         languageClient.onRequest(
             NewCustomViewRequestType,

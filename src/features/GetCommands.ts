@@ -52,7 +52,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         this.command.dispose();
     }
 
-    public setLanguageClient(languageclient: LanguageClient) {
+    public override setLanguageClient(languageclient: LanguageClient) {
         this.languageClient = languageclient;
         if (this.commandsExplorerTreeView.visible) {
             vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
@@ -127,7 +127,7 @@ class Command extends vscode.TreeItem {
         public readonly defaultParameterSet: string,
         public readonly ParameterSets: object,
         public readonly Parameters: object,
-        public readonly collapsibleState = vscode.TreeItemCollapsibleState.None,
+        public override readonly collapsibleState = vscode.TreeItemCollapsibleState.None,
     ) {
         super(Name, collapsibleState);
     }

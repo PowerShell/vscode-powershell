@@ -94,7 +94,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
         this.handlers = [
             languageClient.onNotification(
                 StartDebuggerNotificationType,
@@ -366,7 +366,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
             });
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
 
         if (this.waitingForClientToken && this.getLanguageClientResolve) {
@@ -488,7 +488,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
             }, this);
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
 
         if (this.waitingForClientToken && this.getLanguageClientResolve) {

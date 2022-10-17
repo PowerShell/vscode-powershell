@@ -35,7 +35,7 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
         this.disposable?.dispose();
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
         if (this.helpCompletionProvider) {
             this.helpCompletionProvider.languageClient = languageClient;

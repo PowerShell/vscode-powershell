@@ -222,7 +222,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
         }
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
         this.handlers = [
             this.languageClient.onRequest(

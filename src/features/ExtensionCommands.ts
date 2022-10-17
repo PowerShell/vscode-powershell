@@ -222,7 +222,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         ]
     }
 
-    public setLanguageClient(languageclient: LanguageClient) {
+    public override setLanguageClient(languageclient: LanguageClient) {
         // Clear the current list of extension commands since they were
         // only relevant to the previous session
         this.extensionCommands = [];
