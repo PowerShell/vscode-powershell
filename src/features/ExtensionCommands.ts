@@ -66,15 +66,6 @@ function asPosition(value: vscode.Position): Position | undefined | null {
     return { line: value.line, character: value.character };
 }
 
-function asCodeRange(value: Range): vscode.Range | undefined | null {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
-    return new vscode.Range(asCodePosition(value.start)!, asCodePosition(value.end)!);
-}
-
 function asCodePosition(value: Position): vscode.Position | undefined | null {
     if (value === undefined) {
         return undefined;

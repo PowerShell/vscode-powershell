@@ -25,7 +25,7 @@ import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { RunCodeFeature } from "./features/RunCode";
 import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
-import { Logger, LogLevel } from "./logging";
+import { Logger } from "./logging";
 import { SessionManager } from "./session";
 import Settings = require("./settings");
 import { PowerShellLanguageId } from "./utils";

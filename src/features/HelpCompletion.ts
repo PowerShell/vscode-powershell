@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Disposable, EndOfLine, Position, Range, SnippetString,
+import { Disposable, EndOfLine, Range, SnippetString,
     TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";

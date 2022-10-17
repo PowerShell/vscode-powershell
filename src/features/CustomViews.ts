@@ -72,7 +72,6 @@ export class CustomViewsFeature extends LanguageClientConsumer {
 
 class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
 
-    private count: number = 1;
     private viewIndex: { [id: string]: CustomView } = {};
     private didChangeEvent: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
 
