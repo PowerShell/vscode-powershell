@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2022.10.1-preview
+### Monday, October 17, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🚂 [vscode-powershell #3561](https://github.com/PowerShell/vscode-powershell/pull/4206) - Enable `strict` TypeScript mode .
+- 🐛 🔍 [vscode-powershell #4201](https://github.com/PowerShell/vscode-powershell/pull/4203) - Fix automatic focus to temporary debug terminal (if it exists).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.4
+
+No changes.
+
 ## v2022.10.0-preview
 ### Friday, October 07, 2022
 
