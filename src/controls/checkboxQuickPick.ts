@@ -3,10 +3,10 @@
 
 import vscode = require("vscode");
 
-const confirmItemLabel: string = "$(checklist) Confirm";
-const checkedPrefix: string = "[ $(check) ]";
-const uncheckedPrefix: string = "[     ]";
-const defaultPlaceHolder: string = "Select 'Confirm' to confirm or press 'Esc' key to cancel";
+const confirmItemLabel = "$(checklist) Confirm";
+const checkedPrefix = "[ $(check) ]";
+const uncheckedPrefix = "[     ]";
+const defaultPlaceHolder = "Select 'Confirm' to confirm or press 'Esc' key to cancel";
 
 export interface ICheckboxQuickPickItem {
     label: string;

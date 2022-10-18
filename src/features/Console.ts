@@ -105,7 +105,7 @@ function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable
         // Select the defaults
         for (const choice of promptDetails.defaultChoices) {
             checkboxQuickPickItems[choice].isSelected = true;
-        };
+        }
 
         resultThenable =
             showCheckboxQuickPick(
@@ -232,6 +232,6 @@ export class ConsoleFeature extends LanguageClientConsumer {
             this.languageClient.onRequest(
                 ShowInputPromptRequestType,
                 (promptDetails) => showInputPrompt(promptDetails)),
-        ]
+        ];
     }
 }

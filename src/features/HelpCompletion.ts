@@ -87,30 +87,30 @@ class TriggerFinder {
 
     public updateState(document: TextDocument, changeText: string): void {
         switch (this.state) {
-            case SearchState.Searching:
-                if (changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
-                    this.state = SearchState.Locked;
-                    this.document = document;
-                    this.count++;
-                }
-                break;
+        case SearchState.Searching:
+            if (changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
+                this.state = SearchState.Locked;
+                this.document = document;
+                this.count++;
+            }
+            break;
 
-            case SearchState.Locked:
-                if (document === this.document &&
+        case SearchState.Locked:
+            if (document === this.document &&
                     changeText.length === 1 &&
                     changeText[0] === this.triggerCharacters[this.count]) {
-                    this.count++;
-                    if (this.count === this.triggerCharacters.length) {
-                        this.state = SearchState.Found;
-                    }
-                } else {
-                    this.reset();
+                this.count++;
+                if (this.count === this.triggerCharacters.length) {
+                    this.state = SearchState.Found;
                 }
-                break;
-
-            default:
+            } else {
                 this.reset();
-                break;
+            }
+            break;
+
+        default:
+            this.reset();
+            break;
         }
     }
 

@@ -85,8 +85,8 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
     public createView(id: string, title: string, viewType: CustomViewType) {
         let view;
         switch (viewType) {
-            case CustomViewType.HtmlContent:
-                view = new HtmlContentView(id, title);
+        case CustomViewType.HtmlContent:
+            view = new HtmlContentView(id, title);
         }
 
         this.viewIndex[this.getUri(view.id)] = view;

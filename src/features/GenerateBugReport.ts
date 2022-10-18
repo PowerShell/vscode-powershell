@@ -6,11 +6,11 @@ import vscode = require("vscode");
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 
-const queryStringPrefix: string = "?";
+const queryStringPrefix = "?";
 
 const settings = Settings.load();
 const project = settings.bugReporting.project;
-const issuesUrl: string = `${project}/issues/new`;
+const issuesUrl = `${project}/issues/new`;
 
 const extensions =
     vscode.extensions.all.filter((element) => element.packageJSON.isBuiltin === false)
@@ -84,7 +84,7 @@ ${this.generateExtensionTable(extensions)}
             return "none";
         }
 
-        const tableHeader = `|Extension|Author|Version|\n|---|---|---|`;
+        const tableHeader = "|Extension|Author|Version|\n|---|---|---|";
         const table = installedExtensions.map((e) => {
             if (e.packageJSON.isBuiltin === false) {
                 return `|${e.packageJSON.name}|${e.packageJSON.publisher}|${e.packageJSON.version}|`;
@@ -109,8 +109,8 @@ ${tableHeader}\n${table};
         const powerShellArgs = [
             "-NoProfile",
             "-Command",
-            '$PSVersionString = "|Name|Value|\n"; $PSVersionString += "|---|---|\n"; $PSVersionTable.keys | ' +
-            'ForEach-Object { $PSVersionString += "|$_|$($PSVersionTable.Item($_))|\n" }; $PSVersionString',
+            "$PSVersionString = \"|Name|Value|\n\"; $PSVersionString += \"|---|---|\n\"; $PSVersionTable.keys | " +
+            "ForEach-Object { $PSVersionString += \"|$_|$($PSVersionTable.Item($_))|\n\" }; $PSVersionString",
         ];
 
         const spawn = require("child_process").spawnSync;

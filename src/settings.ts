@@ -324,7 +324,7 @@ function getWorkspaceSettingsWithDefaults<TSettings>(
 }
 
 // We don't want to query the user more than once, so this is idempotent.
-let hasPrompted: boolean = false;
+let hasPrompted = false;
 
 export async function validateCwdSetting(): Promise<string> {
     let cwd = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string | undefined>("cwd");
@@ -346,7 +346,7 @@ export async function validateCwdSetting(): Promise<string> {
         hasPrompted = true;
         const options: vscode.WorkspaceFolderPickOptions = {
             placeHolder: "Select a folder to use as the PowerShell extension's working directory.",
-        }
+        };
         cwd = (await vscode.window.showWorkspaceFolderPick(options))?.uri.fsPath;
         // Save the picked 'cwd' to the workspace settings.
         // We have to check again because the user may not have picked.

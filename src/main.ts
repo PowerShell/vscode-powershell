@@ -36,7 +36,7 @@ import { LanguageClientConsumer } from "./languageClientConsumer";
 const PackageJSON: any = require("../package.json");
 
 // the application insights key (also known as instrumentation key) used for telemetry.
-const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
+const AI_KEY = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
 let logger: Logger;
 let sessionManager: SessionManager;
@@ -141,7 +141,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new RunCodeFeature(sessionManager),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
-    ]
+    ];
 
     const externalApi = new ExternalApiFeature(context, sessionManager, logger);
 
@@ -170,7 +170,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     }
 
     return {
-        registerExternalExtension: (id: string, apiVersion: string = 'v1') => externalApi.registerExternalExtension(id, apiVersion),
+        registerExternalExtension: (id: string, apiVersion = "v1") => externalApi.registerExternalExtension(id, apiVersion),
         unregisterExternalExtension: uuid => externalApi.unregisterExternalExtension(uuid),
         getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
         waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
@@ -182,11 +182,11 @@ export async function deactivate(): Promise<void> {
     // Clean up all extension features
     for (const languageClientConsumer of languageClientConsumers) {
         languageClientConsumer.dispose();
-    };
+    }
 
     for (const commandRegistration of commandRegistrations) {
         commandRegistration.dispose();
-    };
+    }
 
     // Dispose of the current session
     await sessionManager.dispose();

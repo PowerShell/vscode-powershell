@@ -8,7 +8,7 @@ import { IPowerShellAdditionalExePathSettings } from "./settings";
 
 // This uses require so we can rewire it in unit tests!
 // tslint:disable-next-line:no-var-requires
-const utils = require("./utils")
+const utils = require("./utils");
 
 const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
 const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
@@ -68,11 +68,11 @@ export function getPlatformDetails(): IPlatformDetails {
  */
 export class PowerShellExeFinder {
     // This is required, since parseInt("7-preview") will return 7.
-    private static IntRegex: RegExp = /^\d+$/;
+    private static IntRegex = /^\d+$/;
 
-    private static PwshMsixRegex: RegExp = /^Microsoft.PowerShell_.*/;
+    private static PwshMsixRegex = /^Microsoft.PowerShell_.*/;
 
-    private static PwshPreviewMsixRegex: RegExp = /^Microsoft.PowerShellPreview_.*/;
+    private static PwshPreviewMsixRegex = /^Microsoft.PowerShellPreview_.*/;
 
     // The platform details descriptor for the platform we're on
     private readonly platformDetails: IPlatformDetails;
@@ -172,19 +172,19 @@ export class PowerShellExeFinder {
         yield this.findPSCoreStable();
 
         switch (this.platformDetails.operatingSystem) {
-            case OperatingSystem.Linux:
-                // On Linux, find the snap
-                yield this.findPSCoreStableSnap();
-                break;
+        case OperatingSystem.Linux:
+            // On Linux, find the snap
+            yield this.findPSCoreStableSnap();
+            break;
 
-            case OperatingSystem.Windows:
-                // Windows may have a 32-bit pwsh.exe
-                yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true });
+        case OperatingSystem.Windows:
+            // Windows may have a 32-bit pwsh.exe
+            yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true });
 
-                // Also look for the MSIX/UWP installation
-                yield await this.findPSCoreMsix();
+            // Also look for the MSIX/UWP installation
+            yield await this.findPSCoreMsix();
 
-                break;
+            break;
         }
 
         // Look for the .NET global tool
@@ -196,27 +196,27 @@ export class PowerShellExeFinder {
         yield this.findPSCorePreview();
 
         switch (this.platformDetails.operatingSystem) {
-            // On Linux, there might be a preview snap
-            case OperatingSystem.Linux:
-                yield this.findPSCorePreviewSnap();
-                break;
+        // On Linux, there might be a preview snap
+        case OperatingSystem.Linux:
+            yield this.findPSCorePreviewSnap();
+            break;
 
-            case OperatingSystem.Windows:
-                // Find a preview MSIX
-                yield this.findPSCoreMsix({ findPreview: true });
+        case OperatingSystem.Windows:
+            // Find a preview MSIX
+            yield this.findPSCoreMsix({ findPreview: true });
 
-                // Look for pwsh-preview with the opposite bitness
-                yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true, findPreview: true });
+            // Look for pwsh-preview with the opposite bitness
+            yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true, findPreview: true });
 
-                // Finally, get Windows PowerShell
+            // Finally, get Windows PowerShell
 
-                // Get the natural Windows PowerShell for the process bitness
-                yield this.findWinPS();
+            // Get the natural Windows PowerShell for the process bitness
+            yield this.findWinPS();
 
-                // Get the alternate bitness Windows PowerShell
-                yield this.findWinPS({ useAlternateBitness: true });
+            // Get the alternate bitness Windows PowerShell
+            yield this.findWinPS({ useAlternateBitness: true });
 
-                break;
+            break;
         }
     }
 
@@ -237,33 +237,33 @@ export class PowerShellExeFinder {
 
     private async findPSCoreStable(): Promise<IPossiblePowerShellExe | undefined> {
         switch (this.platformDetails.operatingSystem) {
-            case OperatingSystem.Linux:
-                return new PossiblePowerShellExe(LinuxExePath, "PowerShell");
+        case OperatingSystem.Linux:
+            return new PossiblePowerShellExe(LinuxExePath, "PowerShell");
 
-            case OperatingSystem.MacOS:
-                return new PossiblePowerShellExe(MacOSExePath, "PowerShell");
+        case OperatingSystem.MacOS:
+            return new PossiblePowerShellExe(MacOSExePath, "PowerShell");
 
-            case OperatingSystem.Windows:
-                return await this.findPSCoreWindowsInstallation();
+        case OperatingSystem.Windows:
+            return await this.findPSCoreWindowsInstallation();
 
-            case OperatingSystem.Unknown:
-                return undefined;
+        case OperatingSystem.Unknown:
+            return undefined;
         }
     }
 
     private async findPSCorePreview(): Promise<IPossiblePowerShellExe | undefined> {
         switch (this.platformDetails.operatingSystem) {
-            case OperatingSystem.Linux:
-                return new PossiblePowerShellExe(LinuxPreviewExePath, "PowerShell Preview");
+        case OperatingSystem.Linux:
+            return new PossiblePowerShellExe(LinuxPreviewExePath, "PowerShell Preview");
 
-            case OperatingSystem.MacOS:
-                return new PossiblePowerShellExe(MacOSPreviewExePath, "PowerShell Preview");
+        case OperatingSystem.MacOS:
+            return new PossiblePowerShellExe(MacOSPreviewExePath, "PowerShell Preview");
 
-            case OperatingSystem.Windows:
-                return await this.findPSCoreWindowsInstallation({ findPreview: true });
+        case OperatingSystem.Windows:
+            return await this.findPSCoreWindowsInstallation({ findPreview: true });
 
-            case OperatingSystem.Unknown:
-                return undefined;
+        case OperatingSystem.Unknown:
+            return undefined;
         }
     }
 
@@ -332,10 +332,10 @@ export class PowerShellExeFinder {
             return undefined;
         }
 
-        let highestSeenVersion: number = -1;
+        let highestSeenVersion = -1;
         let pwshExePath: string | undefined;
         for (const item of await utils.readDirectory(powerShellInstallBaseDir)) {
-            let currentVersion: number = -1;
+            let currentVersion = -1;
             if (findPreview) {
                 // We are looking for something like "7-preview"
 

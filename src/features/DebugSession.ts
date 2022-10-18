@@ -27,12 +27,12 @@ enum DebugConfig {
     LaunchScript,
     InteractiveSession,
     AttachHostProcess,
-};
+}
 
 export class DebugSessionFeature extends LanguageClientConsumer
     implements DebugConfigurationProvider, vscode.DebugAdapterDescriptorFactory {
 
-    private sessionCount: number = 1;
+    private sessionCount = 1;
     private tempDebugProcess: PowerShellProcess | undefined;
     private tempSessionDetails: IEditorServicesSessionDetails | undefined;
     private handlers: vscode.Disposable[] = [];
@@ -262,7 +262,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         const platformDetails = getPlatformDetails();
         const versionDetails = this.sessionManager.getPowerShellVersionDetails();
         if (versionDetails === undefined) {
-            vscode.window.showErrorMessage(`Session version details were not found for ${config.name}`)
+            vscode.window.showErrorMessage(`Session version details were not found for ${config.name}`);
             return null;
         }
 

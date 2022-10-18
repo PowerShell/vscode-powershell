@@ -37,7 +37,7 @@ export class ISECompatibilityFeature implements vscode.Disposable {
             vscode.commands.registerCommand("PowerShell.EnableISEMode", async () => { await this.EnableISEMode(); }),
             vscode.commands.registerCommand("PowerShell.DisableISEMode", async () => { await this.DisableISEMode(); }),
             vscode.commands.registerCommand("PowerShell.ToggleISEMode", async () => { await this.ToggleISEMode(); })
-        ]
+        ];
     }
 
     public dispose() {

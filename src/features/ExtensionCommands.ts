@@ -191,16 +191,16 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     }
                 }),
 
-            vscode.commands.registerCommand('PowerShell.ClosePanel',
-                async () => { await vscode.commands.executeCommand('workbench.action.closePanel'); }),
+            vscode.commands.registerCommand("PowerShell.ClosePanel",
+                async () => { await vscode.commands.executeCommand("workbench.action.closePanel"); }),
 
-            vscode.commands.registerCommand('PowerShell.PositionPanelLeft',
-                async () => { await vscode.commands.executeCommand('workbench.action.positionPanelLeft'); }),
+            vscode.commands.registerCommand("PowerShell.PositionPanelLeft",
+                async () => { await vscode.commands.executeCommand("workbench.action.positionPanelLeft"); }),
 
-            vscode.commands.registerCommand('PowerShell.PositionPanelBottom',
-                async () => { await vscode.commands.executeCommand('workbench.action.positionPanelBottom'); }),
+            vscode.commands.registerCommand("PowerShell.PositionPanelBottom",
+                async () => { await vscode.commands.executeCommand("workbench.action.positionPanelBottom"); }),
 
-            vscode.commands.registerCommand('PowerShell.Debug.Start',
+            vscode.commands.registerCommand("PowerShell.Debug.Start",
                 async () => {
                     // TODO: Use a named debug configuration.
                     await vscode.debug.startDebugging(undefined, {
@@ -208,9 +208,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                         type: "PowerShell",
                         request: "launch",
                         script: "${file}",
-                    })
+                    });
                 })
-        ]
+        ];
     }
 
     public override setLanguageClient(languageclient: LanguageClient) {
@@ -431,72 +431,72 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         let newFileAbsolutePath: string;
         switch (currentFileUri.scheme) {
-            case "file":
-                // If the file to save can't be found, just complete the request
-                if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
-                    await this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
-                    return EditorOperationResponse.Completed;
-                }
-
-                // If no newFile is given, just save the current file
-                if (!saveFileDetails.newPath) {
-                    const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
-                    if (doc.isDirty) {
-                        await doc.save();
-                    }
-                    return EditorOperationResponse.Completed;
-                }
-
-                // Make sure we have an absolute path
-                if (path.isAbsolute(saveFileDetails.newPath)) {
-                    newFileAbsolutePath = saveFileDetails.newPath;
-                } else {
-                    // If not, interpret the path as relative to the current file
-                    newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
-                }
-                break;
-
-            case "untitled":
-                // We need a new name to save an untitled file
-                if (!saveFileDetails.newPath) {
-                    // TODO: Create a class handle vscode warnings and errors so we can warn easily
-                    //       without logging
-                    this.log.writeAndShowWarning(
-                        "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
-                    return EditorOperationResponse.Completed;
-                }
-
-                // Make sure we have an absolute path
-                if (path.isAbsolute(saveFileDetails.newPath)) {
-                    newFileAbsolutePath = saveFileDetails.newPath;
-                } else {
-                    // In fresh contexts, workspaceFolders is not defined...
-                    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-                        this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
-                            "Try saving to an absolute path, or open a workspace.");
-                        return EditorOperationResponse.Completed;
-                    }
-
-                    // If not, interpret the path as relative to the workspace root
-                    const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
-                    // We don't support saving to a non-file URI-schemed workspace
-                    if (workspaceRootUri.scheme !== "file") {
-                        this.log.writeAndShowWarning(
-                            "Cannot save untitled file to a relative path in an untitled workspace. " +
-                            "Try saving to an absolute path or opening a workspace folder.");
-                        return EditorOperationResponse.Completed;
-                    }
-                    newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
-                }
-                break;
-
-            default:
-                // Other URI schemes are not supported
-                const msg = JSON.stringify(saveFileDetails);
-                this.log.writeVerbose(
-                    `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
-                    `is currently unsupported. Message: '${msg}'`);
+        case "file":
+            // If the file to save can't be found, just complete the request
+            if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
+                await this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
                 return EditorOperationResponse.Completed;
+            }
+
+            // If no newFile is given, just save the current file
+            if (!saveFileDetails.newPath) {
+                const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
+                if (doc.isDirty) {
+                    await doc.save();
+                }
+                return EditorOperationResponse.Completed;
+            }
+
+            // Make sure we have an absolute path
+            if (path.isAbsolute(saveFileDetails.newPath)) {
+                newFileAbsolutePath = saveFileDetails.newPath;
+            } else {
+                // If not, interpret the path as relative to the current file
+                newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
+            }
+            break;
+
+        case "untitled":
+            // We need a new name to save an untitled file
+            if (!saveFileDetails.newPath) {
+                // TODO: Create a class handle vscode warnings and errors so we can warn easily
+                //       without logging
+                this.log.writeAndShowWarning(
+                    "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
+                return EditorOperationResponse.Completed;
+            }
+
+            // Make sure we have an absolute path
+            if (path.isAbsolute(saveFileDetails.newPath)) {
+                newFileAbsolutePath = saveFileDetails.newPath;
+            } else {
+                // In fresh contexts, workspaceFolders is not defined...
+                if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+                    this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
+                            "Try saving to an absolute path, or open a workspace.");
+                    return EditorOperationResponse.Completed;
+                }
+
+                // If not, interpret the path as relative to the workspace root
+                const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
+                // We don't support saving to a non-file URI-schemed workspace
+                if (workspaceRootUri.scheme !== "file") {
+                    this.log.writeAndShowWarning(
+                        "Cannot save untitled file to a relative path in an untitled workspace. " +
+                            "Try saving to an absolute path or opening a workspace folder.");
+                    return EditorOperationResponse.Completed;
+                }
+                newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
+            }
+            break;
+
+        default:
+            // Other URI schemes are not supported
+            const msg = JSON.stringify(saveFileDetails);
+            this.log.writeVerbose(
+                `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
+                    `is currently unsupported. Message: '${msg}'`);
+            return EditorOperationResponse.Completed;
         }
 
         await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);

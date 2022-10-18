@@ -32,7 +32,7 @@ const utilsMock = {
     checkIfFileExists: fakeCheckIfFileOrDirectoryExists,
     checkIfDirectoryExists: fakeCheckIfFileOrDirectoryExists,
     readDirectory: fakeReadDirectory
-}
+};
 
 platformMock.__set__("utils", utilsMock);
 
@@ -652,53 +652,53 @@ describe("Platform module", function () {
     it("Gets the correct platform details", function () {
         const platformDetails: platform.IPlatformDetails = platformMock.getPlatformDetails();
         switch (process.platform) {
-            case "darwin":
-                assert.strictEqual(
-                    platformDetails.operatingSystem,
-                    platform.OperatingSystem.MacOS,
-                    "Platform details operating system should be MacOS");
-                assert.strictEqual(
-                    platformDetails.isProcess64Bit,
-                    true,
-                    "VSCode on darwin should be 64-bit");
-                assert.strictEqual(
-                    platformDetails.isOS64Bit,
-                    true,
-                    "Darwin is 64-bit only");
-                break;
+        case "darwin":
+            assert.strictEqual(
+                platformDetails.operatingSystem,
+                platform.OperatingSystem.MacOS,
+                "Platform details operating system should be MacOS");
+            assert.strictEqual(
+                platformDetails.isProcess64Bit,
+                true,
+                "VSCode on darwin should be 64-bit");
+            assert.strictEqual(
+                platformDetails.isOS64Bit,
+                true,
+                "Darwin is 64-bit only");
+            break;
 
-            case "linux":
-                assert.strictEqual(
-                    platformDetails.operatingSystem,
-                    platform.OperatingSystem.Linux,
-                    "Platform details operating system should be Linux");
-                assert.strictEqual(
-                    platformDetails.isProcess64Bit,
-                    true,
-                    "Only 64-bit VSCode supported on Linux");
-                assert.strictEqual(
-                    platformDetails.isOS64Bit,
-                    true,
-                    "Only 64-bit Linux supported by PowerShell");
-                return;
+        case "linux":
+            assert.strictEqual(
+                platformDetails.operatingSystem,
+                platform.OperatingSystem.Linux,
+                "Platform details operating system should be Linux");
+            assert.strictEqual(
+                platformDetails.isProcess64Bit,
+                true,
+                "Only 64-bit VSCode supported on Linux");
+            assert.strictEqual(
+                platformDetails.isOS64Bit,
+                true,
+                "Only 64-bit Linux supported by PowerShell");
+            return;
 
-            case "win32":
-                assert.strictEqual(
-                    platformDetails.operatingSystem,
-                    platform.OperatingSystem.Windows,
-                    "Platform details operating system should be Windows");
-                assert.strictEqual(
-                    platformDetails.isProcess64Bit,
-                    process.arch === "x64",
-                    "Windows process bitness should match process arch");
-                assert.strictEqual(
-                    platformDetails.isOS64Bit,
-                    !!(platformDetails.isProcess64Bit || process.env.ProgramW6432),
-                    "Windows OS arch should match process bitness unless 64-bit env var set");
-                return;
+        case "win32":
+            assert.strictEqual(
+                platformDetails.operatingSystem,
+                platform.OperatingSystem.Windows,
+                "Platform details operating system should be Windows");
+            assert.strictEqual(
+                platformDetails.isProcess64Bit,
+                process.arch === "x64",
+                "Windows process bitness should match process arch");
+            assert.strictEqual(
+                platformDetails.isOS64Bit,
+                !!(platformDetails.isProcess64Bit || process.env.ProgramW6432),
+                "Windows OS arch should match process bitness unless 64-bit env var set");
+            return;
 
-            default:
-                assert.fail("This platform is unsupported");
+        default:
+            assert.fail("This platform is unsupported");
         }
     });
 

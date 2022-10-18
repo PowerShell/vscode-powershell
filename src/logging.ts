@@ -66,7 +66,7 @@ export class Logger implements ILogger {
 
             for (const additionalMessage of additionalMessages) {
                 this.writeLine(additionalMessage, logLevel);
-            };
+            }
         }
     }
 
@@ -132,7 +132,7 @@ export class Logger implements ILogger {
         }
     }
 
-    public async startNewLog(minimumLogLevel: string = "Normal"): Promise<void> {
+    public async startNewLog(minimumLogLevel = "Normal"): Promise<void> {
         this.MinimumLogLevel = Logger.logLevelNameToValue(minimumLogLevel);
 
         this.logSessionPath =
@@ -147,13 +147,13 @@ export class Logger implements ILogger {
     // TODO: Make the enum smarter about strings so this goes away.
     public static logLevelNameToValue(logLevelName: string): LogLevel {
         switch (logLevelName.trim().toLowerCase()) {
-            case "diagnostic": return LogLevel.Diagnostic;
-            case "verbose": return LogLevel.Verbose;
-            case "normal": return LogLevel.Normal;
-            case "warning": return LogLevel.Warning;
-            case "error": return LogLevel.Error;
-            case "none": return LogLevel.None;
-            default: return LogLevel.Normal;
+        case "diagnostic": return LogLevel.Diagnostic;
+        case "verbose": return LogLevel.Verbose;
+        case "normal": return LogLevel.Normal;
+        case "warning": return LogLevel.Warning;
+        case "error": return LogLevel.Error;
+        case "none": return LogLevel.None;
+        default: return LogLevel.Normal;
         }
     }
 
@@ -187,7 +187,7 @@ export class Logger implements ILogger {
                     Buffer.concat([log, Buffer.from(timestampedMessage)]));
             } catch (e) {
                 // tslint:disable-next-line:no-console
-                console.log(`Error writing to vscode-powershell log file: ${e}`)
+                console.log(`Error writing to vscode-powershell log file: ${e}`);
             }
         }
     }

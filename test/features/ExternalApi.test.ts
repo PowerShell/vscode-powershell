@@ -32,7 +32,7 @@ describe("ExternalApi feature", function () {
 
         it("Rejects if not registered", async function () {
             assert.rejects(
-                async () => await extension.getPowerShellVersionDetails(""))
+                async () => await extension.getPowerShellVersionDetails(""));
         });
 
         it("Throws if attempting to register an extension more than once", async function () {
@@ -52,7 +52,7 @@ describe("ExternalApi feature", function () {
             assert.throws(
                 () => extension.unregisterExternalExtension("not-real"),
                 {
-                    message: `No extension registered with session UUID: not-real`
+                    message: "No extension registered with session UUID: not-real"
                 });
         });
     });

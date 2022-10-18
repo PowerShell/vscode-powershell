@@ -61,7 +61,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
         }
     }
 
-    private async showProjectTemplates(includeInstalledModules: boolean = false): Promise<void> {
+    private async showProjectTemplates(includeInstalledModules = false): Promise<void> {
         const template = await vscode.window.showQuickPick(
             this.getProjectTemplates(includeInstalledModules),
             {
@@ -80,7 +80,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
     private async getProjectTemplates(includeInstalledModules: boolean): Promise<ITemplateQuickPickItem[]> {
         if (this.languageClient === undefined) {
-            return Promise.reject<ITemplateQuickPickItem[]>("Language client not defined!")
+            return Promise.reject<ITemplateQuickPickItem[]>("Language client not defined!");
         }
 
         const response = await this.languageClient.sendRequest(
