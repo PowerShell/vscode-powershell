@@ -68,6 +68,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
         {
+            // TODO: Remove the useless escapes
+            // eslint-disable-next-line no-useless-escape
             wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)/g,
 
             indentationRules: {
@@ -91,27 +93,33 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
             onEnterRules: [
                 {
                     // e.g. /** | */
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+                    // eslint-disable-next-line no-useless-escape
                     afterText: /^\s*\*\/$/,
                     action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: " * " },
                 },
                 {
                     // e.g. /** ...|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: " * " },
                 },
                 {
                     // e.g.  * ...|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: "* " },
                 },
                 {
                     // e.g.  */|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 },
                 },
                 {
                     // e.g.  *-----*/|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 },
                 },

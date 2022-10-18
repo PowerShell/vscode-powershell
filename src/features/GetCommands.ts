@@ -139,6 +139,7 @@ class Command extends vscode.TreeItem {
         };
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public async getChildren(_element?: any): Promise<Command[]> {
         return [];
         // Returning an empty array because we need to return something.

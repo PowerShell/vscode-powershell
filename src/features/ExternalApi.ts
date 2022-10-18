@@ -59,7 +59,8 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     public registerExternalExtension(id: string, apiVersion = "v1"): string {
         this.log.writeDiagnostic(`Registering extension '${id}' for use with API version '${apiVersion}'.`);
 
-        for (const [_, externalExtension] of ExternalApiFeature.registeredExternalExtension) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (const [_name, externalExtension] of ExternalApiFeature.registeredExternalExtension) {
             if (externalExtension.id === id) {
                 const message = `The extension '${id}' is already registered.`;
                 this.log.writeWarning(message);

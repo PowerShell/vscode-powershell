@@ -193,8 +193,12 @@ interface IGetProjectTemplatesResponseBody {
     templates: ITemplateDetails[];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface INewProjectFromTemplateRequestArguments {
+}
+
 export const NewProjectFromTemplateRequestType =
-    new RequestType<any, INewProjectFromTemplateResponseBody, string>(
+    new RequestType<INewProjectFromTemplateRequestArguments, INewProjectFromTemplateResponseBody, string>(
         "powerShell/newProjectFromTemplate");
 
 interface INewProjectFromTemplateResponseBody {

@@ -56,7 +56,7 @@ export function getPlatformDetails(): IPlatformDetails {
 
     return {
         operatingSystem,
-        isOS64Bit: isProcess64Bit || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432"),
+        isOS64Bit: isProcess64Bit || (process.env.PROCESSOR_ARCHITEW6432 !== undefined),
         isProcess64Bit,
     };
 }

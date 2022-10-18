@@ -299,6 +299,7 @@ export async function getEffectiveConfigurationTarget(settingName: string): Prom
 
 export async function change(
     settingName: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
     configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
 

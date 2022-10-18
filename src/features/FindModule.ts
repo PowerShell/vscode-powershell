@@ -1,13 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+// TODO: PSES does not currently support findModule...so this whole thing is broken!
+
 import vscode = require("vscode");
 import { RequestType } from "vscode-languageclient";
 import QuickPickItem = vscode.QuickPickItem;
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IFindModuleRequestArguments {
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IModule {
+    name: string,
+    description: string
+}
+
 export const FindModuleRequestType =
-    new RequestType<any, any, void>("powerShell/findModule");
+    new RequestType<IFindModuleRequestArguments, IModule[], void>("powerShell/findModule");
 
 export const InstallModuleRequestType =
     new RequestType<string, void, void>("powerShell/installModule");
@@ -66,12 +78,8 @@ export class FindModuleFeature extends LanguageClientConsumer {
             return Promise.resolve("");
         }
 
-        if (modules !== undefined) {
-            for (const item in modules) {
-                if (modules.hasOwnProperty(item)) {
-                    items.push({ label: modules[item].name, description: modules[item].description });
-                }
-            }
+        for (const module of modules ?? []) {
+            items.push({ label: module.name, description: module.description });
         }
 
         if (items.length === 0) {

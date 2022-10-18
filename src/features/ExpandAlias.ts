@@ -6,7 +6,16 @@ import Window = vscode.window;
 import { RequestType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export const ExpandAliasRequestType = new RequestType<any, any, void>("powerShell/expandAlias");
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IExpandAliasRequestArguments {
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IExpandAliasRequestResponse {
+    text: string
+}
+
+export const ExpandAliasRequestType = new RequestType<IExpandAliasRequestArguments, IExpandAliasRequestResponse, void>("powerShell/expandAlias");
 
 export class ExpandAliasFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
@@ -24,7 +33,7 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
             const sls = selection.start;
             const sle = selection.end;
 
-            let text: string | any[];
+            let text: string;
             let range: vscode.Range | vscode.Position;
 
             if ((sls.character === sle.character) && (sls.line === sle.line)) {

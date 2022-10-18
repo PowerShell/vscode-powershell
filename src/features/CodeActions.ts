@@ -10,6 +10,8 @@ export class CodeActionsFeature implements vscode.Disposable {
     private showDocumentationCommand: vscode.Disposable;
 
     constructor(private log: ILogger) {
+        // TODO: What type is `edit`, what uses this, and is it working?
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.applyEditsCommand = vscode.commands.registerCommand("PowerShell.ApplyCodeActionEdits", (edit: any) => {
             Window.activeTextEditor?.edit((editBuilder) => {
                 editBuilder.replace(
@@ -23,7 +25,7 @@ export class CodeActionsFeature implements vscode.Disposable {
         });
 
         this.showDocumentationCommand =
-            vscode.commands.registerCommand("PowerShell.ShowCodeActionDocumentation", (ruleName: any) => {
+            vscode.commands.registerCommand("PowerShell.ShowCodeActionDocumentation", (ruleName: string) => {
                 this.showRuleDocumentation(ruleName);
             });
     }

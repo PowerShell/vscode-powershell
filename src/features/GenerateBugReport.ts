@@ -3,6 +3,7 @@
 
 import os = require("os");
 import vscode = require("vscode");
+import child_process = require("child_process");
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 
@@ -79,6 +80,7 @@ ${this.generateExtensionTable(extensions)}
         this.command.dispose();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private generateExtensionTable(installedExtensions: vscode.Extension<any>[]): string {
         if (!installedExtensions.length) {
             return "none";
@@ -104,8 +106,12 @@ ${tableHeader}\n${table};
         return extensionTable;
     }
 
-    private getRuntimeInfo() {
-        const powerShellExePath = this.sessionManager.PowerShellExeDetails?.exePath;
+    private getRuntimeInfo(): string | undefined {
+        if (this.sessionManager.PowerShellExeDetails === undefined) {
+            return;
+        }
+
+        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
         const powerShellArgs = [
             "-NoProfile",
             "-Command",
@@ -113,8 +119,7 @@ ${tableHeader}\n${table};
             "ForEach-Object { $PSVersionString += \"|$_|$($PSVersionTable.Item($_))|\n\" }; $PSVersionString",
         ];
 
-        const spawn = require("child_process").spawnSync;
-        const child = spawn(powerShellExePath, powerShellArgs);
+        const child = child_process.spawnSync(powerShellExePath, powerShellArgs);
         return child.stdout.toString().replace(";", ",");
     }
 }

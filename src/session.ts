@@ -630,7 +630,7 @@ Type 'help' to get help.
                 // Override the default error handler to prevent it from
                 // closing the LanguageClient incorrectly when the socket
                 // hangs up (ECONNRESET errors).
-                error: (_error: any, _message: Message, _count: number): ErrorHandlerResult => {
+                error: (_error: Error, _message: Message, _count: number): ErrorHandlerResult => {
                     // TODO: Is there any error worth terminating on?
                     return { action: ErrorAction.Continue };
                 },
@@ -653,6 +653,7 @@ Type 'help' to get help.
 
         this.languageClient.onTelemetry((event) => {
             const eventName: string = event.eventName ? event.eventName : "PSESEvent";
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const data: any = event.data ? event.data : event;
             this.sendTelemetryEvent(eventName, data);
         });

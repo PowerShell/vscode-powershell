@@ -48,7 +48,11 @@ export class PesterTestsFeature implements vscode.Disposable {
         launchType: LaunchType,
         fileUri: vscode.Uri): Promise<boolean> {
 
-        const uriString = (fileUri || vscode.window.activeTextEditor?.document.uri).toString();
+        if (fileUri === undefined && vscode.window.activeTextEditor === undefined) {
+            return false;
+        }
+
+        const uriString = (fileUri || vscode.window.activeTextEditor!.document.uri).toString();
         const launchConfig = this.createLaunchConfig(uriString, launchType);
         return this.launch(launchConfig);
     }

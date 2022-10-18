@@ -11,8 +11,17 @@ import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface ICommentHelpRequestArguments {
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface ICommentHelpRequestResponse {
+    content: string[]
+}
+
 export const CommentHelpRequestType =
-    new RequestType<any, any, void>("powerShell/getCommentHelp");
+    new RequestType<ICommentHelpRequestArguments, ICommentHelpRequestResponse, void>("powerShell/getCommentHelp");
 
 enum SearchState { Searching, Locked, Found }
 
@@ -175,7 +184,7 @@ class HelpCompletionProvider {
         // Trim the last empty line and join the strings.
         const lines: string[] = result.content;
         const text = lines
-            .map((x) => (x as any).trimLeft())
+            .map((x) => x.trimLeft())
             .join(this.getEOL(doc.eol));
 
         const snippetString = new SnippetString(text);

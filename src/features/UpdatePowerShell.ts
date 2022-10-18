@@ -50,6 +50,7 @@ export class GitHubReleaseInformation {
 
         // For preview, we grab all the releases and then grab the first prerelease.
         const releaseJson = preview
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ? (await response.json()).find((release: any) => release.prerelease)
             : await response.json();
 
@@ -59,8 +60,11 @@ export class GitHubReleaseInformation {
 
     public version: semver.SemVer;
     public isPreview = false;
+    // TODO: Establish a type for the assets.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public assets: any[];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public constructor(version: string | semver.SemVer, assets: any[] = []) {
         this.version = semver.parse(version)!;
 
@@ -128,6 +132,7 @@ export async function InvokePowerShellUpdateCheck(
             const msiMatcher = arch === "x86" ?
                 "win-x86.msi" : "win-x64.msi";
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const asset = release.assets.filter((a: any) => a.name.indexOf(msiMatcher) >= 0)[0];
             const msiDownloadPath = path.join(os.tmpdir(), asset.name);
 

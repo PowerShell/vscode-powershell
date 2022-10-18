@@ -5,8 +5,12 @@ import vscode = require("vscode");
 import { NotificationType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IShowHelpNotificationArguments {
+}
+
 export const ShowHelpNotificationType =
-    new NotificationType<any>("powerShell/showHelp");
+    new NotificationType<IShowHelpNotificationArguments>("powerShell/showHelp");
 
 export class ShowHelpFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;

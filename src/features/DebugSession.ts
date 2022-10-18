@@ -338,6 +338,10 @@ interface IProcessItem extends vscode.QuickPickItem {
     pid: string;    // payload for the QuickPick UI
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IGetPSHostProcessesArguments {
+}
+
 interface IPSHostProcessInfo {
     processName: string;
     processId: string;
@@ -346,7 +350,7 @@ interface IPSHostProcessInfo {
 }
 
 export const GetPSHostProcessesRequestType =
-    new RequestType<any, IPSHostProcessInfo[], string>("powerShell/getPSHostProcesses");
+    new RequestType<IGetPSHostProcessesArguments, IPSHostProcessInfo[], string>("powerShell/getPSHostProcesses");
 
 export class PickPSHostProcessFeature extends LanguageClientConsumer {
 
@@ -462,6 +466,10 @@ interface IRunspaceItem extends vscode.QuickPickItem {
     id: string;    // payload for the QuickPick UI
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IGetRunspaceRequestArguments {
+}
+
 interface IRunspace {
     id: number;
     name: string;
@@ -469,7 +477,7 @@ interface IRunspace {
 }
 
 export const GetRunspaceRequestType =
-    new RequestType<any, IRunspace[], string>("powerShell/getRunspace");
+    new RequestType<IGetRunspaceRequestArguments, IRunspace[], string>("powerShell/getRunspace");
 
 export class PickRunspaceFeature extends LanguageClientConsumer {
 

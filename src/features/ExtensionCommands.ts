@@ -431,7 +431,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         let newFileAbsolutePath: string;
         switch (currentFileUri.scheme) {
-        case "file":
+        case "file": {
             // If the file to save can't be found, just complete the request
             if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
                 await this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
@@ -454,9 +454,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 // If not, interpret the path as relative to the current file
                 newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
             }
-            break;
+            break; }
 
-        case "untitled":
+        case "untitled": {
             // We need a new name to save an untitled file
             if (!saveFileDetails.newPath) {
                 // TODO: Create a class handle vscode warnings and errors so we can warn easily
@@ -488,15 +488,15 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 }
                 newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
             }
-            break;
+            break; }
 
-        default:
+        default: {
             // Other URI schemes are not supported
             const msg = JSON.stringify(saveFileDetails);
             this.log.writeVerbose(
                 `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
-                    `is currently unsupported. Message: '${msg}'`);
-            return EditorOperationResponse.Completed;
+                        `is currently unsupported. Message: '${msg}'`);
+            return EditorOperationResponse.Completed; }
         }
 
         await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
