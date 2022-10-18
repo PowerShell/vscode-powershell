@@ -14,7 +14,8 @@
     "sourceType": "module"
   },
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "header"
   ],
   "rules": {
     "indent": [
@@ -37,6 +38,15 @@
       {
         "argsIgnorePattern": "^_"
       }
+    ],
+    "header/header": [
+      2,
+      "line",
+      [
+        " Copyright (c) Microsoft Corporation.",
+        " Licensed under the MIT License."
+      ],
+      2
     ]
   }
 }
