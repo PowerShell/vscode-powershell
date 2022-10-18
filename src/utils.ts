@@ -25,7 +25,6 @@ async function checkIfFileOrDirectoryExists(targetPath: string | vscode.Uri, typ
             targetPath instanceof vscode.Uri
                 ? targetPath
                 : vscode.Uri.file(targetPath));
-        // tslint:disable-next-line:no-bitwise
         return (stat.type & type) !== 0;
     } catch {
         // TODO: Maybe throw if it's not a FileNotFound exception.

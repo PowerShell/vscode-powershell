@@ -79,7 +79,7 @@ export const GetEditorContextRequestType =
     new RequestType<IGetEditorContextRequestArguments, IEditorContext, void>(
         "editor/getEditorContext");
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IGetEditorContextRequestArguments {
 }
 

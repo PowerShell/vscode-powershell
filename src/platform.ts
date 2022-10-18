@@ -7,7 +7,7 @@ import * as process from "process";
 import { IPowerShellAdditionalExePathSettings } from "./settings";
 
 // This uses require so we can rewire it in unit tests!
-// tslint:disable-next-line:no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
 const utils = require("./utils");
 
 const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
@@ -298,7 +298,6 @@ export class PowerShellExeFinder {
 
         // We should find only one such application, so return on the first one
         for (const name of await utils.readDirectory(msixAppDir)) {
-            // tslint:disable-next-line:no-bitwise
             if (pwshMsixDirRegex.test(name)) {
                 return new PossiblePowerShellExe(path.join(msixAppDir, name, "pwsh.exe"), pwshMsixName);
             }

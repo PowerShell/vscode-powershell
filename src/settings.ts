@@ -265,7 +265,6 @@ export function load(): ISettings {
         notebooks:
             configuration.get<INotebooksSettings>("notebooks", defaultNotebooksSettings),
         startAsLoginShell:
-            // tslint:disable-next-line
             // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
             //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
             //   is the reason terminals on macOS typically run login shells by default which set up

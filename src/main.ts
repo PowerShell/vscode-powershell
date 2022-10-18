@@ -32,7 +32,7 @@ import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
 // The most reliable way to get the name and version of the current extension.
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
 const PackageJSON: any = require("../package.json");
 
 // the application insights key (also known as instrumentation key) used for telemetry.
