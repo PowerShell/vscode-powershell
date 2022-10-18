@@ -96,8 +96,6 @@ task Build Restore, {
     Write-Host "`n### Building vscode-powershell`n" -ForegroundColor Green
     assert (Test-Path ./modules/PowerShellEditorServices/bin) "Extension requires PSES"
 
-    # TODO: TSLint is deprecated and we need to switch to ESLint.
-    # https://github.com/PowerShell/vscode-powershell/pull/3331
     exec { & npm run lint }
 
     # TODO: When supported we should use `esbuild` for the tests too. Although

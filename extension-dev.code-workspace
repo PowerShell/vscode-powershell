@@ -12,12 +12,12 @@
   "extensions": {
     "recommendations": [
       "davidanson.vscode-markdownlint",
+      "dbaeumer.vscode-eslint",
       "editorconfig.editorconfig",
       "josefpihrt-vscode.roslynator",
       "ms-azure-devops.azure-pipelines",
       "ms-dotnettools.csharp",
-      "ms-vscode.powershell-preview",
-      "ms-vscode.vscode-typescript-tslint-plugin",
+      "ms-vscode.powershell-preview"
     ]
   },
   "settings": {
