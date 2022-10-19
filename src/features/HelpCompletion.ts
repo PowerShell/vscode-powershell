@@ -7,7 +7,6 @@ import {
 } from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -30,7 +29,7 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
     private disposable: Disposable | undefined;
     private settings: Settings.ISettings;
 
-    constructor(private log: Logger) {
+    constructor() {
         super();
         this.settings = Settings.load();
 
@@ -57,19 +56,13 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
             return;
         }
 
-        if (changeEvent.contentChanges.length === 0) {
-            this.log.writeWarning(`<${HelpCompletionFeature.name}>: ` +
-                `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
-            return;
-        }
-
         if (changeEvent.contentChanges.length > 0) {
             this.helpCompletionProvider?.updateState(
                 changeEvent.document,
                 changeEvent.contentChanges[0].text,
                 changeEvent.contentChanges[0].range);
 
-            // todo raise an event when trigger is found, and attach complete() to the event.
+            // TODO: Raise an event when trigger is found, and attach complete() to the event.
             if (this.helpCompletionProvider?.triggerFound) {
                 await this.helpCompletionProvider.complete();
                 this.helpCompletionProvider.reset();

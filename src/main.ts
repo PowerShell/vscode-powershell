@@ -165,7 +165,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new PickPSHostProcessFeature(),
-        new HelpCompletionFeature(logger),
+        new HelpCompletionFeature(),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
         externalApi
