@@ -11,7 +11,11 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": "latest",
-    "sourceType": "module"
+    "sourceType": "module",
+    "tsconfigRootDir": ".",
+    "project": [
+      "./tsconfig.json"
+    ]
   },
   "plugins": [
     "@typescript-eslint",
@@ -38,6 +42,15 @@
       {
         "argsIgnorePattern": "^_"
       }
+    ],
+    "@typescript-eslint/require-await": [
+      "error"
+    ],
+    "@typescript-eslint/no-misused-promises": [
+      "error"
+    ],
+    "@typescript-eslint/no-floating-promises": [
+      "error"
     ],
     "header/header": [
       2,

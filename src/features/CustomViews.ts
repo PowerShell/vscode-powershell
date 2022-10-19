@@ -99,12 +99,10 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
     public closeView(id: string) {
         const uriString = this.getUri(id);
 
-        vscode.workspace.textDocuments.some((doc) => {
+        vscode.workspace.textDocuments.some(async (doc) => {
             if (doc.uri.toString() === uriString) {
-                vscode.window
-                    .showTextDocument(doc)
-                    .then((_) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"));
-
+                await vscode.window.showTextDocument(doc);
+                await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
                 return true;
             }
 

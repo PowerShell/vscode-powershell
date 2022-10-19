@@ -31,34 +31,34 @@ export class FindModuleFeature extends LanguageClientConsumer {
 
     constructor() {
         super();
-        this.command = vscode.commands.registerCommand("PowerShell.PowerShellFindModule", () => {
+        this.command = vscode.commands.registerCommand("PowerShell.PowerShellFindModule", async () => {
             // It takes a while to get the list of PowerShell modules, display some UI to let user know
             this.cancelFindToken = new vscode.CancellationTokenSource();
-            vscode.window
-                .showQuickPick(
-                    ["Cancel"],
-                    { placeHolder: "Please wait, retrieving list of PowerShell modules. This can take some time..." },
-                    this.cancelFindToken.token)
-                .then((response) => {
-                    if (response === "Cancel") { this.clearCancelFindToken(); }
-                });
+            const response = await vscode.window.showQuickPick(
+                ["Cancel"],
+                { placeHolder: "Please wait, retrieving list of PowerShell modules. This can take some time..." },
+                this.cancelFindToken.token);
+
+            if (response === "Cancel") {
+                this.clearCancelFindToken();
+            }
 
             // Cancel the loading prompt after 60 seconds
             setTimeout(() => {
                 if (this.cancelFindToken) {
                     this.clearCancelFindToken();
 
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     vscode.window.showErrorMessage(
                         "The online source for PowerShell modules is not responding. " +
                         "Cancelling Find/Install PowerShell command.");
                 }
             }, 60000);
 
-            this.pickPowerShellModule().then((moduleName) => {
-                if (moduleName) {
-                    this.languageClient?.sendRequest(InstallModuleRequestType, moduleName);
-                }
-            });
+            const module = await this.pickPowerShellModule();
+            if (module !== undefined) {
+                await this.languageClient?.sendRequest(InstallModuleRequestType, module);
+            }
         });
     }
 

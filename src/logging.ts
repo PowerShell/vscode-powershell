@@ -22,7 +22,7 @@ export interface ILogger {
     writeDiagnostic(message: string, ...additionalMessages: string[]): void;
     writeVerbose(message: string, ...additionalMessages: string[]): void;
     writeWarning(message: string, ...additionalMessages: string[]): void;
-    writeAndShowWarning(message: string, ...additionalMessages: string[]): void;
+    writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void>;
     writeError(message: string, ...additionalMessages: string[]): void;
 }
 
@@ -62,9 +62,11 @@ export class Logger implements ILogger {
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
         if (logLevel >= this.MinimumLogLevel) {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             this.writeLine(message, logLevel);
 
             for (const additionalMessage of additionalMessages) {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 this.writeLine(additionalMessage, logLevel);
             }
         }
@@ -86,14 +88,13 @@ export class Logger implements ILogger {
         this.writeAtLevel(LogLevel.Warning, message, ...additionalMessages);
     }
 
-    public writeAndShowWarning(message: string, ...additionalMessages: string[]): void {
+    public async writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void> {
         this.writeWarning(message, ...additionalMessages);
 
-        vscode.window.showWarningMessage(message, "Show Logs").then((selection) => {
-            if (selection !== undefined) {
-                this.showLogPanel();
-            }
-        });
+        const selection = await vscode.window.showWarningMessage(message, "Show Logs");
+        if (selection !== undefined) {
+            this.showLogPanel();
+        }
     }
 
     public writeError(message: string, ...additionalMessages: string[]): void {
@@ -116,7 +117,7 @@ export class Logger implements ILogger {
 
         const fullActions = [
             ...actions,
-            { prompt: "Show Logs", action: async () => { this.showLogPanel(); } },
+            { prompt: "Show Logs", action: () => { this.showLogPanel(); } },
         ];
 
         const actionKeys: string[] = fullActions.map((action) => action.prompt);

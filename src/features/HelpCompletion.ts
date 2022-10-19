@@ -189,7 +189,7 @@ class HelpCompletionProvider {
 
         const snippetString = new SnippetString(text);
 
-        window.activeTextEditor?.insertSnippet(snippetString, replaceRange);
+        await window.activeTextEditor?.insertSnippet(snippetString, replaceRange);
     }
 
     private getEOL(eol: EndOfLine): string {

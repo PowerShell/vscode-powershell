@@ -111,13 +111,8 @@ export class SessionManager implements Middleware {
 
         // Create the language status item
         this.languageStatusItem = this.createStatusBarItem();
-
-        // Create a folder for the session files.
         this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri, "sessions");
-        vscode.workspace.fs.createDirectory(this.sessionsFolder);
-
         this.platformDetails = getPlatformDetails();
-
         this.HostName = hostName;
         this.HostVersion = hostVersion;
 
@@ -148,7 +143,7 @@ export class SessionManager implements Middleware {
             command.dispose();
         }
 
-        this.languageClient?.dispose();
+        await this.languageClient?.dispose();
     }
 
     public setLanguageClientConsumers(languageClientConsumers: LanguageClientConsumer[]) {
@@ -166,6 +161,8 @@ export class SessionManager implements Middleware {
             if (exeNameOverride) {
                 this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
             }
+            // Create a folder for the session files.
+            await vscode.workspace.fs.createDirectory(this.sessionsFolder);
             await this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
             await this.promptPowerShellExeSettingsCleanup();
             await this.migrateWhitespaceAroundPipeSetting();
@@ -183,9 +180,9 @@ export class SessionManager implements Middleware {
             if (this.sessionStatus === SessionStatus.Failed) {
                 // Before moving further, clear out the client and process if
                 // the process is already dead (i.e. it crashed).
-                this.languageClient?.dispose();
+                await this.languageClient?.dispose();
                 this.languageClient = undefined;
-                this.languageServerProcess?.dispose();
+                await this.languageServerProcess?.dispose();
                 this.languageServerProcess = undefined;
             }
 
@@ -193,16 +190,16 @@ export class SessionManager implements Middleware {
 
             // Stop the language client.
             await this.languageClient?.stop();
-            this.languageClient?.dispose();
+            await this.languageClient?.dispose();
             this.languageClient = undefined;
 
             // Kill the PowerShell process(es) we spawned.
-            this.debugSessionProcess?.dispose();
+            await this.debugSessionProcess?.dispose();
             this.debugSessionProcess = undefined;
             this.debugEventHandler?.dispose();
             this.debugEventHandler = undefined;
 
-            this.languageServerProcess?.dispose();
+            await this.languageServerProcess?.dispose();
             this.languageServerProcess = undefined;
 
         } finally {
@@ -243,7 +240,7 @@ export class SessionManager implements Middleware {
         // support more, we need to track each separately, and tie the session
         // for the event handler to the right process (and dispose of the event
         // handler when the process is disposed).
-        this.debugSessionProcess?.dispose();
+        await this.debugSessionProcess?.dispose();
         this.debugEventHandler?.dispose();
 
         if (this.PowerShellExeDetails === undefined) {
@@ -344,8 +341,8 @@ export class SessionManager implements Middleware {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = "codeFormatting.whitespaceAroundPipe";
         const newSetting = "codeFormatting.addWhitespaceAroundPipe";
-        const configurationTargetOfNewSetting = await Settings.getEffectiveConfigurationTarget(newSetting);
-        const configurationTargetOfOldSetting = await Settings.getEffectiveConfigurationTarget(deprecatedSetting);
+        const configurationTargetOfNewSetting = Settings.getEffectiveConfigurationTarget(newSetting);
+        const configurationTargetOfOldSetting = Settings.getEffectiveConfigurationTarget(deprecatedSetting);
         if (configurationTargetOfOldSetting !== undefined && configurationTargetOfNewSetting === undefined) {
             const value = configuration.get(deprecatedSetting, configurationTargetOfOldSetting);
             await Settings.change(newSetting, value, configurationTargetOfOldSetting);
@@ -514,7 +511,7 @@ export class SessionManager implements Middleware {
                     prompt: "Get PowerShell",
                     action: async () => {
                         const getPSUri = vscode.Uri.parse("https://aka.ms/get-powershell-vscode");
-                        vscode.env.openExternal(getPSUri);
+                        await vscode.env.openExternal(getPSUri);
                     },
                 },
             ]);
@@ -591,7 +588,7 @@ Type 'help' to get help.
         }
     }
 
-    private async sendTelemetryEvent(eventName: string, properties?: TelemetryEventProperties, measures?: TelemetryEventMeasurements) {
+    private sendTelemetryEvent(eventName: string, properties?: TelemetryEventProperties, measures?: TelemetryEventMeasurements) {
         if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
             this.telemetryReporter.sendTelemetryEvent(eventName, properties, measures);
         }
@@ -698,6 +695,7 @@ Type 'help' to get help.
         this.started = true;
 
         // NOTE: We specifically don't want to wait for this.
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this.checkForPowerShellUpdate();
     }
 
@@ -869,13 +867,13 @@ Type 'help' to get help.
                 .map((item) => {
                     return new SessionMenuItem(
                         `Switch to: ${item.displayName}`,
-                        () => { this.changePowerShellDefaultVersion(item); });
+                        async () => { await this.changePowerShellDefaultVersion(item); });
                 });
 
         const menuItems: SessionMenuItem[] = [
             new SessionMenuItem(
                 sessionText,
-                () => { vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
+                async () => { await vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
 
             // Add all of the different PowerShell options
             ...powerShellItems,
@@ -894,17 +892,15 @@ Type 'help' to get help.
 
             new SessionMenuItem(
                 "Open Session Logs Folder",
-                () => { vscode.commands.executeCommand("PowerShell.OpenLogFolder"); }),
+                async () => { await vscode.commands.executeCommand("PowerShell.OpenLogFolder"); }),
 
             new SessionMenuItem(
                 "Modify list of additional PowerShell locations",
-                () => { vscode.commands.executeCommand("workbench.action.openSettings", "powerShellAdditionalExePaths"); }),
+                async () => { await vscode.commands.executeCommand("workbench.action.openSettings", "powerShellAdditionalExePaths"); }),
         ];
 
-        vscode
-            .window
-            .showQuickPick<SessionMenuItem>(menuItems)
-            .then((selectedItem) => { selectedItem?.callback(); });
+        const selectedItem = await vscode.window.showQuickPick<SessionMenuItem>(menuItems);
+        await selectedItem?.callback();
     }
 }
 
@@ -914,6 +910,6 @@ class SessionMenuItem implements vscode.QuickPickItem {
     constructor(
         public readonly label: string,
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        public readonly callback: () => void = () => { }) {
+        public readonly callback = async () => { }) {
     }
 }

@@ -31,11 +31,10 @@ describe("ExternalApi feature", function () {
         });
 
         it("Rejects if not registered", async function () {
-            assert.rejects(
-                async () => await extension.getPowerShellVersionDetails(""));
+            await assert.rejects(async () => await extension.getPowerShellVersionDetails(""));
         });
 
-        it("Throws if attempting to register an extension more than once", async function () {
+        it("Throws if attempting to register an extension more than once", function () {
             const sessionId: string = extension.registerExternalExtension(utils.extensionId);
             try {
                 assert.throws(
@@ -48,7 +47,7 @@ describe("ExternalApi feature", function () {
             }
         });
 
-        it("Throws when unregistering an extension that isn't registered", async function () {
+        it("Throws when unregistering an extension that isn't registered", function () {
             assert.throws(
                 () => extension.unregisterExternalExtension("not-real"),
                 {

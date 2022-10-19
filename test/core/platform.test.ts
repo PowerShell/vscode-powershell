@@ -15,6 +15,7 @@ import * as vscode from "vscode";
 // overrides the fs module but not the vscode.workspace.fs module.
 const platformMock = rewire("../../src/platform");
 
+// eslint-disable-next-line @typescript-eslint/require-await
 async function fakeCheckIfFileOrDirectoryExists(targetPath: string | vscode.Uri): Promise<boolean> {
     try {
         fs.lstatSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
@@ -24,6 +25,7 @@ async function fakeCheckIfFileOrDirectoryExists(targetPath: string | vscode.Uri)
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/require-await
 async function fakeReadDirectory(targetPath: string | vscode.Uri): Promise<string[]> {
     return fs.readdirSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
 }

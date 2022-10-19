@@ -235,6 +235,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             this.languageClient.onRequest(
                 InsertTextRequestType,
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 (details) => this.insertText(details)),
 
             this.languageClient.onRequest(
@@ -280,6 +281,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     // We check to see if they have TrueClear on. If not, no-op because the
                     // overriden Clear-Host already calls [System.Console]::Clear()
                     if (Settings.load().integratedConsole.forceClearScrollbackBuffer) {
+                        // eslint-disable-next-line @typescript-eslint/no-floating-promises
                         vscode.commands.executeCommand("workbench.action.terminal.clear");
                     }
                 })
@@ -309,8 +311,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private async showExtensionCommands(client: LanguageClient): Promise<void> {
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
-            vscode.window.showInformationMessage(
-                "No extension commands have been loaded into the current session.");
+            await vscode.window.showInformationMessage("No extension commands have been loaded into the current session.");
             return;
         }
 
@@ -329,12 +330,12 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         return this.onCommandSelected(selectedCommand, client);
     }
 
-    private onCommandSelected(
+    private async onCommandSelected(
         chosenItem: IExtensionCommandQuickPickItem | undefined,
         client: LanguageClient | undefined) {
 
         if (chosenItem !== undefined) {
-            client?.sendRequest(
+            await client?.sendRequest(
                 InvokeExtensionCommandRequestType,
                 {
                     name: chosenItem.command.name,
@@ -343,7 +344,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         }
     }
 
-    private insertText(details: IInsertTextRequestArguments): EditorOperationResponse {
+    private async insertText(details: IInsertTextRequestArguments): Promise<EditorOperationResponse> {
         const edit = new vscode.WorkspaceEdit();
 
         edit.set(
@@ -359,7 +360,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             ],
         );
 
-        vscode.workspace.applyEdit(edit);
+        await vscode.workspace.applyEdit(edit);
 
         return EditorOperationResponse.Completed;
     }
@@ -461,7 +462,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             if (!saveFileDetails.newPath) {
                 // TODO: Create a class handle vscode warnings and errors so we can warn easily
                 //       without logging
-                this.log.writeAndShowWarning(
+                await this.log.writeAndShowWarning(
                     "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
                 return EditorOperationResponse.Completed;
             }
@@ -472,7 +473,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             } else {
                 // In fresh contexts, workspaceFolders is not defined...
                 if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-                    this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
+                    await this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
                             "Try saving to an absolute path, or open a workspace.");
                     return EditorOperationResponse.Completed;
                 }
@@ -481,7 +482,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
                 // We don't support saving to a non-file URI-schemed workspace
                 if (workspaceRootUri.scheme !== "file") {
-                    this.log.writeAndShowWarning(
+                    await this.log.writeAndShowWarning(
                         "Cannot save untitled file to a relative path in an untitled workspace. " +
                             "Try saving to an absolute path or opening a workspace folder.");
                     return EditorOperationResponse.Completed;
@@ -521,7 +522,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 vscode.Uri.file(destinationAbsolutePath),
                 Buffer.from(oldDocument.getText()));
         } catch (e) {
-            this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
+            await this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
                 `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
             return;
         }
@@ -529,7 +530,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         // Finally open the new document
         const newFileUri = vscode.Uri.file(destinationAbsolutePath);
         const newFile = await vscode.workspace.openTextDocument(newFileUri);
-        vscode.window.showTextDocument(newFile, { preview: true });
+        await vscode.window.showTextDocument(newFile, { preview: true });
     }
 
     private normalizeFilePath(filePath: string): string {

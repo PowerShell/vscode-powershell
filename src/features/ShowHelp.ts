@@ -17,7 +17,7 @@ export class ShowHelpFeature extends LanguageClientConsumer {
 
     constructor() {
         super();
-        this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", (item?) => {
+        this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", async (item?) => {
             if (!item || !item.Name) {
 
                 const editor = vscode.window.activeTextEditor;
@@ -30,9 +30,9 @@ export class ShowHelpFeature extends LanguageClientConsumer {
                 const cwr = doc.getWordRangeAtPosition(selection.active);
                 const text = doc.getText(cwr);
 
-                this.languageClient?.sendNotification(ShowHelpNotificationType, { text });
+                await this.languageClient?.sendNotification(ShowHelpNotificationType, { text });
             } else {
-                this.languageClient?.sendNotification(ShowHelpNotificationType, { text: item.Name });
+                await this.languageClient?.sendNotification(ShowHelpNotificationType, { text: item.Name });
             }
         });
     }

@@ -152,7 +152,7 @@ export async function InvokePowerShellUpdateCheck(
             });
 
             // Stop the session because Windows likes to hold on to files.
-            sessionManager.stop();
+            await sessionManager.stop();
 
             // Close all terminals with the name "pwsh" in the current VS Code session.
             // This will encourage folks to not close the instance of VS Code that spawned
@@ -166,9 +166,10 @@ export async function InvokePowerShellUpdateCheck(
             // Invoke the MSI via cmd.
             const msi = spawn("msiexec", ["/i", msiDownloadPath]);
 
-            msi.on("close", async () => {
+            msi.on("close", () => {
                 // Now that the MSI is finished, restart the session.
-                await sessionManager.start();
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                sessionManager.start();
                 fs.unlinkSync(msiDownloadPath);
             });
 

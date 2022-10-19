@@ -15,35 +15,33 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
     constructor() {
         super();
         this.command =
-            vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", () => {
+            vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", async () => {
 
                 if (!this.languageClient && !this.waitingForClientToken) {
 
                     // If PowerShell isn't finished loading yet, show a loading message
                     // until the LanguageClient is passed on to us
                     this.waitingForClientToken = new vscode.CancellationTokenSource();
-                    vscode.window
-                        .showQuickPick(
-                            ["Cancel"],
-                            { placeHolder: "New Project: Please wait, starting PowerShell..." },
-                            this.waitingForClientToken.token)
-                        .then((response) => {
-                            if (response === "Cancel") {
-                                this.clearWaitingToken();
-                            }
-                        });
+                    const response = await vscode.window.showQuickPick(
+                        ["Cancel"],
+                        { placeHolder: "New Project: Please wait, starting PowerShell..." },
+                        this.waitingForClientToken.token);
+
+                    if (response === "Cancel") {
+                        this.clearWaitingToken();
+                    }
 
                     // Cancel the loading prompt after 60 seconds
                     setTimeout(() => {
                         if (this.waitingForClientToken) {
                             this.clearWaitingToken();
 
-                            vscode.window.showErrorMessage(
-                                "New Project: PowerShell session took too long to start.");
+                            // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                            vscode.window.showErrorMessage("New Project: PowerShell session took too long to start.");
                         }
                     }, 60000);
                 } else {
-                    this.showProjectTemplates();
+                    await this.showProjectTemplates();
                 }
             });
     }
@@ -57,6 +55,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
         if (this.waitingForClientToken) {
             this.clearWaitingToken();
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             this.showProjectTemplates();
         }
     }
@@ -72,9 +71,9 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
         if (template === undefined) {
             return;
         } else if (template.label.startsWith(this.loadIcon)) {
-            this.showProjectTemplates(true);
+            await this.showProjectTemplates(true);
         } else if (template.template) {
-            this.createProjectFromTemplate(template.template);
+            await this.createProjectFromTemplate(template.template);
         }
     }
 
@@ -89,7 +88,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
         if (response.needsModuleInstall) {
             // TODO: Offer to install Plaster
-            vscode.window.showErrorMessage("Plaster is not installed!");
+            await vscode.window.showErrorMessage("Plaster is not installed!");
             return Promise.reject<ITemplateQuickPickItem[]>("Plaster needs to be installed");
         } else {
             let templates = response.templates.map<ITemplateQuickPickItem>(
@@ -133,13 +132,13 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
         if (destinationPath !== undefined) {
             // Show the PowerShell session output in case an error occurred
-            vscode.commands.executeCommand("PowerShell.ShowSessionOutput");
+            await vscode.commands.executeCommand("PowerShell.ShowSessionOutput");
 
             const result = await this.languageClient?.sendRequest(
                 NewProjectFromTemplateRequestType,
                 { templatePath: template.templatePath, destinationPath });
             if (result?.creationSuccessful) {
-                this.openWorkspacePath(destinationPath);
+                await this.openWorkspacePath(destinationPath);
             } else {
                 await vscode.window.showErrorMessage("Project creation failed, read the Output window for more details.");
             }
@@ -148,14 +147,14 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
                 "New Project: You must enter an absolute folder path to continue.  Try again?",
                 "Yes", "No");
             if (response === "Yes") {
-                this.createProjectFromTemplate(template);
+                await this.createProjectFromTemplate(template);
             }
         }
     }
 
-    private openWorkspacePath(workspacePath: string) {
+    private async openWorkspacePath(workspacePath: string) {
         // Open the created project in a new window
-        vscode.commands.executeCommand(
+        await vscode.commands.executeCommand(
             "vscode.openFolder",
             vscode.Uri.file(workspacePath),
             true);

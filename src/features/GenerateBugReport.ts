@@ -30,7 +30,7 @@ export class GenerateBugReportFeature implements vscode.Disposable {
     private command: vscode.Disposable;
 
     constructor(private sessionManager: SessionManager) {
-        this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", () => {
+        this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", async () => {
 
             const body = `Issue Description
 =====
@@ -72,7 +72,7 @@ ${this.generateExtensionTable(extensions)}
 
             const encodedBody = encodeURIComponent(body);
             const fullUrl = `${issuesUrl}${queryStringPrefix}body=${encodedBody}`;
-            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(fullUrl));
+            await vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(fullUrl));
         });
     }
 
