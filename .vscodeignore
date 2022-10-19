@@ -15,6 +15,7 @@ tools/
 !out/main.js
 
 .editorconfig
+.eslintrc.json
 .gitattributes
 .gitignore
 .markdownlint.json
@@ -22,6 +23,6 @@ tools/
 build.ps1
 extension-dev.code-workspace
 *.vsix
+test-results.xml
 tsconfig.json
-tslint.json
 vscode-powershell.build.ps1

@@ -50,6 +50,7 @@ export class GitHubReleaseInformation {
 
         // For preview, we grab all the releases and then grab the first prerelease.
         const releaseJson = preview
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ? (await response.json()).find((release: any) => release.prerelease)
             : await response.json();
 
@@ -58,9 +59,12 @@ export class GitHubReleaseInformation {
     }
 
     public version: semver.SemVer;
-    public isPreview: boolean = false;
+    public isPreview = false;
+    // TODO: Establish a type for the assets.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public assets: any[];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public constructor(version: string | semver.SemVer, assets: any[] = []) {
         this.version = semver.parse(version)!;
 
@@ -102,9 +106,9 @@ export async function InvokePowerShellUpdateCheck(
         return;
     }
 
-    const commonText: string = `You have an old version of PowerShell (${localVersion.raw
-        }). The current latest release is ${release.version.raw
-        }.`;
+    const commonText = `You have an old version of PowerShell (${localVersion.raw
+    }). The current latest release is ${release.version.raw
+    }.`;
 
     if (process.platform === "linux") {
         await window.showInformationMessage(
@@ -122,68 +126,70 @@ export async function InvokePowerShellUpdateCheck(
 
     // Yes choice.
     switch (result.id) {
-        // Yes choice.
-        case 0:
-            if (isWindows) {
-                const msiMatcher = arch === "x86" ?
-                    "win-x86.msi" : "win-x64.msi";
+    // Yes choice.
+    case 0:
+        if (isWindows) {
+            const msiMatcher = arch === "x86" ?
+                "win-x86.msi" : "win-x64.msi";
 
-                const asset = release.assets.filter((a: any) => a.name.indexOf(msiMatcher) >= 0)[0];
-                const msiDownloadPath = path.join(os.tmpdir(), asset.name);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const asset = release.assets.filter((a: any) => a.name.indexOf(msiMatcher) >= 0)[0];
+            const msiDownloadPath = path.join(os.tmpdir(), asset.name);
 
-                const res = await fetch(asset.browser_download_url);
-                if (!res.ok) {
-                    throw new Error("unable to fetch MSI");
-                }
-
-                await window.withProgress({
-                    title: "Downloading PowerShell Installer...",
-                    location: ProgressLocation.Notification,
-                    cancellable: false,
-                },
-                    async () => {
-                        // Streams the body of the request to a file.
-                        await streamPipeline(res.body, fs.createWriteStream(msiDownloadPath));
-                    });
-
-                // Stop the session because Windows likes to hold on to files.
-                sessionManager.stop();
-
-                // Close all terminals with the name "pwsh" in the current VS Code session.
-                // This will encourage folks to not close the instance of VS Code that spawned
-                // the MSI process.
-                for (const terminal of window.terminals) {
-                    if (terminal.name === "pwsh") {
-                        terminal.dispose();
-                    }
-                }
-
-                // Invoke the MSI via cmd.
-                const msi = spawn("msiexec", ["/i", msiDownloadPath]);
-
-                msi.on("close", async () => {
-                    // Now that the MSI is finished, restart the session.
-                    await sessionManager.start();
-                    fs.unlinkSync(msiDownloadPath);
-                });
-
-            } else if (isMacOS) {
-                const script = release.isPreview
-                    ? "brew upgrade --cask powershell-preview"
-                    : "brew upgrade --cask powershell";
-
-                await languageServerClient.sendRequest(EvaluateRequestType, {
-                    expression: script,
-                });
+            const res = await fetch(asset.browser_download_url);
+            if (!res.ok) {
+                throw new Error("unable to fetch MSI");
             }
 
-            break;
+            await window.withProgress({
+                title: "Downloading PowerShell Installer...",
+                location: ProgressLocation.Notification,
+                cancellable: false,
+            },
+            async () => {
+                // Streams the body of the request to a file.
+                await streamPipeline(res.body, fs.createWriteStream(msiDownloadPath));
+            });
+
+            // Stop the session because Windows likes to hold on to files.
+            await sessionManager.stop();
+
+            // Close all terminals with the name "pwsh" in the current VS Code session.
+            // This will encourage folks to not close the instance of VS Code that spawned
+            // the MSI process.
+            for (const terminal of window.terminals) {
+                if (terminal.name === "pwsh") {
+                    terminal.dispose();
+                }
+            }
+
+            // Invoke the MSI via cmd.
+            const msi = spawn("msiexec", ["/i", msiDownloadPath]);
+
+            msi.on("close", () => {
+                // Now that the MSI is finished, restart the session.
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                sessionManager.start();
+                fs.unlinkSync(msiDownloadPath);
+            });
+
+        } else if (isMacOS) {
+            const script = release.isPreview
+                ? "brew upgrade --cask powershell-preview"
+                : "brew upgrade --cask powershell";
+
+            await languageServerClient.sendRequest(EvaluateRequestType, {
+                expression: script,
+            });
+        }
+
+        break;
 
         // Never choice.
-        case 2:
-            await Settings.change("promptToUpdatePowerShell", false, true);
-            break;
-        default:
-            break;
+    case 2:
+        await Settings.change("promptToUpdatePowerShell", false, true);
+        break;
+    default:
+        break;
     }
 }

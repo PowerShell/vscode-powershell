@@ -25,7 +25,7 @@ describe("ISE compatibility feature", function () {
         assert.strictEqual(vscode.workspace.getConfiguration("workbench").get("colorTheme"), currentTheme);
     });
 
-    describe("Enable ISE Mode updates expected settings", async function () {
+    describe("Enable ISE Mode updates expected settings", function () {
         before(enableISEMode);
         after(disableISEMode);
         for (const iseSetting of ISECompatibilityFeature.settings) {
@@ -36,7 +36,7 @@ describe("ISE compatibility feature", function () {
         }
     });
 
-    describe("Disable ISE Mode reverts expected settings", async function () {
+    describe("Disable ISE Mode reverts expected settings", function () {
         before(enableISEMode);
         before(disableISEMode);
         after(disableISEMode);
@@ -48,7 +48,7 @@ describe("ISE compatibility feature", function () {
         }
     });
 
-    describe("Toggle switches from enabled to disabled", async function () {
+    describe("Toggle switches from enabled to disabled", function () {
         before(enableISEMode);
         before(toggleISEMode);
         after(disableISEMode);
@@ -60,7 +60,7 @@ describe("ISE compatibility feature", function () {
         }
     });
 
-    describe("Toggle switches from disabled to enabled", async function () {
+    describe("Toggle switches from disabled to enabled", function () {
         before(disableISEMode);
         before(toggleISEMode);
         after(disableISEMode);
@@ -72,7 +72,7 @@ describe("ISE compatibility feature", function () {
         }
     });
 
-    describe("Color theme interactions", async function () {
+    describe("Color theme interactions", function () {
         beforeEach(enableISEMode);
 
         function assertISESettings() {

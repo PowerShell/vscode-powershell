@@ -132,7 +132,8 @@ export class PowerShellProcess {
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
 
         // Log that the PowerShell terminal process has been started
-        this.consoleTerminal.processId.then((pid) => this.logTerminalPid(pid ?? 0, pwshName));
+        const pid = await this.consoleTerminal.processId;
+        this.logTerminalPid(pid ?? 0, pwshName);
 
         return sessionDetails;
     }
@@ -141,11 +142,11 @@ export class PowerShellProcess {
         this.consoleTerminal?.show(preserveFocus);
     }
 
-    public dispose() {
+    public async dispose() {
         // Clean up the session file
         this.log.write("Terminating PowerShell process...");
 
-        PowerShellProcess.deleteSessionFile(this.sessionFilePath);
+        await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
 
         this.consoleCloseSubscription?.dispose();
         this.consoleCloseSubscription = undefined;
@@ -204,12 +205,12 @@ export class PowerShellProcess {
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
                 this.log.write("Session file found!");
                 const sessionDetails = await PowerShellProcess.readSessionFile(this.sessionFilePath);
-                PowerShellProcess.deleteSessionFile(this.sessionFilePath);
+                await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
             }
 
             if (warnAt === i) {
-                vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
+                await vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
     If you're using privilege enforcement software, this can affect start up performance.`);
             }
 

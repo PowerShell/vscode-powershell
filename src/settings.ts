@@ -25,9 +25,7 @@ export enum CommentType {
     LineComment = "LineComment",
 }
 
-export interface IPowerShellAdditionalExePathSettings {
-    [versionName: string]: string;
-}
+export type IPowerShellAdditionalExePathSettings = Record<string, string>;
 
 export interface IBugReportingSettings {
     project: string;
@@ -265,7 +263,6 @@ export function load(): ISettings {
         notebooks:
             configuration.get<INotebooksSettings>("notebooks", defaultNotebooksSettings),
         startAsLoginShell:
-            // tslint:disable-next-line
             // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
             //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
             //   is the reason terminals on macOS typically run login shells by default which set up
@@ -281,7 +278,7 @@ export function load(): ISettings {
 }
 
 // Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
-export async function getEffectiveConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget | undefined> {
+export function getEffectiveConfigurationTarget(settingName: string): vscode.ConfigurationTarget | undefined {
     const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
     const detail = configuration.inspect(settingName);
     if (detail === undefined) {
@@ -300,6 +297,7 @@ export async function getEffectiveConfigurationTarget(settingName: string): Prom
 
 export async function change(
     settingName: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
     configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
 
@@ -316,15 +314,13 @@ function getWorkspaceSettingsWithDefaults<TSettings>(
     const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
 
     for (const setting in importedSettings) {
-        if (importedSettings[setting]) {
-            defaultSettings[setting] = importedSettings[setting];
-        }
+        defaultSettings[setting] = importedSettings[setting];
     }
     return defaultSettings;
 }
 
 // We don't want to query the user more than once, so this is idempotent.
-let hasPrompted: boolean = false;
+let hasPrompted = false;
 
 export async function validateCwdSetting(): Promise<string> {
     let cwd = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string | undefined>("cwd");
@@ -336,17 +332,17 @@ export async function validateCwdSetting(): Promise<string> {
 
     // If there is no workspace, or there is but it has no folders, fallback.
     if (vscode.workspace.workspaceFolders === undefined
-        || vscode.workspace.workspaceFolders?.length === 0) {
+        || vscode.workspace.workspaceFolders.length === 0) {
         cwd = undefined;
         // If there is exactly one workspace folder, use that.
-    } else if (vscode.workspace.workspaceFolders?.length === 1) {
-        cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+    } else if (vscode.workspace.workspaceFolders.length === 1) {
+        cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
         // If there is more than one workspace folder, prompt the user once.
-    } else if (vscode.workspace.workspaceFolders?.length > 1 && !hasPrompted) {
+    } else if (vscode.workspace.workspaceFolders.length > 1 && !hasPrompted) {
         hasPrompted = true;
         const options: vscode.WorkspaceFolderPickOptions = {
             placeHolder: "Select a folder to use as the PowerShell extension's working directory.",
-        }
+        };
         cwd = (await vscode.window.showWorkspaceFolderPick(options))?.uri.fsPath;
         // Save the picked 'cwd' to the workspace settings.
         // We have to check again because the user may not have picked.

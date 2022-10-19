@@ -32,11 +32,11 @@ import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
 // The most reliable way to get the name and version of the current extension.
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
 const PackageJSON: any = require("../package.json");
 
 // the application insights key (also known as instrumentation key) used for telemetry.
-const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
+const AI_KEY = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
 let logger: Logger;
 let sessionManager: SessionManager;
@@ -57,7 +57,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     // TODO: Merge extensions and use preview channel in marketplace instead.
     if (PackageJSON.name.toLowerCase() === "powershell-preview"
         && vscode.extensions.getExtension("ms-vscode.powershell")) {
-        vscode.window.showWarningMessage(
+        await vscode.window.showWarningMessage(
             "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
     }
 
@@ -68,6 +68,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
         {
+            // TODO: Remove the useless escapes
+            // eslint-disable-next-line no-useless-escape
             wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)/g,
 
             indentationRules: {
@@ -91,27 +93,33 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
             onEnterRules: [
                 {
                     // e.g. /** | */
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+                    // eslint-disable-next-line no-useless-escape
                     afterText: /^\s*\*\/$/,
                     action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: " * " },
                 },
                 {
                     // e.g. /** ...|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: " * " },
                 },
                 {
                     // e.g.  * ...|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: "* " },
                 },
                 {
                     // e.g.  */|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 },
                 },
                 {
                     // e.g.  *-----*/|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 },
                 },
@@ -141,7 +149,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new RunCodeFeature(sessionManager),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
-    ]
+    ];
 
     const externalApi = new ExternalApiFeature(context, sessionManager, logger);
 
@@ -157,7 +165,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new PickPSHostProcessFeature(),
-        new HelpCompletionFeature(logger),
+        new HelpCompletionFeature(),
         new CustomViewsFeature(),
         new PickRunspaceFeature(),
         externalApi
@@ -170,7 +178,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     }
 
     return {
-        registerExternalExtension: (id: string, apiVersion: string = 'v1') => externalApi.registerExternalExtension(id, apiVersion),
+        registerExternalExtension: (id: string, apiVersion = "v1") => externalApi.registerExternalExtension(id, apiVersion),
         unregisterExternalExtension: uuid => externalApi.unregisterExternalExtension(uuid),
         getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
         waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
@@ -182,11 +190,11 @@ export async function deactivate(): Promise<void> {
     // Clean up all extension features
     for (const languageClientConsumer of languageClientConsumers) {
         languageClientConsumer.dispose();
-    };
+    }
 
     for (const commandRegistration of commandRegistrations) {
         commandRegistration.dispose();
-    };
+    }
 
     // Dispose of the current session
     await sessionManager.dispose();

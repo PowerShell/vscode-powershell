@@ -22,7 +22,7 @@ export const DidSaveTextDocumentNotificationType =
         "textDocument/didSave");
 
 export class RemoteFilesFeature extends LanguageClientConsumer {
-
+    private command: vscode.Disposable;
     private tempSessionPathPrefix: string;
 
     constructor() {
@@ -36,9 +36,9 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         // At startup, close any lingering temporary remote files
         this.closeRemoteFiles();
 
-        vscode.workspace.onDidSaveTextDocument((doc) => {
+        this.command = vscode.workspace.onDidSaveTextDocument(async (doc) => {
             if (this.isDocumentRemote(doc) && this.languageClient) {
-                this.languageClient.sendNotification(
+                await this.languageClient.sendNotification(
                     DidSaveTextDocumentNotificationType,
                     {
                         textDocument: TextDocumentIdentifier.create(doc.uri.toString()),
@@ -48,6 +48,7 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
     }
 
     public dispose() {
+        this.command.dispose();
         // Close any leftover remote files before exiting
         this.closeRemoteFiles();
     }
@@ -71,6 +72,7 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
             return await innerCloseFiles();
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         innerCloseFiles();
     }
 }

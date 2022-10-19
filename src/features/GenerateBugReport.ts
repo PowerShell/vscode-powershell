@@ -3,14 +3,15 @@
 
 import os = require("os");
 import vscode = require("vscode");
+import child_process = require("child_process");
 import { SessionManager } from "../session";
 import Settings = require("../settings");
 
-const queryStringPrefix: string = "?";
+const queryStringPrefix = "?";
 
 const settings = Settings.load();
 const project = settings.bugReporting.project;
-const issuesUrl: string = `${project}/issues/new`;
+const issuesUrl = `${project}/issues/new`;
 
 const extensions =
     vscode.extensions.all.filter((element) => element.packageJSON.isBuiltin === false)
@@ -29,7 +30,7 @@ export class GenerateBugReportFeature implements vscode.Disposable {
     private command: vscode.Disposable;
 
     constructor(private sessionManager: SessionManager) {
-        this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", () => {
+        this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", async () => {
 
             const body = `Issue Description
 =====
@@ -71,7 +72,7 @@ ${this.generateExtensionTable(extensions)}
 
             const encodedBody = encodeURIComponent(body);
             const fullUrl = `${issuesUrl}${queryStringPrefix}body=${encodedBody}`;
-            vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(fullUrl));
+            await vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(fullUrl));
         });
     }
 
@@ -79,12 +80,13 @@ ${this.generateExtensionTable(extensions)}
         this.command.dispose();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private generateExtensionTable(installedExtensions: vscode.Extension<any>[]): string {
         if (!installedExtensions.length) {
             return "none";
         }
 
-        const tableHeader = `|Extension|Author|Version|\n|---|---|---|`;
+        const tableHeader = "|Extension|Author|Version|\n|---|---|---|";
         const table = installedExtensions.map((e) => {
             if (e.packageJSON.isBuiltin === false) {
                 return `|${e.packageJSON.name}|${e.packageJSON.publisher}|${e.packageJSON.version}|`;
@@ -104,17 +106,20 @@ ${tableHeader}\n${table};
         return extensionTable;
     }
 
-    private getRuntimeInfo() {
-        const powerShellExePath = this.sessionManager.PowerShellExeDetails?.exePath;
+    private getRuntimeInfo(): string | undefined {
+        if (this.sessionManager.PowerShellExeDetails === undefined) {
+            return;
+        }
+
+        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
         const powerShellArgs = [
             "-NoProfile",
             "-Command",
-            '$PSVersionString = "|Name|Value|\n"; $PSVersionString += "|---|---|\n"; $PSVersionTable.keys | ' +
-            'ForEach-Object { $PSVersionString += "|$_|$($PSVersionTable.Item($_))|\n" }; $PSVersionString',
+            "$PSVersionString = \"|Name|Value|\n\"; $PSVersionString += \"|---|---|\n\"; $PSVersionTable.keys | " +
+            "ForEach-Object { $PSVersionString += \"|$_|$($PSVersionTable.Item($_))|\n\" }; $PSVersionString",
         ];
 
-        const spawn = require("child_process").spawnSync;
-        const child = spawn(powerShellExePath, powerShellArgs);
+        const child = child_process.spawnSync(powerShellExePath, powerShellArgs);
         return child.stdout.toString().replace(";", ",");
     }
 }

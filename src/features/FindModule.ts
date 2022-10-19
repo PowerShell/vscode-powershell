@@ -1,13 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+// TODO: PSES does not currently support findModule...so this whole thing is broken!
+
 import vscode = require("vscode");
 import { RequestType } from "vscode-languageclient";
 import QuickPickItem = vscode.QuickPickItem;
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IFindModuleRequestArguments {
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IModule {
+    name: string,
+    description: string
+}
+
 export const FindModuleRequestType =
-    new RequestType<any, any, void>("powerShell/findModule");
+    new RequestType<IFindModuleRequestArguments, IModule[], void>("powerShell/findModule");
 
 export const InstallModuleRequestType =
     new RequestType<string, void, void>("powerShell/installModule");
@@ -19,34 +31,34 @@ export class FindModuleFeature extends LanguageClientConsumer {
 
     constructor() {
         super();
-        this.command = vscode.commands.registerCommand("PowerShell.PowerShellFindModule", () => {
+        this.command = vscode.commands.registerCommand("PowerShell.PowerShellFindModule", async () => {
             // It takes a while to get the list of PowerShell modules, display some UI to let user know
             this.cancelFindToken = new vscode.CancellationTokenSource();
-            vscode.window
-                .showQuickPick(
-                    ["Cancel"],
-                    { placeHolder: "Please wait, retrieving list of PowerShell modules. This can take some time..." },
-                    this.cancelFindToken.token)
-                .then((response) => {
-                    if (response === "Cancel") { this.clearCancelFindToken(); }
-                });
+            const response = await vscode.window.showQuickPick(
+                ["Cancel"],
+                { placeHolder: "Please wait, retrieving list of PowerShell modules. This can take some time..." },
+                this.cancelFindToken.token);
+
+            if (response === "Cancel") {
+                this.clearCancelFindToken();
+            }
 
             // Cancel the loading prompt after 60 seconds
             setTimeout(() => {
                 if (this.cancelFindToken) {
                     this.clearCancelFindToken();
 
+                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     vscode.window.showErrorMessage(
                         "The online source for PowerShell modules is not responding. " +
                         "Cancelling Find/Install PowerShell command.");
                 }
             }, 60000);
 
-            this.pickPowerShellModule().then((moduleName) => {
-                if (moduleName) {
-                    this.languageClient?.sendRequest(InstallModuleRequestType, moduleName);
-                }
-            });
+            const module = await this.pickPowerShellModule();
+            if (module !== undefined) {
+                await this.languageClient?.sendRequest(InstallModuleRequestType, module);
+            }
         });
     }
 
@@ -66,12 +78,8 @@ export class FindModuleFeature extends LanguageClientConsumer {
             return Promise.resolve("");
         }
 
-        if (modules !== undefined) {
-            for (const item in modules) {
-                if (modules.hasOwnProperty(item)) {
-                    items.push({ label: modules[item].name, description: modules[item].description });
-                }
-            }
+        for (const module of modules ?? []) {
+            items.push({ label: module.name, description: module.description });
         }
 
         if (items.length === 0) {

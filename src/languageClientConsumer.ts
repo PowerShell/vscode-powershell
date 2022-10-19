@@ -16,6 +16,7 @@ export abstract class LanguageClientConsumer {
 
     public get languageClient(): LanguageClient | undefined {
         if (!this._languageClient) {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             window.showInformationMessage(
                 "PowerShell extension has not finished starting up yet. Please try again in a few moments.");
         }

@@ -22,7 +22,7 @@ export interface ILogger {
     writeDiagnostic(message: string, ...additionalMessages: string[]): void;
     writeVerbose(message: string, ...additionalMessages: string[]): void;
     writeWarning(message: string, ...additionalMessages: string[]): void;
-    writeAndShowWarning(message: string, ...additionalMessages: string[]): void;
+    writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void>;
     writeError(message: string, ...additionalMessages: string[]): void;
 }
 
@@ -62,11 +62,13 @@ export class Logger implements ILogger {
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
         if (logLevel >= this.MinimumLogLevel) {
+            // eslint-disable-next-line @typescript-eslint/no-floating-promises
             this.writeLine(message, logLevel);
 
             for (const additionalMessage of additionalMessages) {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 this.writeLine(additionalMessage, logLevel);
-            };
+            }
         }
     }
 
@@ -86,14 +88,13 @@ export class Logger implements ILogger {
         this.writeAtLevel(LogLevel.Warning, message, ...additionalMessages);
     }
 
-    public writeAndShowWarning(message: string, ...additionalMessages: string[]): void {
+    public async writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void> {
         this.writeWarning(message, ...additionalMessages);
 
-        vscode.window.showWarningMessage(message, "Show Logs").then((selection) => {
-            if (selection !== undefined) {
-                this.showLogPanel();
-            }
-        });
+        const selection = await vscode.window.showWarningMessage(message, "Show Logs");
+        if (selection !== undefined) {
+            this.showLogPanel();
+        }
     }
 
     public writeError(message: string, ...additionalMessages: string[]): void {
@@ -116,7 +117,7 @@ export class Logger implements ILogger {
 
         const fullActions = [
             ...actions,
-            { prompt: "Show Logs", action: async () => { this.showLogPanel(); } },
+            { prompt: "Show Logs", action: () => { this.showLogPanel(); } },
         ];
 
         const actionKeys: string[] = fullActions.map((action) => action.prompt);
@@ -125,14 +126,14 @@ export class Logger implements ILogger {
         if (choice) {
             for (const action of fullActions) {
                 if (choice === action.prompt) {
-                    await action.action();
+                    action.action();
                     return;
                 }
             }
         }
     }
 
-    public async startNewLog(minimumLogLevel: string = "Normal"): Promise<void> {
+    public async startNewLog(minimumLogLevel = "Normal"): Promise<void> {
         this.MinimumLogLevel = Logger.logLevelNameToValue(minimumLogLevel);
 
         this.logSessionPath =
@@ -147,13 +148,13 @@ export class Logger implements ILogger {
     // TODO: Make the enum smarter about strings so this goes away.
     public static logLevelNameToValue(logLevelName: string): LogLevel {
         switch (logLevelName.trim().toLowerCase()) {
-            case "diagnostic": return LogLevel.Diagnostic;
-            case "verbose": return LogLevel.Verbose;
-            case "normal": return LogLevel.Normal;
-            case "warning": return LogLevel.Warning;
-            case "error": return LogLevel.Error;
-            case "none": return LogLevel.None;
-            default: return LogLevel.Normal;
+        case "diagnostic": return LogLevel.Diagnostic;
+        case "verbose": return LogLevel.Verbose;
+        case "normal": return LogLevel.Normal;
+        case "warning": return LogLevel.Warning;
+        case "error": return LogLevel.Error;
+        case "none": return LogLevel.None;
+        default: return LogLevel.Normal;
         }
     }
 
@@ -186,8 +187,7 @@ export class Logger implements ILogger {
                     this.logFilePath,
                     Buffer.concat([log, Buffer.from(timestampedMessage)]));
             } catch (e) {
-                // tslint:disable-next-line:no-console
-                console.log(`Error writing to vscode-powershell log file: ${e}`)
+                console.log(`Error writing to vscode-powershell log file: ${e}`);
             }
         }
     }

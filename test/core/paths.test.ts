@@ -5,7 +5,7 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import utils = require("../utils");
-import { checkIfDirectoryExists } from "../../src/utils"
+import { checkIfDirectoryExists } from "../../src/utils";
 
 describe("Path assumptions", function () {
     let globalStorageUri: vscode.Uri;

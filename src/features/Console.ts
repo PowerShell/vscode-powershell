@@ -71,7 +71,7 @@ function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable
                 };
             });
 
-        if (promptDetails.defaultChoices && promptDetails.defaultChoices.length > 0) {
+        if (promptDetails.defaultChoices.length > 0) {
             // Shift the default items to the front of the
             // array so that the user can select it easily
             const defaultChoice = promptDetails.defaultChoices[0];
@@ -105,7 +105,7 @@ function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable
         // Select the defaults
         for (const choice of promptDetails.defaultChoices) {
             checkboxQuickPickItems[choice].isSelected = true;
-        };
+        }
 
         resultThenable =
             showCheckboxQuickPick(
@@ -232,6 +232,6 @@ export class ConsoleFeature extends LanguageClientConsumer {
             this.languageClient.onRequest(
                 ShowInputPromptRequestType,
                 (promptDetails) => showInputPrompt(promptDetails)),
-        ]
+        ];
     }
 }

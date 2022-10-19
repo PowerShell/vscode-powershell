@@ -18,7 +18,7 @@ export class OpenInISEFeature implements vscode.Disposable {
             const uri = document.uri;
             let ISEPath = process.env.windir;
 
-            if (process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432")) {
+            if (process.env.PROCESSOR_ARCHITEW6432 !== undefined) {
                 ISEPath += "\\Sysnative";
             } else {
                 ISEPath += "\\System32";
@@ -26,7 +26,7 @@ export class OpenInISEFeature implements vscode.Disposable {
 
             ISEPath += "\\WindowsPowerShell\\v1.0\\powershell_ise.exe";
 
-            ChildProcess.exec(ISEPath + ` -File "${uri.fsPath}"`).unref();
+            ChildProcess.exec(`${ISEPath} -File "${uri.fsPath}"`).unref();
         });
     }
 
