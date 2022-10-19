@@ -755,9 +755,9 @@ describe("Platform module", function () {
                     const foundPowerShell = foundPowerShells[i];
                     const expectedPowerShell = testPlatform.expectedPowerShellSequence[i];
 
-                    assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell.exePath);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell.displayName);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
+                    assert.strictEqual(foundPowerShell?.exePath, expectedPowerShell.exePath);
+                    assert.strictEqual(foundPowerShell?.displayName, expectedPowerShell.displayName);
+                    assert.strictEqual(foundPowerShell?.supportsProperArguments, expectedPowerShell.supportsProperArguments);
                 }
 
                 assert.strictEqual(

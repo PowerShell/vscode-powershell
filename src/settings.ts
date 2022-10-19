@@ -25,9 +25,7 @@ export enum CommentType {
     LineComment = "LineComment",
 }
 
-export interface IPowerShellAdditionalExePathSettings {
-    [versionName: string]: string;
-}
+export type IPowerShellAdditionalExePathSettings = Record<string, string>;
 
 export interface IBugReportingSettings {
     project: string;
@@ -316,9 +314,7 @@ function getWorkspaceSettingsWithDefaults<TSettings>(
     const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
 
     for (const setting in importedSettings) {
-        if (importedSettings[setting]) {
-            defaultSettings[setting] = importedSettings[setting];
-        }
+        defaultSettings[setting] = importedSettings[setting];
     }
     return defaultSettings;
 }
@@ -336,13 +332,13 @@ export async function validateCwdSetting(): Promise<string> {
 
     // If there is no workspace, or there is but it has no folders, fallback.
     if (vscode.workspace.workspaceFolders === undefined
-        || vscode.workspace.workspaceFolders?.length === 0) {
+        || vscode.workspace.workspaceFolders.length === 0) {
         cwd = undefined;
         // If there is exactly one workspace folder, use that.
-    } else if (vscode.workspace.workspaceFolders?.length === 1) {
-        cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+    } else if (vscode.workspace.workspaceFolders.length === 1) {
+        cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
         // If there is more than one workspace folder, prompt the user once.
-    } else if (vscode.workspace.workspaceFolders?.length > 1 && !hasPrompted) {
+    } else if (vscode.workspace.workspaceFolders.length > 1 && !hasPrompted) {
         hasPrompted = true;
         const options: vscode.WorkspaceFolderPickOptions = {
             placeHolder: "Select a folder to use as the PowerShell extension's working directory.",

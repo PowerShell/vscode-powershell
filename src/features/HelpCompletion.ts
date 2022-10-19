@@ -57,7 +57,7 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
             return;
         }
 
-        if (!(changeEvent && changeEvent.contentChanges)) {
+        if (changeEvent.contentChanges.length === 0) {
             this.log.writeWarning(`<${HelpCompletionFeature.name}>: ` +
                 `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
             return;
@@ -95,6 +95,7 @@ class TriggerFinder {
     public updateState(document: TextDocument, changeText: string): void {
         switch (this.state) {
         case SearchState.Searching:
+            // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
             if (changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
                 this.state = SearchState.Locked;
                 this.document = document;
@@ -103,9 +104,8 @@ class TriggerFinder {
             break;
 
         case SearchState.Locked:
-            if (document === this.document &&
-                    changeText.length === 1 &&
-                    changeText[0] === this.triggerCharacters[this.count]) {
+            // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
+            if (document === this.document && changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
                 this.count++;
                 if (this.count === this.triggerCharacters.length) {
                     this.state = SearchState.Found;
@@ -171,13 +171,13 @@ class HelpCompletionProvider {
             blockComment: this.settings.helpCompletion === Settings.CommentType.BlockComment,
         });
 
-        if (!(result && result.content)) {
+        if (result.content.length === 0) {
             return;
         }
 
         const replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
 
-        // TODO add indentation level to the help content
+        // TODO: add indentation level to the help content
         // Trim leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
         // Trim the last empty line and join the strings.
         const lines: string[] = result.content;

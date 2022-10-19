@@ -94,8 +94,8 @@ export class PowerShellExeFinder {
         platformDetails?: IPlatformDetails,
         additionalPowerShellExes?: IPowerShellAdditionalExePathSettings) {
 
-        this.platformDetails = platformDetails || getPlatformDetails();
-        this.additionalPSExeSettings = additionalPowerShellExes || {};
+        this.platformDetails = platformDetails ?? getPlatformDetails();
+        this.additionalPSExeSettings = additionalPowerShellExes ?? {};
     }
 
     /**
@@ -157,7 +157,7 @@ export class PowerShellExeFinder {
         // Also show any additionally configured PowerShells
         // These may be duplicates of the default installations, but given a different name.
         for (const additionalPwsh of this.enumerateAdditionalPowerShellInstallations()) {
-            if (additionalPwsh && await additionalPwsh.exists()) {
+            if (await additionalPwsh.exists()) {
                 yield additionalPwsh;
             }
         }

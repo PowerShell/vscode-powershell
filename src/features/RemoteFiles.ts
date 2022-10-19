@@ -48,7 +48,7 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
     }
 
     public dispose() {
-        this.command?.dispose();
+        this.command.dispose();
         // Close any leftover remote files before exiting
         this.closeRemoteFiles();
     }

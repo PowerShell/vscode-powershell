@@ -327,8 +327,11 @@ export class SessionManager implements Middleware {
                 return codeLensToFix;
             };
 
+        // TODO: This makes zero sense, but appears to be "working" and copied by others per https://github.com/microsoft/vscode-languageserver-node/issues/495. Thing is, ESLint says these conditionals are always truthy.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if ((resolvedCodeLens as Thenable<vscode.CodeLens>).then) {
             return (resolvedCodeLens as Thenable<vscode.CodeLens>).then(resolveFunc);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         } else if (resolvedCodeLens as vscode.CodeLens) {
             return resolveFunc(resolvedCodeLens as vscode.CodeLens);
         }

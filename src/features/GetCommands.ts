@@ -110,7 +110,7 @@ class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     }
 
     public getChildren(_element?: Command): Thenable<Command[]> {
-        return Promise.resolve(this.powerShellCommands || []);
+        return Promise.resolve(this.powerShellCommands);
     }
 }
 

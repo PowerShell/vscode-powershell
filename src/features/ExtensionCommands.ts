@@ -48,30 +48,15 @@ export interface IExtensionCommandAddedNotificationBody {
     displayName: string;
 }
 
-function asRange(value: vscode.Range): Range | undefined | null {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
-    return { start: asPosition(value.start)!, end: asPosition(value.end)! };
+function asRange(value: vscode.Range): Range {
+    return { start: asPosition(value.start), end: asPosition(value.end) };
 }
 
-function asPosition(value: vscode.Position): Position | undefined | null {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
+function asPosition(value: vscode.Position): Position {
     return { line: value.line, character: value.character };
 }
 
-function asCodePosition(value: Position): vscode.Position | undefined | null {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
+function asCodePosition(value: Position): vscode.Position {
     return new vscode.Position(value.line, value.character);
 }
 
@@ -218,10 +203,6 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         // only relevant to the previous session
         this.extensionCommands = [];
 
-        if (languageclient === undefined) {
-            this.log.write("Language client given to ExtensionCommandsFeature is undefined");
-            return;
-        }
         this.languageClient = languageclient;
 
         this.handlers = [
