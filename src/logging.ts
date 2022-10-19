@@ -126,7 +126,7 @@ export class Logger implements ILogger {
         if (choice) {
             for (const action of fullActions) {
                 if (choice === action.prompt) {
-                    await action.action();
+                    action.action();
                     return;
                 }
             }

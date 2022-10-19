@@ -4,6 +4,7 @@
 import * as os from "os";
 import * as path from "path";
 import * as process from "process";
+import { integer } from "vscode-languageserver-protocol";
 import { IPowerShellAdditionalExePathSettings } from "./settings";
 
 // This uses require so we can rewire it in unit tests!
@@ -339,7 +340,7 @@ export class PowerShellExeFinder {
                 // We are looking for something like "7-preview"
 
                 // Preview dirs all have dashes in them
-                const dashIndex = item.indexOf("-");
+                const dashIndex: integer = item.indexOf("-");
                 if (dashIndex < 0) {
                     continue;
                 }

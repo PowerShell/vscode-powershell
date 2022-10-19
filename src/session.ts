@@ -232,7 +232,7 @@ export class SessionManager implements Middleware {
 
     public getNewSessionFilePath(): vscode.Uri {
         const uniqueId: number = Math.floor(100000 + Math.random() * 900000);
-        return vscode.Uri.joinPath(this.sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID + "-" + uniqueId + ".json");
+        return vscode.Uri.joinPath(this.sessionsFolder, `PSES-VSCode-${process.env.VSCODE_PID}-${uniqueId}.json`);
     }
 
     public async createDebugSessionProcess(settings: Settings.ISettings): Promise<PowerShellProcess> {

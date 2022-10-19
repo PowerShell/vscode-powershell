@@ -719,9 +719,9 @@ describe("Platform module", function () {
                 const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
                 const expectedPowerShell = testPlatform.expectedPowerShellSequence[0];
 
-                assert.strictEqual(defaultPowerShell.exePath, expectedPowerShell!.exePath);
-                assert.strictEqual(defaultPowerShell.displayName, expectedPowerShell!.displayName);
-                assert.strictEqual(defaultPowerShell.supportsProperArguments, expectedPowerShell!.supportsProperArguments);
+                assert.strictEqual(defaultPowerShell.exePath, expectedPowerShell.exePath);
+                assert.strictEqual(defaultPowerShell.displayName, expectedPowerShell.displayName);
+                assert.strictEqual(defaultPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
             });
         }
 
@@ -755,9 +755,9 @@ describe("Platform module", function () {
                     const foundPowerShell = foundPowerShells[i];
                     const expectedPowerShell = testPlatform.expectedPowerShellSequence[i];
 
-                    assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell!.exePath);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell!.displayName);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.supportsProperArguments, expectedPowerShell!.supportsProperArguments);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell.exePath);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell.displayName);
+                    assert.strictEqual(foundPowerShell && foundPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
                 }
 
                 assert.strictEqual(
