@@ -16,9 +16,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
         super();
         this.command =
             vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", async () => {
-
                 if (!this.languageClient && !this.waitingForClientToken) {
-
                     // If PowerShell isn't finished loading yet, show a loading message
                     // until the LanguageClient is passed on to us
                     this.waitingForClientToken = new vscode.CancellationTokenSource();
@@ -131,8 +129,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
             });
 
         if (destinationPath !== undefined) {
-            // Show the PowerShell session output in case an error occurred
-            await vscode.commands.executeCommand("PowerShell.ShowSessionOutput");
+            await vscode.commands.executeCommand("PowerShell.ShowSessionConsole");
 
             const result = await this.languageClient?.sendRequest(
                 NewProjectFromTemplateRequestType,
