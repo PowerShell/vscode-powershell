@@ -22,11 +22,14 @@ command will show a spinner!
 
 Finally, I wanted to call out work by Patrick to significantly improve the performance of
 reference finding (which powers the reference code lenses), so large workspaces can now be
-used more easily; when the improvement is not enough, we also introduced the setting
-`powershell.enableReferencesCodeLens` which can be used to disable reference finding
-without having to turn off other code lenses.
+used more easily. If these performance improvements are still not enough for a particular
+workspace, we also introduced two new settings to fine-tune the feature:
+
+- `powershell.analyzeOpenDocumentsOnly` when enabled will only search for references within open documents
+- `powershell.enableReferencesCodeLens` can be used to disable reference finding without having to turn off other code lenses
 
 [pssa-v1.21]: https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.21.0
+
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
 
 - 🐛 🔍 [vscode-powershell #4201](https://github.com/PowerShell/vscode-powershell/pull/4203) - Fix automatic focus to temporary debug terminal (if it exists).
