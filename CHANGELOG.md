@@ -1,5 +1,56 @@
 # PowerShell Extension Release History
 
+## v2022.10.0
+### Thursday, October 20, 2022
+
+This October stable release incorporates a number of bugfixes throughout September and
+early October, though is not based on the latest preview, v2022.10.1-preview, as the
+refactors involved in enabling TypeScript's strict type checking and ESLint's strict
+linting will need more testing. However, based on the success of the PowerShell Script
+Analyzer's [v1.21.0][pssa-v1.21] release we wanted to get this to you sooner!
+
+Highlighted bugfixes include: supporting events registered to PowerShell's `OnIdle`
+handler so that Azure cmdlets such as `Az.Tools.Predictor` now work, a lock around the
+client's `start()` so the extension terminal cannot accidentally be spawned multiple
+times, and making the default debug configurations not override your current working
+directory (by unsetting `cwd` on all of them).
+
+In addition to fixing bugs, we also reintroduced a fan-favorite feature: the PowerShell
+Language Status Icon will visually indicate if the execution pipeline is busy. For
+example, a long-running task in the PowerShell Extension Terminal or a launched editor
+command will show a spinner!
+
+Finally, I wanted to call out work by Patrick to significantly improve the performance of
+reference finding (which powers the reference code lenses), so large workspaces can now be
+used more easily; when the improvement is not enough, we also introduced the setting
+`powershell.enableReferencesCodeLens` which can be used to disable reference finding
+without having to turn off other code lenses.
+
+[pssa-v1.21]: https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.21.0
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🔍 [vscode-powershell #4201](https://github.com/PowerShell/vscode-powershell/pull/4203) - Fix automatic focus to temporary debug terminal (if it exists).
+- 🐛 ✂️ [vscode-powershell #4195](https://github.com/PowerShell/vscode-powershell/pull/4195) - Fix Function Help snippet. (Thanks @okhoel!)
+- ✨ 📺 [vscode-powershell #4193](https://github.com/PowerShell/vscode-powershell/pull/4193) - Handle busy notification for all PowerShell tasks.
+- ✨ ‍🕵️ [vscode-powershell #4164](https://github.com/PowerShell/vscode-powershell/pull/4164) - Enable new PSScriptAnalyzer option `avoidSemicolonsAsLineTerminators`. (Thanks @bergmeister!)
+- ✨ 📺 [vscode-powershell #3954](https://github.com/PowerShell/vscode-powershell/pull/4187) - Re-implement indicator when running registered editor commands.
+- 🐛 🔍 [vscode-powershell #4185](https://github.com/PowerShell/vscode-powershell/pull/4186) - Only check a script's extension if a script was given.
+- 🐛 🔍 [vscode-powershell #4082](https://github.com/PowerShell/vscode-powershell/pull/4172) - Refactor the debug launch configuration resolvers.
+- 🐛 📁 [vscode-powershell #4163](https://github.com/PowerShell/vscode-powershell/pull/4171) - Fix incorrect docstring for `powershell.cwd`.
+- #️⃣ 🙏 [vscode-powershell #4170](https://github.com/PowerShell/vscode-powershell/pull/4170) - Add setting to only analyze open documents for references.
+- 🐛 🛫 [vscode-powershell #4160](https://github.com/PowerShell/vscode-powershell/pull/4161) - Lock `SessionManager.start()` so only one session is started.
+- ✨ 🔧 [vscode-powershell #4139](https://github.com/PowerShell/vscode-powershell/pull/4139) - Add setting to control the references code lens.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.4
+
+- ✨ 🚂 [PowerShellEditorServices #1928](https://github.com/PowerShell/PowerShellEditorServices/pull/1928) - Generalize the execution busy status to all PowerShell tasks.
+- ✨ ‍🕵️ [PowerShellEditorServices #1916](https://github.com/PowerShell/PowerShellEditorServices/pull/1916) - Upgrade PSScriptAnalyzer to 1.21.0. (Thanks @bergmeister!)
+- ✨ 🙏 [PowerShellEditorServices #1924](https://github.com/PowerShell/PowerShellEditorServices/pull/1924) - Re-implement indicator when running registered editor commands.
+- 🐛 🛫 [vscode-powershell #4048](https://github.com/PowerShell/PowerShellEditorServices/pull/1918) - Created a nested PowerShell for the top-level loop.
+- #️⃣ 🙏 [PowerShellEditorServices #1917](https://github.com/PowerShell/PowerShellEditorServices/pull/1917) - Overhaul workspace search for symbol references.
+- ✨ 🚨 [PowerShellEditorServices #1914](https://github.com/PowerShell/PowerShellEditorServices/pull/1914) - Add regression tests for F5 and F8 saving to history.
+- ✨ 🙏 [PowerShellEditorServices #1900](https://github.com/PowerShell/PowerShellEditorServices/pull/1900) - Add setting to control references code lens.
+
 ## v2022.10.1-preview
 ### Monday, October 17, 2022
 
