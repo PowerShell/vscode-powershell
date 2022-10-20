@@ -10,8 +10,10 @@ export class CodeActionsFeature implements vscode.Disposable {
     private showDocumentationCommand: vscode.Disposable;
 
     constructor(private log: ILogger) {
-        this.applyEditsCommand = vscode.commands.registerCommand("PowerShell.ApplyCodeActionEdits", (edit: any) => {
-            Window.activeTextEditor.edit((editBuilder) => {
+        // TODO: What type is `edit`, what uses this, and is it working?
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.applyEditsCommand = vscode.commands.registerCommand("PowerShell.ApplyCodeActionEdits", async (edit: any) => {
+            await Window.activeTextEditor?.edit((editBuilder) => {
                 editBuilder.replace(
                     new vscode.Range(
                         edit.StartLineNumber - 1,
@@ -23,8 +25,8 @@ export class CodeActionsFeature implements vscode.Disposable {
         });
 
         this.showDocumentationCommand =
-            vscode.commands.registerCommand("PowerShell.ShowCodeActionDocumentation", (ruleName: any) => {
-                this.showRuleDocumentation(ruleName);
+            vscode.commands.registerCommand("PowerShell.ShowCodeActionDocumentation", async (ruleName: string) => {
+                await this.showRuleDocumentation(ruleName);
             });
     }
 
@@ -33,7 +35,7 @@ export class CodeActionsFeature implements vscode.Disposable {
         this.showDocumentationCommand.dispose();
     }
 
-    public showRuleDocumentation(ruleId: string) {
+    public async showRuleDocumentation(ruleId: string) {
         const pssaDocBaseURL = "https://docs.microsoft.com/powershell/utility-modules/psscriptanalyzer/rules/";
 
         if (!ruleId) {
@@ -45,6 +47,6 @@ export class CodeActionsFeature implements vscode.Disposable {
             ruleId = ruleId.substr(2);
         }
 
-        vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(pssaDocBaseURL + `${ruleId}`));
+        await vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(pssaDocBaseURL + `${ruleId}`));
     }
 }

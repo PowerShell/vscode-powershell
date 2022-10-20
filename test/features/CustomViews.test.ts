@@ -29,7 +29,7 @@ function convertToVSCodeResourceScheme(filePath: string): string {
     return vscode.Uri.file(filePath).toString().replace("file://", "vscode-resource://");
 }
 
-describe("CustomViews feature", async function () {
+describe("CustomViews feature", function () {
     const testCases: IHtmlContentViewTestCase[] = [
         {
             name: "with no JavaScript or CSS",

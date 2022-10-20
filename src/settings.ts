@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
 import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");
@@ -27,9 +25,7 @@ export enum CommentType {
     LineComment = "LineComment",
 }
 
-export interface IPowerShellAdditionalExePathSettings {
-    [versionName: string]: string;
-}
+export type IPowerShellAdditionalExePathSettings = Record<string, string>;
 
 export interface IBugReportingSettings {
     project: string;
@@ -73,10 +69,10 @@ export interface IDebuggingSettings {
 
 export interface IDeveloperSettings {
     featureFlags?: string[];
-    bundledModulesPath?: string;
-    editorServicesLogLevel?: string;
+    bundledModulesPath: string;
+    editorServicesLogLevel: string;
     editorServicesWaitForDebugger?: boolean;
-    waitForSessionFileTimeoutSeconds?: number;
+    waitForSessionFileTimeoutSeconds: number;
 }
 
 export interface ISettings {
@@ -85,20 +81,20 @@ export interface ISettings {
     // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath?: string;
     promptToUpdatePowerShell?: boolean;
-    bundledModulesPath?: string;
-    startAsLoginShell?: IStartAsLoginShellSettings;
+    bundledModulesPath: string;
+    startAsLoginShell: IStartAsLoginShellSettings;
     startAutomatically?: boolean;
-    enableProfileLoading?: boolean;
+    enableProfileLoading: boolean;
     helpCompletion: string;
     scriptAnalysis?: IScriptAnalysisSettings;
-    debugging?: IDebuggingSettings;
-    developer?: IDeveloperSettings;
+    debugging: IDebuggingSettings;
+    developer: IDeveloperSettings;
     codeFolding?: ICodeFoldingSettings;
     codeFormatting?: ICodeFormattingSettings;
-    integratedConsole?: IIntegratedConsoleSettings;
-    bugReporting?: IBugReportingSettings;
-    sideBar?: ISideBarSettings;
-    pester?: IPesterSettings;
+    integratedConsole: IIntegratedConsoleSettings;
+    bugReporting: IBugReportingSettings;
+    sideBar: ISideBarSettings;
+    pester: IPesterSettings;
     buttons?: IButtonSettings;
     cwd?: string;
     notebooks?: INotebooksSettings;
@@ -107,27 +103,27 @@ export interface ISettings {
 }
 
 export interface IStartAsLoginShellSettings {
-    osx?: boolean;
-    linux?: boolean;
+    osx: boolean;
+    linux: boolean;
 }
 
 export interface IIntegratedConsoleSettings {
     showOnStartup?: boolean;
     startInBackground?: boolean;
-    focusConsoleOnExecute?: boolean;
+    focusConsoleOnExecute: boolean;
     useLegacyReadLine?: boolean;
     forceClearScrollbackBuffer?: boolean;
     suppressStartupBanner?: boolean;
 }
 
 export interface ISideBarSettings {
-    CommandExplorerVisibility?: boolean;
+    CommandExplorerVisibility: boolean;
 }
 
 export interface IPesterSettings {
-    useLegacyCodeLens?: boolean;
-    outputVerbosity?: string;
-    debugOutputVerbosity?: string;
+    useLegacyCodeLens: boolean;
+    outputVerbosity: string;
+    debugOutputVerbosity: string;
 }
 
 export interface IButtonSettings {
@@ -226,15 +222,16 @@ export function load(): ISettings {
         saveMarkdownCellsAs: CommentType.BlockComment,
     };
 
+    // TODO: I believe all the defaults can be removed, as the `package.json` should supply them (and be the source of truth).
     return {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
         powerShellAdditionalExePaths:
-            configuration.get<IPowerShellAdditionalExePathSettings>("powerShellAdditionalExePaths", undefined),
+            configuration.get<IPowerShellAdditionalExePathSettings>("powerShellAdditionalExePaths"),
         powerShellDefaultVersion:
-            configuration.get<string>("powerShellDefaultVersion", undefined),
+            configuration.get<string>("powerShellDefaultVersion"),
         powerShellExePath:
-            configuration.get<string>("powerShellExePath", undefined),
+            configuration.get<string>("powerShellExePath"),
         promptToUpdatePowerShell:
             configuration.get<boolean>("promptToUpdatePowerShell", true),
         bundledModulesPath:
@@ -266,14 +263,13 @@ export function load(): ISettings {
         notebooks:
             configuration.get<INotebooksSettings>("notebooks", defaultNotebooksSettings),
         startAsLoginShell:
-            // tslint:disable-next-line
             // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
             //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
             //   is the reason terminals on macOS typically run login shells by default which set up
             //   the environment. See http://unix.stackexchange.com/a/119675/115410"
             configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
         cwd: // NOTE: This must be validated at startup via `validateCwdSetting()`. There's probably a better way to do this.
-            configuration.get<string>("cwd", undefined),
+            configuration.get<string>("cwd"),
         enableReferencesCodeLens:
             configuration.get<boolean>("enableReferencesCodeLens", true),
         analyzeOpenDocumentsOnly:
@@ -282,25 +278,26 @@ export function load(): ISettings {
 }
 
 // Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
-export async function getEffectiveConfigurationTarget(settingName: string): Promise<vscode.ConfigurationTarget> {
+export function getEffectiveConfigurationTarget(settingName: string): vscode.ConfigurationTarget | undefined {
     const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
     const detail = configuration.inspect(settingName);
-    let configurationTarget = null;
-
-    if (typeof detail.workspaceFolderValue !== "undefined") {
-        configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
+    if (detail === undefined) {
+        return undefined;
+    } else if (typeof detail.workspaceFolderValue !== "undefined") {
+        return vscode.ConfigurationTarget.WorkspaceFolder;
     }
     else if (typeof detail.workspaceValue !== "undefined") {
-        configurationTarget = vscode.ConfigurationTarget.Workspace;
+        return vscode.ConfigurationTarget.Workspace;
     }
     else if (typeof detail.globalValue !== "undefined") {
-        configurationTarget = vscode.ConfigurationTarget.Global;
+        return vscode.ConfigurationTarget.Global;
     }
-    return configurationTarget;
+    return undefined;
 }
 
 export async function change(
     settingName: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
     configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
 
@@ -317,41 +314,39 @@ function getWorkspaceSettingsWithDefaults<TSettings>(
     const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
 
     for (const setting in importedSettings) {
-        if (importedSettings[setting]) {
-            defaultSettings[setting] = importedSettings[setting];
-        }
+        defaultSettings[setting] = importedSettings[setting];
     }
     return defaultSettings;
 }
 
 // We don't want to query the user more than once, so this is idempotent.
-let hasPrompted: boolean = false;
+let hasPrompted = false;
 
 export async function validateCwdSetting(): Promise<string> {
-    let cwd: string = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd", undefined);
+    let cwd = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string | undefined>("cwd");
 
     // Only use the cwd setting if it exists.
-    if (await utils.checkIfDirectoryExists(cwd)) {
+    if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
         return cwd;
     }
 
     // If there is no workspace, or there is but it has no folders, fallback.
     if (vscode.workspace.workspaceFolders === undefined
-        || vscode.workspace.workspaceFolders?.length === 0) {
+        || vscode.workspace.workspaceFolders.length === 0) {
         cwd = undefined;
         // If there is exactly one workspace folder, use that.
-    } if (vscode.workspace.workspaceFolders?.length === 1) {
-        cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+    } else if (vscode.workspace.workspaceFolders.length === 1) {
+        cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
         // If there is more than one workspace folder, prompt the user once.
-    } else if (vscode.workspace.workspaceFolders?.length > 1 && !hasPrompted) {
+    } else if (vscode.workspace.workspaceFolders.length > 1 && !hasPrompted) {
         hasPrompted = true;
         const options: vscode.WorkspaceFolderPickOptions = {
             placeHolder: "Select a folder to use as the PowerShell extension's working directory.",
-        }
+        };
         cwd = (await vscode.window.showWorkspaceFolderPick(options))?.uri.fsPath;
         // Save the picked 'cwd' to the workspace settings.
         // We have to check again because the user may not have picked.
-        if (await utils.checkIfDirectoryExists(cwd)) {
+        if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
             try {
                 await change("cwd", cwd);
             } catch {

@@ -6,7 +6,7 @@ import * as path from "path";
 import rewire = require("rewire");
 import vscode = require("vscode");
 import utils = require("../utils");
-import { checkIfFileExists } from "../../src/utils"
+import { checkIfFileExists } from "../../src/utils";
 
 // Setup function that is not exported.
 const customViews = rewire("../../src/features/RunCode");
@@ -21,7 +21,7 @@ describe("RunCode feature", function () {
     before(utils.ensureEditorServicesIsConnected);
 
     it("Creates the launch config", function () {
-        const commandToRun: string = "Invoke-Build";
+        const commandToRun = "Invoke-Build";
         const args: string[] = ["Clean"];
 
         const expected: object = {

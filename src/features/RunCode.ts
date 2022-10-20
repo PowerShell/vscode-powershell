@@ -11,14 +11,13 @@ enum LaunchType {
 }
 
 export class RunCodeFeature implements vscode.Disposable {
-
     private command: vscode.Disposable;
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunCode",
-            (runInDebugger: boolean, scriptToRun: string, args: string[]) => {
-                this.launchTask(runInDebugger, scriptToRun, args);
+            async (runInDebugger: boolean, scriptToRun: string, args: string[]) => {
+                await this.launchTask(runInDebugger, scriptToRun, args);
             });
     }
 

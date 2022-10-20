@@ -4,7 +4,7 @@
 ### Thursday, October 20, 2022
 
 This October stable release incorporates a number of bugfixes throughout September and
-early October, though is no based on the latest preview, v2022.10.1-preview, as the
+early October, though is not based on the latest preview, v2022.10.1-preview, as the
 refactors involved in enabling TypeScript's strict type checking and ESLint's strict
 linting will need more testing. However, based on the success of the PowerShell Script
 Analyzer's [v1.21.0][pssa-v1.21] release we wanted to get this to you sooner!
@@ -50,6 +50,18 @@ without having to turn off other code lenses.
 - #️⃣ 🙏 [PowerShellEditorServices #1917](https://github.com/PowerShell/PowerShellEditorServices/pull/1917) - Overhaul workspace search for symbol references.
 - ✨ 🚨 [PowerShellEditorServices #1914](https://github.com/PowerShell/PowerShellEditorServices/pull/1914) - Add regression tests for F5 and F8 saving to history.
 - ✨ 🙏 [PowerShellEditorServices #1900](https://github.com/PowerShell/PowerShellEditorServices/pull/1900) - Add setting to control references code lens.
+
+## v2022.10.1-preview
+### Monday, October 17, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🚂 [vscode-powershell #3561](https://github.com/PowerShell/vscode-powershell/pull/4206) - Enable `strict` TypeScript mode .
+- 🐛 🔍 [vscode-powershell #4201](https://github.com/PowerShell/vscode-powershell/pull/4203) - Fix automatic focus to temporary debug terminal (if it exists).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.5.4
+
+No changes.
 
 ## v2022.10.0-preview
 ### Friday, October 07, 2022

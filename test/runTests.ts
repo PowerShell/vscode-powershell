@@ -28,10 +28,10 @@ async function main() {
             version: "insiders"
         });
     } catch (err) {
-        // tslint:disable-next-line:no-console
         console.error(`Failed to run tests: ${err}`);
         process.exit(1);
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

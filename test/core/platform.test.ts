@@ -15,6 +15,7 @@ import * as vscode from "vscode";
 // overrides the fs module but not the vscode.workspace.fs module.
 const platformMock = rewire("../../src/platform");
 
+// eslint-disable-next-line @typescript-eslint/require-await
 async function fakeCheckIfFileOrDirectoryExists(targetPath: string | vscode.Uri): Promise<boolean> {
     try {
         fs.lstatSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
@@ -24,6 +25,7 @@ async function fakeCheckIfFileOrDirectoryExists(targetPath: string | vscode.Uri)
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/require-await
 async function fakeReadDirectory(targetPath: string | vscode.Uri): Promise<string[]> {
     return fs.readdirSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
 }
@@ -32,7 +34,7 @@ const utilsMock = {
     checkIfFileExists: fakeCheckIfFileOrDirectoryExists,
     checkIfDirectoryExists: fakeCheckIfFileOrDirectoryExists,
     readDirectory: fakeReadDirectory
-}
+};
 
 platformMock.__set__("utils", utilsMock);
 
@@ -44,7 +46,7 @@ interface ITestPlatform {
     name: string;
     platformDetails: platform.IPlatformDetails;
     filesystem: FileSystem.DirectoryItems;
-    environmentVars?: Record<string, string>;
+    environmentVars: Record<string, string>;
 }
 
 /**
@@ -59,11 +61,12 @@ interface ITestPlatformSuccessCase extends ITestPlatform {
 // Platform configurations where we expect to find a set of PowerShells
 let successTestCases: ITestPlatformSuccessCase[];
 
-let msixAppDir = null;
-let pwshMsixPath = null;
-let pwshPreviewMsixPath = null;
+let msixAppDir: string;
+let pwshMsixPath: string;
+let pwshPreviewMsixPath: string;
+
 if (process.platform === "win32") {
-    msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
+    msixAppDir = path.join(process.env.LOCALAPPDATA!, "Microsoft", "WindowsApps");
     pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
     pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
 
@@ -441,6 +444,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/bin/pwsh",
@@ -481,6 +485,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/local/bin/pwsh",
@@ -507,6 +512,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/bin/pwsh",
@@ -527,6 +533,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/snap/bin/pwsh",
@@ -547,6 +554,7 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/usr/local/bin/pwsh",
@@ -619,6 +627,7 @@ const errorTestCases: ITestPlatform[] = [
             isOS64Bit: true,
             isProcess64Bit: true,
         },
+        environmentVars: {},
         filesystem: {},
     },
     {
@@ -628,6 +637,7 @@ const errorTestCases: ITestPlatform[] = [
             isOS64Bit: true,
             isProcess64Bit: true,
         },
+        environmentVars: {},
         filesystem: {},
     },
 ];
@@ -635,10 +645,8 @@ const errorTestCases: ITestPlatform[] = [
 function setupTestEnvironment(testPlatform: ITestPlatform) {
     mockFS(testPlatform.filesystem);
 
-    if (testPlatform.environmentVars) {
-        for (const envVar of Object.keys(testPlatform.environmentVars)) {
-            sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
-        }
+    for (const envVar of Object.keys(testPlatform.environmentVars)) {
+        sinon.stub(process.env, envVar).value(testPlatform.environmentVars[envVar]);
     }
 }
 
@@ -646,53 +654,53 @@ describe("Platform module", function () {
     it("Gets the correct platform details", function () {
         const platformDetails: platform.IPlatformDetails = platformMock.getPlatformDetails();
         switch (process.platform) {
-            case "darwin":
-                assert.strictEqual(
-                    platformDetails.operatingSystem,
-                    platform.OperatingSystem.MacOS,
-                    "Platform details operating system should be MacOS");
-                assert.strictEqual(
-                    platformDetails.isProcess64Bit,
-                    true,
-                    "VSCode on darwin should be 64-bit");
-                assert.strictEqual(
-                    platformDetails.isOS64Bit,
-                    true,
-                    "Darwin is 64-bit only");
-                break;
+        case "darwin":
+            assert.strictEqual(
+                platformDetails.operatingSystem,
+                platform.OperatingSystem.MacOS,
+                "Platform details operating system should be MacOS");
+            assert.strictEqual(
+                platformDetails.isProcess64Bit,
+                true,
+                "VSCode on darwin should be 64-bit");
+            assert.strictEqual(
+                platformDetails.isOS64Bit,
+                true,
+                "Darwin is 64-bit only");
+            break;
 
-            case "linux":
-                assert.strictEqual(
-                    platformDetails.operatingSystem,
-                    platform.OperatingSystem.Linux,
-                    "Platform details operating system should be Linux");
-                assert.strictEqual(
-                    platformDetails.isProcess64Bit,
-                    true,
-                    "Only 64-bit VSCode supported on Linux");
-                assert.strictEqual(
-                    platformDetails.isOS64Bit,
-                    true,
-                    "Only 64-bit Linux supported by PowerShell");
-                return;
+        case "linux":
+            assert.strictEqual(
+                platformDetails.operatingSystem,
+                platform.OperatingSystem.Linux,
+                "Platform details operating system should be Linux");
+            assert.strictEqual(
+                platformDetails.isProcess64Bit,
+                true,
+                "Only 64-bit VSCode supported on Linux");
+            assert.strictEqual(
+                platformDetails.isOS64Bit,
+                true,
+                "Only 64-bit Linux supported by PowerShell");
+            return;
 
-            case "win32":
-                assert.strictEqual(
-                    platformDetails.operatingSystem,
-                    platform.OperatingSystem.Windows,
-                    "Platform details operating system should be Windows");
-                assert.strictEqual(
-                    platformDetails.isProcess64Bit,
-                    process.arch === "x64",
-                    "Windows process bitness should match process arch");
-                assert.strictEqual(
-                    platformDetails.isOS64Bit,
-                    !!(platformDetails.isProcess64Bit || process.env.ProgramW6432),
-                    "Windows OS arch should match process bitness unless 64-bit env var set");
-                return;
+        case "win32":
+            assert.strictEqual(
+                platformDetails.operatingSystem,
+                platform.OperatingSystem.Windows,
+                "Platform details operating system should be Windows");
+            assert.strictEqual(
+                platformDetails.isProcess64Bit,
+                process.arch === "x64",
+                "Windows process bitness should match process arch");
+            assert.strictEqual(
+                platformDetails.isOS64Bit,
+                !!(platformDetails.isProcess64Bit || process.env.ProgramW6432),
+                "Windows OS arch should match process bitness unless 64-bit env var set");
+            return;
 
-            default:
-                assert.fail("This platform is unsupported");
+        default:
+            assert.fail("This platform is unsupported");
         }
     });
 
@@ -747,9 +755,9 @@ describe("Platform module", function () {
                     const foundPowerShell = foundPowerShells[i];
                     const expectedPowerShell = testPlatform.expectedPowerShellSequence[i];
 
-                    assert.strictEqual(foundPowerShell && foundPowerShell.exePath, expectedPowerShell.exePath);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.displayName, expectedPowerShell.displayName);
-                    assert.strictEqual(foundPowerShell && foundPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
+                    assert.strictEqual(foundPowerShell?.exePath, expectedPowerShell.exePath);
+                    assert.strictEqual(foundPowerShell?.displayName, expectedPowerShell.displayName);
+                    assert.strictEqual(foundPowerShell?.supportsProperArguments, expectedPowerShell.supportsProperArguments);
                 }
 
                 assert.strictEqual(
@@ -785,7 +793,7 @@ describe("Platform module", function () {
 
                 function getWinPSPath(systemDir: string) {
                     return path.join(
-                        testPlatform.environmentVars.windir,
+                        testPlatform.environmentVars.windir!,
                         systemDir,
                         "WindowsPowerShell",
                         "v1.0",

@@ -1,53 +1,49 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Disposable, EndOfLine, Position, Range, SnippetString,
-    TextDocument, TextDocumentChangeEvent, window, workspace } from "vscode";
+import {
+    Disposable, EndOfLine, Range, SnippetString,
+    TextDocument, TextDocumentChangeEvent, window, workspace
+} from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { Logger } from "../logging";
 import Settings = require("../settings");
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface ICommentHelpRequestArguments {
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface ICommentHelpRequestResponse {
+    content: string[]
+}
+
 export const CommentHelpRequestType =
-    new RequestType<any, any, void>("powerShell/getCommentHelp");
-
-interface ICommentHelpRequestParams {
-    documentUri: string;
-    triggerPosition: Position;
-    blockComment: boolean;
-}
-
-interface ICommentHelpRequestResult {
-    content: string[];
-}
+    new RequestType<ICommentHelpRequestArguments, ICommentHelpRequestResponse, void>("powerShell/getCommentHelp");
 
 enum SearchState { Searching, Locked, Found }
 
 export class HelpCompletionFeature extends LanguageClientConsumer {
-    private helpCompletionProvider: HelpCompletionProvider;
-    private disposable: Disposable;
+    private helpCompletionProvider: HelpCompletionProvider | undefined;
+    private disposable: Disposable | undefined;
     private settings: Settings.ISettings;
 
-    constructor(private log: Logger) {
+    constructor() {
         super();
         this.settings = Settings.load();
 
         if (this.settings.helpCompletion !== Settings.CommentType.Disabled) {
             this.helpCompletionProvider = new HelpCompletionProvider();
-            const subscriptions = [];
-            workspace.onDidChangeTextDocument(this.onEvent, this, subscriptions);
-            this.disposable = Disposable.from(...subscriptions);
+            this.disposable = workspace.onDidChangeTextDocument(async (e) => { await this.onEvent(e); });
         }
     }
 
     public dispose() {
-        if (this.disposable) {
-            this.disposable.dispose();
-        }
+        this.disposable?.dispose();
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient) {
         this.languageClient = languageClient;
         if (this.helpCompletionProvider) {
             this.helpCompletionProvider.languageClient = languageClient;
@@ -60,22 +56,16 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
             return;
         }
 
-        if (!(changeEvent && changeEvent.contentChanges)) {
-            this.log.writeWarning(`<${HelpCompletionFeature.name}>: ` +
-                `Bad TextDocumentChangeEvent message: ${JSON.stringify(changeEvent)}`);
-            return;
-        }
-
         if (changeEvent.contentChanges.length > 0) {
-            this.helpCompletionProvider.updateState(
+            this.helpCompletionProvider?.updateState(
                 changeEvent.document,
                 changeEvent.contentChanges[0].text,
                 changeEvent.contentChanges[0].range);
 
-            // todo raise an event when trigger is found, and attach complete() to the event.
-            if (this.helpCompletionProvider.triggerFound) {
+            // TODO: Raise an event when trigger is found, and attach complete() to the event.
+            if (this.helpCompletionProvider?.triggerFound) {
                 await this.helpCompletionProvider.complete();
-                await this.helpCompletionProvider.reset();
+                this.helpCompletionProvider.reset();
             }
         }
     }
@@ -83,7 +73,7 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
 
 class TriggerFinder {
     private state: SearchState;
-    private document: TextDocument;
+    private document: TextDocument | undefined;
     private count: number;
 
     constructor(private triggerCharacters: string) {
@@ -97,30 +87,30 @@ class TriggerFinder {
 
     public updateState(document: TextDocument, changeText: string): void {
         switch (this.state) {
-            case SearchState.Searching:
-                if (changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
-                    this.state = SearchState.Locked;
-                    this.document = document;
-                    this.count++;
-                }
-                break;
+        case SearchState.Searching:
+            // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
+            if (changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
+                this.state = SearchState.Locked;
+                this.document = document;
+                this.count++;
+            }
+            break;
 
-            case SearchState.Locked:
-                if (document === this.document &&
-                        changeText.length === 1 &&
-                        changeText[0] === this.triggerCharacters[this.count]) {
-                    this.count++;
-                    if (this.count === this.triggerCharacters.length) {
-                        this.state = SearchState.Found;
-                    }
-                } else {
-                    this.reset();
+        case SearchState.Locked:
+            // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
+            if (document === this.document && changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
+                this.count++;
+                if (this.count === this.triggerCharacters.length) {
+                    this.state = SearchState.Found;
                 }
-                break;
-
-            default:
+            } else {
                 this.reset();
-                break;
+            }
+            break;
+
+        default:
+            this.reset();
+            break;
         }
     }
 
@@ -132,9 +122,9 @@ class TriggerFinder {
 
 class HelpCompletionProvider {
     private triggerFinderHelpComment: TriggerFinder;
-    private lastChangeRange: Range;
-    private lastDocument: TextDocument;
-    private langClient: LanguageClient;
+    private lastChangeRange: Range | undefined;
+    private lastDocument: TextDocument | undefined;
+    private langClient: LanguageClient | undefined;
     private settings: Settings.ISettings;
 
     constructor() {
@@ -161,7 +151,7 @@ class HelpCompletionProvider {
     }
 
     public async complete(): Promise<void> {
-        if (this.langClient === undefined) {
+        if (this.langClient === undefined || this.lastChangeRange === undefined || this.lastDocument === undefined) {
             return;
         }
 
@@ -174,23 +164,23 @@ class HelpCompletionProvider {
             blockComment: this.settings.helpCompletion === Settings.CommentType.BlockComment,
         });
 
-        if (!(result && result.content)) {
+        if (result.content.length === 0) {
             return;
         }
 
         const replaceRange = new Range(triggerStartPos.translate(0, -1), triggerStartPos.translate(0, 1));
 
-        // TODO add indentation level to the help content
+        // TODO: add indentation level to the help content
         // Trim leading whitespace (used by the rule for indentation) as VSCode takes care of the indentation.
         // Trim the last empty line and join the strings.
         const lines: string[] = result.content;
         const text = lines
-            .map((x) => (x as any).trimLeft())
+            .map((x) => x.trimLeft())
             .join(this.getEOL(doc.eol));
 
         const snippetString = new SnippetString(text);
 
-        window.activeTextEditor.insertSnippet(snippetString, replaceRange);
+        await window.activeTextEditor?.insertSnippet(snippetString, replaceRange);
     }
 
     private getEOL(eol: EndOfLine): string {

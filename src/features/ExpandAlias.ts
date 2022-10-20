@@ -4,26 +4,37 @@
 import vscode = require("vscode");
 import Window = vscode.window;
 import { RequestType } from "vscode-languageclient";
-import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export const ExpandAliasRequestType = new RequestType<any, any, void>("powerShell/expandAlias");
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IExpandAliasRequestArguments {
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface IExpandAliasRequestResponse {
+    text: string
+}
+
+export const ExpandAliasRequestType = new RequestType<IExpandAliasRequestArguments, IExpandAliasRequestResponse, void>("powerShell/expandAlias");
 
 export class ExpandAliasFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
 
-    constructor(private log: Logger) {
+    constructor() {
         super();
-        this.command = vscode.commands.registerCommand("PowerShell.ExpandAlias", () => {
-
+        this.command = vscode.commands.registerCommand("PowerShell.ExpandAlias", async () => {
             const editor = Window.activeTextEditor;
+            if (editor === undefined) {
+                return;
+            }
+
             const document = editor.document;
             const selection = editor.selection;
             const sls = selection.start;
             const sle = selection.end;
 
-            let text;
-            let range;
+            let text: string;
+            let range: vscode.Range | vscode.Position;
 
             if ((sls.character === sle.character) && (sls.line === sle.line)) {
                 text = document.getText();
@@ -33,11 +44,12 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
                 range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
             }
 
-            this.languageClient.sendRequest(ExpandAliasRequestType, { text }).then((result) => {
-                editor.edit((editBuilder) => {
+            const result = await this.languageClient?.sendRequest(ExpandAliasRequestType, { text });
+            if (result !== undefined) {
+                await editor.edit((editBuilder) => {
                     editBuilder.replace(range, result.text);
                 });
-            });
+            }
         });
     }
 

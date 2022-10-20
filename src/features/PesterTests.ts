@@ -13,71 +13,81 @@ enum LaunchType {
 }
 
 export class PesterTestsFeature implements vscode.Disposable {
-
-    private command: vscode.Disposable;
+    private commands: vscode.Disposable[];
     private invokePesterStubScriptPath: string;
 
     constructor(private sessionManager: SessionManager) {
         this.invokePesterStubScriptPath = path.resolve(__dirname, "../modules/PowerShellEditorServices/InvokePesterStub.ps1");
+        this.commands = [
+            // File context-menu command - Run Pester Tests
+            vscode.commands.registerCommand(
+                "PowerShell.RunPesterTestsFromFile",
+                (fileUri?) => {
+                    return this.launchAllTestsInActiveEditor(LaunchType.Run, fileUri);
+                }),
 
-        // File context-menu command - Run Pester Tests
-        this.command = vscode.commands.registerCommand(
-            "PowerShell.RunPesterTestsFromFile",
-            (fileUri) => {
-                return this.launchAllTestsInActiveEditor(LaunchType.Run, fileUri);
-            });
-        // File context-menu command - Debug Pester Tests
-        this.command = vscode.commands.registerCommand(
-            "PowerShell.DebugPesterTestsFromFile",
-            (fileUri) => {
-                return this.launchAllTestsInActiveEditor(LaunchType.Debug, fileUri);
-            });
-        // This command is provided for usage by PowerShellEditorServices (PSES) only
-        this.command = vscode.commands.registerCommand(
-            "PowerShell.RunPesterTests",
-            (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?, outputPath?) => {
-                return this.launchTests(uriString, runInDebugger, describeBlockName, describeBlockLineNumber, outputPath);
-            });
+            // File context-menu command - Debug Pester Tests
+            vscode.commands.registerCommand(
+                "PowerShell.DebugPesterTestsFromFile",
+                (fileUri?) => {
+                    return this.launchAllTestsInActiveEditor(LaunchType.Debug, fileUri);
+                }),
+
+            // This command is provided for usage by PowerShellEditorServices (PSES) only
+            vscode.commands.registerCommand(
+                "PowerShell.RunPesterTests",
+                (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?, outputPath?) => {
+                    return this.launchTests(vscode.Uri.parse(uriString), runInDebugger, describeBlockName, describeBlockLineNumber, outputPath);
+                })
+        ];
     }
 
     public dispose() {
-        this.command.dispose();
+        for (const command of this.commands) {
+            command.dispose();
+        }
     }
 
     private async launchAllTestsInActiveEditor(
         launchType: LaunchType,
-        fileUri: vscode.Uri): Promise<boolean> {
+        fileUri?: vscode.Uri): Promise<boolean> {
 
-        const uriString = (fileUri || vscode.window.activeTextEditor.document.uri).toString();
-        const launchConfig = this.createLaunchConfig(uriString, launchType);
+        if (fileUri === undefined) {
+            fileUri = vscode.window.activeTextEditor?.document.uri;
+        }
+
+        if (fileUri === undefined) {
+            return false;
+        }
+
+        const launchConfig = this.createLaunchConfig(fileUri, launchType);
         return this.launch(launchConfig);
     }
 
     private async launchTests(
-        uriString: string,
+        fileUri: vscode.Uri,
         runInDebugger: boolean,
         describeBlockName?: string,
         describeBlockLineNumber?: number,
         outputPath?: string): Promise<boolean> {
 
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(uriString, launchType, describeBlockName, describeBlockLineNumber, outputPath);
+        const launchConfig = this.createLaunchConfig(fileUri, launchType, describeBlockName, describeBlockLineNumber, outputPath);
         return this.launch(launchConfig);
     }
 
     private createLaunchConfig(
-        uriString: string,
+        fileUri: vscode.Uri,
         launchType: LaunchType,
         testName?: string,
         lineNum?: number,
         outputPath?: string): vscode.DebugConfiguration {
 
-        const uri = vscode.Uri.parse(uriString);
         const settings = Settings.load();
 
         // Since we pass the script path to PSES in single quotes to avoid issues with PowerShell
         // special chars like & $ @ () [], we do have to double up the interior single quotes.
-        const scriptPath = uri.fsPath.replace(/'/g, "''");
+        const scriptPath = fileUri.fsPath.replace(/'/g, "''");
 
         const launchConfig = {
             request: "launch",
@@ -133,7 +143,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         //
         // Ensure the necessary script exists (for testing). The debugger will
         // start regardless, but we also pass its success along.
-        return utils.checkIfFileExists(this.invokePesterStubScriptPath)
+        return await utils.checkIfFileExists(this.invokePesterStubScriptPath)
             && vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
     }
 }

@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-// TODO: This file needs some TLC to use strict mode.
-
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -32,8 +30,8 @@ export interface IEditorContext {
     currentFileContent: string;
     currentFileLanguage: string;
     currentFilePath: string;
-    cursorPosition: Position;
-    selectionRange: Range;
+    cursorPosition: Position | undefined | null;
+    selectionRange: Range | undefined | null;
 }
 
 export interface IInvokeExtensionCommandRequestArguments {
@@ -51,38 +49,14 @@ export interface IExtensionCommandAddedNotificationBody {
 }
 
 function asRange(value: vscode.Range): Range {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
     return { start: asPosition(value.start), end: asPosition(value.end) };
 }
 
 function asPosition(value: vscode.Position): Position {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
     return { line: value.line, character: value.character };
 }
 
-function asCodeRange(value: Range): vscode.Range {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
-    return new vscode.Range(asCodePosition(value.start), asCodePosition(value.end));
-}
-
 function asCodePosition(value: Position): vscode.Position {
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
     return new vscode.Position(value.line, value.character);
 }
 
@@ -90,7 +64,7 @@ export const GetEditorContextRequestType =
     new RequestType<IGetEditorContextRequestArguments, IEditorContext, void>(
         "editor/getEditorContext");
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IGetEditorContextRequestArguments {
 }
 
@@ -172,19 +146,16 @@ interface IInvokeRegisteredEditorCommandParameter {
 
 export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
-    private handlers: vscode.Disposable[];
+    private handlers: vscode.Disposable[] = [];
     private extensionCommands: IExtensionCommand[] = [];
 
     constructor(private log: Logger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", async () => {
-                const editor = vscode.window.activeTextEditor;
-                let start = editor.selection.start;
-                if (editor.selection.isEmpty) {
-                    start = new vscode.Position(start.line, 0);
+                if (this.languageClient !== undefined) {
+                    await this.showExtensionCommands(this.languageClient);
                 }
-                await this.showExtensionCommands(this.languageClient);
             }),
 
             vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
@@ -196,7 +167,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     const commandToExecute = this.extensionCommands.find((x) => x.name === param.commandName);
 
                     if (commandToExecute) {
-                        await this.languageClient.sendRequest(
+                        await this.languageClient?.sendRequest(
                             InvokeExtensionCommandRequestType,
                             {
                                 name: commandToExecute.name,
@@ -205,16 +176,16 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     }
                 }),
 
-            vscode.commands.registerCommand('PowerShell.ClosePanel',
-                async () => { await vscode.commands.executeCommand('workbench.action.closePanel'); }),
+            vscode.commands.registerCommand("PowerShell.ClosePanel",
+                async () => { await vscode.commands.executeCommand("workbench.action.closePanel"); }),
 
-            vscode.commands.registerCommand('PowerShell.PositionPanelLeft',
-                async () => { await vscode.commands.executeCommand('workbench.action.positionPanelLeft'); }),
+            vscode.commands.registerCommand("PowerShell.PositionPanelLeft",
+                async () => { await vscode.commands.executeCommand("workbench.action.positionPanelLeft"); }),
 
-            vscode.commands.registerCommand('PowerShell.PositionPanelBottom',
-                async () => { await vscode.commands.executeCommand('workbench.action.positionPanelBottom'); }),
+            vscode.commands.registerCommand("PowerShell.PositionPanelBottom",
+                async () => { await vscode.commands.executeCommand("workbench.action.positionPanelBottom"); }),
 
-            vscode.commands.registerCommand('PowerShell.Debug.Start',
+            vscode.commands.registerCommand("PowerShell.Debug.Start",
                 async () => {
                     // TODO: Use a named debug configuration.
                     await vscode.debug.startDebugging(undefined, {
@@ -222,20 +193,16 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                         type: "PowerShell",
                         request: "launch",
                         script: "${file}",
-                    })
+                    });
                 })
-        ]
+        ];
     }
 
-    public setLanguageClient(languageclient: LanguageClient) {
+    public override setLanguageClient(languageclient: LanguageClient) {
         // Clear the current list of extension commands since they were
         // only relevant to the previous session
         this.extensionCommands = [];
 
-        if (languageclient === undefined) {
-            this.log.write("Language client given to ExtensionCommandsFeature is undefined");
-            return;
-        }
         this.languageClient = languageclient;
 
         this.handlers = [
@@ -249,6 +216,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             this.languageClient.onRequest(
                 InsertTextRequestType,
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 (details) => this.insertText(details)),
 
             this.languageClient.onRequest(
@@ -294,6 +262,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     // We check to see if they have TrueClear on. If not, no-op because the
                     // overriden Clear-Host already calls [System.Console]::Clear()
                     if (Settings.load().integratedConsole.forceClearScrollbackBuffer) {
+                        // eslint-disable-next-line @typescript-eslint/no-floating-promises
                         vscode.commands.executeCommand("workbench.action.terminal.clear");
                     }
                 })
@@ -320,11 +289,10 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 a.name.localeCompare(b.name));
     }
 
-    private showExtensionCommands(client: LanguageClient): Thenable<IInvokeExtensionCommandRequestArguments> {
+    private async showExtensionCommands(client: LanguageClient): Promise<void> {
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
-            vscode.window.showInformationMessage(
-                "No extension commands have been loaded into the current session.");
+            await vscode.window.showInformationMessage("No extension commands have been loaded into the current session.");
             return;
         }
 
@@ -337,19 +305,18 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 };
             });
 
-        vscode.window
-            .showQuickPick(
-                quickPickItems,
-                { placeHolder: "Select a command" })
-            .then((command) => this.onCommandSelected(command, client));
+        const selectedCommand = await vscode.window.showQuickPick(
+            quickPickItems,
+            { placeHolder: "Select a command" });
+        return this.onCommandSelected(selectedCommand, client);
     }
 
-    private onCommandSelected(
-        chosenItem: IExtensionCommandQuickPickItem,
-        client: LanguageClient) {
+    private async onCommandSelected(
+        chosenItem: IExtensionCommandQuickPickItem | undefined,
+        client: LanguageClient | undefined) {
 
         if (chosenItem !== undefined) {
-            client.sendRequest(
+            await client?.sendRequest(
                 InvokeExtensionCommandRequestType,
                 {
                     name: chosenItem.command.name,
@@ -358,7 +325,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         }
     }
 
-    private insertText(details: IInsertTextRequestArguments): EditorOperationResponse {
+    private async insertText(details: IInsertTextRequestArguments): Promise<EditorOperationResponse> {
         const edit = new vscode.WorkspaceEdit();
 
         edit.set(
@@ -374,12 +341,16 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             ],
         );
 
-        vscode.workspace.applyEdit(edit);
+        await vscode.workspace.applyEdit(edit);
 
         return EditorOperationResponse.Completed;
     }
 
-    private getEditorContext(): IEditorContext {
+    private getEditorContext(): IEditorContext | undefined {
+        if (vscode.window.activeTextEditor === undefined) {
+            return undefined;
+        }
+
         return {
             currentFileContent: vscode.window.activeTextEditor.document.getText(),
             currentFileLanguage: vscode.window.activeTextEditor.document.languageId,
@@ -418,7 +389,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             promise =
                 vscode.workspace.openTextDocument(filePath)
                     .then((doc) => vscode.window.showTextDocument(doc))
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
+                    .then((_) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
                     .then((_) => EditorOperationResponse.Completed);
         } else {
             promise = Promise.resolve(EditorOperationResponse.Completed);
@@ -442,72 +413,72 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         let newFileAbsolutePath: string;
         switch (currentFileUri.scheme) {
-            case "file":
-                // If the file to save can't be found, just complete the request
-                if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
-                    await this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
-                    return EditorOperationResponse.Completed;
-                }
-
-                // If no newFile is given, just save the current file
-                if (!saveFileDetails.newPath) {
-                    const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
-                    if (doc.isDirty) {
-                        await doc.save();
-                    }
-                    return EditorOperationResponse.Completed;
-                }
-
-                // Make sure we have an absolute path
-                if (path.isAbsolute(saveFileDetails.newPath)) {
-                    newFileAbsolutePath = saveFileDetails.newPath;
-                } else {
-                    // If not, interpret the path as relative to the current file
-                    newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
-                }
-                break;
-
-            case "untitled":
-                // We need a new name to save an untitled file
-                if (!saveFileDetails.newPath) {
-                    // TODO: Create a class handle vscode warnings and errors so we can warn easily
-                    //       without logging
-                    this.log.writeAndShowWarning(
-                        "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
-                    return EditorOperationResponse.Completed;
-                }
-
-                // Make sure we have an absolute path
-                if (path.isAbsolute(saveFileDetails.newPath)) {
-                    newFileAbsolutePath = saveFileDetails.newPath;
-                } else {
-                    // In fresh contexts, workspaceFolders is not defined...
-                    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-                        this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
-                            "Try saving to an absolute path, or open a workspace.");
-                        return EditorOperationResponse.Completed;
-                    }
-
-                    // If not, interpret the path as relative to the workspace root
-                    const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
-                    // We don't support saving to a non-file URI-schemed workspace
-                    if (workspaceRootUri.scheme !== "file") {
-                        this.log.writeAndShowWarning(
-                            "Cannot save untitled file to a relative path in an untitled workspace. " +
-                            "Try saving to an absolute path or opening a workspace folder.");
-                        return EditorOperationResponse.Completed;
-                    }
-                    newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
-                }
-                break;
-
-            default:
-                // Other URI schemes are not supported
-                const msg = JSON.stringify(saveFileDetails);
-                this.log.writeVerbose(
-                    `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
-                    `is currently unsupported. Message: '${msg}'`);
+        case "file": {
+            // If the file to save can't be found, just complete the request
+            if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
+                await this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
                 return EditorOperationResponse.Completed;
+            }
+
+            // If no newFile is given, just save the current file
+            if (!saveFileDetails.newPath) {
+                const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
+                if (doc.isDirty) {
+                    await doc.save();
+                }
+                return EditorOperationResponse.Completed;
+            }
+
+            // Make sure we have an absolute path
+            if (path.isAbsolute(saveFileDetails.newPath)) {
+                newFileAbsolutePath = saveFileDetails.newPath;
+            } else {
+                // If not, interpret the path as relative to the current file
+                newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
+            }
+            break; }
+
+        case "untitled": {
+            // We need a new name to save an untitled file
+            if (!saveFileDetails.newPath) {
+                // TODO: Create a class handle vscode warnings and errors so we can warn easily
+                //       without logging
+                await this.log.writeAndShowWarning(
+                    "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
+                return EditorOperationResponse.Completed;
+            }
+
+            // Make sure we have an absolute path
+            if (path.isAbsolute(saveFileDetails.newPath)) {
+                newFileAbsolutePath = saveFileDetails.newPath;
+            } else {
+                // In fresh contexts, workspaceFolders is not defined...
+                if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
+                    await this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
+                            "Try saving to an absolute path, or open a workspace.");
+                    return EditorOperationResponse.Completed;
+                }
+
+                // If not, interpret the path as relative to the workspace root
+                const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
+                // We don't support saving to a non-file URI-schemed workspace
+                if (workspaceRootUri.scheme !== "file") {
+                    await this.log.writeAndShowWarning(
+                        "Cannot save untitled file to a relative path in an untitled workspace. " +
+                            "Try saving to an absolute path or opening a workspace folder.");
+                    return EditorOperationResponse.Completed;
+                }
+                newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
+            }
+            break; }
+
+        default: {
+            // Other URI schemes are not supported
+            const msg = JSON.stringify(saveFileDetails);
+            this.log.writeVerbose(
+                `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
+                        `is currently unsupported. Message: '${msg}'`);
+            return EditorOperationResponse.Completed; }
         }
 
         await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
@@ -532,7 +503,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 vscode.Uri.file(destinationAbsolutePath),
                 Buffer.from(oldDocument.getText()));
         } catch (e) {
-            this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
+            await this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
                 `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
             return;
         }
@@ -540,7 +511,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         // Finally open the new document
         const newFileUri = vscode.Uri.file(destinationAbsolutePath);
         const newFile = await vscode.workspace.openTextDocument(newFileUri);
-        vscode.window.showTextDocument(newFile, { preview: true });
+        await vscode.window.showTextDocument(newFile, { preview: true });
     }
 
     private normalizeFilePath(filePath: string): string {
@@ -549,7 +520,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             // Make sure the file path is absolute
             if (!path.win32.isAbsolute(filePath)) {
                 filePath = path.win32.resolve(
-                    vscode.workspace.rootPath,
+                    vscode.workspace.rootPath!,
                     filePath);
             }
 
@@ -559,7 +530,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             // Make sure the file path is absolute
             if (!path.isAbsolute(filePath)) {
                 filePath = path.resolve(
-                    vscode.workspace.rootPath,
+                    vscode.workspace.rootPath!,
                     filePath);
             }
 
@@ -590,31 +561,30 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     }
 
     private setSelection(details: ISetSelectionRequestArguments): EditorOperationResponse {
-        vscode.window.activeTextEditor.selections = [
-            new vscode.Selection(
-                asCodePosition(details.selectionRange.start),
-                asCodePosition(details.selectionRange.end)),
-        ];
+        if (vscode.window.activeTextEditor !== undefined) {
+            vscode.window.activeTextEditor.selections = [
+                new vscode.Selection(
+                    asCodePosition(details.selectionRange.start)!,
+                    asCodePosition(details.selectionRange.end)!),
+            ];
+        }
 
         return EditorOperationResponse.Completed;
     }
 
-    private showInformationMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-            .showInformationMessage(message)
-            .then((_) => EditorOperationResponse.Completed);
+    private async showInformationMessage(message: string): Promise<EditorOperationResponse> {
+        await vscode.window.showInformationMessage(message);
+        return EditorOperationResponse.Completed;
     }
 
-    private showErrorMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-            .showErrorMessage(message)
-            .then((_) => EditorOperationResponse.Completed);
+    private async showErrorMessage(message: string): Promise<EditorOperationResponse> {
+        await vscode.window.showErrorMessage(message);
+        return EditorOperationResponse.Completed;
     }
 
-    private showWarningMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-            .showWarningMessage(message)
-            .then((_) => EditorOperationResponse.Completed);
+    private async showWarningMessage(message: string): Promise<EditorOperationResponse> {
+        await vscode.window.showWarningMessage(message);
+        return EditorOperationResponse.Completed;
     }
 
     private setStatusBarMessage(messageDetails: IStatusBarMessageDetails): EditorOperationResponse {

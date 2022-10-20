@@ -21,8 +21,8 @@ export class PowerShellProcess {
     public onExited: vscode.Event<void>;
     private onExitedEmitter = new vscode.EventEmitter<void>();
 
-    private consoleTerminal: vscode.Terminal = undefined;
-    private consoleCloseSubscription: vscode.Disposable;
+    private consoleTerminal?: vscode.Terminal;
+    private consoleCloseSubscription?: vscode.Disposable;
 
     constructor(
         public exePath: string,
@@ -52,14 +52,14 @@ export class PowerShellProcess {
 
         this.startPsesArgs +=
             `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath.fsPath)}' ` +
-        `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
+            `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 
         if (this.sessionSettings.integratedConsole.useLegacyReadLine) {
             this.startPsesArgs += "-UseLegacyReadLine";
         }
 
-        const powerShellArgs = [];
+        const powerShellArgs: string[] = [];
 
         const useLoginShell: boolean =
             (utils.isMacOS && this.sessionSettings.startAsLoginShell.osx)
@@ -132,7 +132,8 @@ export class PowerShellProcess {
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
 
         // Log that the PowerShell terminal process has been started
-        this.consoleTerminal.processId.then((pid) => this.logTerminalPid(pid, pwshName));
+        const pid = await this.consoleTerminal.processId;
+        this.logTerminalPid(pid ?? 0, pwshName);
 
         return sessionDetails;
     }
@@ -141,20 +142,17 @@ export class PowerShellProcess {
         this.consoleTerminal?.show(preserveFocus);
     }
 
-    public dispose() {
+    public async dispose() {
         // Clean up the session file
-        PowerShellProcess.deleteSessionFile(this.sessionFilePath);
+        this.log.write("Terminating PowerShell process...");
 
-        if (this.consoleCloseSubscription) {
-            this.consoleCloseSubscription.dispose();
-            this.consoleCloseSubscription = undefined;
-        }
+        await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
 
-        if (this.consoleTerminal) {
-            this.log.write("Terminating PowerShell process...");
-            this.consoleTerminal.dispose();
-            this.consoleTerminal = undefined;
-        }
+        this.consoleCloseSubscription?.dispose();
+        this.consoleCloseSubscription = undefined;
+
+        this.consoleTerminal?.dispose();
+        this.consoleTerminal = undefined;
     }
 
     public sendKeyPress() {
@@ -162,7 +160,7 @@ export class PowerShellProcess {
         // because non-printing characters can cause havoc with different
         // languages and terminal settings. We discard the character server-side
         // anyway, so it doesn't matter what we send.
-        this.consoleTerminal.sendText("p", false);
+        this.consoleTerminal?.sendText("p", false);
     }
 
     private logTerminalPid(pid: number, exeName: string) {
@@ -207,12 +205,12 @@ export class PowerShellProcess {
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
                 this.log.write("Session file found!");
                 const sessionDetails = await PowerShellProcess.readSessionFile(this.sessionFilePath);
-                PowerShellProcess.deleteSessionFile(this.sessionFilePath);
+                await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
             }
 
             if (warnAt === i) {
-                vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
+                await vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
     If you're using privilege enforcement software, this can affect start up performance.`);
             }
 
