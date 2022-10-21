@@ -50,7 +50,7 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
             }
 
             Write-Host "`n### Building PSES`n" -ForegroundColor Green
-            Invoke-Build Build (Get-EditorServicesPath)
+            Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
         }
         "Release" {
             # When releasing, we ensure the bits are not symlinked but copied,
@@ -64,7 +64,7 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
                 # We only build if it hasn't been built at all.
                 if (!(Test-Path "$(Split-Path (Get-EditorServicesPath))/module/PowerShellEditorServices/bin")) {
                     Write-Host "`n### Building PSES`n" -ForegroundColor Green
-                    Invoke-Build Build (Get-EditorServicesPath)
+                    Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
                 }
 
                 Write-Host "`n### Copying PSES`n" -ForegroundColor Green
