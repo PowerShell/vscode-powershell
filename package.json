@@ -229,7 +229,8 @@
       {
         "command": "PowerShell.PowerShellFindModule",
         "title": "Find/Install PowerShell Modules from the Gallery",
-        "category": "PowerShell"
+        "category": "PowerShell",
+        "deprecationMessage": "This feature is no longer available, we're sorry!"
       },
       {
         "command": "PowerShell.ShowAdditionalCommands",

@@ -12,7 +12,6 @@ import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
 import { ExternalApiFeature, IPowerShellExtensionClient } from "./features/ExternalApi";
-import { FindModuleFeature } from "./features/FindModule";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
@@ -159,7 +158,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new ExpandAliasFeature(),
         new GetCommandsFeature(logger),
         new ShowHelpFeature(),
-        new FindModuleFeature(),
         new ExtensionCommandsFeature(logger),
         new NewFileOrProjectFeature(),
         new RemoteFilesFeature(),
