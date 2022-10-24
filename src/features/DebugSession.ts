@@ -15,6 +15,7 @@ import Settings = require("../settings");
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import path = require("path");
+import utils = require("../utils");
 
 export const StartDebuggerNotificationType =
     new NotificationType<void>("powerShell/startDebugger");
@@ -244,17 +245,21 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
 
         // Check the temporary console setting for untitled documents only, and
-        // check the document extension for everything else.
+        // check the document extension for if the script is an extant file (it
+        // could be inline).
         if (config.untitled_document) {
             if (config.createTemporaryIntegratedConsole) {
                 await vscode.window.showErrorMessage("Debugging untitled files in a temporary console is not supported.");
                 return undefined;
             }
         } else if (config.script) {
-            const ext = path.extname(config.script).toLowerCase();
-            if (!(ext === ".ps1" || ext === ".psm1")) {
-                await vscode.window.showErrorMessage(`PowerShell does not support debugging this file type: '${path.basename(config.script)}'`);
-                return undefined;
+            // TODO: Why even bother with this complexity?
+            if (await utils.checkIfFileExists(config.script)) {
+                const ext = path.extname(config.script).toLowerCase();
+                if (!(ext === ".ps1" || ext === ".psm1")) {
+                    await vscode.window.showErrorMessage(`PowerShell does not support debugging this file type: '${path.basename(config.script)}'`);
+                    return undefined;
+                }
             }
         }
 
