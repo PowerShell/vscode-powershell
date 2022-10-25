@@ -1,5 +1,25 @@
 # PowerShell Extension Release History
 
+## v2022.10.2-preview
+### Tuesday, October 25, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🚂 [vscode-powershell #4213](https://github.com/PowerShell/vscode-powershell/pull/4228) - Remove `FindModule.ts` since its long since been deprecated.
+- 🐛 🔍 [vscode-powershell #4223](https://github.com/PowerShell/vscode-powershell/pull/4227) - Only check a script's extension if a script file was given.
+- ✨ 👷 [vscode-powershell #4220](https://github.com/PowerShell/vscode-powershell/pull/4220) - Add assertion to build that PSES bits are built in release configuration.
+- ✨ 🚂 [vscode-powershell #3561](https://github.com/PowerShell/vscode-powershell/pull/4206) - Enable `strict` TypeScript mode .
+- 🐛 🔍 [vscode-powershell #4201](https://github.com/PowerShell/vscode-powershell/pull/4203) - Fix automatic focus to temporary debug terminal (if it exists).
+- ✨ 👷 [vscode-powershell #2882](https://github.com/PowerShell/vscode-powershell/pull/3331) - Replace TSLint with ESLint.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.6.0
+
+- 🐛 🚂 [vscode-powershell #4219](https://github.com/PowerShell/PowerShellEditorServices/pull/1936) - Fix regression around `OnIdle` handler.
+- 🐛 🧠 [PowerShellEditorServices #1926](https://github.com/PowerShell/PowerShellEditorServices/pull/1935) - Catch exceptions within completion handler.
+- 🐛 👷 [vscode-powershell #4218](https://github.com/PowerShell/PowerShellEditorServices/pull/1933) - Fix release build.
+- ✨ 📖 [PowerShellEditorServices #1932](https://github.com/PowerShell/PowerShellEditorServices/pull/1932) - Add example of starting PSES in a script to readme. (Thanks @smartguy1196!)
+- #️⃣ 🙏 [PowerShellEditorServices #1931](https://github.com/PowerShell/PowerShellEditorServices/pull/1931) - Fix broken links in readme. (Thanks @smartguy1196!)
+
 ## v2022.10.0
 ### Thursday, October 20, 2022
 
