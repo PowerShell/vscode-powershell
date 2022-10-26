@@ -235,32 +235,29 @@ export class DebugSessionFeature extends LanguageClientConsumer
     }
 
     private async resolveLaunchDebugConfiguration(config: DebugConfiguration): Promise<DebugConfiguration | undefined> {
-        // Check the languageId only for current documents (which includes untitled documents).
+        // Check the languageId and file extension only for current documents
+        // (which includes untitled documents). This prevents accidentally
+        // running the debugger for an open non-PowerShell file.
         if (config.current_document) {
             const currentDocument = vscode.window.activeTextEditor?.document;
             if (currentDocument?.languageId !== "powershell") {
-                await vscode.window.showErrorMessage("Please change the current document's language mode to PowerShell.");
+                void this.logger.writeAndShowError(`PowerShell does not support debugging this language mode: '${currentDocument?.languageId}'.`);
                 return undefined;
             }
-        }
 
-        // Check the temporary console setting for untitled documents only, and
-        // check the document extension for if the script is an extant file (it
-        // could be inline).
-        if (config.untitled_document) {
-            if (config.createTemporaryIntegratedConsole) {
-                await vscode.window.showErrorMessage("Debugging untitled files in a temporary console is not supported.");
-                return undefined;
-            }
-        } else if (config.script) {
-            // TODO: Why even bother with this complexity?
             if (await utils.checkIfFileExists(config.script)) {
                 const ext = path.extname(config.script).toLowerCase();
                 if (!(ext === ".ps1" || ext === ".psm1")) {
-                    await vscode.window.showErrorMessage(`PowerShell does not support debugging this file type: '${path.basename(config.script)}'`);
+                    void this.logger.writeAndShowError(`PowerShell does not support debugging this file type: '${path.basename(config.script)}'.`);
                     return undefined;
                 }
             }
+        }
+
+        // Check the temporary console setting for untitled documents only.
+        if (config.untitled_document && config.createTemporaryIntegratedConsole) {
+            void this.logger.writeAndShowError("PowerShell does not support debugging untitled files in a temporary console.");
+            return undefined;
         }
 
         return config;
