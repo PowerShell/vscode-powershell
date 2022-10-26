@@ -72,7 +72,6 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
             return await innerCloseFiles();
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        innerCloseFiles();
+        void innerCloseFiles();
     }
 }

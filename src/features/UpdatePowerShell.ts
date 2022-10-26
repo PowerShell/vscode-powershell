@@ -168,8 +168,7 @@ export async function InvokePowerShellUpdateCheck(
 
             msi.on("close", () => {
                 // Now that the MSI is finished, restart the session.
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                sessionManager.start();
+                void sessionManager.start();
                 fs.unlinkSync(msiDownloadPath);
             });
 

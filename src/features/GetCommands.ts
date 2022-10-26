@@ -29,7 +29,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;
 
-    constructor(private log: Logger) {
+    constructor(private logger: Logger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
@@ -58,14 +58,13 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     public override setLanguageClient(languageclient: LanguageClient) {
         this.languageClient = languageclient;
         if (this.commandsExplorerTreeView.visible) {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
+            void vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
         }
     }
 
     private async CommandExplorerRefresh() {
         if (this.languageClient === undefined) {
-            this.log.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
+            this.logger.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
             return;
         }
         await this.languageClient.sendRequest(GetCommandRequestType).then((result) => {

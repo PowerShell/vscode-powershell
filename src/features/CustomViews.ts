@@ -101,10 +101,8 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
 
         vscode.workspace.textDocuments.some((doc) => {
             if (doc.uri.toString() === uriString) {
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                vscode.window.showTextDocument(doc);
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+                void vscode.window.showTextDocument(doc);
+                void vscode.commands.executeCommand("workbench.action.closeActiveEditor");
                 return true;
             }
 

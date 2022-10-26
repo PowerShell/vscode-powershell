@@ -56,7 +56,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     // TODO: Merge extensions and use preview channel in marketplace instead.
     if (PackageJSON.name.toLowerCase() === "powershell-preview"
         && vscode.extensions.getExtension("ms-vscode.powershell")) {
-        await vscode.window.showWarningMessage(
+        void vscode.window.showErrorMessage(
             "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
     }
 
@@ -159,13 +159,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new GetCommandsFeature(logger),
         new ShowHelpFeature(),
         new ExtensionCommandsFeature(logger),
-        new NewFileOrProjectFeature(),
+        new NewFileOrProjectFeature(logger),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
-        new PickPSHostProcessFeature(),
+        new PickPSHostProcessFeature(logger),
         new HelpCompletionFeature(),
         new CustomViewsFeature(),
-        new PickRunspaceFeature(),
+        new PickRunspaceFeature(logger),
         externalApi
     ];
 

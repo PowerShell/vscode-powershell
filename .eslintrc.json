@@ -36,6 +36,12 @@
       "error",
       "always"
     ],
+    "@typescript-eslint/no-floating-promises": [
+      "error",
+      {
+        "ignoreVoid": true
+      }
+    ],
     "@typescript-eslint/no-non-null-assertion": [
       "off"
     ],

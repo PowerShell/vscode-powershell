@@ -103,7 +103,7 @@ export class SessionManager implements Middleware {
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionSettings: Settings.ISettings,
-        private log: Logger,
+        private logger: Logger,
         private documentSelector: DocumentSelector,
         hostName: string,
         hostVersion: string,
@@ -119,7 +119,7 @@ export class SessionManager implements Middleware {
         const osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
 
-        this.log.write(
+        this.logger.write(
             `Visual Studio Code v${vscode.version} ${procBitness}`,
             `${this.HostName} Extension v${this.HostVersion}`,
             `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`);
@@ -163,7 +163,7 @@ export class SessionManager implements Middleware {
             }
             // Create a folder for the session files.
             await vscode.workspace.fs.createDirectory(this.sessionsFolder);
-            await this.log.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
+            await this.logger.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
             await this.promptPowerShellExeSettingsCleanup();
             await this.migrateWhitespaceAroundPipeSetting();
             this.PowerShellExeDetails = await this.findPowerShell();
@@ -174,7 +174,7 @@ export class SessionManager implements Middleware {
     }
 
     public async stop() {
-        this.log.write("Shutting down language client...");
+        this.logger.write("Shutting down language client...");
 
         try {
             if (this.sessionStatus === SessionStatus.Failed) {
@@ -258,7 +258,7 @@ export class SessionManager implements Middleware {
                 this.PowerShellExeDetails.exePath,
                 bundledModulesPath,
                 "[TEMP] PowerShell Extension",
-                this.log,
+                this.logger,
                 this.buildEditorServicesArgs(bundledModulesPath, this.PowerShellExeDetails) + "-DebugServiceOnly ",
                 this.getNewSessionFilePath(),
                 this.sessionSettings);
@@ -293,7 +293,7 @@ export class SessionManager implements Middleware {
                 if (codeLensToFix.command?.command === "editor.action.showReferences") {
                     const oldArgs = codeLensToFix.command.arguments;
                     if (oldArgs === undefined || oldArgs.length < 3) {
-                        this.log.writeError("Code Lens arguments were malformed");
+                        this.logger.writeError("Code Lens arguments were malformed");
                         return codeLensToFix;
                     }
 
@@ -353,6 +353,7 @@ export class SessionManager implements Middleware {
         }
     }
 
+    // TODO: Remove this migration code.
     private async promptPowerShellExeSettingsCleanup() {
         if (!this.sessionSettings.powerShellExePath) { // undefined or null
             return;
@@ -421,7 +422,7 @@ export class SessionManager implements Middleware {
 
     private async startPowerShell(): Promise<PowerShellProcess | undefined> {
         if (this.PowerShellExeDetails === undefined) {
-            await this.setSessionFailure("Unable to find PowerShell.");
+            this.setSessionFailure("Unable to find PowerShell.");
             return;
         }
 
@@ -433,7 +434,7 @@ export class SessionManager implements Middleware {
                 this.PowerShellExeDetails.exePath,
                 bundledModulesPath,
                 "PowerShell Extension",
-                this.log,
+                this.logger,
                 this.buildEditorServicesArgs(bundledModulesPath, this.PowerShellExeDetails),
                 this.getNewSessionFilePath(),
                 this.sessionSettings);
@@ -449,31 +450,31 @@ export class SessionManager implements Middleware {
         try {
             this.sessionDetails = await languageServerProcess.start("EditorServices");
         } catch (err) {
-            await this.setSessionFailure("PowerShell process failed to start: ", err instanceof Error ? err.message : "unknown");
+            this.setSessionFailure("PowerShell process failed to start: ", err instanceof Error ? err.message : "unknown");
         }
 
         if (this.sessionDetails?.status === "started") {
-            this.log.write("Language server started.");
+            this.logger.write("Language server started.");
             try {
                 await this.startLanguageClient(this.sessionDetails);
             } catch (err) {
-                await this.setSessionFailure("Language client failed to start: ", err instanceof Error ? err.message : "unknown");
+                this.setSessionFailure("Language client failed to start: ", err instanceof Error ? err.message : "unknown");
             }
         } else if (this.sessionDetails?.status === "failed") {
             if (this.sessionDetails.reason === "unsupported") {
-                await this.setSessionFailure(
+                this.setSessionFailure(
                     "PowerShell language features are only supported on PowerShell version 5.1 and 7+. " +
                     `The current version is ${this.sessionDetails.powerShellVersion}.`);
             } else if (this.sessionDetails.reason === "languageMode") {
-                await this.setSessionFailure(
+                this.setSessionFailure(
                     "PowerShell language features are disabled due to an unsupported LanguageMode: " +
                     `${this.sessionDetails.detail}`);
             } else {
-                await this.setSessionFailure(
+                this.setSessionFailure(
                     `PowerShell could not be started for an unknown reason '${this.sessionDetails.reason}'`);
             }
         } else {
-            await this.setSessionFailure(
+            this.setSessionFailure(
                 `Unknown session status '${this.sessionDetails?.status}' with reason '${this.sessionDetails?.reason}`);
         }
 
@@ -500,7 +501,7 @@ export class SessionManager implements Middleware {
             }
             foundPowerShell = defaultPowerShell ?? await powershellExeFinder.getFirstAvailablePowerShellInstallation();
         } catch (e) {
-            this.log.writeError(`Error occurred while searching for a PowerShell executable:\n${e}`);
+            this.logger.writeError(`Error occurred while searching for a PowerShell executable:\n${e}`);
         }
 
         if (foundPowerShell === undefined) {
@@ -509,7 +510,7 @@ export class SessionManager implements Middleware {
                 + " You can also configure custom PowerShell installations"
                 + " with the 'powershell.powerShellAdditionalExePaths' setting.";
 
-            await this.log.writeAndShowErrorWithActions(message, [
+            await this.logger.writeAndShowErrorWithActions(message, [
                 {
                     prompt: "Get PowerShell",
                     action: async () => {
@@ -533,7 +534,7 @@ export class SessionManager implements Middleware {
             if (await utils.checkIfDirectoryExists(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
                 bundledModulesPath = devBundledModulesPath;
             } else {
-                this.log.write(
+                this.logger.write(
                     "\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
                     `found (or has not been built yet): ${devBundledModulesPath}\n`);
             }
@@ -582,13 +583,19 @@ Type 'help' to get help.
     }
 
     private async promptForRestart() {
-        const response = await vscode.window.showErrorMessage(
+        await this.logger.writeAndShowErrorWithActions(
             "The PowerShell Extension Terminal has stopped, would you like to restart it? IntelliSense and other features will not work without it!",
-            "Yes", "No");
-
-        if (response === "Yes") {
-            await this.restartSession();
-        }
+            [
+                {
+                    prompt: "Yes",
+                    action: async () => { await this.restartSession(); }
+                },
+                {
+                    prompt: "No",
+                    action: undefined
+                }
+            ]
+        );
     }
 
     private sendTelemetryEvent(eventName: string, properties?: TelemetryEventProperties, measures?: TelemetryEventMeasurements) {
@@ -598,8 +605,8 @@ Type 'help' to get help.
     }
 
     private async startLanguageClient(sessionDetails: IEditorServicesSessionDetails) {
-        this.log.write(`Connecting to language service on pipe: ${sessionDetails.languageServicePipeName}`);
-        this.log.write("Session details: " + JSON.stringify(sessionDetails));
+        this.logger.write(`Connecting to language service on pipe: ${sessionDetails.languageServicePipeName}`);
+        this.logger.write("Session details: " + JSON.stringify(sessionDetails));
 
         const connectFunc = () => {
             return new Promise<StreamInfo>(
@@ -608,7 +615,7 @@ Type 'help' to get help.
                     socket.on(
                         "connect",
                         () => {
-                            this.log.write("Language service socket connected.");
+                            this.logger.write("Language service socket connected.");
                             resolve({ writer: socket, reader: socket });
                         });
                 });
@@ -686,7 +693,7 @@ Type 'help' to get help.
         try {
             await this.languageClient.start();
         } catch (err) {
-            await this.setSessionFailure("Could not start language service: ", err instanceof Error ? err.message : "unknown");
+            this.setSessionFailure("Could not start language service: ", err instanceof Error ? err.message : "unknown");
             return;
         }
 
@@ -698,8 +705,7 @@ Type 'help' to get help.
         this.started = true;
 
         // NOTE: We specifically don't want to wait for this.
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        this.checkForPowerShellUpdate();
+        void this.checkForPowerShellUpdate();
     }
 
     private async checkForPowerShellUpdate() {
@@ -728,7 +734,7 @@ Type 'help' to get help.
                 release);
         } catch (err) {
             // Best effort. This probably failed to fetch the data from GitHub.
-            this.log.writeWarning(err instanceof Error ? err.message : "unknown");
+            this.logger.writeWarning(err instanceof Error ? err.message : "unknown");
         }
     }
 
@@ -790,9 +796,9 @@ Type 'help' to get help.
         this.setSessionStatus("Executing...", SessionStatus.Busy);
     }
 
-    private async setSessionFailure(message: string, ...additionalMessages: string[]) {
+    private setSessionFailure(message: string, ...additionalMessages: string[]): void {
         this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
-        await this.log.writeAndShowError(message, ...additionalMessages);
+        void this.logger.writeAndShowError(message, ...additionalMessages);
     }
 
     private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
