@@ -81,8 +81,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             : this.sessionManager.getSessionDetails();
 
         if (sessionDetails === undefined) {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.logger.writeAndShowError(`No session details available for ${session.name}`);
+            void this.logger.writeAndShowError(`PowerShell session details not available for ${session.name}`);
             return;
         }
 
@@ -103,8 +102,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             languageClient.onNotification(
                 StartDebuggerNotificationType,
                 // TODO: Use a named debug configuration.
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                () => vscode.debug.startDebugging(undefined, {
+                () => void vscode.debug.startDebugging(undefined, {
                     request: "launch",
                     type: "PowerShell",
                     name: "PowerShell: Interactive Session"
@@ -112,8 +110,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
             languageClient.onNotification(
                 StopDebuggerNotificationType,
-                // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                () => vscode.debug.stopDebugging(undefined))
+                () => void vscode.debug.stopDebugging(undefined))
         ];
     }
 
@@ -192,7 +189,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
         if (config.script === "${file}" || config.script === "${relativeFile}") {
             if (vscode.window.activeTextEditor === undefined) {
-                await vscode.window.showErrorMessage("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
+                void this.logger.writeAndShowError("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
                 return undefined;
             }
             config.current_document = true;
@@ -218,7 +215,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         } else if (config.request === "launch") {
             resolvedConfig = await this.resolveLaunchDebugConfiguration(config);
         } else {
-            await vscode.window.showErrorMessage(`The request type was invalid: '${config.request}'`);
+            void this.logger.writeAndShowError(`PowerShell debug configuration's request type was invalid: '${config.request}'.`);
             return null;
         }
 
@@ -267,13 +264,13 @@ export class DebugSessionFeature extends LanguageClientConsumer
         const platformDetails = getPlatformDetails();
         const versionDetails = this.sessionManager.getPowerShellVersionDetails();
         if (versionDetails === undefined) {
-            await vscode.window.showErrorMessage(`Session version details were not found for ${config.name}`);
+            void this.logger.writeAndShowError(`PowerShell session version details were not found for '${config.name}'.`);
             return null;
         }
 
         // Cross-platform attach to process was added in 6.2.0-preview.4.
         if (versionDetails.version < "7.0.0" && platformDetails.operatingSystem !== OperatingSystem.Windows) {
-            await vscode.window.showErrorMessage(`Attaching to a PowerShell Host Process on ${OperatingSystem[platformDetails.operatingSystem]} requires PowerShell 7.0 or higher.`);
+            void this.logger.writeAndShowError(`Attaching to a PowerShell Host Process on ${OperatingSystem[platformDetails.operatingSystem]} requires PowerShell 7.0 or higher.`);
             return undefined;
         }
 
@@ -306,10 +303,9 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
     constructor(context: vscode.ExtensionContext) {
         this.context = context;
 
-        this.command =
-            vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
-                return this.specifyScriptArguments();
-            });
+        this.command = vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
+            return this.specifyScriptArguments();
+        });
     }
 
     public dispose() {
@@ -363,7 +359,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
     private waitingForClientToken?: vscode.CancellationTokenSource;
     private getLanguageClientResolve?: (value: LanguageClient) => void;
 
-    constructor() {
+    constructor(private logger: Logger) {
         super();
 
         this.command =
@@ -398,7 +394,6 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     vscode.window
                         .showQuickPick(
                             ["Cancel"],
@@ -409,7 +404,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
                                 this.clearWaitingToken();
                                 reject();
                             }
-                        });
+                        }, undefined);
 
                     // Cancel the loading prompt after 60 seconds
                     setTimeout(() => {
@@ -417,9 +412,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
                             this.clearWaitingToken();
                             reject();
 
-                            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                            vscode.window.showErrorMessage(
-                                "Attach to PowerShell host process: PowerShell session took too long to start.");
+                            void this.logger.writeAndShowError("Attach to PowerShell host process: PowerShell session took too long to start.");
                         }
                     }, 60000);
                 },
@@ -492,7 +485,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
     private waitingForClientToken?: vscode.CancellationTokenSource;
     private getLanguageClientResolve?: (value: LanguageClient) => void;
 
-    constructor() {
+    constructor(private logger: Logger) {
         super();
         this.command =
             vscode.commands.registerCommand("PowerShell.PickRunspace", (processId) => {
@@ -526,7 +519,6 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    // eslint-disable-next-line @typescript-eslint/no-floating-promises
                     vscode.window
                         .showQuickPick(
                             ["Cancel"],
@@ -537,7 +529,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
                                 this.clearWaitingToken();
                                 reject();
                             }
-                        });
+                        }, undefined);
 
                     // Cancel the loading prompt after 60 seconds
                     setTimeout(() => {
@@ -545,9 +537,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
                             this.clearWaitingToken();
                             reject();
 
-                            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                            vscode.window.showErrorMessage(
-                                "Attach to PowerShell host process: PowerShell session took too long to start.");
+                            void this.logger.writeAndShowError("Attach to PowerShell host process: PowerShell session took too long to start.");
                         }
                     }, 60000);
                 },

@@ -39,7 +39,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionManager: SessionManager,
-        private log: Logger) {
+        private logger: Logger) {
         super();
     }
 
@@ -57,13 +57,13 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         string session uuid
     */
     public registerExternalExtension(id: string, apiVersion = "v1"): string {
-        this.log.writeDiagnostic(`Registering extension '${id}' for use with API version '${apiVersion}'.`);
+        this.logger.writeDiagnostic(`Registering extension '${id}' for use with API version '${apiVersion}'.`);
 
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (const [_name, externalExtension] of ExternalApiFeature.registeredExternalExtension) {
             if (externalExtension.id === id) {
                 const message = `The extension '${id}' is already registered.`;
-                this.log.writeWarning(message);
+                this.logger.writeWarning(message);
                 throw new Error(message);
             }
         }
@@ -99,7 +99,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         true if it worked, otherwise throws an error.
     */
     public unregisterExternalExtension(uuid = ""): boolean {
-        this.log.writeDiagnostic(`Unregistering extension with session UUID: ${uuid}`);
+        this.logger.writeDiagnostic(`Unregistering extension with session UUID: ${uuid}`);
         if (!ExternalApiFeature.registeredExternalExtension.delete(uuid)) {
             throw new Error(`No extension registered with session UUID: ${uuid}`);
         }
@@ -136,7 +136,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     */
     public async getPowerShellVersionDetails(uuid = ""): Promise<IExternalPowerShellDetails> {
         const extension = this.getRegisteredExtension(uuid);
-        this.log.writeDiagnostic(`Extension '${extension.id}' called 'getPowerShellVersionDetails'`);
+        this.logger.writeDiagnostic(`Extension '${extension.id}' called 'getPowerShellVersionDetails'`);
 
         await this.sessionManager.waitUntilStarted();
         const versionDetails = this.sessionManager.getPowerShellVersionDetails();
@@ -164,7 +164,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     */
     public async waitUntilStarted(uuid = ""): Promise<void> {
         const extension = this.getRegisteredExtension(uuid);
-        this.log.writeDiagnostic(`Extension '${extension.id}' called 'waitUntilStarted'`);
+        this.logger.writeDiagnostic(`Extension '${extension.id}' called 'waitUntilStarted'`);
         await this.sessionManager.waitUntilStarted();
     }
 

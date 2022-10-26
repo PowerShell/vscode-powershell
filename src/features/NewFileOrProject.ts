@@ -5,6 +5,7 @@ import vscode = require("vscode");
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import { Logger } from "../logging";
 
 export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
@@ -12,7 +13,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
     private waitingForClientToken?: vscode.CancellationTokenSource;
 
-    constructor() {
+    constructor(private logger: Logger) {
         super();
         this.command =
             vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", async () => {
@@ -33,9 +34,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
                     setTimeout(() => {
                         if (this.waitingForClientToken) {
                             this.clearWaitingToken();
-
-                            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                            vscode.window.showErrorMessage("New Project: PowerShell session took too long to start.");
+                            void this.logger.writeAndShowError("New Project: PowerShell session took too long to start.");
                         }
                     }, 60000);
                 } else {
@@ -53,8 +52,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
         if (this.waitingForClientToken) {
             this.clearWaitingToken();
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.showProjectTemplates();
+            void this.showProjectTemplates();
         }
     }
 
@@ -86,7 +84,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
         if (response.needsModuleInstall) {
             // TODO: Offer to install Plaster
-            await vscode.window.showErrorMessage("Plaster is not installed!");
+            void this.logger.writeAndShowError("Plaster is not installed!");
             return Promise.reject<ITemplateQuickPickItem[]>("Plaster needs to be installed");
         } else {
             let templates = response.templates.map<ITemplateQuickPickItem>(
@@ -137,15 +135,22 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
             if (result?.creationSuccessful) {
                 await this.openWorkspacePath(destinationPath);
             } else {
-                await vscode.window.showErrorMessage("Project creation failed, read the Output window for more details.");
+                void this.logger.writeAndShowError("Project creation failed, read the Output window for more details.");
             }
         } else {
-            const response = await vscode.window.showErrorMessage(
-                "New Project: You must enter an absolute folder path to continue.  Try again?",
-                "Yes", "No");
-            if (response === "Yes") {
-                await this.createProjectFromTemplate(template);
-            }
+            await this.logger.writeAndShowErrorWithActions(
+                "New Project: You must enter an absolute folder path to continue. Try again?",
+                [
+                    {
+                        prompt: "Yes",
+                        action: async () => { await this.createProjectFromTemplate(template); }
+                    },
+                    {
+                        prompt: "No",
+                        action: undefined
+                    }
+                ]
+            );
         }
     }
 

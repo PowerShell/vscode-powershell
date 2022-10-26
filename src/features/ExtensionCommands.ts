@@ -149,7 +149,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private handlers: vscode.Disposable[] = [];
     private extensionCommands: IExtensionCommand[] = [];
 
-    constructor(private log: Logger) {
+    constructor(private logger: Logger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", async () => {
@@ -216,7 +216,6 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             this.languageClient.onRequest(
                 InsertTextRequestType,
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 (details) => this.insertText(details)),
 
             this.languageClient.onRequest(
@@ -262,8 +261,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     // We check to see if they have TrueClear on. If not, no-op because the
                     // overriden Clear-Host already calls [System.Console]::Clear()
                     if (Settings.load().integratedConsole.forceClearScrollbackBuffer) {
-                        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                        vscode.commands.executeCommand("workbench.action.terminal.clear");
+                        void vscode.commands.executeCommand("workbench.action.terminal.clear");
                     }
                 })
         ];
@@ -292,7 +290,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private async showExtensionCommands(client: LanguageClient): Promise<void> {
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
-            await vscode.window.showInformationMessage("No extension commands have been loaded into the current session.");
+            void this.logger.writeAndShowInformation("No extension commands have been loaded into the current session.");
             return;
         }
 
@@ -364,10 +362,10 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         };
     }
 
-    private newFile(): Thenable<EditorOperationResponse> {
-        return vscode.workspace.openTextDocument({ content: "" })
-            .then((doc) => vscode.window.showTextDocument(doc))
-            .then((_) => EditorOperationResponse.Completed);
+    private async newFile(): Promise<EditorOperationResponse> {
+        const doc = await vscode.workspace.openTextDocument({ content: "" });
+        await vscode.window.showTextDocument(doc);
+        return EditorOperationResponse.Completed;
     }
 
     private openFile(openFileDetails: IOpenFileDetails): Thenable<EditorOperationResponse> {
@@ -416,7 +414,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         case "file": {
             // If the file to save can't be found, just complete the request
             if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
-                await this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
+                void this.logger.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
                 return EditorOperationResponse.Completed;
             }
 
@@ -443,8 +441,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             if (!saveFileDetails.newPath) {
                 // TODO: Create a class handle vscode warnings and errors so we can warn easily
                 //       without logging
-                await this.log.writeAndShowWarning(
-                    "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
+                void this.logger.writeAndShowWarning("Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
                 return EditorOperationResponse.Completed;
             }
 
@@ -454,7 +451,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             } else {
                 // In fresh contexts, workspaceFolders is not defined...
                 if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-                    await this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
+                    void this.logger.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
                             "Try saving to an absolute path, or open a workspace.");
                     return EditorOperationResponse.Completed;
                 }
@@ -463,7 +460,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
                 // We don't support saving to a non-file URI-schemed workspace
                 if (workspaceRootUri.scheme !== "file") {
-                    await this.log.writeAndShowWarning(
+                    void this.logger.writeAndShowWarning(
                         "Cannot save untitled file to a relative path in an untitled workspace. " +
                             "Try saving to an absolute path or opening a workspace folder.");
                     return EditorOperationResponse.Completed;
@@ -475,7 +472,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         default: {
             // Other URI schemes are not supported
             const msg = JSON.stringify(saveFileDetails);
-            this.log.writeVerbose(
+            this.logger.writeVerbose(
                 `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
                         `is currently unsupported. Message: '${msg}'`);
             return EditorOperationResponse.Completed; }
@@ -503,7 +500,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 vscode.Uri.file(destinationAbsolutePath),
                 Buffer.from(oldDocument.getText()));
         } catch (e) {
-            await this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
+            void this.logger.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
                 `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
             return;
         }
@@ -572,18 +569,18 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         return EditorOperationResponse.Completed;
     }
 
-    private async showInformationMessage(message: string): Promise<EditorOperationResponse> {
-        await vscode.window.showInformationMessage(message);
+    private showInformationMessage(message: string): EditorOperationResponse {
+        void this.logger.writeAndShowInformation(message);
         return EditorOperationResponse.Completed;
     }
 
-    private async showErrorMessage(message: string): Promise<EditorOperationResponse> {
-        await vscode.window.showErrorMessage(message);
+    private showErrorMessage(message: string): EditorOperationResponse {
+        void this.logger.writeAndShowError(message);
         return EditorOperationResponse.Completed;
     }
 
-    private async showWarningMessage(message: string): Promise<EditorOperationResponse> {
-        await vscode.window.showWarningMessage(message);
+    private showWarningMessage(message: string): EditorOperationResponse {
+        void this.logger.writeAndShowWarning(message);
         return EditorOperationResponse.Completed;
     }
 

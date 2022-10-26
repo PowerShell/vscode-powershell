@@ -62,18 +62,25 @@ export class Logger implements ILogger {
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
         if (logLevel >= this.MinimumLogLevel) {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.writeLine(message, logLevel);
+            void this.writeLine(message, logLevel);
 
             for (const additionalMessage of additionalMessages) {
-                // eslint-disable-next-line @typescript-eslint/no-floating-promises
-                this.writeLine(additionalMessage, logLevel);
+                void this.writeLine(additionalMessage, logLevel);
             }
         }
     }
 
     public write(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Normal, message, ...additionalMessages);
+    }
+
+    public async writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void> {
+        this.write(message, ...additionalMessages);
+
+        const selection = await vscode.window.showInformationMessage(message, "Show Logs");
+        if (selection !== undefined) {
+            this.showLogPanel();
+        }
     }
 
     public writeDiagnostic(message: string, ...additionalMessages: string[]): void {
@@ -112,7 +119,7 @@ export class Logger implements ILogger {
 
     public async writeAndShowErrorWithActions(
         message: string,
-        actions: { prompt: string; action: () => Promise<void> }[]): Promise<void> {
+        actions: { prompt: string; action: (() => Promise<void>) | undefined }[]): Promise<void> {
         this.writeError(message);
 
         const fullActions = [
@@ -125,8 +132,8 @@ export class Logger implements ILogger {
         const choice = await vscode.window.showErrorMessage(message, ...actionKeys);
         if (choice) {
             for (const action of fullActions) {
-                if (choice === action.prompt) {
-                    action.action();
+                if (choice === action.prompt && action.action !== undefined ) {
+                    await action.action();
                     return;
                 }
             }

@@ -28,7 +28,7 @@ export class PowerShellProcess {
         public exePath: string,
         private bundledModulesPath: string,
         private title: string,
-        private log: Logger,
+        private logger: Logger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
         private sessionSettings: Settings.ISettings) {
@@ -37,7 +37,7 @@ export class PowerShellProcess {
     }
 
     public async start(logFileName: string): Promise<IEditorServicesSessionDetails> {
-        const editorServicesLogPath = this.log.getLogFilePath(logFileName);
+        const editorServicesLogPath = this.logger.getLogFilePath(logFileName);
 
         const psesModulePath =
             path.resolve(
@@ -94,7 +94,7 @@ export class PowerShellProcess {
                 Buffer.from(startEditorServices, "utf16le").toString("base64"));
         }
 
-        this.log.write(
+        this.logger.write(
             "Language server starting --",
             "    PowerShell executable: " + this.exePath,
             "    PowerShell args: " + powerShellArgs.join(" "),
@@ -117,7 +117,7 @@ export class PowerShellProcess {
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
 
         const pwshName = path.basename(this.exePath);
-        this.log.write(`${pwshName} started.`);
+        this.logger.write(`${pwshName} started.`);
 
         if (this.sessionSettings.integratedConsole.showOnStartup
             && !this.sessionSettings.integratedConsole.startInBackground) {
@@ -144,7 +144,7 @@ export class PowerShellProcess {
 
     public async dispose() {
         // Clean up the session file
-        this.log.write("Terminating PowerShell process...");
+        this.logger.write("Terminating PowerShell process...");
 
         await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
 
@@ -164,7 +164,7 @@ export class PowerShellProcess {
     }
 
     private logTerminalPid(pid: number, exeName: string) {
-        this.log.write(`${exeName} PID: ${pid}`);
+        this.logger.write(`${exeName} PID: ${pid}`);
     }
 
     private isLoginShell(pwshPath: string): boolean {
@@ -200,18 +200,17 @@ export class PowerShellProcess {
         const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
 
         // Check every 2 seconds
-        this.log.write("Waiting for session file...");
+        this.logger.write("Waiting for session file...");
         for (let i = numOfTries; i > 0; i--) {
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
-                this.log.write("Session file found!");
+                this.logger.write("Session file found!");
                 const sessionDetails = await PowerShellProcess.readSessionFile(this.sessionFilePath);
                 await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
                 return sessionDetails;
             }
 
             if (warnAt === i) {
-                await vscode.window.showWarningMessage(`Loading the PowerShell extension is taking longer than expected.
-    If you're using privilege enforcement software, this can affect start up performance.`);
+                void this.logger.writeAndShowWarning("Loading the PowerShell extension is taking longer than expected. If you're using privilege enforcement software, this can affect start up performance.");
             }
 
             // Wait a bit and try again
@@ -219,7 +218,7 @@ export class PowerShellProcess {
         }
 
         const err = "Timed out waiting for session file to appear!";
-        this.log.write(err);
+        this.logger.write(err);
         throw new Error(err);
     }
 
@@ -228,7 +227,7 @@ export class PowerShellProcess {
             return;
         }
 
-        this.log.write("powershell.exe terminated or terminal UI was closed");
+        this.logger.write("powershell.exe terminated or terminal UI was closed");
         this.onExitedEmitter.fire();
     }
 }
