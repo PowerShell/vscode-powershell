@@ -75,7 +75,7 @@
     "glob": "^8.0.3",
     "mocha": "~10.1.0",
     "mocha-multi-reporters": "~1.5.1",
-    "mock-fs": "~5.1.4",
+    "mock-fs": "~5.2.0",
     "rewire": "~6.0.0",
     "sinon": "~14.0.1",
     "typescript": "~4.8.4",
