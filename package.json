@@ -931,12 +931,31 @@
         "description": "Set up your environment and see what the PowerShell Extension in Visual Studio Code can help you achieve!",
         "steps": [
           {
-            "id": "version",
+            "id": "install-windows",
             "title": "Choose a version of PowerShell",
             "media": {
               "markdown": "media/walkthrough.md"
             },
-            "description": "There are multiple versions of PowerShell that you can use with the extension! Choose the version that best fits your needs here.\nFor the newest version of PowerShell, install PowerShell 7 or run ``iex \"& { $(irm https://aka.ms/install-powershell.ps1) } -UseMSI\"``\n[Install PowerShell 7](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.2)\n⭐️ Latest version ― if you want the latest and greatest capabilities.\n💻 Can be used to manage multiple operating systems.\n👥 [Open Source](https://github.com/powershell/powershell) and community-focused!"
+            "description": "There are multiple versions of PowerShell that you can use with the extension! Choose the version that best fits your needs here.\nFor the newest version of PowerShell, install PowerShell 7 or run ``iex \"& { $(irm https://aka.ms/install-powershell.ps1) } -UseMSI\"``\n[Install PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows)\n⭐️ Latest version ― if you want the latest and greatest capabilities.\n💻 Can be used to manage multiple operating systems.\n👥 [Open source](https://github.com/powershell/powershell) and community-focused!",
+            "when": "isWindows"
+          },
+          {
+            "id": "install-mac",
+            "title": "Install PowerShell",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "💻 PowerShell 7 is cross-platform! See the instructions to [install on macOS](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-macos).\n⭐️ If you already have [Homebrew](https://brew.sh) installed, you can run ``brew install --cask powershell`` to install ``pwsh``.\n👥 PowerShell is [open source](https://github.com/powershell/powershell) and community-focused!",
+            "when": "isMac"
+          },
+          {
+            "id": "install-linux",
+            "title": "Install PowerShell",
+            "media": {
+              "markdown": "media/walkthrough.md"
+            },
+            "description": "💻 PowerShell 7 is cross-platform!\n⭐️ See the instructions to [install on Linux](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux).\n👥 PowerShell is [open source](https://github.com/powershell/powershell) and community-focused!",
+            "when": "isLinux"
           },
           {
             "id": "file",
