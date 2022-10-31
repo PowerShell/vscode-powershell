@@ -12,6 +12,7 @@ import * as util from "util";
 import { MessageItem, ProgressLocation, window } from "vscode";
 
 import { LanguageClient } from "vscode-languageclient/node";
+import { Logger } from "../logging";
 import { SessionManager } from "../session";
 import * as Settings from "../settings";
 import { isMacOS, isWindows } from "../utils";
@@ -21,7 +22,7 @@ const streamPipeline = util.promisify(stream.pipeline);
 
 const PowerShellGitHubReleasesUrl =
     "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
-const PowerShellGitHubPrereleasesUrl =
+const PowerShellGitHubPreReleasesUrl =
     "https://api.github.com/repos/PowerShell/PowerShell/releases";
 
 export class GitHubReleaseInformation {
@@ -40,7 +41,7 @@ export class GitHubReleaseInformation {
 
         // Fetch the latest PowerShell releases from GitHub.
         const response = await fetch(
-            preview ? PowerShellGitHubPrereleasesUrl : PowerShellGitHubReleasesUrl,
+            preview ? PowerShellGitHubPreReleasesUrl : PowerShellGitHubReleasesUrl,
             requestConfig);
 
         if (!response.ok) {
@@ -85,7 +86,8 @@ export async function InvokePowerShellUpdateCheck(
     languageServerClient: LanguageClient,
     localVersion: semver.SemVer,
     arch: string,
-    release: GitHubReleaseInformation) {
+    release: GitHubReleaseInformation,
+    logger: Logger) {
     const options: IUpdateMessageItem[] = [
         {
             id: 0,
@@ -103,6 +105,7 @@ export async function InvokePowerShellUpdateCheck(
 
     // If our local version is up-to-date, we can return early.
     if (semver.compare(localVersion, release.version) >= 0) {
+        logger.writeDiagnostic("PowerShell is up-to-date!");
         return;
     }
 
@@ -111,8 +114,7 @@ export async function InvokePowerShellUpdateCheck(
     }.`;
 
     if (process.platform === "linux") {
-        await window.showInformationMessage(
-            `${commonText} We recommend updating to the latest version.`);
+        void logger.writeAndShowInformation(`${commonText} We recommend updating to the latest version.`);
         return;
     }
 
@@ -122,7 +124,10 @@ export async function InvokePowerShellUpdateCheck(
         }`, ...options);
 
     // If the user cancels the notification.
-    if (!result) { return; }
+    if (!result) {
+        logger.writeDiagnostic("User canceled PowerShell update prompt.");
+        return;
+    }
 
     // Yes choice.
     switch (result.id) {
@@ -152,6 +157,7 @@ export async function InvokePowerShellUpdateCheck(
             });
 
             // Stop the session because Windows likes to hold on to files.
+            logger.writeDiagnostic("MSI downloaded, stopping session and closing terminals!");
             await sessionManager.stop();
 
             // Close all terminals with the name "pwsh" in the current VS Code session.
@@ -164,10 +170,12 @@ export async function InvokePowerShellUpdateCheck(
             }
 
             // Invoke the MSI via cmd.
+            logger.writeDiagnostic(`Running '${msiDownloadPath}' to update PowerShell...`);
             const msi = spawn("msiexec", ["/i", msiDownloadPath]);
 
             msi.on("close", () => {
                 // Now that the MSI is finished, restart the session.
+                logger.writeDiagnostic("MSI installation finished, restarting session.");
                 void sessionManager.start();
                 fs.unlinkSync(msiDownloadPath);
             });
@@ -177,6 +185,7 @@ export async function InvokePowerShellUpdateCheck(
                 ? "brew upgrade --cask powershell-preview"
                 : "brew upgrade --cask powershell";
 
+            logger.writeDiagnostic(`Running '${script}' to update PowerShell...`);
             await languageServerClient.sendRequest(EvaluateRequestType, {
                 expression: script,
             });
@@ -186,7 +195,7 @@ export async function InvokePowerShellUpdateCheck(
 
         // Never choice.
     case 2:
-        await Settings.change("promptToUpdatePowerShell", false, true);
+        await Settings.change("promptToUpdatePowerShell", false, true, logger);
         break;
     default:
         break;
