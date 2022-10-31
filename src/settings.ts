@@ -98,7 +98,6 @@ export interface ISettings {
     pester: IPesterSettings;
     buttons?: IButtonSettings;
     cwd?: string;
-    notebooks?: INotebooksSettings;
     enableReferencesCodeLens?: boolean;
     analyzeOpenDocumentsOnly?: boolean;
 }
@@ -130,10 +129,6 @@ export interface IPesterSettings {
 export interface IButtonSettings {
     showRunButtons?: boolean;
     showPanelMovementButtons?: boolean;
-}
-
-export interface INotebooksSettings {
-    saveMarkdownCellsAs?: CommentType;
 }
 
 // TODO: This could probably be async, and call `validateCwdSetting()` directly.
@@ -219,10 +214,6 @@ export function load(): ISettings {
         debugOutputVerbosity: "Diagnostic",
     };
 
-    const defaultNotebooksSettings: INotebooksSettings = {
-        saveMarkdownCellsAs: CommentType.BlockComment,
-    };
-
     // TODO: I believe all the defaults can be removed, as the `package.json` should supply them (and be the source of truth).
     return {
         startAutomatically:
@@ -261,8 +252,6 @@ export function load(): ISettings {
             configuration.get<IPesterSettings>("pester", defaultPesterSettings),
         buttons:
             configuration.get<IButtonSettings>("buttons", defaultButtonSettings),
-        notebooks:
-            configuration.get<INotebooksSettings>("notebooks", defaultNotebooksSettings),
         startAsLoginShell:
             // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
             //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
