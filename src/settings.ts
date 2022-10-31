@@ -33,8 +33,8 @@ export interface IBugReportingSettings {
 }
 
 export interface ICodeFoldingSettings {
-    enable?: boolean;
-    showLastLine?: boolean;
+    enable: boolean;
+    showLastLine: boolean;
 }
 
 export interface ICodeFormattingSettings {
@@ -60,46 +60,46 @@ export interface ICodeFormattingSettings {
 }
 
 export interface IScriptAnalysisSettings {
-    enable?: boolean;
+    enable: boolean;
     settingsPath: string;
 }
 
 export interface IDebuggingSettings {
-    createTemporaryIntegratedConsole?: boolean;
+    createTemporaryIntegratedConsole: boolean;
 }
 
 export interface IDeveloperSettings {
-    featureFlags?: string[];
+    featureFlags: string[];
     bundledModulesPath: string;
     editorServicesLogLevel: string;
-    editorServicesWaitForDebugger?: boolean;
+    editorServicesWaitForDebugger: boolean;
     waitForSessionFileTimeoutSeconds: number;
 }
 
 export interface ISettings {
-    powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings;
-    powerShellDefaultVersion?: string;
+    powerShellAdditionalExePaths: IPowerShellAdditionalExePathSettings | undefined;
+    powerShellDefaultVersion: string | undefined;
     // This setting is no longer used but is here to assist in cleaning up the users settings.
-    powerShellExePath?: string;
-    promptToUpdatePowerShell?: boolean;
+    powerShellExePath: string | undefined;
+    promptToUpdatePowerShell: boolean;
     bundledModulesPath: string;
     startAsLoginShell: IStartAsLoginShellSettings;
-    startAutomatically?: boolean;
+    startAutomatically: boolean;
     enableProfileLoading: boolean;
     helpCompletion: string;
-    scriptAnalysis?: IScriptAnalysisSettings;
+    scriptAnalysis: IScriptAnalysisSettings;
     debugging: IDebuggingSettings;
     developer: IDeveloperSettings;
-    codeFolding?: ICodeFoldingSettings;
-    codeFormatting?: ICodeFormattingSettings;
+    codeFolding: ICodeFoldingSettings;
+    codeFormatting: ICodeFormattingSettings;
     integratedConsole: IIntegratedConsoleSettings;
     bugReporting: IBugReportingSettings;
     sideBar: ISideBarSettings;
     pester: IPesterSettings;
-    buttons?: IButtonSettings;
-    cwd?: string;
-    enableReferencesCodeLens?: boolean;
-    analyzeOpenDocumentsOnly?: boolean;
+    buttons: IButtonSettings;
+    cwd: string | undefined;
+    enableReferencesCodeLens: boolean;
+    analyzeOpenDocumentsOnly: boolean;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -108,12 +108,12 @@ export interface IStartAsLoginShellSettings {
 }
 
 export interface IIntegratedConsoleSettings {
-    showOnStartup?: boolean;
-    startInBackground?: boolean;
+    showOnStartup: boolean;
+    startInBackground: boolean;
     focusConsoleOnExecute: boolean;
-    useLegacyReadLine?: boolean;
-    forceClearScrollbackBuffer?: boolean;
-    suppressStartupBanner?: boolean;
+    useLegacyReadLine: boolean;
+    forceClearScrollbackBuffer: boolean;
+    suppressStartupBanner: boolean;
 }
 
 export interface ISideBarSettings {
@@ -127,8 +127,8 @@ export interface IPesterSettings {
 }
 
 export interface IButtonSettings {
-    showRunButtons?: boolean;
-    showPanelMovementButtons?: boolean;
+    showRunButtons: boolean;
+    showPanelMovementButtons: boolean;
 }
 
 // TODO: This could probably be async, and call `validateCwdSetting()` directly.
@@ -197,6 +197,7 @@ export function load(): ISettings {
         focusConsoleOnExecute: true,
         useLegacyReadLine: false,
         forceClearScrollbackBuffer: false,
+        suppressStartupBanner: false,
     };
 
     const defaultSideBarSettings: ISideBarSettings = {

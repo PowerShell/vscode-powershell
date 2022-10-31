@@ -816,7 +816,7 @@
         "powershell.integratedConsole.suppressStartupBanner": {
           "type": "boolean",
           "default": false,
-          "description": "Do not show the Powershell Extension Terminal banner on launch"
+          "description": "Do not show the PowerShell Extension Terminal banner on launch."
         },
         "powershell.debugging.createTemporaryIntegratedConsole": {
           "type": "boolean",
