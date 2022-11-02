@@ -573,6 +573,7 @@
         },
         "powershell.powerShellAdditionalExePaths": {
           "type": "object",
+          "default": {},
           "description": "Specifies a list of versionName / exePath pairs where exePath points to a non-standard install location for PowerShell and versionName can be used to reference this path with the powershell.powerShellDefaultVersion setting.",
           "additionalProperties": {
             "type": "string"
@@ -580,10 +581,12 @@
         },
         "powershell.powerShellDefaultVersion": {
           "type": "string",
+          "default": "",
           "description": "Specifies the PowerShell version name, as displayed by the 'PowerShell: Show Session Menu' command, used when the extension loads e.g \"Windows PowerShell (x86)\" or \"PowerShell Core 7 (x64)\". You can specify additional PowerShell executables by using the \"powershell.powerShellAdditionalExePaths\" setting."
         },
         "powershell.powerShellExePath": {
           "type": "string",
+          "default": "",
           "scope": "machine",
           "description": "REMOVED: Please use the \"powershell.powerShellAdditionalExePaths\" setting instead.",
           "deprecationMessage": "Please use the \"powershell.powerShellAdditionalExePaths\" setting instead."
@@ -652,6 +655,7 @@
         },
         "powershell.cwd": {
           "type": "string",
+          "default": "",
           "description": "An explicit start path where the PowerShell Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. A fully resolved path must be provided!"
         },
         "powershell.scriptAnalysis.enable": {

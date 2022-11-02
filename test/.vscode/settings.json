@@ -1,4 +1,7 @@
 {
   "terminal.integrated.shellIntegration.enabled": false,
   "powershell.enableProfileLoading": false,
+  "powershell.powerShellAdditionalExePaths": {
+    "Some PowerShell": "somePath"
+  },
 }

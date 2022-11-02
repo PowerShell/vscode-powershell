@@ -7,10 +7,10 @@ import os = require("os");
 import { Logger } from "./logging";
 
 export interface ISettings {
-    powerShellAdditionalExePaths: IPowerShellAdditionalExePathSettings | undefined;
-    powerShellDefaultVersion: string | undefined;
+    powerShellAdditionalExePaths: IPowerShellAdditionalExePathSettings;
+    powerShellDefaultVersion: string;
     // This setting is no longer used but is here to assist in cleaning up the users settings.
-    powerShellExePath: string | undefined;
+    powerShellExePath: string;
     promptToUpdatePowerShell: boolean;
     startAsLoginShell: IStartAsLoginShellSettings;
     startAutomatically: boolean;
@@ -26,7 +26,7 @@ export interface ISettings {
     sideBar: ISideBarSettings;
     pester: IPesterSettings;
     buttons: IButtonSettings;
-    cwd: string | undefined;
+    cwd: string;
     enableReferencesCodeLens: boolean;
     analyzeOpenDocumentsOnly: boolean;
     // TODO: Add (deprecated) useX86Host (for testing)
@@ -142,10 +142,7 @@ export interface IButtonSettings {
     showPanelMovementButtons: boolean;
 }
 
-export function getSettings(): ISettings {
-    const configuration: vscode.WorkspaceConfiguration =
-        vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
-
+export function getDefaultSettings() {
     const defaultBugReportingSettings: IBugReportingSettings = {
         project: "https://github.com/PowerShell/vscode-powershell",
     };
@@ -196,6 +193,10 @@ export function getSettings(): ISettings {
         useCorrectCasing: false,
     };
 
+    // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
+    //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
+    //   is the reason terminals on macOS typically run login shells by default which set up
+    //   the environment. See http://unix.stackexchange.com/a/119675/115410"
     const defaultStartAsLoginShellSettings: IStartAsLoginShellSettings = {
         osx: true,
         linux: false,
@@ -225,58 +226,54 @@ export function getSettings(): ISettings {
         debugOutputVerbosity: "Diagnostic",
     };
 
-    // TODO: I believe all the defaults can be removed, as the `package.json`
-    // should supply them (and be the source of truth). However, this proves
-    // fairly messy to do as it requires casting the configuration to unknown
-    // and then to `ISettings`. It could work but will take more testing.
-    return {
-        startAutomatically:
-            configuration.get<boolean>("startAutomatically", true),
-        powerShellAdditionalExePaths:
-            configuration.get<IPowerShellAdditionalExePathSettings>("powerShellAdditionalExePaths"),
-        powerShellDefaultVersion:
-            configuration.get<string>("powerShellDefaultVersion"),
-        powerShellExePath:
-            configuration.get<string>("powerShellExePath"),
-        promptToUpdatePowerShell:
-            configuration.get<boolean>("promptToUpdatePowerShell", true),
-        enableProfileLoading:
-            configuration.get<boolean>("enableProfileLoading", true),
-        helpCompletion:
-            configuration.get<string>("helpCompletion", CommentType.BlockComment),
-        scriptAnalysis:
-            configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
-        debugging:
-            configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
-        developer:
-            configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
-        codeFolding:
-            configuration.get<ICodeFoldingSettings>("codeFolding", defaultCodeFoldingSettings),
-        codeFormatting:
-            configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
-        integratedConsole:
-            configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
-        bugReporting:
-            configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
-        sideBar:
-            configuration.get<ISideBarSettings>("sideBar", defaultSideBarSettings),
-        pester:
-            configuration.get<IPesterSettings>("pester", defaultPesterSettings),
-        buttons:
-            configuration.get<IButtonSettings>("buttons", defaultButtonSettings),
-        startAsLoginShell:
-            // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
-            //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
-            //   is the reason terminals on macOS typically run login shells by default which set up
-            //   the environment. See http://unix.stackexchange.com/a/119675/115410"
-            configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
-        cwd: // NOTE: This must be validated at startup via `validateCwdSetting()`. There's probably a better way to do this.
-            configuration.get<string>("cwd"),
-        enableReferencesCodeLens:
-            configuration.get<boolean>("enableReferencesCodeLens", true),
-        analyzeOpenDocumentsOnly:
-            configuration.get<boolean>("analyzeOpenDocumentsOnly", false),
+    const defaultSettings: ISettings = {
+        startAutomatically: true,
+        powerShellAdditionalExePaths: {},
+        powerShellDefaultVersion: "",
+        powerShellExePath: "",
+        promptToUpdatePowerShell: true,
+        enableProfileLoading: true,
+        helpCompletion: CommentType.BlockComment,
+        scriptAnalysis: defaultScriptAnalysisSettings,
+        debugging: defaultDebuggingSettings,
+        developer: defaultDeveloperSettings,
+        codeFolding: defaultCodeFoldingSettings,
+        codeFormatting: defaultCodeFormattingSettings,
+        integratedConsole: defaultIntegratedConsoleSettings,
+        bugReporting: defaultBugReportingSettings,
+        sideBar: defaultSideBarSettings,
+        pester: defaultPesterSettings,
+        buttons: defaultButtonSettings,
+        startAsLoginShell: defaultStartAsLoginShellSettings,
+        cwd: "",
+        enableReferencesCodeLens: true,
+        analyzeOpenDocumentsOnly: false,
     };
+
+    return defaultSettings;
+}
+
+// This is a recursive function which unpacks a WorkspaceConfiguration into our settings.
+function getSetting<TSetting>(key: string | undefined, value: TSetting, configuration: vscode.WorkspaceConfiguration): TSetting {
+    // Base case where we're looking at a primitive type (or our special record).
+    if (key !== undefined && (typeof (value) !== "object" || key === "powerShellAdditionalExePaths")) {
+        return configuration.get<TSetting>(key, value);
+    }
+
+    // Otherwise we're looking at one of our interfaces and need to extract.
+    for (const property in value) {
+        const subKey = key !== undefined ? `${key}.${property}` : property;
+        value[property] = getSetting(subKey, value[property], configuration);
+    }
+
+    return value;
+}
+
+export function getSettings(): ISettings {
+    const configuration: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+
+    return getSetting(undefined, getDefaultSettings(), configuration);
 }
 
 // Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from

@@ -354,7 +354,7 @@ export class SessionManager implements Middleware {
 
     // TODO: Remove this migration code.
     private async promptPowerShellExeSettingsCleanup() {
-        if (!this.sessionSettings.powerShellExePath) { // undefined or null
+        if (this.sessionSettings.powerShellExePath === "") {
             return;
         }
 
@@ -378,7 +378,7 @@ export class SessionManager implements Middleware {
         }
 
         // Show the session menu at the end if they don't have a PowerShellDefaultVersion.
-        if (this.sessionSettings.powerShellDefaultVersion === undefined) {
+        if (this.sessionSettings.powerShellDefaultVersion === "") {
             await vscode.commands.executeCommand(this.ShowSessionMenuCommandName);
         }
     }
@@ -389,8 +389,8 @@ export class SessionManager implements Middleware {
 
         // Detect any setting changes that would affect the session
         if (!this.suppressRestartPrompt &&
-            (settings.cwd?.toLowerCase() !== this.sessionSettings.cwd?.toLowerCase()
-                || settings.powerShellDefaultVersion?.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion?.toLowerCase()
+            (settings.cwd.toLowerCase() !== this.sessionSettings.cwd.toLowerCase()
+                || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
                 || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
                 || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
@@ -489,7 +489,7 @@ export class SessionManager implements Middleware {
         let foundPowerShell: IPowerShellExeDetails | undefined;
         try {
             let defaultPowerShell: IPowerShellExeDetails | undefined;
-            if (this.sessionSettings.powerShellDefaultVersion !== undefined) {
+            if (this.sessionSettings.powerShellDefaultVersion !== "") {
                 for await (const details of powershellExeFinder.enumeratePowerShellInstallations()) {
                     // Need to compare names case-insensitively, from https://stackoverflow.com/a/2140723
                     const wantedName = this.sessionSettings.powerShellDefaultVersion;
