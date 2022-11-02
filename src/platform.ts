@@ -5,6 +5,7 @@ import * as os from "os";
 import * as path from "path";
 import * as process from "process";
 import { integer } from "vscode-languageserver-protocol";
+import { Logger } from "./logging";
 import { PowerShellAdditionalExePathSettings } from "./settings";
 
 // This uses require so we can rewire it in unit tests!
@@ -70,19 +71,9 @@ export function getPlatformDetails(): IPlatformDetails {
 export class PowerShellExeFinder {
     // This is required, since parseInt("7-preview") will return 7.
     private static IntRegex = /^\d+$/;
-
     private static PwshMsixRegex = /^Microsoft.PowerShell_.*/;
-
     private static PwshPreviewMsixRegex = /^Microsoft.PowerShellPreview_.*/;
-
-    // The platform details descriptor for the platform we're on
-    private readonly platformDetails: IPlatformDetails;
-
-    // Additional configured PowerShells
-    private readonly additionalPSExeSettings: PowerShellAdditionalExePathSettings;
-
     private winPS: IPossiblePowerShellExe | undefined;
-
     private alternateBitnessWinPS: IPossiblePowerShellExe | undefined;
 
     /**
@@ -91,12 +82,11 @@ export class PowerShellExeFinder {
      * @param additionalPowerShellExes Additional PowerShell installations as configured in the settings.
      */
     constructor(
-        platformDetails?: IPlatformDetails,
-        additionalPowerShellExes?: PowerShellAdditionalExePathSettings) {
-
-        this.platformDetails = platformDetails ?? getPlatformDetails();
-        this.additionalPSExeSettings = additionalPowerShellExes ?? {};
-    }
+        // The platform details descriptor for the platform we're on
+        private platformDetails: IPlatformDetails,
+        // Additional configured PowerShells
+        private additionalPowerShellExes: PowerShellAdditionalExePathSettings,
+        private logger: Logger) { }
 
     /**
      * Returns the first available PowerShell executable found in the search order.
@@ -159,6 +149,8 @@ export class PowerShellExeFinder {
         for (const additionalPwsh of this.enumerateAdditionalPowerShellInstallations()) {
             if (await additionalPwsh.exists()) {
                 yield additionalPwsh;
+            } else {
+                void this.logger.writeAndShowWarning(`Additional PowerShell '${additionalPwsh.displayName}' not found at '${additionalPwsh.exePath}'!`);
             }
         }
     }
@@ -226,9 +218,9 @@ export class PowerShellExeFinder {
      * without checking for their existence.
      */
     private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
-        for (const versionName in this.additionalPSExeSettings) {
-            if (Object.prototype.hasOwnProperty.call(this.additionalPSExeSettings, versionName)) {
-                const exePath = this.additionalPSExeSettings[versionName];
+        for (const versionName in this.additionalPowerShellExes) {
+            if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
+                const exePath = this.additionalPowerShellExes[versionName];
                 if (exePath) {
                     yield new PossiblePowerShellExe(exePath, versionName);
                 }
