@@ -5,7 +5,7 @@ import * as os from "os";
 import * as path from "path";
 import * as process from "process";
 import { integer } from "vscode-languageserver-protocol";
-import { IPowerShellAdditionalExePathSettings } from "./settings";
+import { PowerShellAdditionalExePathSettings } from "./settings";
 
 // This uses require so we can rewire it in unit tests!
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
@@ -79,7 +79,7 @@ export class PowerShellExeFinder {
     private readonly platformDetails: IPlatformDetails;
 
     // Additional configured PowerShells
-    private readonly additionalPSExeSettings: IPowerShellAdditionalExePathSettings;
+    private readonly additionalPSExeSettings: PowerShellAdditionalExePathSettings;
 
     private winPS: IPossiblePowerShellExe | undefined;
 
@@ -92,7 +92,7 @@ export class PowerShellExeFinder {
      */
     constructor(
         platformDetails?: IPlatformDetails,
-        additionalPowerShellExes?: IPowerShellAdditionalExePathSettings) {
+        additionalPowerShellExes?: PowerShellAdditionalExePathSettings) {
 
         this.platformDetails = platformDetails ?? getPlatformDetails();
         this.additionalPSExeSettings = additionalPowerShellExes ?? {};

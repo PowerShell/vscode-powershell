@@ -31,7 +31,7 @@ export class PowerShellProcess {
         private logger: Logger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
-        private sessionSettings: Settings.ISettings) {
+        private sessionSettings: Settings.Settings) {
 
         this.onExited = this.onExitedEmitter.event;
     }

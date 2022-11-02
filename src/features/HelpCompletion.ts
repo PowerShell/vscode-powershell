@@ -7,7 +7,7 @@ import {
 } from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { ISettings, CommentType, getSettings } from "../settings";
+import { Settings, CommentType, getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -27,7 +27,7 @@ enum SearchState { Searching, Locked, Found }
 export class HelpCompletionFeature extends LanguageClientConsumer {
     private helpCompletionProvider: HelpCompletionProvider | undefined;
     private disposable: Disposable | undefined;
-    private settings: ISettings;
+    private settings: Settings;
 
     constructor() {
         super();
@@ -125,7 +125,7 @@ class HelpCompletionProvider {
     private lastChangeRange: Range | undefined;
     private lastDocument: TextDocument | undefined;
     private langClient: LanguageClient | undefined;
-    private settings: ISettings;
+    private settings: Settings;
 
     constructor() {
         this.triggerFinderHelpComment = new TriggerFinder("##");

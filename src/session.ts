@@ -9,7 +9,7 @@ import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements
 import { Message } from "vscode-jsonrpc";
 import { Logger } from "./logging";
 import { PowerShellProcess } from "./process";
-import { ISettings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
+import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
 
 import {
@@ -102,7 +102,7 @@ export class SessionManager implements Middleware {
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
-        private sessionSettings: ISettings,
+        private sessionSettings: Settings,
         private logger: Logger,
         private documentSelector: DocumentSelector,
         hostName: string,
@@ -234,7 +234,7 @@ export class SessionManager implements Middleware {
         return vscode.Uri.joinPath(this.sessionsFolder, `PSES-VSCode-${process.env.VSCODE_PID}-${uniqueId}.json`);
     }
 
-    public async createDebugSessionProcess(settings: ISettings): Promise<PowerShellProcess> {
+    public async createDebugSessionProcess(settings: Settings): Promise<PowerShellProcess> {
         // NOTE: We only support one temporary Extension Terminal at a time. To
         // support more, we need to track each separately, and tie the session
         // for the event handler to the right process (and dispose of the event

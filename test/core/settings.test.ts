@@ -11,7 +11,7 @@ describe("Settings module", function () {
     });
 
     it("Loads the correct defaults", function () {
-        const testSettings = settings.getDefaultSettings();
+        const testSettings = new settings.Settings();
         testSettings.enableProfileLoading = false;
         testSettings.powerShellAdditionalExePaths = { "Some PowerShell": "somePath" };
         const actualSettings = settings.getSettings();
