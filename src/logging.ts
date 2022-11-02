@@ -5,6 +5,7 @@ import utils = require("./utils");
 import os = require("os");
 import vscode = require("vscode");
 
+// NOTE: This is not a string enum because the order is used for comparison.
 export enum LogLevel {
     Diagnostic,
     Verbose,
@@ -27,17 +28,29 @@ export interface ILogger {
 }
 
 export class Logger implements ILogger {
-    public logBasePath: vscode.Uri;
-    public logSessionPath: vscode.Uri | undefined;
-    public MinimumLogLevel: LogLevel = LogLevel.Normal;
+    public logDirectoryPath: vscode.Uri;
 
+    private logLevel: LogLevel;
     private commands: vscode.Disposable[];
     private logChannel: vscode.OutputChannel;
-    private logFilePath: vscode.Uri | undefined;
+    private logFilePath: vscode.Uri;
+    private logDirectoryCreated = false;
 
-    constructor(logBasePath: vscode.Uri) {
+    constructor(logLevelName: string, globalStorageUri: vscode.Uri) {
+        this.logLevel = Logger.logLevelNameToValue(logLevelName);
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
-        this.logBasePath = vscode.Uri.joinPath(logBasePath, "logs");
+        this.logDirectoryPath = vscode.Uri.joinPath(
+            globalStorageUri,
+            "logs",
+            `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
+        this.logFilePath = this.getLogFilePath("vscode-powershell");
+
+        // Early logging of the log paths for debugging.
+        if (LogLevel.Diagnostic >= this.logLevel) {
+            const uriMessage = Logger.timestampMessage(`Global storage URI: '${globalStorageUri}', log file path: '${this.logFilePath}'`, LogLevel.Diagnostic);
+            this.logChannel.appendLine(uriMessage);
+        }
+
         this.commands = [
             vscode.commands.registerCommand(
                 "PowerShell.ShowLogs",
@@ -57,11 +70,11 @@ export class Logger implements ILogger {
     }
 
     public getLogFilePath(baseName: string): vscode.Uri {
-        return vscode.Uri.joinPath(this.logSessionPath!, `${baseName}.log`);
+        return vscode.Uri.joinPath(this.logDirectoryPath, `${baseName}.log`);
     }
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
-        if (logLevel >= this.MinimumLogLevel) {
+        if (logLevel >= this.logLevel) {
             void this.writeLine(message, logLevel);
 
             for (const additionalMessage of additionalMessages) {
@@ -140,20 +153,8 @@ export class Logger implements ILogger {
         }
     }
 
-    public async startNewLog(minimumLogLevel = "Normal"): Promise<void> {
-        this.MinimumLogLevel = Logger.logLevelNameToValue(minimumLogLevel);
-
-        this.logSessionPath =
-            vscode.Uri.joinPath(
-                this.logBasePath,
-                `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
-
-        this.logFilePath = this.getLogFilePath("vscode-powershell");
-        await vscode.workspace.fs.createDirectory(this.logSessionPath);
-    }
-
     // TODO: Make the enum smarter about strings so this goes away.
-    public static logLevelNameToValue(logLevelName: string): LogLevel {
+    private static logLevelNameToValue(logLevelName: string): LogLevel {
         switch (logLevelName.trim().toLowerCase()) {
         case "diagnostic": return LogLevel.Diagnostic;
         case "verbose": return LogLevel.Verbose;
@@ -165,27 +166,40 @@ export class Logger implements ILogger {
         }
     }
 
+    public updateLogLevel(logLevelName: string): void {
+        this.logLevel = Logger.logLevelNameToValue(logLevelName);
+    }
+
     private showLogPanel(): void {
         this.logChannel.show();
     }
 
     private async openLogFolder(): Promise<void> {
-        if (this.logSessionPath) {
+        if (this.logDirectoryCreated) {
             // Open the folder in VS Code since there isn't an easy way to
             // open the folder in the platform's file browser
-            await vscode.commands.executeCommand("vscode.openFolder", this.logSessionPath, true);
+            await vscode.commands.executeCommand("vscode.openFolder", this.logDirectoryPath, true);
+        } else {
+            void this.writeAndShowError("Cannot open PowerShell log directory as it does not exist!");
         }
+    }
+
+    private static timestampMessage(message: string, level: LogLevel): string {
+        const now = new Date();
+        return `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}${os.EOL}`;
     }
 
     // TODO: Should we await this function above?
     private async writeLine(message: string, level: LogLevel = LogLevel.Normal): Promise<void> {
-        const now = new Date();
-        const timestampedMessage =
-            `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}${os.EOL}`;
-
+        const timestampedMessage = Logger.timestampMessage(message, level);
         this.logChannel.appendLine(timestampedMessage);
-        if (this.logFilePath && this.MinimumLogLevel !== LogLevel.None) {
+        if (this.logLevel !== LogLevel.None) {
             try {
+                if (!this.logDirectoryCreated) {
+                    this.logChannel.appendLine(Logger.timestampMessage(`Creating log directory at: '${this.logDirectoryPath}'`, level));
+                    await vscode.workspace.fs.createDirectory(this.logDirectoryPath);
+                    this.logDirectoryCreated = await utils.checkIfDirectoryExists(this.logDirectoryPath);
+                }
                 let log = new Uint8Array();
                 if (await utils.checkIfFileExists(this.logFilePath)) {
                     log = await vscode.workspace.fs.readFile(this.logFilePath);

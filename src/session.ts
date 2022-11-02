@@ -163,7 +163,6 @@ export class SessionManager implements Middleware {
             }
             // Create a folder for the session files.
             await vscode.workspace.fs.createDirectory(this.sessionsFolder);
-            await this.logger.startNewLog(this.sessionSettings.developer.editorServicesLogLevel);
             await this.promptPowerShellExeSettingsCleanup();
             await this.migrateWhitespaceAroundPipeSetting();
             this.PowerShellExeDetails = await this.findPowerShell();
@@ -212,7 +211,7 @@ export class SessionManager implements Middleware {
         await this.stop();
 
         // Re-load and validate the settings.
-        await Settings.validateCwdSetting();
+        await Settings.validateCwdSetting(this.logger);
         this.sessionSettings = Settings.load();
 
         await this.start(exeNameOverride);
@@ -348,8 +347,8 @@ export class SessionManager implements Middleware {
         const configurationTargetOfOldSetting = Settings.getEffectiveConfigurationTarget(deprecatedSetting);
         if (configurationTargetOfOldSetting !== undefined && configurationTargetOfNewSetting === undefined) {
             const value = configuration.get(deprecatedSetting, configurationTargetOfOldSetting);
-            await Settings.change(newSetting, value, configurationTargetOfOldSetting);
-            await Settings.change(deprecatedSetting, undefined, configurationTargetOfOldSetting);
+            await Settings.change(newSetting, value, configurationTargetOfOldSetting, this.logger);
+            await Settings.change(deprecatedSetting, undefined, configurationTargetOfOldSetting, this.logger);
         }
     }
 
@@ -373,7 +372,7 @@ export class SessionManager implements Middleware {
 
         this.suppressRestartPrompt = true;
         try {
-            await Settings.change("powerShellExePath", undefined, true);
+            await Settings.change("powerShellExePath", undefined, true, this.logger);
         } finally {
             this.suppressRestartPrompt = false;
         }
@@ -386,6 +385,7 @@ export class SessionManager implements Middleware {
 
     private async onConfigurationUpdated() {
         const settings = Settings.load();
+        this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
         // Detect any setting changes that would affect the session
         if (!this.suppressRestartPrompt &&
@@ -534,8 +534,8 @@ export class SessionManager implements Middleware {
             if (await utils.checkIfDirectoryExists(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
                 bundledModulesPath = devBundledModulesPath;
             } else {
-                this.logger.write(
-                    "\nWARNING: In development mode but PowerShellEditorServices dev module path cannot be " +
+                void this.logger.writeAndShowWarning(
+                    "In development mode but PowerShellEditorServices dev module path cannot be " +
                     `found (or has not been built yet): ${devBundledModulesPath}\n`);
             }
         }
@@ -731,7 +731,8 @@ Type 'help' to get help.
                 this.languageClient!,
                 localVersion!,
                 this.versionDetails!.architecture,
-                release);
+                release,
+                this.logger);
         } catch (err) {
             // Best effort. This probably failed to fetch the data from GitHub.
             this.logger.writeWarning(err instanceof Error ? err.message : "unknown");
@@ -804,7 +805,7 @@ Type 'help' to get help.
     private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
         this.suppressRestartPrompt = true;
         try {
-            await Settings.change("powerShellDefaultVersion", exePath.displayName, true);
+            await Settings.change("powerShellDefaultVersion", exePath.displayName, true, this.logger);
         } finally {
             this.suppressRestartPrompt = false;
         }

@@ -4,6 +4,7 @@
 import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");
+import { Logger } from "./logging";
 
 enum CodeFormattingPreset {
     Custom,
@@ -299,11 +300,17 @@ export async function change(
     settingName: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
-    configurationTarget?: vscode.ConfigurationTarget | boolean): Promise<void> {
+    configurationTarget: vscode.ConfigurationTarget | boolean | undefined,
+    logger: Logger | undefined): Promise<void> {
 
-    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
-    // TODO: Consider wrapping with try/catch, but we can't log the error.
-    await configuration.update(settingName, newValue, configurationTarget);
+    logger?.writeDiagnostic(`Changing '${settingName}' at scope '${configurationTarget} to '${newValue}'`);
+
+    try {
+        const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+        await configuration.update(settingName, newValue, configurationTarget);
+    } catch (err) {
+        logger?.writeError(`Failed to change setting: ${err}`);
+    }
 }
 
 function getWorkspaceSettingsWithDefaults<TSettings>(
@@ -322,7 +329,7 @@ function getWorkspaceSettingsWithDefaults<TSettings>(
 // We don't want to query the user more than once, so this is idempotent.
 let hasPrompted = false;
 
-export async function validateCwdSetting(): Promise<string> {
+export async function validateCwdSetting(logger: Logger): Promise<string> {
     let cwd = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string | undefined>("cwd");
 
     // Only use the cwd setting if it exists.
@@ -347,11 +354,7 @@ export async function validateCwdSetting(): Promise<string> {
         // Save the picked 'cwd' to the workspace settings.
         // We have to check again because the user may not have picked.
         if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
-            try {
-                await change("cwd", cwd);
-            } catch {
-                // Could fail if workspace file is invalid.
-            }
+            await change("cwd", cwd, undefined, logger);
         }
     }
 

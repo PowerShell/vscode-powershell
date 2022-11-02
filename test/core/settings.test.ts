@@ -11,16 +11,16 @@ describe("Settings module", function () {
     });
 
     it("Updates correctly", async function () {
-        await Settings.change("helpCompletion", "LineComment", false);
+        await Settings.change("helpCompletion", "LineComment", false, undefined);
         assert.strictEqual(Settings.load().helpCompletion, "LineComment");
     });
 
     it("Gets the effective configuration target", async function () {
-        await Settings.change("helpCompletion", "LineComment", false);
+        await Settings.change("helpCompletion", "LineComment", false, undefined);
         let target = Settings.getEffectiveConfigurationTarget("helpCompletion");
         assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);
 
-        await Settings.change("helpCompletion", undefined, false);
+        await Settings.change("helpCompletion", undefined, false, undefined);
         target = Settings.getEffectiveConfigurationTarget("helpCompletion");
         assert.strictEqual(target, undefined);
     });

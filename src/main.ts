@@ -37,6 +37,7 @@ const PackageJSON: any = require("../package.json");
 // the application insights key (also known as instrumentation key) used for telemetry.
 const AI_KEY = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
+let languageConfigurationDisposable: vscode.Disposable;
 let logger: Logger;
 let sessionManager: SessionManager;
 let languageClientConsumers: LanguageClientConsumer[] = [];
@@ -48,23 +49,27 @@ const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "untitled" },
 ];
 
-// NOTE: Now that this is async, we can probably improve a lot!
 export async function activate(context: vscode.ExtensionContext): Promise<IPowerShellExtensionClient> {
+    const logLevel = vscode.workspace.getConfiguration(`${PowerShellLanguageId}.developer`)
+        .get<string>("editorServicesLogLevel", "Normal");
+    logger = new Logger(logLevel, context.globalStorageUri);
+
     telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
 
     // If both extensions are enabled, this will cause unexpected behavior since both register the same commands.
     // TODO: Merge extensions and use preview channel in marketplace instead.
     if (PackageJSON.name.toLowerCase() === "powershell-preview"
         && vscode.extensions.getExtension("ms-vscode.powershell")) {
-        void vscode.window.showErrorMessage(
+        void logger.writeAndShowError(
             "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
     }
 
     // Load and validate settings (will prompt for 'cwd' if necessary).
-    await Settings.validateCwdSetting();
+    await Settings.validateCwdSetting(logger);
     const settings = Settings.load();
+    logger.writeDiagnostic(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
-    vscode.languages.setLanguageConfiguration(
+    languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
         {
             // TODO: Remove the useless escapes
@@ -124,10 +129,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
                 },
             ],
         });
-
-    // Setup the logger.
-    logger = new Logger(context.globalStorageUri);
-    logger.MinimumLogLevel = Logger.logLevelNameToValue(settings.developer.editorServicesLogLevel);
 
     sessionManager = new SessionManager(
         context,
@@ -202,4 +203,6 @@ export async function deactivate(): Promise<void> {
 
     // Dispose of telemetry reporter
     await telemetryReporter.dispose();
+
+    languageConfigurationDisposable.dispose();
 }
