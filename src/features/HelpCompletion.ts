@@ -7,7 +7,7 @@ import {
 } from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import Settings = require("../settings");
+import { ISettings, CommentType, getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -27,13 +27,13 @@ enum SearchState { Searching, Locked, Found }
 export class HelpCompletionFeature extends LanguageClientConsumer {
     private helpCompletionProvider: HelpCompletionProvider | undefined;
     private disposable: Disposable | undefined;
-    private settings: Settings.ISettings;
+    private settings: ISettings;
 
     constructor() {
         super();
-        this.settings = Settings.load();
+        this.settings = getSettings();
 
-        if (this.settings.helpCompletion !== Settings.CommentType.Disabled) {
+        if (this.settings.helpCompletion !== CommentType.Disabled) {
             this.helpCompletionProvider = new HelpCompletionProvider();
             this.disposable = workspace.onDidChangeTextDocument(async (e) => { await this.onEvent(e); });
         }
@@ -125,11 +125,11 @@ class HelpCompletionProvider {
     private lastChangeRange: Range | undefined;
     private lastDocument: TextDocument | undefined;
     private langClient: LanguageClient | undefined;
-    private settings: Settings.ISettings;
+    private settings: ISettings;
 
     constructor() {
         this.triggerFinderHelpComment = new TriggerFinder("##");
-        this.settings = Settings.load();
+        this.settings = getSettings();
     }
 
     public get triggerFound(): boolean {
@@ -161,7 +161,7 @@ class HelpCompletionProvider {
         const result = await this.langClient.sendRequest(CommentHelpRequestType, {
             documentUri: doc.uri.toString(),
             triggerPosition: triggerStartPos,
-            blockComment: this.settings.helpCompletion === Settings.CommentType.BlockComment,
+            blockComment: this.settings.helpCompletion === CommentType.BlockComment,
         });
 
         if (result.content.length === 0) {

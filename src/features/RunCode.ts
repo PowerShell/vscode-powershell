@@ -3,7 +3,7 @@
 
 import vscode = require("vscode");
 import { SessionManager } from "../session";
-import Settings = require("../settings");
+import { getSettings } from "../settings";
 
 enum LaunchType {
     Debug,
@@ -46,7 +46,7 @@ export class RunCodeFeature implements vscode.Disposable {
 }
 
 function createLaunchConfig(launchType: LaunchType, commandToRun: string, args: string[]) {
-    const settings = Settings.load();
+    const settings = getSettings();
 
     const launchConfig = {
         request: "launch",

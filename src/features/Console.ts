@@ -6,7 +6,7 @@ import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
 import { Logger } from "../logging";
-import Settings = require("../settings");
+import { getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
@@ -182,7 +182,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
                     // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
                     // takes is called `preserveFocus` which when `true` the terminal will not take focus.
                     // This is the inverse of focusConsoleOnExecute so we have to inverse the boolean.
-                    vscode.window.activeTerminal.show(!Settings.load().integratedConsole.focusConsoleOnExecute);
+                    vscode.window.activeTerminal.show(!getSettings().integratedConsole.focusConsoleOnExecute);
                     await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
 
                     return;

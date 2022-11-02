@@ -3,25 +3,25 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import Settings = require("../../src/settings");
+import { CommentType, getSettings, changeSetting, getEffectiveConfigurationTarget } from "../../src/settings";
 
 describe("Settings module", function () {
     it("Loads without error", function () {
-        assert.doesNotThrow(Settings.load);
+        assert.doesNotThrow(getSettings);
     });
 
     it("Updates correctly", async function () {
-        await Settings.change("helpCompletion", "LineComment", false, undefined);
-        assert.strictEqual(Settings.load().helpCompletion, "LineComment");
+        await changeSetting("helpCompletion", CommentType.LineComment, false, undefined);
+        assert.strictEqual(getSettings().helpCompletion, CommentType.LineComment);
     });
 
     it("Gets the effective configuration target", async function () {
-        await Settings.change("helpCompletion", "LineComment", false, undefined);
-        let target = Settings.getEffectiveConfigurationTarget("helpCompletion");
+        await changeSetting("helpCompletion", CommentType.LineComment, false, undefined);
+        let target = getEffectiveConfigurationTarget("helpCompletion");
         assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);
 
-        await Settings.change("helpCompletion", undefined, false, undefined);
-        target = Settings.getEffectiveConfigurationTarget("helpCompletion");
+        await changeSetting("helpCompletion", undefined, false, undefined);
+        target = getEffectiveConfigurationTarget("helpCompletion");
         assert.strictEqual(target, undefined);
     });
 });

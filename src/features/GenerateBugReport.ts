@@ -5,12 +5,11 @@ import os = require("os");
 import vscode = require("vscode");
 import child_process = require("child_process");
 import { SessionManager } from "../session";
-import Settings = require("../settings");
+import { getSettings } from "../settings";
 
 const queryStringPrefix = "?";
 
-const settings = Settings.load();
-const project = settings.bugReporting.project;
+const project = getSettings().bugReporting.project;
 const issuesUrl = `${project}/issues/new`;
 
 const extensions =

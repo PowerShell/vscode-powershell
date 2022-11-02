@@ -9,7 +9,7 @@ import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements
 import { Message } from "vscode-jsonrpc";
 import { Logger } from "./logging";
 import { PowerShellProcess } from "./process";
-import Settings = require("./settings");
+import { ISettings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
 
 import {
@@ -102,7 +102,7 @@ export class SessionManager implements Middleware {
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
-        private sessionSettings: Settings.ISettings,
+        private sessionSettings: ISettings,
         private logger: Logger,
         private documentSelector: DocumentSelector,
         hostName: string,
@@ -211,8 +211,8 @@ export class SessionManager implements Middleware {
         await this.stop();
 
         // Re-load and validate the settings.
-        await Settings.validateCwdSetting(this.logger);
-        this.sessionSettings = Settings.load();
+        await validateCwdSetting(this.logger);
+        this.sessionSettings = getSettings();
 
         await this.start(exeNameOverride);
     }
@@ -234,7 +234,7 @@ export class SessionManager implements Middleware {
         return vscode.Uri.joinPath(this.sessionsFolder, `PSES-VSCode-${process.env.VSCODE_PID}-${uniqueId}.json`);
     }
 
-    public async createDebugSessionProcess(settings: Settings.ISettings): Promise<PowerShellProcess> {
+    public async createDebugSessionProcess(settings: ISettings): Promise<PowerShellProcess> {
         // NOTE: We only support one temporary Extension Terminal at a time. To
         // support more, we need to track each separately, and tie the session
         // for the event handler to the right process (and dispose of the event
@@ -343,12 +343,12 @@ export class SessionManager implements Middleware {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = "codeFormatting.whitespaceAroundPipe";
         const newSetting = "codeFormatting.addWhitespaceAroundPipe";
-        const configurationTargetOfNewSetting = Settings.getEffectiveConfigurationTarget(newSetting);
-        const configurationTargetOfOldSetting = Settings.getEffectiveConfigurationTarget(deprecatedSetting);
+        const configurationTargetOfNewSetting = getEffectiveConfigurationTarget(newSetting);
+        const configurationTargetOfOldSetting = getEffectiveConfigurationTarget(deprecatedSetting);
         if (configurationTargetOfOldSetting !== undefined && configurationTargetOfNewSetting === undefined) {
             const value = configuration.get(deprecatedSetting, configurationTargetOfOldSetting);
-            await Settings.change(newSetting, value, configurationTargetOfOldSetting, this.logger);
-            await Settings.change(deprecatedSetting, undefined, configurationTargetOfOldSetting, this.logger);
+            await changeSetting(newSetting, value, configurationTargetOfOldSetting, this.logger);
+            await changeSetting(deprecatedSetting, undefined, configurationTargetOfOldSetting, this.logger);
         }
     }
 
@@ -372,7 +372,7 @@ export class SessionManager implements Middleware {
 
         this.suppressRestartPrompt = true;
         try {
-            await Settings.change("powerShellExePath", undefined, true, this.logger);
+            await changeSetting("powerShellExePath", undefined, true, this.logger);
         } finally {
             this.suppressRestartPrompt = false;
         }
@@ -384,7 +384,7 @@ export class SessionManager implements Middleware {
     }
 
     private async onConfigurationUpdated() {
-        const settings = Settings.load();
+        const settings = getSettings();
         this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
         // Detect any setting changes that would affect the session
@@ -578,9 +578,7 @@ Type 'help' to get help.
             editorServicesArgs += "-WaitForDebugger ";
         }
 
-        if (this.sessionSettings.developer.editorServicesLogLevel) {
-            editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
-        }
+        editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
 
         return editorServicesArgs;
     }
@@ -808,7 +806,7 @@ Type 'help' to get help.
     private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
         this.suppressRestartPrompt = true;
         try {
-            await Settings.change("powerShellDefaultVersion", exePath.displayName, true, this.logger);
+            await changeSetting("powerShellDefaultVersion", exePath.displayName, true, this.logger);
         } finally {
             this.suppressRestartPrompt = false;
         }

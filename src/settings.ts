@@ -6,18 +6,53 @@ import utils = require("./utils");
 import os = require("os");
 import { Logger } from "./logging";
 
-enum CodeFormattingPreset {
-    Custom,
-    Allman,
-    OTBS,
-    Stroustrup,
+export interface ISettings {
+    powerShellAdditionalExePaths: IPowerShellAdditionalExePathSettings | undefined;
+    powerShellDefaultVersion: string | undefined;
+    // This setting is no longer used but is here to assist in cleaning up the users settings.
+    powerShellExePath: string | undefined;
+    promptToUpdatePowerShell: boolean;
+    startAsLoginShell: IStartAsLoginShellSettings;
+    startAutomatically: boolean;
+    enableProfileLoading: boolean;
+    helpCompletion: string;
+    scriptAnalysis: IScriptAnalysisSettings;
+    debugging: IDebuggingSettings;
+    developer: IDeveloperSettings;
+    codeFolding: ICodeFoldingSettings;
+    codeFormatting: ICodeFormattingSettings;
+    integratedConsole: IIntegratedConsoleSettings;
+    bugReporting: IBugReportingSettings;
+    sideBar: ISideBarSettings;
+    pester: IPesterSettings;
+    buttons: IButtonSettings;
+    cwd: string | undefined;
+    enableReferencesCodeLens: boolean;
+    analyzeOpenDocumentsOnly: boolean;
+    // TODO: Add (deprecated) useX86Host (for testing)
 }
 
-enum PipelineIndentationStyle {
-    IncreaseIndentationForFirstPipeline,
-    IncreaseIndentationAfterEveryPipeline,
-    NoIndentation,
-    None,
+export enum CodeFormattingPreset {
+    Custom = "Custom",
+    Allman = "Allman",
+    OTBS = "OTBS",
+    Stroustrup = "Stroustrup",
+}
+
+export enum PipelineIndentationStyle {
+    IncreaseIndentationForFirstPipeline = "IncreaseIndentationForFirstPipeline",
+    IncreaseIndentationAfterEveryPipeline = "IncreaseIndentationAfterEveryPipeline",
+    NoIndentation = "NoIndentation",
+    None = "None",
+}
+
+export enum LogLevel {
+    Diagnostic = "Diagnostic",
+    Verbose = "Verbose",
+    Normal = "Normal",
+    Warning = "Warning",
+    Error = "Error",
+    None = "None",
 }
 
 export enum CommentType {
@@ -71,34 +106,9 @@ export interface IDebuggingSettings {
 export interface IDeveloperSettings {
     featureFlags: string[];
     bundledModulesPath: string;
-    editorServicesLogLevel: string;
+    editorServicesLogLevel: LogLevel;
     editorServicesWaitForDebugger: boolean;
     waitForSessionFileTimeoutSeconds: number;
-}
-
-export interface ISettings {
-    powerShellAdditionalExePaths: IPowerShellAdditionalExePathSettings | undefined;
-    powerShellDefaultVersion: string | undefined;
-    // This setting is no longer used but is here to assist in cleaning up the users settings.
-    powerShellExePath: string | undefined;
-    promptToUpdatePowerShell: boolean;
-    startAsLoginShell: IStartAsLoginShellSettings;
-    startAutomatically: boolean;
-    enableProfileLoading: boolean;
-    helpCompletion: string;
-    scriptAnalysis: IScriptAnalysisSettings;
-    debugging: IDebuggingSettings;
-    developer: IDeveloperSettings;
-    codeFolding: ICodeFoldingSettings;
-    codeFormatting: ICodeFormattingSettings;
-    integratedConsole: IIntegratedConsoleSettings;
-    bugReporting: IBugReportingSettings;
-    sideBar: ISideBarSettings;
-    pester: IPesterSettings;
-    buttons: IButtonSettings;
-    cwd: string | undefined;
-    enableReferencesCodeLens: boolean;
-    analyzeOpenDocumentsOnly: boolean;
 }
 
 export interface IStartAsLoginShellSettings {
@@ -132,8 +142,7 @@ export interface IButtonSettings {
     showPanelMovementButtons: boolean;
 }
 
-// TODO: This could probably be async, and call `validateCwdSetting()` directly.
-export function load(): ISettings {
+export function getSettings(): ISettings {
     const configuration: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
@@ -155,7 +164,7 @@ export function load(): ISettings {
         // From `<root>/out/main.js` we go to the directory before <root> and
         // then into the other repo.
         bundledModulesPath: "../../PowerShellEditorServices/module",
-        editorServicesLogLevel: "Normal",
+        editorServicesLogLevel: LogLevel.Normal,
         editorServicesWaitForDebugger: false,
         waitForSessionFileTimeoutSeconds: 240,
     };
@@ -288,7 +297,7 @@ export function getEffectiveConfigurationTarget(settingName: string): vscode.Con
     return undefined;
 }
 
-export async function change(
+export async function changeSetting(
     settingName: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
@@ -333,7 +342,7 @@ export async function validateCwdSetting(logger: Logger): Promise<string> {
         // Save the picked 'cwd' to the workspace settings.
         // We have to check again because the user may not have picked.
         if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
-            await change("cwd", cwd, undefined, logger);
+            await changeSetting("cwd", cwd, undefined, logger);
         }
     }
 

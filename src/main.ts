@@ -26,7 +26,7 @@ import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
-import Settings = require("./settings");
+import { LogLevel, getSettings, validateCwdSetting } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
@@ -51,7 +51,7 @@ const documentSelector: DocumentSelector = [
 
 export async function activate(context: vscode.ExtensionContext): Promise<IPowerShellExtensionClient> {
     const logLevel = vscode.workspace.getConfiguration(`${PowerShellLanguageId}.developer`)
-        .get<string>("editorServicesLogLevel", "Normal");
+        .get<string>("editorServicesLogLevel", LogLevel.Normal);
     logger = new Logger(logLevel, context.globalStorageUri);
 
     telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
@@ -65,8 +65,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     }
 
     // Load and validate settings (will prompt for 'cwd' if necessary).
-    await Settings.validateCwdSetting(logger);
-    const settings = Settings.load();
+    await validateCwdSetting(logger);
+    const settings = getSettings();
     logger.writeDiagnostic(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(

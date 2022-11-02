@@ -10,7 +10,7 @@ import {
 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
-import Settings = require("../settings");
+import { getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export interface IExtensionCommand {
@@ -260,7 +260,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 () => {
                     // We check to see if they have TrueClear on. If not, no-op because the
                     // overriden Clear-Host already calls [System.Console]::Clear()
-                    if (Settings.load().integratedConsole.forceClearScrollbackBuffer) {
+                    if (getSettings().integratedConsole.forceClearScrollbackBuffer) {
                         void vscode.commands.executeCommand("workbench.action.terminal.clear");
                     }
                 })
