@@ -331,7 +331,7 @@ export class SessionManager implements Middleware {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if ((resolvedCodeLens as Thenable<vscode.CodeLens>).then) {
             return (resolvedCodeLens as Thenable<vscode.CodeLens>).then(resolveFunc);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         } else if (resolvedCodeLens as vscode.CodeLens) {
             return resolveFunc(resolvedCodeLens as vscode.CodeLens);
         }
@@ -571,7 +571,9 @@ Type 'help' to get help.
             editorServicesArgs += `-StartupBanner "${startupBanner}" `;
         }
 
-        if (this.sessionSettings.developer.editorServicesWaitForDebugger) {
+        // We guard this here too out of an abundance of precaution.
+        if (this.sessionSettings.developer.editorServicesWaitForDebugger
+            && this.extensionContext.extensionMode === vscode.ExtensionMode.Development) {
             editorServicesArgs += "-WaitForDebugger ";
         }
 
