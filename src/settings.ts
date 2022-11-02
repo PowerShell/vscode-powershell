@@ -82,7 +82,6 @@ export interface ISettings {
     // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath: string | undefined;
     promptToUpdatePowerShell: boolean;
-    bundledModulesPath: string;
     startAsLoginShell: IStartAsLoginShellSettings;
     startAutomatically: boolean;
     enableProfileLoading: boolean;
@@ -117,10 +116,12 @@ export interface IIntegratedConsoleSettings {
 }
 
 export interface ISideBarSettings {
+    // TODO: add CommandExplorerExcludeFilter
     CommandExplorerVisibility: boolean;
 }
 
 export interface IPesterSettings {
+    // TODO: add codeLens property
     useLegacyCodeLens: boolean;
     outputVerbosity: string;
     debugOutputVerbosity: string;
@@ -161,7 +162,7 @@ export function load(): ISettings {
 
     const defaultCodeFoldingSettings: ICodeFoldingSettings = {
         enable: true,
-        showLastLine: false,
+        showLastLine: true,
     };
 
     const defaultCodeFormattingSettings: ICodeFormattingSettings = {
@@ -215,7 +216,10 @@ export function load(): ISettings {
         debugOutputVerbosity: "Diagnostic",
     };
 
-    // TODO: I believe all the defaults can be removed, as the `package.json` should supply them (and be the source of truth).
+    // TODO: I believe all the defaults can be removed, as the `package.json`
+    // should supply them (and be the source of truth). However, this proves
+    // fairly messy to do as it requires casting the configuration to unknown
+    // and then to `ISettings`. It could work but will take more testing.
     return {
         startAutomatically:
             configuration.get<boolean>("startAutomatically", true),
@@ -227,10 +231,8 @@ export function load(): ISettings {
             configuration.get<string>("powerShellExePath"),
         promptToUpdatePowerShell:
             configuration.get<boolean>("promptToUpdatePowerShell", true),
-        bundledModulesPath:
-            "../modules", // Because the extension is always at `<root>/out/main.js`
         enableProfileLoading:
-            configuration.get<boolean>("enableProfileLoading", false),
+            configuration.get<boolean>("enableProfileLoading", true),
         helpCompletion:
             configuration.get<string>("helpCompletion", CommentType.BlockComment),
         scriptAnalysis:
@@ -238,7 +240,7 @@ export function load(): ISettings {
         debugging:
             configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
         developer:
-            getWorkspaceSettingsWithDefaults<IDeveloperSettings>(configuration, "developer", defaultDeveloperSettings),
+            configuration.get<IDeveloperSettings>("developer", defaultDeveloperSettings),
         codeFolding:
             configuration.get<ICodeFoldingSettings>("codeFolding", defaultCodeFoldingSettings),
         codeFormatting:
@@ -264,7 +266,7 @@ export function load(): ISettings {
         enableReferencesCodeLens:
             configuration.get<boolean>("enableReferencesCodeLens", true),
         analyzeOpenDocumentsOnly:
-            configuration.get<boolean>("analyzeOpenDocumentsOnly", true),
+            configuration.get<boolean>("analyzeOpenDocumentsOnly", false),
     };
 }
 
@@ -301,19 +303,6 @@ export async function change(
     } catch (err) {
         logger?.writeError(`Failed to change setting: ${err}`);
     }
-}
-
-function getWorkspaceSettingsWithDefaults<TSettings>(
-    workspaceConfiguration: vscode.WorkspaceConfiguration,
-    settingName: string,
-    defaultSettings: TSettings): TSettings {
-
-    const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
-
-    for (const setting in importedSettings) {
-        defaultSettings[setting] = importedSettings[setting];
-    }
-    return defaultSettings;
 }
 
 // We don't want to query the user more than once, so this is idempotent.

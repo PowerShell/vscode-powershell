@@ -525,13 +525,14 @@ export class SessionManager implements Middleware {
     }
 
     private async getBundledModulesPath(): Promise<string> {
-        let bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
+        // Because the extension is always at `<root>/out/main.js`
+        let bundledModulesPath = path.resolve(__dirname, "../modules");
 
         if (this.extensionContext.extensionMode === vscode.ExtensionMode.Development) {
             const devBundledModulesPath = path.resolve(__dirname, this.sessionSettings.developer.bundledModulesPath);
 
             // Make sure the module's bin path exists
-            if (await utils.checkIfDirectoryExists(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
+            if (await utils.checkIfDirectoryExists(devBundledModulesPath)) {
                 bundledModulesPath = devBundledModulesPath;
             } else {
                 void this.logger.writeAndShowWarning(

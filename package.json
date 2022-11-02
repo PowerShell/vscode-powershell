@@ -584,7 +584,6 @@
         },
         "powershell.powerShellExePath": {
           "type": "string",
-          "default": "",
           "scope": "machine",
           "description": "REMOVED: Please use the \"powershell.powerShellAdditionalExePaths\" setting instead.",
           "deprecationMessage": "Please use the \"powershell.powerShellAdditionalExePaths\" setting instead."
@@ -653,7 +652,6 @@
         },
         "powershell.cwd": {
           "type": "string",
-          "default": null,
           "description": "An explicit start path where the PowerShell Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. A fully resolved path must be provided!"
         },
         "powershell.scriptAnalysis.enable": {
@@ -811,6 +809,7 @@
         },
         "powershell.integratedConsole.forceClearScrollbackBuffer": {
           "type": "boolean",
+          "default": false,
           "description": "Use the vscode API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're used to 'Clear-Host' clearing scroll history as well as clear-terminal-via-lsp."
         },
         "powershell.integratedConsole.suppressStartupBanner": {
@@ -825,6 +824,7 @@
         },
         "powershell.developer.bundledModulesPath": {
           "type": "string",
+          "default": "../../PowerShellEditorServices/module",
           "description": "Specifies an alternate path to the folder containing modules that are bundled with the PowerShell extension (i.e. PowerShell Editor Services, PSScriptAnalyzer, Plaster)"
         },
         "powershell.developer.editorServicesLogLevel": {
