@@ -484,7 +484,8 @@ export class SessionManager implements Middleware {
     private async findPowerShell(): Promise<IPowerShellExeDetails | undefined> {
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
-            this.sessionSettings.powerShellAdditionalExePaths);
+            this.sessionSettings.powerShellAdditionalExePaths,
+            this.logger);
 
         let foundPowerShell: IPowerShellExeDetails | undefined;
         try {
@@ -837,7 +838,8 @@ Type 'help' to get help.
     private async showSessionMenu() {
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
-            this.sessionSettings.powerShellAdditionalExePaths);
+            this.sessionSettings.powerShellAdditionalExePaths,
+            this.logger);
         const availablePowerShellExes = await powershellExeFinder.getAllAvailablePowerShellInstallations();
 
         let sessionText: string;
