@@ -6,6 +6,7 @@ import { RequestType0 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import { getSettings } from "../settings";
 
 interface ICommand {
     name: string;
@@ -68,8 +69,8 @@ export class GetCommandsFeature extends LanguageClientConsumer {
             return;
         }
         await this.languageClient.sendRequest(GetCommandRequestType).then((result) => {
-            const SidebarConfig = vscode.workspace.getConfiguration("powershell.sideBar");
-            const excludeFilter = (SidebarConfig.CommandExplorerExcludeFilter).map((filter: string) => filter.toLowerCase());
+            const exclusions = getSettings().sideBar.CommandExplorerExcludeFilter;
+            const excludeFilter = exclusions.map((filter: string) => filter.toLowerCase());
             result = result.filter((command) => (excludeFilter.indexOf(command.moduleName.toLowerCase()) === -1));
             this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
             this.commandsExplorerProvider.refresh();

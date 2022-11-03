@@ -102,7 +102,7 @@ class DebuggingSettings extends PartialSettings {
 }
 
 class DeveloperSettings extends PartialSettings {
-    featureFlags = [];
+    featureFlags: string[] = [];
     // From `<root>/out/main.js` we go to the directory before <root> and
     // then into the other repo.
     bundledModulesPath = "../../PowerShellEditorServices/module";
@@ -130,8 +130,8 @@ class IntegratedConsoleSettings extends PartialSettings {
 }
 
 class SideBarSettings extends PartialSettings {
-    // TODO: add CommandExplorerExcludeFilter
     CommandExplorerVisibility = true;
+    CommandExplorerExcludeFilter: string[] = [];
 }
 
 class PesterSettings extends PartialSettings {
