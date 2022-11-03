@@ -6,6 +6,14 @@ import utils = require("./utils");
 import os = require("os");
 import { Logger } from "./logging";
 
+// TODO: Quite a few of these settings are unused in the client and instead
+// exist just for the server. Those settings do not need to be represented in
+// this class, as the LSP layers take care of communicating them. Frankly, this
+// class is over-engineered and seems to have originally been created to avoid
+// using vscode.workspace.getConfiguration() directly. It wasn't a bad idea to
+// keep things organized so consistent...but it ended up failing in execution.
+// Perhaps we just get rid of this entirely?
+
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 class PartialSettings { }
 
@@ -22,7 +30,6 @@ export class Settings extends PartialSettings {
     scriptAnalysis = new ScriptAnalysisSettings();
     debugging = new DebuggingSettings();
     developer = new DeveloperSettings();
-    codeFolding = new CodeFoldingSettings();
     codeFormatting = new CodeFormattingSettings();
     integratedConsole = new IntegratedConsoleSettings();
     sideBar = new SideBarSettings();
@@ -64,11 +71,6 @@ export enum CommentType {
 }
 
 export type PowerShellAdditionalExePathSettings = Record<string, string>;
-
-class CodeFoldingSettings extends PartialSettings {
-    enable = true;
-    showLastLine = true;
-}
 
 class CodeFormattingSettings extends PartialSettings {
     autoCorrectAliases = false;
