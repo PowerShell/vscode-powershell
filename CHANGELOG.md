@@ -1,5 +1,23 @@
 # PowerShell Extension Release History
 
+## v2022.11.0-preview
+### Thursday, November 03, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 💭 [vscode-powershell #4242](https://github.com/PowerShell/vscode-powershell/pull/4242) - Show warning when additional PowerShell is not found.
+- 🐛 🛫 [vscode-powershell #4241](https://github.com/PowerShell/vscode-powershell/pull/4241) - Guard `-WaitForDebugger` flag client-side too.
+- ✨ 💭 [vscode-powershell #4240](https://github.com/PowerShell/vscode-powershell/pull/4240) - Capture more logs.
+- ✨ 💭 [vscode-powershell #4235](https://github.com/PowerShell/vscode-powershell/pull/4235) - Refactor `settings.ts`.
+- 🐛 📺 [vscode-powershell #4149](https://github.com/PowerShell/vscode-powershell/pull/4233) - Add cross-platform installation to walkthrough.
+- 🐛 🔍 [vscode-powershell #4231](https://github.com/PowerShell/vscode-powershell/pull/4231) - Check script extension for current file only.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.6.1
+
+- #️⃣ 🙏 [PowerShellEditorServices #1947](https://github.com/PowerShell/PowerShellEditorServices/pull/1947) - Manually update `Newtonsoft.Json`.
+- 🐛 🚂 [vscode-powershell #4175](https://github.com/PowerShell/PowerShellEditorServices/pull/1946) - Bump OmniSharp to `v0.19.6`.
+- 🐛 🔍 [vscode-powershell #4238](https://github.com/PowerShell/PowerShellEditorServices/pull/1940) - Wrap script paths with single instead of double quotes.
+
 ## v2022.10.2-preview
 ### Tuesday, October 25, 2022
 
