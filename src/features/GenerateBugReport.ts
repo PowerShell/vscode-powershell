@@ -5,11 +5,10 @@ import os = require("os");
 import vscode = require("vscode");
 import child_process = require("child_process");
 import { SessionManager } from "../session";
-import { getSettings } from "../settings";
 
 const queryStringPrefix = "?";
 
-const project = getSettings().bugReporting.project;
+const project = "https://github.com/PowerShell/vscode-powershell";
 const issuesUrl = `${project}/issues/new`;
 
 const extensions =

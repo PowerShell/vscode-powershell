@@ -25,7 +25,6 @@ export class Settings extends PartialSettings {
     codeFolding = new CodeFoldingSettings();
     codeFormatting = new CodeFormattingSettings();
     integratedConsole = new IntegratedConsoleSettings();
-    bugReporting = new BugReportingSettings();
     sideBar = new SideBarSettings();
     pester = new PesterSettings();
     buttons = new ButtonSettings();
@@ -65,10 +64,6 @@ export enum CommentType {
 }
 
 export type PowerShellAdditionalExePathSettings = Record<string, string>;
-
-class BugReportingSettings extends PartialSettings {
-    project = "https://github.com/PowerShell/vscode-powershell";
-}
 
 class CodeFoldingSettings extends PartialSettings {
     enable = true;

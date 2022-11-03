@@ -625,6 +625,7 @@ Type 'help' to get help.
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
             synchronize: {
+                // TODO: This is deprecated and they should be pulled by the server.
                 // backend uses "files" and "search" to ignore references.
                 configurationSection: [utils.PowerShellLanguageId, "files", "search"],
                 // TODO: fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
@@ -657,6 +658,7 @@ Type 'help' to get help.
         this.languageClient = new LanguageClient("PowerShell Editor Services", connectFunc, clientOptions);
 
         // This enables handling Semantic Highlighting messages in PowerShell Editor Services
+        // TODO: We should only turn this on in preview.
         this.languageClient.registerProposedFeatures();
 
         this.languageClient.onTelemetry((event) => {
