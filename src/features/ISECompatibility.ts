@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import * as vscode from "vscode";
-import * as Settings from "../settings";
+import { getSettings } from "../settings";
 
 interface ISetting {
     path: string;
@@ -63,7 +63,7 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         // Show the PowerShell view container which has the Command Explorer view
         await vscode.commands.executeCommand("workbench.view.extension.PowerShell");
 
-        if (!Settings.load().sideBar.CommandExplorerVisibility) {
+        if (!getSettings().sideBar.CommandExplorerVisibility) {
             // Hide the explorer if the setting says so.
             await vscode.commands.executeCommand("workbench.action.toggleSidebarVisibility");
         }

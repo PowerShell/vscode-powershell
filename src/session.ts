@@ -9,7 +9,7 @@ import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements
 import { Message } from "vscode-jsonrpc";
 import { Logger } from "./logging";
 import { PowerShellProcess } from "./process";
-import Settings = require("./settings");
+import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
 
 import {
@@ -102,7 +102,7 @@ export class SessionManager implements Middleware {
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
-        private sessionSettings: Settings.ISettings,
+        private sessionSettings: Settings,
         private logger: Logger,
         private documentSelector: DocumentSelector,
         hostName: string,
@@ -211,8 +211,8 @@ export class SessionManager implements Middleware {
         await this.stop();
 
         // Re-load and validate the settings.
-        await Settings.validateCwdSetting(this.logger);
-        this.sessionSettings = Settings.load();
+        await validateCwdSetting(this.logger);
+        this.sessionSettings = getSettings();
 
         await this.start(exeNameOverride);
     }
@@ -234,7 +234,7 @@ export class SessionManager implements Middleware {
         return vscode.Uri.joinPath(this.sessionsFolder, `PSES-VSCode-${process.env.VSCODE_PID}-${uniqueId}.json`);
     }
 
-    public async createDebugSessionProcess(settings: Settings.ISettings): Promise<PowerShellProcess> {
+    public async createDebugSessionProcess(settings: Settings): Promise<PowerShellProcess> {
         // NOTE: We only support one temporary Extension Terminal at a time. To
         // support more, we need to track each separately, and tie the session
         // for the event handler to the right process (and dispose of the event
@@ -343,18 +343,18 @@ export class SessionManager implements Middleware {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = "codeFormatting.whitespaceAroundPipe";
         const newSetting = "codeFormatting.addWhitespaceAroundPipe";
-        const configurationTargetOfNewSetting = Settings.getEffectiveConfigurationTarget(newSetting);
-        const configurationTargetOfOldSetting = Settings.getEffectiveConfigurationTarget(deprecatedSetting);
+        const configurationTargetOfNewSetting = getEffectiveConfigurationTarget(newSetting);
+        const configurationTargetOfOldSetting = getEffectiveConfigurationTarget(deprecatedSetting);
         if (configurationTargetOfOldSetting !== undefined && configurationTargetOfNewSetting === undefined) {
             const value = configuration.get(deprecatedSetting, configurationTargetOfOldSetting);
-            await Settings.change(newSetting, value, configurationTargetOfOldSetting, this.logger);
-            await Settings.change(deprecatedSetting, undefined, configurationTargetOfOldSetting, this.logger);
+            await changeSetting(newSetting, value, configurationTargetOfOldSetting, this.logger);
+            await changeSetting(deprecatedSetting, undefined, configurationTargetOfOldSetting, this.logger);
         }
     }
 
     // TODO: Remove this migration code.
     private async promptPowerShellExeSettingsCleanup() {
-        if (!this.sessionSettings.powerShellExePath) { // undefined or null
+        if (this.sessionSettings.powerShellExePath === "") {
             return;
         }
 
@@ -372,25 +372,25 @@ export class SessionManager implements Middleware {
 
         this.suppressRestartPrompt = true;
         try {
-            await Settings.change("powerShellExePath", undefined, true, this.logger);
+            await changeSetting("powerShellExePath", undefined, true, this.logger);
         } finally {
             this.suppressRestartPrompt = false;
         }
 
         // Show the session menu at the end if they don't have a PowerShellDefaultVersion.
-        if (this.sessionSettings.powerShellDefaultVersion === undefined) {
+        if (this.sessionSettings.powerShellDefaultVersion === "") {
             await vscode.commands.executeCommand(this.ShowSessionMenuCommandName);
         }
     }
 
     private async onConfigurationUpdated() {
-        const settings = Settings.load();
+        const settings = getSettings();
         this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
         // Detect any setting changes that would affect the session
         if (!this.suppressRestartPrompt &&
-            (settings.cwd?.toLowerCase() !== this.sessionSettings.cwd?.toLowerCase()
-                || settings.powerShellDefaultVersion?.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion?.toLowerCase()
+            (settings.cwd.toLowerCase() !== this.sessionSettings.cwd.toLowerCase()
+                || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
                 || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
                 || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
@@ -489,7 +489,7 @@ export class SessionManager implements Middleware {
         let foundPowerShell: IPowerShellExeDetails | undefined;
         try {
             let defaultPowerShell: IPowerShellExeDetails | undefined;
-            if (this.sessionSettings.powerShellDefaultVersion !== undefined) {
+            if (this.sessionSettings.powerShellDefaultVersion !== "") {
                 for await (const details of powershellExeFinder.enumeratePowerShellInstallations()) {
                     // Need to compare names case-insensitively, from https://stackoverflow.com/a/2140723
                     const wantedName = this.sessionSettings.powerShellDefaultVersion;
@@ -525,13 +525,14 @@ export class SessionManager implements Middleware {
     }
 
     private async getBundledModulesPath(): Promise<string> {
-        let bundledModulesPath = path.resolve(__dirname, this.sessionSettings.bundledModulesPath);
+        // Because the extension is always at `<root>/out/main.js`
+        let bundledModulesPath = path.resolve(__dirname, "../modules");
 
         if (this.extensionContext.extensionMode === vscode.ExtensionMode.Development) {
             const devBundledModulesPath = path.resolve(__dirname, this.sessionSettings.developer.bundledModulesPath);
 
             // Make sure the module's bin path exists
-            if (await utils.checkIfDirectoryExists(path.join(devBundledModulesPath, "PowerShellEditorServices/bin"))) {
+            if (await utils.checkIfDirectoryExists(devBundledModulesPath)) {
                 bundledModulesPath = devBundledModulesPath;
             } else {
                 void this.logger.writeAndShowWarning(
@@ -577,9 +578,7 @@ Type 'help' to get help.
             editorServicesArgs += "-WaitForDebugger ";
         }
 
-        if (this.sessionSettings.developer.editorServicesLogLevel) {
-            editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
-        }
+        editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
 
         return editorServicesArgs;
     }
@@ -626,6 +625,7 @@ Type 'help' to get help.
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
             synchronize: {
+                // TODO: This is deprecated and they should be pulled by the server.
                 // backend uses "files" and "search" to ignore references.
                 configurationSection: [utils.PowerShellLanguageId, "files", "search"],
                 // TODO: fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
@@ -658,6 +658,7 @@ Type 'help' to get help.
         this.languageClient = new LanguageClient("PowerShell Editor Services", connectFunc, clientOptions);
 
         // This enables handling Semantic Highlighting messages in PowerShell Editor Services
+        // TODO: We should only turn this on in preview.
         this.languageClient.registerProposedFeatures();
 
         this.languageClient.onTelemetry((event) => {
@@ -807,7 +808,7 @@ Type 'help' to get help.
     private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
         this.suppressRestartPrompt = true;
         try {
-            await Settings.change("powerShellDefaultVersion", exePath.displayName, true, this.logger);
+            await changeSetting("powerShellDefaultVersion", exePath.displayName, true, this.logger);
         } finally {
             this.suppressRestartPrompt = false;
         }

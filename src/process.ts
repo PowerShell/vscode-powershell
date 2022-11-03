@@ -31,7 +31,7 @@ export class PowerShellProcess {
         private logger: Logger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
-        private sessionSettings: Settings.ISettings) {
+        private sessionSettings: Settings.Settings) {
 
         this.onExited = this.onExitedEmitter.event;
     }
@@ -46,7 +46,7 @@ export class PowerShellProcess {
                 "PowerShellEditorServices/PowerShellEditorServices.psd1");
 
         const featureFlags =
-            this.sessionSettings.developer.featureFlags !== undefined
+            this.sessionSettings.developer.featureFlags.length > 0
                 ? this.sessionSettings.developer.featureFlags.map((f) => `'${f}'`).join(", ")
                 : "";
 

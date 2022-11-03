@@ -11,7 +11,7 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess } from "../process";
 import { IEditorServicesSessionDetails, SessionManager, SessionStatus } from "../session";
-import Settings = require("../settings");
+import { getSettings } from "../settings";
 import { Logger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import path = require("path");
@@ -169,7 +169,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         // setting. Otherwise, the launch config value overrides the setting.
         //
         // Also start the temporary process and console for this configuration.
-        const settings = Settings.load();
+        const settings = getSettings();
         config.createTemporaryIntegratedConsole =
             config.createTemporaryIntegratedConsole ??
             settings.debugging.createTemporaryIntegratedConsole;

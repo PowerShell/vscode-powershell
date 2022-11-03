@@ -6,18 +6,62 @@ import utils = require("./utils");
 import os = require("os");
 import { Logger } from "./logging";
 
-enum CodeFormattingPreset {
-    Custom,
-    Allman,
-    OTBS,
-    Stroustrup,
+// TODO: Quite a few of these settings are unused in the client and instead
+// exist just for the server. Those settings do not need to be represented in
+// this class, as the LSP layers take care of communicating them. Frankly, this
+// class is over-engineered and seems to have originally been created to avoid
+// using vscode.workspace.getConfiguration() directly. It wasn't a bad idea to
+// keep things organized so consistent...but it ended up failing in execution.
+// Perhaps we just get rid of this entirely?
+
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+class PartialSettings { }
+
+export class Settings extends PartialSettings {
+    powerShellAdditionalExePaths: PowerShellAdditionalExePathSettings = {};
+    powerShellDefaultVersion = "";
+    // This setting is no longer used but is here to assist in cleaning up the users settings.
+    powerShellExePath = "";
+    promptToUpdatePowerShell = true;
+    startAsLoginShell = new StartAsLoginShellSettings();
+    startAutomatically = true;
+    enableProfileLoading = true;
+    helpCompletion = CommentType.BlockComment;
+    scriptAnalysis = new ScriptAnalysisSettings();
+    debugging = new DebuggingSettings();
+    developer = new DeveloperSettings();
+    codeFormatting = new CodeFormattingSettings();
+    integratedConsole = new IntegratedConsoleSettings();
+    sideBar = new SideBarSettings();
+    pester = new PesterSettings();
+    buttons = new ButtonSettings();
+    cwd = "";
+    enableReferencesCodeLens = true;
+    analyzeOpenDocumentsOnly = false;
+    // TODO: Add (deprecated) useX86Host (for testing)
 }
 
-enum PipelineIndentationStyle {
-    IncreaseIndentationForFirstPipeline,
-    IncreaseIndentationAfterEveryPipeline,
-    NoIndentation,
-    None,
+export enum CodeFormattingPreset {
+    Custom = "Custom",
+    Allman = "Allman",
+    OTBS = "OTBS",
+    Stroustrup = "Stroustrup",
+}
+
+export enum PipelineIndentationStyle {
+    IncreaseIndentationForFirstPipeline = "IncreaseIndentationForFirstPipeline",
+    IncreaseIndentationAfterEveryPipeline = "IncreaseIndentationAfterEveryPipeline",
+    NoIndentation = "NoIndentation",
+    None = "None",
+}
+
+export enum LogLevel {
+    Diagnostic = "Diagnostic",
+    Verbose = "Verbose",
+    Normal = "Normal",
+    Warning = "Warning",
+    Error = "Error",
+    None = "None",
 }
 
 export enum CommentType {
@@ -26,256 +70,104 @@ export enum CommentType {
     LineComment = "LineComment",
 }
 
-export type IPowerShellAdditionalExePathSettings = Record<string, string>;
+export type PowerShellAdditionalExePathSettings = Record<string, string>;
 
-export interface IBugReportingSettings {
-    project: string;
+class CodeFormattingSettings extends PartialSettings {
+    autoCorrectAliases = false;
+    avoidSemicolonsAsLineTerminators = false;
+    preset = CodeFormattingPreset.Custom;
+    openBraceOnSameLine = true;
+    newLineAfterOpenBrace = true;
+    newLineAfterCloseBrace = true;
+    pipelineIndentationStyle = PipelineIndentationStyle.NoIndentation;
+    whitespaceBeforeOpenBrace = true;
+    whitespaceBeforeOpenParen = true;
+    whitespaceAroundOperator = true;
+    whitespaceAfterSeparator = true;
+    whitespaceBetweenParameters = false;
+    whitespaceInsideBrace = true;
+    addWhitespaceAroundPipe = true;
+    trimWhitespaceAroundPipe = false;
+    ignoreOneLineBlock = true;
+    alignPropertyValuePairs = true;
+    useConstantStrings = false;
+    useCorrectCasing = false;
 }
 
-export interface ICodeFoldingSettings {
-    enable?: boolean;
-    showLastLine?: boolean;
+class ScriptAnalysisSettings extends PartialSettings {
+    enable = true;
+    settingsPath = "PSScriptAnalyzerSettings.psd1";
 }
 
-export interface ICodeFormattingSettings {
-    autoCorrectAliases: boolean;
-    avoidSemicolonsAsLineTerminators: boolean;
-    preset: CodeFormattingPreset;
-    openBraceOnSameLine: boolean;
-    newLineAfterOpenBrace: boolean;
-    newLineAfterCloseBrace: boolean;
-    pipelineIndentationStyle: PipelineIndentationStyle;
-    whitespaceBeforeOpenBrace: boolean;
-    whitespaceBeforeOpenParen: boolean;
-    whitespaceAroundOperator: boolean;
-    whitespaceAfterSeparator: boolean;
-    whitespaceBetweenParameters: boolean;
-    whitespaceInsideBrace: boolean;
-    addWhitespaceAroundPipe: boolean;
-    trimWhitespaceAroundPipe: boolean;
-    ignoreOneLineBlock: boolean;
-    alignPropertyValuePairs: boolean;
-    useConstantStrings: boolean;
-    useCorrectCasing: boolean;
+class DebuggingSettings extends PartialSettings {
+    createTemporaryIntegratedConsole = false;
 }
 
-export interface IScriptAnalysisSettings {
-    enable?: boolean;
-    settingsPath: string;
+class DeveloperSettings extends PartialSettings {
+    featureFlags: string[] = [];
+    // From `<root>/out/main.js` we go to the directory before <root> and
+    // then into the other repo.
+    bundledModulesPath = "../../PowerShellEditorServices/module";
+    editorServicesLogLevel = LogLevel.Normal;
+    editorServicesWaitForDebugger = false;
+    waitForSessionFileTimeoutSeconds = 240;
 }
 
-export interface IDebuggingSettings {
-    createTemporaryIntegratedConsole?: boolean;
+// We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
+//   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
+//   is the reason terminals on macOS typically run login shells by default which set up
+//   the environment. See http://unix.stackexchange.com/a/119675/115410"
+class StartAsLoginShellSettings extends PartialSettings {
+    osx = true;
+    linux = false;
 }
 
-export interface IDeveloperSettings {
-    featureFlags?: string[];
-    bundledModulesPath: string;
-    editorServicesLogLevel: string;
-    editorServicesWaitForDebugger?: boolean;
-    waitForSessionFileTimeoutSeconds: number;
+class IntegratedConsoleSettings extends PartialSettings {
+    showOnStartup = true;
+    startInBackground = false;
+    focusConsoleOnExecute = true;
+    useLegacyReadLine = false;
+    forceClearScrollbackBuffer = false;
+    suppressStartupBanner = false;
 }
 
-export interface ISettings {
-    powerShellAdditionalExePaths?: IPowerShellAdditionalExePathSettings;
-    powerShellDefaultVersion?: string;
-    // This setting is no longer used but is here to assist in cleaning up the users settings.
-    powerShellExePath?: string;
-    promptToUpdatePowerShell?: boolean;
-    bundledModulesPath: string;
-    startAsLoginShell: IStartAsLoginShellSettings;
-    startAutomatically?: boolean;
-    enableProfileLoading: boolean;
-    helpCompletion: string;
-    scriptAnalysis?: IScriptAnalysisSettings;
-    debugging: IDebuggingSettings;
-    developer: IDeveloperSettings;
-    codeFolding?: ICodeFoldingSettings;
-    codeFormatting?: ICodeFormattingSettings;
-    integratedConsole: IIntegratedConsoleSettings;
-    bugReporting: IBugReportingSettings;
-    sideBar: ISideBarSettings;
-    pester: IPesterSettings;
-    buttons?: IButtonSettings;
-    cwd?: string;
-    notebooks?: INotebooksSettings;
-    enableReferencesCodeLens?: boolean;
-    analyzeOpenDocumentsOnly?: boolean;
+class SideBarSettings extends PartialSettings {
+    CommandExplorerVisibility = true;
+    CommandExplorerExcludeFilter: string[] = [];
 }
 
-export interface IStartAsLoginShellSettings {
-    osx: boolean;
-    linux: boolean;
+class PesterSettings extends PartialSettings {
+    useLegacyCodeLens = true;
+    outputVerbosity = "FromPreference";
+    debugOutputVerbosity = "Diagnostic";
 }
 
-export interface IIntegratedConsoleSettings {
-    showOnStartup?: boolean;
-    startInBackground?: boolean;
-    focusConsoleOnExecute: boolean;
-    useLegacyReadLine?: boolean;
-    forceClearScrollbackBuffer?: boolean;
-    suppressStartupBanner?: boolean;
+class ButtonSettings extends PartialSettings {
+    showRunButtons = true;
+    showPanelMovementButtons = false;
 }
 
-export interface ISideBarSettings {
-    CommandExplorerVisibility: boolean;
+// This is a recursive function which unpacks a WorkspaceConfiguration into our settings.
+function getSetting<TSetting>(key: string | undefined, value: TSetting, configuration: vscode.WorkspaceConfiguration): TSetting {
+    // Base case where we're looking at a primitive type (or our special record).
+    if (key !== undefined && !(value instanceof PartialSettings)) {
+        return configuration.get<TSetting>(key, value);
+    }
+
+    // Otherwise we're looking at one of our interfaces and need to extract.
+    for (const property in value) {
+        const subKey = key !== undefined ? `${key}.${property}` : property;
+        value[property] = getSetting(subKey, value[property], configuration);
+    }
+
+    return value;
 }
 
-export interface IPesterSettings {
-    useLegacyCodeLens: boolean;
-    outputVerbosity: string;
-    debugOutputVerbosity: string;
-}
-
-export interface IButtonSettings {
-    showRunButtons?: boolean;
-    showPanelMovementButtons?: boolean;
-}
-
-export interface INotebooksSettings {
-    saveMarkdownCellsAs?: CommentType;
-}
-
-// TODO: This could probably be async, and call `validateCwdSetting()` directly.
-export function load(): ISettings {
+export function getSettings(): Settings {
     const configuration: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
 
-    const defaultBugReportingSettings: IBugReportingSettings = {
-        project: "https://github.com/PowerShell/vscode-powershell",
-    };
-
-    const defaultScriptAnalysisSettings: IScriptAnalysisSettings = {
-        enable: true,
-        settingsPath: "PSScriptAnalyzerSettings.psd1",
-    };
-
-    const defaultDebuggingSettings: IDebuggingSettings = {
-        createTemporaryIntegratedConsole: false,
-    };
-
-    const defaultDeveloperSettings: IDeveloperSettings = {
-        featureFlags: [],
-        // From `<root>/out/main.js` we go to the directory before <root> and
-        // then into the other repo.
-        bundledModulesPath: "../../PowerShellEditorServices/module",
-        editorServicesLogLevel: "Normal",
-        editorServicesWaitForDebugger: false,
-        waitForSessionFileTimeoutSeconds: 240,
-    };
-
-    const defaultCodeFoldingSettings: ICodeFoldingSettings = {
-        enable: true,
-        showLastLine: false,
-    };
-
-    const defaultCodeFormattingSettings: ICodeFormattingSettings = {
-        autoCorrectAliases: false,
-        avoidSemicolonsAsLineTerminators: false,
-        preset: CodeFormattingPreset.Custom,
-        openBraceOnSameLine: true,
-        newLineAfterOpenBrace: true,
-        newLineAfterCloseBrace: true,
-        pipelineIndentationStyle: PipelineIndentationStyle.NoIndentation,
-        whitespaceBeforeOpenBrace: true,
-        whitespaceBeforeOpenParen: true,
-        whitespaceAroundOperator: true,
-        whitespaceAfterSeparator: true,
-        whitespaceBetweenParameters: false,
-        whitespaceInsideBrace: true,
-        addWhitespaceAroundPipe: true,
-        trimWhitespaceAroundPipe: false,
-        ignoreOneLineBlock: true,
-        alignPropertyValuePairs: true,
-        useConstantStrings: false,
-        useCorrectCasing: false,
-    };
-
-    const defaultStartAsLoginShellSettings: IStartAsLoginShellSettings = {
-        osx: true,
-        linux: false,
-    };
-
-    const defaultIntegratedConsoleSettings: IIntegratedConsoleSettings = {
-        showOnStartup: true,
-        startInBackground: false,
-        focusConsoleOnExecute: true,
-        useLegacyReadLine: false,
-        forceClearScrollbackBuffer: false,
-    };
-
-    const defaultSideBarSettings: ISideBarSettings = {
-        CommandExplorerVisibility: true,
-    };
-
-    const defaultButtonSettings: IButtonSettings = {
-        showRunButtons: true,
-        showPanelMovementButtons: false
-    };
-
-    const defaultPesterSettings: IPesterSettings = {
-        useLegacyCodeLens: true,
-        outputVerbosity: "FromPreference",
-        debugOutputVerbosity: "Diagnostic",
-    };
-
-    const defaultNotebooksSettings: INotebooksSettings = {
-        saveMarkdownCellsAs: CommentType.BlockComment,
-    };
-
-    // TODO: I believe all the defaults can be removed, as the `package.json` should supply them (and be the source of truth).
-    return {
-        startAutomatically:
-            configuration.get<boolean>("startAutomatically", true),
-        powerShellAdditionalExePaths:
-            configuration.get<IPowerShellAdditionalExePathSettings>("powerShellAdditionalExePaths"),
-        powerShellDefaultVersion:
-            configuration.get<string>("powerShellDefaultVersion"),
-        powerShellExePath:
-            configuration.get<string>("powerShellExePath"),
-        promptToUpdatePowerShell:
-            configuration.get<boolean>("promptToUpdatePowerShell", true),
-        bundledModulesPath:
-            "../modules", // Because the extension is always at `<root>/out/main.js`
-        enableProfileLoading:
-            configuration.get<boolean>("enableProfileLoading", false),
-        helpCompletion:
-            configuration.get<string>("helpCompletion", CommentType.BlockComment),
-        scriptAnalysis:
-            configuration.get<IScriptAnalysisSettings>("scriptAnalysis", defaultScriptAnalysisSettings),
-        debugging:
-            configuration.get<IDebuggingSettings>("debugging", defaultDebuggingSettings),
-        developer:
-            getWorkspaceSettingsWithDefaults<IDeveloperSettings>(configuration, "developer", defaultDeveloperSettings),
-        codeFolding:
-            configuration.get<ICodeFoldingSettings>("codeFolding", defaultCodeFoldingSettings),
-        codeFormatting:
-            configuration.get<ICodeFormattingSettings>("codeFormatting", defaultCodeFormattingSettings),
-        integratedConsole:
-            configuration.get<IIntegratedConsoleSettings>("integratedConsole", defaultIntegratedConsoleSettings),
-        bugReporting:
-            configuration.get<IBugReportingSettings>("bugReporting", defaultBugReportingSettings),
-        sideBar:
-            configuration.get<ISideBarSettings>("sideBar", defaultSideBarSettings),
-        pester:
-            configuration.get<IPesterSettings>("pester", defaultPesterSettings),
-        buttons:
-            configuration.get<IButtonSettings>("buttons", defaultButtonSettings),
-        notebooks:
-            configuration.get<INotebooksSettings>("notebooks", defaultNotebooksSettings),
-        startAsLoginShell:
-            // We follow the same convention as VS Code - https://github.com/microsoft/vscode/blob/ff00badd955d6cfcb8eab5f25f3edc86b762f49f/src/vs/workbench/contrib/terminal/browser/terminal.contribution.ts#L105-L107
-            //   "Unlike on Linux, ~/.profile is not sourced when logging into a macOS session. This
-            //   is the reason terminals on macOS typically run login shells by default which set up
-            //   the environment. See http://unix.stackexchange.com/a/119675/115410"
-            configuration.get<IStartAsLoginShellSettings>("startAsLoginShell", defaultStartAsLoginShellSettings),
-        cwd: // NOTE: This must be validated at startup via `validateCwdSetting()`. There's probably a better way to do this.
-            configuration.get<string>("cwd"),
-        enableReferencesCodeLens:
-            configuration.get<boolean>("enableReferencesCodeLens", true),
-        analyzeOpenDocumentsOnly:
-            configuration.get<boolean>("analyzeOpenDocumentsOnly", true),
-    };
+    return getSetting(undefined, new Settings(), configuration);
 }
 
 // Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
@@ -296,7 +188,7 @@ export function getEffectiveConfigurationTarget(settingName: string): vscode.Con
     return undefined;
 }
 
-export async function change(
+export async function changeSetting(
     settingName: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
@@ -311,19 +203,6 @@ export async function change(
     } catch (err) {
         logger?.writeError(`Failed to change setting: ${err}`);
     }
-}
-
-function getWorkspaceSettingsWithDefaults<TSettings>(
-    workspaceConfiguration: vscode.WorkspaceConfiguration,
-    settingName: string,
-    defaultSettings: TSettings): TSettings {
-
-    const importedSettings: TSettings = workspaceConfiguration.get<TSettings>(settingName, defaultSettings);
-
-    for (const setting in importedSettings) {
-        defaultSettings[setting] = importedSettings[setting];
-    }
-    return defaultSettings;
 }
 
 // We don't want to query the user more than once, so this is idempotent.
@@ -354,7 +233,7 @@ export async function validateCwdSetting(logger: Logger): Promise<string> {
         // Save the picked 'cwd' to the workspace settings.
         // We have to check again because the user may not have picked.
         if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
-            await change("cwd", cwd, undefined, logger);
+            await changeSetting("cwd", cwd, undefined, logger);
         }
     }
 

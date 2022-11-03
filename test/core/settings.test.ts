@@ -3,25 +3,34 @@
 
 import * as assert from "assert";
 import * as vscode from "vscode";
-import Settings = require("../../src/settings");
+import * as settings from "../../src/settings";
 
 describe("Settings module", function () {
     it("Loads without error", function () {
-        assert.doesNotThrow(Settings.load);
+        assert.doesNotThrow(settings.getSettings);
     });
 
+    it("Loads the correct defaults", function () {
+        const testSettings = new settings.Settings();
+        testSettings.enableProfileLoading = false;
+        testSettings.powerShellAdditionalExePaths = { "Some PowerShell": "somePath" };
+        const actualSettings = settings.getSettings();
+        assert.deepStrictEqual(actualSettings, testSettings);
+    });
+
+
     it("Updates correctly", async function () {
-        await Settings.change("helpCompletion", "LineComment", false, undefined);
-        assert.strictEqual(Settings.load().helpCompletion, "LineComment");
+        await settings.changeSetting("helpCompletion", settings.CommentType.LineComment, false, undefined);
+        assert.strictEqual(settings.getSettings().helpCompletion, settings.CommentType.LineComment);
     });
 
     it("Gets the effective configuration target", async function () {
-        await Settings.change("helpCompletion", "LineComment", false, undefined);
-        let target = Settings.getEffectiveConfigurationTarget("helpCompletion");
+        await settings.changeSetting("helpCompletion", settings.CommentType.LineComment, false, undefined);
+        let target = settings.getEffectiveConfigurationTarget("helpCompletion");
         assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);
 
-        await Settings.change("helpCompletion", undefined, false, undefined);
-        target = Settings.getEffectiveConfigurationTarget("helpCompletion");
+        await settings.changeSetting("helpCompletion", undefined, false, undefined);
+        target = settings.getEffectiveConfigurationTarget("helpCompletion");
         assert.strictEqual(target, undefined);
     });
 });

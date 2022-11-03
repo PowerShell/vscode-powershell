@@ -14,7 +14,7 @@ import { MessageItem, ProgressLocation, window } from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
 import { SessionManager } from "../session";
-import * as Settings from "../settings";
+import { changeSetting } from "../settings";
 import { isMacOS, isWindows } from "../utils";
 import { EvaluateRequestType } from "./Console";
 
@@ -195,7 +195,7 @@ export async function InvokePowerShellUpdateCheck(
 
         // Never choice.
     case 2:
-        await Settings.change("promptToUpdatePowerShell", false, true, logger);
+        await changeSetting("promptToUpdatePowerShell", false, true, logger);
         break;
     default:
         break;

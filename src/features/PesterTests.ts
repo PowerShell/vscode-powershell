@@ -4,7 +4,7 @@
 import * as path from "path";
 import vscode = require("vscode");
 import { SessionManager } from "../session";
-import Settings = require("../settings");
+import { getSettings } from "../settings";
 import utils = require("../utils");
 
 enum LaunchType {
@@ -83,7 +83,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         lineNum?: number,
         outputPath?: string): vscode.DebugConfiguration {
 
-        const settings = Settings.load();
+        const settings = getSettings();
 
         // Since we pass the script path to PSES in single quotes to avoid issues with PowerShell
         // special chars like & $ @ () [], we do have to double up the interior single quotes.
