@@ -71,7 +71,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         await this.languageClient.sendRequest(GetCommandRequestType).then((result) => {
             const exclusions = getSettings().sideBar.CommandExplorerExcludeFilter;
             const excludeFilter = exclusions.map((filter: string) => filter.toLowerCase());
-            result = result.filter((command) => (excludeFilter.indexOf(command.moduleName.toLowerCase()) === -1));
+            result = result.filter((command) => (!excludeFilter.includes(command.moduleName.toLowerCase())));
             this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
             this.commandsExplorerProvider.refresh();
         });
