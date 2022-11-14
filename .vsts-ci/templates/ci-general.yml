@@ -43,9 +43,17 @@ steps:
 
 - task: UseDotNet@2
   condition: not(${{ parameters.usePipelineArtifact }})
-  displayName: Install .NET 6.0.x SDK
+  displayName: Install .NET 7.0.x SDK
   inputs:
     packageType: sdk
+    version: 7.0.x
+    performMultiLevelLookup: true
+
+- task: UseDotNet@2
+  condition: not(${{ parameters.usePipelineArtifact }})
+  displayName: Install .NET 6.0.x runtime
+  inputs:
+    packageType: runtime
     version: 6.0.x
     performMultiLevelLookup: true
 
