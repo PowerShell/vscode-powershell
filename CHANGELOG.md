@@ -1,5 +1,67 @@
 # PowerShell Extension Release History
 
+## v2022.11.0
+### Wednesday, November 16, 2022
+
+The November release represents a renewed focus on the client, that is, the TypeScript
+extension for Visual Studio Code. We've paid back a significant amount of technical debt
+by enabling both the TypeScript compiler's and ESLint linter's strict checks, helping us
+ensure we are writing correct code. We've increased the client's logging, made the
+walkthrough's installation instructions cross-platform, added a warning popup when custom
+configured additional PowerShell executables aren't found, and fixed a couple debugger
+configuration edge cases.
+
+A regression for the `OnIdle` handler was fixed in the server, complete with regression
+tests covering the registration and triggering of idle events registered both in a profile
+and during a session. A workaround was implemented for a completion bug in PowerShell that
+was causing the LSP session to disconnect when used with third-party clients. When
+executing scripts, the path is now escaped with single quotes instead of double quotes,
+addressing the edge case where a path contains a dollar sign, and is now inline with
+PowerShell's semantics.
+
+The build is now correctly published in release mode which should be more performant and
+won't allow the user to accidentally enable the "wait for debugger" scenario (which can
+appear as a hang, though it is a correctly working feature that is now hidden behind more
+developer settings). Additionally, checks were added to both the server and client build
+pipelines to assert that the bits are in release mode before packaging, as it was
+unfortunately the act of running the tests that erroneously and silently overwrote release
+bits with debug bits.
+
+Finally, a long-standing bug that often prevented the server from starting with Windows
+PowerShell was resolved. Known to users as the `DryIoc` error (which was a misleading
+stacktrace that commonly popped up), we tracked down a broken dependency of OmniSharp that
+when present and loaded into the GAC caused a type resolution error. While it took a year
+for us to find the root cause, the fix was a single line dependency update for OmniSharp,
+and then some work to incorporate the OmniSharp update into the server.
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🚂 [vscode-powershell #3561](https://github.com/PowerShell/vscode-powershell/pull/4206) - Enable `strict` TypeScript mode .
+- 🐛 🔍 [vscode-powershell #4201](https://github.com/PowerShell/vscode-powershell/pull/4203) - Fix automatic focus to temporary debug terminal (if it exists).
+- 🐛 🚂 [vscode-powershell #4213](https://github.com/PowerShell/vscode-powershell/pull/4228) - Remove `FindModule.ts` since its long since been deprecated.
+- 🐛 🔍 [vscode-powershell #4223](https://github.com/PowerShell/vscode-powershell/pull/4227) - Only check a script's extension if a script file was given.
+- ✨ 👷 [vscode-powershell #4220](https://github.com/PowerShell/vscode-powershell/pull/4220) - Add assertion to build that PSES bits are built in release configuration.
+- ✨ 🚂 [vscode-powershell #3561](https://github.com/PowerShell/vscode-powershell/pull/4206) - Enable `strict` TypeScript mode .
+- 🐛 🔍 [vscode-powershell #4201](https://github.com/PowerShell/vscode-powershell/pull/4203) - Fix automatic focus to temporary debug terminal (if it exists).
+- ✨ 👷 [vscode-powershell #2882](https://github.com/PowerShell/vscode-powershell/pull/3331) - Replace TSLint with ESLint.
+- ✨ 💭 [vscode-powershell #4242](https://github.com/PowerShell/vscode-powershell/pull/4242) - Show warning when additional PowerShell is not found.
+- 🐛 🛫 [vscode-powershell #4241](https://github.com/PowerShell/vscode-powershell/pull/4241) - Guard `-WaitForDebugger` flag client-side too.
+- ✨ 💭 [vscode-powershell #4240](https://github.com/PowerShell/vscode-powershell/pull/4240) - Capture more logs.
+- ✨ 💭 [vscode-powershell #4235](https://github.com/PowerShell/vscode-powershell/pull/4235) - Refactor `settings.ts`.
+- 🐛 📺 [vscode-powershell #4149](https://github.com/PowerShell/vscode-powershell/pull/4233) - Add cross-platform installation to walkthrough.
+- 🐛 🔍 [vscode-powershell #4231](https://github.com/PowerShell/vscode-powershell/pull/4231) - Check script extension for current file only.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.6.1
+
+- 🐛 🚂 [vscode-powershell #4219](https://github.com/PowerShell/PowerShellEditorServices/pull/1936) - Fix regression around `OnIdle` handler.
+- 🐛 🧠 [PowerShellEditorServices #1926](https://github.com/PowerShell/PowerShellEditorServices/pull/1935) - Catch exceptions within completion handler.
+- 🐛 👷 [vscode-powershell #4218](https://github.com/PowerShell/PowerShellEditorServices/pull/1933) - Fix release build.
+- ✨ 📖 [PowerShellEditorServices #1932](https://github.com/PowerShell/PowerShellEditorServices/pull/1932) - Add example of starting PSES in a script to readme. (Thanks @smartguy1196!)
+- #️⃣ 🙏 [PowerShellEditorServices #1931](https://github.com/PowerShell/PowerShellEditorServices/pull/1931) - Fix broken links in readme. (Thanks @smartguy1196!)
+- #️⃣ 🙏 [PowerShellEditorServices #1947](https://github.com/PowerShell/PowerShellEditorServices/pull/1947) - Manually update `Newtonsoft.Json`.
+- 🐛 🚂 [vscode-powershell #4175](https://github.com/PowerShell/PowerShellEditorServices/pull/1946) - Bump OmniSharp to `v0.19.6`.
+- 🐛 🔍 [vscode-powershell #4238](https://github.com/PowerShell/PowerShellEditorServices/pull/1940) - Wrap script paths with single instead of double quotes.
+
 ## v2022.11.0-preview
 ### Thursday, November 03, 2022
 
