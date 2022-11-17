@@ -10,10 +10,6 @@ import utils = require("./utils");
 import { IEditorServicesSessionDetails } from "./session";
 
 export class PowerShellProcess {
-    public static escapeSingleQuotes(psPath: string): string {
-        return psPath.replace(new RegExp("'", "g"), "''");
-    }
-
     // This is used to warn the user that the extension is taking longer than expected to startup.
     // After the 15th try we've hit 30 seconds and should warn.
     private static warnUserThreshold = 15;
@@ -51,8 +47,8 @@ export class PowerShellProcess {
                 : "";
 
         this.startPsesArgs +=
-            `-LogPath '${PowerShellProcess.escapeSingleQuotes(editorServicesLogPath.fsPath)}' ` +
-            `-SessionDetailsPath '${PowerShellProcess.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
+            `-LogPath '${utils.escapeSingleQuotes(editorServicesLogPath.fsPath)}' ` +
+            `-SessionDetailsPath '${utils.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 
         if (this.sessionSettings.integratedConsole.useLegacyReadLine) {
@@ -78,7 +74,7 @@ export class PowerShellProcess {
         }
 
         const startEditorServices = "Import-Module '" +
-            PowerShellProcess.escapeSingleQuotes(psesModulePath) +
+            utils.escapeSingleQuotes(psesModulePath) +
             "'; Start-EditorServices " + this.startPsesArgs;
 
         // On Windows we unfortunately can't Base64 encode the startup command

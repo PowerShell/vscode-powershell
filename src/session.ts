@@ -551,7 +551,7 @@ export class SessionManager implements Middleware {
             "-HostProfileId 'Microsoft.VSCode' " +
             `-HostVersion '${this.HostVersion}' ` +
             "-AdditionalModules @('PowerShellEditorServices.VSCode') " +
-            `-BundledModulesPath '${PowerShellProcess.escapeSingleQuotes(bundledModulesPath)}' ` +
+            `-BundledModulesPath '${utils.escapeSingleQuotes(bundledModulesPath)}' ` +
             "-EnableConsoleRepl ";
 
         if (this.sessionSettings.integratedConsole.suppressStartupBanner) {

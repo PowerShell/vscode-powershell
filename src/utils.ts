@@ -7,6 +7,10 @@ import vscode = require("vscode");
 
 export const PowerShellLanguageId = "powershell";
 
+export function escapeSingleQuotes(p: string): string {
+    return p.replace(new RegExp("'", "g"), "''");
+}
+
 export function getPipePath(pipeName: string) {
     if (os.platform() === "win32") {
         return "\\\\.\\pipe\\" + pipeName;
