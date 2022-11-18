@@ -84,11 +84,6 @@ export class PesterTestsFeature implements vscode.Disposable {
         outputPath?: string): vscode.DebugConfiguration {
 
         const settings = getSettings();
-
-        // Since we pass the script path to PSES in single quotes to avoid issues with PowerShell
-        // special chars like & $ @ () [], we do have to double up the interior single quotes.
-        const scriptPath = fileUri.fsPath.replace(/'/g, "''");
-
         const launchConfig = {
             request: "launch",
             type: "PowerShell",
@@ -96,7 +91,7 @@ export class PesterTestsFeature implements vscode.Disposable {
             script: this.invokePesterStubScriptPath,
             args: [
                 "-ScriptPath",
-                `'${scriptPath}'`,
+                `'${utils.escapeSingleQuotes(fileUri.fsPath)}'`,
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: (launchType === LaunchType.Run),
@@ -106,12 +101,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         if (lineNum) {
             launchConfig.args.push("-LineNumber", `${lineNum}`);
         } else if (testName) {
-            // Escape single quotes inside double quotes by doubling them up
-            if (testName.includes("'")) {
-                testName = testName.replace(/'/g, "''");
-            }
-
-            launchConfig.args.push("-TestName", `'${testName}'`);
+            launchConfig.args.push("-TestName", `'${utils.escapeSingleQuotes(testName)}'`);
         } else {
             launchConfig.args.push("-All");
         }
