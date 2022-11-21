@@ -40,8 +40,10 @@ export class Logger implements ILogger {
     constructor(logLevelName: string, globalStorageUri: vscode.Uri) {
         this.logLevel = Logger.logLevelNameToValue(logLevelName);
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
+        // We have to override the scheme because it defaults to
+        // 'vscode-userdata' which breaks UNC paths.
         this.logDirectoryPath = vscode.Uri.joinPath(
-            globalStorageUri,
+            globalStorageUri.with({ scheme: "file" }),
             "logs",
             `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
         this.logFilePath = this.getLogFilePath("vscode-powershell");
