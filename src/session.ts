@@ -635,6 +635,7 @@ Type 'help' to get help.
             initializationOptions: {
                 enableProfileLoading: this.sessionSettings.enableProfileLoading,
                 initialWorkingDirectory: this.sessionSettings.cwd,
+                shellIntegrationEnabled: vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled"),
             },
             errorHandler: {
                 // Override the default error handler to prevent it from
