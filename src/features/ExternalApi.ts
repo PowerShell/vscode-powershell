@@ -169,7 +169,9 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     }
 
     public getStorageUri(): vscode.Uri {
-        return this.extensionContext.globalStorageUri;
+        // We have to override the scheme because it defaults to
+        // 'vscode-userdata' which breaks UNC paths.
+        return this.extensionContext.globalStorageUri.with({ scheme: "file"});
     }
 
     public dispose() {

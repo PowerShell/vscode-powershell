@@ -111,7 +111,9 @@ export class SessionManager implements Middleware {
 
         // Create the language status item
         this.languageStatusItem = this.createStatusBarItem();
-        this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri, "sessions");
+        // We have to override the scheme because it defaults to
+        // 'vscode-userdata' which breaks UNC paths.
+        this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri.with({ scheme: "file"}), "sessions");
         this.platformDetails = getPlatformDetails();
         this.HostName = hostName;
         this.HostVersion = hostVersion;

@@ -35,12 +35,15 @@ export class Logger implements ILogger {
     private logChannel: vscode.OutputChannel;
     private logFilePath: vscode.Uri;
     private logDirectoryCreated = false;
+    private writingLog = false;
 
     constructor(logLevelName: string, globalStorageUri: vscode.Uri) {
         this.logLevel = Logger.logLevelNameToValue(logLevelName);
         this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
+        // We have to override the scheme because it defaults to
+        // 'vscode-userdata' which breaks UNC paths.
         this.logDirectoryPath = vscode.Uri.joinPath(
-            globalStorageUri,
+            globalStorageUri.with({ scheme: "file" }),
             "logs",
             `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
         this.logFilePath = this.getLogFilePath("vscode-powershell");
@@ -194,11 +197,16 @@ export class Logger implements ILogger {
         const timestampedMessage = Logger.timestampMessage(message, level);
         this.logChannel.appendLine(timestampedMessage);
         if (this.logLevel !== LogLevel.None) {
+            // A simple lock because this function isn't re-entrant.
+            while (this.writingLog) {
+                await utils.sleep(300);
+            }
             try {
+                this.writingLog = true;
                 if (!this.logDirectoryCreated) {
                     this.logChannel.appendLine(Logger.timestampMessage(`Creating log directory at: '${this.logDirectoryPath}'`, level));
                     await vscode.workspace.fs.createDirectory(this.logDirectoryPath);
-                    this.logDirectoryCreated = await utils.checkIfDirectoryExists(this.logDirectoryPath);
+                    this.logDirectoryCreated = true;
                 }
                 let log = new Uint8Array();
                 if (await utils.checkIfFileExists(this.logFilePath)) {
@@ -209,6 +217,8 @@ export class Logger implements ILogger {
                     Buffer.concat([log, Buffer.from(timestampedMessage)]));
             } catch (e) {
                 console.log(`Error writing to vscode-powershell log file: ${e}`);
+            } finally {
+                this.writingLog = false;
             }
         }
     }
