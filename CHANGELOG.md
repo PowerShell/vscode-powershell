@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2022.11.1-preview
+### Monday, November 21, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 💭 [vscode-powershell #4202](https://github.com/PowerShell/vscode-powershell/pull/4276) - Make `Logger.WriteLine` thread-safe and fix bug with UNC paths.
+- ✨ 📟 [vscode-powershell #4271](https://github.com/PowerShell/vscode-powershell/pull/4271) - Send shell integration setting to server.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.6.2
+
+- ✨ 📟 [vscode-powershell #3901](https://github.com/PowerShell/PowerShellEditorServices/pull/1958) - Enable VS Code's shell integration.
+- 🐛 🔍 [vscode-powershell #4269](https://github.com/PowerShell/PowerShellEditorServices/pull/1957) - Escape single quotes when launching a script by path.
+- ✨ 🚨 [PowerShellEditorServices #1955](https://github.com/PowerShell/PowerShellEditorServices/pull/1955) - Add PowerShell 7.3 to test matrix.
+
 ## v2022.11.0
 ### Wednesday, November 16, 2022
 
