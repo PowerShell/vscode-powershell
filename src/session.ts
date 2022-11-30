@@ -492,17 +492,22 @@ export class SessionManager implements Middleware {
         let foundPowerShell: IPowerShellExeDetails | undefined;
         try {
             let defaultPowerShell: IPowerShellExeDetails | undefined;
-            if (this.sessionSettings.powerShellDefaultVersion !== "") {
+            const wantedName = this.sessionSettings.powerShellDefaultVersion;
+            if (wantedName !== "") {
                 for await (const details of powershellExeFinder.enumeratePowerShellInstallations()) {
                     // Need to compare names case-insensitively, from https://stackoverflow.com/a/2140723
-                    const wantedName = this.sessionSettings.powerShellDefaultVersion;
                     if (wantedName.localeCompare(details.displayName, undefined, { sensitivity: "accent" }) === 0) {
                         defaultPowerShell = details;
                         break;
                     }
                 }
+
             }
             foundPowerShell = defaultPowerShell ?? await powershellExeFinder.getFirstAvailablePowerShellInstallation();
+            if (defaultPowerShell === undefined && foundPowerShell !== undefined) {
+                void this.logger.writeAndShowWarning(`The 'powerShellDefaultVersion' setting was '${wantedName}' but this was not found!`
+                    + ` Instead using first available installation '${foundPowerShell.displayName}' at '${foundPowerShell.exePath}'!`);
+            }
         } catch (e) {
             this.logger.writeError(`Error occurred while searching for a PowerShell executable:\n${e}`);
         }
