@@ -504,7 +504,7 @@ export class SessionManager implements Middleware {
 
             }
             foundPowerShell = defaultPowerShell ?? await powershellExeFinder.getFirstAvailablePowerShellInstallation();
-            if (defaultPowerShell === undefined && foundPowerShell !== undefined) {
+            if (wantedName !== "" && defaultPowerShell === undefined && foundPowerShell !== undefined) {
                 void this.logger.writeAndShowWarning(`The 'powerShellDefaultVersion' setting was '${wantedName}' but this was not found!`
                     + ` Instead using first available installation '${foundPowerShell.displayName}' at '${foundPowerShell.exePath}'!`);
             }
