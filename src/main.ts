@@ -145,8 +145,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new GenerateBugReportFeature(sessionManager),
         new ISECompatibilityFeature(),
         new OpenInISEFeature(),
-        new PesterTestsFeature(sessionManager),
-        new RunCodeFeature(sessionManager),
+        new PesterTestsFeature(sessionManager, logger),
+        new RunCodeFeature(sessionManager, logger),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
     ];

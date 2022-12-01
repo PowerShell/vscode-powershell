@@ -10,7 +10,7 @@ import {
 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
-import { getSettings } from "../settings";
+import { getSettings, validateCwdSetting } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export interface IExtensionCommand {
@@ -368,32 +368,20 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         return EditorOperationResponse.Completed;
     }
 
-    private openFile(openFileDetails: IOpenFileDetails): Thenable<EditorOperationResponse> {
-        const filePath = this.normalizeFilePath(openFileDetails.filePath);
-
-        const promise =
-            vscode.workspace.openTextDocument(filePath)
-                .then((doc) => vscode.window.showTextDocument(
-                    doc,
-                    { preview: openFileDetails.preview }))
-                .then((_) => EditorOperationResponse.Completed);
-
-        return promise;
+    private async openFile(openFileDetails: IOpenFileDetails): Promise<EditorOperationResponse> {
+        const filePath = await this.normalizeFilePath(openFileDetails.filePath);
+        const doc = await vscode.workspace.openTextDocument(filePath);
+        await vscode.window.showTextDocument(doc, { preview: openFileDetails.preview });
+        return EditorOperationResponse.Completed;
     }
 
-    private closeFile(filePath: string): Thenable<EditorOperationResponse> {
-        let promise: Thenable<EditorOperationResponse>;
-        if (this.findTextDocument(this.normalizeFilePath(filePath))) {
-            promise =
-                vscode.workspace.openTextDocument(filePath)
-                    .then((doc) => vscode.window.showTextDocument(doc))
-                    .then((_) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
-                    .then((_) => EditorOperationResponse.Completed);
-        } else {
-            promise = Promise.resolve(EditorOperationResponse.Completed);
+    private async closeFile(filePath: string): Promise<EditorOperationResponse> {
+        if (this.findTextDocument(await this.normalizeFilePath(filePath))) {
+            const doc = await vscode.workspace.openTextDocument(filePath);
+            await vscode.window.showTextDocument(doc);
+            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         }
-
-        return promise;
+        return EditorOperationResponse.Completed;
     }
 
     /**
@@ -413,7 +401,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         switch (currentFileUri.scheme) {
         case "file": {
             // If the file to save can't be found, just complete the request
-            if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
+            if (!this.findTextDocument(await this.normalizeFilePath(currentFileUri.fsPath))) {
                 void this.logger.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
                 return EditorOperationResponse.Completed;
             }
@@ -449,23 +437,8 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             if (path.isAbsolute(saveFileDetails.newPath)) {
                 newFileAbsolutePath = saveFileDetails.newPath;
             } else {
-                // In fresh contexts, workspaceFolders is not defined...
-                if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-                    void this.logger.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
-                            "Try saving to an absolute path, or open a workspace.");
-                    return EditorOperationResponse.Completed;
-                }
-
-                // If not, interpret the path as relative to the workspace root
-                const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
-                // We don't support saving to a non-file URI-schemed workspace
-                if (workspaceRootUri.scheme !== "file") {
-                    void this.logger.writeAndShowWarning(
-                        "Cannot save untitled file to a relative path in an untitled workspace. " +
-                            "Try saving to an absolute path or opening a workspace folder.");
-                    return EditorOperationResponse.Completed;
-                }
-                newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
+                const cwd = await validateCwdSetting(this.logger);
+                newFileAbsolutePath = path.join(cwd, saveFileDetails.newPath);
             }
             break; }
 
@@ -511,14 +484,13 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         await vscode.window.showTextDocument(newFile, { preview: true });
     }
 
-    private normalizeFilePath(filePath: string): string {
+    private async normalizeFilePath(filePath: string): Promise<string> {
+        const cwd = await validateCwdSetting(this.logger);
         const platform = os.platform();
         if (platform === "win32") {
             // Make sure the file path is absolute
             if (!path.win32.isAbsolute(filePath)) {
-                filePath = path.win32.resolve(
-                    vscode.workspace.rootPath!,
-                    filePath);
+                filePath = path.win32.resolve(cwd, filePath);
             }
 
             // Normalize file path case for comparison for Windows
@@ -526,9 +498,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         } else {
             // Make sure the file path is absolute
             if (!path.isAbsolute(filePath)) {
-                filePath = path.resolve(
-                    vscode.workspace.rootPath!,
-                    filePath);
+                filePath = path.resolve(cwd, filePath);
             }
 
             // macOS is case-insensitive

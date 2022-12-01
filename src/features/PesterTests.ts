@@ -3,8 +3,9 @@
 
 import * as path from "path";
 import vscode = require("vscode");
+import { Logger } from "../logging";
 import { SessionManager } from "../session";
-import { getSettings } from "../settings";
+import { getSettings, chosenWorkspace, validateCwdSetting } from "../settings";
 import utils = require("../utils");
 
 enum LaunchType {
@@ -16,7 +17,7 @@ export class PesterTestsFeature implements vscode.Disposable {
     private commands: vscode.Disposable[];
     private invokePesterStubScriptPath: string;
 
-    constructor(private sessionManager: SessionManager) {
+    constructor(private sessionManager: SessionManager, private logger: Logger) {
         this.invokePesterStubScriptPath = path.resolve(__dirname, "../modules/PowerShellEditorServices/InvokePesterStub.ps1");
         this.commands = [
             // File context-menu command - Run Pester Tests
@@ -129,11 +130,10 @@ export class PesterTestsFeature implements vscode.Disposable {
         // TODO: #367 Check if "newSession" mode is configured
         this.sessionManager.showDebugTerminal(true);
 
-        // TODO: Update to handle multiple root workspaces.
-        //
         // Ensure the necessary script exists (for testing). The debugger will
         // start regardless, but we also pass its success along.
+        await validateCwdSetting(this.logger);
         return await utils.checkIfFileExists(this.invokePesterStubScriptPath)
-            && vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
+            && vscode.debug.startDebugging(chosenWorkspace, launchConfig);
     }
 }

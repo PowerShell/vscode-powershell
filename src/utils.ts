@@ -24,6 +24,9 @@ export function getPipePath(pipeName: string) {
 // Check that the file or directory exists in an asynchronous manner that relies
 // solely on the VS Code API, not Node's fs library, ignoring symlinks.
 async function checkIfFileOrDirectoryExists(targetPath: string | vscode.Uri, type: vscode.FileType): Promise<boolean> {
+    if (targetPath === "") {
+        return false;
+    }
     try {
         const stat: vscode.FileStat = await vscode.workspace.fs.stat(
             targetPath instanceof vscode.Uri
