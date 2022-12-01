@@ -3,7 +3,8 @@
 
 import vscode = require("vscode");
 import { SessionManager } from "../session";
-import { getSettings } from "../settings";
+import { Logger } from "../logging";
+import { getSettings, chosenWorkspace, validateCwdSetting } from "../settings";
 
 enum LaunchType {
     Debug,
@@ -13,7 +14,7 @@ enum LaunchType {
 export class RunCodeFeature implements vscode.Disposable {
     private command: vscode.Disposable;
 
-    constructor(private sessionManager: SessionManager) {
+    constructor(private sessionManager: SessionManager, private logger: Logger) {
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunCode",
             async (runInDebugger: boolean, scriptToRun: string, args: string[]) => {
@@ -40,8 +41,8 @@ export class RunCodeFeature implements vscode.Disposable {
         // TODO: #367: Check if "newSession" mode is configured
         this.sessionManager.showDebugTerminal(true);
 
-        // TODO: Update to handle multiple root workspaces.
-        await vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], launchConfig);
+        await validateCwdSetting(this.logger);
+        await vscode.debug.startDebugging(chosenWorkspace, launchConfig);
     }
 }
 
