@@ -15,7 +15,7 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { Logger } from "../logging";
 import { SessionManager } from "../session";
 import { changeSetting } from "../settings";
-import { isMacOS, isWindows } from "../utils";
+import { isLinux, isMacOS, isWindows } from "../utils";
 import { EvaluateRequestType } from "./Console";
 
 const streamPipeline = util.promisify(stream.pipeline);
@@ -113,7 +113,8 @@ export async function InvokePowerShellUpdateCheck(
     }). The current latest release is ${release.version.raw
     }.`;
 
-    if (process.platform === "linux") {
+    // Cannot auto-install for Linux or Windows that isn't x86 or x64.
+    if (isLinux || (isWindows && (arch !== "X86" && arch !== "X64"))) {
         void logger.writeAndShowInformation(`${commonText} We recommend updating to the latest version.`);
         return;
     }
@@ -134,7 +135,7 @@ export async function InvokePowerShellUpdateCheck(
     // Yes choice.
     case 0:
         if (isWindows) {
-            const msiMatcher = arch === "x86" ?
+            const msiMatcher = arch === "X86" ?
                 "win-x86.msi" : "win-x64.msi";
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
