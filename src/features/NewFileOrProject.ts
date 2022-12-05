@@ -5,7 +5,7 @@ import vscode = require("vscode");
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 
 export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
@@ -13,7 +13,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
     private waitingForClientToken?: vscode.CancellationTokenSource;
 
-    constructor(private logger: Logger) {
+    constructor(private logger: ILogger) {
         super();
         this.command =
             vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", async () => {

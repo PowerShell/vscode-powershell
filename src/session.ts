@@ -7,7 +7,7 @@ import * as semver from "semver";
 import vscode = require("vscode");
 import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
 import { Message } from "vscode-jsonrpc";
-import { Logger } from "./logging";
+import { ILogger } from "./logging";
 import { PowerShellProcess } from "./process";
 import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
@@ -103,7 +103,7 @@ export class SessionManager implements Middleware {
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionSettings: Settings,
-        private logger: Logger,
+        private logger: ILogger,
         private documentSelector: DocumentSelector,
         hostName: string,
         hostVersion: string,

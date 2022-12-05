@@ -4,7 +4,7 @@
 import * as vscode from "vscode";
 import { RequestType0 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import { getSettings } from "../settings";
 
@@ -30,7 +30,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;
 
-    constructor(private logger: Logger) {
+    constructor(private logger: ILogger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",

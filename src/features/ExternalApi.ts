@@ -4,7 +4,7 @@
 import * as vscode from "vscode";
 import { v4 as uuidv4 } from "uuid";
 import { LanguageClientConsumer } from "../languageClientConsumer";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import { SessionManager } from "../session";
 
 export interface IExternalPowerShellDetails {
@@ -39,7 +39,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionManager: SessionManager,
-        private logger: Logger) {
+        private logger: ILogger) {
         super();
     }
 

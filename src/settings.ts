@@ -4,7 +4,7 @@
 import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");
-import { Logger } from "./logging";
+import { ILogger } from "./logging";
 
 // TODO: Quite a few of these settings are unused in the client and instead
 // exist just for the server. Those settings do not need to be represented in
@@ -193,7 +193,7 @@ export async function changeSetting(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
     configurationTarget: vscode.ConfigurationTarget | boolean | undefined,
-    logger: Logger | undefined): Promise<void> {
+    logger: ILogger | undefined): Promise<void> {
 
     logger?.writeDiagnostic(`Changing '${settingName}' at scope '${configurationTarget} to '${newValue}'`);
 
@@ -209,7 +209,7 @@ export async function changeSetting(
 let hasPrompted = false;
 export let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
 
-export async function validateCwdSetting(logger: Logger): Promise<string> {
+export async function validateCwdSetting(logger: ILogger): Promise<string> {
     let cwd: string | undefined = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd");
 
     // Only use the cwd setting if it exists.

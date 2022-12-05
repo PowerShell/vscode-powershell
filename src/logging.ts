@@ -19,12 +19,19 @@ export enum LogLevel {
  *  This will allow for easy mocking of the logger during unit tests.
  */
 export interface ILogger {
+    getLogFilePath(baseName: string): vscode.Uri;
+    updateLogLevel(logLevelName: string): void;
     write(message: string, ...additionalMessages: string[]): void;
+    writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void>;
     writeDiagnostic(message: string, ...additionalMessages: string[]): void;
     writeVerbose(message: string, ...additionalMessages: string[]): void;
     writeWarning(message: string, ...additionalMessages: string[]): void;
     writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void>;
     writeError(message: string, ...additionalMessages: string[]): void;
+    writeAndShowError(message: string, ...additionalMessages: string[]): Promise<void>;
+    writeAndShowErrorWithActions(
+        message: string,
+        actions: { prompt: string; action: (() => Promise<void>) | undefined }[]): Promise<void>;
 }
 
 export class Logger implements ILogger {

@@ -9,7 +9,7 @@ import {
     Position, Range, RequestType
 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import { getSettings, validateCwdSetting } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -149,7 +149,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private handlers: vscode.Disposable[] = [];
     private extensionCommands: IExtensionCommand[] = [];
 
-    constructor(private logger: Logger) {
+    constructor(private logger: ILogger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", async () => {

@@ -3,7 +3,7 @@
 
 import * as path from "path";
 import vscode = require("vscode");
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import { SessionManager } from "../session";
 import { getSettings, chosenWorkspace, validateCwdSetting } from "../settings";
 import utils = require("../utils");
@@ -17,7 +17,7 @@ export class PesterTestsFeature implements vscode.Disposable {
     private commands: vscode.Disposable[];
     private invokePesterStubScriptPath: string;
 
-    constructor(private sessionManager: SessionManager, private logger: Logger) {
+    constructor(private sessionManager: SessionManager, private logger: ILogger) {
         this.invokePesterStubScriptPath = path.resolve(__dirname, "../modules/PowerShellEditorServices/InvokePesterStub.ps1");
         this.commands = [
             // File context-menu command - Run Pester Tests

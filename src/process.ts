@@ -4,7 +4,7 @@
 import cp = require("child_process");
 import path = require("path");
 import vscode = require("vscode");
-import { Logger } from "./logging";
+import { ILogger } from "./logging";
 import Settings = require("./settings");
 import utils = require("./utils");
 import { IEditorServicesSessionDetails } from "./session";
@@ -24,7 +24,7 @@ export class PowerShellProcess {
         public exePath: string,
         private bundledModulesPath: string,
         private title: string,
-        private logger: Logger,
+        private logger: ILogger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
         private sessionSettings: Settings.Settings) {
