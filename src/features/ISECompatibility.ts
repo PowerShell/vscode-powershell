@@ -28,6 +28,7 @@ export class ISECompatibilityFeature implements vscode.Disposable {
 
     private _commandRegistrations: vscode.Disposable[] = [];
     private _iseModeEnabled: boolean;
+    private _originalSettings: Record<string, boolean | string | undefined> = {};
 
     constructor() {
         // TODO: This test isn't great.
@@ -50,7 +51,9 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         this._iseModeEnabled = true;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             try {
-                await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, iseSetting.value, true);
+                const config = vscode.workspace.getConfiguration(iseSetting.path);
+                this._originalSettings[iseSetting.path + iseSetting.name] = config.get(iseSetting.name);
+                await config.update(iseSetting.name, iseSetting.value, true);
             } catch {
                 // The `update` call can fail if the setting doesn't exist. This
                 // happens when the extension runs in Azure Data Studio, which
@@ -72,9 +75,10 @@ export class ISECompatibilityFeature implements vscode.Disposable {
     private async DisableISEMode() {
         this._iseModeEnabled = false;
         for (const iseSetting of ISECompatibilityFeature.settings) {
-            const currently = vscode.workspace.getConfiguration(iseSetting.path).get<string | boolean>(iseSetting.name);
+            const config = vscode.workspace.getConfiguration(iseSetting.path);
+            const currently = config.get(iseSetting.name);
             if (currently === iseSetting.value) {
-                await vscode.workspace.getConfiguration(iseSetting.path).update(iseSetting.name, undefined, true);
+                await config.update(iseSetting.name, this._originalSettings[iseSetting.path + iseSetting.name], true);
             }
         }
     }
