@@ -177,7 +177,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 }),
 
             vscode.commands.registerCommand("PowerShell.ClosePanel",
-                async () => { await vscode.commands.executeCommand("workbench.action.closePanel"); }),
+                async () => { await vscode.commands.executeCommand("workbench.action.togglePanel"); }),
 
             vscode.commands.registerCommand("PowerShell.PositionPanelLeft",
                 async () => { await vscode.commands.executeCommand("workbench.action.positionPanelLeft"); }),

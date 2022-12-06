@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "(Preview) Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.65.0"
+    "vscode": "^1.67.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/main/README.md",
@@ -280,29 +280,19 @@
       {
         "command": "PowerShell.ClosePanel",
         "title": "Close panel",
-        "category": "PowerShell",
-        "icon": {
-          "light": "media/resources/light/ClosePanel.svg",
-          "dark": "media/resources/dark/ClosePanel.svg"
-        }
+        "category": "PowerShell"
       },
       {
         "command": "PowerShell.PositionPanelLeft",
         "title": "Move panel left",
         "category": "PowerShell",
-        "icon": {
-          "light": "media/resources/light/MovePanelLeft.svg",
-          "dark": "media/resources/dark/MovePanelLeft.svg"
-        }
+        "icon": "$(layout-sidebar-left)"
       },
       {
         "command": "PowerShell.PositionPanelBottom",
         "title": "Move panel to bottom",
         "category": "PowerShell",
-        "icon": {
-          "light": "media/resources/light/MovePanelBottom.svg",
-          "dark": "media/resources/dark/MovePanelBottom.svg"
-        }
+        "icon": "$(layout-panel-right)"
       }
     ],
     "menus": {
@@ -352,11 +342,6 @@
           "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
           "command": "PowerShell.PositionPanelLeft",
           "group": "navigation@98"
-        },
-        {
-          "when": "editorLangId == powershell && config.powershell.buttons.showPanelMovementButtons",
-          "command": "PowerShell.ClosePanel",
-          "group": "navigation@99"
         },
         {
           "when": "editorLangId == powershell && config.powershell.buttons.showRunButtons",
