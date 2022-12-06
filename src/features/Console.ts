@@ -5,7 +5,7 @@ import vscode = require("vscode");
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import { getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
@@ -170,7 +170,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
     private handlers: vscode.Disposable[] = [];
 
-    constructor(private logger: Logger) {
+    constructor(private logger: ILogger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {

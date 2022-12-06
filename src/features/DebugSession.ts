@@ -12,7 +12,7 @@ import { getPlatformDetails, OperatingSystem } from "../platform";
 import { PowerShellProcess } from "../process";
 import { IEditorServicesSessionDetails, SessionManager, SessionStatus } from "../session";
 import { getSettings } from "../settings";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import path = require("path");
 import utils = require("../utils");
@@ -65,7 +65,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         },
     };
 
-    constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: Logger) {
+    constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: ILogger) {
         super();
         // Register a debug configuration provider
         context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("PowerShell", this));
@@ -359,7 +359,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
     private waitingForClientToken?: vscode.CancellationTokenSource;
     private getLanguageClientResolve?: (value: LanguageClient) => void;
 
-    constructor(private logger: Logger) {
+    constructor(private logger: ILogger) {
         super();
 
         this.command =
@@ -485,7 +485,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
     private waitingForClientToken?: vscode.CancellationTokenSource;
     private getLanguageClientResolve?: (value: LanguageClient) => void;
 
-    constructor(private logger: Logger) {
+    constructor(private logger: ILogger) {
         super();
         this.command =
             vscode.commands.registerCommand("PowerShell.PickRunspace", (processId) => {

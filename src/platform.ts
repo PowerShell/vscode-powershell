@@ -5,7 +5,7 @@ import * as os from "os";
 import * as path from "path";
 import * as process from "process";
 import { integer } from "vscode-languageserver-protocol";
-import { Logger } from "./logging";
+import { ILogger } from "./logging";
 import { PowerShellAdditionalExePathSettings } from "./settings";
 
 // This uses require so we can rewire it in unit tests!
@@ -86,7 +86,7 @@ export class PowerShellExeFinder {
         private platformDetails: IPlatformDetails,
         // Additional configured PowerShells
         private additionalPowerShellExes: PowerShellAdditionalExePathSettings,
-        private logger: Logger) { }
+        private logger: ILogger) { }
 
     /**
      * Returns the first available PowerShell executable found in the search order.

@@ -3,7 +3,7 @@
 
 import vscode = require("vscode");
 import { SessionManager } from "../session";
-import { Logger } from "../logging";
+import { ILogger } from "../logging";
 import { getSettings, chosenWorkspace, validateCwdSetting } from "../settings";
 
 enum LaunchType {
@@ -14,7 +14,7 @@ enum LaunchType {
 export class RunCodeFeature implements vscode.Disposable {
     private command: vscode.Disposable;
 
-    constructor(private sessionManager: SessionManager, private logger: Logger) {
+    constructor(private sessionManager: SessionManager, private logger: ILogger) {
         this.command = vscode.commands.registerCommand(
             "PowerShell.RunCode",
             async (runInDebugger: boolean, scriptToRun: string, args: string[]) => {

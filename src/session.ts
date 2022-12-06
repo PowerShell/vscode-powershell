@@ -3,11 +3,10 @@
 
 import net = require("net");
 import path = require("path");
-import * as semver from "semver";
 import vscode = require("vscode");
 import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
 import { Message } from "vscode-jsonrpc";
-import { Logger } from "./logging";
+import { ILogger } from "./logging";
 import { PowerShellProcess } from "./process";
 import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
@@ -19,12 +18,13 @@ import {
 } from "vscode-languageclient";
 import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
 
-import { GitHubReleaseInformation, InvokePowerShellUpdateCheck } from "./features/UpdatePowerShell";
+import { UpdatePowerShell } from "./features/UpdatePowerShell";
 import {
     getPlatformDetails, IPlatformDetails, IPowerShellExeDetails,
     OperatingSystem, PowerShellExeFinder
 } from "./platform";
 import { LanguageClientConsumer } from "./languageClientConsumer";
+import { SemVer } from "semver";
 
 export enum SessionStatus {
     NeverStarted,
@@ -55,15 +55,9 @@ export interface IEditorServicesSessionDetails {
 
 export interface IPowerShellVersionDetails {
     version: string;
-    displayVersion: string;
     edition: string;
+    commit: string;
     architecture: string;
-}
-
-export interface IRunspaceDetails {
-    powerShellVersion: IPowerShellVersionDetails;
-    runspaceType: RunspaceType;
-    connectionString: string;
 }
 
 export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
@@ -103,7 +97,7 @@ export class SessionManager implements Middleware {
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionSettings: Settings,
-        private logger: Logger,
+        private logger: ILogger,
         private documentSelector: DocumentSelector,
         hostName: string,
         hostVersion: string,
@@ -716,39 +710,9 @@ Type 'help' to get help.
         // We haven't "started" until we're done getting the version information.
         this.started = true;
 
+        const updater = new UpdatePowerShell(this, this.sessionSettings, this.logger, this.versionDetails);
         // NOTE: We specifically don't want to wait for this.
-        void this.checkForPowerShellUpdate();
-    }
-
-    private async checkForPowerShellUpdate() {
-        // If the user opted to not check for updates, then don't.
-        if (!this.sessionSettings.promptToUpdatePowerShell) {
-            return;
-        }
-
-        const localVersion = semver.parse(this.versionDetails!.version);
-        if (semver.lt(localVersion!, "6.0.0")) {
-            // Skip prompting when using Windows PowerShell for now.
-            return;
-        }
-
-        try {
-            // Fetch the latest PowerShell releases from GitHub.
-            const isPreRelease = !!semver.prerelease(localVersion!);
-            const release: GitHubReleaseInformation =
-                await GitHubReleaseInformation.FetchLatestRelease(isPreRelease);
-
-            await InvokePowerShellUpdateCheck(
-                this,
-                this.languageClient!,
-                localVersion!,
-                this.versionDetails!.architecture,
-                release,
-                this.logger);
-        } catch (err) {
-            // Best effort. This probably failed to fetch the data from GitHub.
-            this.logger.writeWarning(err instanceof Error ? err.message : "unknown");
-        }
+        void updater.checkForUpdate();
     }
 
     private createStatusBarItem(): vscode.LanguageStatusItem {
@@ -765,12 +729,9 @@ Type 'help' to get help.
         this.languageStatusItem.detail = "PowerShell";
 
         if (this.versionDetails !== undefined) {
-            const version = this.versionDetails.architecture === "x86"
-                ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture})`
-                : this.versionDetails.displayVersion;
-
-            this.languageStatusItem.text = "$(terminal-powershell) " + version;
-            this.languageStatusItem.detail += " " + version;
+            const semver = new SemVer(this.versionDetails.version);
+            this.languageStatusItem.text = `$(terminal-powershell) ${semver.major}.${semver.minor}`;
+            this.languageStatusItem.detail += ` ${this.versionDetails.commit} (${this.versionDetails.architecture.toLowerCase()})`;
         }
 
         if (statusText) {
@@ -866,8 +827,8 @@ Type 'help' to get help.
                 const powerShellSessionName =
                         currentPowerShellExe ?
                             currentPowerShellExe.displayName :
-                            `PowerShell ${this.versionDetails.displayVersion} ` +
-                            `(${this.versionDetails.architecture}) ${this.versionDetails.edition} Edition ` +
+                            `PowerShell ${this.versionDetails.version} ` +
+                            `(${this.versionDetails.architecture.toLowerCase()}) ${this.versionDetails.edition} Edition ` +
                             `[${this.versionDetails.version}]`;
 
                 sessionText = `Current session: ${powerShellSessionName}`;
