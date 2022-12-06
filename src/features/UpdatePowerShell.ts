@@ -53,7 +53,11 @@ export class UpdatePowerShell {
         private sessionSettings: Settings,
         private logger: ILogger,
         versionDetails: IPowerShellVersionDetails) {
-        this.localVersion = new SemVer(versionDetails.version);
+        // We use the commit field as it's like
+        // '7.3.0-preview.3-508-g07175ae0ff8eb7306fe0b0fc7d...' which translates
+        // to SemVer. The version handler in PSES handles Windows PowerShell and
+        // just returns the first three fields like '5.1.22621'.
+        this.localVersion = new SemVer(versionDetails.commit);
         this.architecture = versionDetails.architecture.toLowerCase();
     }
 
@@ -77,8 +81,27 @@ export class UpdatePowerShell {
             return false;
         }
 
-        // TODO: Check if PowerShell is self-built, i.e. PSVersionInfo.GitCommitId.Length > 40.
-        // TODO: Check if preview is a daily build.
+        if (this.localVersion.prerelease.length > 1) {
+            // Daily builds look like '7.3.0-daily20221206.1' which split to
+            // ['daily20221206', '1'] and development builds look like
+            // '7.3.0-preview.3-508-g07175...' which splits to ['preview',
+            // '3-508-g0717...']. The ellipsis is hiding a 40 char hash.
+            const daily = this.localVersion.prerelease[0].toString();
+            const commit = this.localVersion.prerelease[1].toString();
+
+            // Skip if PowerShell is self-built, that is, this contains a commit hash.
+            if (commit.length >= 40) {
+                this.logger.writeDiagnostic("Not offering to update development build.");
+                return false;
+            }
+
+            // Skip if preview is a daily build.
+            if (daily.toLowerCase().startsWith("daily")) {
+                this.logger.writeDiagnostic("Not offering to update daily build.");
+                return false;
+            }
+        }
+
         // TODO: Check if network is available?
         // TODO: Only check once a week.
         this.logger.writeDiagnostic("Should check for PowerShell update.");

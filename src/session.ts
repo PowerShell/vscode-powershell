@@ -24,6 +24,7 @@ import {
     OperatingSystem, PowerShellExeFinder
 } from "./platform";
 import { LanguageClientConsumer } from "./languageClientConsumer";
+import { SemVer } from "semver";
 
 export enum SessionStatus {
     NeverStarted,
@@ -54,15 +55,9 @@ export interface IEditorServicesSessionDetails {
 
 export interface IPowerShellVersionDetails {
     version: string;
-    displayVersion: string;
     edition: string;
+    commit: string;
     architecture: string;
-}
-
-export interface IRunspaceDetails {
-    powerShellVersion: IPowerShellVersionDetails;
-    runspaceType: RunspaceType;
-    connectionString: string;
 }
 
 export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
@@ -734,12 +729,9 @@ Type 'help' to get help.
         this.languageStatusItem.detail = "PowerShell";
 
         if (this.versionDetails !== undefined) {
-            const version = this.versionDetails.architecture.toLowerCase() !== "x64"
-                ? `${this.versionDetails.displayVersion} (${this.versionDetails.architecture.toLowerCase()})`
-                : this.versionDetails.displayVersion;
-
-            this.languageStatusItem.text = "$(terminal-powershell) " + version;
-            this.languageStatusItem.detail += " " + version;
+            const semver = new SemVer(this.versionDetails.version);
+            this.languageStatusItem.text = `$(terminal-powershell) ${semver.major}.${semver.minor}`;
+            this.languageStatusItem.detail += ` ${this.versionDetails.commit} (${this.versionDetails.architecture.toLowerCase()})`;
         }
 
         if (statusText) {
@@ -835,7 +827,7 @@ Type 'help' to get help.
                 const powerShellSessionName =
                         currentPowerShellExe ?
                             currentPowerShellExe.displayName :
-                            `PowerShell ${this.versionDetails.displayVersion} ` +
+                            `PowerShell ${this.versionDetails.version} ` +
                             `(${this.versionDetails.architecture.toLowerCase()}) ${this.versionDetails.edition} Edition ` +
                             `[${this.versionDetails.version}]`;
 

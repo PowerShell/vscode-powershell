@@ -70,6 +70,7 @@ steps:
   inputs:
     targetType: inline
     script: |
+      Get-ChildItem env:
       Get-Module -ListAvailable Pester
       Install-Module InvokeBuild -Scope CurrentUser -Force
       Install-Module platyPS -Scope CurrentUser -Force
