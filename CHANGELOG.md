@@ -1,5 +1,25 @@
 # PowerShell Extension Release History
 
+## v2022.12.0-preview
+### Tuesday, December 06, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🔧 [vscode-powershell #4308](https://github.com/PowerShell/vscode-powershell/pull/4308) - Restore original settings after disabling ISE mode.
+- ✨ 🚂 [vscode-powershell #4301](https://github.com/PowerShell/vscode-powershell/pull/4307) - Bump engine to 1.67.0 and update panel graphics.
+- ✨ 🛫 [vscode-powershell #3226](https://github.com/PowerShell/vscode-powershell/pull/4306) - Rewrite `UpdatePowerShell` feature.
+- 🐛 🛫 [vscode-powershell #3435](https://github.com/PowerShell/vscode-powershell/pull/4298) - Skip auto-update on unsupported Windows architectures.
+- 🐛 🔧 [vscode-powershell #4297](https://github.com/PowerShell/vscode-powershell/pull/4297) - Fix small bug with `powerShellDefaultVersion` warning.
+- ✨ 🔧 [vscode-powershell #4129](https://github.com/PowerShell/vscode-powershell/pull/4295) - Show warning if `powerShellDefaultVersion` is set but not found.
+- ✨ 📁 [vscode-powershell #2153](https://github.com/PowerShell/vscode-powershell/pull/3796) - Fully support multi-root workspaces.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.7.0
+
+- ✨ 👷 [PowerShellEditorServices #1879](https://github.com/PowerShell/PowerShellEditorServices/pull/1967) - Drop support for end-of-life PowerShell 7.0.
+- ✨ 🛫 [PowerShellEditorServices #1965](https://github.com/PowerShell/PowerShellEditorServices/pull/1965) - Send `GitCommitId` over `GetVersionHandler`.
+- 🐛 🛫 [PowerShellEditorServices #1964](https://github.com/PowerShell/PowerShellEditorServices/pull/1964) - Remove unnecessary `PowerShellProcessArchitecture`.
+- 🐛 🚂 [PowerShellEditorServices #1953](https://github.com/PowerShell/PowerShellEditorServices/pull/1953) - Fix `IsExternalInit` bug, re-enable tests, and update OmniSharp to v0.19.7.
+
 ## v2022.11.2-preview
 ### Tuesday, November 29, 2022
 
