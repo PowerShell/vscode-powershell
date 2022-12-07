@@ -606,7 +606,7 @@
       "\t${0:$TM_SELECTED_TEXT}",
       "}",
       "catch {",
-      "\t{1:<#Do this if a terminating exception happens#>}",
+      "\t${1:<#Do this if a terminating exception happens#>}",
       "}"
     ]
   },
