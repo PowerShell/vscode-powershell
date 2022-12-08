@@ -8,6 +8,7 @@
   "engines": {
     "vscode": "^1.67.0"
   },
+  "author": "Microsoft Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
   "homepage": "https://github.com/PowerShell/vscode-powershell/blob/main/README.md",
   "categories": [
@@ -15,16 +16,41 @@
     "Formatters",
     "Programming Languages",
     "Snippets",
-    "Linters"
+    "Linters",
+    "Themes"
+  ],
+  "keywords": [
+    "PowerShell",
+    "pwsh"
   ],
   "icon": "media/PowerShell_Preview_Icon.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"
   },
+  "badges": [
+    {
+      "url": "https://dev.azure.com/powershell/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=main",
+      "href": "https://dev.azure.com/powershell/vscode-powershell/_build/latest?definitionId=51&branchName=main",
+      "description": "Build Status"
+    },
+    {
+      "url": "https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white",
+      "href": "https://aka.ms/powershell-vscode-discord",
+      "description": "Join the chat on Discord"
+    },
+    {
+      "url": "https://badges.gitter.im/PowerShell/vscode-powershell.svg",
+      "href": "https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge",
+      "description": "Join the chat on Gitter"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/PowerShell/vscode-powershell.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PowerShell/vscode-powershell/issues"
   },
   "activationEvents": [
     "onDebugResolve:PowerShell",

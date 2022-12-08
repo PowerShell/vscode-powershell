@@ -1,14 +1,14 @@
-# PowerShell Language Support for Azure Data Studio
+# PowerShell  for Azure Data Studio
 
 [![Build Status](https://dev.azure.com/powershell/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=main)](https://dev.azure.com/powershell/vscode-powershell/_build/latest?definitionId=51&branchName=main)
 [![Version](https://vsmarketplacebadge.apphb.com/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
-[![Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/powershell-vscode-discord)
-[![Join the chat at https://gitter.im/PowerShell/vscode-powershell](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat on Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/powershell-vscode-discord)
+[![Join the chat on Gitter](https://badges.gitter.im/PowerShell/vscode-powershell.svg)](https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This extension provides rich PowerShell language support for [Azure Data Studio](https://github.com/Microsoft/azuredatastudio) (ADS).
 Now you can write and run PowerShell scripts using the excellent IDE-like interface
-that Azure Data Studio provides.
+that ADS provides.
 
 This extension is powered by the PowerShell language server,
 [PowerShell Editor Services](https://github.com/PowerShell/PowerShellEditorServices).
@@ -23,14 +23,15 @@ select "PowerShell ISE" for a fun and familiar experience.
 
 ## Platform Support
 
-The extension _should_ work anywhere ADS itself and PowerShell Core 7 or higher is
+The extension _should_ work anywhere ADS itself and PowerShell Core 7.2 or higher is
 [supported][]. For Windows PowerShell, only version 5.1 is supported. Please note that
 PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
 following:
 
-- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.4
-- **macOS 10.15** with PowerShell Core 7.2.5
-- **Ubuntu 20.04** with PowerShell Core 7.2.4
+- **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell Core 7.2.7
+- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.7
+- **macOS 11** with PowerShell Core 7.2.7
+- **Ubuntu 20.04** with PowerShell Core 7.2.7
 
 [supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle?view=powershell-7.1#supported-platforms
 
