@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2022.12.1-preview
+### Monday, December 12, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🔧 [vscode-powershell #4315](https://github.com/PowerShell/vscode-powershell/pull/4320) - Enhance (and correct) our settings' descriptions using markdown.
+- 🐛 ✂️ [vscode-powershell #3964](https://github.com/PowerShell/vscode-powershell/pull/4311) - Fix `try-catch` snippet (missing a `$`).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.7.1
+
+- 🐛 🚂 [vscode-powershell #4212](https://github.com/PowerShell/PowerShellEditorServices/pull/1970) - Fix `ShowHelpHandler` by running with `RequiresForeground`.
+
 ## v2022.12.0-preview
 ### Tuesday, December 06, 2022
 

@@ -41,6 +41,11 @@ steps:
     archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
     destinationFolder: $(Build.SourcesDirectory)/vscode-powershell/modules
 
+- task: NodeTool@0
+  displayName: Install Node.js
+  inputs:
+    versionSpec: 16.x
+
 - task: UseDotNet@2
   condition: not(${{ parameters.usePipelineArtifact }})
   displayName: Install .NET 7.0.x SDK
