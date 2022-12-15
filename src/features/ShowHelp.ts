@@ -18,7 +18,7 @@ export class ShowHelpFeature extends LanguageClientConsumer {
     constructor() {
         super();
         this.command = vscode.commands.registerCommand("PowerShell.ShowHelp", async (item?) => {
-            if (!item || !item.Name) {
+            if (!item?.Name) {
 
                 const editor = vscode.window.activeTextEditor;
                 if (editor === undefined) {

@@ -211,6 +211,9 @@ export class PowerShellExeFinder {
 
             break;
         }
+
+        // Look for PSCore daily
+        yield this.findPSCoreDaily();
     }
 
     /**
@@ -254,6 +257,42 @@ export class PowerShellExeFinder {
 
         case OperatingSystem.Windows:
             return await this.findPSCoreWindowsInstallation({ findPreview: true });
+
+        case OperatingSystem.Unknown:
+            return undefined;
+        }
+    }
+
+    /**
+    * If the daily was installed via 'https://aka.ms/install-powershell.ps1', then
+    * this is the default installation location:
+    *
+    * if ($IsWinEnv) {
+    *     $Destination = "$env:LOCALAPPDATA\Microsoft\powershell"
+    * } else {
+    *     $Destination = "~/.powershell"
+    * }
+    *
+    * if ($Daily) {
+    *     $Destination = "${Destination}-daily"
+    * }
+    */
+    private findPSCoreDaily(): IPossiblePowerShellExe | undefined {
+        switch (this.platformDetails.operatingSystem) {
+        case OperatingSystem.Linux:
+        case OperatingSystem.MacOS: {
+            const exePath = path.join(os.homedir(), ".powershell-daily", "pwsh");
+            return new PossiblePowerShellExe(exePath, "PowerShell Daily");
+        }
+
+        case OperatingSystem.Windows: {
+            // We can't proceed if there's no LOCALAPPDATA path
+            if (!process.env.LOCALAPPDATA) {
+                return undefined;
+            }
+            const exePath = path.join(process.env.LOCALAPPDATA, "Microsoft", "powershell-daily", "pwsh.exe");
+            return new PossiblePowerShellExe(exePath, "PowerShell Daily");
+        }
 
         case OperatingSystem.Unknown:
             return undefined;

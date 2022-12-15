@@ -4,6 +4,7 @@
 import * as assert from "assert";
 import mockFS = require("mock-fs");
 import FileSystem = require("mock-fs/lib/filesystem");
+import * as os from "os";
 import * as path from "path";
 import rewire = require("rewire");
 import * as sinon from "sinon";
@@ -61,14 +62,13 @@ interface ITestPlatformSuccessCase extends ITestPlatform {
 // Platform configurations where we expect to find a set of PowerShells
 let successTestCases: ITestPlatformSuccessCase[];
 
-let msixAppDir: string;
-let pwshMsixPath: string;
-let pwshPreviewMsixPath: string;
 
 if (process.platform === "win32") {
-    msixAppDir = path.join(process.env.LOCALAPPDATA!, "Microsoft", "WindowsApps");
-    pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
-    pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
+    const msixAppDir = path.join(process.env.LOCALAPPDATA!, "Microsoft", "WindowsApps");
+    const pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
+    const pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
+    const pwshDailyDir = path.join(process.env.LOCALAPPDATA!, "Microsoft", "powershell-daily");
+    const pwshDailyPath = path.join(pwshDailyDir, "pwsh.exe");
 
     successTestCases = [
         {
@@ -124,6 +124,11 @@ if (process.platform === "win32") {
                     displayName: "Windows PowerShell (x86)",
                     supportsProperArguments: true
                 },
+                {
+                    exePath: pwshDailyPath,
+                    displayName: "PowerShell Daily",
+                    supportsProperArguments: true
+                }
             ],
             filesystem: {
                 "C:\\Program Files\\PowerShell": {
@@ -156,6 +161,9 @@ if (process.platform === "win32") {
                 "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
                     "powershell.exe": "",
                 },
+                [pwshDailyDir]: {
+                    "pwsh.exe": "",
+                }
             },
         },
         {
@@ -436,6 +444,7 @@ if (process.platform === "win32") {
         },
     ];
 } else {
+    const pwshDailyDir = path.join(os.homedir(), ".powershell-daily");
     successTestCases = [
         {
             name: "Linux (all installations)",
@@ -466,6 +475,11 @@ if (process.platform === "win32") {
                     displayName: "PowerShell Preview Snap",
                     supportsProperArguments: true
                 },
+                {
+                    exePath: path.join(pwshDailyDir, "pwsh"),
+                    displayName: "PowerShell Daily",
+                    supportsProperArguments: true
+                }
             ],
             filesystem: {
                 "/usr/bin": {
@@ -476,6 +490,9 @@ if (process.platform === "win32") {
                     "pwsh": "",
                     "pwsh-preview": "",
                 },
+                [pwshDailyDir]: {
+                    "pwsh": ""
+                }
             },
         },
         {
@@ -497,12 +514,20 @@ if (process.platform === "win32") {
                     displayName: "PowerShell Preview",
                     supportsProperArguments: true
                 },
+                {
+                    exePath: path.join(pwshDailyDir, "pwsh"),
+                    displayName: "PowerShell Daily",
+                    supportsProperArguments: true
+                }
             ],
             filesystem: {
                 "/usr/local/bin": {
                     "pwsh": "",
                     "pwsh-preview": "",
                 },
+                [pwshDailyDir]: {
+                    "pwsh": ""
+                }
             },
         },
         {
