@@ -1,5 +1,43 @@
 # PowerShell Extension Release History
 
+## v2022.12.1
+### Thursday, December 15, 2022
+
+This release brings a variety of bugfixes and feature improvements, including everyone's
+favorite: [VS Code Terminal Shell Integration][shell-integration] in the PowerShell
+Extension Terminal! We overhauled the PowerShell update notification feature, with support
+for more platforms and architectures. Also checkout the revamped settings descriptions in
+VS Code, complete with formatting and hyperlinks.
+
+[shell-integration]: https://code.visualstudio.com/docs/terminal/shell-integration
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🔧 [vscode-powershell #4315](https://github.com/PowerShell/vscode-powershell/pull/4320) - Enhance (and correct) our settings' descriptions using markdown.
+- 🐛 ✂️ [vscode-powershell #3964](https://github.com/PowerShell/vscode-powershell/pull/4311) - Fix `try-catch` snippet (missing a `$`).
+- 🐛 🔧 [vscode-powershell #4308](https://github.com/PowerShell/vscode-powershell/pull/4308) - Restore original settings after disabling ISE mode.
+- ✨ 🚂 [vscode-powershell #4301](https://github.com/PowerShell/vscode-powershell/pull/4307) - Bump engine to 1.67.0 and update panel graphics.
+- ✨ 🛫 [vscode-powershell #3226](https://github.com/PowerShell/vscode-powershell/pull/4306) - Rewrite `UpdatePowerShell` feature.
+- 🐛 🛫 [vscode-powershell #3435](https://github.com/PowerShell/vscode-powershell/pull/4298) - Skip auto-update on unsupported Windows architectures.
+- 🐛 🔧 [vscode-powershell #4297](https://github.com/PowerShell/vscode-powershell/pull/4297) - Fix small bug with `powerShellDefaultVersion` warning.
+- ✨ 🔧 [vscode-powershell #4129](https://github.com/PowerShell/vscode-powershell/pull/4295) - Show warning if `powerShellDefaultVersion` is set but not found.
+- ✨ 📁 [vscode-powershell #2153](https://github.com/PowerShell/vscode-powershell/pull/3796) - Fully support multi-root workspaces.
+- 🐛 💭 [vscode-powershell #4202](https://github.com/PowerShell/vscode-powershell/pull/4276) - Make `Logger.WriteLine` thread-safe and fix bug with UNC paths.
+- ✨ 📟 [vscode-powershell #4271](https://github.com/PowerShell/vscode-powershell/pull/4271) - Send shell integration setting to server.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.7.1
+
+- 🐛 🚂 [vscode-powershell #4212](https://github.com/PowerShell/PowerShellEditorServices/pull/1970) - Fix `ShowHelpHandler` by running with `RequiresForeground`.
+- ✨ 👷 [PowerShellEditorServices #1879](https://github.com/PowerShell/PowerShellEditorServices/pull/1967) - Drop support for end-of-life PowerShell 7.0.
+- ✨ 🛫 [PowerShellEditorServices #1965](https://github.com/PowerShell/PowerShellEditorServices/pull/1965) - Send `GitCommitId` over `GetVersionHandler`.
+- 🐛 🛫 [PowerShellEditorServices #1964](https://github.com/PowerShell/PowerShellEditorServices/pull/1964) - Remove unnecessary `PowerShellProcessArchitecture`.
+- 🐛 🚂 [PowerShellEditorServices #1953](https://github.com/PowerShell/PowerShellEditorServices/pull/1953) - Fix `IsExternalInit` bug, re-enable tests, and update OmniSharp to v0.19.7.
+- 🐛 🙏 [PowerShellEditorServices #1962](https://github.com/PowerShell/PowerShellEditorServices/pull/1962) - Revert manual pin of Newtonsoft.Json.
+- 🐛 📟 [vscode-powershell #4279](https://github.com/PowerShell/PowerShellEditorServices/pull/1961) - Replace backtick-e with `$([char]0x1b)`.
+- ✨ 📟 [vscode-powershell #3901](https://github.com/PowerShell/PowerShellEditorServices/pull/1958) - Enable VS Code's shell integration.
+- 🐛 🔍 [vscode-powershell #4269](https://github.com/PowerShell/PowerShellEditorServices/pull/1957) - Escape single quotes when launching a script by path.
+- ✨ 🚨 [PowerShellEditorServices #1955](https://github.com/PowerShell/PowerShellEditorServices/pull/1955) - Add PowerShell 7.3 to test matrix.
+
 ## v2022.12.1-preview
 ### Monday, December 12, 2022
 
