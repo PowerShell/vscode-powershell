@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2022.12.2-preview
+### Tuesday, December 20, 2022
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🛫 [vscode-powershell #4329](https://github.com/PowerShell/vscode-powershell/pull/4331) - Automatically find "PowerShell Daily" at its common path.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.7.2
+
+- 🐛 🔍 [vscode-powershell #4174](https://github.com/PowerShell/PowerShellEditorServices/pull/1975) - Fix several bugs in the debugger.
+- #️⃣ 🙏 [PowerShellEditorServices #1973](https://github.com/PowerShell/PowerShellEditorServices/pull/1973) - Update `Microsoft.PowerShell.SDK` with workaround.
+
 ## v2022.12.1
 ### Thursday, December 15, 2022
 
