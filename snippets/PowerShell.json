@@ -33,7 +33,7 @@
     "description": "A blueprint used to create instances of objects at run time. More: Get-Help about_Classes",
     "body": [
       "class ${1:ClassName} {",
-      "\t${0:${TM_SELECTED_TEXT:< #Define the class. Try constructors, properties, or methods #>}}",
+      "\t${0:${TM_SELECTED_TEXT:<# Define the class. Try constructors, properties, or methods. #>}}",
       "}"
     ]
   },
