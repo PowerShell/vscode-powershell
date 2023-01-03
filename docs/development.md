@@ -20,7 +20,7 @@ to before you can proceed.
    > using VSCode Insiders means the extension can be developed ready for new features and changes in the next VSCode
    > release.
 
-5. Install [Node.js](https://nodejs.org/en/) 10.x or higher.
+5. Install [Node.js](https://nodejs.org/en/) 16.x or higher.
 
 [fork]: https://help.github.com/articles/fork-a-repo/
 
