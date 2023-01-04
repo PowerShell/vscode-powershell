@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2023.1.0-preview
+### Wednesday, January 04, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 👷 [vscode-powershell #4357](https://github.com/PowerShell/vscode-powershell/pull/4357) - Fix `@vscode/vsce` dependency after its rename.
+- 🐛 ✂️ [vscode-powershell #4346](https://github.com/PowerShell/vscode-powershell/pull/4347) - fix class snippet (unnecessary space between `<` and `#`). (Thanks @ALiwoto!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.7.3
+
+- 🐛 🚂 [vscode-powershell #4343](https://github.com/PowerShell/PowerShellEditorServices/pull/1982) - Update VS Code shell integration script.
+- ✨ 🙏 [PowerShellEditorServices #1981](https://github.com/PowerShell/PowerShellEditorServices/pull/1981) - Make `Set-ScriptExtent` not slow.
+- 🐛 🙏 [PowerShellEditorServices #1959](https://github.com/PowerShell/PowerShellEditorServices/pull/1980) - Use an empty array instead of `null`.
+
 ## v2022.12.2-preview
 ### Tuesday, December 20, 2022
 
