@@ -96,7 +96,7 @@
     "@typescript-eslint/parser": "^5.48.2",
     "@vscode/test-electron": "~2.2.2",
     "@vscode/vsce": "~2.16.0",
-    "esbuild": "^0.16.17",
+    "esbuild": "^0.17.2",
     "eslint": "^8.32.0",
     "eslint-plugin-header": "^3.1.1",
     "glob": "^8.0.3",
