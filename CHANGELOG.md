@@ -1,12 +1,36 @@
 # PowerShell Extension Release History
 
+## v2023.1.0
+### Wednesday, January 18, 2023
+
+First stable release for the new year, includes a multitude of fixes for the debugger!
+Expanding variables with properties that are inaccessible no longer causes a short-circuit
+preventing the rest of the properties from being expanded, variable values whose expansion
+results in PowerShell code being executed now works as expected, and in general all the
+correct properties are now present. We look forward to adding the ability to view static
+and private fields in a future update.
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 👷 [vscode-powershell #4357](https://github.com/PowerShell/vscode-powershell/pull/4357) - Fix `@vscode/vsce` dependency after its rename.
+- 🐛 ✂️ [vscode-powershell #4346](https://github.com/PowerShell/vscode-powershell/pull/4347) - Fix class snippet (unnecessary space between `<` and `#`). (Thanks @ALiwoto!)
+- 🐛 🛫 [vscode-powershell #4329](https://github.com/PowerShell/vscode-powershell/pull/4331) - Automatically find "PowerShell Daily" at its common path.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.7.3
+
+- 🐛 🚂 [vscode-powershell #4343](https://github.com/PowerShell/PowerShellEditorServices/pull/1982) - Update VS Code shell integration script.
+- ✨ 🙏 [PowerShellEditorServices #1981](https://github.com/PowerShell/PowerShellEditorServices/pull/1981) - Make `Set-ScriptExtent` not slow.
+- 🐛 🙏 [PowerShellEditorServices #1959](https://github.com/PowerShell/PowerShellEditorServices/pull/1980) - Use an empty array instead of `null`.
+- 🐛 🔍 [vscode-powershell #4174](https://github.com/PowerShell/PowerShellEditorServices/pull/1975) - Fix several bugs in the debugger.
+- #️⃣ 🙏 [PowerShellEditorServices #1973](https://github.com/PowerShell/PowerShellEditorServices/pull/1973) - Update `Microsoft.PowerShell.SDK` with workaround.
+
 ## v2023.1.0-preview
 ### Wednesday, January 04, 2023
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
 
 - 🐛 👷 [vscode-powershell #4357](https://github.com/PowerShell/vscode-powershell/pull/4357) - Fix `@vscode/vsce` dependency after its rename.
-- 🐛 ✂️ [vscode-powershell #4346](https://github.com/PowerShell/vscode-powershell/pull/4347) - fix class snippet (unnecessary space between `<` and `#`). (Thanks @ALiwoto!)
+- 🐛 ✂️ [vscode-powershell #4346](https://github.com/PowerShell/vscode-powershell/pull/4347) - Fix class snippet (unnecessary space between `<` and `#`). (Thanks @ALiwoto!)
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.7.3
 
