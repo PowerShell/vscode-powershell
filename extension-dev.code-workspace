@@ -44,7 +44,8 @@
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     // Lock the TypeScript SDK path to the version we use
-    "typescript.tsdk": "Client/node_modules/typescript/lib"
+    "typescript.tsdk": "Client/node_modules/typescript/lib",
+    "powershell.cwd": "/workspaces/vscode-powershell"
   },
   "tasks": {
     "version": "2.0.0",
