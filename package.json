@@ -92,7 +92,7 @@
     "@types/sinon": "~10.0.13",
     "@types/uuid": "~9.0.0",
     "@types/vscode": "~1.65.0",
-    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "@vscode/test-electron": "~2.2.3",
     "@vscode/vsce": "~2.17.0",
