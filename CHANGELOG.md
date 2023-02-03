@@ -1,5 +1,32 @@
 # PowerShell Extension Release History
 
+## v2023.2.0-preview
+### Thursday, February 02, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+This preview includes all the work outlined below for enhanced symbol support.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.0
+
+In the PR below we rewrote all the symbol logic. Classes (and their properties and
+methods) are now proper symbols. Instead of a dozen similar-yet-different Abstract Symbol
+Tree (AST) PowerShell script visitors handling different parts of each symbol-related
+request, we have a single visitor that builds a cached dictionary of symbols for each
+file. This was a massive simplification of the code that also leads to huge performance
+improvements across all the symbol related features:
+
+- [Go to Symbol in Workspace](https://code.visualstudio.com/Docs/editor/editingevolved#_open-symbol-by-name)
+- [Go to Symbol in Editor](https://code.visualstudio.com/Docs/editor/editingevolved#_go-to-symbol)
+- [Go to Definition](https://code.visualstudio.com/Docs/editor/editingevolved#_go-to-definition)
+- [Go to References / CodeLens](https://code.visualstudio.com/Docs/editor/editingevolved#_reference-information)
+- [Outline view](https://code.visualstudio.com/docs/getstarted/userinterface#_outline-view)
+
+Please try it out and give us feedback! There's plenty of room for more improvement, and
+this will be much easier going forward.
+
+- ✨ 🙏 [PowerShellEditorServices #1984](https://github.com/PowerShell/PowerShellEditorServices/pull/1984) - Integrating class symbol support.
+
 ## v2023.1.0
 ### Wednesday, January 18, 2023
 
