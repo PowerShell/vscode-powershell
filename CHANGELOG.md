@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2023.2.1-preview
+### Monday, February 13, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+Includes the updates from PowerShell Editor Services below:
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.1
+
+- ✨ 📁 [vscode-powershell #2112](https://github.com/PowerShell/PowerShellEditorServices/pull/1995) - Add `WorkspaceFolders` and use it when enumerating files.
+- ✨ 🙏 [vscode-powershell #1481](https://github.com/PowerShell/PowerShellEditorServices/pull/1993) - Count `${Function:My-Function}` as a function reference.
+- 🐛 🙏 [vscode-powershell #1089](https://github.com/PowerShell/PowerShellEditorServices/pull/1990) - Strip scope from function references.
+- 🐛 🙏 [PowerShellEditorServices #1989](https://github.com/PowerShell/PowerShellEditorServices/pull/1989) - Keep only first assignment as declaration.
+- ✨ 🐢 [PowerShellEditorServices #1988](https://github.com/PowerShell/PowerShellEditorServices/pull/1988) - Support Run/Debug tests in PSKoans-files. (Thanks @fflaten!)
+
 ## v2023.2.0-preview
 ### Thursday, February 02, 2023
 
