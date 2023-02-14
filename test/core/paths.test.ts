@@ -14,13 +14,6 @@ describe("Path assumptions", function () {
         globalStorageUri = extension.getStorageUri();
     });
 
-    // TODO: This is skipped because it interferes with other tests. Either
-    // need to find a way to close the opened folder via a Code API, or find
-    // another way to test this.
-    it.skip("Opens the examples folder at the expected path", async function () {
-        assert(await vscode.commands.executeCommand("PowerShell.OpenExamplesFolder"));
-    });
-
     it("Creates the session folder at the correct path", async function () {
         assert(await checkIfDirectoryExists(vscode.Uri.joinPath(globalStorageUri, "sessions")));
     });
