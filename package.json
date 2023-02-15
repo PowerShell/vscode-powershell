@@ -78,7 +78,7 @@
     "node-fetch": "2.6.9",
     "semver": "7.3.8",
     "uuid": "9.0.0",
-    "vscode-languageclient": "8.0.2",
+    "vscode-languageclient": "8.1.0",
     "vscode-languageserver-protocol": "3.17.3"
   },
   "devDependencies": {
