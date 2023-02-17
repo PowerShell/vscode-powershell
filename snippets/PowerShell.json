@@ -161,6 +161,23 @@
       "}"
     ]
   },
+  "Foreach with Progress": {
+		"prefix": "foreach-progress",
+    "description": "Insert a foreach loop with Write-Progress initialized",
+		"body": [
+		  "\\$total = $${1:array}.count",
+		  "\\$i = 1",
+		  "Foreach ($${2:item} in $${1:array}) {",
+		  "    \\$progPercent = \"{0:n2}\" -f ([math]::round(\\$i/\\$total,4) * 100)",
+		  "    Write-Progress -Activity \"${3:activityName}\" -Status \"\\$i of \\$total - \\$progPercent% Complete:\" -PercentComplete \\$progPercent",
+		  "    # Insert Code Here",
+		  "    ${0}",
+		  "    ",
+		  "    \\$i++",
+		  "}",
+		  ""
+		]
+	},
   "ForEach-Object -Parallel": {
     "prefix": "foreach-parallel",
     "description": "[PS 7+] Process multiple objects in parallel using runspaces. This has some limitations compared to a regular ForEach-Object. More: Get-Help ForEach-Object",
