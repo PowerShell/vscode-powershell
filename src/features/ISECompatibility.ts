@@ -23,7 +23,8 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         { path: "files", name: "defaultLanguage", value: "powershell" },
         { path: "workbench", name: "colorTheme", value: "PowerShell ISE" },
         { path: "editor", name: "wordSeparators", value: "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?" },
-        { path: "powershell.buttons", name: "showPanelMovementButtons", value: true }
+        { path: "powershell.buttons", name: "showPanelMovementButtons", value: true },
+        { path: "powershell.codeFolding", name: "showLastLine", value: false }
     ];
 
     private _commandRegistrations: vscode.Disposable[] = [];
