@@ -13,6 +13,7 @@ body:
 - type: textarea
   attributes:
     label: Summary
+    id: summary
     description: Explain the feature request below.
     placeholder: I would like to do X because it would be useful for Y and I cannot currently do it with Z.
   validations:
@@ -20,5 +21,6 @@ body:
 - type: textarea
   attributes:
     label: Proposed Design
+    id: proposed-design
     description: Optionally explain any technical design below.
     placeholder: We could accomplish this by extending X to take Y and yield Z.

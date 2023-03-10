@@ -239,7 +239,7 @@
       },
       {
         "command": "PowerShell.GenerateBugReport",
-        "title": "Upload Bug Report to Github",
+        "title": "Upload Bug Report to GitHub",
         "category": "PowerShell"
       },
       {
