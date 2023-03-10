@@ -11,6 +11,7 @@ body:
     - label: I have searched all [issues](https://github.com/PowerShell/vscode-powershell/issues?q=is%3Aissue) to ensure it has not already been reported.
       required: true
 - type: textarea
+  id: summary
   attributes:
     label: Summary
     description: Explain the feature request below.
@@ -18,6 +19,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: proposed-design
   attributes:
     label: Proposed Design
     description: Optionally explain any technical design below.
