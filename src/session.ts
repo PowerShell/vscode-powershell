@@ -74,7 +74,9 @@ export const PowerShellVersionRequestType =
 
 export class SessionManager implements Middleware {
     public HostName: string;
+    public DisplayName: string;
     public HostVersion: string;
+    public Publisher: string;
     public PowerShellExeDetails: IPowerShellExeDetails | undefined;
     private ShowSessionMenuCommandName = "PowerShell.ShowSessionMenu";
     private sessionStatus: SessionStatus = SessionStatus.NeverStarted;
@@ -100,7 +102,9 @@ export class SessionManager implements Middleware {
         private logger: ILogger,
         private documentSelector: DocumentSelector,
         hostName: string,
+        displayName: string,
         hostVersion: string,
+        publisher: string,
         private telemetryReporter: TelemetryReporter) {
 
         // Create the language status item
@@ -110,14 +114,16 @@ export class SessionManager implements Middleware {
         this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri.with({ scheme: "file"}), "sessions");
         this.platformDetails = getPlatformDetails();
         this.HostName = hostName;
+        this.DisplayName = displayName;
         this.HostVersion = hostVersion;
+        this.Publisher = publisher;
 
         const osBitness = this.platformDetails.isOS64Bit ? "64-bit" : "32-bit";
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
 
         this.logger.write(
             `Visual Studio Code v${vscode.version} ${procBitness}`,
-            `${this.HostName} Extension v${this.HostVersion}`,
+            `${this.DisplayName} Extension v${this.HostVersion}`,
             `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`);
 
         // Fix the host version so that PowerShell can consume it.
@@ -563,9 +569,9 @@ export class SessionManager implements Middleware {
             // Unfortunately this means that for some installs of PowerShell
             // (such as through the `dotnet` package manager), we can't include
             // a multi-line startup banner as the quotes break the command.
-            editorServicesArgs += `-StartupBanner '${this.HostName} Extension v${this.HostVersion}' `;
+            editorServicesArgs += `-StartupBanner '${this.DisplayName} Extension v${this.HostVersion}' `;
         } else {
-            const startupBanner = `${this.HostName} Extension v${this.HostVersion}
+            const startupBanner = `${this.DisplayName} Extension v${this.HostVersion}
 Copyright (c) Microsoft Corporation.
 
 https://aka.ms/vscode-powershell

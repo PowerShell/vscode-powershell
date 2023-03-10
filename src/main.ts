@@ -135,8 +135,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         settings,
         logger,
         documentSelector,
+        PackageJSON.name,
         PackageJSON.displayName,
         PackageJSON.version,
+        PackageJSON.publisher,
         telemetryReporter);
 
     // Register commands that do not require Language client
