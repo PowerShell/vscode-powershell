@@ -25,7 +25,7 @@
     "prefix": "calculated-property",
     "description": "Typically used with Select-Object or Sort-Object. More: Get-Help about_Calculated_Properties",
     "body": [
-      "@{Name='${1:PropertyName}';Expression={${2:${TM_SELECTED_TEXT:<# Desired result. You can reference this object via \\$_ and \\$PSItem#>}}}}$0 #>"
+      "@{Name='${1:PropertyName}';Expression={${2:${TM_SELECTED_TEXT:<# Desired result. You can reference this object via \\$_ and \\$PSItem#>}}}}$0"
     ]
   },
   "Class": {
