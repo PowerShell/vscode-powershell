@@ -301,10 +301,7 @@ function Update-Changelog {
   - package.json:
     - `version` field with `"X.Y.Z"` and no prefix or suffix
     - `preview` field set to `true` or `false` if version is a preview
-    - `name` field has `-preview` appended similarly
-    - `displayName` field has ` Preview` appended similarly
-    - `description` field has `(Preview) ` prepended similarly
-    - `icon` field has `_Preview ` inserted similarly
+    - `icon` field has `_Preview ` inserted if preview
 #>
 function Update-Version {
     [CmdletBinding(SupportsShouldProcess)]
@@ -318,22 +315,14 @@ function Update-Version {
 
     Update-Branch -RepositoryName $RepositoryName
 
-    # TODO: Maybe cleanup the replacement logic.
     Use-Repository -RepositoryName $RepositoryName -Script {
         switch ($RepositoryName) {
             "vscode-powershell" {
-                $d = "Develop PowerShell modules, commands and scripts in Visual Studio Code!"
                 if ($Version.PreReleaseLabel) {
-                    $name = "powershell-preview"
-                    $displayName = "PowerShell Preview"
                     $preview = "true"
-                    $description = "(Preview) $d"
                     $icon = "media/PowerShell_Preview_Icon.png"
                 } else {
-                    $name = "powershell"
-                    $displayName = "PowerShell"
                     $preview = "false"
-                    $description = $d
                     $icon = "media/PowerShell_Icon.png"
                 }
 
@@ -341,11 +330,8 @@ function Update-Version {
                 $f = Get-Content -Path $path
                 # NOTE: The prefix regex match two spaces exactly to avoid matching
                 # nested objects in the file.
-                $f = $f -replace '^(?<prefix>  "name":\s+")(.+)(?<suffix>",)$', "`${prefix}${name}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "displayName":\s+")(.+)(?<suffix>",)$', "`${prefix}${displayName}`${suffix}"
                 $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
                 $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "description":\s+")(.+)(?<suffix>",)$', "`${prefix}${description}`${suffix}"
                 $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
                 $f | Set-Content -Path $path
                 git add $path
