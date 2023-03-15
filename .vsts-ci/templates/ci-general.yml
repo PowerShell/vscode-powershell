@@ -72,7 +72,8 @@ steps:
       Install-Module InvokeBuild -Scope CurrentUser -Force
       Install-Module platyPS -Scope CurrentUser -Force
       Invoke-Build -Configuration Release
-      Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-*.vsix)"
+      $PackageJson = Get-Content -Raw package.json | ConvertFrom-Json
+      Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-$($PackageJson.version).vsix)"
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
     pwsh: ${{ parameters.pwsh }}
 
@@ -81,9 +82,9 @@ steps:
   inputs:
     targetType: inline
     script: |
-      $assembly = [Reflection.Assembly]::LoadFile("$(Build.SourcesDirectory)/vscode-powershell/modules/PowerShellEditorServices.VSCode/bin/Microsoft.PowerShell.EditorServices.VSCode.dll")
+      $assembly = [Reflection.Assembly]::LoadFile('$(Build.SourcesDirectory)/vscode-powershell/modules/PowerShellEditorServices.VSCode/bin/Microsoft.PowerShell.EditorServices.VSCode.dll')
       if ($assembly.GetCustomAttributes([System.Diagnostics.DebuggableAttribute], $true).IsJITOptimizerDisabled) {
-        Write-Host "##vso[task.LogIssue type=error;] PowerShell Editor Services bits were not built in release configuration!"
+        Write-Host '##vso[task.LogIssue type=error;]PowerShell Editor Services bits were not built in release configuration!'
         exit 1
       }
     pwsh: ${{ parameters.pwsh }}
