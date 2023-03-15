@@ -11,7 +11,6 @@ param(
 
 # Grab package.json data which is used throughout the build.
 $script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
-$script:IsPreviewExtension = $script:PackageJson.name -like "*preview*" -or $script:PackageJson.displayName -like "*preview*"
 Write-Host "`n### Extension: $($script:PackageJson.name)-$($script:PackageJson.version)`n" -ForegroundColor Green
 
 function Get-EditorServicesPath {
@@ -128,26 +127,14 @@ task TestEditorServices -If (Get-EditorServicesPath) {
 #endregion
 #region Package tasks
 
-task UpdateReadme -If { $script:IsPreviewExtension } {
-    # Add the preview text
-    $newReadmeTop = '# PowerShell Language Support for Visual Studio Code
-
-> ## ATTENTION: This is the PREVIEW version of the PowerShell extension for VSCode which contains features that are being evaluated for stable. It works with PowerShell 5.1 and up.
-> ### If you are looking for the stable version, please [go here](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) or install the extension called "PowerShell" (not "PowerShell Preview")
-> ## NOTE: If you have both stable (aka "PowerShell") and preview (aka "PowerShell Preview") installed, you MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance. Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)'
-    $readmePath = (Join-Path $PSScriptRoot README.md)
-
-    $readmeContent = Get-Content -Path $readmePath
-    if (!($readmeContent -match "This is the PREVIEW version of the PowerShell extension")) {
-        $readmeContent[0] = $newReadmeTop
-        $readmeContent | Set-Content $readmePath -Encoding utf8
-    }
-}
-
-task Package UpdateReadme, Build, {
+task Package Build, {
     Write-Host "`n### Packaging $($script:PackageJson.name)-$($script:PackageJson.version).vsix`n" -ForegroundColor Green
     assert ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
-    exec { & npm run package }
+    if ($script:PackageJson.preview) {
+        exec { & npm run package -- --pre-release }
+    } else {
+        exec { & npm run package }
+    }
 }
 
 #endregion
