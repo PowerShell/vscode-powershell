@@ -1,5 +1,18 @@
 # PowerShell Extension Release History
 
+## v2023.3.1-preview
+### Wednesday, March 15, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 👷 [vscode-powershell #3716](https://github.com/PowerShell/vscode-powershell/pull/4462) - Adopt the pre-release extension feature.
+- 🐛 ✂️ [vscode-powershell #4455](https://github.com/PowerShell/vscode-powershell/pull/4455) - Fix up "Calculated Property" snippet. (Thanks @DougDyreng!)
+- 🐛 📺 [vscode-powershell #4453](https://github.com/PowerShell/vscode-powershell/pull/4454) - Fix `GenerateBugReport` command to pre-fill template.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.2
+
+No changes.
+
 ## v2023.3.0-preview
 ### Thursday, March 09, 2023
 
