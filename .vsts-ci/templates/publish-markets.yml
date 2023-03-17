@@ -7,7 +7,7 @@ steps:
 
 - pwsh: |
     npm ci --loglevel=error
-    Import-Module $(Build.SourcesDirectory)/tools/ReleaseTools.psm1
+    Import-Module $(Build.SourcesDirectory)/tools/VersionTools.psm1
     $Version = Get-Version -RepositoryName vscode-powershell
     $PackageVersion = Get-MajorMinorPatch -Version $Version
     $PublishArgs = @(

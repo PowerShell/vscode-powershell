@@ -10,7 +10,7 @@ param(
 #Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "3.0.0" }
 
 # Sanity check our changelog version versus package.json (which lacks pre-release label)
-Import-Module $PSScriptRoot/tools/ReleaseTools.psm1
+Import-Module $PSScriptRoot/tools/VersionTools.psm1
 $script:Version = Get-Version -RepositoryName vscode-powershell
 $script:PackageVersion = Get-MajorMinorPatch -Version $Version
 $script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
