@@ -17,7 +17,7 @@
       "josefpihrt-vscode.roslynator",
       "ms-azure-devops.azure-pipelines",
       "ms-dotnettools.csharp",
-      "ms-vscode.powershell-preview"
+      "ms-vscode.powershell"
     ]
   },
   "settings": {

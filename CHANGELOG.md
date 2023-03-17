@@ -854,7 +854,7 @@ major update.
 
 These major updates have also been tested over the last 6 months, in 13 releases of our
 [PowerShell Preview extension for Visual Studio
-Code](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell-preview). A
+Code](https://marketplace.visualstudio.com/items?itemName=ms-vscode.powershell). A
 huge thank you to all of the community members who have tested these changes to the
 extension and have worked with us to polish the extension before releasing it through our
 stable channel.
@@ -1079,7 +1079,7 @@ are updating the stable extension to bring some bug fixes forward. Please try ou
 [PowerShell Preview extension][] for the latest and hopefully greatest experience, and
 help us squash those bugs!
 
-[PowerShell Preview extension]: https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell-Preview
+[PowerShell Preview extension]: https://marketplace.visualstudio.com/items?itemName=ms-vscode.powershell
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)
 
