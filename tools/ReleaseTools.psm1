@@ -211,6 +211,48 @@ function Get-Version {
 
 <#
 .SYNOPSIS
+  Validates the given version string.
+#>
+function Test-VersionIsValid {
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet([RepoNames])]
+        [string]$RepositoryName,
+
+        [Parameter(Mandatory)]
+        [string]$Version
+    )
+    if (!$Version.StartsWith("v")) {
+        throw "Version should start with 'v' prefix!"
+    }
+
+    $SemanticVersion = [semver]$Version.Substring(1)
+    switch ($RepositoryName) {
+        "vscode-powershell" {
+            $Date = Get-Date
+            if ($SemanticVersion.Major -ne $Date.Year) {
+                throw "Major version should be the current year!"
+            }
+            if ($SemanticVersion.Minor -ne $Date.Month) {
+                throw "Minor version should be the current month!"
+            }
+            if ($SemanticVersion.PreReleaseLabel) {
+                if ($SemanticVersion.PreReleaseLabel -ne "preview") {
+                    throw "Suffix should only be 'preview'!"
+                }
+            }
+        }
+        "PowerShellEditorServices" {
+            if ($SemanticVersion.PreReleaseLabel) {
+                throw "Version shouldn't have a pre-release label!"
+            }
+        }
+    }
+    return $true
+}
+
+<#
+.SYNOPSIS
   Updates the CHANGELOG file with PRs merged since the last release.
 .DESCRIPTION
   Uses the local Git repositories but does not pull, so ensure HEAD is where you
@@ -224,9 +266,8 @@ function Update-Changelog {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
-        # TODO: Validate version style for each repo.
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
+        [ValidateScript({ Test-VersionIsValid -RepositoryName $RepositoryName -Version $_ })]
         [string]$Version
     )
 
