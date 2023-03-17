@@ -7,11 +7,13 @@ steps:
 
 - pwsh: |
     npm ci --loglevel=error
-    $PackageJson = Get-Content -Raw $(Build.SourcesDirectory)/package.json | ConvertFrom-Json
+    Import-Module $(Build.SourcesDirectory)/tools/ReleaseTools.psm1
+    $Version = Get-Version -RepositoryName vscode-powershell
+    $PackageVersion = Get-MajorMinorPatch -Version $Version
     $PublishArgs = @(
-      if ($PackageJson.preview) { '--pre-release' }
+      if (Test-IsPreRelease) { '--pre-release' }
       '--packagePath'
-      "$(Pipeline.Workspace)/vscode-powershell/powershell-$($PackageJson.version).vsix"
+      "$(Pipeline.Workspace)/vscode-powershell/powershell-$PackageVersion.vsix"
       '--pat'
       '$(VsceToken)'
     )

@@ -2,7 +2,7 @@
   "name": "powershell",
   "displayName": "PowerShell",
   "version": "2023.3.1",
-  "preview": true,
+  "preview": false,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
@@ -23,7 +23,7 @@
     "PowerShell",
     "pwsh"
   ],
-  "icon": "media/PowerShell_Preview_Icon.png",
+  "icon": "media/PowerShell_Icon.png",
   "galleryBanner": {
     "color": "#ACD1EC",
     "theme": "light"

@@ -211,6 +211,28 @@ function Get-Version {
 
 <#
 .SYNOPSIS
+  Gets the version as a semantic version string without the 'v' prefix or
+  pre-release suffix.
+#>
+function Get-MajorMinorPatch {
+    param(
+        [Parameter(Mandatory)]
+        [semver]$Version
+    )
+    return "$($Version.Major).$($Version.Minor).$($Version.Patch)"
+}
+
+<#
+.SYNOPSIS
+  Tests if this is a pre-release (specifically for the extension).
+#>
+function Test-IsPreRelease {
+    $Version = Get-Version -RepositoryName vscode-powershell
+    return [bool]$Version.PreReleaseLabel
+}
+
+<#
+.SYNOPSIS
   Validates the given version string.
 #>
 function Test-VersionIsValid {
@@ -341,8 +363,8 @@ function Update-Changelog {
 
   - package.json:
     - `version` field with `"X.Y.Z"` and no prefix or suffix
-    - `preview` field set to `true` or `false` if version is a preview
-    - `icon` field has `_Preview ` inserted if preview
+    - `preview` field is always `false` because now we do "pre-releases"
+    - TODO: `icon` field has `_Preview ` inserted if preview
 #>
 function Update-Version {
     [CmdletBinding(SupportsShouldProcess)]
@@ -352,28 +374,26 @@ function Update-Version {
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
-    $v = "$($Version.Major).$($Version.Minor).$($Version.Patch)"
+    $v = Get-MajorMinorPatch -Version $Version
 
     Update-Branch -RepositoryName $RepositoryName
 
     Use-Repository -RepositoryName $RepositoryName -Script {
         switch ($RepositoryName) {
             "vscode-powershell" {
-                if ($Version.PreReleaseLabel) {
-                    $preview = "true"
-                    $icon = "media/PowerShell_Preview_Icon.png"
-                } else {
-                    $preview = "false"
-                    $icon = "media/PowerShell_Icon.png"
-                }
+                # TODO: Bring this back when the marketplace supports it.
+                # if ($Version.PreReleaseLabel) {
+                #     $icon = "media/PowerShell_Preview_Icon.png"
+                # } else {
+                #     $icon = "media/PowerShell_Icon.png"
+                # }
 
                 $path = "package.json"
                 $f = Get-Content -Path $path
                 # NOTE: The prefix regex match two spaces exactly to avoid matching
                 # nested objects in the file.
                 $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
+                # TODO: $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
                 $f | Set-Content -Path $path
                 git add $path
             }
