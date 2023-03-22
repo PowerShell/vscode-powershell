@@ -7,13 +7,6 @@ parameters:
     default: false
 
 steps:
-- task: PowerShell@2
-  displayName: PowerShell version
-  inputs:
-    targetType: inline
-    script: $PSVersionTable
-    pwsh: ${{ parameters.pwsh }}
-
 - checkout: self
 
 # NOTE: We either checkout the Git repo for PowerShellEditorServices, or we
@@ -62,18 +55,31 @@ steps:
     version: 6.0.x
     performMultiLevelLookup: true
 
+# The build script is always run with PowerShell Core
 - task: PowerShell@2
-  displayName: Build and test
+  displayName: Build and package
   inputs:
     targetType: inline
     script: |
+      Install-Module InvokeBuild -Scope CurrentUser -Force
+      Install-Module platyPS -Scope CurrentUser -Force
+      Invoke-Build -Configuration Release Package
+      $PackageJson = Get-Content -Raw package.json | ConvertFrom-Json
+      Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-$($PackageJson.version).vsix)"
+    workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
+    pwsh: true
+
+# Tests in particular are run with either PowerShell Core or Windows PowerShell
+- task: PowerShell@2
+  displayName: Run unit tests
+  inputs:
+    targetType: inline
+    script: |
+      $PSVersionTable
       Get-ChildItem env:
       Get-Module -ListAvailable Pester
       Install-Module InvokeBuild -Scope CurrentUser -Force
-      Install-Module platyPS -Scope CurrentUser -Force
-      Invoke-Build -Configuration Release
-      $PackageJson = Get-Content -Raw package.json | ConvertFrom-Json
-      Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-$($PackageJson.version).vsix)"
+      Invoke-Build -Configuration Release Test
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
     pwsh: ${{ parameters.pwsh }}
 
@@ -87,7 +93,7 @@ steps:
         Write-Host '##vso[task.LogIssue type=error;]PowerShell Editor Services bits were not built in release configuration!'
         exit 1
       }
-    pwsh: ${{ parameters.pwsh }}
+    pwsh: true
 
 - publish: $(vsixPath)
   artifact: vscode-powershell-vsix-$(System.JobId)

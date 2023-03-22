@@ -9,14 +9,6 @@ param(
 
 #Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "3.0.0" }
 
-# Sanity check our changelog version versus package.json (which lacks pre-release label)
-Import-Module $PSScriptRoot/tools/VersionTools.psm1
-$script:Version = Get-Version -RepositoryName vscode-powershell
-$script:PackageVersion = Get-MajorMinorPatch -Version $Version
-$script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
-Assert-Build ($script:PackageJson.version -eq $script:PackageVersion)
-Write-Host "`n### Building Extension Version: $script:Version`n" -ForegroundColor Green
-
 function Get-EditorServicesPath {
     $psesRepoPath = if ($EditorServicesRepoPath) {
         $EditorServicesRepoPath
@@ -133,7 +125,14 @@ task TestEditorServices -If (Get-EditorServicesPath) {
 #region Package tasks
 
 task Package Build, {
-    Write-Host "`n### Packaging powershell-$script:PackageVersion.vsix`n" -ForegroundColor Green
+    # Sanity check our changelog version versus package.json (which lacks pre-release label)
+    Import-Module $PSScriptRoot/tools/VersionTools.psm1
+    $version = Get-Version -RepositoryName vscode-powershell
+    $packageVersion = Get-MajorMinorPatch -Version $version
+    $packageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
+    Assert-Build ($packageJson.version -eq $packageVersion)
+
+    Write-Host "`n### Packaging powershell-$packageVersion.vsix`n" -ForegroundColor Green
     Assert-Build ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
     if (Test-IsPreRelease) {
         Write-Host "`n### This is a pre-release!`n" -ForegroundColor Green
