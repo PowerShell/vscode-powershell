@@ -144,7 +144,9 @@ function Test-VersionIsValid {
         }
         "PowerShellEditorServices" {
             if ($SemanticVersion.PreReleaseLabel) {
-                throw "Version shouldn't have a pre-release label!"
+                if ($SemanticVersion.PreReleaseLabel -ne "preview") {
+                    throw "Suffix should only be 'preview'!"
+                }
             }
         }
     }
