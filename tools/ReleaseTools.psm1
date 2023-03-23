@@ -145,9 +145,11 @@ function Update-Changelog {
         [string]$RepositoryName,
 
         [Parameter(Mandatory)]
-        [ValidateScript({ Test-VersionIsValid -RepositoryName $RepositoryName -Version $_ })]
         [string]$Version
     )
+
+    # Since we depend on both parameters, we can't do this with `ValidateScript`.
+    Test-VersionIsValid -RepositoryName $RepositoryName -Version $Version
 
     # Get the repo object, latest release, and commits since its tag.
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName

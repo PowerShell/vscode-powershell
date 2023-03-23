@@ -5,7 +5,7 @@
 
 using namespace System.Management.Automation
 
-class RepoNames: IValidateSetValuesGenerator {
+class RepoNames : IValidateSetValuesGenerator {
     # NOTE: This is super over-engineered, but it was fun.
     static [string[]] $Values = "vscode-powershell", "PowerShellEditorServices"
     [String[]] GetValidValues() { return [RepoNames]::Values }
@@ -150,5 +150,4 @@ function Test-VersionIsValid {
             }
         }
     }
-    return $true
 }
