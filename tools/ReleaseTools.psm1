@@ -6,40 +6,26 @@
 using module PowerShellForGitHub
 using namespace System.Management.Automation
 
-class RepoNames: IValidateSetValuesGenerator {
-    # NOTE: This is super over-engineered, but it was fun.
-    static [string[]] $Values = "vscode-powershell", "PowerShellEditorServices"
-    [String[]] GetValidValues() { return [RepoNames]::Values }
-}
-
-$ChangelogFile = "CHANGELOG.md"
+Import-Module $PSScriptRoot/VersionTools.psm1
 
 <#
 .SYNOPSIS
-  Given the repository name, execute the script in its directory.
+  Creates and checks out `release` if not already on it.
 #>
-function Use-Repository {
-    [CmdletBinding()]
+function Update-Branch {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
         [ValidateSet([RepoNames])]
-        [string]$RepositoryName,
-
-        [Parameter(Mandatory)]
-        [scriptblock]$Script
+        [string]$RepositoryName
     )
-    try {
-        switch ($RepositoryName) {
-            "vscode-powershell" {
-                Push-Location -Path "$PSScriptRoot/../"
-            }
-            "PowerShellEditorServices" {
-                Push-Location -Path "$PSScriptRoot/../../PowerShellEditorServices"
+    Use-Repository -RepositoryName $RepositoryName -Script {
+        $Branch = git branch --show-current
+        if ($Branch -ne "release") {
+            if ($PSCmdlet.ShouldProcess("release", "git checkout -B")) {
+                git checkout -B "release"
             }
         }
-        & $Script
-    } finally {
-        Pop-Location
     }
 }
 
@@ -145,72 +131,6 @@ function Get-Bullets {
 
 <#
 .SYNOPSIS
-  Gets the unpublished content from the changelog.
-.DESCRIPTION
-  This is used so that we can manually touch-up the automatically updated
-  changelog, and then bring its contents into the extension's changelog or
-  the GitHub release. It just gets the first header's contents.
-#>
-function Get-FirstChangelog {
-    param(
-        [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
-        [string]$RepositoryName
-    )
-    $Changelog = Use-Repository -RepositoryName $RepositoryName -Script {
-        Get-Content -Path $ChangelogFile
-    }
-    # NOTE: The space after the header marker is important! Otherwise ### matches.
-    $Header = $Changelog.Where({$_.StartsWith("## ")}, "First")
-    $Changelog.Where(
-        { $_ -eq $Header }, "SkipUntil"
-    ).Where(
-        { $_.StartsWith("## ") -and $_ -ne $Header }, "Until"
-    )
-}
-
-<#
-.SYNOPSIS
-  Creates and checks out `release` if not already on it.
-#>
-function Update-Branch {
-    [CmdletBinding(SupportsShouldProcess)]
-    param(
-        [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
-        [string]$RepositoryName
-    )
-    Use-Repository -RepositoryName $RepositoryName -Script {
-        $Branch = git branch --show-current
-        if ($Branch -ne "release") {
-            if ($PSCmdlet.ShouldProcess("release", "git checkout -B")) {
-                git checkout -B "release"
-            }
-        }
-    }
-}
-
-<#
-.SYNOPSIS
-  Gets current version from changelog as `[semver]`.
-#>
-function Get-Version {
-    param(
-        [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
-        [string]$RepositoryName
-    )
-    # NOTE: The first line should always be the header.
-    $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName)[0]
-    if ($Changelog -match '## v(?<version>\d+\.\d+\.\d+(-preview\.?\d*)?)') {
-        return [semver]$Matches.version
-    } else {
-        Write-Error "Couldn't find version from changelog!"
-    }
-}
-
-<#
-.SYNOPSIS
   Updates the CHANGELOG file with PRs merged since the last release.
 .DESCRIPTION
   Uses the local Git repositories but does not pull, so ensure HEAD is where you
@@ -224,11 +144,12 @@ function Update-Changelog {
         [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
-        # TODO: Validate version style for each repo.
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
         [string]$Version
     )
+
+    # Since we depend on both parameters, we can't do this with `ValidateScript`.
+    Test-VersionIsValid -RepositoryName $RepositoryName -Version $Version
 
     # Get the repo object, latest release, and commits since its tag.
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
@@ -300,8 +221,8 @@ function Update-Changelog {
 
   - package.json:
     - `version` field with `"X.Y.Z"` and no prefix or suffix
-    - `preview` field set to `true` or `false` if version is a preview
-    - `icon` field has `_Preview ` inserted if preview
+    - `preview` field is always `false` because now we do "pre-releases"
+    - TODO: `icon` field has `_Preview ` inserted if preview
 #>
 function Update-Version {
     [CmdletBinding(SupportsShouldProcess)]
@@ -311,28 +232,26 @@ function Update-Version {
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
-    $v = "$($Version.Major).$($Version.Minor).$($Version.Patch)"
+    $v = Get-MajorMinorPatch -Version $Version
 
     Update-Branch -RepositoryName $RepositoryName
 
     Use-Repository -RepositoryName $RepositoryName -Script {
         switch ($RepositoryName) {
             "vscode-powershell" {
-                if ($Version.PreReleaseLabel) {
-                    $preview = "true"
-                    $icon = "media/PowerShell_Preview_Icon.png"
-                } else {
-                    $preview = "false"
-                    $icon = "media/PowerShell_Icon.png"
-                }
+                # TODO: Bring this back when the marketplace supports it.
+                # if ($Version.PreReleaseLabel) {
+                #     $icon = "media/PowerShell_Preview_Icon.png"
+                # } else {
+                #     $icon = "media/PowerShell_Icon.png"
+                # }
 
                 $path = "package.json"
                 $f = Get-Content -Path $path
                 # NOTE: The prefix regex match two spaces exactly to avoid matching
                 # nested objects in the file.
                 $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
+                # TODO: $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
                 $f | Set-Content -Path $path
                 git add $path
             }

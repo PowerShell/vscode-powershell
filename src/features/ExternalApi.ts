@@ -72,9 +72,8 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
             throw new Error(`No extension installed with id '${id}'. You must use a valid extension id.`);
         }
 
-        // These are only allowed to be used in our unit tests.
-        if ((id === "ms-vscode.powershell" || id === "ms-vscode.powershell-preview")
-            && !(this.extensionContext.extensionMode === vscode.ExtensionMode.Test)) {
+        // Our ID is only only allowed to be used in our unit tests.
+        if (id === "ms-vscode.powershell" && !(this.extensionContext.extensionMode === vscode.ExtensionMode.Test)) {
             throw new Error("You can't use the PowerShell extension's id in this registration.");
         }
 

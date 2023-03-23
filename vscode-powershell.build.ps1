@@ -7,11 +7,7 @@ param(
     [string]$EditorServicesRepoPath = $null
 )
 
-#Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
-
-# Grab package.json data which is used throughout the build.
-$script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
-Write-Host "`n### Extension: $($script:PackageJson.name)-$($script:PackageJson.version)`n" -ForegroundColor Green
+#Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "3.0.0" }
 
 function Get-EditorServicesPath {
     $psesRepoPath = if ($EditorServicesRepoPath) {
@@ -95,6 +91,7 @@ task Build Restore, {
     Write-Host "`n### Building vscode-powershell`n" -ForegroundColor Green
     Assert-Build (Test-Path ./modules/PowerShellEditorServices/bin) "Extension requires PSES"
 
+    Write-Host "`n### Linting TypeScript`n" -ForegroundColor Green
     Invoke-BuildExec { & npm run lint }
 
     # TODO: When supported we should use `esbuild` for the tests too. Although
@@ -128,9 +125,17 @@ task TestEditorServices -If (Get-EditorServicesPath) {
 #region Package tasks
 
 task Package Build, {
-    Write-Host "`n### Packaging $($script:PackageJson.name)-$($script:PackageJson.version).vsix`n" -ForegroundColor Green
+    # Sanity check our changelog version versus package.json (which lacks pre-release label)
+    Import-Module $PSScriptRoot/tools/VersionTools.psm1
+    $version = Get-Version -RepositoryName vscode-powershell
+    $packageVersion = Get-MajorMinorPatch -Version $version
+    $packageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
+    Assert-Build ($packageJson.version -eq $packageVersion)
+
+    Write-Host "`n### Packaging powershell-$packageVersion.vsix`n" -ForegroundColor Green
     Assert-Build ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
-    if ($script:PackageJson.preview) {
+    if (Test-IsPreRelease) {
+        Write-Host "`n### This is a pre-release!`n" -ForegroundColor Green
         Invoke-BuildExec { & npm run package -- --pre-release }
     } else {
         Invoke-BuildExec { & npm run package }
