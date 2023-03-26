@@ -29,6 +29,7 @@ import { SessionManager } from "./session";
 import { LogLevel, getSettings, validateCwdSetting } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
+import { RenameSymbolFeature } from "./features/RenameSymbol";
 
 // The most reliable way to get the name and version of the current extension.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
@@ -38,6 +39,7 @@ const PackageJSON: any = require("../package.json");
 const AI_KEY = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
 
 let languageConfigurationDisposable: vscode.Disposable;
+let languageRenameProvider:vscode.Disposable;
 let logger: Logger;
 let sessionManager: SessionManager;
 let languageClientConsumers: LanguageClientConsumer[] = [];
@@ -60,6 +62,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     await validateCwdSetting(logger);
     const settings = getSettings();
     logger.writeDiagnostic(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
+
+    const RenameSymbol = new RenameSymbolFeature();
+    languageRenameProvider = vscode.languages.registerRenameProvider(documentSelector,RenameSymbol);
 
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -161,6 +166,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new HelpCompletionFeature(),
         new CustomViewsFeature(),
         new PickRunspaceFeature(logger),
+        RenameSymbol,
         externalApi
     ];
 
@@ -199,4 +205,5 @@ export async function deactivate(): Promise<void> {
     await telemetryReporter.dispose();
 
     languageConfigurationDisposable.dispose();
+    languageRenameProvider.dispose();
 }
