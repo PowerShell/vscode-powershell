@@ -7,6 +7,7 @@ using module PowerShellForGitHub
 using namespace System.Management.Automation
 
 Import-Module $PSScriptRoot/VersionTools.psm1
+$ChangelogFile = "CHANGELOG.md"
 
 <#
 .SYNOPSIS
