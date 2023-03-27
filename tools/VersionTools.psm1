@@ -5,12 +5,6 @@
 
 using namespace System.Management.Automation
 
-class RepoNames : IValidateSetValuesGenerator {
-    # NOTE: This is super over-engineered, but it was fun.
-    static [string[]] $Values = "vscode-powershell", "PowerShellEditorServices"
-    [String[]] GetValidValues() { return [RepoNames]::Values }
-}
-
 $ChangelogFile = "CHANGELOG.md"
 
 <#
@@ -21,7 +15,7 @@ function Use-Repository {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName,
 
         [Parameter(Mandatory)]
@@ -53,7 +47,6 @@ function Use-Repository {
 function Get-FirstChangelog {
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
     $Changelog = Use-Repository -RepositoryName $RepositoryName -Script {
@@ -75,7 +68,6 @@ function Get-FirstChangelog {
 function Get-Version {
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
     # NOTE: The first line should always be the header.
@@ -116,7 +108,7 @@ function Test-IsPreRelease {
 function Test-VersionIsValid {
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName,
 
         [Parameter(Mandatory)]
