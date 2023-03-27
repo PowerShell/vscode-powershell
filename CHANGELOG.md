@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2023.3.2-preview
+### Monday, March 27, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 👷 [vscode-powershell #4481](https://github.com/PowerShell/vscode-powershell/pull/4481) - Remove problematic `[RepoNames]` PowerShell class.
+- ✨ 👷 [vscode-powershell #4464](https://github.com/PowerShell/vscode-powershell/pull/4464) - Remove `preview` label from marketplace.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.3
+
+- Documentation update and CI fix.
+
 ## v2023.3.1-preview
 ### Wednesday, March 15, 2023
 
