@@ -1,5 +1,15 @@
 # PowerShell Extension Release History
 
+## v2023.3.3
+### Thursday, March 30, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.3
+
+- Documentation update and CI fix.
+
 ## v2023.3.2-preview
 ### Monday, March 27, 2023
 
