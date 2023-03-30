@@ -1,5 +1,36 @@
 # PowerShell Extension Release History
 
+## v2023.3.3
+### Thursday, March 30, 2023
+
+This is primarily a bug-fix focused release, and we want to say thanks to all our loyal
+preview extension users! The "PowerShell Preview" extension has now been officially
+deprecated, with "preview" releases now available via the "pre-release" option on the
+stable "PowerShell" extension in the marketplace. While you should be migrated
+automatically, feel free to just uninstall the preview and install the now one-and-only
+extension, but please keep testing our pre-releases! This change makes it much simpler to
+use, as you no longer have to switch between two different extensions and instead can use
+VS Code's marketplace to install your choice of version!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 👷 [vscode-powershell #4481](https://github.com/PowerShell/vscode-powershell/pull/4481) - Remove problematic `[RepoNames]` PowerShell class.
+- ✨ 👷 [vscode-powershell #4464](https://github.com/PowerShell/vscode-powershell/pull/4464) - Remove `preview` label from marketplace.
+- ✨ 👷 [vscode-powershell #3716](https://github.com/PowerShell/vscode-powershell/pull/4462) - Adopt the pre-release extension feature.
+- 🐛 ✂️ [vscode-powershell #4455](https://github.com/PowerShell/vscode-powershell/pull/4455) - Fix up "Calculated Property" snippet. (Thanks @DougDyreng!)
+- 🐛 📺 [vscode-powershell #4453](https://github.com/PowerShell/vscode-powershell/pull/4454) - Fix `GenerateBugReport` command to pre-fill template.
+- ✨ 🙏 [vscode-powershell #4425](https://github.com/PowerShell/vscode-powershell/pull/4425) - Hide last line in folded ranges for ISE Mode. (Thanks @fflaten!)
+- #️⃣ 🙏 [vscode-powershell #4417](https://github.com/PowerShell/vscode-powershell/pull/4417) - Fix up dependencies.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.3
+
+- Documentation update and CI fix.
+- 🐛 🙏 [vscode-powershell #4443](https://github.com/PowerShell/PowerShellEditorServices/pull/2006) - Fix declaration detection for variables with type constraints.
+- ✨ 🙏 [vscode-powershell #3604](https://github.com/PowerShell/PowerShellEditorServices/pull/2003) - Add document symbols for `#region`.
+- ✨ 🙏 [PowerShellEditorServices #2000](https://github.com/PowerShell/PowerShellEditorServices/pull/2000) - Code clean-up and fixing end-to-end tests.
+- 🐛 🐢 [PowerShellEditorServices #1998](https://github.com/PowerShell/PowerShellEditorServices/pull/1998) - Support module-qualified calls for Pester keywords. (Thanks @fflaten!)
+- 🐛 🙏 [vscode-powershell #3192](https://github.com/PowerShell/PowerShellEditorServices/pull/1997) - Fix New-EditorFile adding content in current file. (Thanks @fflaten!)
+
 ## v2023.3.2-preview
 ### Monday, March 27, 2023
 
