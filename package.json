@@ -105,7 +105,7 @@
     "mock-fs": "5.2.0",
     "rewire": "6.0.0",
     "sinon": "15.0.3",
-    "typescript": "5.0.2"
+    "typescript": "5.0.3"
   },
   "extensionDependencies": [
     "vscode.powershell"
