@@ -21,13 +21,13 @@ export class CustomViewsFeature extends LanguageClientConsumer {
                 this.contentProvider));
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this.commands) {
             command.dispose();
         }
     }
 
-    public override setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
 
         languageClient.onRequest(
             NewCustomViewRequestType,
@@ -81,7 +81,7 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
         return this.viewIndex[uri.toString()].getContent();
     }
 
-    public createView(id: string, title: string, viewType: CustomViewType) {
+    public createView(id: string, title: string, viewType: CustomViewType): void {
         let view;
         switch (viewType) {
         case CustomViewType.HtmlContent:
@@ -91,12 +91,12 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
         this.viewIndex[this.getUri(view.id)] = view;
     }
 
-    public showView(id: string, viewColumn: vscode.ViewColumn) {
+    public showView(id: string, viewColumn: vscode.ViewColumn): void {
         const uriString = this.getUri(id);
         (this.viewIndex[uriString] as HtmlContentView).showContent(viewColumn);
     }
 
-    public closeView(id: string) {
+    public closeView(id: string): void {
         const uriString = this.getUri(id);
 
         vscode.workspace.textDocuments.some((doc) => {
@@ -110,7 +110,7 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
         });
     }
 
-    public setHtmlContentView(id: string, content: IHtmlContent) {
+    public setHtmlContentView(id: string, content: IHtmlContent): void {
         const uriString = this.getUri(id);
         const view: CustomView = this.viewIndex[uriString];
 
@@ -118,7 +118,7 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
         this.didChangeEvent.fire(vscode.Uri.parse(uriString));
     }
 
-    public appendHtmlOutputView(id: string, content: string) {
+    public appendHtmlOutputView(id: string, content: string): void {
         const uriString = this.getUri(id);
         const view: CustomView = this.viewIndex[uriString];
 
@@ -126,7 +126,7 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
         this.didChangeEvent.fire(vscode.Uri.parse(uriString));
     }
 
-    private getUri(id: string) {
+    private getUri(id: string): string {
         return `powershell://views/${id}`;
     }
 }
@@ -158,11 +158,11 @@ class HtmlContentView extends CustomView {
         super(id, title, CustomViewType.HtmlContent);
     }
 
-    public setContent(htmlContent: IHtmlContent) {
+    public setContent(htmlContent: IHtmlContent): void {
         this.htmlContent = htmlContent;
     }
 
-    public appendContent(content: string) {
+    public appendContent(content: string): void {
         this.htmlContent.bodyContent += content;
     }
 

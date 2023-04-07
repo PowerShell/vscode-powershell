@@ -9,9 +9,9 @@ import utils = require("../utils");
 describe("ISE compatibility feature", function () {
     let currentTheme: string | undefined;
 
-    async function enableISEMode() { await vscode.commands.executeCommand("PowerShell.EnableISEMode"); }
-    async function disableISEMode() { await vscode.commands.executeCommand("PowerShell.DisableISEMode"); }
-    async function toggleISEMode() { await vscode.commands.executeCommand("PowerShell.ToggleISEMode"); }
+    async function enableISEMode(): Promise<void> { await vscode.commands.executeCommand("PowerShell.EnableISEMode"); }
+    async function disableISEMode(): Promise<void> { await vscode.commands.executeCommand("PowerShell.DisableISEMode"); }
+    async function toggleISEMode(): Promise<void> { await vscode.commands.executeCommand("PowerShell.ToggleISEMode"); }
 
     before(async function () {
         // Save user's current theme.
@@ -75,7 +75,7 @@ describe("ISE compatibility feature", function () {
     describe("Color theme interactions", function () {
         beforeEach(enableISEMode);
 
-        function assertISESettings() {
+        function assertISESettings(): void {
             for (const iseSetting of ISECompatibilityFeature.settings) {
                 const currently = vscode.workspace.getConfiguration(iseSetting.path).get(iseSetting.name);
                 assert.notStrictEqual(currently, iseSetting.value);

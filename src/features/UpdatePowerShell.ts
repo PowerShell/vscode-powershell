@@ -156,7 +156,7 @@ export class UpdatePowerShell {
         return undefined;
     }
 
-    public async checkForUpdate() {
+    public async checkForUpdate(): Promise<void> {
         try {
             const tag = await this.maybeGetNewRelease();
             if (tag) {
@@ -168,12 +168,12 @@ export class UpdatePowerShell {
         }
     }
 
-    private async openReleaseInBrowser(tag: string) {
+    private async openReleaseInBrowser(tag: string): Promise<void> {
         const url = vscode.Uri.parse(UpdatePowerShell.GitHubWebReleaseURL + tag);
         await vscode.env.openExternal(url);
     }
 
-    private async updateWindows(tag: string) {
+    private async updateWindows(tag: string): Promise<void> {
         let msiMatcher: string;
         if (this.architecture === "x64") {
             msiMatcher = "win-x64.msi";
@@ -233,7 +233,7 @@ export class UpdatePowerShell {
         });
     }
 
-    private async installUpdate(tag: string) {
+    private async installUpdate(tag: string): Promise<void> {
         const releaseVersion = new SemVer(tag);
         const result = await vscode.window.showInformationMessage(
             `You have an old version of PowerShell (${this.localVersion.version}). The current latest release is ${releaseVersion.version}.

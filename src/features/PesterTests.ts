@@ -43,7 +43,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this.commands) {
             command.dispose();
         }

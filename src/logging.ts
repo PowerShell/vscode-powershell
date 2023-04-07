@@ -72,7 +72,7 @@ export class Logger implements ILogger {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         this.logChannel.dispose();
         for (const command of this.commands) {
             command.dispose();
@@ -147,7 +147,7 @@ export class Logger implements ILogger {
 
         const fullActions = [
             ...actions,
-            { prompt: "Show Logs", action: () => { this.showLogPanel(); } },
+            { prompt: "Show Logs", action: (): void => { this.showLogPanel(); } },
         ];
 
         const actionKeys: string[] = fullActions.map((action) => action.prompt);

@@ -173,7 +173,7 @@ export class ExternalApiFeature extends LanguageClientConsumer implements IPower
         return this.extensionContext.globalStorageUri.with({ scheme: "file"});
     }
 
-    public dispose() {
+    public dispose(): void {
         // Nothing to dispose.
     }
 }

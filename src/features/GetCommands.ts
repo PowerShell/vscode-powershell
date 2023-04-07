@@ -50,20 +50,20 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this.commands) {
             command.dispose();
         }
     }
 
-    public override setLanguageClient(languageclient: LanguageClient) {
-        this.languageClient = languageclient;
+    public override setLanguageClient(languageClient: LanguageClient): void {
+        this.languageClient = languageClient;
         if (this.commandsExplorerTreeView.visible) {
             void vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
         }
     }
 
-    private async CommandExplorerRefresh() {
+    private async CommandExplorerRefresh(): Promise<void> {
         if (this.languageClient === undefined) {
             this.logger.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
             return;
@@ -77,7 +77,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         });
     }
 
-    private async InsertCommand(item: { Name: string; }) {
+    private async InsertCommand(item: { Name: string; }): Promise<void> {
         const editor = vscode.window.activeTextEditor;
         if (editor === undefined) {
             return;

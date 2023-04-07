@@ -91,13 +91,13 @@ export class DebugSessionFeature extends LanguageClientConsumer
         return new vscode.DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const handler of this.handlers) {
             handler.dispose();
         }
     }
 
-    public override setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         this.handlers = [
             languageClient.onNotification(
                 StartDebuggerNotificationType,
@@ -308,7 +308,7 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 
@@ -369,7 +369,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
             });
     }
 
-    public override setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
 
         if (this.waitingForClientToken && this.getLanguageClientResolve) {
@@ -378,7 +378,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         }
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 
@@ -456,7 +456,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         return item ? `${item.pid}` : undefined;
     }
 
-    private clearWaitingToken() {
+    private clearWaitingToken(): void {
         this.waitingForClientToken?.dispose();
         this.waitingForClientToken = undefined;
     }
@@ -494,7 +494,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
             }, this);
     }
 
-    public override setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
 
         if (this.waitingForClientToken && this.getLanguageClientResolve) {
@@ -503,7 +503,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         }
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 
@@ -572,7 +572,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         return item ? `${item.id}` : undefined;
     }
 
-    private clearWaitingToken() {
+    private clearWaitingToken(): void {
         this.waitingForClientToken?.dispose();
         this.waitingForClientToken = undefined;
     }

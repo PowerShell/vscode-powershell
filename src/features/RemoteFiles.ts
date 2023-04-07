@@ -47,17 +47,17 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
         // Close any leftover remote files before exiting
         this.closeRemoteFiles();
     }
 
-    private isDocumentRemote(doc: vscode.TextDocument) {
+    private isDocumentRemote(doc: vscode.TextDocument): boolean {
         return doc.fileName.toLowerCase().startsWith(this.tempSessionPathPrefix);
     }
 
-    private closeRemoteFiles() {
+    private closeRemoteFiles(): void {
         const remoteDocuments =
             vscode.workspace.textDocuments.filter((doc) => this.isDocumentRemote(doc));
 
