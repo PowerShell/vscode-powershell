@@ -198,12 +198,12 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         ];
     }
 
-    public override setLanguageClient(languageclient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         // Clear the current list of extension commands since they were
         // only relevant to the previous session
         this.extensionCommands = [];
 
-        this.languageClient = languageclient;
+        this.languageClient = languageClient;
 
         this.handlers = [
             this.languageClient.onNotification(
@@ -267,7 +267,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this.commands) {
             command.dispose();
         }
@@ -276,7 +276,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         }
     }
 
-    private addExtensionCommand(command: IExtensionCommandAddedNotificationBody) {
+    private addExtensionCommand(command: IExtensionCommandAddedNotificationBody): void {
         this.extensionCommands.push({
             name: command.name,
             displayName: command.displayName,
@@ -311,7 +311,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
     private async onCommandSelected(
         chosenItem: IExtensionCommandQuickPickItem | undefined,
-        client: LanguageClient | undefined) {
+        client: LanguageClient | undefined): Promise<void> {
 
         if (chosenItem !== undefined) {
             await client?.sendRequest(

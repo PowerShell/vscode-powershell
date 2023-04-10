@@ -134,11 +134,11 @@ export class PowerShellProcess {
         return sessionDetails;
     }
 
-    public showTerminal(preserveFocus?: boolean) {
+    public showTerminal(preserveFocus?: boolean): void {
         this.consoleTerminal?.show(preserveFocus);
     }
 
-    public async dispose() {
+    public async dispose(): Promise<void> {
         // Clean up the session file
         this.logger.write("Terminating PowerShell process...");
 
@@ -151,7 +151,7 @@ export class PowerShellProcess {
         this.consoleTerminal = undefined;
     }
 
-    public sendKeyPress() {
+    public sendKeyPress(): void {
         // NOTE: This is a regular character instead of something like \0
         // because non-printing characters can cause havoc with different
         // languages and terminal settings. We discard the character server-side
@@ -159,7 +159,7 @@ export class PowerShellProcess {
         this.consoleTerminal?.sendText("p", false);
     }
 
-    private logTerminalPid(pid: number, exeName: string) {
+    private logTerminalPid(pid: number, exeName: string): void {
         this.logger.write(`${exeName} PID: ${pid}`);
     }
 
@@ -182,7 +182,7 @@ export class PowerShellProcess {
         return JSON.parse(fileContents.toString());
     }
 
-    private static async deleteSessionFile(sessionFilePath: vscode.Uri) {
+    private static async deleteSessionFile(sessionFilePath: vscode.Uri): Promise<void> {
         try {
             await vscode.workspace.fs.delete(sessionFilePath);
         } catch (e) {
@@ -218,7 +218,7 @@ export class PowerShellProcess {
         throw new Error(err);
     }
 
-    private onTerminalClose(terminal: vscode.Terminal) {
+    private onTerminalClose(terminal: vscode.Terminal): void {
         if (terminal !== this.consoleTerminal) {
             return;
         }

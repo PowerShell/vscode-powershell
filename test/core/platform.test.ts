@@ -667,7 +667,7 @@ const errorTestCases: ITestPlatform[] = [
     },
 ];
 
-function setupTestEnvironment(testPlatform: ITestPlatform) {
+function setupTestEnvironment(testPlatform: ITestPlatform): void {
     mockFS(testPlatform.filesystem);
 
     for (const envVar of Object.keys(testPlatform.environmentVars)) {
@@ -816,7 +816,7 @@ describe("Platform module", function () {
             it(`Corrects the Windows PowerShell path on ${testPlatform.name}`, function () {
                 setupTestEnvironment(testPlatform);
 
-                function getWinPSPath(systemDir: string) {
+                function getWinPSPath(systemDir: string): string {
                     return path.join(
                         testPlatform.environmentVars.windir!,
                         systemDir,

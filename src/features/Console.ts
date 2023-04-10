@@ -213,7 +213,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this.commands) {
             command.dispose();
         }
@@ -222,7 +222,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
         }
     }
 
-    public override setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
         this.handlers = [
             this.languageClient.onRequest(

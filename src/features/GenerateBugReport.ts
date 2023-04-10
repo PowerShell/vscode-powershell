@@ -25,7 +25,7 @@ export class GenerateBugReportFeature implements vscode.Disposable {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 

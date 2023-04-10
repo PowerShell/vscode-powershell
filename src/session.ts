@@ -111,7 +111,7 @@ export class SessionManager implements Middleware {
         this.languageStatusItem = this.createStatusBarItem();
         // We have to override the scheme because it defaults to
         // 'vscode-userdata' which breaks UNC paths.
-        this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri.with({ scheme: "file"}), "sessions");
+        this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri.with({ scheme: "file" }), "sessions");
         this.platformDetails = getPlatformDetails();
         this.HostName = hostName;
         this.DisplayName = displayName;
@@ -148,12 +148,12 @@ export class SessionManager implements Middleware {
         await this.languageClient?.dispose();
     }
 
-    public setLanguageClientConsumers(languageClientConsumers: LanguageClientConsumer[]) {
+    public setLanguageClientConsumers(languageClientConsumers: LanguageClientConsumer[]): void {
         this.languageClientConsumers = languageClientConsumers;
     }
 
     // The `exeNameOverride` is used by `restartSession` to override ANY other setting.
-    public async start(exeNameOverride?: string) {
+    public async start(exeNameOverride?: string): Promise<void> {
         // A simple lock because this function isn't re-entrant.
         if (this.started || this.starting) {
             return await this.waitUntilStarted();
@@ -174,7 +174,7 @@ export class SessionManager implements Middleware {
         }
     }
 
-    public async stop() {
+    public async stop(): Promise<void> {
         this.logger.write("Shutting down language client...");
 
         try {
@@ -209,7 +209,7 @@ export class SessionManager implements Middleware {
         }
     }
 
-    public async restartSession(exeNameOverride?: string) {
+    public async restartSession(exeNameOverride?: string): Promise<void> {
         await this.stop();
 
         // Re-load and validate the settings.
@@ -341,7 +341,7 @@ export class SessionManager implements Middleware {
     }
 
     // Move old setting codeFormatting.whitespaceAroundPipe to new setting codeFormatting.addWhitespaceAroundPipe
-    private async migrateWhitespaceAroundPipeSetting() {
+    private async migrateWhitespaceAroundPipeSetting(): Promise<void> {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = "codeFormatting.whitespaceAroundPipe";
         const newSetting = "codeFormatting.addWhitespaceAroundPipe";
@@ -355,7 +355,7 @@ export class SessionManager implements Middleware {
     }
 
     // TODO: Remove this migration code.
-    private async promptPowerShellExeSettingsCleanup() {
+    private async promptPowerShellExeSettingsCleanup(): Promise<void> {
         if (this.sessionSettings.powerShellExePath === "") {
             return;
         }
@@ -385,7 +385,7 @@ export class SessionManager implements Middleware {
         }
     }
 
-    private async onConfigurationUpdated() {
+    private async onConfigurationUpdated(): Promise<void> {
         const settings = getSettings();
         this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
@@ -521,7 +521,7 @@ export class SessionManager implements Middleware {
             await this.logger.writeAndShowErrorWithActions(message, [
                 {
                     prompt: "Get PowerShell",
-                    action: async () => {
+                    action: async (): Promise<void> => {
                         const getPSUri = vscode.Uri.parse("https://aka.ms/get-powershell-vscode");
                         await vscode.env.openExternal(getPSUri);
                     },
@@ -591,13 +591,13 @@ Type 'help' to get help.
         return editorServicesArgs;
     }
 
-    private async promptForRestart() {
+    private async promptForRestart(): Promise<void> {
         await this.logger.writeAndShowErrorWithActions(
             "The PowerShell Extension Terminal has stopped, would you like to restart it? IntelliSense and other features will not work without it!",
             [
                 {
                     prompt: "Yes",
-                    action: async () => { await this.restartSession(); }
+                    action: async (): Promise<void> => { await this.restartSession(); }
                 },
                 {
                     prompt: "No",
@@ -607,17 +607,21 @@ Type 'help' to get help.
         );
     }
 
-    private sendTelemetryEvent(eventName: string, properties?: TelemetryEventProperties, measures?: TelemetryEventMeasurements) {
+    private sendTelemetryEvent(
+        eventName: string,
+        properties?: TelemetryEventProperties,
+        measures?: TelemetryEventMeasurements): void {
+
         if (this.extensionContext.extensionMode === vscode.ExtensionMode.Production) {
             this.telemetryReporter.sendTelemetryEvent(eventName, properties, measures);
         }
     }
 
-    private async startLanguageClient(sessionDetails: IEditorServicesSessionDetails) {
+    private async startLanguageClient(sessionDetails: IEditorServicesSessionDetails): Promise<void> {
         this.logger.write(`Connecting to language service on pipe: ${sessionDetails.languageServicePipeName}`);
         this.logger.write("Session details: " + JSON.stringify(sessionDetails));
 
-        const connectFunc = () => {
+        const connectFunc = (): Promise<StreamInfo> => {
             return new Promise<StreamInfo>(
                 (resolve, _reject) => {
                     const socket = net.connect(sessionDetails.languageServicePipeName);
@@ -781,7 +785,7 @@ Type 'help' to get help.
         void this.logger.writeAndShowError(message, ...additionalMessages);
     }
 
-    private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails) {
+    private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails): Promise<void> {
         this.suppressRestartPrompt = true;
         try {
             await changeSetting("powerShellDefaultVersion", exePath.displayName, true, this.logger);
@@ -797,7 +801,7 @@ Type 'help' to get help.
     }
 
     // Shows the temp debug terminal if it exists, otherwise the session terminal.
-    public showDebugTerminal(isExecute?: boolean) {
+    public showDebugTerminal(isExecute?: boolean): void {
         if (this.debugSessionProcess) {
             this.debugSessionProcess.showTerminal(isExecute && !this.sessionSettings.integratedConsole.focusConsoleOnExecute);
         } else {
@@ -806,11 +810,11 @@ Type 'help' to get help.
     }
 
     // Always shows the session terminal.
-    public showSessionTerminal(isExecute?: boolean) {
+    public showSessionTerminal(isExecute?: boolean): void {
         this.languageServerProcess?.showTerminal(isExecute && !this.sessionSettings.integratedConsole.focusConsoleOnExecute);
     }
 
-    private async showSessionMenu() {
+    private async showSessionMenu(): Promise<void> {
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
             this.sessionSettings.powerShellAdditionalExePaths,
@@ -900,6 +904,6 @@ class SessionMenuItem implements vscode.QuickPickItem {
     constructor(
         public readonly label: string,
         // eslint-disable-next-line @typescript-eslint/no-empty-function
-        public readonly callback = async () => { }) {
+        public readonly callback = async (): Promise<void> => { }) {
     }
 }
