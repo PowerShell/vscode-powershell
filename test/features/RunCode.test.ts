@@ -40,17 +40,17 @@ describe("RunCode feature", function () {
     });
 
     it("Runs Pester tests from a file", async function () {
+        this.slow(5000);
         const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
         assert(checkIfFileExists(pesterTests));
 
-        // Open the PowerShell file with Pester tests and then wait a while for
-        // the extension to finish connecting to the server.
         await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(pesterTests));
-
-        // Now run the Pester tests, check the debugger started, wait a bit for
-        // it to run, and then kill it for safety's sake.
         assert(await vscode.commands.executeCommand("PowerShell.RunPesterTestsFromFile"));
-        assert(vscode.debug.activeDebugSession !== undefined);
+        const debugSession = await utils.WaitEvent<vscode.DebugSession>(vscode.debug.onDidStartDebugSession,
+            session => session.name === "PowerShell: Launch Pester Tests"
+        );
         await vscode.debug.stopDebugging();
+
+        assert(debugSession.type === "PowerShell");
     });
 });
