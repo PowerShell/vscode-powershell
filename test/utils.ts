@@ -161,6 +161,7 @@ export function BuildBinaryModuleMock(): void {
 /** Waits until the registered vscode event is fired and returns the trigger result of the event.
  * @param event The event to wait for
  * @param filter An optional filter to apply to the event TResult. The filter will continue to monitor the event firings until the filter returns true.
+ * @returns A promise that resolves when the specified event is fired with the TResult subject of the event. If a filter is specified, the promise will not resolve until the filter returns true.
 */
 export function WaitEvent<TResult>(event: vscode.Event<TResult>, filter?: (event: TResult) => boolean | undefined): Promise<TResult> {
     return new Promise<TResult>((resolve) => {
