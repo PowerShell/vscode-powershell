@@ -91,7 +91,6 @@ export class DebugSessionFeature extends LanguageClientConsumer
     private tempDebugProcess: PowerShellProcess | undefined;
     private tempSessionDetails: IEditorServicesSessionDetails | undefined;
     private handlers: Disposable[] = [];
-    private configs = defaultDebugConfigurations;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: ILogger) {
         super();
@@ -156,10 +155,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 { placeHolder: "Select a PowerShell debug configuration" });
 
         if (launchSelection) {
-            return [this.configs[launchSelection.id]];
+            return [defaultDebugConfigurations[launchSelection.id]];
         }
 
-        return [this.configs[DebugConfig.LaunchCurrentFile]];
+        return [defaultDebugConfigurations[DebugConfig.LaunchCurrentFile]];
     }
 
     // We don't use await here but we are returning a promise and the return syntax is easier in an async function
@@ -174,7 +173,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         if (!config.request) {
             // No launch.json, create the default configuration for both unsaved
             // (Untitled) and saved documents.
-            const LaunchCurrentFileConfig = this.configs[DebugConfig.LaunchCurrentFile];
+            const LaunchCurrentFileConfig = defaultDebugConfigurations[DebugConfig.LaunchCurrentFile];
             config = { ...config, ...LaunchCurrentFileConfig };
             config.current_document = true;
         }
