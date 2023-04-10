@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import vscode from "vscode";
 import {
+    debug,
     CancellationToken,
     DebugAdapterDescriptor,
     DebugAdapterDescriptorFactory,
@@ -12,7 +12,16 @@ import {
     DebugConfigurationProvider,
     DebugSession,
     ExtensionContext,
-    WorkspaceFolder
+    WorkspaceFolder,
+    Disposable,
+    window,
+    extensions,
+    workspace,
+    commands,
+    CancellationTokenSource,
+    InputBoxOptions,
+    QuickPickItem,
+    QuickPickOptions
 } from "vscode";
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
@@ -81,14 +90,14 @@ export class DebugSessionFeature extends LanguageClientConsumer
     private sessionCount = 1;
     private tempDebugProcess: PowerShellProcess | undefined;
     private tempSessionDetails: IEditorServicesSessionDetails | undefined;
-    private handlers: vscode.Disposable[] = [];
+    private handlers: Disposable[] = [];
     private configs = defaultDebugConfigurations;
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: ILogger) {
         super();
-        // This "activates" the debug adapter for use with vscode. You can only do this once.
-        context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider("PowerShell", this));
-        context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory("PowerShell", this));
+        // This "activates" the debug adapter for use with  You can only do this once.
+        context.subscriptions.push(debug.registerDebugConfigurationProvider("PowerShell", this));
+        context.subscriptions.push(debug.registerDebugAdapterDescriptorFactory("PowerShell", this));
     }
 
     public dispose(): void {
@@ -102,7 +111,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             languageClient.onNotification(
                 StartDebuggerNotificationType,
                 // TODO: Use a named debug configuration.
-                () => void vscode.debug.startDebugging(undefined, {
+                () => void debug.startDebugging(undefined, {
                     request: "launch",
                     type: "PowerShell",
                     name: "PowerShell: Interactive Session"
@@ -110,7 +119,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
             languageClient.onNotification(
                 StopDebuggerNotificationType,
-                () => void vscode.debug.stopDebugging(undefined))
+                () => void debug.stopDebugging(undefined))
         ];
     }
 
@@ -142,7 +151,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         ];
 
         const launchSelection =
-            await vscode.window.showQuickPick(
+            await window.showQuickPick(
                 debugConfigPickItems,
                 { placeHolder: "Select a PowerShell debug configuration" });
 
@@ -169,13 +178,13 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
 
         if (config.script === "${file}" || config.script === "${relativeFile}") {
-            if (vscode.window.activeTextEditor === undefined) {
+            if (window.activeTextEditor === undefined) {
                 await this.logger.writeAndShowError("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
                 return PREVENT_DEBUG_START;
             }
             config.current_document = true;
             // Special case using the URI for untitled documents.
-            const currentDocument = vscode.window.activeTextEditor.document;
+            const currentDocument = window.activeTextEditor.document;
             if (currentDocument.isUntitled) {
                 config.untitled_document = true;
                 config.script = currentDocument.uri.toString();
@@ -241,7 +250,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         // (which includes untitled documents). This prevents accidentally
         // running the debugger for an open non-PowerShell file.
         if (config.current_document) {
-            const currentDocument = vscode.window.activeTextEditor?.document;
+            const currentDocument = window.activeTextEditor?.document;
             if (currentDocument?.languageId !== "powershell") {
                 void this.logger.writeAndShowError(`PowerShell does not support debugging this language mode: '${currentDocument?.languageId}'.`);
                 return PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
@@ -274,7 +283,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
     }
 
     private resolveAttachDotnetDebugConfiguration(config: DebugConfiguration): ResolveDebugConfigurationResult {
-        if (!vscode.extensions.getExtension("ms-dotnettools.csharp")) {
+        if (!extensions.getExtension("ms-dotnettools.csharp")) {
             void this.logger.writeAndShowError("You specified attachDotnetDebugger in your PowerShell Launch configuration but the C# extension is not installed. Please install the C# extension and try again.");
             return PREVENT_DEBUG_START;
         }
@@ -308,14 +317,14 @@ export class DebugSessionFeature extends LanguageClientConsumer
             dotnetAttachConfig.processId = pid;
 
             // Ensure the .NET session stops before the PowerShell session so that the .NET debug session doesn't emit an error about the process unexpectedly terminating.
-            const startDebugEvent = vscode.debug.onDidStartDebugSession((dotnetAttachSession) => {
+            const startDebugEvent = debug.onDidStartDebugSession((dotnetAttachSession) => {
                 // Makes the event one-time
                 // HACK: This seems like you would be calling a method on a variable not assigned yet, but it does work in the flow.
                 // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
                 startDebugEvent.dispose();
                 this.logger.write(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
                 if (dotnetAttachSession.configuration.name == dotnetAttachConfig.name) {
-                    const stopDebugEvent = vscode.debug.onDidTerminateDebugSession(async (terminatedDebugSession) => {
+                    const stopDebugEvent = debug.onDidTerminateDebugSession(async (terminatedDebugSession) => {
                         // Makes the event one-time
                         stopDebugEvent.dispose();
 
@@ -323,7 +332,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
                         if (terminatedDebugSession === session) {
                             this.logger.write("Terminating dotnet debugger session associated with PowerShell debug session");
-                            await vscode.debug.stopDebugging(dotnetAttachSession);
+                            await debug.stopDebugging(dotnetAttachSession);
                         }
                     });
                 }
@@ -331,7 +340,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
             // Start a child debug session to attach the dotnet debugger
             // TODO: Accomodate multi-folder workspaces if the C# code is in a different workspace folder
-            await vscode.debug.startDebugging(undefined, dotnetAttachConfig, session);
+            await debug.startDebugging(undefined, dotnetAttachConfig, session);
             this.logger.writeVerbose(`Dotnet Attach Debug configuration: ${JSON.stringify(dotnetAttachConfig)}`);
             this.logger.write(`Attached dotnet debugger to process ${pid}`);
         }
@@ -340,7 +349,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
     private getDotnetNamedConfigOrDefault(configName?: string): ResolveDebugConfigurationResult {
         if (configName) {
-            const debugConfigs = vscode.workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
+            const debugConfigs = workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
             return debugConfigs.find(({ type, request, name, dotnetDebuggerConfigName }) =>
                 type === "coreclr" &&
                 request === "attach" &&
@@ -377,7 +386,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
         // If nothing is set, prompt for the processId.
         if (!config.customPipeName && !config.processId) {
-            config.processId = await vscode.commands.executeCommand("PowerShell.PickPSHostProcess");
+            config.processId = await commands.executeCommand("PowerShell.PickPSHostProcess");
             // No process selected. Cancel attach.
             if (!config.processId) {
                 return PREVENT_DEBUG_START;
@@ -385,7 +394,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
 
         if (!config.runspaceId && !config.runspaceName) {
-            config.runspaceId = await vscode.commands.executeCommand("PowerShell.PickRunspace", config.processId);
+            config.runspaceId = await commands.executeCommand("PowerShell.PickRunspace", config.processId);
             // No runspace selected. Cancel attach.
             if (!config.runspaceId) {
                 return PREVENT_DEBUG_START;
@@ -396,15 +405,15 @@ export class DebugSessionFeature extends LanguageClientConsumer
     }
 }
 
-export class SpecifyScriptArgsFeature implements vscode.Disposable {
+export class SpecifyScriptArgsFeature implements Disposable {
 
-    private command: vscode.Disposable;
-    private context: vscode.ExtensionContext;
+    private command: Disposable;
+    private context: ExtensionContext;
 
-    constructor(context: vscode.ExtensionContext) {
+    constructor(context: ExtensionContext) {
         this.context = context;
 
-        this.command = vscode.commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
+        this.command = commands.registerCommand("PowerShell.SpecifyScriptArgs", () => {
             return this.specifyScriptArguments();
         });
     }
@@ -416,7 +425,7 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
     private async specifyScriptArguments(): Promise<string | undefined> {
         const powerShellDbgScriptArgsKey = "powerShellDebugScriptArgs";
 
-        const options: vscode.InputBoxOptions = {
+        const options: InputBoxOptions = {
             ignoreFocusOut: true,
             placeHolder: "Enter script arguments or leave empty to pass no args",
         };
@@ -426,7 +435,7 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
             options.value = prevArgs;
         }
 
-        const text = await vscode.window.showInputBox(options);
+        const text = await window.showInputBox(options);
         // When user cancel's the input box (by pressing Esc), the text value is undefined.
         // Let's not blow away the previous setting.
         if (text !== undefined) {
@@ -436,7 +445,7 @@ export class SpecifyScriptArgsFeature implements vscode.Disposable {
     }
 }
 
-interface IProcessItem extends vscode.QuickPickItem {
+interface IProcessItem extends QuickPickItem {
     pid: string;    // payload for the QuickPick UI
 }
 
@@ -456,15 +465,15 @@ export const GetPSHostProcessesRequestType =
 
 export class PickPSHostProcessFeature extends LanguageClientConsumer {
 
-    private command: vscode.Disposable;
-    private waitingForClientToken?: vscode.CancellationTokenSource;
+    private command: Disposable;
+    private waitingForClientToken?: CancellationTokenSource;
     private getLanguageClientResolve?: (value: LanguageClient) => void;
 
     constructor(private logger: ILogger) {
         super();
 
         this.command =
-            vscode.commands.registerCommand("PowerShell.PickPSHostProcess", () => {
+            commands.registerCommand("PowerShell.PickPSHostProcess", () => {
                 return this.getLanguageClient()
                     .then((_) => this.pickPSHostProcess(), (_) => undefined);
             });
@@ -489,13 +498,13 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         } else {
             // If PowerShell isn't finished loading yet, show a loading message
             // until the LanguageClient is passed on to us
-            this.waitingForClientToken = new vscode.CancellationTokenSource();
+            this.waitingForClientToken = new CancellationTokenSource();
 
             return new Promise<LanguageClient>(
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    vscode.window
+                    window
                         .showQuickPick(
                             ["Cancel"],
                             { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
@@ -547,12 +556,12 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
             return Promise.reject("There are no PowerShell host processes to attach to.");
         }
 
-        const options: vscode.QuickPickOptions = {
+        const options: QuickPickOptions = {
             placeHolder: "Select a PowerShell host process to attach to",
             matchOnDescription: true,
             matchOnDetail: true,
         };
-        const item = await vscode.window.showQuickPick(items, options);
+        const item = await window.showQuickPick(items, options);
 
         return item ? `${item.pid}` : undefined;
     }
@@ -563,7 +572,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
     }
 }
 
-interface IRunspaceItem extends vscode.QuickPickItem {
+interface IRunspaceItem extends QuickPickItem {
     id: string;    // payload for the QuickPick UI
 }
 
@@ -582,14 +591,14 @@ export const GetRunspaceRequestType =
 
 export class PickRunspaceFeature extends LanguageClientConsumer {
 
-    private command: vscode.Disposable;
-    private waitingForClientToken?: vscode.CancellationTokenSource;
+    private command: Disposable;
+    private waitingForClientToken?: CancellationTokenSource;
     private getLanguageClientResolve?: (value: LanguageClient) => void;
 
     constructor(private logger: ILogger) {
         super();
         this.command =
-            vscode.commands.registerCommand("PowerShell.PickRunspace", (processId) => {
+            commands.registerCommand("PowerShell.PickRunspace", (processId) => {
                 return this.getLanguageClient()
                     .then((_) => this.pickRunspace(processId), (_) => undefined);
             }, this);
@@ -614,13 +623,13 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         } else {
             // If PowerShell isn't finished loading yet, show a loading message
             // until the LanguageClient is passed on to us
-            this.waitingForClientToken = new vscode.CancellationTokenSource();
+            this.waitingForClientToken = new CancellationTokenSource();
 
             return new Promise<LanguageClient>(
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    vscode.window
+                    window
                         .showQuickPick(
                             ["Cancel"],
                             { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
@@ -663,12 +672,12 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
             });
         }
 
-        const options: vscode.QuickPickOptions = {
+        const options: QuickPickOptions = {
             placeHolder: "Select PowerShell runspace to debug",
             matchOnDescription: true,
             matchOnDetail: true,
         };
-        const item = await vscode.window.showQuickPick(items, options);
+        const item = await window.showQuickPick(items, options);
 
         return item ? `${item.id}` : undefined;
     }
