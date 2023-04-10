@@ -109,7 +109,7 @@ task Build Restore, {
 #endregion
 #region Test tasks
 
-task Test -If (!($env:TF_BUILD -and $global:IsLinux)) Build, {
+task Test Build, {
     Write-Host "`n### Running extension tests" -ForegroundColor Green
     Invoke-BuildExec { & npm run test }
     # Reset the state of files modified by tests
