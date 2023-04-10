@@ -36,7 +36,7 @@ describe("DebugSessionFeature", () => {
         }),
         sessionManager = Sinon.createStubInstance(SessionManager),
         logger = testLogger
-    }) {
+    }): DebugSessionFeature {
         return new DebugSessionFeature(context, sessionManager, logger);
     }
 
