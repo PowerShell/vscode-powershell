@@ -43,12 +43,13 @@ describe("RunCode feature", function () {
         this.slow(5000);
         const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
         assert(checkIfFileExists(pesterTests));
+        const pesterTestDebugStarted = utils.WaitEvent<vscode.DebugSession>(vscode.debug.onDidStartDebugSession,
+            session => session.name === "PowerShell: Launch Pester Tests"
+        );
 
         await vscode.commands.executeCommand("vscode.open", vscode.Uri.file(pesterTests));
         assert(await vscode.commands.executeCommand("PowerShell.RunPesterTestsFromFile"));
-        const debugSession = await utils.WaitEvent<vscode.DebugSession>(vscode.debug.onDidStartDebugSession,
-            session => session.name === "PowerShell: Launch Pester Tests"
-        );
+        const debugSession = await pesterTestDebugStarted;
         await vscode.debug.stopDebugging();
 
         assert(debugSession.type === "PowerShell");
