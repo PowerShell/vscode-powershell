@@ -179,7 +179,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
         if (config.script === "${file}" || config.script === "${relativeFile}") {
             if (window.activeTextEditor === undefined) {
-                await this.logger.writeAndShowError("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
+                void this.logger.writeAndShowError("To debug the 'Current File', you must first open a PowerShell script file in the editor.");
                 return PREVENT_DEBUG_START;
             }
             config.current_document = true;
