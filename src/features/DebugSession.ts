@@ -162,6 +162,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
         return [this.configs[DebugConfig.LaunchCurrentFile]];
     }
 
+    // We don't use await here but we are returning a promise and the return syntax is easier in an async function
+    // eslint-disable-next-line @typescript-eslint/require-await
     public async resolveDebugConfiguration(
         _folder: WorkspaceFolder | undefined,
         config: DebugConfiguration,
