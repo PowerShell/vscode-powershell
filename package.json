@@ -94,12 +94,12 @@
     "@types/uuid": "9.0.1",
     "@types/vscode": "1.67.0",
     "@typescript-eslint/eslint-plugin": "5.57.0",
-    "@typescript-eslint/parser": "5.57.1",
+    "@typescript-eslint/parser": "5.58.0",
     "@ungap/structured-clone": "1.0.2",
     "@vscode/test-electron": "2.3.0",
     "@vscode/vsce": "2.18.0",
-    "esbuild": "0.17.15",
-    "eslint": "8.37.0",
+    "esbuild": "0.17.16",
+    "eslint": "8.38.0",
     "eslint-plugin-header": "3.1.1",
     "glob": "8.1.0",
     "mocha": "10.2.0",
@@ -107,7 +107,7 @@
     "mock-fs": "5.2.0",
     "rewire": "6.0.0",
     "sinon": "15.0.3",
-    "typescript": "5.0.3"
+    "typescript": "5.0.4"
   },
   "extensionDependencies": [
     "vscode.powershell"
