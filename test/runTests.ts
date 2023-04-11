@@ -24,11 +24,12 @@ async function main(): Promise<void> {
         /** The path to the extension test script. Passed to --extensionTestsPath */
         const extensionTestsPath = path.resolve(__dirname, "./index");
 
-        /** The starting workspace/folder to open in vscode */
-        const workspaceToOpen = path.resolve(extensionDevelopmentPath, "test/mocks/EmptyWorkspace");
+        /** The starting workspace/folder to open in vscode. */
+        const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/mocks/EmptyWorkspace";
+        const workspaceToOpen = path.resolve(extensionDevelopmentPath, workspacePath);
 
         /** The version to test. By default we test on insiders. */
-        const vsCodeVersion = "insiders";
+        const vsCodeVersion = process.env.__TEST_VSCODE_VERSION ?? "insiders";
 
         /** Install a temporary vscode. This must be done ahead of RunTests in order to install extensions ahead of time. @see https://github.com/microsoft/vscode-test/blob/addc23e100b744de598220adbbf0761da870eda9/README.md?plain=1#L71-L89 **/
         const testVSCodePath = await downloadAndUnzipVSCode(vsCodeVersion, undefined, new ConsoleReporter(true));
