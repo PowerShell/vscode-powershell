@@ -27,7 +27,6 @@ async function main(): Promise<void> {
         const extensionTestsPath = path.resolve(__dirname, "./index");
 
         // Open VSCode with the examples folder, so any UI testing can run against the examples.
-        // Also install the c# extension which is needed for hybrid binary module debug testing
         const launchArgs = [
             "./test"
         ];
