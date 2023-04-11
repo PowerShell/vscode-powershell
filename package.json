@@ -115,8 +115,11 @@
   "main": "./out/main.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --bundle --external:vscode --platform=node",
-    "test": "node ./out/test/runTests.js",
+    "build": "esbuild ./src/main.ts --outdir=out --bundle --external:vscode --platform=node",
+    "build-watch": "npm run build -- --watch",
+    "build-test": "tsc --incremental",
+    "build-test-watch": "npm run build-test -- --watch",
+    "test": "npm run build-test && node ./out/test/runTests.js",
     "package": "vsce package --no-gitHubIssueLinking",
     "publish": "vsce publish"
   },
