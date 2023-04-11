@@ -21,6 +21,7 @@
     ]
   },
   "settings": {
+    "window.title": "PowerShell VSCode Extension Development",
     "debug.onTaskErrors": "prompt",
     "editor.tabSize": 4,
     "editor.insertSpaces": true,

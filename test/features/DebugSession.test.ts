@@ -428,6 +428,8 @@ describe("DebugSessionFeature E2E", function slowTests() {
         afterEach(async () => {
             // Cleanup E2E testing state
             await debug.stopDebugging(undefined);
+            // Close all editors
+            await commands.executeCommand("workbench.action.closeAllEditors");
         });
 
         it("Debugs a binary module script", async () => {

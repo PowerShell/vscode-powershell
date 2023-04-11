@@ -3,8 +3,4 @@
     // Relative paths for this setting are always relative to the workspace root dir.
     "powershell.scriptAnalysis.settingsPath": "./PSScriptAnalyzerSettings.psd1",
     "files.defaultLanguage": "powershell",
-    // Suppresses some first-run messages
-    "git.openRepositoryInParentFolders": "never",
-    "csharp.suppressDotnetRestoreNotification": true,
-    "extensions.ignoreRecommendations": true
 }

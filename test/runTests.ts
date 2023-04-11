@@ -25,7 +25,7 @@ async function main(): Promise<void> {
         const extensionTestsPath = path.resolve(__dirname, "./index");
 
         /** The starting workspace/folder to open in vscode. */
-        const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/mocks";
+        const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/TestEnvironment.code-workspace";
         const workspaceToOpen = path.resolve(extensionDevelopmentPath, workspacePath);
 
         /** The version to test. By default we test on insiders. */
