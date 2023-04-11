@@ -3,6 +3,8 @@ logs/
 modules
 modules/
 node_modules/
+obj/
+bin/
 out/
 sessions/
 test/.vscode/

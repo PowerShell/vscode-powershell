@@ -128,10 +128,16 @@ export class PowerShellProcess {
         this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
 
         // Log that the PowerShell terminal process has been started
-        const pid = await this.consoleTerminal.processId;
+        const pid = await this.getPid();
         this.logTerminalPid(pid ?? 0, pwshName);
 
         return sessionDetails;
+    }
+
+    // Returns the process Id of the consoleTerminal
+    public async getPid(): Promise<number | undefined> {
+        if (!this.consoleTerminal) { return undefined; }
+        return await this.consoleTerminal.processId;
     }
 
     public showTerminal(preserveFocus?: boolean): void {

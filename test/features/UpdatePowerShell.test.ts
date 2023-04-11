@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as assert from "assert";
+import assert from "assert";
 import { UpdatePowerShell } from "../../src/features/UpdatePowerShell";
 import { Settings } from "../../src/settings";
 import { IPowerShellVersionDetails } from "../../src/session";
