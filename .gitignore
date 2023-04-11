@@ -8,7 +8,7 @@ bin/
 out/
 sessions/
 test/.vscode/
-
+test/mocks/EmptyWorkspace
 test-results.xml
 *.vsix
 *.DS_Store
