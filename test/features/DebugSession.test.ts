@@ -425,8 +425,8 @@ describe("DebugSessionFeature E2E", function slowTests() {
             await ensureEditorServicesIsConnected();
         });
         afterEach(async () => {
-            // await debug.stopDebugging(undefined);
-            // await commands.executeCommand("workbench.action.closeAllEditors");
+            // Cleanup E2E testing state
+            await debug.stopDebugging(undefined);
         });
 
         it("Debugs a binary module script", async () => {
