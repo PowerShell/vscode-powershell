@@ -12,7 +12,7 @@ import * as platform from "../../src/platform";
 import { IPlatformDetails } from "../../src/platform";
 import { IEditorServicesSessionDetails, IPowerShellVersionDetails, SessionManager, SessionStatus } from "../../src/session";
 import * as utils from "../../src/utils";
-import { BuildBinaryModuleMock, InstallCSharpExtension, WaitEvent, ensureEditorServicesIsConnected, stubInterface, testLogger } from "../utils";
+import { BuildBinaryModuleMock, WaitEvent, ensureEditorServicesIsConnected, stubInterface, testLogger } from "../utils";
 
 const TEST_NUMBER = 7357; //7357 = TEST. Get it? :)
 
@@ -420,7 +420,6 @@ describe("DebugSessionFeature E2E", function slowTests() {
 
     describe("Binary Modules", () => {
         before(async () => {
-            await InstallCSharpExtension();
             BuildBinaryModuleMock();
             await ensureEditorServicesIsConnected();
         });
