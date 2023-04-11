@@ -113,7 +113,7 @@ task Test Build, {
     Write-Host "`n### Running extension tests" -ForegroundColor Green
     Invoke-BuildExec { & npm run test }
     # Reset the state of files modified by tests
-    Invoke-BuildExec { git checkout package.json test/.vscode/settings.json}
+    Invoke-BuildExec { git checkout package.json test/TestEnvironment.code-workspace }
 }
 
 task TestEditorServices -If (Get-EditorServicesPath) {
