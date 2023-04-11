@@ -7,8 +7,7 @@ obj/
 bin/
 out/
 sessions/
-test/.vscode/
-test/mocks/EmptyWorkspace
+test/**/.vscode
 test-results.xml
 *.vsix
 *.DS_Store

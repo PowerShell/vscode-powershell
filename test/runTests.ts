@@ -25,7 +25,7 @@ async function main(): Promise<void> {
         const extensionTestsPath = path.resolve(__dirname, "./index");
 
         /** The starting workspace/folder to open in vscode. */
-        const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/mocks/EmptyWorkspace";
+        const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/mocks";
         const workspaceToOpen = path.resolve(extensionDevelopmentPath, workspacePath);
 
         /** The version to test. By default we test on insiders. */
@@ -51,7 +51,10 @@ async function main(): Promise<void> {
             launchArgs: launchArgs,
             // This is necessary because the tests fail if more than once
             // instance of Code is running.
-            version: vsCodeVersion
+            version: vsCodeVersion,
+            extensionTestsEnv: {
+                __TEST_EXTENSIONDEVELOPMENTPATH: extensionDevelopmentPath
+            }
         });
     } catch (err) {
         console.error(`Failed to run tests: ${err}`);
