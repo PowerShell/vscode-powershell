@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2023.4.0-preview
+### Wednesday, April 12, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🔍 [vscode-powershell #4511](https://github.com/PowerShell/vscode-powershell/pull/4511) - Add additional debug configuration templates for Pester and binary modules. (Thanks @JustinGrote!)
+- #️⃣ 🔍🙏 [vscode-powershell #4510](https://github.com/PowerShell/vscode-powershell/pull/4510) - Improve extension authoring experience with new Build Tasks and Launch Configs. (Thanks @JustinGrote!)
+- ✨ 👷 [vscode-powershell #4502](https://github.com/PowerShell/vscode-powershell/pull/4503) - Enable VS Code unit tests in Linux CI.
+- ✨ 🙏 [vscode-powershell #4498](https://github.com/PowerShell/vscode-powershell/pull/4500) - Enable ESLint `explicit-function-return-type`.
+- ✨ 🔍 [vscode-powershell #3903](https://github.com/PowerShell/vscode-powershell/pull/3903) - Add `attachDotnetDebugger` debug option. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.3
+
+- No update.
+
 ## v2023.3.3
 ### Thursday, March 30, 2023
 
