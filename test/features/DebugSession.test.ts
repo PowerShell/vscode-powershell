@@ -419,18 +419,22 @@ describe("DebugSessionFeature E2E", function slowTests() {
     });
 
     describe("Binary Modules", () => {
+        let binaryModulePath: Uri;
         before(async () => {
+            binaryModulePath = Uri.joinPath(workspace.workspaceFolders![0].uri, "BinaryModule");
             BuildBinaryModuleMock();
             await ensureEditorServicesIsConnected();
         });
         afterEach(async () => {
             // Cleanup E2E testing state
             await debug.stopDebugging(undefined);
+            // Close all editors
+            await commands.executeCommand("workbench.action.closeAllEditors");
         });
 
         it("Debugs a binary module script", async () => {
             const launchScriptConfig = structuredClone(defaultDebugConfigurations[DebugConfig.LaunchScript]);
-            launchScriptConfig.script = "../examples/BinaryModule/BinaryModuleTest.ps1";
+            launchScriptConfig.script = Uri.joinPath(binaryModulePath, "BinaryModuleTest.ps1").fsPath;
             launchScriptConfig.attachDotnetDebugger = true;
             launchScriptConfig.createTemporaryIntegratedConsole = true;
             const startDebugging = Sinon.spy(debug, "startDebugging");
@@ -454,8 +458,8 @@ describe("DebugSessionFeature E2E", function slowTests() {
             const launchScriptConfig = structuredClone(defaultDebugConfigurations[DebugConfig.LaunchCurrentFile]);
             launchScriptConfig.attachDotnetDebugger = true;
             launchScriptConfig.createTemporaryIntegratedConsole = true;
-            const testScriptPath = Uri.joinPath(workspace.workspaceFolders![0].uri, "mocks/BinaryModule/BinaryModuleTest.ps1");
-            const cmdletSourcePath = Uri.joinPath(workspace.workspaceFolders![0].uri, "mocks/BinaryModule/TestSampleCmdletCommand.cs");
+            const testScriptPath = Uri.joinPath(binaryModulePath, "BinaryModuleTest.ps1");
+            const cmdletSourcePath = Uri.joinPath(binaryModulePath, "TestSampleCmdletCommand.cs");
             const testScriptDocument = await workspace.openTextDocument(testScriptPath);
             await window.showTextDocument(testScriptDocument);
 
@@ -463,7 +467,6 @@ describe("DebugSessionFeature E2E", function slowTests() {
 
             //We wire this up before starting the debug session so the event is registered
             const dotnetDebugSessionActive = WaitEvent(debug.onDidChangeActiveDebugSession, (session) => {
-                console.log(`Debug Session Changed: ${session?.name}`);
                 return !!session?.name.match(/Dotnet Debugger/);
             });
 

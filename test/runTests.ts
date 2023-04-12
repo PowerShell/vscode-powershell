@@ -18,24 +18,25 @@ async function main(): Promise<void> {
     }
 
     try {
-        // The folder containing the Extension Manifest package.json
-        // Passed to `--extensionDevelopmentPath`
+        /** The folder containing the Extension Manifest package.json. Passed to `--extensionDevelopmentPath */
         const extensionDevelopmentPath = path.resolve(__dirname, "../../");
 
-        // The path to the extension test script
-        // Passed to --extensionTestsPath
+        /** The path to the extension test script. Passed to --extensionTestsPath */
         const extensionTestsPath = path.resolve(__dirname, "./index");
 
-        // The version to test. By default we test on insiders.
-        const vsCodeVersion = "insiders";
+        /** The starting workspace/folder to open in vscode. */
+        const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/TestEnvironment.code-workspace";
+        const workspaceToOpen = path.resolve(extensionDevelopmentPath, workspacePath);
 
-        // Install Temp VSCode. We need to do this first so we can then install extensions as the runTests function doesn't give us a way to hook in to do this.
+        /** The version to test. By default we test on insiders. */
+        const vsCodeVersion = process.env.__TEST_VSCODE_VERSION ?? "insiders";
+
+        /** Install a temporary vscode. This must be done ahead of RunTests in order to install extensions ahead of time. @see https://github.com/microsoft/vscode-test/blob/addc23e100b744de598220adbbf0761da870eda9/README.md?plain=1#L71-L89 **/
         const testVSCodePath = await downloadAndUnzipVSCode(vsCodeVersion, undefined, new ConsoleReporter(true));
         InstallExtension(testVSCodePath, "ms-dotnettools.csharp");
 
-        // Open VSCode with the examples folder, so any UI testing can run against the examples.
         const launchArgs = [
-            "./test"
+            workspaceToOpen
         ];
 
         // Allow to wait for extension test debugging
@@ -50,14 +51,16 @@ async function main(): Promise<void> {
             launchArgs: launchArgs,
             // This is necessary because the tests fail if more than once
             // instance of Code is running.
-            version: vsCodeVersion
+            version: vsCodeVersion,
+            extensionTestsEnv: {
+                __TEST_EXTENSIONDEVELOPMENTPATH: extensionDevelopmentPath
+            }
         });
     } catch (err) {
         console.error(`Failed to run tests: ${err}`);
         process.exit(1);
     }
 }
-
 
 /** Installs an extension into an existing vscode instance. Returns the output result */
 function InstallExtension(vscodeExePath: string, extensionIdOrVSIXPath: string): string {
