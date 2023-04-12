@@ -47,7 +47,7 @@
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     // Lock the TypeScript SDK path to the version we use
     "typescript.tsdk": "Client/node_modules/typescript/lib",
-    // Code actions like "organize imports" ignore eslint, so we need this here
+    // Code actions like "organize imports" ignore ESLint, so we need this here
     "typescript.format.semicolons": "insert",
     // Enable ESLint as defaut formatter so quick fixes can be applied directly
     "eslint.format.enable": true,
