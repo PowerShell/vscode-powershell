@@ -1,5 +1,5 @@
 {
-  // A simple test environment that suppresses some first start warnings we dont care about.
+  // A simple test environment that suppresses some first start warnings we don't care about.
   "folders": [
     {
       "path": "mocks"
