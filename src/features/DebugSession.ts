@@ -45,6 +45,10 @@ export enum DebugConfig {
     LaunchScript,
     InteractiveSession,
     AttachHostProcess,
+    RunPester,
+    ModuleInteractiveSession,
+    BinaryModule,
+    BinaryModulePester,
 }
 
 /** Make the implicit behavior of undefined and null in the debug api more explicit  */
@@ -55,7 +59,7 @@ type ResolveDebugConfigurationResult = DebugConfiguration | PREVENT_DEBUG_START 
 const PREVENT_DEBUG_START = undefined;
 const PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG = null;
 
-
+/** Represents the various built-in debug configurations that will be advertised to the user if they choose "Add Config" from the launch debug config window */
 export const defaultDebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
     [DebugConfig.LaunchCurrentFile]: {
         name: "PowerShell: Launch Current File",
@@ -81,6 +85,36 @@ export const defaultDebugConfigurations: Record<DebugConfig, DebugConfiguration>
         type: "PowerShell",
         request: "attach",
         runspaceId: 1,
+    },
+    [DebugConfig.RunPester]: {
+        name: "PowerShell: Run Pester Tests",
+        type: "PowerShell",
+        request: "launch",
+        script: "Invoke-Pester",
+        createTemporaryIntegratedConsole: true,
+        attachDotnetDebugger: true
+    },
+    [DebugConfig.ModuleInteractiveSession]: {
+        name: "PowerShell: Module Interactive Session",
+        type: "PowerShell",
+        request: "launch",
+        script: "Enter command to import your binary module, for example: \"Import-Module -Force ${workspaceFolder}/path/to/module.psd1|dll\"",
+    },
+    [DebugConfig.BinaryModule]: {
+        name: "PowerShell: Binary Module Interactive",
+        type: "PowerShell",
+        request: "launch",
+        script: "Enter command to import your binary module, for example: \"Import-Module -Force ${workspaceFolder}/path/to/module.psd1|dll\"",
+        createTemporaryIntegratedConsole: true,
+        attachDotnetDebugger: true
+    },
+    [DebugConfig.BinaryModulePester]: {
+        name: "PowerShell: Binary Module Pester Tests",
+        type: "PowerShell",
+        request: "launch",
+        script: "Invoke-Pester",
+        createTemporaryIntegratedConsole: true,
+        attachDotnetDebugger: true
     }
 };
 
@@ -146,6 +180,26 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 id: DebugConfig.AttachHostProcess,
                 label: "Attach",
                 description: "Attach the debugger to a running PowerShell Host Process",
+            },
+            {
+                id: DebugConfig.RunPester,
+                label: "Run Pester Tests",
+                description: "Debug Pester Tests detected in your current directory (runs Invoke-Pester)",
+            },
+            {
+                id: DebugConfig.ModuleInteractiveSession,
+                label: "Interactive Session (Module)",
+                description: "Debug commands executed from the PowerShell Extension Terminal after auto-loading your module",
+            },
+            {
+                id: DebugConfig.BinaryModule,
+                label: "Interactive Session (Binary Module)",
+                description: "Debug a .NET binary or hybrid module loaded into a PowerShell session. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
+            },
+            {
+                id: DebugConfig.RunPester,
+                label: "Run Pester Tests (Binary Module)",
+                description: "Debug a .NET binary or hybrid module by running pester tests. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
             },
         ];
 
