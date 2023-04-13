@@ -405,10 +405,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
     private getDotnetNamedConfigOrDefault(configName?: string): ResolveDebugConfigurationResult {
         if (configName) {
             const debugConfigs = workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
-            return debugConfigs.find(({ type, request, name, dotnetDebuggerConfigName }) =>
+            return debugConfigs.find(({ type, request, name }) =>
                 type === "coreclr" &&
                 request === "attach" &&
-                name === dotnetDebuggerConfigName
+                name === configName
             );
         }
 
