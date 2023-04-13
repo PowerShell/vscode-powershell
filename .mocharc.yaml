@@ -1,0 +1,14 @@
+color: true
+extensions:
+  - js
+  - jsx
+spec: "out/test/**/*.test.js"
+require: source-map-support/register
+reporter: mocha-multi-reporters
+reporterOptions:
+  #NOTE: The XML output by Mocha's xUnit reporter is actually in the
+  #JUnit style. I'm unsure how no one else has noticed this.
+  reporterEnabled: spec, xunit
+  xunitReporterOptions:
+    output: test-results.xml
+timeout: 10000 # Lots of tests are slow in the UI

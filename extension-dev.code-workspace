@@ -17,7 +17,8 @@
       "josefpihrt-vscode.roslynator",
       "ms-azure-devops.azure-pipelines",
       "ms-dotnettools.csharp",
-      "ms-vscode.powershell"
+      "ms-vscode.powershell",
+      "hbenl.vscode-mocha-test-adapter"
     ]
   },
   "settings": {
@@ -56,7 +57,23 @@
       "editor.formatOnPaste": true,
       "editor.formatOnSave": true,
       "editor.formatOnSaveMode": "modificationsIfAvailable"
-    }
+    },
+    // Mocha Test Explorer
+    "mochaExplorer.files": "out/test/**/*.test.js",
+    "mochaExplorer.watch": "out/**/*.test.js",
+    // "mochaExplorer.launcherScript": "out/test/runTests",
+    "mochaExplorer.launcherScript": "node_modules/mocha-explorer-launcher-scripts/vscode-test/index",
+    "mochaExplorer.autoload": false,
+    "mochaExplorer.require": "source-map-support/register",
+    "mochaExplorer.ipcRole": "server",
+    "mochaExplorer.ipcTimeout": 10000,
+    "mochaExplorer.debuggerPort": 59229,
+    "mochaExplorer.debuggerConfig": "Test Extension",
+    "mochaExplorer.env": {
+      "VSCODE_VERSION": "insiders",
+      "ELECTRON_RUN_AS_NODE": null
+    },
+    "mochaExplorer.configFile": ".mocharc.yaml"
   },
   "tasks": {
     "version": "2.0.0",
