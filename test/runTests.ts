@@ -9,7 +9,20 @@ import { ConsoleReporter, downloadAndUnzipVSCode, resolveCliArgsFromVSCodeExecut
 import { existsSync } from "fs";
 import { spawnSync } from "child_process";
 
+/** This is the main test entrypoint that:
+ * - Prepares the test environment by downloading a testing instance of vscode and any additional extensions
+ * - Starts the test environment with runTestsInner injected into the extensionsTestsPath which will in turn start the Mocha test runner inside the environment.
+ *
+ * Tools like npm run test and vscode tasks should point to this script to begin the testing process. It is assumed you have built the extension prior to this step, it will error if it does not find the built extension or related test scaffolding.
+ * */
 async function main(): Promise<void> {
+    // Verify that the extension is built
+    const compiledExtensionPath = path.resolve(__dirname, "../main.js");
+    if (!existsSync(compiledExtensionPath)) {
+        console.error("ERROR: The extension is not built yet. Please run a build first, using either the 'Run Build Task' in VSCode or ./build.ps1 in PowerShell.");
+        process.exit(1);
+    }
+
     // Test for the presence of modules folder and error if not found
     const PSESPath = path.resolve(__dirname, "../../modules/PowerShellEditorServices.VSCode/bin/Microsoft.PowerShell.EditorServices.VSCode.dll");
     if (!existsSync(PSESPath)) {
@@ -21,10 +34,10 @@ async function main(): Promise<void> {
         /** The folder containing the Extension Manifest package.json. Passed to `--extensionDevelopmentPath */
         const extensionDevelopmentPath = path.resolve(__dirname, "../../");
 
-        /** The path to the extension test script. Passed to --extensionTestsPath */
-        const extensionTestsPath = path.resolve(__dirname, "./index");
+        /** The path to the test script that will run inside the vscode instance. Passed to --extensionTestsPath */
+        const extensionTestsPath = path.resolve(__dirname, "./runTestsInner");
 
-        /** The starting workspace/folder to open in vscode. */
+        /** The starting workspace/folder to open in vscode. By default this is a testing instance pointed to the Examples folder */
         const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/TestEnvironment.code-workspace";
         const workspaceToOpen = path.resolve(extensionDevelopmentPath, workspacePath);
 
@@ -39,10 +52,31 @@ async function main(): Promise<void> {
             workspaceToOpen
         ];
 
-        // Allow to wait for extension test debugging
-        const port = process.argv[2];
-        if (port) {launchArgs.push(`--inspect-brk-extensions=${port}`);}
+        /** This is fed to runTestsInner so it knows the extension context to find config files */
+        const extensionTestsEnv: Record<string, string | undefined> = {
+            __TEST_EXTENSION_DEVELOPMENT_PATH: extensionDevelopmentPath
+        };
 
+        // This info is provided by the Mocha test explorer so it can communicate with the mocha running inside the vscode test instance.
+        // Adapted from: https://github.com/hbenl/mocha-explorer-launcher-scripts/blob/bd3ace403e729de1be31f46afddccc477f82a178/vscode-test/index.ts#L33-L37
+        if (process.argv[2]) {
+            const mochaIPCInfo = JSON.parse(process.argv[2]);
+            extensionTestsEnv.MOCHA_WORKER_IPC_ROLE = mochaIPCInfo.role;
+            extensionTestsEnv.MOCHA_WORKER_IPC_HOST = mochaIPCInfo.host;
+            extensionTestsEnv.MOCHA_WORKER_IPC_PORT = String(mochaIPCInfo.port);
+        }
+
+        /** This env var should be passed by launch configurations for debugging the extension tests. If specified, we should wait for it to connect because it means something explicitly asked for debugging **/
+        const debugPort = process.env.__TEST_DEBUG_INSPECT_PORT;
+        console.log("DebugPort", debugPort);
+        if (debugPort !== undefined) {
+            console.log(`__TEST_DEBUG_INSPECT_PORT is set to ${debugPort}`);
+            launchArgs.push(`--inspect-brk-extensions=${debugPort}`);
+        } else {
+            // Make debugger optionally available. Mocha Test adapter will use this when debugging because it provides no indicator when it is debugging vs. just running
+            // FIXME: Because the mocha test explorer often doesn't attach until after the tests start and it provides no indicator of debug vs run, it may be flaky for debug until https://github.com/hbenl/vscode-mocha-test-adapter/pull/240 is merged. To workaround, start debugging sessions using "Test Extensions" launch config. We could use a timeout here but it would slow down everything including normal runs.
+            launchArgs.push("--inspect-extensions=59229");
+        }
 
         // Download VS Code, unzip it and run the integration test
         await runTests({
@@ -52,13 +86,14 @@ async function main(): Promise<void> {
             // This is necessary because the tests fail if more than once
             // instance of Code is running.
             version: vsCodeVersion,
-            extensionTestsEnv: {
-                __TEST_EXTENSIONDEVELOPMENTPATH: extensionDevelopmentPath
-            }
+            extensionTestsEnv: extensionTestsEnv
         });
     } catch (err) {
-        console.error(`Failed to run tests: ${err}`);
+        console.error(`RunTests failed to run tests: ${err}`);
         process.exit(1);
+    } finally {
+        // Clean this up because runTests sets it on the current process, not the child one.
+        process.env.__TEST_DEBUG_INSPECT_PORT = undefined;
     }
 }
 
@@ -82,6 +117,5 @@ function InstallExtension(vscodeExePath: string, extensionIdOrVSIXPath: string):
     }
     return installResult.stdout;
 }
-
 
 void main();

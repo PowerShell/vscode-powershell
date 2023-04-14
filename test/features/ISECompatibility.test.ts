@@ -73,6 +73,7 @@ describe("ISE compatibility feature", function () {
     });
 
     describe("Color theme interactions", function () {
+        this.slow(4000);
         beforeEach(enableISEMode);
 
         function assertISESettings(): void {

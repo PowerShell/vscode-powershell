@@ -17,7 +17,8 @@
       "josefpihrt-vscode.roslynator",
       "ms-azure-devops.azure-pipelines",
       "ms-dotnettools.csharp",
-      "ms-vscode.powershell"
+      "ms-vscode.powershell",
+      "hbenl.vscode-mocha-test-adapter"
     ]
   },
   "settings": {
@@ -28,9 +29,7 @@
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "files.associations": {
-      // Use JSONC instead of JSON because (1) that's how VS Code interprets
-      // snippet files, and (2) it enables better source documentation.
-      "**/snippets/*.json": "jsonc",
+      "**/snippets/*.json": "jsonc", // Use JSONC instead of JSON because that's how VS Code interprets snippet files, and it enables better source documentation.
       "**/.vsts-ci/**/*.yml": "azure-pipelines",
     },
     // Ignore the Markdown rule:
@@ -45,18 +44,26 @@
     "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
-    // Lock the TypeScript SDK path to the version we use
-    "typescript.tsdk": "Client/node_modules/typescript/lib",
-    // Code actions like "organize imports" ignore ESLint, so we need this here
-    "typescript.format.semicolons": "insert",
-    // Enable ESLint as defaut formatter so quick fixes can be applied directly
-    "eslint.format.enable": true,
+    "typescript.tsdk": "Client/node_modules/typescript/lib", // Lock the TypeScript SDK path to the version we use
+    "typescript.format.semicolons": "insert", // Code actions like "organize imports" ignore ESLint, so we need this here
+    "eslint.format.enable": true, // Enable ESLint as defaut formatter so quick fixes can be applied directly
     "[typescript]": {
       "editor.defaultFormatter": "dbaeumer.vscode-eslint",
       "editor.formatOnPaste": true,
       "editor.formatOnSave": true,
       "editor.formatOnSaveMode": "modificationsIfAvailable"
-    }
+    },
+    "mochaExplorer.configFile": ".mocharc.json",
+    "mochaExplorer.launcherScript": "out/test/runTests",
+    "mochaExplorer.autoload": false, // The test instance pops up every time discovery or run is done, this could be annoying on startup.
+    "mochaExplorer.debuggerPort": 59229, // Matches the launch config, we dont want to use the default port as we are launching a duplicate instance of vscode and it might conflict.
+    "mochaExplorer.ipcRole": "server",
+    "mochaExplorer.ipcTimeout": 10000,
+    "testExplorer.useNativeTesting": true,
+    "mochaExplorer.env": {
+      "VSCODE_VERSION": "insiders",
+      "ELECTRON_RUN_AS_NODE": null
+    },
   },
   "tasks": {
     "version": "2.0.0",
@@ -160,39 +167,7 @@
         },
         "command": "Invoke-Build ${input:serverBuildCommand}",
         "group": "build"
-      },
-      // HACK: Can't use task type npm in workspace config: https://github.com/microsoft/vscode/issues/96086
-      {
-        "label": "test-watch",
-        "icon": {
-          "color": "terminal.ansiCyan",
-          "id": "sync"
-        },
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder:Client}"
-        },
-        "command": "npm run-script build-test-watch",
-        "group": "test",
-        "problemMatcher": "$tsc-watch",
-        "isBackground": true,
-        "dependsOn": "build-watch" // We need to also build main.js extension for testing or it leads to sourcemap errors
-      },
-      {
-        "label": "build-watch",
-        "icon": {
-          "color": "terminal.ansiCyan",
-          "id": "sync"
-        },
-        "type": "shell",
-        "options": {
-          "cwd": "${workspaceFolder:Client}"
-        },
-        "command": "npm run-script build-watch",
-        "group": "build",
-        "problemMatcher": "$esbuild-watch",
-        "isBackground": true,
-      },
+      }
     ],
     "inputs": [
       {
@@ -228,52 +203,7 @@
   },
   "launch": {
     "version": "0.2.0",
-    "compounds": [
-      {
-        "name": "Test Extension",
-        "configurations": [
-          "ExtensionTests",
-          "ExtensionTestRunner",
-        ],
-        "stopAll": true,
-        "presentation": {
-          "group": "test",
-          "order": 1
-        },
-        // This is here so instead of under TestRunner so that the attach doesn't start until the compile is complete
-        "preLaunchTask": "test-watch"
-      }
-    ],
     "configurations": [
-      {
-        "name": "Launch Extension",
-        "type": "extensionHost",
-        "request": "launch",
-        "runtimeExecutable": "${execPath}",
-        "args": [
-          "--extensionDevelopmentPath=${workspaceFolder:Client}"
-        ],
-        "env": {
-          "__TEST_WORKSPACE_PATH": "${workspaceFolder:Client}/examples",
-        },
-        "sourceMaps": true,
-        // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/out/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
-        ],
-        "skipFiles": [
-          "<node_internals>/**",
-          "**/node_modules/**",
-          "**/.vscode-test/**"
-        ],
-        "presentation": {
-          "hidden": false,
-          "group": "test",
-          "order": 2
-        }
-      },
       {
         // https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
         "name": "Attach to Editor Services",
@@ -292,123 +222,6 @@
           "group": "test",
           "order": 3
         }
-      },
-      {
-        // Runs the extension in an empty temp profile that is automatically cleaned up after use
-        // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
-        "name": "Launch Extension - Temp Profile",
-        "type": "extensionHost",
-        "request": "launch",
-        "runtimeExecutable": "${execPath}",
-        "args": [
-          "--profile-temp",
-          "--extensionDevelopmentPath=${workspaceFolder:Client}",
-          "${workspaceFolder:Client}/examples"
-        ],
-        "sourceMaps": true,
-        // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/out/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
-        ],
-        "skipFiles": [
-          "<node_internals>/**",
-          "**/node_modules/**",
-          "**/.vscode-test/**"
-        ],
-        "presentation": {
-          "hidden": false,
-          "group": "test",
-          "order": 2
-        }
-      },
-      {
-        // Runs the extension in an isolated but persistent profile separate from the user settings
-        // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
-        "name": "Launch Extension - Isolated Profile",
-        "type": "extensionHost",
-        "request": "launch",
-        "runtimeExecutable": "${execPath}",
-        "args": [
-          "--profile=debug",
-          "--extensionDevelopmentPath=${workspaceFolder:Client}",
-          "${workspaceFolder:Client}/examples"
-        ],
-        "sourceMaps": true,
-        // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/out/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
-        ],
-        "skipFiles": [
-          "<node_internals>/**",
-          "**/node_modules/**",
-          "**/.vscode-test/**"
-        ],
-        "presentation": {
-          "hidden": false,
-          "group": "test",
-          "order": 2
-        }
-      },
-      {
-        "name": "ExtensionTestRunner",
-        "type": "node",
-        "request": "launch",
-        "program": "${workspaceFolder:Client}/out/test/runTests.js",
-        "cascadeTerminateToConfigurations": [
-          "ExtensionTests",
-        ],
-        // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/out/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
-        ],
-        "skipFiles": [
-          "<node_internals>/**",
-          "**/node_modules/**",
-          "**/.vscode-test/**"
-        ],
-        "args": [
-          "59229" // Wait on this port for the separate debugger task to attach
-        ],
-        "presentation": {
-          "hidden": true,
-        },
-        "internalConsoleOptions": "neverOpen",
-        "console": "integratedTerminal",
-        "autoAttachChildProcesses": false // Doesnt work with the extension host for whatever reason, hence the separate attach.
-      },
-      {
-        "name": "ExtensionTests",
-        "type": "node",
-        "request": "attach",
-        "port": 59229,
-        "autoAttachChildProcesses": true,
-        "outputCapture": "console",
-        "continueOnAttach": true,
-        // Sometimes we may need to install extensions or reload the window which requires reconnecting
-        "restart": {
-          "delay": 1000,
-          "maxAttempts": 3
-        },
-        "presentation": {
-          "hidden": true,
-        },
-        // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/out/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
-        ],
-        "skipFiles": [
-          "<node_internals>/**",
-          "**/node_modules/**",
-          "**/.vscode-test/**"
-        ],
       }
     ]
   }

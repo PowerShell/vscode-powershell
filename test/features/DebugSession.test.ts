@@ -64,10 +64,9 @@ describe("DebugSessionFeature", () => {
             });
 
             createDebugSessionFeatureStub({context: context});
-
             assert.ok(registerFactoryStub.calledOnce, "Debug adapter factory method called");
-            assert.ok(registerProviderStub.calledOnce, "Debug config provider method called");
-            assert.equal(context.subscriptions.length, 2, "DebugSessionFeature disposables populated");
+            assert.ok(registerProviderStub.calledTwice, "Debug config provider registered for both Initial and Dynamic");
+            assert.equal(context.subscriptions.length, 3, "DebugSessionFeature disposables populated");
             // TODO: Validate the registration content, such as the language name
         });
     });
@@ -353,6 +352,56 @@ describe("DebugSessionFeature", () => {
             assert.equal(actual!, null);
             assert.match(logger.writeAndShowError.firstCall.args[0], /matching launch config was not found/);
         });
+
+        it("Finds the correct dotnetDebuggerConfigName", async () => {
+            const foundDotnetConfig: DebugConfiguration = {
+                name: "TestDotnetAttachConfig",
+                request: "attach",
+                type: "coreclr",
+            };
+            const candidateDotnetConfigs: DebugConfiguration[] = [
+                {
+                    name: "BadCandidate1",
+                    type: "powershell",
+                    request: "attach"
+                },
+                {
+                    name: "BadCandidate2",
+                    type: "coreclr",
+                    request: "attach"
+                },
+                { // This one has launch instead of attach and even tho it has same name, should not be matched
+                    name: foundDotnetConfig.name,
+                    type: "coreclr",
+                    request: "launch"
+                },
+                foundDotnetConfig, //This is the one we want to match
+                {
+                    name: foundDotnetConfig.name,
+                    type: "notcoreclrExactly",
+                    request: "attach"
+                },
+                {
+                    name: `${foundDotnetConfig.name}notexactlythisname`,
+                    type: "coreclr",
+                    request: "attach"
+                }
+            ];
+            const attachConfig = defaultDebugConfig;
+            attachConfig.script = "test.ps1"; // This bypasses the ${file} logic
+            attachConfig.createTemporaryIntegratedConsole = true;
+            attachConfig.attachDotnetDebugger = true;
+            attachConfig.dotnetDebuggerConfigName = foundDotnetConfig.name;
+            const debugSessionFeature = createDebugSessionFeatureStub({});
+
+            // The any is necessary to stub a private method
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            Sinon.stub(debugSessionFeature, "getLaunchConfigurations" as any).returns(candidateDotnetConfigs);
+
+            const config = await debugSessionFeature.resolveDebugConfigurationWithSubstitutedVariables(undefined, attachConfig);
+
+            assert.deepStrictEqual(config!.dotnetAttachConfig, foundDotnetConfig);
+        });
     });
 
     describe("createDebugAdapterDescriptor", () => {
@@ -382,6 +431,7 @@ describe("DebugSessionFeature", () => {
 
 describe("DebugSessionFeature E2E", function slowTests() {
     this.slow(20000); // Will warn if test takes longer than 10s and show red if longer than 20s
+    this.timeout(30000);
 
     if (process.platform == "darwin") {
         this.timeout(60000); // The MacOS test runner is sloooow in Azure Devops
