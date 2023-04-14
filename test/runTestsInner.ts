@@ -6,16 +6,17 @@ import path from "path";
 import Mocha from "mocha";
 /** This is the entrypoint into the standalone vscode instance that should be passed to the --extensionsTestPath parameter of the test VSCode instance. */
 export function run(testsRoot: string): Promise<void> {
-    console.log(`\n\n=====\nTest Runner Start\n${testsRoot}\n=====`);
-    return runTestsInner();
+    return runTestsInner(testsRoot);
 }
 
 /** Runs inside of the test vscode instance, and should set up and activate the test runner */
-function runTestsInner(): Promise<void> {
+function runTestsInner(testsRoot: string): Promise<void> {
     // Allow tools like Mocha Test Explorer to inject their own Mocha worker
     if (process.env.MOCHA_WORKER_PATH) {
         return require(process.env.MOCHA_WORKER_PATH);
     }
+
+    console.log(`\n\n=====\nTest Runner START\n${testsRoot}\n=====`);
 
     /** Passed from RunTests */
     const rootDir = process.env.__TEST_EXTENSION_DEVELOPMENT_PATH;
@@ -59,6 +60,7 @@ function runTestsInner(): Promise<void> {
                 if (failures > 0) {
                     throw new Error(`${failures} tests failed.`);
                 } else {
+                    console.log("\n\n=====\nTest Runner STOP\n=====");
                     return c();
                 }
             });
