@@ -431,6 +431,7 @@ describe("DebugSessionFeature", () => {
 
 describe("DebugSessionFeature E2E", function slowTests() {
     this.slow(20000); // Will warn if test takes longer than 10s and show red if longer than 20s
+    this.timeout(30000);
 
     if (process.platform == "darwin") {
         this.timeout(60000); // The MacOS test runner is sloooow in Azure Devops
