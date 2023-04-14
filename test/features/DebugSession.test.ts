@@ -354,7 +354,7 @@ describe("DebugSessionFeature", () => {
             assert.match(logger.writeAndShowError.firstCall.args[0], /matching launch config was not found/);
         });
 
-        it.only("Finds the correct dotnetDebuggerConfigName", async () => {
+        it("Finds the correct dotnetDebuggerConfigName", async () => {
             const foundDotnetConfig: DebugConfiguration = {
                 name: "TestDotnetAttachConfig",
                 request: "attach",
