@@ -203,22 +203,6 @@
   },
   "launch": {
     "version": "0.2.0",
-    "compounds": [
-      // {
-      //   "name": "Test Extension",
-      //   "configurations": [
-      //     "ExtensionTests",
-      //     "ExtensionTestRunner",
-      //   ],
-      //   "stopAll": true,
-      //   "presentation": {
-      //     "group": "test",
-      //     "order": 1
-      //   },
-      //   // This is here so instead of under TestRunner so that the attach doesn't start until the compile is complete
-      //   "preLaunchTask": "test-watch"
-      // }
-    ],
     "configurations": [
       {
         // https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
