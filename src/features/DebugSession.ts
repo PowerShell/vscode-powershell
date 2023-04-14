@@ -21,7 +21,8 @@ import {
     CancellationTokenSource,
     InputBoxOptions,
     QuickPickItem,
-    QuickPickOptions
+    QuickPickOptions,
+    DebugConfigurationProviderTriggerKind
 } from "vscode";
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
@@ -60,6 +61,7 @@ const PREVENT_DEBUG_START = undefined;
 const PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG = null;
 
 /** Represents the various built-in debug configurations that will be advertised to the user if they choose "Add Config" from the launch debug config window */
+// NOTE: These are duplicated with what is in package.json until https://github.com/microsoft/vscode/issues/150663#issuecomment-1506134754 is resolved.
 export const defaultDebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
     [DebugConfig.LaunchCurrentFile]: {
         name: "PowerShell: Launch Current File",
@@ -129,7 +131,12 @@ export class DebugSessionFeature extends LanguageClientConsumer
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: ILogger) {
         super();
         // This "activates" the debug adapter for use with  You can only do this once.
-        context.subscriptions.push(debug.registerDebugConfigurationProvider("PowerShell", this));
+        [
+            DebugConfigurationProviderTriggerKind.Initial,
+            DebugConfigurationProviderTriggerKind.Dynamic
+        ].forEach(triggerKind => {
+            context.subscriptions.push(debug.registerDebugConfigurationProvider("PowerShell", this, triggerKind));
+        });
         context.subscriptions.push(debug.registerDebugAdapterDescriptorFactory("PowerShell", this));
     }
 
@@ -199,7 +206,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             {
                 id: DebugConfig.RunPester,
                 label: "Run Pester Tests (Binary Module)",
-                description: "Debug a .NET binary or hybrid module by running pester tests. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
+                description: "Debug a .NET binary or hybrid module by running Pester tests. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
             },
         ];
 
@@ -404,11 +411,11 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
     private getDotnetNamedConfigOrDefault(configName?: string): ResolveDebugConfigurationResult {
         if (configName) {
-            const debugConfigs = workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
-            return debugConfigs.find(({ type, request, name, dotnetDebuggerConfigName }) =>
+            const debugConfigs = this.getLaunchConfigurations();
+            return debugConfigs.find(({ type, request, name }) =>
                 type === "coreclr" &&
                 request === "attach" &&
-                name === dotnetDebuggerConfigName
+                name === configName
             );
         }
 
@@ -423,6 +430,11 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 moduleLoad: false
             }
         };
+    }
+
+    /** Fetches all available vscode launch configurations. This is abstracted out for easier testing */
+    private getLaunchConfigurations(): DebugConfiguration[] {
+        return workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
     }
 
     private async resolveAttachDebugConfiguration(config: DebugConfiguration): Promise<ResolveDebugConfigurationResult> {
@@ -742,3 +754,4 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         this.waitingForClientToken = undefined;
     }
 }
+
