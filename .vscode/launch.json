@@ -1,20 +1,5 @@
 {
   "version": "0.2.0",
-  "compounds": [
-    {
-      "name": "Test Extension",
-      "configurations": [
-        "ExtensionTests",
-        "ExtensionTestRunner",
-      ],
-      "stopAll": true,
-      "presentation": {
-        "group": "test",
-        "order": 1
-      },
-      "preLaunchTask": "test-watch"
-    }
-  ],
   "configurations": [
     // NOTE: These are not in the code-workspace file because StartDebugging cannot current resolve configs stored there so they have to be here for the Mocha Test Explorer feature.
     // Ref: https://github.com/microsoft/vscode/issues/150663
@@ -108,7 +93,7 @@
       }
     },
     {
-      "name": "ExtensionTestRunner",
+      "name": "Test Extension",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/out/test/runTests.js",
@@ -126,43 +111,17 @@
         "**/node_modules/**",
         "**/.vscode-test/**"
       ],
+      "attachSimplePort": 59229, // THe default is 9229 but we want to avoid conflicts because we will have two vscode instances running.
       "env": {
-        "__TEST_DEBUG_INSPECT_PORT": "59229" // Should match the "attach" launch config port.
+        "__TEST_DEBUG_INSPECT_PORT": "59229" // Needs to match attachSimplePort
       },
       "presentation": {
-        "hidden": true,
+        "hidden": false,
       },
       "internalConsoleOptions": "neverOpen",
       "console": "integratedTerminal",
-      "autoAttachChildProcesses": false // Doesnt work with the extension host for whatever reason, hence the separate attach.
-    },
-    {
-      "name": "ExtensionTests",
-      "type": "node",
-      "request": "attach",
-      "port": 59229,
-      "autoAttachChildProcesses": true,
-      "outputCapture": "console",
-      "continueOnAttach": true,
-      // Sometimes we may need to install extensions or reload the window which requires reconnecting
-      "restart": {
-        "delay": 1000,
-        "maxAttempts": 3
-      },
-      "presentation": {
-        "hidden": true,
-      },
-      // This speeds up source map detection and makes smartStep work correctly
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
-        "!**/node_modules/**",
-        "!**/.vscode-test/**"
-      ],
-      "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**",
-        "**/.vscode-test/**"
-      ],
+      "autoAttachChildProcesses": false,
+      "preLaunchTask": "test-watch"
     }
   ]
 }

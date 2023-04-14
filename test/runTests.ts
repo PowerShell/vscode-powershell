@@ -16,6 +16,9 @@ import { spawnSync } from "child_process";
  * Tools like npm run test and vscode tasks should point to this script to begin the testing process. It is assumed you have built the extension prior to this step, it will error if it does not find the built extension or related test scaffolding.
  * */
 async function main(): Promise<void> {
+    console.log("Args", process.argv);
+    console.log("Environment", process.env);
+
     // Verify that the extension is built
     const compiledExtensionPath = path.resolve(__dirname, "../main.js");
     if (!existsSync(compiledExtensionPath)) {
@@ -29,7 +32,6 @@ async function main(): Promise<void> {
         console.error("ERROR: A PowerShell Editor Services build was not found in the modules directory. Please run a build first, using either the 'Run Build Task' in VSCode or ./build.ps1 in PowerShell.");
         process.exit(1);
     }
-
 
     try {
         /** The folder containing the Extension Manifest package.json. Passed to `--extensionDevelopmentPath */
@@ -67,12 +69,16 @@ async function main(): Promise<void> {
             extensionTestsEnv.MOCHA_WORKER_IPC_PORT = String(mochaIPCInfo.port);
         }
 
-        // This env var should be passed by launch configurations for debugging the extension tests
+        /** This env var should be passed by launch configurations for debugging the extension tests. If specified, we should wait for it to connect because it means something explicitly asked for debugging **/
         const debugPort = process.env.__TEST_DEBUG_INSPECT_PORT;
         console.log("DebugPort", debugPort);
         if (debugPort !== undefined) {
             console.log(`__TEST_DEBUG_INSPECT_PORT is set to ${debugPort}`);
             launchArgs.push(`--inspect-brk-extensions=${debugPort}`);
+        } else {
+            // Make debugger optionally available. Mocha Test adapter will use this when debugging because it provides no indicator when it is debugging vs. just running
+            // FIXME: Because the mocha test explorer often doesn't attach until after the tests start and it provides no indicator of debug vs run, it may be flaky for debug until https://github.com/hbenl/vscode-mocha-test-adapter/pull/240 is merged. To workaround, start debugging sessions using "Test Extensions" launch config. We could use a timeout here but it would slow down everything including normal runs.
+            launchArgs.push("--inspect-extensions=59229");
         }
 
         // Download VS Code, unzip it and run the integration test
@@ -114,6 +120,5 @@ function InstallExtension(vscodeExePath: string, extensionIdOrVSIXPath: string):
     }
     return installResult.stdout;
 }
-
 
 void main();
