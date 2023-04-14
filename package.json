@@ -501,6 +501,52 @@
               "request": "attach",
               "processId": "current"
             }
+          },
+          {
+            "label": "PowerShell: Run Pester Tests",
+            "description": "Debug Pester Tests detected in your current directory (runs Invoke-Pester)",
+            "body": {
+              "name": "PowerShell Run Pester Tests",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Invoke-Pester",
+              "createTemporaryIntegratedConsole": true,
+              "attachDotnetDebugger": true
+            }
+          },
+          {
+            "label": "PowerShell: Interactive Session (Module)",
+            "description": "Debug commands executed from the PowerShell Extension Terminal after auto-loading your module",
+            "body": {
+              "name": "PowerShell: Module Interactive Session",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Enter command to import your binary module, for example: \"Import-Module -Force ${workspaceFolder}/path/to/module.psd1|dll\""
+            }
+          },
+          {
+            "label": "PowerShell: Interactive Session (Binary Module)",
+            "description": "Debug a .NET binary or hybrid module loaded into a PowerShell session. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
+            "body": {
+              "name": "PowerShell: Binary Module Interactive",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Enter command to import your binary module, for example: \"Import-Module -Force ${workspaceFolder}/path/to/module.psd1|dll\"",
+              "createTemporaryIntegratedConsole": true,
+              "attachDotnetDebugger": true
+            }
+          },
+          {
+            "label": "Run Pester Tests (Binary Module)",
+            "description": "Debug a .NET binary or hybrid module by running Pester tests. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
+            "body": {
+              "name": "PowerShell: Binary Module Pester Tests",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Invoke-Pester",
+              "createTemporaryIntegratedConsole": true,
+              "attachDotnetDebugger": true
+            }
           }
         ],
         "configurationAttributes": {
