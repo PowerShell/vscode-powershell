@@ -77,10 +77,14 @@ export function stubInterface<T>(object?: Partial<T>): T {
 
 /** Builds the sample binary module code. We need to do this because the source maps have absolute paths so they are not portable between machines, and while we could do deterministic with source maps, that's way more complicated and everywhere we build has dotnet already anyways */
 export function BuildBinaryModuleMock(): void {
-    console.log("==BUILDING: Binary Module Mock==");
     const projectPath = path.resolve(`${__dirname}/../../test/mocks/BinaryModule/BinaryModule.csproj`); //Relative to "out/test" when testing.
-    const buildResult = execSync(`dotnet publish ${projectPath}`);
-    console.log(buildResult.toString());
+    try {
+        execSync(`dotnet publish ${projectPath}`, {
+            encoding: "utf8"
+        });
+    } catch (err) {
+        throw new Error(`Failed to build the binary module mock. Please ensure that you have the .NET Core SDK installed: ${err}`);
+    }
 }
 
 /** Waits until the registered vscode event is fired and returns the trigger result of the event.
