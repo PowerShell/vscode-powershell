@@ -6,7 +6,7 @@ using namespace Microsoft.PowerShell.Commands
 param(
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Debug',
-    [string]$EditorServicesRepoPath = $null,
+    [string]$PSESBuildScriptPath,
     # Keep this up to date with the version that vscode stable uses (see vscode help -> about)
     [Version]$RequiredNodeVersion = '16.14.2',
     # List of modules that are required for the build
@@ -65,15 +65,20 @@ function Assert-Module ([ModuleSpecification[]]$RequiredModules) {
 
 #endregion Prerequisites
 
-function Get-EditorServicesPath {
-    $psesRepoPath = if ($EditorServicesRepoPath) {
-        $EditorServicesRepoPath
+function Get-PSESBuildScriptPath {
+    $psesRepoPath = if ($PSESBuildScriptPath) {
+        $PSESBuildScriptPath
     } else {
-        "$PSScriptRoot/../PowerShellEditorServices/"
+        Join-Path $PSScriptRoot '../PowerShellEditorServices/'
     }
     # NOTE: The ErrorActionPreference for both Invoke-Build and Azure DevOps
     # scripts is Stop, but we want to continue and return false here.
-    return Resolve-Path "$psesRepoPath/PowerShellEditorServices.build.ps1" -ErrorAction Continue
+    try {
+        Resolve-Path "$psesRepoPath/PowerShellEditorServices.build.ps1"
+    } catch {
+        Write-Warning "Could not find PowerShellEditorServices build script at $psesRepoPath. Skipping PSES build."
+        return $false
+    }
 }
 
 #region Setup tasks
@@ -89,7 +94,7 @@ task RestoreNodeModules -If { !(Test-Path ./node_modules) } {
     }
 }
 
-task RestoreEditorServices -If (Get-EditorServicesPath) {
+task RestoreEditorServices -If (Get-PSESBuildScriptPath) {
     switch ($Configuration) {
         'Debug' {
             # When debugging, we always rebuild PSES and ensure its symlinked so
@@ -97,11 +102,11 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
             if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne 'SymbolicLink') {
                 Write-Host "`n### Creating symbolic link to PSES" -ForegroundColor Green
                 Remove-BuildItem ./modules
-                New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
+                New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-PSESBuildScriptPath))/module"
             }
 
             Write-Host "`n### Building PSES`n" -ForegroundColor Green
-            Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
+            Invoke-Build -File (Get-PSESBuildScriptPath) -Task Build -Configuration $Configuration
         }
         'Release' {
             # When releasing, we ensure the bits are not symlinked but copied,
@@ -113,13 +118,13 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
 
             if (!(Test-Path ./modules)) {
                 # We only build if it hasn't been built at all.
-                if (!(Test-Path "$(Split-Path (Get-EditorServicesPath))/module/PowerShellEditorServices/bin")) {
+                if (!(Test-Path "$(Split-Path (Get-PSESBuildScriptPath))/module/PowerShellEditorServices/bin")) {
                     Write-Host "`n### Building PSES`n" -ForegroundColor Green
-                    Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
+                    Invoke-Build -File (Get-PSESBuildScriptPath) -Task Build -Configuration $Configuration
                 }
 
                 Write-Host "`n### Copying PSES`n" -ForegroundColor Green
-                Copy-Item -Recurse -Force "$(Split-Path (Get-EditorServicesPath))/module" ./modules
+                Copy-Item -Recurse -Force "$(Split-Path (Get-PSESBuildScriptPath))/module" ./modules
             }
         }
     }
@@ -135,9 +140,9 @@ task CleanExtension {
     Remove-BuildItem ./modules, ./out, ./node_modules, *.vsix
 }
 
-task CleanEditorServices -If (Get-EditorServicesPath) {
+task CleanEditorServices -If (Get-PSESBuildScriptPath) {
     Write-Host "`n### Cleaning PowerShellEditorServices`n" -ForegroundColor Green
-    Invoke-Build Clean (Get-EditorServicesPath)
+    Invoke-Build -File (Get-PSESBuildScriptPath) -Task Clean
 }
 
 #endregion
@@ -172,9 +177,9 @@ task TestExtension {
     Invoke-BuildExec { git checkout package.json test/TestEnvironment.code-workspace }
 }
 
-task TestEditorServices -If (Get-EditorServicesPath) {
+task TestEditorServices -If (Get-PSESBuildScriptPath) {
     Write-Host "`n### Testing PowerShellEditorServices`n" -ForegroundColor Green
-    Invoke-Build Test (Get-EditorServicesPath)
+    Invoke-Build Test (Get-PSESBuildScriptPath)
 }
 
 #endregion
