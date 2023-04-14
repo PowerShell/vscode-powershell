@@ -35,10 +35,10 @@ function runTestsInner(testsRoot: string): Promise<void> {
     }
 
     const mocha = new Mocha(config);
-    if (process.env.TF_BUILD) {
-        console.log("Detected Azure Devops, disabling color output as ANSI escapes do not make Azure Devops happy.");
-        config.color = false;
-    }
+    // if (process.env.TF_BUILD) {
+    //     console.log("Detected Azure DevOps, disabling color output as ANSI escapes do not make Azure Devops happy.");
+    //     config.color = false;
+    // }
 
     // Test if files is empty
     const files = globSync(config.spec, { cwd: rootDir });
@@ -52,6 +52,13 @@ function runTestsInner(testsRoot: string): Promise<void> {
         const testFile = path.resolve(rootDir, file);
         mocha.addFile(testFile);
     }
+
+    mocha.reporter("mocha-multi-reporters", {
+        reporterEnabled: "spec, xunit",
+        xunitReporterOptions: {
+            output: path.resolve(rootDir, "test-results.xml"),
+        }
+    });
 
     return new Promise((c, e) => {
         try {
