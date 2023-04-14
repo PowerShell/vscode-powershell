@@ -16,9 +16,6 @@ import { spawnSync } from "child_process";
  * Tools like npm run test and vscode tasks should point to this script to begin the testing process. It is assumed you have built the extension prior to this step, it will error if it does not find the built extension or related test scaffolding.
  * */
 async function main(): Promise<void> {
-    console.log("Args", process.argv);
-    console.log("Environment", process.env);
-
     // Verify that the extension is built
     const compiledExtensionPath = path.resolve(__dirname, "../main.js");
     if (!existsSync(compiledExtensionPath)) {
