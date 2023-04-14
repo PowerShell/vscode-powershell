@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 
 using namespace Microsoft.PowerShell.Commands
+using namespace System.Management.Automation
 
 param(
     [ValidateSet('Debug', 'Release')]
