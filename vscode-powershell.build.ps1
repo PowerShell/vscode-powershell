@@ -1,32 +1,40 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+#requires -modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "5.0.0" }
+
 using namespace Microsoft.PowerShell.Commands
 using namespace System.Management.Automation
 
 param(
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Debug',
+
     [string]$PSESBuildScriptPath,
-    # Keep this up to date with the version that vscode stable uses (see vscode help -> about)
-    [Version]$RequiredNodeVersion = '16.14.2',
-    # List of modules that are required for the build
-    [Microsoft.PowerShell.Commands.ModuleSpecification[]]$RequiredModules = @(
-        @{ ModuleName = 'InvokeBuild'; ModuleVersion = '5.0.0' }
-        @{ ModuleName = 'Pester'; ModuleVersion = '5.3.0' } #For PSES Build. TODO: Remove once we hook into PSES build script
-        @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.21.0' } #For PSES Build
-        @{ ModuleName = 'platyPS'; ModuleVersion = '0.14.0' } #For PSES Build
-    )
+
+    [ValidateNotNullOrEmpty()]
+    [string]$RequirementsManifest = $(Join-Path $PSScriptRoot 'requirements.psd1'),
+
+    [ValidateNotNullOrEmpty()]
+    [string]$RequiredNodeVersion = $RequirementsManifest.Node,
+
+    [ValidateNotNullOrEmpty()]
+    [Microsoft.PowerShell.Commands.ModuleSpecification]$RequiredModules = $RequirementsManifest.Node,
+
+    [ValidateNotNullOrEmpty()]
+    [Version]$RequiredPowerShellVersion = $RequirementsManifest.Pwsh,
+
+    [Switch]$InstallPrerequisites
 )
 $SCRIPT:ErrorActionPreference = 'Stop'
 
-#Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "5.0.0" }
 
 #region Prerequisites
 
 task Prerequisites {
     # We want all prereqs to run so we can tell the user everything they are missing, rather than them having to fix/check/fix/check/etc.
     [ErrorRecord[]]$preRequisiteIssues = & {
+        Assert-Pwsh $RequiredPowerShellVersion -ErrorAction Continue
         Assert-NodeVersion $RequiredNodeVersion -ErrorAction Continue
         Assert-Module $RequiredModules -ErrorAction Continue
     } 2>&1
@@ -40,9 +48,32 @@ task Prerequisites {
 
 }
 
+function Assert-Pwsh ([string]$RequiredPowerShellVersion) {
+    try {
+        [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application).Version
+    } catch {
+        if ($InstallPrerequisites) {
+            throw [NotImplementedException]'Automatic installation of Pwsh is not yet supported.'
+        }
+        Write-Error "PowerShell (pwsh) not found on your system. Please install PowerShell $RequiredPowerShellVersion or higher and ensure it is available in your `$env:PATH environment variable"
+        return
+    }
+    if ($pwshVersion -lt $RequiredPowerShellVersion) {
+        if ($InstallPrerequisites) {
+            throw [NotImplementedException]'Automatic installation of Pwsh is not yet supported.'
+        }
+        Write-Error "PowerShell version $pwshVersion is not or no longer supported. Please install PowerShell $RequiredPowerShellVersion or higher"
+        return
+    }
+    Write-Debug "PREREQUISITE: Detected supported PowerShell version $psVersion at or above minimum $RequiredPowerShellVersion"
+}
+
 function Assert-NodeVersion ($RequiredNodeVersion) {
     [version]$nodeVersion = (& node -v).Substring(1)
     if ($nodeVersion -lt $RequiredNodeVersion) {
+        if ($InstallPrerequisites) {
+            throw [NotImplementedException]'Automatic installation of Node.js is not yet supported.'
+        }
         Write-Error "Node.js version $nodeVersion is not supported. Please install Node.js $RequiredNodeVersion or higher"
         return
     }
@@ -56,6 +87,25 @@ function Assert-Module ([ModuleSpecification[]]$RequiredModules) {
             Select-Object -First 1
 
         if (-not $moduleMatch) {
+            if ($InstallPrerequisites) {
+                $otherPowershell = if ($PSVersionTable.PSVersion -lt '6.0.0') {
+                    'pwsh'
+                } else {
+                    'powershell'
+                }
+                Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.Version)"
+                $installModuleParams = @{
+                    Name            = $moduleSpec.Name
+                    RequiredVersion = $moduleSpec.Version
+                    Force           = $true
+                    Scope           = 'CurrentUser'
+                }
+                Install-Module @installModuleParams
+
+                # We could do a symbolic link or point both instances to the same PSModulePath but there are some potential risks so we go slow in the name of safety.
+                Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.Version) ($otherPowerShell)"
+                & $otherPowershell -noprofile -c "Install-Module -Name $($moduleSpec.Name) -RequiredVersion $($moduleSpec.Version) -Force -Scope CurrentUser -ErrorAction Stop"
+            }
             Write-Error "Module $($moduleSpec.Name) $($moduleSpec.Version) is not installed. Please install it."
             return
         }
