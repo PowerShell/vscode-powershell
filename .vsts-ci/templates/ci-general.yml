@@ -61,8 +61,8 @@ steps:
   inputs:
     targetType: inline
     script: |
-      Install-Module InvokeBuild -Scope CurrentUser -Force
-      Install-Module platyPS -Scope CurrentUser -Force
+      Install-Module InvokeBuild -Scope CurrentUser -Force -PassThru
+      Install-Module platyPS -Scope CurrentUser -Force -Verbose -Passthru
       Invoke-Build -Configuration Release Package
       $PackageJson = Get-Content -Raw package.json | ConvertFrom-Json
       Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-$($PackageJson.version).vsix)"
