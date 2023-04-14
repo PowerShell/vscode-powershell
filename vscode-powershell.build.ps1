@@ -148,7 +148,7 @@ task CleanEditorServices -If (Get-PSESBuildScriptPath) {
 #endregion
 #region Build tasks
 
-task Build Restore, {
+task Build Prerequisites, Restore, {
     Write-Host "`n### Building vscode-powershell`n" -ForegroundColor Green
     Assert-Build (Test-Path ./modules/PowerShellEditorServices/bin) 'Extension requires PSES'
 
@@ -209,5 +209,5 @@ task Package Build, {
 # High Level Tasks
 task Bootstrap Prerequisites
 task Clean CleanExtension, CleanEditorServices
-task Test Build, TestExtension #We dont test PSES unless explicitly requested, it should have already been tested in PSES build
+task Test Prerequisites, Build, TestExtension #We dont test PSES unless explicitly requested, it should have already been tested in PSES build
 task . Prerequisites, Build, Test, Package
