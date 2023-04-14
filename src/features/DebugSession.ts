@@ -404,7 +404,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
     private getDotnetNamedConfigOrDefault(configName?: string): ResolveDebugConfigurationResult {
         if (configName) {
-            const debugConfigs = workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
+            const debugConfigs = this.getLaunchConfigurations();
             return debugConfigs.find(({ type, request, name }) =>
                 type === "coreclr" &&
                 request === "attach" &&
@@ -423,6 +423,11 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 moduleLoad: false
             }
         };
+    }
+
+    /** Fetches all available vscode launch configurations. This is abstracted out for easier testing */
+    private getLaunchConfigurations(): DebugConfiguration[] {
+        return workspace.getConfiguration("launch").get<DebugConfiguration[]>("configurations") ?? [];
     }
 
     private async resolveAttachDebugConfiguration(config: DebugConfiguration): Promise<ResolveDebugConfigurationResult> {
@@ -742,3 +747,4 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         this.waitingForClientToken = undefined;
     }
 }
+
