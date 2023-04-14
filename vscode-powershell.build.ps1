@@ -179,7 +179,7 @@ task TestExtension {
 
 task TestEditorServices -If (Get-PSESBuildScriptPath) {
     Write-Host "`n### Testing PowerShellEditorServices`n" -ForegroundColor Green
-    Invoke-Build Test (Get-PSESBuildScriptPath)
+    Invoke-Build -File (Get-PSESBuildScriptPath) -Task Test -Configuration $Configuration
 }
 
 #endregion
@@ -209,5 +209,5 @@ task Package Build, {
 # High Level Tasks
 task Bootstrap Prerequisites
 task Clean CleanExtension, CleanEditorServices
-task Test Build, TestExtension, TestEditorServices
+task Test Build, TestExtension #We dont test PSES unless explicitly requested, it should have already been tested in PSES build
 task . Prerequisites, Build, Test, Package
