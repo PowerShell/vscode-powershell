@@ -9,22 +9,34 @@ param(
     [string]$EditorServicesRepoPath = $null,
     # Keep this up to date with the version that vscode stable uses (see vscode help -> about)
     [Version]$RequiredNodeVersion = '16.14.2',
-    [PowerShell.Commands.ModuleSpecification]$RequiredModules = @(
+    # List of modules that are required for the build
+    [Microsoft.PowerShell.Commands.ModuleSpecification[]]$RequiredModules = @(
         @{ ModuleName = 'InvokeBuild'; ModuleVersion = '5.0.0' }
         @{ ModuleName = 'Pester'; ModuleVersion = '5.3.0' } #For PSES Build. TODO: Remove once we hook into PSES build script
         @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.21.0' } #For PSES Build
         @{ ModuleName = 'platyPS'; ModuleVersion = '0.14.0' } #For PSES Build
     )
 )
-$ErrorActionPreference = 'Stop'
+$SCRIPT:ErrorActionPreference = 'Stop'
 
 #Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "5.0.0" }
 
 #region Prerequisites
 
 task Prerequisites {
-    Assert-NodeVersion $RequiredNodeVersion -ErrorAction Continue
-    Assert-Module $RequiredModules -ErrorAction Continue
+    # We want all prereqs to run so we can tell the user everything they are missing, rather than them having to fix/check/fix/check/etc.
+    [ErrorRecord[]]$preRequisiteIssues = & {
+        Assert-NodeVersion $RequiredNodeVersion -ErrorAction Continue
+        Assert-Module $RequiredModules -ErrorAction Continue
+    } 2>&1
+
+    if ($preRequisiteIssues) {
+        $ErrorActionPreference = 'Continue'
+        Write-Warning 'The following prerequisites are not met. Please install them before continuing. Setup guidance can be found here: https://github.com/PowerShell/vscode-powershell/blob/main/docs/development.md'
+        $preRequisiteIssues | ForEach-Object { Write-Error $_ }
+    }
+    # We dont need to test for vscode anymore because we download it dynamically during the build.
+
 }
 
 function Assert-NodeVersion ($RequiredNodeVersion) {
@@ -118,7 +130,7 @@ task Restore RestoreEditorServices, RestoreNodeModules
 #endregion
 #region Clean tasks
 
-task Clean {
+task CleanExtension {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
     Remove-BuildItem ./modules, ./out, ./node_modules, *.vsix
 }
@@ -153,7 +165,7 @@ task Build Restore, {
 #endregion
 #region Test tasks
 
-task Test Build, {
+task TestExtension {
     Write-Host "`n### Running extension tests" -ForegroundColor Green
     Invoke-BuildExec { & npm run test }
     # Reset the state of files modified by tests
@@ -191,4 +203,6 @@ task Package Build, {
 
 # High Level Tasks
 task Bootstrap Prerequisites
-task . Build, Test, Package
+task Clean CleanExtension, CleanEditorServices
+task Test Build, TestExtension, TestEditorServices
+task . Prerequisites, Build, Test, Package
