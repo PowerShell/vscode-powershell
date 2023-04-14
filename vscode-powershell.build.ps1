@@ -1,13 +1,57 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-param(
-    [ValidateSet("Debug", "Release")]
-    [string]$Configuration = "Debug",
-    [string]$EditorServicesRepoPath = $null
-)
+using namespace Microsoft.PowerShell.Commands
 
-#Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "3.0.0" }
+param(
+    [ValidateSet('Debug', 'Release')]
+    [string]$Configuration = 'Debug',
+    [string]$EditorServicesRepoPath = $null,
+    # Keep this up to date with the version that vscode stable uses (see vscode help -> about)
+    [Version]$RequiredNodeVersion = '16.14.2',
+    [PowerShell.Commands.ModuleSpecification]$RequiredModules = @(
+        @{ ModuleName = 'InvokeBuild'; ModuleVersion = '5.0.0' }
+        @{ ModuleName = 'Pester'; ModuleVersion = '5.3.0' } #For PSES Build. TODO: Remove once we hook into PSES build script
+        @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.21.0' } #For PSES Build
+        @{ ModuleName = 'platyPS'; ModuleVersion = '0.14.0' } #For PSES Build
+    )
+)
+$ErrorActionPreference = 'Stop'
+
+#Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "5.0.0" }
+
+#region Prerequisites
+
+task Prerequisites {
+    Assert-NodeVersion $RequiredNodeVersion -ErrorAction Continue
+    Assert-Module $RequiredModules -ErrorAction Continue
+}
+
+function Assert-NodeVersion ($RequiredNodeVersion) {
+    [version]$nodeVersion = (& node -v).Substring(1)
+    if ($nodeVersion -lt $RequiredNodeVersion) {
+        Write-Error "Node.js version $nodeVersion is not supported. Please install Node.js $RequiredNodeVersion or higher"
+        return
+    }
+    Write-Debug "PREREQUISITE: Detected supported Node.js version $nodeVersion at or above minimum $RequiredNodeVersion"
+}
+
+function Assert-Module ([ModuleSpecification[]]$RequiredModules) {
+    foreach ($moduleSpec in $RequiredModules) {
+        $moduleMatch = Get-Module -ListAvailable -FullyQualifiedName $moduleSpec |
+            Sort-Object Version -Descending |
+            Select-Object -First 1
+
+        if (-not $moduleMatch) {
+            Write-Error "Module $($moduleSpec.Name) $($moduleSpec.Version) is not installed. Please install it."
+            return
+        }
+
+        Write-Debug "PREREQUISITE: Detected supported module $($moduleMatch.Name) $($moduleMatch.Version) at or above minimum $($moduleSpec.Version)"
+    }
+}
+
+#endregion Prerequisites
 
 function Get-EditorServicesPath {
     $psesRepoPath = if ($EditorServicesRepoPath) {
@@ -35,10 +79,10 @@ task RestoreNodeModules -If { !(Test-Path ./node_modules) } {
 
 task RestoreEditorServices -If (Get-EditorServicesPath) {
     switch ($Configuration) {
-        "Debug" {
+        'Debug' {
             # When debugging, we always rebuild PSES and ensure its symlinked so
             # that developers always have the latest local bits.
-            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne "SymbolicLink") {
+            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne 'SymbolicLink') {
                 Write-Host "`n### Creating symbolic link to PSES" -ForegroundColor Green
                 Remove-BuildItem ./modules
                 New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
@@ -47,10 +91,10 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
             Write-Host "`n### Building PSES`n" -ForegroundColor Green
             Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
         }
-        "Release" {
+        'Release' {
             # When releasing, we ensure the bits are not symlinked but copied,
             # and only if they don't already exist.
-            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq "SymbolicLink") {
+            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq 'SymbolicLink') {
                 Write-Host "`n### Deleting PSES symbolic link" -ForegroundColor Green
                 Remove-BuildItem ./modules
             }
@@ -89,7 +133,7 @@ task CleanEditorServices -If (Get-EditorServicesPath) {
 
 task Build Restore, {
     Write-Host "`n### Building vscode-powershell`n" -ForegroundColor Green
-    Assert-Build (Test-Path ./modules/PowerShellEditorServices/bin) "Extension requires PSES"
+    Assert-Build (Test-Path ./modules/PowerShellEditorServices/bin) 'Extension requires PSES'
 
     Write-Host "`n### Linting TypeScript`n" -ForegroundColor Green
     Invoke-BuildExec { & npm run lint }
@@ -101,8 +145,8 @@ task Build Restore, {
     # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
     # https://github.com/evanw/esbuild/issues/944
     switch ($Configuration) {
-        "Debug" { Invoke-BuildExec { & npm run build -- --sourcemap } }
-        "Release" { Invoke-BuildExec { & npm run build -- --minify } }
+        'Debug' { Invoke-BuildExec { & npm run build -- --sourcemap } }
+        'Release' { Invoke-BuildExec { & npm run build -- --minify } }
     }
 }
 
@@ -133,7 +177,7 @@ task Package Build, {
     Assert-Build ($packageJson.version -eq $packageVersion)
 
     Write-Host "`n### Packaging powershell-$packageVersion.vsix`n" -ForegroundColor Green
-    Assert-Build ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
+    Assert-Build ((Get-Item ./modules).LinkType -ne 'SymbolicLink') 'Packaging requires a copy of PSES, not a symlink!'
     if (Test-IsPreRelease) {
         Write-Host "`n### This is a pre-release!`n" -ForegroundColor Green
         Invoke-BuildExec { & npm run package -- --pre-release }
@@ -144,4 +188,7 @@ task Package Build, {
 
 #endregion
 
+
+# High Level Tasks
+task Bootstrap Prerequisites
 task . Build, Test, Package
