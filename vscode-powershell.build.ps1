@@ -46,22 +46,25 @@ task Prerequisites {
 function Assert-Pwsh ([Version]$RequiredPowerShellVersion) {
     $ErrorActionPreference = 'Continue'
     try {
-        [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application -ErrorAction Stop)
+        $pwsh = (Get-Command -Name pwsh -CommandType Application -ErrorAction Stop)
         | Sort-Object Version -Descending
         | Select-Object -First 1
-        | ForEach-Object Version
+        if (-not $pwsh) {
+            throw [NotImplementedException]'Pwsh not found but automatic installation is not yet supported.'
+        }
+        [Version]$pwshVersion = $pwsh.Version
     } catch {
         if ($InstallPrerequisites) {
             throw [NotImplementedException]"Pwsh not found but automatic installation is not yet supported. Error: $PSItem"
         }
-        Write-Error "PowerShell (pwsh) not found on your system. Please install PowerShell $RequiredPowerShellVersion or higher and ensure it is available in your `$env:PATH environment variable"
+        Write-Error "PowerShell (pwsh) not found on your system. Please install PowerShell $RequiredPowerShellVersion or higher and ensure it is available in your `$env:PATH environment variable. $PSItem"
         return
     }
     if ($pwshVersion -lt $RequiredPowerShellVersion) {
         if ($InstallPrerequisites) {
             throw [NotImplementedException]"Pwsh $pwshVersion less than $requiredPowershell Version but Automatic installation of Pwsh is not yet supported."
         }
-        Write-Error "PowerShell version $pwshVersion is not or no longer supported. Please install PowerShell $RequiredPowerShellVersion or higher"
+        Write-Error "PowerShell version $pwshVersion is not or no longer supported. Please install PowerShell $RequiredPowerShellVersion or higher. $PSItem"
         return
     }
     Write-Debug "PREREQUISITE: Detected supported PowerShell version $pwshVersion at or above minimum $RequiredPowerShellVersion"
