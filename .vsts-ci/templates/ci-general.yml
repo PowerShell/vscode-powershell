@@ -62,7 +62,7 @@ steps:
     targetType: inline
     script: |
       $PSStyle.Formatting.Verbose = $PSStyle.Foreground.BrightCyan
-      $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Magenta
+      $PSStyle.Formatting.Debug = $PSStyle.Foreground.BrightMagenta
       $VerbosePreference = 'Continue'
       $DebugPreference = 'Continue'
       Install-Module -Name InvokeBuild -Force -Scope CurrentUser -RequiredVersion 5.10.3
@@ -76,7 +76,6 @@ steps:
   inputs:
     targetType: inline
     script: |
-      Install-Module -Name InvokeBuild -Force -Scope CurrentUser -RequiredVersion 5.10.3
       Invoke-Build -InstallPrerequisites -Configuration Release Package
       $PackageJson = Get-Content -Raw package.json | ConvertFrom-Json
       Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-$($PackageJson.version).vsix)"

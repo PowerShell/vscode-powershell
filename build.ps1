@@ -21,11 +21,14 @@ param(
 
     [Parameter(ParameterSetName = 'Build')]
     [switch]
-    $Test
+    $Test,
+
+    # Pin the InvokeBuild version to avoid possible supply chain attacks or breaking changes.
+    [Version]
+    $InvokeBuildVersion = '5.10.3'
 )
 $SCRIPT:ErrorActionPreference = 'Stop'
-# Pin the InvokeBuild version to avoid possible supply chain attacks or breaking changes.
-$InvokeBuildVersion = '5.10.3'
+
 
 # Get unique non-common parameters specified to pass to Invoke-Build
 [hashset[string]]$commonParameters = ([PSCmdlet]::CommonParameters, [PSCmdlet]::OptionalCommonParameters) | ForEach-Object { $_ }
