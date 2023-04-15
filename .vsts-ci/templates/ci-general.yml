@@ -55,6 +55,17 @@ steps:
     version: 6.0.x
     performMultiLevelLookup: true
 
+# Some modules like Pester have .NET DLLs that will require a new PowerShell instance, so we run this first prior to the build.
+- task: PowerShell@2
+  displayName: Install Prerequisites
+  inputs:
+    targetType: inline
+    script: |
+      Install-Module -Name InvokeBuild -Force -Scope CurrentUser -RequiredVersion 5.10.3
+      Invoke-Build -InstallPrerequisites -Configuration Release Prerequisites
+    workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
+    pwsh: true
+
 # The build script is always run with PowerShell Core
 - task: PowerShell@2
   displayName: Build and package
