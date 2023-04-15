@@ -105,6 +105,8 @@ function Assert-Module {
                     RequiredVersion = $moduleSpec.Version
                     Force           = $true
                     Scope           = 'CurrentUser'
+                    Verbose         = $false
+                    Debug           = $false
                 }
                 if ($installModuleParams.Name -eq 'Pester') {
                     $installModuleParams.SkipPublisherCheck = $true
@@ -114,7 +116,7 @@ function Assert-Module {
                 # We could do a symbolic link or point both instances to the same PSModulePath but there are some potential risks so we go slow in the name of safety.
                 if ($otherPowerShell) {
                     Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.RequiredVersion) ($otherPowerShell)"
-                    & $otherPowershell -noprofile -c "Install-Module -Name $($moduleSpec.Name) -RequiredVersion $($moduleSpec.RequiredVersion) -Force -Scope CurrentUser -ErrorAction Stop -SkipPublisherCheck"
+                    & $otherPowershell -noprofile -c "Install-Module -Name $($moduleSpec.Name) -RequiredVersion $($moduleSpec.RequiredVersion) -Force -Scope CurrentUser -ErrorAction Stop -SkipPublisherCheck -Verbose:`$false -Debug:`$false"
                 }
                 continue
             } else {
