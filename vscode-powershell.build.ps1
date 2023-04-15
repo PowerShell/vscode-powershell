@@ -54,7 +54,7 @@ function Assert-Pwsh ([string]$RequiredPowerShellVersion) {
         [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application).Version
     } catch {
         if ($InstallPrerequisites) {
-            throw [NotImplementedException]'Pwsh not found but automatic installation is not yet supported.'
+            throw [NotImplementedException]"Pwsh not found but automatic installation is not yet supported. Error: $PSItem"
         }
         Write-Error "PowerShell (pwsh) not found on your system. Please install PowerShell $RequiredPowerShellVersion or higher and ensure it is available in your `$env:PATH environment variable"
         return
