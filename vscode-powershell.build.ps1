@@ -46,7 +46,7 @@ task Prerequisites {
 function Assert-Pwsh ([Version]$RequiredPowerShellVersion) {
     $ErrorActionPreference = 'Continue'
     try {
-        [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application)
+        [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application -ErrorAction Stop)
         | Sort-Object Version -Descending
         | Select-Object -First 1
         | ForEach-Object Version
