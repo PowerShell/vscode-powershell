@@ -4,6 +4,9 @@ variables:
   # Don't download unneeded packages
   - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
     value: 'true'
+  - name: DOTNET_NOLOGO
+    value: 'true'
+
   # Improve performance by not sending telemetry
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
     value: 'true'
