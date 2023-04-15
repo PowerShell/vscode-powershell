@@ -61,6 +61,8 @@ steps:
   inputs:
     targetType: inline
     script: |
+      $PSStyle.Formatting.Verbose = $PSStyle.Foreground.BrightCyan
+      $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Magenta
       $VerbosePreference = 'Continue'
       $DebugPreference = 'Continue'
       Install-Module -Name InvokeBuild -Force -Scope CurrentUser -RequiredVersion 5.10.3
