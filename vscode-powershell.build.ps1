@@ -16,7 +16,7 @@ param(
     [string]$RequirementsManifest = $(Join-Path $PSScriptRoot 'requirements.psd1'),
 
     [ValidateNotNullOrEmpty()]
-    [string]$RequiredNodeVersion = $RequirementsManifest.Node,
+    [Version]$RequiredNodeVersion = $RequirementsManifest.Node,
 
     [ValidateNotNullOrEmpty()]
     [Microsoft.PowerShell.Commands.ModuleSpecification]$RequiredModules = $RequirementsManifest.Node,
@@ -69,7 +69,7 @@ function Assert-Pwsh ([Version]$RequiredPowerShellVersion) {
     Write-Debug "PREREQUISITE: Detected supported PowerShell version $psVersion at or above minimum $RequiredPowerShellVersion"
 }
 
-function Assert-NodeVersion ($RequiredNodeVersion) {
+function Assert-NodeVersion ([Version]$RequiredNodeVersion) {
     [version]$nodeVersion = (& node -v).Substring(1)
     if ($nodeVersion -lt $RequiredNodeVersion) {
         if ($InstallPrerequisites) {
