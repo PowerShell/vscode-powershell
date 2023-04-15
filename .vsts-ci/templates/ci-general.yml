@@ -61,6 +61,8 @@ steps:
   inputs:
     targetType: inline
     script: |
+      $VerbosePreference = 'Continue'
+      $DebugPreference = 'Continue'
       Install-Module -Name InvokeBuild -Force -Scope CurrentUser -RequiredVersion 5.10.3
       Invoke-Build -InstallPrerequisites -Configuration Release Prerequisites
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
