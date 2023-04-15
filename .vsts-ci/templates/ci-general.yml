@@ -80,6 +80,7 @@ steps:
   inputs:
     targetType: inline
     script: |
+      Install-Module -Name InvokeBuild -Force -Scope CurrentUser -RequiredVersion 5.10.3
       Invoke-Build -InstallPrerequisites -Configuration Release Test
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
     pwsh: ${{ parameters.pwsh }}
