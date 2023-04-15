@@ -15,15 +15,6 @@ param(
     [ValidateNotNullOrEmpty()]
     [string]$RequirementsManifest = $(Join-Path $PSScriptRoot 'requirements.psd1'),
 
-    [ValidateNotNullOrEmpty()]
-    [Version]$RequiredNodeVersion = $RequirementsManifest.Node,
-
-    [ValidateNotNullOrEmpty()]
-    [Microsoft.PowerShell.Commands.ModuleSpecification]$RequiredModules = $RequirementsManifest.Node,
-
-    [ValidateNotNullOrEmpty()]
-    [Version]$RequiredPowerShellVersion = $RequirementsManifest.Pwsh,
-
     [Switch]$InstallPrerequisites
 )
 $SCRIPT:ErrorActionPreference = 'Stop'
@@ -32,26 +23,33 @@ $SCRIPT:ErrorActionPreference = 'Stop'
 #region Prerequisites
 
 task Prerequisites {
+    [CmdletBinding()] #This is just so we have access to $PSCmdlet
+    param()
     # We want all prereqs to run so we can tell the user everything they are missing, rather than them having to fix/check/fix/check/etc.
+    $requirements = Import-PowerShellDataFile -Path $RequirementsManifest
+    $ErrorActionPreference = 'Continue'
     [ErrorRecord[]]$preRequisiteIssues = & {
-        Assert-Pwsh $RequiredPowerShellVersion -ErrorAction Continue
-        Assert-NodeVersion $RequiredNodeVersion -ErrorAction Continue
-        Assert-Module $RequiredModules -ErrorAction Continue
+        Assert-Pwsh $requirements.Pwsh
+        Assert-NodeVersion $requirements.Node
+        Assert-Module $requirements.Modules
     } 2>&1
 
     if ($preRequisiteIssues) {
-        $ErrorActionPreference = 'Continue'
         Write-Warning 'The following prerequisites are not met. Please install them before continuing. Setup guidance can be found here: https://github.com/PowerShell/vscode-powershell/blob/main/docs/development.md'
-        $preRequisiteIssues | ForEach-Object { Write-Error $_ }
+        $preRequisiteIssues | ForEach-Object { $PSCmdlet.WriteError($_) }
+        exit 1
     }
     # We dont need to test for vscode anymore because we download it dynamically during the build.
 
 }
 
 function Assert-Pwsh ([Version]$RequiredPowerShellVersion) {
+    $ErrorActionPreference = 'Continue'
     try {
-        Write-Host -Foreground Magenta "PATH: $env:PATH"
-        [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application).Version
+        [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application)
+        | Sort-Object Version -Descending
+        | Select-Object -First 1
+        | ForEach-Object Version
     } catch {
         if ($InstallPrerequisites) {
             throw [NotImplementedException]"Pwsh not found but automatic installation is not yet supported. Error: $PSItem"
@@ -66,10 +64,11 @@ function Assert-Pwsh ([Version]$RequiredPowerShellVersion) {
         Write-Error "PowerShell version $pwshVersion is not or no longer supported. Please install PowerShell $RequiredPowerShellVersion or higher"
         return
     }
-    Write-Debug "PREREQUISITE: Detected supported PowerShell version $psVersion at or above minimum $RequiredPowerShellVersion"
+    Write-Debug "PREREQUISITE: Detected supported PowerShell version $pwshVersion at or above minimum $RequiredPowerShellVersion"
 }
 
 function Assert-NodeVersion ([Version]$RequiredNodeVersion) {
+    $ErrorActionPreference = 'Continue'
     [version]$nodeVersion = (& node -v).Substring(1)
     if ($nodeVersion -lt $RequiredNodeVersion) {
         if ($InstallPrerequisites) {
@@ -82,33 +81,44 @@ function Assert-NodeVersion ([Version]$RequiredNodeVersion) {
 }
 
 function Assert-Module ([ModuleSpecification[]]$RequiredModules) {
+    $ErrorActionPreference = 'Continue'
     foreach ($moduleSpec in $RequiredModules) {
+        Write-Debug "PREREQUISITE: Checking for module $($moduleSpec.Name) $($moduleSpec.RequiredVersion)"
         $moduleMatch = Get-Module -ListAvailable -FullyQualifiedName $moduleSpec |
             Sort-Object Version -Descending |
             Select-Object -First 1
 
         if (-not $moduleMatch) {
             if ($InstallPrerequisites) {
-                $otherPowershell = if ($PSVersionTable.PSVersion -lt '6.0.0') {
-                    'pwsh'
-                } else {
-                    'powershell'
+                if ($isWindows -or $PSVersionTable.PSEdition -eq 'Desktop') {
+                    $otherPowershell = if ($PSVersionTable.PSVersion -lt '6.0.0') {
+                        'pwsh'
+                    } else {
+                        'powershell'
+                    }
                 }
-                Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.Version)"
+
+                Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.RequiredVersion)"
                 $installModuleParams = @{
                     Name            = $moduleSpec.Name
                     RequiredVersion = $moduleSpec.Version
                     Force           = $true
                     Scope           = 'CurrentUser'
                 }
+                if ($installModuleParams.Name -eq 'Pester') {
+                    $installModuleParams.SkipPublisherCheck = $true
+                }
                 Install-Module @installModuleParams
 
                 # We could do a symbolic link or point both instances to the same PSModulePath but there are some potential risks so we go slow in the name of safety.
-                Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.Version) ($otherPowerShell)"
-                & $otherPowershell -noprofile -c "Install-Module -Name $($moduleSpec.Name) -RequiredVersion $($moduleSpec.Version) -Force -Scope CurrentUser -ErrorAction Stop"
+                if ($otherPowerShell) {
+                    Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.RequiredVersion) ($otherPowerShell)"
+                    & $otherPowershell -noprofile -c "Install-Module -Name $($moduleSpec.Name) -RequiredVersion $($moduleSpec.RequiredVersion) -Force -Scope CurrentUser -ErrorAction Stop -SkipPublisherCheck"
+                }
+            } else {
+                Write-Error "Module $($moduleSpec.Name) $($moduleSpec.RequiredVersion) is not installed. Please install it."
+                continue
             }
-            Write-Error "Module $($moduleSpec.Name) $($moduleSpec.Version) is not installed. Please install it."
-            return
         }
 
         Write-Debug "PREREQUISITE: Detected supported module $($moduleMatch.Name) $($moduleMatch.Version) at or above minimum $($moduleSpec.Version)"
