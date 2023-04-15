@@ -23,8 +23,6 @@ $SCRIPT:ErrorActionPreference = 'Stop'
 #region Prerequisites
 
 task Prerequisites {
-    [CmdletBinding()] #This is just so we have access to $PSCmdlet
-    param()
     # We want all prereqs to run so we can tell the user everything they are missing, rather than them having to fix/check/fix/check/etc.
     $requirements = Import-PowerShellDataFile -Path $RequirementsManifest
     $ErrorActionPreference = 'Continue'
@@ -36,7 +34,7 @@ task Prerequisites {
 
     if ($preRequisiteIssues) {
         Write-Warning 'The following prerequisites are not met. Please install them before continuing. Setup guidance can be found here: https://github.com/PowerShell/vscode-powershell/blob/main/docs/development.md'
-        $preRequisiteIssues | ForEach-Object { $PSCmdlet.WriteError($_) }
+        $preRequisiteIssues
         exit 1
     }
     # We dont need to test for vscode anymore because we download it dynamically during the build.
@@ -46,10 +44,6 @@ task Prerequisites {
 function Assert-Pwsh ([Version]$RequiredPowerShellVersion) {
     $ErrorActionPreference = 'Continue'
     try {
-        if ($isLinux) {
-            Write-Host -Fore Magenta "pwsh which: $(which pwsh)"
-        }
-        Write-Host -Fore Magenta "pwsh command: $(Get-Command pwsh)"
         [Version]$pwshVersion = (& pwsh -v) -replace '^PowerShell '
     } catch {
         if ($InstallPrerequisites) {
@@ -81,7 +75,12 @@ function Assert-NodeVersion ([Version]$RequiredNodeVersion) {
     Write-Debug "PREREQUISITE: Detected supported Node.js version $nodeVersion at or above minimum $RequiredNodeVersion"
 }
 
-function Assert-Module ([ModuleSpecification[]]$RequiredModules) {
+function Assert-Module {
+    [CmdletBinding()]
+    param(
+        [ModuleSpecification[]]$RequiredModules
+    )
+
     $ErrorActionPreference = 'Continue'
     foreach ($moduleSpec in $RequiredModules) {
         Write-Debug "PREREQUISITE: Checking for module $($moduleSpec.Name) $($moduleSpec.RequiredVersion)"
@@ -91,6 +90,7 @@ function Assert-Module ([ModuleSpecification[]]$RequiredModules) {
 
         if (-not $moduleMatch) {
             if ($InstallPrerequisites) {
+                #We want to install the module in both Windows PowerShell and PowerShell for testing.
                 if ($isWindows -or $PSVersionTable.PSEdition -eq 'Desktop') {
                     $otherPowershell = if ($PSVersionTable.PSVersion -lt '6.0.0') {
                         'pwsh'
