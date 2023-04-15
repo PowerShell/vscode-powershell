@@ -50,6 +50,7 @@ task Prerequisites {
 
 function Assert-Pwsh ([string]$RequiredPowerShellVersion) {
     try {
+        Write-Host -Foreground Magenta "PATH: $env:PATH"
         [Version]$pwshVersion = (Get-Command -Name pwsh -CommandType Application).Version
     } catch {
         if ($InstallPrerequisites) {
