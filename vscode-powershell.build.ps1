@@ -46,6 +46,10 @@ task Prerequisites {
 function Assert-Pwsh ([Version]$RequiredPowerShellVersion) {
     $ErrorActionPreference = 'Continue'
     try {
+        if ($isLinux) {
+            Write-Host -Fore Magenta "pwsh which: $(which pwsh)"
+        }
+        Write-Host -Fore Magenta "pwsh command: $(Get-Command pwsh)"
         $pwsh = (Get-Command -Name pwsh -CommandType Application -ErrorAction Stop)
         | Sort-Object Version -Descending
         | Select-Object -First 1
