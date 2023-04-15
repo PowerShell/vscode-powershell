@@ -116,6 +116,7 @@ function Assert-Module {
                     Write-Verbose "PREREQUISITE: Installing Missing Module $($moduleSpec.Name) $($moduleSpec.RequiredVersion) ($otherPowerShell)"
                     & $otherPowershell -noprofile -c "Install-Module -Name $($moduleSpec.Name) -RequiredVersion $($moduleSpec.RequiredVersion) -Force -Scope CurrentUser -ErrorAction Stop -SkipPublisherCheck"
                 }
+                continue
             } else {
                 Write-Error "Module $($moduleSpec.Name) $($moduleSpec.RequiredVersion) is not installed. Please install it."
                 continue
