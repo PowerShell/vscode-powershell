@@ -33,10 +33,9 @@ export class GenerateBugReportFeature implements vscode.Disposable {
         if (this.sessionManager.PowerShellExeDetails === undefined) {
             return "Session's PowerShell details are unknown!";
         }
-
-        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
-        const powerShellArgs = [ "-NoProfile", "-Command", "$PSVersionTable | Out-String" ];
-        const child = child_process.spawnSync(powerShellExePath, powerShellArgs);
+        const child = child_process.spawnSync(
+            this.sessionManager.PowerShellExeDetails.exePath,
+            ["-NoProfile", "-NoLogo", "-Command", "$PSVersionTable | Out-String"]);
         // Replace semicolons as they'll cause the URI component to truncate
         return child.stdout.toString().trim().replace(";", ",");
     }

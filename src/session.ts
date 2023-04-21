@@ -24,7 +24,7 @@ import {
     OperatingSystem, PowerShellExeFinder
 } from "./platform";
 import { LanguageClientConsumer } from "./languageClientConsumer";
-import { SemVer } from "semver";
+import { SemVer, satisfies } from "semver";
 
 export enum SessionStatus {
     NeverStarted,
@@ -458,35 +458,57 @@ export class SessionManager implements Middleware {
         try {
             this.sessionDetails = await languageServerProcess.start("EditorServices");
         } catch (err) {
-            this.setSessionFailure("PowerShell process failed to start: ", err instanceof Error ? err.message : "unknown");
+            // We should kill the process in case it's stuck.
+            void languageServerProcess.dispose();
+
+            // PowerShell never started, probably a bad version!
+            const version = await languageServerProcess.getVersionCli();
+            let shouldUpdate = true;
+            if (satisfies(version, "<5.1.0")) {
+                void this.setSessionFailedGetPowerShell(`PowerShell ${version} is not supported, please update!`);
+            } else if (satisfies(version, ">=5.1.0 <6.0.0")) {
+                void this.setSessionFailedGetPowerShell("It looks like you're trying to use Windows PowerShell, which is supported on a best-effort basis. Can you try PowerShell 7?");
+            } else if (satisfies(version, ">=6.0.0 <7.2.0")) {
+                void this.setSessionFailedGetPowerShell(`PowerShell ${version} has reached end-of-support, please update!`);
+            } else {
+                shouldUpdate = false;
+                void this.setSessionFailedOpenBug("PowerShell language server process didn't start!");
+            }
+            if (shouldUpdate) {
+                // Run the update notifier since it won't run later as we failed
+                // to start, but we have enough details to do so now.
+                const versionDetails: IPowerShellVersionDetails = {
+                    "version": version,
+                    "edition": "", // Unused by UpdatePowerShell
+                    "commit": version, // Actually used by UpdatePowerShell
+                    "architecture": process.arch // Best guess based off Code's architecture
+                };
+                const updater = new UpdatePowerShell(this, this.sessionSettings, this.logger, versionDetails);
+                void updater.checkForUpdate();
+            }
+            return;
         }
 
-        if (this.sessionDetails?.status === "started") {
+        if (this.sessionDetails.status === "started") { // Successful server start with a session file
             this.logger.write("Language server started.");
             try {
                 await this.startLanguageClient(this.sessionDetails);
+                return languageServerProcess;
             } catch (err) {
-                this.setSessionFailure("Language client failed to start: ", err instanceof Error ? err.message : "unknown");
+                void this.setSessionFailedOpenBug("Language client failed to start: " + (err instanceof Error ? err.message : "unknown"));
             }
-        } else if (this.sessionDetails?.status === "failed") {
+        } else if (this.sessionDetails.status === "failed") { // Server started but indicated it failed
             if (this.sessionDetails.reason === "unsupported") {
-                this.setSessionFailure(
-                    "PowerShell language features are only supported on PowerShell version 5.1 and 7+. " +
-                    `The current version is ${this.sessionDetails.powerShellVersion}.`);
+                void this.setSessionFailedGetPowerShell(`PowerShell ${this.sessionDetails.powerShellVersion} is not supported, please update!`);
             } else if (this.sessionDetails.reason === "languageMode") {
-                this.setSessionFailure(
-                    "PowerShell language features are disabled due to an unsupported LanguageMode: " +
-                    `${this.sessionDetails.detail}`);
+                this.setSessionFailure(`PowerShell language features are disabled due to an unsupported LanguageMode: ${this.sessionDetails.detail}`);
             } else {
-                this.setSessionFailure(
-                    `PowerShell could not be started for an unknown reason '${this.sessionDetails.reason}'`);
+                void this.setSessionFailedOpenBug(`PowerShell could not be started for an unknown reason: ${this.sessionDetails.reason}`);
             }
         } else {
-            this.setSessionFailure(
-                `Unknown session status '${this.sessionDetails?.status}' with reason '${this.sessionDetails?.reason}`);
+            void this.setSessionFailedOpenBug(`PowerShell could not be started with an unknown status: ${this.sessionDetails.status}, and reason: ${this.sessionDetails.reason}`);
         }
-
-        return languageServerProcess;
+        return;
     }
 
     private async findPowerShell(): Promise<IPowerShellExeDetails | undefined> {
@@ -523,16 +545,7 @@ export class SessionManager implements Middleware {
                 + " Do you have PowerShell installed?"
                 + " You can also configure custom PowerShell installations"
                 + " with the 'powershell.powerShellAdditionalExePaths' setting.";
-
-            await this.logger.writeAndShowErrorWithActions(message, [
-                {
-                    prompt: "Get PowerShell",
-                    action: async (): Promise<void> => {
-                        const getPSUri = vscode.Uri.parse("https://aka.ms/get-powershell-vscode");
-                        await vscode.env.openExternal(getPSUri);
-                    },
-                },
-            ]);
+            void this.setSessionFailedGetPowerShell(message);
         }
 
         return foundPowerShell;
@@ -789,6 +802,27 @@ Type 'help' to get help.
     private setSessionFailure(message: string, ...additionalMessages: string[]): void {
         this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
         void this.logger.writeAndShowError(message, ...additionalMessages);
+    }
+
+    private async setSessionFailedOpenBug(message: string): Promise<void> {
+        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
+        await this.logger.writeAndShowErrorWithActions(message, [{
+            prompt: "Open an Issue",
+            action: async (): Promise<void> => {
+                await vscode.commands.executeCommand("PowerShell.GenerateBugReport");
+            }}]
+        );
+    }
+
+    private async setSessionFailedGetPowerShell(message: string): Promise<void> {
+        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
+        await this.logger.writeAndShowErrorWithActions(message, [{
+            prompt: "Open PowerShell Install Documentation",
+            action: async (): Promise<void> => {
+                await vscode.env.openExternal(
+                    vscode.Uri.parse("https://aka.ms/get-powershell-vscode"));
+            }}]
+        );
     }
 
     private async changePowerShellDefaultVersion(exePath: IPowerShellExeDetails): Promise<void> {
