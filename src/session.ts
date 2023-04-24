@@ -862,7 +862,8 @@ Type 'help' to get help.
     private async showSessionMenu(): Promise<void> {
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
-            this.sessionSettings.powerShellAdditionalExePaths,
+            // We don't pull from session settings because we want them fresh!
+            getSettings().powerShellAdditionalExePaths,
             this.logger);
         const availablePowerShellExes = await powershellExeFinder.getAllAvailablePowerShellInstallations();
 
