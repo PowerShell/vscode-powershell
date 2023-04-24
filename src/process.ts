@@ -111,10 +111,20 @@ export class PowerShellProcess {
             hideFromUser: this.sessionSettings.integratedConsole.startInBackground,
         };
 
+        // Subscribe a log event for when the terminal closes (this fires for
+        // all terminals and the event itself checks if it's our terminal). This
+        // subscription should happen before we create the terminal so if it
+        // fails immediately, the event fires.
+        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
+
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
 
         const pwshName = path.basename(this.exePath);
         this.logger.write(`${pwshName} started.`);
+
+        // Log that the PowerShell terminal process has been started
+        const pid = await this.getPid();
+        this.logTerminalPid(pid ?? 0, pwshName);
 
         if (this.sessionSettings.integratedConsole.showOnStartup
             && !this.sessionSettings.integratedConsole.startInBackground) {
@@ -122,17 +132,7 @@ export class PowerShellProcess {
             this.consoleTerminal.show(true);
         }
 
-        // Start the language client
-        const sessionDetails = await this.waitForSessionFile();
-
-        // Subscribe a log event for when the terminal closes
-        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
-
-        // Log that the PowerShell terminal process has been started
-        const pid = await this.getPid();
-        this.logTerminalPid(pid ?? 0, pwshName);
-
-        return sessionDetails;
+        return await this.waitForSessionFile();
     }
 
     // This function should only be used after a failure has occurred because it is slow!
@@ -154,7 +154,7 @@ export class PowerShellProcess {
 
     public async dispose(): Promise<void> {
         // Clean up the session file
-        this.logger.write("Terminating PowerShell process...");
+        this.logger.write("Disposing PowerShell Extension Terminal...");
 
         this.consoleTerminal?.dispose();
         this.consoleTerminal = undefined;
@@ -199,8 +199,8 @@ export class PowerShellProcess {
     private static async deleteSessionFile(sessionFilePath: vscode.Uri): Promise<void> {
         try {
             await vscode.workspace.fs.delete(sessionFilePath);
-        } catch (e) {
-            // TODO: Be more specific about what we're catching
+        } catch {
+            // We don't care about any reasons for it to fail.
         }
     }
 
@@ -212,6 +212,12 @@ export class PowerShellProcess {
         // Check every 2 seconds
         this.logger.write("Waiting for session file...");
         for (let i = numOfTries; i > 0; i--) {
+            if (this.consoleTerminal === undefined) {
+                const err = "PowerShell Extension Terminal didn't start!";
+                this.logger.write(err);
+                throw new Error(err);
+            }
+
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
                 this.logger.write("Session file found!");
                 const sessionDetails = await PowerShellProcess.readSessionFile(this.sessionFilePath);
@@ -237,7 +243,8 @@ export class PowerShellProcess {
             return;
         }
 
-        this.logger.write("powershell.exe terminated or terminal UI was closed");
+        this.logger.write("PowerShell process terminated or Extension Terminal was closed!");
         this.onExitedEmitter.fire();
+        void this.dispose();
     }
 }

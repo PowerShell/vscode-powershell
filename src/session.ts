@@ -457,9 +457,6 @@ export class SessionManager implements Middleware {
         try {
             this.sessionDetails = await languageServerProcess.start("EditorServices");
         } catch (err) {
-            // We should kill the process in case it's stuck.
-            void languageServerProcess.dispose();
-
             // PowerShell never started, probably a bad version!
             const version = await languageServerProcess.getVersionCli();
             let shouldUpdate = true;
