@@ -757,6 +757,9 @@ Type 'help' to get help.
             const semver = new SemVer(this.versionDetails.version);
             this.languageStatusItem.text = `$(terminal-powershell) ${semver.major}.${semver.minor}`;
             this.languageStatusItem.detail += ` ${this.versionDetails.commit} (${this.versionDetails.architecture.toLowerCase()})`;
+        } else if (this.PowerShellExeDetails?.displayName) { // In case it didn't start.
+            this.languageStatusItem.text = `$(terminal-powershell) ${this.PowerShellExeDetails.displayName}`;
+            this.languageStatusItem.detail += `: ${this.PowerShellExeDetails.exePath}`;
         }
 
         if (statusText) {
