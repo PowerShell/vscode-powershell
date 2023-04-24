@@ -8,6 +8,7 @@ import { ILogger } from "./logging";
 import Settings = require("./settings");
 import utils = require("./utils");
 import { IEditorServicesSessionDetails } from "./session";
+import { promisify } from "util";
 
 export class PowerShellProcess {
     // This is used to warn the user that the extension is taking longer than expected to startup.
@@ -134,6 +135,13 @@ export class PowerShellProcess {
         return sessionDetails;
     }
 
+    // This function should only be used after a failure has occurred because it is slow!
+    public async getVersionCli(): Promise<string> {
+        const exec = promisify(cp.execFile);
+        const { stdout } = await exec(this.exePath, ["-NoProfile", "-NoLogo", "-Command", "$PSVersionTable.PSVersion.ToString()"]);
+        return stdout.trim();
+    }
+
     // Returns the process Id of the consoleTerminal
     public async getPid(): Promise<number | undefined> {
         if (!this.consoleTerminal) { return undefined; }
@@ -148,13 +156,13 @@ export class PowerShellProcess {
         // Clean up the session file
         this.logger.write("Terminating PowerShell process...");
 
-        await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
+        this.consoleTerminal?.dispose();
+        this.consoleTerminal = undefined;
 
         this.consoleCloseSubscription?.dispose();
         this.consoleCloseSubscription = undefined;
 
-        this.consoleTerminal?.dispose();
-        this.consoleTerminal = undefined;
+        await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
     }
 
     public sendKeyPress(): void {
