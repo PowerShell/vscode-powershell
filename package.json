@@ -106,7 +106,7 @@
     "mocha-multi-reporters": "1.5.1",
     "mock-fs": "5.2.0",
     "rewire": "6.0.0",
-    "sinon": "15.0.3",
+    "sinon": "15.0.4",
     "source-map-support": "0.5.21",
     "typescript": "5.0.4"
   },
