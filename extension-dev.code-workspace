@@ -18,7 +18,8 @@
       "ms-azure-devops.azure-pipelines",
       "ms-dotnettools.csharp",
       "ms-vscode.powershell",
-      "hbenl.vscode-mocha-test-adapter"
+      "hbenl.vscode-mocha-test-adapter",
+      "connor4312.esbuild-problem-matchers"
     ]
   },
   "settings": {
