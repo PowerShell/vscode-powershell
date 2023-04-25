@@ -44,7 +44,6 @@ export enum RunspaceType {
 export interface IEditorServicesSessionDetails {
     status: string;
     reason: string;
-    detail: string;
     powerShellVersion: string;
     channel: string;
     languageServicePort: number;
@@ -430,7 +429,7 @@ export class SessionManager implements Middleware {
 
     private async startPowerShell(): Promise<PowerShellProcess | undefined> {
         if (this.PowerShellExeDetails === undefined) {
-            this.setSessionFailure("Unable to find PowerShell.");
+            void this.setSessionFailedGetPowerShell("Unable to find PowerShell, try installing it?");
             return;
         }
 
@@ -458,9 +457,6 @@ export class SessionManager implements Middleware {
         try {
             this.sessionDetails = await languageServerProcess.start("EditorServices");
         } catch (err) {
-            // We should kill the process in case it's stuck.
-            void languageServerProcess.dispose();
-
             // PowerShell never started, probably a bad version!
             const version = await languageServerProcess.getVersionCli();
             let shouldUpdate = true;
@@ -498,10 +494,10 @@ export class SessionManager implements Middleware {
                 void this.setSessionFailedOpenBug("Language client failed to start: " + (err instanceof Error ? err.message : "unknown"));
             }
         } else if (this.sessionDetails.status === "failed") { // Server started but indicated it failed
-            if (this.sessionDetails.reason === "unsupported") {
+            if (this.sessionDetails.reason === "powerShellVersion") {
                 void this.setSessionFailedGetPowerShell(`PowerShell ${this.sessionDetails.powerShellVersion} is not supported, please update!`);
-            } else if (this.sessionDetails.reason === "languageMode") {
-                this.setSessionFailure(`PowerShell language features are disabled due to an unsupported LanguageMode: ${this.sessionDetails.detail}`);
+            } else if (this.sessionDetails.reason === "dotNetVersion") { // Only applies to PowerShell 5.1
+                void this.setSessionFailedGetDotNet(".NET Framework is out-of-date, please install at least 4.8!");
             } else {
                 void this.setSessionFailedOpenBug(`PowerShell could not be started for an unknown reason: ${this.sessionDetails.reason}`);
             }
@@ -728,7 +724,7 @@ Type 'help' to get help.
         try {
             await this.languageClient.start();
         } catch (err) {
-            this.setSessionFailure("Could not start language service: ", err instanceof Error ? err.message : "unknown");
+            void this.setSessionFailedOpenBug("Could not start language service: " + (err instanceof Error ? err.message : "unknown"));
             return;
         }
 
@@ -761,6 +757,9 @@ Type 'help' to get help.
             const semver = new SemVer(this.versionDetails.version);
             this.languageStatusItem.text = `$(terminal-powershell) ${semver.major}.${semver.minor}`;
             this.languageStatusItem.detail += ` ${this.versionDetails.commit} (${this.versionDetails.architecture.toLowerCase()})`;
+        } else if (this.PowerShellExeDetails?.displayName) { // In case it didn't start.
+            this.languageStatusItem.text = `$(terminal-powershell) ${this.PowerShellExeDetails.displayName}`;
+            this.languageStatusItem.detail += `: ${this.PowerShellExeDetails.exePath}`;
         }
 
         if (statusText) {
@@ -799,11 +798,6 @@ Type 'help' to get help.
         this.setSessionStatus("Executing...", SessionStatus.Busy);
     }
 
-    private setSessionFailure(message: string, ...additionalMessages: string[]): void {
-        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
-        void this.logger.writeAndShowError(message, ...additionalMessages);
-    }
-
     private async setSessionFailedOpenBug(message: string): Promise<void> {
         this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
         await this.logger.writeAndShowErrorWithActions(message, [{
@@ -821,6 +815,17 @@ Type 'help' to get help.
             action: async (): Promise<void> => {
                 await vscode.env.openExternal(
                     vscode.Uri.parse("https://aka.ms/get-powershell-vscode"));
+            }}]
+        );
+    }
+
+    private async setSessionFailedGetDotNet(message: string): Promise<void> {
+        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
+        await this.logger.writeAndShowErrorWithActions(message, [{
+            prompt: "Open .NET Framework Documentation",
+            action: async (): Promise<void> => {
+                await vscode.env.openExternal(
+                    vscode.Uri.parse("https://dotnet.microsoft.com/en-us/download/dotnet-framework"));
             }}]
         );
     }
@@ -857,7 +862,8 @@ Type 'help' to get help.
     private async showSessionMenu(): Promise<void> {
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
-            this.sessionSettings.powerShellAdditionalExePaths,
+            // We don't pull from session settings because we want them fresh!
+            getSettings().powerShellAdditionalExePaths,
             this.logger);
         const availablePowerShellExes = await powershellExeFinder.getAllAvailablePowerShellInstallations();
 
