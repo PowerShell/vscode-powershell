@@ -440,31 +440,27 @@ describe("DebugSessionFeature E2E", function slowTests() {
 
     it("Starts and stops a debugging session", async () => {
         // Inspect the debug session via the started events to ensure it is correct
-        let startDebugSession: DebugSession;
-        let stopDebugSession: DebugSession;
-        const interactiveSessionConfig = defaultDebugConfigurations[DebugConfig.InteractiveSession];
-        // Asserts don't seem to fire in this event or the event doesn't resolve
-        // in the test code flow, so we need to "extract" the values for later
-        // use by the asserts
-
-        const startDebugEvent = debug.onDidStartDebugSession((newDebugSession) => {
-            startDebugEvent.dispose();
-            startDebugSession = newDebugSession;
-            const stopDebugEvent = debug.onDidTerminateDebugSession((terminatedDebugSession) => {
-                stopDebugEvent.dispose();
-                stopDebugSession = terminatedDebugSession;
+        const startDebugSession = new Promise<DebugSession>((resolve) => {
+            const event = debug.onDidStartDebugSession((session) => {
+                resolve(session);
+                event.dispose();
+            });
+        });
+        const stopDebugSession = new Promise<DebugSession>((resolve) => {
+            const event = debug.onDidTerminateDebugSession((session) => {
+                resolve(session);
+                event.dispose();
             });
         });
 
-        const debugSessionStarted = await debug.startDebugging(undefined, interactiveSessionConfig);
-        assert.ok(debugSessionStarted, "Debug session should start");
-        assert.equal(startDebugSession!.name, interactiveSessionConfig.name, "Debug session name should match when started");
-        // debugSession var should be populated from the event before startDebugging completes
-        await debug.stopDebugging(startDebugSession!);
+        const config = defaultDebugConfigurations[DebugConfig.InteractiveSession];
+        assert.ok(await debug.startDebugging(undefined, config), "Debug session should start");
+        assert.equal((await startDebugSession).name, config.name, "Debug session name should match when started");
 
-        assert.equal(stopDebugSession!.name, interactiveSessionConfig.name, "Debug session name should match when stopped");
-        assert.equal(stopDebugSession!.configuration.internalConsoleOptions, "neverOpen", "Debug session should always have neverOpen internalConsoleOptions");
-        assert.ok(stopDebugSession!, "Debug session should stop");
+        await debug.stopDebugging(await startDebugSession);
+        assert.ok(await stopDebugSession, "Debug session should stop");
+        assert.equal((await stopDebugSession).name, config.name, "Debug session name should match when stopped");
+        assert.equal((await stopDebugSession).configuration.internalConsoleOptions, "neverOpen", "Debug session should always have neverOpen internalConsoleOptions");
     });
 
     describe("Binary Modules", () => {
