@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2023.4.1-preview
+### Tuesday, April 25, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🛫 [vscode-powershell #4543](https://github.com/PowerShell/vscode-powershell/pull/4543) - Update startup logic to handle session failure reasons.
+- #️⃣ 🙏 [vscode-powershell #4534](https://github.com/PowerShell/vscode-powershell/pull/4534) - Add ESBuild Problem Matcher Extension. (Thanks @JustinGrote!)
+- 🐛 🙏 [vscode-powershell #4521](https://github.com/PowerShell/vscode-powershell/pull/4532) - Handle end-of-support PowerShell with error message.
+- ✨ 👷 [vscode-powershell #4518](https://github.com/PowerShell/vscode-powershell/pull/4518) - Enable Mocha Test Explorer Integration. (Thanks @JustinGrote!)
+- 🐛 🔍 [vscode-powershell #4517](https://github.com/PowerShell/vscode-powershell/pull/4517) - Fix `attachDotnetDebugger` with custom config. (Thanks @fflaten!)
+- 🐛 🔍 [vscode-powershell #4516](https://github.com/PowerShell/vscode-powershell/pull/4516) - Add new debug configurations to `package.json`. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.4
+
+- 🐛 🛫 [vscode-powershell #4509](https://github.com/PowerShell/PowerShellEditorServices/pull/2018) - Set session failure with reason when applicable.
+- ✨ 📖 [PowerShellEditorServices #2016](https://github.com/PowerShell/PowerShellEditorServices/pull/2016) - Add guide to configure Neovim. (Thanks @csc027!)
+
 ## v2023.4.0-preview
 ### Wednesday, April 12, 2023
 
