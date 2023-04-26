@@ -430,12 +430,9 @@ describe("DebugSessionFeature", () => {
 });
 
 describe("DebugSessionFeature E2E", function slowTests() {
-    this.slow(20000); // Will warn if test takes longer than 10s and show red if longer than 20s
-    this.timeout(30000);
+    this.slow(20 * 1000); // Will warn if test takes longer than 10s and show red if longer than 20s
+    this.timeout(5 * 60 * 1000); // Give it five minutes, some CI is slow!
 
-    if (process.platform == "darwin") {
-        this.timeout(60000); // The MacOS test runner is sloooow in Azure Devops
-    }
     before(async () => {
         // Registers and warms up the debug adapter and the PowerShell Extension Terminal
         await ensureEditorServicesIsConnected();
@@ -446,7 +443,9 @@ describe("DebugSessionFeature E2E", function slowTests() {
         let startDebugSession: DebugSession;
         let stopDebugSession: DebugSession;
         const interactiveSessionConfig = defaultDebugConfigurations[DebugConfig.InteractiveSession];
-        // Asserts dont seem to fire in this event or the event doesnt resolve in the test code flow, so we need to "extract" the values for later use by the asserts
+        // Asserts don't seem to fire in this event or the event doesn't resolve
+        // in the test code flow, so we need to "extract" the values for later
+        // use by the asserts
 
         const startDebugEvent = debug.onDidStartDebugSession((newDebugSession) => {
             startDebugEvent.dispose();
@@ -470,11 +469,18 @@ describe("DebugSessionFeature E2E", function slowTests() {
 
     describe("Binary Modules", () => {
         let binaryModulePath: Uri;
-        before(async () => {
+
+        before(async function binarySetup() {
+            if (process.env.BUILD_SOURCEBRANCHNAME === "release") {
+                // The binary modules tests won't work in the release pipeline
+                // due to dependency requirements.
+                this.skip();
+            }
             binaryModulePath = Uri.joinPath(workspace.workspaceFolders![0].uri, "BinaryModule");
             BuildBinaryModuleMock();
             await ensureEditorServicesIsConnected();
         });
+
         afterEach(async () => {
             // Cleanup E2E testing state
             await debug.stopDebugging(undefined);
