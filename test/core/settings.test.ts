@@ -6,7 +6,6 @@ import * as vscode from "vscode";
 import { Settings, getSettings, getEffectiveConfigurationTarget, changeSetting, CommentType } from "../../src/settings";
 
 describe("Settings E2E", function () {
-    this.slow(800);
     it("Loads without error", function () {
         assert.doesNotThrow(getSettings);
     });

@@ -107,7 +107,6 @@ describe("UpdatePowerShell feature", function () {
     });
 
     describe("Which version it gets", function () {
-        this.slow(2000);
         it("Would update to LTS", async function() {
             process.env.POWERSHELL_UPDATECHECK = "LTS";
             const version: IPowerShellVersionDetails = {

@@ -30,7 +30,6 @@ function convertToVSCodeResourceScheme(filePath: string): string {
 }
 
 describe("CustomViews feature", function () {
-    this.slow(1500);
     const testCases: IHtmlContentViewTestCase[] = [
         {
             name: "with no JavaScript or CSS",

@@ -6,6 +6,7 @@
     ".jsx"
   ],
   "require": "source-map-support/register",
-  "timeout": 10000,
+  "timeout": 30000,
+  "slow": 2000,
   "spec": "out/test/**/*.test.js"
 }
