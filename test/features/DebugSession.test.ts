@@ -429,10 +429,7 @@ describe("DebugSessionFeature", () => {
     });
 });
 
-describe("DebugSessionFeature E2E", function slowTests() {
-    this.slow(20 * 1000); // Will warn if test takes longer than 10s and show red if longer than 20s
-    this.timeout(5 * 60 * 1000); // Give it five minutes, some CI is slow!
-
+describe("DebugSessionFeature E2E", () => {
     before(async () => {
         // Registers and warms up the debug adapter and the PowerShell Extension Terminal
         await ensureEditorServicesIsConnected();

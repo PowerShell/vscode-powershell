@@ -40,7 +40,6 @@ describe("RunCode feature", function () {
     });
 
     it("Runs Pester tests from a file", async function () {
-        this.slow(5000);
         const pesterTests = path.resolve(__dirname, "../../../examples/Tests/SampleModule.Tests.ps1");
         assert(checkIfFileExists(pesterTests));
         const pesterTestDebugStarted = utils.WaitEvent<vscode.DebugSession>(vscode.debug.onDidStartDebugSession,
