@@ -12,6 +12,7 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { ILogger } from "../logging";
 import { getSettings, validateCwdSetting } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import { DebugConfig, DebugConfigurations } from "./DebugSession";
 
 export interface IExtensionCommand {
     name: string;
@@ -187,13 +188,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             vscode.commands.registerCommand("PowerShell.Debug.Start",
                 async () => {
-                    // TODO: Use a named debug configuration.
-                    await vscode.debug.startDebugging(undefined, {
-                        name: "PowerShell: Launch Current File",
-                        type: "PowerShell",
-                        request: "launch",
-                        script: "${file}",
-                    });
+                    await vscode.debug.startDebugging(undefined, DebugConfigurations[DebugConfig.LaunchCurrentFile]);
                 })
         ];
     }

@@ -62,7 +62,7 @@ const PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG = null;
 
 /** Represents the various built-in debug configurations that will be advertised to the user if they choose "Add Config" from the launch debug config window */
 // NOTE: These are duplicated with what is in package.json until https://github.com/microsoft/vscode/issues/150663#issuecomment-1506134754 is resolved.
-export const defaultDebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
+export const DebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
     [DebugConfig.LaunchCurrentFile]: {
         name: "PowerShell: Launch Current File",
         type: "PowerShell",
@@ -150,12 +150,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         this.handlers = [
             languageClient.onNotification(
                 StartDebuggerNotificationType,
-                // TODO: Use a named debug configuration.
-                () => void debug.startDebugging(undefined, {
-                    request: "launch",
-                    type: "PowerShell",
-                    name: "PowerShell: Interactive Session"
-                })),
+                () => void debug.startDebugging(undefined, DebugConfigurations[DebugConfig.InteractiveSession])),
 
             languageClient.onNotification(
                 StopDebuggerNotificationType,
@@ -216,10 +211,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 { placeHolder: "Select a PowerShell debug configuration" });
 
         if (launchSelection) {
-            return [defaultDebugConfigurations[launchSelection.id]];
+            return [DebugConfigurations[launchSelection.id]];
         }
 
-        return [defaultDebugConfigurations[DebugConfig.LaunchCurrentFile]];
+        return [DebugConfigurations[DebugConfig.LaunchCurrentFile]];
     }
 
     // We don't use await here but we are returning a promise and the return syntax is easier in an async function
@@ -234,7 +229,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         if (!config.request) {
             // No launch.json, create the default configuration for both unsaved
             // (Untitled) and saved documents.
-            const LaunchCurrentFileConfig = defaultDebugConfigurations[DebugConfig.LaunchCurrentFile];
+            const LaunchCurrentFileConfig = DebugConfigurations[DebugConfig.LaunchCurrentFile];
             config = { ...config, ...LaunchCurrentFileConfig };
             config.current_document = true;
         }
@@ -401,7 +396,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             });
 
             // Start a child debug session to attach the dotnet debugger
-            // TODO: Accomodate multi-folder workspaces if the C# code is in a different workspace folder
+            // TODO: Accommodate multi-folder workspaces if the C# code is in a different workspace folder
             await debug.startDebugging(undefined, dotnetAttachConfig, session);
             this.logger.writeVerbose(`Dotnet Attach Debug configuration: ${JSON.stringify(dotnetAttachConfig)}`);
             this.logger.write(`Attached dotnet debugger to process ${pid}`);
@@ -754,4 +749,3 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         this.waitingForClientToken = undefined;
     }
 }
-

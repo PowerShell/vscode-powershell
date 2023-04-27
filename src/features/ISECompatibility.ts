@@ -32,7 +32,6 @@ export class ISECompatibilityFeature implements vscode.Disposable {
     private _originalSettings: Record<string, boolean | string | undefined> = {};
 
     constructor() {
-        // TODO: This test isn't great.
         const testSetting = ISECompatibilityFeature.settings[ISECompatibilityFeature.settings.length - 1];
         this._iseModeEnabled = vscode.workspace.getConfiguration(testSetting.path).get(testSetting.name) === testSetting.value;
         this._commandRegistrations = [
