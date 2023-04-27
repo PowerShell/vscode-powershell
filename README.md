@@ -25,18 +25,22 @@ select "PowerShell ISE" for a fun and familiar experience.
 
 The extension _should_ work anywhere VS Code itself and PowerShell Core 7.2 or higher is
 [supported][]. For Windows PowerShell, only version 5.1 is supported. Please note that
-PowerShell Core 6 is end-of-life and so not supported. Our test matrix includes the
+PowerShell Core 6, 7.0, and 7.1 have reached end-of-support. Our test matrix includes the
 following:
 
-- **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell Core 7.2.7
-- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.7
-- **macOS 11** with PowerShell Core 7.2.7
-- **Ubuntu 20.04** with PowerShell Core 7.2.7
+- **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell Core 7.2.11
+- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2.11
+- **macOS 11** with PowerShell Core 7.2.11
+- **Ubuntu 20.04** with PowerShell Core 7.2.11
 
 [supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle
 
 Read the [installation instructions](https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode)
 to get more details on how to use the extension on these platforms.
+
+For Windows PowerShell 5.1, [.NET Framework 4.8][dotnet-framework] or higher is required.
+
+[dotnet-framework]: https://dotnet.microsoft.com/en-us/download/dotnet-framework
 
 **Read the [troubleshooting guide](./docs/troubleshooting.md) for answers to common questions.**
 
