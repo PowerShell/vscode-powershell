@@ -6,7 +6,7 @@ import * as assert from "assert";
 import Sinon from "sinon";
 import { DebugAdapterNamedPipeServer, DebugConfiguration, DebugSession, Extension, ExtensionContext, Range, SourceBreakpoint, TextDocument, TextEditor, Uri, commands, debug, extensions, window, workspace } from "vscode";
 import { Disposable } from "vscode-languageserver-protocol";
-import { DebugConfig, DebugSessionFeature, defaultDebugConfigurations } from "../../src/features/DebugSession";
+import { DebugConfig, DebugSessionFeature, DebugConfigurations } from "../../src/features/DebugSession";
 import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import * as platform from "../../src/platform";
 import { IPlatformDetails } from "../../src/platform";
@@ -14,12 +14,12 @@ import { IEditorServicesSessionDetails, IPowerShellVersionDetails, SessionManage
 import * as utils from "../../src/utils";
 import { BuildBinaryModuleMock, WaitEvent, ensureEditorServicesIsConnected, stubInterface, testLogger } from "../utils";
 
-const TEST_NUMBER = 7357; //7357 = TEST. Get it? :)
+const TEST_NUMBER = 7357; // 7357 = TEST. Get it? :)
 
 let defaultDebugConfig: DebugConfiguration;
 beforeEach(() => {
     // This prevents state from creeping into the template between test runs
-    defaultDebugConfig = structuredClone(defaultDebugConfigurations[DebugConfig.LaunchCurrentFile]);
+    defaultDebugConfig = structuredClone(DebugConfigurations[DebugConfig.LaunchCurrentFile]);
 });
 
 describe("DebugSessionFeature", () => {
@@ -81,7 +81,7 @@ describe("DebugSessionFeature", () => {
             const actual = await createDebugSessionFeatureStub({}).resolveDebugConfiguration(undefined, noRequestConfig);
 
             assert.equal(actual!.current_document, true);
-            assert.equal(actual!.request, defaultDebugConfigurations[DebugConfig.LaunchCurrentFile].request);
+            assert.equal(actual!.request, DebugConfigurations[DebugConfig.LaunchCurrentFile].request);
         });
 
         it("Errors if current file config was specified but no file is open in the editor", async () => {
@@ -450,7 +450,7 @@ describe("DebugSessionFeature E2E", () => {
             });
         });
 
-        const config = defaultDebugConfigurations[DebugConfig.InteractiveSession];
+        const config = DebugConfigurations[DebugConfig.InteractiveSession];
         assert.ok(await debug.startDebugging(undefined, config), "Debug session should start");
         assert.equal((await startDebugSession).name, config.name, "Debug session name should match when started");
 
@@ -482,7 +482,7 @@ describe("DebugSessionFeature E2E", () => {
         });
 
         it("Debugs a binary module script", async () => {
-            const launchScriptConfig = structuredClone(defaultDebugConfigurations[DebugConfig.LaunchScript]);
+            const launchScriptConfig = structuredClone(DebugConfigurations[DebugConfig.LaunchScript]);
             launchScriptConfig.script = Uri.joinPath(binaryModulePath, "BinaryModuleTest.ps1").fsPath;
             launchScriptConfig.attachDotnetDebugger = true;
             launchScriptConfig.createTemporaryIntegratedConsole = true;
@@ -504,7 +504,7 @@ describe("DebugSessionFeature E2E", () => {
         });
 
         it("Stops at a binary module breakpoint", async () => {
-            const launchScriptConfig = structuredClone(defaultDebugConfigurations[DebugConfig.LaunchCurrentFile]);
+            const launchScriptConfig = structuredClone(DebugConfigurations[DebugConfig.LaunchCurrentFile]);
             launchScriptConfig.attachDotnetDebugger = true;
             launchScriptConfig.createTemporaryIntegratedConsole = true;
             const testScriptPath = Uri.joinPath(binaryModulePath, "BinaryModuleTest.ps1");
