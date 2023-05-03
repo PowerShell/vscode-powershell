@@ -1,5 +1,37 @@
 # PowerShell Extension Release History
 
+## v2023.5.0
+### Wednesday, May 03, 2023
+
+This release focused on include Justin Grote's new "attach .NET debugger" debug
+configuration for binary PowerShell modules, and on handling start-up failures more
+gracefully. If the start-up fails because the configured PowerShell is out-of-date,
+instead of a confusing "undefined" error message we now detect the problem, inform the
+user with a pop-up message of it, and offer to open the installation and/or update
+instructions.
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4549](https://github.com/PowerShell/vscode-powershell/pull/4549) - Update readme and troubleshooting docs.
+- ✨ 🙏 [vscode-powershell #4548](https://github.com/PowerShell/vscode-powershell/pull/4548) - Use named debug configurations instead of duplicating them.
+- 🐛 🚨 [vscode-powershell #4547](https://github.com/PowerShell/vscode-powershell/pull/4547) - Fix flaky test.
+- 🐛 🛫 [vscode-powershell #4543](https://github.com/PowerShell/vscode-powershell/pull/4543) - Update startup logic to handle session failure reasons.
+- #️⃣ 🙏 [vscode-powershell #4534](https://github.com/PowerShell/vscode-powershell/pull/4534) - Add ESBuild Problem Matcher Extension. (Thanks @JustinGrote!)
+- 🐛 🙏 [vscode-powershell #4521](https://github.com/PowerShell/vscode-powershell/pull/4532) - Handle end-of-support PowerShell with error message.
+- ✨ 👷 [vscode-powershell #4518](https://github.com/PowerShell/vscode-powershell/pull/4518) - Enable Mocha Test Explorer Integration. (Thanks @JustinGrote!)
+- 🐛 🔍 [vscode-powershell #4517](https://github.com/PowerShell/vscode-powershell/pull/4517) - Fix `attachDotnetDebugger` with custom config. (Thanks @fflaten!)
+- 🐛 🔍 [vscode-powershell #4516](https://github.com/PowerShell/vscode-powershell/pull/4516) - Add new debug configurations to `package.json`. (Thanks @JustinGrote!)
+- #️⃣ 🔍 [vscode-powershell #4511](https://github.com/PowerShell/vscode-powershell/pull/4511) - Add additional debug configuration templates for Pester and binary modules. (Thanks @JustinGrote!)
+- #️⃣ 🔍🙏 [vscode-powershell #4510](https://github.com/PowerShell/vscode-powershell/pull/4510) - Improve extension authoring experience with new Build Tasks and Launch Configs. (Thanks @JustinGrote!)
+- ✨ 👷 [vscode-powershell #4502](https://github.com/PowerShell/vscode-powershell/pull/4503) - Enable VS Code unit tests in Linux CI.
+- ✨ 🙏 [vscode-powershell #4498](https://github.com/PowerShell/vscode-powershell/pull/4500) - Enable ESLint `explicit-function-return-type`.
+- ✨ 🔍 [vscode-powershell #3903](https://github.com/PowerShell/vscode-powershell/pull/3903) - Add `attachDotnetDebugger` debug option. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.4
+
+- 🐛 🛫 [vscode-powershell #4509](https://github.com/PowerShell/PowerShellEditorServices/pull/2018) - Set session failure with reason when applicable.
+- ✨ 📖 [PowerShellEditorServices #2016](https://github.com/PowerShell/PowerShellEditorServices/pull/2016) - Add guide to configure Neovim. (Thanks @csc027!)
+
 ## v2023.4.1-preview
 ### Tuesday, April 25, 2023
 
