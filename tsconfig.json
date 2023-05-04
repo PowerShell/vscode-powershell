@@ -22,4 +22,5 @@
     "useUnknownInCatchVariables": true
   },
   "include": [ "src", "test" ],
+  "exclude": [ "node_modules/@ungap/structured-clone" ]
 }
