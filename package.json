@@ -75,7 +75,7 @@
   ],
   "dependencies": {
     "@vscode/extension-telemetry": "0.6.2",
-    "node-fetch": "2.6.9",
+    "node-fetch": "2.6.11",
     "semver": "7.5.0",
     "uuid": "9.0.0",
     "vscode-languageclient": "8.1.0",
@@ -85,7 +85,7 @@
     "@types/mocha": "10.0.1",
     "@types/mock-fs": "4.13.1",
     "@types/node": "16.18.12",
-    "@types/node-fetch": "2.6.2",
+    "@types/node-fetch": "2.6.3",
     "@types/rewire": "2.5.28",
     "@types/semver": "7.5.0",
     "@types/sinon": "10.0.14",
