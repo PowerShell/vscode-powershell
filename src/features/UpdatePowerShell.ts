@@ -1,22 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { spawn } from "child_process";
-import * as fs from "fs"; // TODO: Remove, but it's for a stream.
 import fetch from "node-fetch";
-import * as os from "os";
-import * as path from "path";
 import { SemVer } from "semver";
-import * as stream from "stream";
-import * as util from "util";
 import vscode = require("vscode");
 
 import { ILogger } from "../logging";
-import { IPowerShellVersionDetails, SessionManager } from "../session";
+import { IPowerShellVersionDetails } from "../session";
 import { changeSetting, Settings } from "../settings";
-import { isWindows } from "../utils";
-
-const streamPipeline = util.promisify(stream.pipeline);
 
 interface IUpdateMessageItem extends vscode.MessageItem {
     id: number;
@@ -29,7 +20,6 @@ export class UpdatePowerShell {
     private static LTSBuildInfoURL = "https://aka.ms/pwsh-buildinfo-lts";
     private static StableBuildInfoURL = "https://aka.ms/pwsh-buildinfo-stable";
     private static PreviewBuildInfoURL = "https://aka.ms/pwsh-buildinfo-preview";
-    private static GitHubAPIReleaseURL = "https://api.github.com/repos/PowerShell/PowerShell/releases/tags/";
     private static GitHubWebReleaseURL = "https://github.com/PowerShell/PowerShell/releases/tag/";
     private static promptOptions: IUpdateMessageItem[] = [
         {
@@ -46,10 +36,8 @@ export class UpdatePowerShell {
         },
     ];
     private localVersion: SemVer;
-    private architecture: string;
 
     constructor(
-        private sessionManager: SessionManager,
         private sessionSettings: Settings,
         private logger: ILogger,
         versionDetails: IPowerShellVersionDetails) {
@@ -58,7 +46,6 @@ export class UpdatePowerShell {
         // to SemVer. The version handler in PSES handles Windows PowerShell and
         // just returns the first three fields like '5.1.22621'.
         this.localVersion = new SemVer(versionDetails.commit);
-        this.architecture = versionDetails.architecture.toLowerCase();
     }
 
     private shouldCheckForUpdate(): boolean {
@@ -173,74 +160,13 @@ export class UpdatePowerShell {
         await vscode.env.openExternal(url);
     }
 
-    private async updateWindows(tag: string): Promise<void> {
-        let msiMatcher: string;
-        if (this.architecture === "x64") {
-            msiMatcher = "win-x64.msi";
-        } else if (this.architecture === "x86") {
-            msiMatcher = "win-x86.msi";
-        } else {
-            // We shouldn't get here, but do something sane anyway.
-            return this.openReleaseInBrowser(tag);
-        }
-
-        let response = await fetch(UpdatePowerShell.GitHubAPIReleaseURL + tag);
-        if (!response.ok) {
-            throw new Error("Failed to fetch GitHub release info!");
-        }
-        const release = await response.json();
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const asset = release.assets.filter((a: any) => a.name.indexOf(msiMatcher) >= 0)[0];
-        const msiDownloadPath = path.join(os.tmpdir(), asset.name);
-
-        response = await fetch(asset.browser_download_url);
-        if (!response.ok) {
-            throw new Error("Failed to fetch MSI!");
-        }
-
-        const progressOptions = {
-            title: "Downloading PowerShell Installer...",
-            location: vscode.ProgressLocation.Notification,
-            cancellable: false,
-        };
-        // Streams the body of the request to a file.
-        await vscode.window.withProgress(progressOptions,
-            async () => { await streamPipeline(response.body, fs.createWriteStream(msiDownloadPath)); });
-
-        // Stop the session because Windows likes to hold on to files.
-        this.logger.writeDiagnostic("MSI downloaded, stopping session and closing terminals!");
-        await this.sessionManager.stop();
-
-        // Close all terminals with the name "pwsh" in the current VS Code session.
-        // This will encourage folks to not close the instance of VS Code that spawned
-        // the MSI process.
-        for (const terminal of vscode.window.terminals) {
-            if (terminal.name === "pwsh") {
-                terminal.dispose();
-            }
-        }
-
-        // Invoke the MSI via cmd.
-        this.logger.writeDiagnostic(`Running '${msiDownloadPath}' to update PowerShell...`);
-        const msi = spawn("msiexec", ["/i", msiDownloadPath]);
-
-        msi.on("close", () => {
-            // Now that the MSI is finished, restart the session.
-            this.logger.writeDiagnostic("MSI installation finished, restarting session.");
-            void this.sessionManager.start();
-            fs.unlinkSync(msiDownloadPath);
-        });
-    }
-
     private async installUpdate(tag: string): Promise<void> {
         const releaseVersion = new SemVer(tag);
         const result = await vscode.window.showInformationMessage(
-            `You have an old version of PowerShell (${this.localVersion.version}). The current latest release is ${releaseVersion.version}.
-            Would you like to update the version? ${isWindows
-        ? "This will close ALL pwsh terminals running in this VS Code session!"
-        : "We can't update you automatically, but we can open the latest release in your browser!"
-}`, ...UpdatePowerShell.promptOptions);
+            `You have an old version of PowerShell (${this.localVersion.version}).
+            The current latest release is ${releaseVersion.version}.
+            Would you like to open the GitHub release in your browser?`,
+            ...UpdatePowerShell.promptOptions);
 
         // If the user cancels the notification.
         if (!result) {
@@ -253,11 +179,7 @@ export class UpdatePowerShell {
         switch (result.id) {
         // Yes
         case 0:
-            if (isWindows && (this.architecture === "x64" || this.architecture === "x86")) {
-                await this.updateWindows(tag);
-            } else {
-                await this.openReleaseInBrowser(tag);
-            }
+            await this.openReleaseInBrowser(tag);
             break;
             // Not Now
         case 1:
