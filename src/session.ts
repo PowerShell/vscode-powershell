@@ -479,7 +479,7 @@ export class SessionManager implements Middleware {
                     "commit": version, // Actually used by UpdatePowerShell
                     "architecture": process.arch // Best guess based off Code's architecture
                 };
-                const updater = new UpdatePowerShell(this, this.sessionSettings, this.logger, versionDetails);
+                const updater = new UpdatePowerShell(this.sessionSettings, this.logger, versionDetails);
                 void updater.checkForUpdate();
             }
             return;
@@ -735,7 +735,7 @@ Type 'help' to get help.
         // We haven't "started" until we're done getting the version information.
         this.started = true;
 
-        const updater = new UpdatePowerShell(this, this.sessionSettings, this.logger, this.versionDetails);
+        const updater = new UpdatePowerShell(this.sessionSettings, this.logger, this.versionDetails);
         // NOTE: We specifically don't want to wait for this.
         void updater.checkForUpdate();
     }
