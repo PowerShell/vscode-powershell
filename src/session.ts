@@ -403,6 +403,7 @@ export class SessionManager implements Middleware {
                 || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
                 || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
                 || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
+            || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
                 || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground)) {
 
