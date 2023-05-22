@@ -176,7 +176,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
                 if (vscode.window.activeTerminal &&
                     vscode.window.activeTerminal.name !== "PowerShell Extension") {
-                    this.logger.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'");
+                    this.logger.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'.");
                     await vscode.commands.executeCommand("workbench.action.terminal.runSelectedText");
 
                     // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`

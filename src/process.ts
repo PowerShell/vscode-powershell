@@ -86,16 +86,13 @@ export class PowerShellProcess {
                 startEditorServices);
         } else {
             // Otherwise use -EncodedCommand for better quote support.
+            this.logger.writeVerbose("Using Base64 -EncodedCommand but logging as -Command equivalent.");
             powerShellArgs.push(
                 "-EncodedCommand",
                 Buffer.from(startEditorServices, "utf16le").toString("base64"));
         }
 
-        this.logger.write(
-            "Language server starting --",
-            "    PowerShell executable: " + this.exePath,
-            "    PowerShell args: " + powerShellArgs.join(" "),
-            "    PowerShell Editor Services args: " + startEditorServices);
+        this.logger.writeVerbose(`Starting process: ${this.exePath} ${powerShellArgs.slice(0, -2).join(" ")} -Command ${startEditorServices}`);
 
         // Make sure no old session file exists
         await PowerShellProcess.deleteSessionFile(this.sessionFilePath);

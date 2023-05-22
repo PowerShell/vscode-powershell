@@ -51,20 +51,20 @@ export class UpdatePowerShell {
     private shouldCheckForUpdate(): boolean {
         // Respect user setting.
         if (!this.sessionSettings.promptToUpdatePowerShell) {
-            this.logger.writeDiagnostic("Setting 'promptToUpdatePowerShell' was false.");
+            this.logger.writeVerbose("Setting 'promptToUpdatePowerShell' was false.");
             return false;
         }
 
         // Respect environment configuration.
         if (process.env.POWERSHELL_UPDATECHECK?.toLowerCase() === "off") {
-            this.logger.writeDiagnostic("Environment variable 'POWERSHELL_UPDATECHECK' was 'Off'.");
+            this.logger.writeVerbose("Environment variable 'POWERSHELL_UPDATECHECK' was 'Off'.");
             return false;
         }
 
         // Skip prompting when using Windows PowerShell for now.
         if (this.localVersion.compare("6.0.0") === -1) {
             // TODO: Maybe we should announce PowerShell Core?
-            this.logger.writeDiagnostic("Not offering to update Windows PowerShell.");
+            this.logger.writeVerbose("Not prompting to update Windows PowerShell.");
             return false;
         }
 
@@ -78,20 +78,19 @@ export class UpdatePowerShell {
 
             // Skip if PowerShell is self-built, that is, this contains a commit hash.
             if (commit.length >= 40) {
-                this.logger.writeDiagnostic("Not offering to update development build.");
+                this.logger.writeVerbose("Not prompting to update development build.");
                 return false;
             }
 
             // Skip if preview is a daily build.
             if (daily.toLowerCase().startsWith("daily")) {
-                this.logger.writeDiagnostic("Not offering to update daily build.");
+                this.logger.writeVerbose("Not prompting to update daily build.");
                 return false;
             }
         }
 
         // TODO: Check if network is available?
         // TODO: Only check once a week.
-        this.logger.writeDiagnostic("Should check for PowerShell update.");
         return true;
     }
 
@@ -107,7 +106,7 @@ export class UpdatePowerShell {
         //     "ReleaseTag": "v7.2.7"
         // }
         const data = await response.json();
-        this.logger.writeDiagnostic(`From '${url}' received:\n${data}`);
+        this.logger.writeVerbose(`Received from '${url}':\n${JSON.stringify(data, undefined, 2)}`);
         return data.ReleaseTag;
     }
 
@@ -116,6 +115,7 @@ export class UpdatePowerShell {
             return undefined;
         }
 
+        this.logger.writeVerbose("Checking for PowerShell update...");
         const tags: string[] = [];
         if (process.env.POWERSHELL_UPDATECHECK?.toLowerCase() === "lts") {
             // Only check for update to LTS.
@@ -135,11 +135,11 @@ export class UpdatePowerShell {
 
         for (const tag of tags) {
             if (this.localVersion.compare(tag) === -1) {
-                this.logger.writeDiagnostic(`Offering to update PowerShell to ${tag}.`);
                 return tag;
             }
         }
 
+        this.logger.write("PowerShell is up-to-date.");
         return undefined;
     }
 
@@ -162,6 +162,7 @@ export class UpdatePowerShell {
 
     private async installUpdate(tag: string): Promise<void> {
         const releaseVersion = new SemVer(tag);
+        this.logger.write(`Prompting to update PowerShell v${this.localVersion.version} to v${releaseVersion.version}.`);
         const result = await vscode.window.showInformationMessage(
             `You have an old version of PowerShell (${this.localVersion.version}).
             The current latest release is ${releaseVersion.version}.
@@ -170,11 +171,11 @@ export class UpdatePowerShell {
 
         // If the user cancels the notification.
         if (!result) {
-            this.logger.writeDiagnostic("User canceled PowerShell update prompt.");
+            this.logger.writeVerbose("User canceled PowerShell update prompt.");
             return;
         }
 
-        this.logger.writeDiagnostic(`User said '${UpdatePowerShell.promptOptions[result.id].title}'.`);
+        this.logger.writeVerbose(`User said '${UpdatePowerShell.promptOptions[result.id].title}'.`);
 
         switch (result.id) {
         // Yes

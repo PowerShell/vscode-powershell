@@ -121,9 +121,9 @@ export class SessionManager implements Middleware {
         const procBitness = this.platformDetails.isProcess64Bit ? "64-bit" : "32-bit";
 
         this.logger.write(
-            `Visual Studio Code v${vscode.version} ${procBitness}`,
-            `${this.DisplayName} Extension v${this.HostVersion}`,
-            `Operating System: ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`);
+            `Visual Studio Code: v${vscode.version} ${procBitness}`
+            + ` on ${OperatingSystem[this.platformDetails.operatingSystem]} ${osBitness}`,
+            `${this.DisplayName} Extension: v${this.HostVersion}`);
 
         // Fix the host version so that PowerShell can consume it.
         // This is needed when the extension uses a prerelease
@@ -209,6 +209,7 @@ export class SessionManager implements Middleware {
     }
 
     public async restartSession(exeNameOverride?: string): Promise<void> {
+        this.logger.write("Restarting session...");
         await this.stop();
 
         // Re-load and validate the settings.
@@ -219,13 +220,11 @@ export class SessionManager implements Middleware {
     }
 
     public getSessionDetails(): IEditorServicesSessionDetails | undefined {
-        const sessionDetails = this.sessionDetails;
-        if (sessionDetails != undefined) {
-            return sessionDetails;
-        } else {
-            void this.logger.writeAndShowError("Editor Services session details are not available yet.");
-            return undefined;
+        // TODO: This is used solely by the debugger and should actually just wait (with a timeout).
+        if (this.sessionDetails === undefined) {
+            void this.logger.writeAndShowError("PowerShell session unavailable for debugging!");
         }
+        return this.sessionDetails;
     }
 
     public getSessionStatus(): SessionStatus {
@@ -299,7 +298,7 @@ export class SessionManager implements Middleware {
                 if (codeLensToFix.command?.command === "editor.action.showReferences") {
                     const oldArgs = codeLensToFix.command.arguments;
                     if (oldArgs === undefined || oldArgs.length < 3) {
-                        this.logger.writeError("Code Lens arguments were malformed");
+                        this.logger.writeError("Code Lens arguments were malformed!");
                         return codeLensToFix;
                     }
 
@@ -345,7 +344,9 @@ export class SessionManager implements Middleware {
         return resolvedCodeLens;
     }
 
-    // Move old setting codeFormatting.whitespaceAroundPipe to new setting codeFormatting.addWhitespaceAroundPipe
+    // TODO: Remove this migration code. Move old setting
+    // codeFormatting.whitespaceAroundPipe to new setting
+    // codeFormatting.addWhitespaceAroundPipe.
     private async migrateWhitespaceAroundPipeSetting(): Promise<void> {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
         const deprecatedSetting = "codeFormatting.whitespaceAroundPipe";
@@ -353,6 +354,7 @@ export class SessionManager implements Middleware {
         const configurationTargetOfNewSetting = getEffectiveConfigurationTarget(newSetting);
         const configurationTargetOfOldSetting = getEffectiveConfigurationTarget(deprecatedSetting);
         if (configurationTargetOfOldSetting !== undefined && configurationTargetOfNewSetting === undefined) {
+            this.logger.writeWarning("Deprecated setting: whitespaceAroundPipe");
             const value = configuration.get(deprecatedSetting, configurationTargetOfOldSetting);
             await changeSetting(newSetting, value, configurationTargetOfOldSetting, this.logger);
             await changeSetting(deprecatedSetting, undefined, configurationTargetOfOldSetting, this.logger);
@@ -365,6 +367,7 @@ export class SessionManager implements Middleware {
             return;
         }
 
+        this.logger.writeWarning("Deprecated setting: powerShellExePath");
         let warningMessage = "The 'powerShell.powerShellExePath' setting is no longer used. ";
         warningMessage += this.sessionSettings.powerShellDefaultVersion
             ? "We can automatically remove it for you."
@@ -394,7 +397,7 @@ export class SessionManager implements Middleware {
         const settings = getSettings();
         this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
-        // Detect any setting changes that would affect the session
+        // Detect any setting changes that would affect the session.
         if (!this.suppressRestartPrompt &&
             (settings.cwd.toLowerCase() !== this.sessionSettings.cwd.toLowerCase()
                 || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
@@ -402,6 +405,8 @@ export class SessionManager implements Middleware {
                 || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
                 || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground)) {
+
+            this.logger.writeVerbose("Settings changed, prompting to restart...");
             const response = await vscode.window.showInformationMessage(
                 "The PowerShell runtime configuration has changed, would you like to start a new session?",
                 "Yes", "No");
@@ -749,21 +754,23 @@ Type 'help' to get help.
         return languageStatusItem;
     }
 
-    private setSessionStatus(statusText: string, status: SessionStatus): void {
+    private setSessionStatus(detail: string, status: SessionStatus): void {
+        this.logger.writeVerbose(`Session status changing from '${this.sessionStatus}' to '${status}'.`);
         this.sessionStatus = status;
+        this.languageStatusItem.text = "$(terminal-powershell)";
         this.languageStatusItem.detail = "PowerShell";
 
         if (this.versionDetails !== undefined) {
             const semver = new SemVer(this.versionDetails.version);
-            this.languageStatusItem.text = `$(terminal-powershell) ${semver.major}.${semver.minor}`;
+            this.languageStatusItem.text += ` ${semver.major}.${semver.minor}`;
             this.languageStatusItem.detail += ` ${this.versionDetails.commit} (${this.versionDetails.architecture.toLowerCase()})`;
         } else if (this.PowerShellExeDetails?.displayName) { // In case it didn't start.
-            this.languageStatusItem.text = `$(terminal-powershell) ${this.PowerShellExeDetails.displayName}`;
-            this.languageStatusItem.detail += `: ${this.PowerShellExeDetails.exePath}`;
+            this.languageStatusItem.text += ` ${this.PowerShellExeDetails.displayName}`;
+            this.languageStatusItem.detail += ` at '${this.PowerShellExeDetails.exePath}'`;
         }
 
-        if (statusText) {
-            this.languageStatusItem.detail += ": " + statusText;
+        if (detail) {
+            this.languageStatusItem.detail += ": " + detail;
         }
 
         switch (status) {
@@ -799,7 +806,7 @@ Type 'help' to get help.
     }
 
     private async setSessionFailedOpenBug(message: string): Promise<void> {
-        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
+        this.setSessionStatus("Startup Error!", SessionStatus.Failed);
         await this.logger.writeAndShowErrorWithActions(message, [{
             prompt: "Open an Issue",
             action: async (): Promise<void> => {
@@ -809,7 +816,7 @@ Type 'help' to get help.
     }
 
     private async setSessionFailedGetPowerShell(message: string): Promise<void> {
-        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
+        this.setSessionStatus("Startup Error!", SessionStatus.Failed);
         await this.logger.writeAndShowErrorWithActions(message, [{
             prompt: "Open PowerShell Install Documentation",
             action: async (): Promise<void> => {
@@ -820,7 +827,7 @@ Type 'help' to get help.
     }
 
     private async setSessionFailedGetDotNet(message: string): Promise<void> {
-        this.setSessionStatus("Initialization Error!", SessionStatus.Failed);
+        this.setSessionStatus("Startup Error!", SessionStatus.Failed);
         await this.logger.writeAndShowErrorWithActions(message, [{
             prompt: "Open .NET Framework Documentation",
             action: async (): Promise<void> => {

@@ -439,7 +439,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         default: {
             // Other URI schemes are not supported
-            const msg = JSON.stringify(saveFileDetails);
+            const msg = JSON.stringify(saveFileDetails, undefined, 2);
             this.logger.writeVerbose(
                 `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
                         `is currently unsupported. Message: '${msg}'`);
@@ -467,9 +467,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             await vscode.workspace.fs.writeFile(
                 vscode.Uri.file(destinationAbsolutePath),
                 Buffer.from(oldDocument.getText()));
-        } catch (e) {
+        } catch (err) {
             void this.logger.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
-                `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
+                `Unable to save file to path '${destinationAbsolutePath}': ${err}`);
             return;
         }
 

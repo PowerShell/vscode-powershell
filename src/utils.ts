@@ -34,7 +34,6 @@ async function checkIfFileOrDirectoryExists(targetPath: string | vscode.Uri, typ
                 : vscode.Uri.file(targetPath));
         return (stat.type & type) !== 0;
     } catch {
-        // TODO: Maybe throw if it's not a FileNotFound exception.
         return false;
     }
 }
