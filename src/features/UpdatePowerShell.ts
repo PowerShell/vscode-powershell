@@ -94,10 +94,10 @@ export class UpdatePowerShell {
         return true;
     }
 
-    private async getRemoteVersion(url: string): Promise<string> {
+    private async getRemoteVersion(url: string): Promise<string | undefined> {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error("Failed to get remote version!");
+            return undefined;
         }
         // Looks like:
         // {
@@ -119,17 +119,26 @@ export class UpdatePowerShell {
         const tags: string[] = [];
         if (process.env.POWERSHELL_UPDATECHECK?.toLowerCase() === "lts") {
             // Only check for update to LTS.
-            this.logger.writeDiagnostic("Checking for LTS update.");
-            tags.push(await this.getRemoteVersion(UpdatePowerShell.LTSBuildInfoURL));
+            this.logger.writeVerbose("Checking for LTS update...");
+            const tag = await this.getRemoteVersion(UpdatePowerShell.LTSBuildInfoURL);
+            if (tag != undefined) {
+                tags.push(tag);
+            }
         } else {
             // Check for update to stable.
-            this.logger.writeDiagnostic("Checking for stable update.");
-            tags.push(await this.getRemoteVersion(UpdatePowerShell.StableBuildInfoURL));
+            this.logger.writeVerbose("Checking for stable update...");
+            const tag = await this.getRemoteVersion(UpdatePowerShell.StableBuildInfoURL);
+            if (tag != undefined) {
+                tags.push(tag);
+            }
 
             // Also check for a preview update.
             if (this.localVersion.prerelease.length > 0) {
-                this.logger.writeDiagnostic("Checking for preview update.");
-                tags.push(await this.getRemoteVersion(UpdatePowerShell.PreviewBuildInfoURL));
+                this.logger.writeVerbose("Checking for preview update...");
+                const tag = await this.getRemoteVersion(UpdatePowerShell.PreviewBuildInfoURL);
+                if (tag != undefined) {
+                    tags.push(tag);
+                }
             }
         }
 
@@ -147,7 +156,7 @@ export class UpdatePowerShell {
         try {
             const tag = await this.maybeGetNewRelease();
             if (tag) {
-                return await this.installUpdate(tag);
+                return await this.promptToUpdate(tag);
             }
         } catch (err) {
             // Best effort. This probably failed to fetch the data from GitHub.
@@ -160,13 +169,13 @@ export class UpdatePowerShell {
         await vscode.env.openExternal(url);
     }
 
-    private async installUpdate(tag: string): Promise<void> {
+    private async promptToUpdate(tag: string): Promise<void> {
         const releaseVersion = new SemVer(tag);
         this.logger.write(`Prompting to update PowerShell v${this.localVersion.version} to v${releaseVersion.version}.`);
         const result = await vscode.window.showInformationMessage(
-            `You have an old version of PowerShell (${this.localVersion.version}).
-            The current latest release is ${releaseVersion.version}.
-            Would you like to open the GitHub release in your browser?`,
+            `PowerShell v${this.localVersion.version} is out-of-date.
+             The latest version is v${releaseVersion.version}.
+             Would you like to open the GitHub release in your browser?`,
             ...UpdatePowerShell.promptOptions);
 
         // If the user cancels the notification.
