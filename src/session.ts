@@ -875,59 +875,24 @@ Type 'help' to get help.
             this.logger);
         const availablePowerShellExes = await powershellExeFinder.getAllAvailablePowerShellInstallations();
 
-        let sessionText: string;
-
-        switch (this.sessionStatus) {
-        case SessionStatus.Running:
-        case SessionStatus.Initializing:
-        case SessionStatus.NotStarted:
-        case SessionStatus.NeverStarted:
-        case SessionStatus.Stopping:
-            if (this.PowerShellExeDetails && this.versionDetails) {
-                const currentPowerShellExe =
-                        availablePowerShellExes
-                            .find((item) => item.displayName.toLowerCase() === this.PowerShellExeDetails!.displayName.toLowerCase());
-
-                const powerShellSessionName =
-                        currentPowerShellExe ?
-                            currentPowerShellExe.displayName :
-                            `PowerShell ${this.versionDetails.version} ` +
-                            `(${this.versionDetails.architecture.toLowerCase()}) ${this.versionDetails.edition} Edition ` +
-                            `[${this.versionDetails.version}]`;
-
-                sessionText = `Current session: ${powerShellSessionName}`;
-            } else {
-                sessionText = "Current session: Unknown";
-            }
-            break;
-
-        case SessionStatus.Failed:
-            sessionText = "Session initialization failed, click here to show PowerShell extension logs";
-            break;
-
-        default:
-            throw new TypeError("Not a valid value for the enum 'SessionStatus'");
-        }
-
-        const powerShellItems =
-            availablePowerShellExes
-                .filter((item) => item.displayName !== this.PowerShellExeDetails?.displayName)
-                .map((item) => {
-                    return new SessionMenuItem(
-                        `Switch to: ${item.displayName}`,
-                        async () => { await this.changePowerShellDefaultVersion(item); });
-                });
+        const powerShellItems = availablePowerShellExes
+            .filter((item) => item.displayName !== this.PowerShellExeDetails?.displayName)
+            .map((item) => {
+                return new SessionMenuItem(
+                    `Switch to: ${item.displayName}`,
+                    async () => { await this.changePowerShellDefaultVersion(item); });
+            });
 
         const menuItems: SessionMenuItem[] = [
             new SessionMenuItem(
-                sessionText,
+                `Current session: ${this.PowerShellExeDetails?.displayName ?? "Unknown"} (click to show logs)`,
                 async () => { await vscode.commands.executeCommand("PowerShell.ShowLogs"); }),
 
             // Add all of the different PowerShell options
             ...powerShellItems,
 
             new SessionMenuItem(
-                "Restart Current Session",
+                "Restart current session",
                 async () => {
                     // We pass in the display name so we guarantee that the session
                     // will be the same PowerShell.
@@ -939,7 +904,7 @@ Type 'help' to get help.
                 }),
 
             new SessionMenuItem(
-                "Open Session Logs Folder",
+                "Open session logs folder",
                 async () => { await vscode.commands.executeCommand("PowerShell.OpenLogFolder"); }),
 
             new SessionMenuItem(
