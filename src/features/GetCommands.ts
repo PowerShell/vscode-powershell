@@ -65,7 +65,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
 
     private async CommandExplorerRefresh(): Promise<void> {
         if (this.languageClient === undefined) {
-            this.logger.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request`);
+            this.logger.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request!`);
             return;
         }
         await this.languageClient.sendRequest(GetCommandRequestType).then((result) => {

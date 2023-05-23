@@ -59,7 +59,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     // Load and validate settings (will prompt for 'cwd' if necessary).
     await validateCwdSetting(logger);
     const settings = getSettings();
-    logger.writeDiagnostic(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
+    logger.writeVerbose(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,

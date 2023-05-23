@@ -4,6 +4,7 @@
 import {
     debug,
     CancellationToken,
+    CancellationTokenSource,
     DebugAdapterDescriptor,
     DebugAdapterDescriptorFactory,
     DebugAdapterExecutable,
@@ -18,7 +19,6 @@ import {
     extensions,
     workspace,
     commands,
-    CancellationTokenSource,
     InputBoxOptions,
     QuickPickItem,
     QuickPickOptions,
@@ -297,7 +297,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         this.sessionManager.showDebugTerminal(true);
 
         this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
-        this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration)}`);
+        this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration, undefined, 2)}`);
 
         return new DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
     }
@@ -359,7 +359,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
     private async createTemporaryIntegratedConsole(session: DebugSession): Promise<IEditorServicesSessionDetails | undefined> {
         const settings = getSettings();
         this.tempDebugProcess = await this.sessionManager.createDebugSessionProcess(settings);
-        this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
+        // TODO: Maybe set a timeout on the cancellation token?
+        const cancellationTokenSource = new CancellationTokenSource();
+        this.tempSessionDetails = await this.tempDebugProcess.start(
+            `DebugSession-${this.sessionCount++}`, cancellationTokenSource.token);
 
         // NOTE: Dotnet attach debugging is only currently supported if a temporary debug terminal is used, otherwise we get lots of lock conflicts from loading the assemblies.
         if (session.configuration.attachDotnetDebugger) {
@@ -379,16 +382,16 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 // HACK: This seems like you would be calling a method on a variable not assigned yet, but it does work in the flow.
                 // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
                 startDebugEvent.dispose();
-                this.logger.write(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
+                this.logger.writeVerbose(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
                 if (dotnetAttachSession.configuration.name == dotnetAttachConfig.name) {
                     const stopDebugEvent = debug.onDidTerminateDebugSession(async (terminatedDebugSession) => {
                         // Makes the event one-time
                         stopDebugEvent.dispose();
 
-                        this.logger.write(`Debugger session stopped: ${terminatedDebugSession.name} (${terminatedDebugSession.id})`);
+                        this.logger.writeVerbose(`Debugger session stopped: ${terminatedDebugSession.name} (${terminatedDebugSession.id})`);
 
                         if (terminatedDebugSession === session) {
-                            this.logger.write("Terminating dotnet debugger session associated with PowerShell debug session");
+                            this.logger.writeVerbose("Terminating dotnet debugger session associated with PowerShell debug session!");
                             await debug.stopDebugging(dotnetAttachSession);
                         }
                     });
@@ -398,8 +401,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
             // Start a child debug session to attach the dotnet debugger
             // TODO: Accommodate multi-folder workspaces if the C# code is in a different workspace folder
             await debug.startDebugging(undefined, dotnetAttachConfig, session);
-            this.logger.writeVerbose(`Dotnet Attach Debug configuration: ${JSON.stringify(dotnetAttachConfig)}`);
-            this.logger.write(`Attached dotnet debugger to process ${pid}`);
+            this.logger.writeVerbose(`Dotnet attach debug configuration: ${JSON.stringify(dotnetAttachConfig, undefined, 2)}`);
+            this.logger.writeVerbose(`Attached dotnet debugger to process: ${pid}`);
         }
         return this.tempSessionDetails;
     }
