@@ -359,7 +359,10 @@ export class DebugSessionFeature extends LanguageClientConsumer
     private async createTemporaryIntegratedConsole(session: DebugSession): Promise<IEditorServicesSessionDetails | undefined> {
         const settings = getSettings();
         this.tempDebugProcess = await this.sessionManager.createDebugSessionProcess(settings);
-        this.tempSessionDetails = await this.tempDebugProcess.start(`DebugSession-${this.sessionCount++}`);
+        // TODO: Maybe set a timeout on the cancellation token?
+        const cancellationTokenSource = new CancellationTokenSource();
+        this.tempSessionDetails = await this.tempDebugProcess.start(
+            `DebugSession-${this.sessionCount++}`, cancellationTokenSource.token);
 
         // NOTE: Dotnet attach debugging is only currently supported if a temporary debug terminal is used, otherwise we get lots of lock conflicts from loading the assemblies.
         if (session.configuration.attachDotnetDebugger) {
