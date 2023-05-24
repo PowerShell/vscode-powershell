@@ -26,7 +26,7 @@ import {
 import { LanguageClientConsumer } from "./languageClientConsumer";
 import { SemVer, satisfies } from "semver";
 
-export enum SessionStatus {
+enum SessionStatus {
     NotStarted = "Not Started",
     Starting = "Starting",
     Running = "Running",
@@ -146,11 +146,34 @@ export class SessionManager implements Middleware {
     }
 
     // The `exeNameOverride` is used by `restartSession` to override ANY other setting.
+    // We've made this function idempotent, so it can used to ensure the session has started.
     public async start(exeNameOverride?: string): Promise<void> {
-        // A simple lock because this function isn't re-entrant.
-        if (this.sessionStatus === SessionStatus.Starting) {
+        switch (this.sessionStatus) {
+        case SessionStatus.NotStarted:
+            // Go ahead and start.
+            break;
+        case SessionStatus.Starting:
+            // A simple lock because this function isn't re-entrant.
             this.logger.writeWarning("Re-entered 'start' so waiting...");
-            return await this.waitUntilStarted();
+            return await this.waitWhileStarting();
+        case SessionStatus.Running:
+            // We're started, just return.
+            this.logger.writeVerbose("Already started.");
+            return;
+        case SessionStatus.Busy:
+            // We're started but busy so notify and return.
+            // TODO: Make a proper notification for this and when IntelliSense is blocked.
+            this.logger.write("The Extension Terminal is currently busy, please wait for your task to finish!");
+            return;
+        case SessionStatus.Stopping:
+            // Wait until done stopping, then start.
+            this.logger.writeVerbose("Still stopping.");
+            await this.waitWhileStopping();
+            break;
+        case SessionStatus.Failed:
+            // Try to start again.
+            this.logger.writeVerbose("Previously failed, starting again.");
+            break;
         }
 
         this.setSessionStatus("Starting...", SessionStatus.Starting);
@@ -220,7 +243,7 @@ export class SessionManager implements Middleware {
         }
     }
 
-    public async stop(): Promise<void> {
+    private async stop(): Promise<void> {
         this.setSessionStatus("Stopping...", SessionStatus.Stopping);
         // Cancel start-up if we're still waiting.
         this.startCancellationTokenSource?.cancel();
@@ -255,7 +278,7 @@ export class SessionManager implements Middleware {
         this.setSessionStatus("Not Started", SessionStatus.NotStarted);
     }
 
-    public async restartSession(exeNameOverride?: string): Promise<void> {
+    private async restartSession(exeNameOverride?: string): Promise<void> {
         this.logger.write("Restarting session...");
         await this.stop();
 
@@ -267,22 +290,18 @@ export class SessionManager implements Middleware {
     }
 
     public getSessionDetails(): IEditorServicesSessionDetails | undefined {
-        // TODO: This is used solely by the debugger and should actually just wait (with a timeout).
+        // This is used by the debugger which should have already called `start`.
         if (this.sessionDetails === undefined) {
             void this.logger.writeAndShowError("PowerShell session unavailable for debugging!");
         }
         return this.sessionDetails;
     }
 
-    public getSessionStatus(): SessionStatus {
-        return this.sessionStatus;
-    }
-
     public getPowerShellVersionDetails(): IPowerShellVersionDetails | undefined {
         return this.versionDetails;
     }
 
-    public getNewSessionFilePath(): vscode.Uri {
+    private getNewSessionFilePath(): vscode.Uri {
         const uniqueId: number = Math.floor(100000 + Math.random() * 900000);
         return vscode.Uri.joinPath(this.sessionsFolder, `PSES-VSCode-${process.env.VSCODE_PID}-${uniqueId}.json`);
     }
@@ -334,14 +353,12 @@ export class SessionManager implements Middleware {
     }
 
     public async waitUntilStarted(): Promise<void> {
-        while (this.sessionStatus === SessionStatus.Starting) {
-            if (this.startCancellationTokenSource?.token.isCancellationRequested) {
-                return;
-            }
+        while (this.sessionStatus !== SessionStatus.Running) {
             await utils.sleep(300);
         }
     }
 
+    // TODO: Is this used by the magic of "Middleware" in the client library?
     public resolveCodeLens(
         codeLens: vscode.CodeLens,
         token: vscode.CancellationToken,
@@ -803,6 +820,21 @@ Type 'help' to get help.
         return languageStatusItem;
     }
 
+    private async waitWhileStarting(): Promise<void> {
+        while (this.sessionStatus === SessionStatus.Starting) {
+            if (this.startCancellationTokenSource?.token.isCancellationRequested) {
+                return;
+            }
+            await utils.sleep(300);
+        }
+    }
+
+    private async waitWhileStopping(): Promise<void> {
+        while (this.sessionStatus === SessionStatus.Stopping) {
+            await utils.sleep(300);
+        }
+    }
+
     private setSessionStatus(detail: string, status: SessionStatus): void {
         this.logger.writeVerbose(`Session status changing from '${this.sessionStatus}' to '${status}'.`);
         this.sessionStatus = status;
@@ -842,7 +874,6 @@ Type 'help' to get help.
             this.languageStatusItem.severity = vscode.LanguageStatusSeverity.Error;
             break;
         }
-
     }
 
     private setSessionRunningStatus(): void {
@@ -910,7 +941,7 @@ Type 'help' to get help.
     }
 
     // Always shows the session terminal.
-    public showSessionTerminal(isExecute?: boolean): void {
+    private showSessionTerminal(isExecute?: boolean): void {
         this.languageServerProcess?.showTerminal(isExecute && !this.sessionSettings.integratedConsole.focusConsoleOnExecute);
     }
 
