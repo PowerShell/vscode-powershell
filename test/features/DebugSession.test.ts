@@ -10,7 +10,7 @@ import { DebugConfig, DebugSessionFeature, DebugConfigurations } from "../../src
 import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import * as platform from "../../src/platform";
 import { IPlatformDetails } from "../../src/platform";
-import { IEditorServicesSessionDetails, IPowerShellVersionDetails, SessionManager, SessionStatus } from "../../src/session";
+import { IEditorServicesSessionDetails, IPowerShellVersionDetails, SessionManager } from "../../src/session";
 import * as utils from "../../src/utils";
 import { BuildBinaryModuleMock, WaitEvent, ensureEditorServicesIsConnected, stubInterface, testLogger } from "../utils";
 
@@ -408,7 +408,6 @@ describe("DebugSessionFeature", () => {
         it("Creates a named pipe server for the debug adapter", async () => {
             const debugSessionFeature = createDebugSessionFeatureStub({
                 sessionManager: Sinon.createStubInstance(SessionManager, {
-                    getSessionStatus: SessionStatus.Running,
                     getSessionDetails: stubInterface<IEditorServicesSessionDetails>({
                         debugServicePipeName: "testPipeName"
                     })

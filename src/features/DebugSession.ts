@@ -30,7 +30,7 @@ import { LanguageClientConsumer } from "../languageClientConsumer";
 import { ILogger } from "../logging";
 import { OperatingSystem, getPlatformDetails } from "../platform";
 import { PowerShellProcess } from "../process";
-import { IEditorServicesSessionDetails, SessionManager, SessionStatus } from "../session";
+import { IEditorServicesSessionDetails, SessionManager } from "../session";
 import { getSettings } from "../settings";
 import path from "path";
 import { checkIfFileExists } from "../utils";
@@ -281,9 +281,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         _executable: DebugAdapterExecutable | undefined): Promise<DebugAdapterDescriptor | undefined> {
         // NOTE: A Promise meets the shape of a ProviderResult, which allows us to make this method async.
 
-        if (this.sessionManager.getSessionStatus() !== SessionStatus.Running) {
-            await this.sessionManager.start();
-        }
+        await this.sessionManager.start();
 
         const sessionDetails = session.configuration.createTemporaryIntegratedConsole
             ? await this.createTemporaryIntegratedConsole(session)
