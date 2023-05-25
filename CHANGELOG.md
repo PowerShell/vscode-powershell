@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2023.5.3-preview
+### Wednesday, May 24, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4599](https://github.com/PowerShell/vscode-powershell/pull/4599) - Make `sessionManager.start()` idempotent.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.6
+
+- 🐛 💭 [vscode-powershell #4582](https://github.com/PowerShell/PowerShellEditorServices/pull/2028) - Ignore cancellation of completion requests.
+- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2026) - Fix the `TranscribeOnly` bug (take two).
+
 ## v2023.5.2-preview
 ### Tuesday, May 23, 2023
 
