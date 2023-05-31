@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2023.5.4-preview
+### Tuesday, May 30, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+No changes, just pulling in PSES.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.7
+
+- 🐛 📟 [PowerShellEditorServices #2031](https://github.com/PowerShell/PowerShellEditorServices/pull/2031) - Fix the `TranscribeOnly` bug (take three).
+
 ## v2023.5.3-preview
 ### Wednesday, May 24, 2023
 
@@ -9,8 +20,7 @@
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.6
 
-- 🐛 💭 [vscode-powershell #4582](https://github.com/PowerShell/PowerShellEditorServices/pull/2028) - Ignore cancellation of completion requests.
-- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2026) - Fix the `TranscribeOnly` bug (take two).
+No changes.
 
 ## v2023.5.2-preview
 ### Tuesday, May 23, 2023
