@@ -1,5 +1,40 @@
 # PowerShell Extension Release History
 
+## v2023.6.0
+### Tuesday, June 06, 2023
+
+This release focused on fixing the "disappearing output" bug present in PowerShell 5.1,
+where an old bug with the `Out-Default` cmdlet's `TranscribeOnly` flag could cause the
+Extension Terminal to stop displaying output. While the root cause in the cmdlet is fixed
+upstream, that fix is only in PowerShell Core, and not backported to Windows PowerShell.
+We were able to workaround the bug with a very careful use of reflection to reset the
+flag's value at the appropriate times (see the three takes it took to get this right).
+
+We also refactored the client's startup logic so that it should be impossible to create a
+ghost Extension Terminal, and the error handling and logging was given a thorough cleanup.
+Finally, two noisy bugs were fixed: when completions are canceled the useless error
+message is no longer produced, and when the DSC module is only loaded in one attempt
+instead of repeatedly.
+
+Please enjoy these bugfixes! We sure enjoy making the extension more stable.
+
+Don't forget to catch Andy's talk, "PowerShell Extension for VS Code Deep Dive" at
+[PSConfEU](https://psconf.eu) on Thursday, 22 June 2023!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4599](https://github.com/PowerShell/vscode-powershell/pull/4599) - Make `sessionManager.start()` idempotent.
+- 🐛 🛫 [vscode-powershell #4584](https://github.com/PowerShell/vscode-powershell/pull/4584) - Robustify startup, error handling, and logging.
+- 🐛 📺 [vscode-powershell #4553](https://github.com/PowerShell/vscode-powershell/pull/4570) - Remove the MSI install logic (it's unreliable).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.7
+
+- 🐛 📟 [PowerShellEditorServices #2031](https://github.com/PowerShell/PowerShellEditorServices/pull/2031) - Fix the `TranscribeOnly` bug (take three).
+- 🐛 💭 [vscode-powershell #4582](https://github.com/PowerShell/PowerShellEditorServices/pull/2028) - Ignore cancellation of completion requests.
+- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2026) - Fix the `TranscribeOnly` bug (take two).
+- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2023) - Fix disappearing output in PowerShell 5.1.
+- 🐛 🔍 [PowerShellEditorServices #2020](https://github.com/PowerShell/PowerShellEditorServices/pull/2020) - Fix repeated failure to load DSC module.
+
 ## v2023.5.4-preview
 ### Tuesday, May 30, 2023
 
