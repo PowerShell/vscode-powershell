@@ -195,7 +195,7 @@ export async function changeSetting(
     configurationTarget: vscode.ConfigurationTarget | boolean | undefined,
     logger: ILogger | undefined): Promise<void> {
 
-    logger?.writeDiagnostic(`Changing '${settingName}' at scope '${configurationTarget} to '${newValue}'`);
+    logger?.writeVerbose(`Changing '${settingName}' at scope '${configurationTarget}' to '${newValue}'.`);
 
     try {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);

@@ -57,7 +57,7 @@ export class Logger implements ILogger {
 
         // Early logging of the log paths for debugging.
         if (LogLevel.Diagnostic >= this.logLevel) {
-            const uriMessage = Logger.timestampMessage(`Global storage URI: '${globalStorageUri}', log file path: '${this.logFilePath}'`, LogLevel.Diagnostic);
+            const uriMessage = Logger.timestampMessage(`Log file path: '${this.logFilePath}'`, LogLevel.Verbose);
             this.logChannel.appendLine(uriMessage);
         }
 
@@ -72,7 +72,7 @@ export class Logger implements ILogger {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         this.logChannel.dispose();
         for (const command of this.commands) {
             command.dispose();
@@ -147,7 +147,7 @@ export class Logger implements ILogger {
 
         const fullActions = [
             ...actions,
-            { prompt: "Show Logs", action: () => { this.showLogPanel(); } },
+            { prompt: "Show Logs", action: (): void => { this.showLogPanel(); } },
         ];
 
         const actionKeys: string[] = fullActions.map((action) => action.prompt);
@@ -211,7 +211,7 @@ export class Logger implements ILogger {
             try {
                 this.writingLog = true;
                 if (!this.logDirectoryCreated) {
-                    this.logChannel.appendLine(Logger.timestampMessage(`Creating log directory at: '${this.logDirectoryPath}'`, level));
+                    this.writeVerbose(`Creating log directory at: '${this.logDirectoryPath}'`);
                     await vscode.workspace.fs.createDirectory(this.logDirectoryPath);
                     this.logDirectoryCreated = true;
                 }
@@ -222,8 +222,8 @@ export class Logger implements ILogger {
                 await vscode.workspace.fs.writeFile(
                     this.logFilePath,
                     Buffer.concat([log, Buffer.from(timestampedMessage)]));
-            } catch (e) {
-                console.log(`Error writing to vscode-powershell log file: ${e}`);
+            } catch (err) {
+                console.log(`Error writing to vscode-powershell log file: ${err}`);
             } finally {
                 this.writingLog = false;
             }

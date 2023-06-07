@@ -1,0 +1,12 @@
+{
+  "color": true,
+  "enable-source-maps": true,
+  "extensions": [
+    ".js",
+    ".jsx"
+  ],
+  "require": "source-map-support/register",
+  "timeout": 60000,
+  "slow": 2000,
+  "spec": "out/test/**/*.test.js"
+}

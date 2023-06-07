@@ -43,11 +43,11 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
             });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 
-    public override setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
 
         if (this.waitingForClientToken) {
@@ -143,7 +143,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
                 [
                     {
                         prompt: "Yes",
-                        action: async () => { await this.createProjectFromTemplate(template); }
+                        action: async (): Promise<void> => { await this.createProjectFromTemplate(template); }
                     },
                     {
                         prompt: "No",
@@ -154,7 +154,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
         }
     }
 
-    private async openWorkspacePath(workspacePath: string) {
+    private async openWorkspacePath(workspacePath: string): Promise<void> {
         // Open the created project in a new window
         await vscode.commands.executeCommand(
             "vscode.openFolder",
@@ -162,7 +162,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
             true);
     }
 
-    private clearWaitingToken() {
+    private clearWaitingToken(): void {
         this.waitingForClientToken?.dispose();
         this.waitingForClientToken = undefined;
     }

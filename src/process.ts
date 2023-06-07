@@ -8,17 +8,19 @@ import { ILogger } from "./logging";
 import Settings = require("./settings");
 import utils = require("./utils");
 import { IEditorServicesSessionDetails } from "./session";
+import { promisify } from "util";
 
 export class PowerShellProcess {
     // This is used to warn the user that the extension is taking longer than expected to startup.
-    // After the 15th try we've hit 30 seconds and should warn.
-    private static warnUserThreshold = 15;
+    private static warnUserThreshold = 30;
 
     public onExited: vscode.Event<void>;
     private onExitedEmitter = new vscode.EventEmitter<void>();
 
     private consoleTerminal?: vscode.Terminal;
     private consoleCloseSubscription?: vscode.Disposable;
+
+    private pid?: number;
 
     constructor(
         public exePath: string,
@@ -32,7 +34,7 @@ export class PowerShellProcess {
         this.onExited = this.onExitedEmitter.event;
     }
 
-    public async start(logFileName: string): Promise<IEditorServicesSessionDetails> {
+    public async start(logFileName: string, cancellationToken: vscode.CancellationToken): Promise<IEditorServicesSessionDetails | undefined> {
         const editorServicesLogPath = this.logger.getLogFilePath(logFileName);
 
         const psesModulePath =
@@ -85,19 +87,16 @@ export class PowerShellProcess {
                 startEditorServices);
         } else {
             // Otherwise use -EncodedCommand for better quote support.
+            this.logger.writeVerbose("Using Base64 -EncodedCommand but logging as -Command equivalent.");
             powerShellArgs.push(
                 "-EncodedCommand",
                 Buffer.from(startEditorServices, "utf16le").toString("base64"));
         }
 
-        this.logger.write(
-            "Language server starting --",
-            "    PowerShell executable: " + this.exePath,
-            "    PowerShell args: " + powerShellArgs.join(" "),
-            "    PowerShell Editor Services args: " + startEditorServices);
+        this.logger.writeVerbose(`Starting process: ${this.exePath} ${powerShellArgs.slice(0, -2).join(" ")} -Command ${startEditorServices}`);
 
         // Make sure no old session file exists
-        await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
+        await this.deleteSessionFile(this.sessionFilePath);
 
         // Launch PowerShell in the integrated terminal
         const terminalOptions: vscode.TerminalOptions = {
@@ -110,10 +109,14 @@ export class PowerShellProcess {
             hideFromUser: this.sessionSettings.integratedConsole.startInBackground,
         };
 
+        // Subscribe a log event for when the terminal closes (this fires for
+        // all terminals and the event itself checks if it's our terminal). This
+        // subscription should happen before we create the terminal so if it
+        // fails immediately, the event fires.
+        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
-
-        const pwshName = path.basename(this.exePath);
-        this.logger.write(`${pwshName} started.`);
+        this.pid = await this.getPid();
+        this.logger.write(`PowerShell process started with PID: ${this.pid}`);
 
         if (this.sessionSettings.integratedConsole.showOnStartup
             && !this.sessionSettings.integratedConsole.startInBackground) {
@@ -121,46 +124,43 @@ export class PowerShellProcess {
             this.consoleTerminal.show(true);
         }
 
-        // Start the language client
-        const sessionDetails = await this.waitForSessionFile();
-
-        // Subscribe a log event for when the terminal closes
-        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
-
-        // Log that the PowerShell terminal process has been started
-        const pid = await this.consoleTerminal.processId;
-        this.logTerminalPid(pid ?? 0, pwshName);
-
-        return sessionDetails;
+        return await this.waitForSessionFile(cancellationToken);
     }
 
-    public showTerminal(preserveFocus?: boolean) {
+    // This function should only be used after a failure has occurred because it is slow!
+    public async getVersionCli(): Promise<string> {
+        const exec = promisify(cp.execFile);
+        const { stdout } = await exec(this.exePath, ["-NoProfile", "-NoLogo", "-Command", "$PSVersionTable.PSVersion.ToString()"]);
+        return stdout.trim();
+    }
+
+    // Returns the process Id of the consoleTerminal
+    public async getPid(): Promise<number | undefined> {
+        return await this.consoleTerminal?.processId;
+    }
+
+    public showTerminal(preserveFocus?: boolean): void {
         this.consoleTerminal?.show(preserveFocus);
     }
 
-    public async dispose() {
-        // Clean up the session file
-        this.logger.write("Terminating PowerShell process...");
+    public dispose(): void {
+        this.logger.writeVerbose(`Disposing PowerShell process with PID: ${this.pid}`);
 
-        await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
-
-        this.consoleCloseSubscription?.dispose();
-        this.consoleCloseSubscription = undefined;
+        void this.deleteSessionFile(this.sessionFilePath);
 
         this.consoleTerminal?.dispose();
         this.consoleTerminal = undefined;
+
+        this.consoleCloseSubscription?.dispose();
+        this.consoleCloseSubscription = undefined;
     }
 
-    public sendKeyPress() {
+    public sendKeyPress(): void {
         // NOTE: This is a regular character instead of something like \0
         // because non-printing characters can cause havoc with different
         // languages and terminal settings. We discard the character server-side
         // anyway, so it doesn't matter what we send.
         this.consoleTerminal?.sendText("p", false);
-    }
-
-    private logTerminalPid(pid: number, exeName: string) {
-        this.logger.write(`${exeName} PID: ${pid}`);
     }
 
     private isLoginShell(pwshPath: string): boolean {
@@ -173,57 +173,63 @@ export class PowerShellProcess {
         } catch {
             return false;
         }
-
         return true;
     }
 
-    private static async readSessionFile(sessionFilePath: vscode.Uri): Promise<IEditorServicesSessionDetails> {
+    private async readSessionFile(sessionFilePath: vscode.Uri): Promise<IEditorServicesSessionDetails> {
         const fileContents = await vscode.workspace.fs.readFile(sessionFilePath);
         return JSON.parse(fileContents.toString());
     }
 
-    private static async deleteSessionFile(sessionFilePath: vscode.Uri) {
+    private async deleteSessionFile(sessionFilePath: vscode.Uri): Promise<void> {
         try {
             await vscode.workspace.fs.delete(sessionFilePath);
-        } catch (e) {
-            // TODO: Be more specific about what we're catching
+        } catch {
+            // We don't care about any reasons for it to fail.
         }
     }
 
-    private async waitForSessionFile(): Promise<IEditorServicesSessionDetails> {
-        // Determine how many tries by dividing by 2000 thus checking every 2 seconds.
-        const numOfTries = this.sessionSettings.developer.waitForSessionFileTimeoutSeconds / 2;
+    private async waitForSessionFile(cancellationToken: vscode.CancellationToken): Promise<IEditorServicesSessionDetails | undefined> {
+        const numOfTries = this.sessionSettings.developer.waitForSessionFileTimeoutSeconds;
         const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
 
-        // Check every 2 seconds
-        this.logger.write("Waiting for session file...");
+        // Check every second.
+        this.logger.writeVerbose(`Waiting for session file: ${this.sessionFilePath}`);
         for (let i = numOfTries; i > 0; i--) {
+            if (cancellationToken.isCancellationRequested) {
+                this.logger.writeWarning("Canceled while waiting for session file.");
+                return undefined;
+            }
+
+            if (this.consoleTerminal === undefined) {
+                this.logger.writeError("Extension Terminal is undefined.");
+                return undefined;
+            }
+
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
-                this.logger.write("Session file found!");
-                const sessionDetails = await PowerShellProcess.readSessionFile(this.sessionFilePath);
-                await PowerShellProcess.deleteSessionFile(this.sessionFilePath);
-                return sessionDetails;
+                this.logger.writeVerbose("Session file found.");
+                return await this.readSessionFile(this.sessionFilePath);
             }
 
             if (warnAt === i) {
                 void this.logger.writeAndShowWarning("Loading the PowerShell extension is taking longer than expected. If you're using privilege enforcement software, this can affect start up performance.");
             }
 
-            // Wait a bit and try again
-            await utils.sleep(2000);
+            // Wait a bit and try again.
+            await utils.sleep(1000);
         }
 
-        const err = "Timed out waiting for session file to appear!";
-        this.logger.write(err);
-        throw new Error(err);
+        this.logger.writeError("Timed out waiting for session file!");
+        return undefined;
     }
 
-    private onTerminalClose(terminal: vscode.Terminal) {
+    private onTerminalClose(terminal: vscode.Terminal): void {
         if (terminal !== this.consoleTerminal) {
             return;
         }
 
-        this.logger.write("powershell.exe terminated or terminal UI was closed");
+        this.logger.writeWarning(`PowerShell process terminated or Extension Terminal was closed, PID: ${this.pid}`);
         this.onExitedEmitter.fire();
+        this.dispose();
     }
 }

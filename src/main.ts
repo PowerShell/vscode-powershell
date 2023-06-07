@@ -56,18 +56,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
 
-    // If both extensions are enabled, this will cause unexpected behavior since both register the same commands.
-    // TODO: Merge extensions and use preview channel in marketplace instead.
-    if (PackageJSON.name.toLowerCase() === "powershell-preview"
-        && vscode.extensions.getExtension("ms-vscode.powershell")) {
-        void logger.writeAndShowError(
-            "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
-    }
-
     // Load and validate settings (will prompt for 'cwd' if necessary).
     await validateCwdSetting(logger);
     const settings = getSettings();
-    logger.writeDiagnostic(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
+    logger.writeVerbose(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -135,8 +127,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         settings,
         logger,
         documentSelector,
+        PackageJSON.name,
         PackageJSON.displayName,
         PackageJSON.version,
+        PackageJSON.publisher,
         telemetryReporter);
 
     // Register commands that do not require Language client

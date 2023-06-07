@@ -1,27 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import os = require("os");
 import vscode = require("vscode");
 import child_process = require("child_process");
 import { SessionManager } from "../session";
 
-const queryStringPrefix = "?";
-
-const project = "https://github.com/PowerShell/vscode-powershell";
-const issuesUrl = `${project}/issues/new`;
-
-const extensions =
-    vscode.extensions.all.filter((element) => element.packageJSON.isBuiltin === false)
-        .sort((leftSide, rightSide): number => {
-            if (leftSide.packageJSON.name.toLowerCase() < rightSide.packageJSON.name.toLowerCase()) {
-                return -1;
-            }
-            if (leftSide.packageJSON.name.toLowerCase() > rightSide.packageJSON.name.toLowerCase()) {
-                return 1;
-            }
-            return 0;
-        });
+const issuesUrl = "https://github.com/PowerShell/vscode-powershell/issues/new?";
 
 export class GenerateBugReportFeature implements vscode.Disposable {
 
@@ -29,95 +13,30 @@ export class GenerateBugReportFeature implements vscode.Disposable {
 
     constructor(private sessionManager: SessionManager) {
         this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", async () => {
-
-            const body = `Issue Description
-=====
-
-I am experiencing a problem with...
-
-Attached Logs
-=====
-
-Follow the instructions in the [README](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md) about
-capturing and sending logs.
-
-Environment Information
-=====
-
-Visual Studio Code
------
-
-| Name | Version |
-| --- | --- |
-| Operating System | ${os.type()} ${os.arch()} ${os.release()} |
-| VSCode | ${vscode.version}|
-| PowerShell Extension Version | ${sessionManager.HostVersion} |
-
-PowerShell Information
------
-
-${this.getRuntimeInfo()}
-
-Visual Studio Code Extensions
------
-
-<details><summary>Visual Studio Code Extensions(Click to Expand)</summary>
-
-${this.generateExtensionTable(extensions)}
-</details>
-
-`;
-
-            const encodedBody = encodeURIComponent(body);
-            const fullUrl = `${issuesUrl}${queryStringPrefix}body=${encodedBody}`;
-            await vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(fullUrl));
+            const params = [
+                "labels=Issue-Bug",
+                "template=bug-report.yml",
+                "powershell-version=" + this.getRuntimeInfo(),
+                "vscode-version=" + vscode.version + "\n" + process.arch,
+                "extension-version=" + sessionManager.Publisher + "." + sessionManager.HostName + "@" + sessionManager.HostVersion,
+            ];
+            const url = vscode.Uri.parse(issuesUrl + encodeURIComponent(params.join("&")));
+            await vscode.env.openExternal(url);
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private generateExtensionTable(installedExtensions: vscode.Extension<any>[]): string {
-        if (!installedExtensions.length) {
-            return "none";
-        }
-
-        const tableHeader = "|Extension|Author|Version|\n|---|---|---|";
-        const table = installedExtensions.map((e) => {
-            if (e.packageJSON.isBuiltin === false) {
-                return `|${e.packageJSON.name}|${e.packageJSON.publisher}|${e.packageJSON.version}|`;
-            }
-            return undefined;
-        }).join("\n");
-
-        const extensionTable = `
-${tableHeader}\n${table};
-`;
-        // 2000 chars is browsers de-facto limit for URLs, 400 chars are allowed for other string parts of the issue URL
-        // http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers
-        // if (encodeURIComponent(extensionTable).length > 1600) {
-        //     return 'the listing length exceeds browsers\' URL characters limit';
-        // }
-
-        return extensionTable;
-    }
-
-    private getRuntimeInfo(): string | undefined {
+    private getRuntimeInfo(): string {
         if (this.sessionManager.PowerShellExeDetails === undefined) {
-            return;
+            return "Session's PowerShell details are unknown!";
         }
-
-        const powerShellExePath = this.sessionManager.PowerShellExeDetails.exePath;
-        const powerShellArgs = [
-            "-NoProfile",
-            "-Command",
-            "$PSVersionString = \"|Name|Value|\n\"; $PSVersionString += \"|---|---|\n\"; $PSVersionTable.keys | " +
-            "ForEach-Object { $PSVersionString += \"|$_|$($PSVersionTable.Item($_))|\n\" }; $PSVersionString",
-        ];
-
-        const child = child_process.spawnSync(powerShellExePath, powerShellArgs);
-        return child.stdout.toString().replace(";", ",");
+        const child = child_process.spawnSync(
+            this.sessionManager.PowerShellExeDetails.exePath,
+            ["-NoProfile", "-NoLogo", "-Command", "$PSVersionTable | Out-String"]);
+        // Replace semicolons as they'll cause the URI component to truncate
+        return child.stdout.toString().trim().replace(";", ",");
     }
 }

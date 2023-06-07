@@ -12,6 +12,7 @@ import { LanguageClient } from "vscode-languageclient/node";
 import { ILogger } from "../logging";
 import { getSettings, validateCwdSetting } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import { DebugConfig, DebugConfigurations } from "./DebugSession";
 
 export interface IExtensionCommand {
     name: string;
@@ -187,23 +188,17 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             vscode.commands.registerCommand("PowerShell.Debug.Start",
                 async () => {
-                    // TODO: Use a named debug configuration.
-                    await vscode.debug.startDebugging(undefined, {
-                        name: "PowerShell: Launch Current File",
-                        type: "PowerShell",
-                        request: "launch",
-                        script: "${file}",
-                    });
+                    await vscode.debug.startDebugging(undefined, DebugConfigurations[DebugConfig.LaunchCurrentFile]);
                 })
         ];
     }
 
-    public override setLanguageClient(languageclient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         // Clear the current list of extension commands since they were
         // only relevant to the previous session
         this.extensionCommands = [];
 
-        this.languageClient = languageclient;
+        this.languageClient = languageClient;
 
         this.handlers = [
             this.languageClient.onNotification(
@@ -267,7 +262,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this.commands) {
             command.dispose();
         }
@@ -276,7 +271,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         }
     }
 
-    private addExtensionCommand(command: IExtensionCommandAddedNotificationBody) {
+    private addExtensionCommand(command: IExtensionCommandAddedNotificationBody): void {
         this.extensionCommands.push({
             name: command.name,
             displayName: command.displayName,
@@ -311,7 +306,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
     private async onCommandSelected(
         chosenItem: IExtensionCommandQuickPickItem | undefined,
-        client: LanguageClient | undefined) {
+        client: LanguageClient | undefined): Promise<void> {
 
         if (chosenItem !== undefined) {
             await client?.sendRequest(
@@ -444,7 +439,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         default: {
             // Other URI schemes are not supported
-            const msg = JSON.stringify(saveFileDetails);
+            const msg = JSON.stringify(saveFileDetails, undefined, 2);
             this.logger.writeVerbose(
                 `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
                         `is currently unsupported. Message: '${msg}'`);
@@ -472,9 +467,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             await vscode.workspace.fs.writeFile(
                 vscode.Uri.file(destinationAbsolutePath),
                 Buffer.from(oldDocument.getText()));
-        } catch (e) {
+        } catch (err) {
             void this.logger.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
-                `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
+                `Unable to save file to path '${destinationAbsolutePath}': ${err}`);
             return;
         }
 

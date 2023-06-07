@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as assert from "assert";
+import assert from "assert";
 import { UpdatePowerShell } from "../../src/features/UpdatePowerShell";
 import { Settings } from "../../src/settings";
 import { IPowerShellVersionDetails } from "../../src/session";
@@ -33,8 +33,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "7.3.0",
                 "architecture": "X64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             assert(!updater.shouldCheckForUpdate());
         });
@@ -46,8 +45,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "5.1.22621",
                 "architecture": "X64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             assert(!updater.shouldCheckForUpdate());
         });
@@ -59,8 +57,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "7.3.0-preview.3-508-g07175ae0ff8eb7306fe0b0fc7d19bdef4fbf2d67",
                 "architecture": "Arm64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             assert(!updater.shouldCheckForUpdate());
         });
@@ -72,8 +69,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "7.3.0-daily20221206.1",
                 "architecture": "Arm64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             assert(!updater.shouldCheckForUpdate());
         });
@@ -86,8 +82,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "7.3.0",
                 "architecture": "X64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             assert(!updater.shouldCheckForUpdate());
         });
@@ -99,8 +94,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "7.3.0",
                 "architecture": "X64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             assert(updater.shouldCheckForUpdate());
         });
@@ -115,8 +109,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "7.0.0",
                 "architecture": "X64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             const tag: string | undefined = await updater.maybeGetNewRelease();
             // NOTE: This will need to be updated each new major LTS.
@@ -130,8 +123,7 @@ describe("UpdatePowerShell feature", function () {
                 "commit": "7.0.0",
                 "architecture": "X64"
             };
-            // @ts-expect-error testing doesn't require all arguments.
-            const updater = new UpdatePowerShell(undefined, settings, testLogger, version);
+            const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
             const tag: string | undefined = await updater.maybeGetNewRelease();
             // NOTE: This will need to be updated each new major stable.

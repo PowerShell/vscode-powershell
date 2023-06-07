@@ -7,7 +7,17 @@ steps:
 
 - pwsh: |
     npm ci --loglevel=error
-    npm run publish -- --packagePath $(Pipeline.Workspace)/vscode-powershell/powershell-*.vsix --pat $(VsceToken)
+    Import-Module $(Build.SourcesDirectory)/tools/VersionTools.psm1
+    $Version = Get-Version -RepositoryName vscode-powershell
+    $PackageVersion = Get-MajorMinorPatch -Version $Version
+    $PublishArgs = @(
+      if (Test-IsPreRelease) { '--pre-release' }
+      '--packagePath'
+      "$(Pipeline.Workspace)/vscode-powershell/powershell-$PackageVersion.vsix"
+      '--pat'
+      '$(VsceToken)'
+    )
+    npm run publish -- @PublishArgs
   displayName: Publishing VSIX to VS Code Marketplace
 
 # NOTE: We rarely update this script, so we can ignore errors from the gallery

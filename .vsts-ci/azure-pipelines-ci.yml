@@ -1,4 +1,11 @@
-name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+name: CI-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
+
+trigger:
+  - main
+pr:
+  paths:
+    exclude:
+    - '**/*.md'
 
 variables:
   # Don't download unneeded packages
