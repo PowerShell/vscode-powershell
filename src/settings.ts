@@ -70,6 +70,11 @@ export enum CommentType {
     LineComment = "LineComment",
 }
 
+export enum StartLocation {
+    Editor = "Editor",
+    Panel = "Panel"
+}
+
 export type PowerShellAdditionalExePathSettings = Record<string, string>;
 
 class CodeFormattingSettings extends PartialSettings {
@@ -129,6 +134,7 @@ class IntegratedConsoleSettings extends PartialSettings {
     useLegacyReadLine = false;
     forceClearScrollbackBuffer = false;
     suppressStartupBanner = false;
+    startLocation = StartLocation.Panel;
 }
 
 class SideBarSettings extends PartialSettings {
