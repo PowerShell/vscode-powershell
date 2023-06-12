@@ -476,7 +476,8 @@ export class SessionManager implements Middleware {
                 || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
             || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
-                || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground)) {
+                || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
+                || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation)) {
 
             this.logger.writeVerbose("Settings changed, prompting to restart...");
             const response = await vscode.window.showInformationMessage(

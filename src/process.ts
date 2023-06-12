@@ -107,6 +107,7 @@ export class PowerShellProcess {
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
             isTransient: true,
             hideFromUser: this.sessionSettings.integratedConsole.startInBackground,
+            location: vscode.TerminalLocation[this.sessionSettings.integratedConsole.startLocation],
         };
 
         // Subscribe a log event for when the terminal closes (this fires for
