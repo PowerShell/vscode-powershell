@@ -76,7 +76,7 @@
   "dependencies": {
     "@vscode/extension-telemetry": "0.6.2",
     "node-fetch": "2.6.11",
-    "semver": "7.5.1",
+    "semver": "7.5.2",
     "uuid": "9.0.0",
     "vscode-languageclient": "8.1.0",
     "vscode-languageserver-protocol": "3.17.3"
