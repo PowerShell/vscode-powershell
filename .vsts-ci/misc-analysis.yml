@@ -1,6 +1,7 @@
 name: Misc-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
-trigger: none
+trigger:
+  - gh-readonly-queue/main/*
 pr:
   paths:
     exclude:

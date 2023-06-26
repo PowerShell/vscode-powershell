@@ -1,7 +1,7 @@
 name: CI-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
 trigger:
-  - main
+  - gh-readonly-queue/main/*
 pr:
   paths:
     exclude:
