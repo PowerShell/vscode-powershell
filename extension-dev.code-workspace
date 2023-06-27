@@ -110,7 +110,7 @@
         "options": {
           "cwd": "${workspaceFolder:Client}"
         },
-        "command": "./build.ps1",
+        "command": "Invoke-Build Build",
         "problemMatcher": [
           "$msCompile",
           "$tsc"
@@ -126,7 +126,7 @@
         "options": {
           "cwd": "${workspaceFolder:Client}"
         },
-        "command": "./build.ps1 -Test",
+        "command": "Invoke-Build Test",
         "problemMatcher": [
           "$msCompile",
           "$tsc"
