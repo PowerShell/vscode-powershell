@@ -108,7 +108,7 @@
     "rewire": "6.0.0",
     "sinon": "15.2.0",
     "source-map-support": "0.5.21",
-    "typescript": "5.1.3"
+    "typescript": "5.1.6"
   },
   "extensionDependencies": [
     "vscode.powershell"
