@@ -716,7 +716,7 @@ describe("Platform module", function () {
                 "Platform details operating system should be Windows");
             assert.strictEqual(
                 platformDetails.isProcess64Bit,
-                process.arch === "x64",
+                process.arch === "x64" || process.arch === "arm64",
                 "Windows process bitness should match process arch");
             assert.strictEqual(
                 platformDetails.isOS64Bit,
