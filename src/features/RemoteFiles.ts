@@ -69,7 +69,7 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
 
             await vscode.window.showTextDocument(doc);
             await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-            return await innerCloseFiles();
+            await innerCloseFiles();
         }
 
         void innerCloseFiles();

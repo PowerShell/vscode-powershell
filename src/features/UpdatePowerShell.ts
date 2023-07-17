@@ -156,7 +156,8 @@ export class UpdatePowerShell {
         try {
             const tag = await this.maybeGetNewRelease();
             if (tag) {
-                return await this.promptToUpdate(tag);
+                await this.promptToUpdate(tag);
+                return;
             }
         } catch (err) {
             // Best effort. This probably failed to fetch the data from GitHub.

@@ -489,8 +489,8 @@ describe("DebugSessionFeature E2E", () => {
 
             const debugStarted = await debug.startDebugging(undefined, launchScriptConfig);
             assert.ok(debugStarted);
-            const debugStopped = await debug.stopDebugging(undefined);
-            assert.ok(debugStopped);
+
+            await debug.stopDebugging(undefined);
 
             assert.ok(startDebugging.calledTwice);
             assert.ok(startDebugging.calledWith(undefined, launchScriptConfig));
@@ -531,11 +531,11 @@ describe("DebugSessionFeature E2E", () => {
             const dotnetDebugSession = await dotnetDebugSessionActive;
             console.log(debug.activeDebugSession);
             console.log(debug.breakpoints);
-            const debugStopped = await debug.stopDebugging(undefined);
+
+            await debug.stopDebugging(undefined);
 
             assert.ok(debugStarted);
             assert.ok(dotnetDebugSession);
-            assert.ok(debugStopped);
         });
     });
 });
