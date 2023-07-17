@@ -567,7 +567,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    window
+                    void window
                         .showQuickPick(
                             ["Cancel"],
                             { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
@@ -692,7 +692,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    window
+                    void window
                         .showQuickPick(
                             ["Cancel"],
                             { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
