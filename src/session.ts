@@ -155,7 +155,8 @@ export class SessionManager implements Middleware {
         case SessionStatus.Starting:
             // A simple lock because this function isn't re-entrant.
             this.logger.writeWarning("Re-entered 'start' so waiting...");
-            return await this.waitWhileStarting();
+            await this.waitWhileStarting();
+            return;
         case SessionStatus.Running:
             // We're started, just return.
             this.logger.writeVerbose("Already started.");

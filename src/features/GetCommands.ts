@@ -34,8 +34,8 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
-                async () => await this.CommandExplorerRefresh()),
-            vscode.commands.registerCommand("PowerShell.InsertCommand", async (item) => await this.InsertCommand(item))
+                async () => { await this.CommandExplorerRefresh(); }),
+            vscode.commands.registerCommand("PowerShell.InsertCommand", async (item) => { await this.InsertCommand(item); })
         ];
         this.commandsExplorerProvider = new CommandsExplorerProvider();
 

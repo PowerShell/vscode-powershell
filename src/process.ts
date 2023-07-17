@@ -114,7 +114,7 @@ export class PowerShellProcess {
         // all terminals and the event itself checks if it's our terminal). This
         // subscription should happen before we create the terminal so if it
         // fails immediately, the event fires.
-        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
+        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => { this.onTerminalClose(terminal); });
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
         this.pid = await this.getPid();
         this.logger.write(`PowerShell process started with PID: ${this.pid}`);

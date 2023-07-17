@@ -203,7 +203,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         this.handlers = [
             this.languageClient.onNotification(
                 ExtensionCommandAddedNotificationType,
-                (command) => this.addExtensionCommand(command)),
+                (command) => { this.addExtensionCommand(command); }),
 
             this.languageClient.onRequest(
                 GetEditorContextRequestType,

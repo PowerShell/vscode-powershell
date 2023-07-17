@@ -68,7 +68,8 @@ function runTestsInner(testsRoot: string): Promise<void> {
                     throw new Error(`${failures} tests failed.`);
                 } else {
                     console.log("\n\n=====\nTest Runner STOP\n=====");
-                    return c();
+                    c();
+                    return;
                 }
             });
         } catch (err) {
