@@ -9,3 +9,9 @@ updates:
   directory: "/"
   schedule:
     interval: weekly
+  groups:
+    ESLint:
+      patterns:
+        - esbuild
+        - eslint
+        - "@typescript-eslint/*"
