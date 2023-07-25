@@ -5,13 +5,13 @@ updates:
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
+  groups:
+    ESLint:
+      patterns:
+        - "esbuild"
+        - "eslint"
+        - "@typescript-eslint/*"
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
     interval: weekly
-  groups:
-    ESLint:
-      patterns:
-        - esbuild
-        - eslint
-        - "@typescript-eslint/*"
