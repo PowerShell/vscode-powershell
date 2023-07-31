@@ -536,7 +536,7 @@ class PossiblePowerShellExe implements IPossiblePowerShellExe {
         public readonly exePath: string,
         public readonly displayName: string,
         private knownToExist?: boolean,
-        public readonly supportsProperArguments: boolean = true) { }
+        public readonly supportsProperArguments = true) { }
 
     public async exists(): Promise<boolean> {
         if (this.knownToExist === undefined) {
