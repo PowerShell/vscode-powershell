@@ -23,6 +23,7 @@ export class Settings extends PartialSettings {
     // This setting is no longer used but is here to assist in cleaning up the users settings.
     powerShellExePath = "";
     promptToUpdatePowerShell = true;
+    suppressAdditionalExeNotFoundWarning = false;
     startAsLoginShell = new StartAsLoginShellSettings();
     startAutomatically = true;
     enableProfileLoading = true;

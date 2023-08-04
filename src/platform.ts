@@ -4,9 +4,10 @@
 import * as os from "os";
 import * as path from "path";
 import * as process from "process";
+import vscode = require("vscode");
 import { integer } from "vscode-languageserver-protocol";
 import { ILogger } from "./logging";
-import { PowerShellAdditionalExePathSettings } from "./settings";
+import { changeSetting, getSettings, PowerShellAdditionalExePathSettings } from "./settings";
 
 // This uses require so we can rewire it in unit tests!
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
@@ -149,8 +150,16 @@ export class PowerShellExeFinder {
         for (const additionalPwsh of this.enumerateAdditionalPowerShellInstallations()) {
             if (await additionalPwsh.exists()) {
                 yield additionalPwsh;
-            } else {
-                void this.logger.writeAndShowWarning(`Additional PowerShell '${additionalPwsh.displayName}' not found at '${additionalPwsh.exePath}'!`);
+            } else if (!additionalPwsh.suppressWarning) {
+                const message = `Additional PowerShell '${additionalPwsh.displayName}' not found at '${additionalPwsh.exePath}'!`;
+                this.logger.writeWarning(message);
+
+                if (!getSettings().suppressAdditionalExeNotFoundWarning) {
+                    const selection = await vscode.window.showWarningMessage(message, "Don't Show Again");
+                    if (selection !== undefined) {
+                        await changeSetting("suppressAdditionalExeNotFoundWarning", true, true, this.logger);
+                    }
+                }
             }
         }
     }
@@ -223,9 +232,39 @@ export class PowerShellExeFinder {
     private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
         for (const versionName in this.additionalPowerShellExes) {
             if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
-                const exePath = this.additionalPowerShellExes[versionName];
-                if (exePath) {
-                    yield new PossiblePowerShellExe(exePath, versionName);
+                let exePath = this.additionalPowerShellExes[versionName];
+                if (!exePath) {
+                    continue;
+                }
+
+                // Remove surrounding quotes from path (without regex)
+                if (exePath.startsWith("'") && exePath.endsWith("'")
+                    || exePath.startsWith("\"") && exePath.endsWith("\"")) {
+                    exePath = exePath.slice(1, -1);
+                }
+
+                // Always search for what the user gave us first
+                yield new PossiblePowerShellExe(exePath, versionName);
+
+                // Also search for `pwsh[.exe]` and `powershell[.exe]` if missing
+                const args: [string, undefined, boolean, boolean]
+                    // Must be a tuple type and is suppressing the warning
+                    = [versionName, undefined, true, true];
+
+                // Handle Windows where '.exe' and 'powershell' are things
+                if (this.platformDetails.operatingSystem === OperatingSystem.Windows) {
+                    if (!exePath.endsWith("pwsh.exe") && !exePath.endsWith("powershell.exe")) {
+                        if (exePath.endsWith("pwsh") || exePath.endsWith("powershell")) {
+                            // Add extension if that was missing
+                            yield new PossiblePowerShellExe(exePath + ".exe", ...args);
+                        }
+                        // Also add full exe names (this isn't an else just in case
+                        // the folder was named "pwsh" or "powershell")
+                        yield new PossiblePowerShellExe(path.join(exePath, "pwsh.exe"), ...args);
+                        yield new PossiblePowerShellExe(path.join(exePath, "powershell.exe"), ...args);
+                    }
+                } else if (!exePath.endsWith("pwsh")) { // Always just 'pwsh' on non-Windows
+                    yield new PossiblePowerShellExe(path.join(exePath, "pwsh"), ...args);
                 }
             }
         }
@@ -529,6 +568,7 @@ export function getWindowsSystemPowerShellPath(systemFolderName: string): string
 
 interface IPossiblePowerShellExe extends IPowerShellExeDetails {
     exists(): Promise<boolean>;
+    readonly suppressWarning: boolean;
 }
 
 class PossiblePowerShellExe implements IPossiblePowerShellExe {
@@ -536,7 +576,8 @@ class PossiblePowerShellExe implements IPossiblePowerShellExe {
         public readonly exePath: string,
         public readonly displayName: string,
         private knownToExist?: boolean,
-        public readonly supportsProperArguments = true) { }
+        public readonly supportsProperArguments = true,
+        public readonly suppressWarning = false) { }
 
     public async exists(): Promise<boolean> {
         if (this.knownToExist === undefined) {
