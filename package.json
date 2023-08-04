@@ -669,6 +669,11 @@
           "markdownDescription": "**Deprecated:** Specifies whether you should be prompted to update your version of `PackageManagement` if it's under 1.4.6.",
           "markdownDeprecationMessage": "**Deprecated:** This prompt has been removed as it's no longer strictly necessary to upgrade the `PackageManagement` module."
         },
+        "powershell.suppressAdditionalExeNotFoundWarning": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Suppresses the warning message when any of `#powershell.powerShellAdditionalExePaths#` is not found."
+        },
         "powershell.startAsLoginShell.osx": {
           "type": "boolean",
           "default": true,
