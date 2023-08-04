@@ -217,7 +217,8 @@ let hasPrompted = false;
 export let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
 
 export async function validateCwdSetting(logger: ILogger): Promise<string> {
-    let cwd: string | undefined = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd");
+    let cwd: string | undefined = utils.stripQuotePair(
+        vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"));
 
     // Only use the cwd setting if it exists.
     if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {

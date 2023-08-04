@@ -232,15 +232,9 @@ export class PowerShellExeFinder {
     private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
         for (const versionName in this.additionalPowerShellExes) {
             if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
-                let exePath = this.additionalPowerShellExes[versionName];
+                const exePath = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);
                 if (!exePath) {
                     continue;
-                }
-
-                // Remove surrounding quotes from path (without regex)
-                if (exePath.startsWith("'") && exePath.endsWith("'")
-                    || exePath.startsWith("\"") && exePath.endsWith("\"")) {
-                    exePath = exePath.slice(1, -1);
                 }
 
                 // Always search for what the user gave us first
