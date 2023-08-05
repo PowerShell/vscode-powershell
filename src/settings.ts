@@ -217,7 +217,7 @@ export async function changeSetting(
 let hasPrompted = false;
 export let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
 
-export async function validateCwdSetting(logger: ILogger): Promise<string> {
+export async function validateCwdSetting(logger: ILogger | undefined): Promise<string> {
     let cwd: string | undefined = utils.stripQuotePair(
         vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"));
 
