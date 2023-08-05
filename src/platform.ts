@@ -8,6 +8,7 @@ import vscode = require("vscode");
 import { integer } from "vscode-languageserver-protocol";
 import { ILogger } from "./logging";
 import { changeSetting, getSettings, PowerShellAdditionalExePathSettings } from "./settings";
+import untildify from "untildify";
 
 // This uses require so we can rewire it in unit tests!
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
@@ -232,10 +233,12 @@ export class PowerShellExeFinder {
     private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
         for (const versionName in this.additionalPowerShellExes) {
             if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
-                const exePath = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);
+                let exePath = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);
                 if (!exePath) {
                     continue;
                 }
+
+                exePath = untildify(exePath);
 
                 // Always search for what the user gave us first
                 yield new PossiblePowerShellExe(exePath, versionName);

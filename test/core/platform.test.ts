@@ -451,6 +451,7 @@ if (process.platform === "win32") {
 
     additionalPowerShellExes = {
         "pwsh": "C:\\Users\\test\\pwsh\\pwsh.exe",
+        "pwsh-tilde": "~\\pwsh\\pwsh.exe",
         "pwsh-no-exe": "C:\\Users\\test\\pwsh\\pwsh",
         "pwsh-folder": "C:\\Users\\test\\pwsh\\",
         "pwsh-folder-no-slash": "C:\\Users\\test\\pwsh",
@@ -466,13 +467,16 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
-            environmentVars: {
-                "USERPROFILE": "C:\\Users\\test",
-            },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "C:\\Users\\test\\pwsh\\pwsh.exe",
                     displayName: "pwsh",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: path.join(os.homedir(), "pwsh", "pwsh.exe"),
+                    displayName: "pwsh-tilde",
                     supportsProperArguments: true
                 },
                 {
@@ -747,6 +751,7 @@ if (process.platform === "win32") {
 
     additionalPowerShellExes = {
         "pwsh": "/home/bin/pwsh",
+        "pwsh-tilde": "~/bin/pwsh",
         "pwsh-folder": "/home/bin/",
         "pwsh-folder-no-slash": "/home/bin",
         "pwsh-single-quotes": "'/home/bin/pwsh'",
@@ -761,13 +766,16 @@ if (process.platform === "win32") {
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
-            environmentVars: {
-                "HOME": "/home/test",
-            },
+            environmentVars: {},
             expectedPowerShellSequence: [
                 {
                     exePath: "/home/bin/pwsh",
                     displayName: "pwsh",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: path.join(os.homedir(), "bin", "pwsh"),
+                    displayName: "pwsh-tilde",
                     supportsProperArguments: true
                 },
                 {
