@@ -77,6 +77,7 @@
     "@vscode/extension-telemetry": "0.8.2",
     "node-fetch": "2.6.12",
     "semver": "7.5.4",
+    "untildify": "4.0.0",
     "uuid": "9.0.0",
     "vscode-languageclient": "8.1.0",
     "vscode-languageserver-protocol": "3.17.3"

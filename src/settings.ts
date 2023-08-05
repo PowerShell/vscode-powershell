@@ -5,6 +5,7 @@ import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");
 import { ILogger } from "./logging";
+import untildify from "untildify";
 
 // TODO: Quite a few of these settings are unused in the client and instead
 // exist just for the server. Those settings do not need to be represented in
@@ -221,8 +222,11 @@ export async function validateCwdSetting(logger: ILogger): Promise<string> {
         vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"));
 
     // Only use the cwd setting if it exists.
-    if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
-        return cwd;
+    if (cwd !== undefined) {
+        cwd = untildify(cwd);
+        if (await utils.checkIfDirectoryExists(cwd)) {
+            return cwd;
+        }
     }
 
     // If there is no workspace, or there is but it has no folders, fallback.
