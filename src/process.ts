@@ -5,7 +5,7 @@ import cp = require("child_process");
 import path = require("path");
 import vscode = require("vscode");
 import { ILogger } from "./logging";
-import Settings = require("./settings");
+import { Settings, validateCwdSetting } from "./settings";
 import utils = require("./utils");
 import { IEditorServicesSessionDetails } from "./session";
 import { promisify } from "util";
@@ -29,7 +29,7 @@ export class PowerShellProcess {
         private logger: ILogger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
-        private sessionSettings: Settings.Settings) {
+        private sessionSettings: Settings) {
 
         this.onExited = this.onExitedEmitter.event;
     }
@@ -103,7 +103,7 @@ export class PowerShellProcess {
             name: this.title,
             shellPath: this.exePath,
             shellArgs: powerShellArgs,
-            cwd: this.sessionSettings.cwd,
+            cwd: await validateCwdSetting(this.logger),
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
             isTransient: true,
             hideFromUser: this.sessionSettings.integratedConsole.startInBackground,

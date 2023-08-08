@@ -37,7 +37,7 @@ export class Settings extends PartialSettings {
     sideBar = new SideBarSettings();
     pester = new PesterSettings();
     buttons = new ButtonSettings();
-    cwd = "";
+    cwd = "";  // NOTE: use validateCwdSetting() instead of this directly!
     enableReferencesCodeLens = true;
     analyzeOpenDocumentsOnly = false;
     // TODO: Add (deprecated) useX86Host (for testing)

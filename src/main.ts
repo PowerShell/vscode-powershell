@@ -26,7 +26,7 @@ import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
-import { LogLevel, getSettings, validateCwdSetting } from "./settings";
+import { LogLevel, getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
@@ -57,8 +57,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
     telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
-    // Load and validate settings (will prompt for 'cwd' if necessary).
-    await validateCwdSetting(logger);
     const settings = getSettings();
     logger.writeVerbose(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
