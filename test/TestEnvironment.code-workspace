@@ -8,6 +8,6 @@
   "settings": {
     "git.openRepositoryInParentFolders": "never",
     "csharp.suppressDotnetRestoreNotification": true,
-    "extensions.ignoreRecommendations": true
+    "extensions.ignoreRecommendations": true,
   }
 }

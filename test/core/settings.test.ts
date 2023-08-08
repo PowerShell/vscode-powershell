@@ -13,9 +13,20 @@ import {
     validateCwdSetting
 } from "../../src/settings";
 import path from "path";
+import { ensureEditorServicesIsConnected } from "../utils";
 
 describe("Settings E2E", function () {
+    async function changeCwdSetting(cwd: string | undefined): Promise<void> {
+        await changeSetting("cwd", cwd, vscode.ConfigurationTarget.Workspace, undefined);
+    }
+
+    async function resetCwdSetting(): Promise<void> {
+        await changeCwdSetting(undefined);
+    }
+
     describe("The 'getSettings' method loads the 'Settings' class", function () {
+        before(resetCwdSetting);
+
         it("Loads without error", function () {
             assert.doesNotThrow(getSettings);
         });
@@ -29,29 +40,30 @@ describe("Settings E2E", function () {
 
     describe("The 'changeSetting' method", function () {
         it("Updates correctly", async function () {
-            await changeSetting("helpCompletion", CommentType.LineComment, false, undefined);
+            await changeSetting("helpCompletion", CommentType.LineComment, vscode.ConfigurationTarget.Workspace, undefined);
             assert.strictEqual(getSettings().helpCompletion, CommentType.LineComment);
         });
     });
 
     describe("The 'getEffectiveConfigurationTarget' method'", function () {
         it("Works for 'Workspace' target", async function () {
-            await changeSetting("helpCompletion", CommentType.LineComment, false, undefined);
+            await changeSetting("helpCompletion", CommentType.LineComment, vscode.ConfigurationTarget.Workspace, undefined);
             const target = getEffectiveConfigurationTarget("helpCompletion");
             assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);
         });
 
         it("Works for 'undefined' target", async function () {
-            await changeSetting("helpCompletion", undefined, false, undefined);
+            await changeSetting("helpCompletion", undefined, vscode.ConfigurationTarget.Workspace, undefined);
             const target = getEffectiveConfigurationTarget("helpCompletion");
             assert.strictEqual(target, undefined);
         });
     });
 
     describe("The CWD setting", function () {
-        beforeEach(async function () {
-            await changeSetting("cwd", undefined, undefined, undefined);
-        });
+        // We're relying on this to be sure that the workspace is loaded.
+        before(ensureEditorServicesIsConnected);
+        before(resetCwdSetting);
+        afterEach(resetCwdSetting);
 
         const workspace = vscode.workspace.workspaceFolders![0].uri.fsPath;
 
@@ -60,20 +72,26 @@ describe("Settings E2E", function () {
         });
 
         it("Uses the default when given a non-existent folder", async function () {
-            await changeSetting("cwd", "/a/totally/fake/folder", undefined, undefined);
+            await changeCwdSetting("/a/totally/fake/folder");
             assert.strictEqual(await validateCwdSetting(undefined), workspace);
         });
 
         it("Uses the given folder when it exists", async function () {
             // A different than default folder that definitely exists
             const cwd = path.resolve(path.join(process.cwd(), ".."));
-            await changeSetting("cwd", cwd, undefined, undefined);
+            await changeCwdSetting(cwd);
             assert.strictEqual(await validateCwdSetting(undefined), cwd);
         });
 
         it("Uses the home folder for ~ (tilde)", async function () {
-            // A different than default folder that definitely exists
-            await changeSetting("cwd", "~", undefined, undefined);
+            await changeCwdSetting("~");
+            assert.strictEqual(await validateCwdSetting(undefined), os.homedir());
+        });
+
+        it("Resolves relative paths", async function () {
+            // A different than default folder that definitely exists and is relative
+            const cwd = path.join("~", "somewhere", "..");
+            await changeCwdSetting(cwd);
             assert.strictEqual(await validateCwdSetting(undefined), os.homedir());
         });
     });
