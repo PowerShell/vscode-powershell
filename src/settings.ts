@@ -6,6 +6,7 @@ import utils = require("./utils");
 import os = require("os");
 import { ILogger } from "./logging";
 import untildify from "untildify";
+import path = require("path");
 
 // TODO: Quite a few of these settings are unused in the client and instead
 // exist just for the server. Those settings do not need to be represented in
@@ -214,47 +215,66 @@ export async function changeSetting(
 }
 
 // We don't want to query the user more than once, so this is idempotent.
-let hasPrompted = false;
-export let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
-
-export async function validateCwdSetting(logger: ILogger | undefined): Promise<string> {
-    let cwd: string | undefined = utils.stripQuotePair(
-        vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"));
-
-    // Only use the cwd setting if it exists.
-    if (cwd !== undefined) {
-        cwd = untildify(cwd);
-        if (await utils.checkIfDirectoryExists(cwd)) {
-            return cwd;
-        }
+let hasChosen = false;
+let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
+export async function getChosenWorkspace(logger: ILogger | undefined): Promise<vscode.WorkspaceFolder | undefined> {
+    if (hasChosen) {
+        return chosenWorkspace;
     }
 
     // If there is no workspace, or there is but it has no folders, fallback.
     if (vscode.workspace.workspaceFolders === undefined
         || vscode.workspace.workspaceFolders.length === 0) {
-        cwd = undefined;
+        chosenWorkspace = undefined;
         // If there is exactly one workspace folder, use that.
     } else if (vscode.workspace.workspaceFolders.length === 1) {
-        cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        chosenWorkspace = vscode.workspace.workspaceFolders[0];
         // If there is more than one workspace folder, prompt the user once.
-    } else if (vscode.workspace.workspaceFolders.length > 1 && !hasPrompted) {
-        hasPrompted = true;
+    } else if (vscode.workspace.workspaceFolders.length > 1) {
         const options: vscode.WorkspaceFolderPickOptions = {
             placeHolder: "Select a workspace folder to use for the PowerShell Extension.",
         };
+
         chosenWorkspace = await vscode.window.showWorkspaceFolderPick(options);
-        cwd = chosenWorkspace?.uri.fsPath;
-        // Save the picked 'cwd' to the workspace settings.
-        // We have to check again because the user may not have picked.
-        if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
-            await changeSetting("cwd", cwd, undefined, logger);
+        logger?.writeVerbose(`User selected workspace: '${chosenWorkspace?.name}'`);
+    }
+
+    // NOTE: We don't rely on checking if `chosenWorkspace` is undefined because
+    // that may be the case if the user dismissed the prompt, and we don't want
+    // to show it again this session.
+    hasChosen = true;
+    return chosenWorkspace;
+}
+
+export async function validateCwdSetting(logger: ILogger | undefined): Promise<string> {
+    let cwd: string | undefined = utils.stripQuotePair(
+        vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"));
+
+    // Use the resolved cwd setting if it exists. We're checking truthiness
+    // because it could be an empty string, in which case we ignore it.
+    if (cwd) {
+        cwd = path.resolve(untildify(cwd));
+        if (await utils.checkIfDirectoryExists(cwd)) {
+            return cwd;
         }
+    }
+
+    // Otherwise get a cwd from the workspace, if possible.
+    const workspace = await getChosenWorkspace(logger);
+    cwd = workspace?.uri.fsPath;
+
+    // Save the picked 'cwd' to the workspace settings.
+    if (cwd && await utils.checkIfDirectoryExists(cwd)) {
+        // TODO: Stop saving this to settings! Instead, save the picked
+        // workspace (or save this, but in a cache).
+        await changeSetting("cwd", cwd, undefined, logger);
     }
 
     // If there were no workspace folders, or somehow they don't exist, use
     // the home directory.
-    if (cwd === undefined || !await utils.checkIfDirectoryExists(cwd)) {
+    if (!cwd || !await utils.checkIfDirectoryExists(cwd)) {
         return os.homedir();
     }
+
     return cwd;
 }

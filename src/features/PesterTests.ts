@@ -5,7 +5,7 @@ import * as path from "path";
 import vscode = require("vscode");
 import { ILogger } from "../logging";
 import { SessionManager } from "../session";
-import { getSettings, chosenWorkspace, validateCwdSetting } from "../settings";
+import { getSettings, getChosenWorkspace } from "../settings";
 import utils = require("../utils");
 
 enum LaunchType {
@@ -132,8 +132,7 @@ export class PesterTestsFeature implements vscode.Disposable {
 
         // Ensure the necessary script exists (for testing). The debugger will
         // start regardless, but we also pass its success along.
-        await validateCwdSetting(this.logger);
         return await utils.checkIfFileExists(this.invokePesterStubScriptPath)
-            && vscode.debug.startDebugging(chosenWorkspace, launchConfig);
+            && vscode.debug.startDebugging(await getChosenWorkspace(this.logger), launchConfig);
     }
 }
