@@ -283,8 +283,7 @@ export class SessionManager implements Middleware {
         this.logger.write("Restarting session...");
         await this.stop();
 
-        // Re-load and validate the settings.
-        await validateCwdSetting(this.logger);
+        // Re-load the settings.
         this.sessionSettings = getSettings();
 
         await this.start(exeNameOverride);
@@ -475,7 +474,7 @@ export class SessionManager implements Middleware {
                 || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
                 || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
                 || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
-            || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
+                || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
                 || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
                 || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation)) {
@@ -644,7 +643,7 @@ export class SessionManager implements Middleware {
             // NOTE: Some settings are only applicable on startup, so we send them during initialization.
             initializationOptions: {
                 enableProfileLoading: this.sessionSettings.enableProfileLoading,
-                initialWorkingDirectory: this.sessionSettings.cwd,
+                initialWorkingDirectory: await validateCwdSetting(this.logger),
                 shellIntegrationEnabled: vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled"),
             },
             errorHandler: {
