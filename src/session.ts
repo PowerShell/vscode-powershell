@@ -469,7 +469,7 @@ export class SessionManager implements Middleware {
         this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
         // Detect any setting changes that would affect the session.
-        if (!this.suppressRestartPrompt &&
+        if (!this.suppressRestartPrompt && this.sessionStatus === SessionStatus.Running &&
             (settings.cwd.toLowerCase() !== this.sessionSettings.cwd.toLowerCase()
                 || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
                 || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
