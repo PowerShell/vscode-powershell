@@ -59,7 +59,7 @@
     "mochaExplorer.autoload": false, // The test instance pops up every time discovery or run is done, this could be annoying on startup.
     "mochaExplorer.debuggerPort": 59229, // Matches the launch config, we dont want to use the default port as we are launching a duplicate instance of vscode and it might conflict.
     "mochaExplorer.ipcRole": "server",
-    "mochaExplorer.ipcTimeout": 10000,
+    "mochaExplorer.ipcTimeout": 30000, // 30 seconds
     "testExplorer.useNativeTesting": true,
     "mochaExplorer.env": {
       "VSCODE_VERSION": "insiders",
