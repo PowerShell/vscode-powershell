@@ -100,8 +100,8 @@ export class Logger implements ILogger {
     public async writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void> {
         this.write(message, ...additionalMessages);
 
-        const selection = await vscode.window.showInformationMessage(message, "Show Logs");
-        if (selection !== undefined) {
+        const selection = await vscode.window.showInformationMessage(message, "Show Logs", "Okay");
+        if (selection === "Show Logs") {
             this.showLogPanel();
         }
     }

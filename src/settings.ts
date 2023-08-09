@@ -240,6 +240,14 @@ export async function getChosenWorkspace(logger: ILogger | undefined): Promise<v
         logger?.writeVerbose(`User selected workspace: '${chosenWorkspace?.name}'`);
         if (chosenWorkspace === undefined) {
             chosenWorkspace = vscode.workspace.workspaceFolders[0];
+        } else {
+            const response = await vscode.window.showInformationMessage(
+                `Would you like to save this choice by setting this workspace's 'powershell.cwd' value to '${chosenWorkspace.name}'?`,
+                "Yes", "No");
+
+            if (response === "Yes") {
+                await changeSetting("cwd", chosenWorkspace.name, vscode.ConfigurationTarget.Workspace, logger);
+            }
         }
     }
 
