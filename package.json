@@ -735,7 +735,7 @@
         "powershell.cwd": {
           "type": "string",
           "default": "",
-          "markdownDescription": "An explicit start path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. **Path must be fully resolved: variables are not supported!**"
+          "markdownDescription": "A path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. Does not support variables, but does support the use of '~' and paths relative to a single workspace. **For multi-root workspaces, use the name of the folder you wish to have as the cwd.**"
         },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
