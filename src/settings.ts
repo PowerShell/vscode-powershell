@@ -236,7 +236,11 @@ export async function getChosenWorkspace(logger: ILogger | undefined): Promise<v
         };
 
         chosenWorkspace = await vscode.window.showWorkspaceFolderPick(options);
+
         logger?.writeVerbose(`User selected workspace: '${chosenWorkspace?.name}'`);
+        if (chosenWorkspace === undefined) {
+            chosenWorkspace = vscode.workspace.workspaceFolders[0];
+        }
     }
 
     // NOTE: We don't rely on checking if `chosenWorkspace` is undefined because
@@ -247,34 +251,55 @@ export async function getChosenWorkspace(logger: ILogger | undefined): Promise<v
 }
 
 export async function validateCwdSetting(logger: ILogger | undefined): Promise<string> {
-    let cwd: string | undefined = utils.stripQuotePair(
-        vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"));
+    let cwd = utils.stripQuotePair(
+        vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"))
+        ?? "";
 
-    // Use the resolved cwd setting if it exists. We're checking truthiness
-    // because it could be an empty string, in which case we ignore it.
-    if (cwd) {
-        cwd = path.resolve(untildify(cwd));
-        if (await utils.checkIfDirectoryExists(cwd)) {
-            return cwd;
+    // Replace ~ with home directory.
+    cwd = untildify(cwd);
+
+    // Use the cwd setting if it's absolute and exists. We don't use or resolve
+    // relative paths here because it'll be relative to the Code process's cwd,
+    // which is not what the user is expecting.
+    if (path.isAbsolute(cwd) && await utils.checkIfDirectoryExists(cwd)) {
+        return cwd;
+    }
+
+    // If the cwd matches the name of a workspace folder, use it. Essentially
+    // "choose" a workspace folder based off the cwd path, and so set the state
+    // appropriately for `getChosenWorkspace`.
+    if (vscode.workspace.workspaceFolders) {
+        for (const workspaceFolder of vscode.workspace.workspaceFolders) {
+            // TODO: With some more work, we could support paths relative to a
+            // workspace folder name too.
+            if (cwd === workspaceFolder.name) {
+                hasChosen = true;
+                chosenWorkspace = workspaceFolder;
+                cwd = "";
+            }
         }
     }
 
     // Otherwise get a cwd from the workspace, if possible.
     const workspace = await getChosenWorkspace(logger);
-    cwd = workspace?.uri.fsPath;
-
-    // Save the picked 'cwd' to the workspace settings.
-    if (cwd && await utils.checkIfDirectoryExists(cwd)) {
-        // TODO: Stop saving this to settings! Instead, save the picked
-        // workspace (or save this, but in a cache).
-        await changeSetting("cwd", cwd, undefined, logger);
-    }
-
-    // If there were no workspace folders, or somehow they don't exist, use
-    // the home directory.
-    if (!cwd || !await utils.checkIfDirectoryExists(cwd)) {
+    if (workspace === undefined) {
+        logger?.writeVerbose("Workspace was undefined, using homedir!");
         return os.homedir();
     }
 
-    return cwd;
+    const workspacePath = workspace.uri.fsPath;
+
+    // Use the chosen workspace's root to resolve the cwd.
+    const relativePath = path.join(workspacePath, cwd);
+    if (await utils.checkIfDirectoryExists(relativePath)) {
+        return relativePath;
+    }
+
+    // Just use the workspace path.
+    if (await utils.checkIfDirectoryExists(workspacePath)) {
+        return workspacePath;
+    }
+
+    // If all else fails, use the home directory.
+    return os.homedir();
 }

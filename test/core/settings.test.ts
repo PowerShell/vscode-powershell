@@ -88,11 +88,18 @@ describe("Settings E2E", function () {
             assert.strictEqual(await validateCwdSetting(undefined), os.homedir());
         });
 
-        it("Resolves relative paths", async function () {
+        it("Accepts relative paths", async function () {
             // A different than default folder that definitely exists and is relative
             const cwd = path.join("~", "somewhere", "..");
+            const expected = path.join(os.homedir(), "somewhere", "..");
             await changeCwdSetting(cwd);
-            assert.strictEqual(await validateCwdSetting(undefined), os.homedir());
+            assert.strictEqual(await validateCwdSetting(undefined), expected);
+        });
+
+        it("Handles relative paths", async function () {
+            await changeCwdSetting("./BinaryModule");
+            const expected = path.join(workspace, "./BinaryModule");
+            assert.strictEqual(await validateCwdSetting(undefined), expected);
         });
     });
 });
