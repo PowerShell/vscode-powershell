@@ -125,12 +125,16 @@ function Test-VersionIsValid {
             if ($SemanticVersion.Major -ne $Date.Year) {
                 throw "Major version should be the current year!"
             }
-            if ($SemanticVersion.Minor -ne $Date.Month) {
-                throw "Minor version should be the current month!"
-            }
             if ($SemanticVersion.PreReleaseLabel) {
                 if ($SemanticVersion.PreReleaseLabel -ne "preview") {
                     throw "Suffix should only be 'preview'!"
+                }
+                if ($SemanticVersion.Minor % 2 -eq 0) {
+                    throw "Minor version must be odd for pre-release!"
+                }
+            } else {
+                if ($SemanticVersion.Minor % 2 -ne 0) {
+                    throw "Minor version must be even for pre-release!"
                 }
             }
         }

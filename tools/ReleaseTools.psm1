@@ -44,7 +44,7 @@ function Get-Bullets {
     )
     begin {
         $SkipThanks = @(
-            'andschwa'
+            'andyleejordan'
             'daxian-dbw'
             'PaulHigin'
             'SeeminglyScience'
