@@ -22,8 +22,6 @@ class PartialSettings { }
 export class Settings extends PartialSettings {
     powerShellAdditionalExePaths: PowerShellAdditionalExePathSettings = {};
     powerShellDefaultVersion = "";
-    // This setting is no longer used but is here to assist in cleaning up the users settings.
-    powerShellExePath = "";
     promptToUpdatePowerShell = true;
     suppressAdditionalExeNotFoundWarning = false;
     startAsLoginShell = new StartAsLoginShellSettings();
