@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import {
@@ -141,6 +140,7 @@ export interface IStatusBarMessageDetails {
     message: string;
     timeout?: number;
 }
+
 interface IInvokeRegisteredEditorCommandParameter {
     commandName: string;
 }
@@ -161,11 +161,8 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
                 async (param: IInvokeRegisteredEditorCommandParameter) => {
-                    if (this.extensionCommands.length === 0) {
-                        return;
-                    }
-
-                    const commandToExecute = this.extensionCommands.find((x) => x.name === param.commandName);
+                    const commandToExecute = this.extensionCommands.find(
+                        (x) => x.name === param.commandName);
 
                     if (commandToExecute) {
                         await this.languageClient?.sendRequest(
@@ -219,7 +216,8 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             this.languageClient.onRequest(
                 NewFileRequestType,
-                // TODO: Shouldn't this use the file path?
+                // NOTE: The VS Code API does not support naming a file as it's
+                // opened, only when it's saved. Hence the argument is not used.
                 (_filePath) => this.newFile()),
 
             this.languageClient.onRequest(
@@ -300,7 +298,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         const selectedCommand = await vscode.window.showQuickPick(
             quickPickItems,
-            { placeHolder: "Select a command" });
+            { placeHolder: "Select a command..." });
         return this.onCommandSelected(selectedCommand, client);
     }
 
@@ -364,15 +362,16 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     }
 
     private async openFile(openFileDetails: IOpenFileDetails): Promise<EditorOperationResponse> {
-        const filePath = await this.normalizeFilePath(openFileDetails.filePath);
+        const filePath = await this.resolveFilePathWithCwd(openFileDetails.filePath);
         const doc = await vscode.workspace.openTextDocument(filePath);
         await vscode.window.showTextDocument(doc, { preview: openFileDetails.preview });
         return EditorOperationResponse.Completed;
     }
 
     private async closeFile(filePath: string): Promise<EditorOperationResponse> {
-        if (this.findTextDocument(await this.normalizeFilePath(filePath))) {
-            const doc = await vscode.workspace.openTextDocument(filePath);
+        filePath = await this.resolveFilePathWithCwd(filePath);
+        const doc = vscode.workspace.textDocuments.find((x) => x.fileName === filePath);
+        if (doc != undefined && !doc.isClosed) {
             await vscode.window.showTextDocument(doc);
             await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         }
@@ -384,7 +383,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
      * @param saveFileDetails the object detailing the path of the file to save and optionally its new path to save to
      */
     private async saveFile(saveFileDetails: ISaveFileDetails): Promise<EditorOperationResponse> {
-        // Try to interpret the filepath as a URI, defaulting to "file://" if we don't succeed
+        // Try to interpret the filePath as a URI, defaulting to "file://" if we don't succeed
         let currentFileUri: vscode.Uri;
         if (saveFileDetails.filePath.startsWith("untitled") || saveFileDetails.filePath.startsWith("file")) {
             currentFileUri = vscode.Uri.parse(saveFileDetails.filePath);
@@ -392,61 +391,46 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             currentFileUri = vscode.Uri.file(saveFileDetails.filePath);
         }
 
-        let newFileAbsolutePath: string;
-        switch (currentFileUri.scheme) {
-        case "file": {
-            // If the file to save can't be found, just complete the request
-            if (!this.findTextDocument(await this.normalizeFilePath(currentFileUri.fsPath))) {
-                void this.logger.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
-                return EditorOperationResponse.Completed;
-            }
+        // If the file to save can't be found, just complete the request
+        const doc = vscode.workspace.textDocuments.find((x) => x.uri === currentFileUri);
+        if (doc === undefined) {
+            void this.logger.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}`);
+            return EditorOperationResponse.Completed;
+        }
 
+        let newFilePath = saveFileDetails.newPath;
+        if (currentFileUri.scheme === "file") {
             // If no newFile is given, just save the current file
-            if (!saveFileDetails.newPath) {
-                const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
+            if (newFilePath === undefined) {
                 if (doc.isDirty) {
                     await doc.save();
                 }
                 return EditorOperationResponse.Completed;
             }
 
-            // Make sure we have an absolute path
-            if (path.isAbsolute(saveFileDetails.newPath)) {
-                newFileAbsolutePath = saveFileDetails.newPath;
-            } else {
-                // If not, interpret the path as relative to the current file
-                newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
+            // Special case where we interpret a path as relative to the current
+            // file, not the CWD!
+            if (!path.isAbsolute(newFilePath)) {
+                newFilePath = path.join(path.dirname(currentFileUri.fsPath), newFilePath);
             }
-            break; }
-
-        case "untitled": {
+        } else if (currentFileUri.scheme === "untitled") {
             // We need a new name to save an untitled file
-            if (!saveFileDetails.newPath) {
-                // TODO: Create a class handle vscode warnings and errors so we can warn easily
-                //       without logging
-                void this.logger.writeAndShowWarning("Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
+            if (newFilePath === undefined) {
+                void this.logger.writeAndShowError("Cannot save untitled file! Try SaveAs(\"path/to/file.ps1\") instead.");
                 return EditorOperationResponse.Completed;
             }
 
-            // Make sure we have an absolute path
-            if (path.isAbsolute(saveFileDetails.newPath)) {
-                newFileAbsolutePath = saveFileDetails.newPath;
-            } else {
-                const cwd = await validateCwdSetting(this.logger);
-                newFileAbsolutePath = path.join(cwd, saveFileDetails.newPath);
-            }
-            break; }
-
-        default: {
+            newFilePath = await this.resolveFilePathWithCwd(newFilePath);
+        } else {
             // Other URI schemes are not supported
             const msg = JSON.stringify(saveFileDetails, undefined, 2);
-            this.logger.writeVerbose(
+            void this.logger.writeAndShowError(
                 `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
-                        `is currently unsupported. Message: '${msg}'`);
-            return EditorOperationResponse.Completed; }
+                `is currently unsupported. Message: '${msg}'`);
+            return EditorOperationResponse.Completed;
         }
 
-        await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
+        await this.saveFileAs(doc, newFilePath);
         return EditorOperationResponse.Completed;
 
     }
@@ -454,72 +438,33 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
     /**
      * Take a document available to vscode at the given URI and save it to the given absolute path
      * @param documentUri the URI of the vscode document to save
-     * @param destinationAbsolutePath the absolute path to save the document contents to
+     * @param filePath the absolute path to save the document contents to
      */
-    private async saveDocumentContentToAbsolutePath(
-        documentUri: vscode.Uri,
-        destinationAbsolutePath: string): Promise<void> {
-        // Retrieve the text out of the current document
-        const oldDocument = await vscode.workspace.openTextDocument(documentUri);
-
-        // Write it to the new document path
+    private async saveFileAs(doc: vscode.TextDocument, filePath: string): Promise<void> {
+        // Write the old document's contents to the new document path
+        const newFileUri = vscode.Uri.file(filePath);
         try {
             await vscode.workspace.fs.writeFile(
-                vscode.Uri.file(destinationAbsolutePath),
-                Buffer.from(oldDocument.getText()));
+                newFileUri,
+                Buffer.from(doc.getText()));
         } catch (err) {
             void this.logger.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
-                `Unable to save file to path '${destinationAbsolutePath}': ${err}`);
+                `Unable to save file to path '${filePath}': ${err}`);
             return;
         }
 
         // Finally open the new document
-        const newFileUri = vscode.Uri.file(destinationAbsolutePath);
         const newFile = await vscode.workspace.openTextDocument(newFileUri);
         await vscode.window.showTextDocument(newFile, { preview: true });
     }
 
-    private async normalizeFilePath(filePath: string): Promise<string> {
-        const cwd = await validateCwdSetting(this.logger);
-        const platform = os.platform();
-        if (platform === "win32") {
-            // Make sure the file path is absolute
-            if (!path.win32.isAbsolute(filePath)) {
-                filePath = path.win32.resolve(cwd, filePath);
-            }
-
-            // Normalize file path case for comparison for Windows
-            return filePath.toLowerCase();
-        } else {
-            // Make sure the file path is absolute
-            if (!path.isAbsolute(filePath)) {
-                filePath = path.resolve(cwd, filePath);
-            }
-
-            // macOS is case-insensitive
-            if (platform === "darwin") {
-                filePath = filePath.toLowerCase();
-            }
-
-            return filePath;
+    // Resolve file path against user's CWD setting
+    private async resolveFilePathWithCwd(filePath: string): Promise<string> {
+        if (!path.isAbsolute(filePath)) {
+            const cwd = await validateCwdSetting(this.logger);
+            return path.resolve(cwd, filePath);
         }
-    }
-
-    private findTextDocument(filePath: string): boolean {
-        // since Windows and macOS are case-insensitive, we need to normalize them differently
-        const canFind = vscode.workspace.textDocuments.find((doc) => {
-            let docPath: string;
-            const platform = os.platform();
-            if (platform === "win32" || platform === "darwin") {
-                // for Windows and macOS paths, they are normalized to be lowercase
-                docPath = doc.fileName.toLowerCase();
-            } else {
-                docPath = doc.fileName;
-            }
-            return docPath === filePath;
-        });
-
-        return canFind != null;
+        return filePath;
     }
 
     private setSelection(details: ISetSelectionRequestArguments): EditorOperationResponse {
