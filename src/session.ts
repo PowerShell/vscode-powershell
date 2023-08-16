@@ -444,10 +444,10 @@ export class SessionManager implements Middleware {
 
         // Detect any setting changes that would affect the session.
         if (!this.suppressRestartPrompt && this.sessionStatus === SessionStatus.Running &&
-            (settings.cwd.toLowerCase() !== this.sessionSettings.cwd.toLowerCase()
-                || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
-                || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
-                || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
+            (settings.cwd !== this.sessionSettings.cwd
+                || settings.powerShellDefaultVersion !== this.sessionSettings.powerShellDefaultVersion
+                || settings.developer.editorServicesLogLevel !== this.sessionSettings.developer.editorServicesLogLevel
+                || settings.developer.bundledModulesPath !== this.sessionSettings.developer.bundledModulesPath
                 || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
                 || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
@@ -872,7 +872,8 @@ Type 'help' to get help.
             prompt: "Open an Issue",
             action: async (): Promise<void> => {
                 await vscode.commands.executeCommand("PowerShell.GenerateBugReport");
-            }}]
+            }
+        }]
         );
     }
 
@@ -883,7 +884,8 @@ Type 'help' to get help.
             action: async (): Promise<void> => {
                 await vscode.env.openExternal(
                     vscode.Uri.parse("https://aka.ms/get-powershell-vscode"));
-            }}]
+            }
+        }]
         );
     }
 
@@ -894,7 +896,8 @@ Type 'help' to get help.
             action: async (): Promise<void> => {
                 await vscode.env.openExternal(
                     vscode.Uri.parse("https://dotnet.microsoft.com/en-us/download/dotnet-framework"));
-            }}]
+            }
+        }]
         );
     }
 
