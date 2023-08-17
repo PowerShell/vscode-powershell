@@ -381,20 +381,29 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
                 startDebugEvent.dispose();
                 this.logger.writeVerbose(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
+
+                // HACK: As of 2023-08-17, there is no vscode debug API to request the C# debugger to detach, so we send it a custom DAP request instead.
                 if (dotnetAttachSession.configuration.name == dotnetAttachConfig.name) {
-                    const stopDebugEvent = debug.onDidTerminateDebugSession(async (terminatedDebugSession) => {
-                        // Makes the event one-time
-                        stopDebugEvent.dispose();
+                    const onTerminateAttachSession = debug.onDidTerminateDebugSession(async parentSession => {
+                        // HACK: Force the "this" on this since we are supplying a "this" to the function via an argument. There probably is a type-safe way to do this, but because we also need a self-reference to the function in order to make it a one-time action, I'm not sure how to do it.
+                        const dotnetAttachSession = this as unknown as DebugSession;
 
-                        this.logger.writeVerbose(`Debugger session stopped: ${terminatedDebugSession.name} (${terminatedDebugSession.id})`);
+                        if (parentSession.parentSession?.id !== dotnetAttachSession.id) {return;}
 
-                        if (terminatedDebugSession === session) {
-                            this.logger.writeVerbose("Terminating dotnet debugger session associated with PowerShell debug session!");
-                            await debug.stopDebugging(dotnetAttachSession);
-                        }
-                    });
-                }
-            });
+                        this.logger.writeVerbose(`Powershell Binary Debug Session Stop Detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id}), detaching dotnet debugger.`);
+
+                        await dotnetAttachSession.customRequest(
+                            "disconnect",
+                            {
+                                restart: false,
+                                terminateDebuggee: false,
+                                suspendDebuggee: false
+                            }
+                        );
+
+                        onTerminateAttachSession.dispose();
+                    }, session);
+                }});
 
             // Start a child debug session to attach the dotnet debugger
             // TODO: Accommodate multi-folder workspaces if the C# code is in a different workspace folder
