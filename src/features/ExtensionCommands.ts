@@ -68,9 +68,11 @@ export const GetEditorContextRequestType =
 export interface IGetEditorContextRequestArguments {
 }
 
+// NOTE: The server at least now expects this response, but it's not used in any
+// way. In the future we could actually communicate an error to the user.
 enum EditorOperationResponse {
-    Unsupported = 0,
     Completed,
+    Failed
 }
 
 export const InsertTextRequestType =
@@ -148,6 +150,7 @@ interface IInvokeRegisteredEditorCommandParameter {
 export class ExtensionCommandsFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
     private handlers: vscode.Disposable[] = [];
+    private statusBarMessages: vscode.Disposable[] = [];
     private extensionCommands: IExtensionCommand[] = [];
 
     constructor(private logger: ILogger) {
@@ -216,9 +219,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
             this.languageClient.onRequest(
                 NewFileRequestType,
-                // NOTE: The VS Code API does not support naming a file as it's
-                // opened, only when it's saved. Hence the argument is not used.
-                (_filePath) => this.newFile()),
+                (_content) => this.newFile(_content)),
 
             this.languageClient.onRequest(
                 OpenFileRequestType,
@@ -266,6 +267,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         }
         for (const handler of this.handlers) {
             handler.dispose();
+        }
+        for (const statusBarMessage of this.statusBarMessages) {
+            statusBarMessage.dispose();
         }
     }
 
@@ -355,27 +359,35 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         };
     }
 
-    private async newFile(): Promise<EditorOperationResponse> {
-        const doc = await vscode.workspace.openTextDocument({ content: "" });
+    private async newFile(content: string): Promise<EditorOperationResponse> {
+        const doc = await vscode.workspace.openTextDocument(
+            { language: "powershell", content: content });
         await vscode.window.showTextDocument(doc);
         return EditorOperationResponse.Completed;
     }
 
     private async openFile(openFileDetails: IOpenFileDetails): Promise<EditorOperationResponse> {
         const filePath = await this.resolveFilePathWithCwd(openFileDetails.filePath);
-        const doc = await vscode.workspace.openTextDocument(filePath);
-        await vscode.window.showTextDocument(doc, { preview: openFileDetails.preview });
+        try {
+            const doc = await vscode.workspace.openTextDocument(filePath);
+            await vscode.window.showTextDocument(doc, { preview: openFileDetails.preview });
+        } catch {
+            void this.logger.writeAndShowWarning(`File to open not found: ${filePath}`);
+            return EditorOperationResponse.Failed;
+        }
         return EditorOperationResponse.Completed;
     }
 
     private async closeFile(filePath: string): Promise<EditorOperationResponse> {
         filePath = await this.resolveFilePathWithCwd(filePath);
-        const doc = vscode.workspace.textDocuments.find((x) => x.fileName === filePath);
+        const doc = vscode.workspace.textDocuments.find((x) => x.uri.fsPath === filePath);
         if (doc != undefined && !doc.isClosed) {
             await vscode.window.showTextDocument(doc);
             await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            return EditorOperationResponse.Completed;
         }
-        return EditorOperationResponse.Completed;
+        void this.logger.writeAndShowWarning(`File to close not found or already closed: ${filePath}`);
+        return EditorOperationResponse.Failed;
     }
 
     /**
@@ -388,17 +400,17 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         if (saveFileDetails.filePath.startsWith("untitled") || saveFileDetails.filePath.startsWith("file")) {
             currentFileUri = vscode.Uri.parse(saveFileDetails.filePath);
         } else {
-            currentFileUri = vscode.Uri.file(saveFileDetails.filePath);
+            const filePath = await this.resolveFilePathWithCwd(saveFileDetails.filePath);
+            currentFileUri = vscode.Uri.file(filePath);
         }
 
-        // If the file to save can't be found, just complete the request
-        const doc = vscode.workspace.textDocuments.find((x) => x.uri === currentFileUri);
+        const doc = vscode.workspace.textDocuments.find((x) => x.uri.fsPath === currentFileUri.fsPath);
         if (doc === undefined) {
-            void this.logger.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}`);
-            return EditorOperationResponse.Completed;
+            void this.logger.writeAndShowWarning(`File to save not found: ${currentFileUri.fsPath}`);
+            return EditorOperationResponse.Failed;
         }
 
-        let newFilePath = saveFileDetails.newPath;
+        let newFilePath = saveFileDetails.newPath ?? undefined; // Otherwise it's null.
         if (currentFileUri.scheme === "file") {
             // If no newFile is given, just save the current file
             if (newFilePath === undefined) {
@@ -416,23 +428,21 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         } else if (currentFileUri.scheme === "untitled") {
             // We need a new name to save an untitled file
             if (newFilePath === undefined) {
-                void this.logger.writeAndShowError("Cannot save untitled file! Try SaveAs(\"path/to/file.ps1\") instead.");
-                return EditorOperationResponse.Completed;
+                void this.logger.writeAndShowWarning("Cannot save untitled file! Try SaveAs(\"path/to/file.ps1\") instead.");
+                return EditorOperationResponse.Failed;
             }
 
             newFilePath = await this.resolveFilePathWithCwd(newFilePath);
         } else {
             // Other URI schemes are not supported
             const msg = JSON.stringify(saveFileDetails, undefined, 2);
-            void this.logger.writeAndShowError(
+            void this.logger.writeAndShowWarning(
                 `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
                 `is currently unsupported. Message: '${msg}'`);
-            return EditorOperationResponse.Completed;
+            return EditorOperationResponse.Failed;
         }
 
-        await this.saveFileAs(doc, newFilePath);
-        return EditorOperationResponse.Completed;
-
+        return await this.saveFileAs(doc, newFilePath);
     }
 
     /**
@@ -440,7 +450,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
      * @param documentUri the URI of the vscode document to save
      * @param filePath the absolute path to save the document contents to
      */
-    private async saveFileAs(doc: vscode.TextDocument, filePath: string): Promise<void> {
+    private async saveFileAs(doc: vscode.TextDocument, filePath: string): Promise<EditorOperationResponse> {
         // Write the old document's contents to the new document path
         const newFileUri = vscode.Uri.file(filePath);
         try {
@@ -450,12 +460,13 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         } catch (err) {
             void this.logger.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
                 `Unable to save file to path '${filePath}': ${err}`);
-            return;
+            return EditorOperationResponse.Failed;
         }
 
         // Finally open the new document
         const newFile = await vscode.workspace.openTextDocument(newFileUri);
         await vscode.window.showTextDocument(newFile, { preview: true });
+        return EditorOperationResponse.Completed;
     }
 
     // Resolve file path against user's CWD setting
@@ -474,9 +485,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                     asCodePosition(details.selectionRange.start)!,
                     asCodePosition(details.selectionRange.end)!),
             ];
+            return EditorOperationResponse.Completed;
         }
-
-        return EditorOperationResponse.Completed;
+        return EditorOperationResponse.Failed;
     }
 
     private showInformationMessage(message: string): EditorOperationResponse {
@@ -496,11 +507,12 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
     private setStatusBarMessage(messageDetails: IStatusBarMessageDetails): EditorOperationResponse {
         if (messageDetails.timeout) {
-            vscode.window.setStatusBarMessage(messageDetails.message, messageDetails.timeout);
+            this.statusBarMessages.push(
+                vscode.window.setStatusBarMessage(messageDetails.message, messageDetails.timeout));
         } else {
-            vscode.window.setStatusBarMessage(messageDetails.message);
+            this.statusBarMessages.push(
+                vscode.window.setStatusBarMessage(messageDetails.message));
         }
-
         return EditorOperationResponse.Completed;
     }
 }
