@@ -24,6 +24,7 @@ import {
     QuickPickOptions,
     DebugConfigurationProviderTriggerKind
 } from "vscode";
+import type { DebugProtocol } from "@vscode/debugprotocol";
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
@@ -403,7 +404,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                             restart: false,
                             terminateDebuggee: false,
                             suspendDebuggee: false
-                        }
+                        } as DebugProtocol.DisconnectArguments
                     );
                 });
             });
