@@ -398,13 +398,20 @@ export class DebugSessionFeature extends LanguageClientConsumer
                     this.logger.writeVerbose(`Debugger session terminated: ${tempConsoleSession.name} (${tempConsoleSession.id})`);
 
                     // HACK: As of 2023-08-17, there is no vscode debug API to request the C# debugger to detach, so we send it a custom DAP request instead.
-                    await dotnetAttachSession.customRequest(
-                        "disconnect",
-                        {
+                    const disconnectRequest: DebugProtocol.DisconnectRequest = {
+                        command: "disconnect",
+                        seq: 0,
+                        type: "request",
+                        arguments: {
                             restart: false,
                             terminateDebuggee: false,
                             suspendDebuggee: false
-                        } as DebugProtocol.DisconnectArguments
+                        }
+                    };
+
+                    await dotnetAttachSession.customRequest(
+                        disconnectRequest.command,
+                        disconnectRequest.arguments
                     );
                 });
             });
