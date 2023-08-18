@@ -375,35 +375,38 @@ export class DebugSessionFeature extends LanguageClientConsumer
             dotnetAttachConfig.processId = pid;
 
             // Ensure the .NET session stops before the PowerShell session so that the .NET debug session doesn't emit an error about the process unexpectedly terminating.
-            const startDebugEvent = debug.onDidStartDebugSession((dotnetAttachSession) => {
+            let tempConsoleDotnetAttachSession: DebugSession;
+            const startDebugEvent = debug.onDidStartDebugSession(dotnetAttachSession => {
+                if (dotnetAttachSession.configuration.name != dotnetAttachConfig.name) {return;}
+
                 // Makes the event one-time
                 // HACK: This seems like you would be calling a method on a variable not assigned yet, but it does work in the flow.
                 // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
                 startDebugEvent.dispose();
+
                 this.logger.writeVerbose(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
 
-                // HACK: As of 2023-08-17, there is no vscode debug API to request the C# debugger to detach, so we send it a custom DAP request instead.
-                if (dotnetAttachSession.configuration.name == dotnetAttachConfig.name) {
-                    const onTerminateAttachSession = debug.onDidTerminateDebugSession(async parentSession => {
-                        // HACK: Force the "this" on this since we are supplying a "this" to the function via an argument. There probably is a type-safe way to do this, but because we also need a self-reference to the function in order to make it a one-time action, I'm not sure how to do it.
-                        const dotnetAttachSession = this as unknown as DebugSession;
+                tempConsoleDotnetAttachSession = dotnetAttachSession;
 
-                        if (parentSession.parentSession?.id !== dotnetAttachSession.id) {return;}
+                const stopDebugEvent = debug.onDidTerminateDebugSession( async tempConsoleSession => {
+                    if (tempConsoleDotnetAttachSession.parentSession?.id !== tempConsoleSession.id) {return;}
 
-                        this.logger.writeVerbose(`Powershell Binary Debug Session Stop Detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id}), detaching dotnet debugger.`);
+                    // Makes the event one-time
+                    stopDebugEvent.dispose();
 
-                        await dotnetAttachSession.customRequest(
-                            "disconnect",
-                            {
-                                restart: false,
-                                terminateDebuggee: false,
-                                suspendDebuggee: false
-                            }
-                        );
+                    this.logger.writeVerbose(`Debugger session terminated: ${tempConsoleSession.name} (${tempConsoleSession.id})`);
 
-                        onTerminateAttachSession.dispose();
-                    }, session);
-                }});
+                    // HACK: As of 2023-08-17, there is no vscode debug API to request the C# debugger to detach, so we send it a custom DAP request instead.
+                    await dotnetAttachSession.customRequest(
+                        "disconnect",
+                        {
+                            restart: false,
+                            terminateDebuggee: false,
+                            suspendDebuggee: false
+                        }
+                    );
+                });
+            });
 
             // Start a child debug session to attach the dotnet debugger
             // TODO: Accommodate multi-folder workspaces if the C# code is in a different workspace folder
