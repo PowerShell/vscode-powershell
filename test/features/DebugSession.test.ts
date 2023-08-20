@@ -428,13 +428,16 @@ describe("DebugSessionFeature", () => {
     });
 });
 
-describe("DebugSessionFeature E2E", () => {
+describe("DebugSessionFeature E2E", function() {
+    // E2E tests can take a while to run since the debugger has to start up and attach
+    this.slow(20000);
     before(async () => {
         // Registers and warms up the debug adapter and the PowerShell Extension Terminal
         await ensureEditorServicesIsConnected();
     });
 
     it("Starts and stops a debugging session", async () => {
+
         // Inspect the debug session via the started events to ensure it is correct
         const startDebugSession = new Promise<DebugSession>((resolve) => {
             const event = debug.onDidStartDebugSession((session) => {
