@@ -409,10 +409,14 @@ export class DebugSessionFeature extends LanguageClientConsumer
                         }
                     };
 
-                    await dotnetAttachSession.customRequest(
-                        disconnectRequest.command,
-                        disconnectRequest.arguments
-                    );
+                    try {
+                        await dotnetAttachSession.customRequest(
+                            disconnectRequest.command,
+                            disconnectRequest.arguments
+                        );
+                    } catch (err) {
+                        this.logger.writeWarning(`Disconnect request to C# debugger failed: ${err}`);
+                    }
                 });
             });
 
