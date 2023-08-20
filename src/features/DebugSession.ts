@@ -415,7 +415,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                             disconnectRequest.arguments
                         );
                     } catch (err) {
-                        this.logger.writeWarning(`Disconnect request to C# debugger failed: ${err}`);
+                        this.logger.writeWarning(`Disconnect request to dotnet debugger failed: ${err}`);
                     }
                 });
             });
