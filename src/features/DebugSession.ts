@@ -378,7 +378,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
             // Ensure the .NET session stops before the PowerShell session so that the .NET debug session doesn't emit an error about the process unexpectedly terminating.
             let tempConsoleDotnetAttachSession: DebugSession;
             const startDebugEvent = debug.onDidStartDebugSession(dotnetAttachSession => {
-                if (dotnetAttachSession.configuration.name != dotnetAttachConfig.name) {return;}
+                if (dotnetAttachSession.configuration.name != dotnetAttachConfig.name) { return; }
 
                 // Makes the event one-time
                 // HACK: This seems like you would be calling a method on a variable not assigned yet, but it does work in the flow.
@@ -389,8 +389,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
                 tempConsoleDotnetAttachSession = dotnetAttachSession;
 
-                const stopDebugEvent = debug.onDidTerminateDebugSession( async tempConsoleSession => {
-                    if (tempConsoleDotnetAttachSession.parentSession?.id !== tempConsoleSession.id) {return;}
+                const stopDebugEvent = debug.onDidTerminateDebugSession(async tempConsoleSession => {
+                    if (tempConsoleDotnetAttachSession.parentSession?.id !== tempConsoleSession.id) { return; }
 
                     // Makes the event one-time
                     stopDebugEvent.dispose();
