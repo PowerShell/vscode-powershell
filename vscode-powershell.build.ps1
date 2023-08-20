@@ -101,7 +101,7 @@ task Build Restore, {
     # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
     # https://github.com/evanw/esbuild/issues/944
     switch ($Configuration) {
-        "Debug" { Invoke-BuildExec { & npm run build -- --sourcemap } }
+        "Debug" { Invoke-BuildExec { & npm run build } }
         "Release" { Invoke-BuildExec { & npm run build -- --minify } }
     }
 }

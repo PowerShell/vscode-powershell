@@ -118,7 +118,7 @@
   "main": "./out/main.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "build": "esbuild ./src/main.ts --outdir=out --bundle --external:vscode --platform=node",
+    "build": "esbuild ./src/main.ts --outdir=out --sourcemap --bundle --external:vscode --platform=node",
     "build-watch": "npm run build -- --watch",
     "build-test": "tsc --incremental",
     "build-test-watch": "npm run build-test -- --watch",
