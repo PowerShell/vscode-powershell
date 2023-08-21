@@ -75,7 +75,7 @@
   ],
   "dependencies": {
     "@vscode/extension-telemetry": "0.8.2",
-    "node-fetch": "2.6.12",
+    "node-fetch": "2.6.13",
     "semver": "7.5.4",
     "untildify": "4.0.0",
     "uuid": "9.0.0",
