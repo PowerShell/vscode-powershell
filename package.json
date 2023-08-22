@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.79.0"
+    "vscode": "^1.79.2"
   },
   "author": "Microsoft Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -74,7 +74,7 @@
     "onWalkthrough:PowerShell"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "0.8.2",
+    "@vscode/extension-telemetry": "0.8.3",
     "node-fetch": "2.6.13",
     "semver": "7.5.4",
     "untildify": "4.0.0",
@@ -92,7 +92,7 @@
     "@types/sinon": "10.0.16",
     "@types/ungap__structured-clone": "0.3.0",
     "@types/uuid": "9.0.2",
-    "@types/vscode": "1.67.0",
+    "@types/vscode": "1.79.0",
     "@typescript-eslint/eslint-plugin": "6.4.1",
     "@typescript-eslint/parser": "6.4.1",
     "@ungap/structured-clone": "1.2.0",
