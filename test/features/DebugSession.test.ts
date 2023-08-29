@@ -428,13 +428,16 @@ describe("DebugSessionFeature", () => {
     });
 });
 
-describe("DebugSessionFeature E2E", () => {
+describe("DebugSessionFeature E2E", function() {
+    // E2E tests can take a while to run since the debugger has to start up and attach
+    this.slow(20000);
     before(async () => {
         // Registers and warms up the debug adapter and the PowerShell Extension Terminal
         await ensureEditorServicesIsConnected();
     });
 
     it("Starts and stops a debugging session", async () => {
+
         // Inspect the debug session via the started events to ensure it is correct
         const startDebugSession = new Promise<DebugSession>((resolve) => {
             const event = debug.onDidStartDebugSession((session) => {
@@ -489,8 +492,8 @@ describe("DebugSessionFeature E2E", () => {
 
             const debugStarted = await debug.startDebugging(undefined, launchScriptConfig);
             assert.ok(debugStarted);
-            const debugStopped = await debug.stopDebugging(undefined);
-            assert.ok(debugStopped);
+
+            await debug.stopDebugging(undefined);
 
             assert.ok(startDebugging.calledTwice);
             assert.ok(startDebugging.calledWith(undefined, launchScriptConfig));
@@ -531,11 +534,11 @@ describe("DebugSessionFeature E2E", () => {
             const dotnetDebugSession = await dotnetDebugSessionActive;
             console.log(debug.activeDebugSession);
             console.log(debug.breakpoints);
-            const debugStopped = await debug.stopDebugging(undefined);
+
+            await debug.stopDebugging(undefined);
 
             assert.ok(debugStarted);
             assert.ok(dotnetDebugSession);
-            assert.ok(debugStopped);
         });
     });
 });

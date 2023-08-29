@@ -147,7 +147,7 @@ export class SessionManager implements Middleware {
 
     // The `exeNameOverride` is used by `restartSession` to override ANY other setting.
     // We've made this function idempotent, so it can used to ensure the session has started.
-    public async start(exeNameOverride?: string): Promise<void> {
+    public async start(): Promise<void> {
         switch (this.sessionStatus) {
         case SessionStatus.NotStarted:
             // Go ahead and start.
@@ -155,7 +155,8 @@ export class SessionManager implements Middleware {
         case SessionStatus.Starting:
             // A simple lock because this function isn't re-entrant.
             this.logger.writeWarning("Re-entered 'start' so waiting...");
-            return await this.waitWhileStarting();
+            await this.waitWhileStarting();
+            return;
         case SessionStatus.Running:
             // We're started, just return.
             this.logger.writeVerbose("Already started.");
@@ -176,20 +177,16 @@ export class SessionManager implements Middleware {
             break;
         }
 
+        // This status needs to be set immediately so the above check works
         this.setSessionStatus("Starting...", SessionStatus.Starting);
+
         this.startCancellationTokenSource = new vscode.CancellationTokenSource();
         const cancellationToken = this.startCancellationTokenSource.token;
-
-        if (exeNameOverride != undefined) {
-            this.logger.writeVerbose(`Starting with executable overriden to: ${exeNameOverride}`);
-            this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
-        }
 
         // Create a folder for the session files.
         await vscode.workspace.fs.createDirectory(this.sessionsFolder);
 
         // Migrate things.
-        await this.promptPowerShellExeSettingsCleanup();
         await this.migrateWhitespaceAroundPipeSetting();
 
         // Find the PowerShell executable to use for the server.
@@ -204,6 +201,8 @@ export class SessionManager implements Middleware {
             return;
         }
 
+        // Refresh the status with the found executable details.
+        this.refreshSessionStatus();
         this.logger.write(`Starting '${this.PowerShellExeDetails.displayName}' at: ${this.PowerShellExeDetails.exePath}`);
 
         // Start the server.
@@ -273,7 +272,6 @@ export class SessionManager implements Middleware {
         this.startCancellationTokenSource?.dispose();
         this.startCancellationTokenSource = undefined;
         this.sessionDetails = undefined;
-        this.versionDetails = undefined;
 
         this.setSessionStatus("Not Started", SessionStatus.NotStarted);
     }
@@ -282,11 +280,19 @@ export class SessionManager implements Middleware {
         this.logger.write("Restarting session...");
         await this.stop();
 
-        // Re-load and validate the settings.
-        await validateCwdSetting(this.logger);
+        // Re-load the settings.
         this.sessionSettings = getSettings();
 
-        await this.start(exeNameOverride);
+        if (exeNameOverride) {
+            // Reset the version and PowerShell details since we're launching a
+            // new executable.
+            this.logger.writeVerbose(`Starting with executable overriden to: ${exeNameOverride}`);
+            this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
+            this.versionDetails = undefined;
+            this.PowerShellExeDetails = undefined;
+        }
+
+        await this.start();
     }
 
     public getSessionDetails(): IEditorServicesSessionDetails | undefined {
@@ -432,51 +438,20 @@ export class SessionManager implements Middleware {
         }
     }
 
-    // TODO: Remove this migration code.
-    private async promptPowerShellExeSettingsCleanup(): Promise<void> {
-        if (this.sessionSettings.powerShellExePath === "") {
-            return;
-        }
-
-        this.logger.writeWarning("Deprecated setting: powerShellExePath");
-        let warningMessage = "The 'powerShell.powerShellExePath' setting is no longer used. ";
-        warningMessage += this.sessionSettings.powerShellDefaultVersion
-            ? "We can automatically remove it for you."
-            : "We can remove it from your settings and prompt you for which PowerShell you want to use.";
-
-        const choice = await vscode.window.showWarningMessage(warningMessage, "Let's do it!");
-
-        if (choice === undefined) {
-            // They hit the 'x' to close the dialog.
-            return;
-        }
-
-        this.suppressRestartPrompt = true;
-        try {
-            await changeSetting("powerShellExePath", undefined, true, this.logger);
-        } finally {
-            this.suppressRestartPrompt = false;
-        }
-
-        // Show the session menu at the end if they don't have a PowerShellDefaultVersion.
-        if (this.sessionSettings.powerShellDefaultVersion === "") {
-            await vscode.commands.executeCommand(this.ShowSessionMenuCommandName);
-        }
-    }
-
     private async onConfigurationUpdated(): Promise<void> {
         const settings = getSettings();
         this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
         // Detect any setting changes that would affect the session.
-        if (!this.suppressRestartPrompt &&
-            (settings.cwd.toLowerCase() !== this.sessionSettings.cwd.toLowerCase()
-                || settings.powerShellDefaultVersion.toLowerCase() !== this.sessionSettings.powerShellDefaultVersion.toLowerCase()
-                || settings.developer.editorServicesLogLevel.toLowerCase() !== this.sessionSettings.developer.editorServicesLogLevel.toLowerCase()
-                || settings.developer.bundledModulesPath.toLowerCase() !== this.sessionSettings.developer.bundledModulesPath.toLowerCase()
-            || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
+        if (!this.suppressRestartPrompt && this.sessionStatus === SessionStatus.Running &&
+            (settings.cwd !== this.sessionSettings.cwd
+                || settings.powerShellDefaultVersion !== this.sessionSettings.powerShellDefaultVersion
+                || settings.developer.editorServicesLogLevel !== this.sessionSettings.developer.editorServicesLogLevel
+                || settings.developer.bundledModulesPath !== this.sessionSettings.developer.bundledModulesPath
+                || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
-                || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground)) {
+                || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
+                || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation)) {
 
             this.logger.writeVerbose("Settings changed, prompting to restart...");
             const response = await vscode.window.showInformationMessage(
@@ -523,7 +498,6 @@ export class SessionManager implements Middleware {
                         break;
                     }
                 }
-
             }
             foundPowerShell = defaultPowerShell ?? await powershellExeFinder.getFirstAvailablePowerShellInstallation();
             if (wantedName !== "" && defaultPowerShell === undefined && foundPowerShell !== undefined) {
@@ -642,7 +616,7 @@ export class SessionManager implements Middleware {
             // NOTE: Some settings are only applicable on startup, so we send them during initialization.
             initializationOptions: {
                 enableProfileLoading: this.sessionSettings.enableProfileLoading,
-                initialWorkingDirectory: this.sessionSettings.cwd,
+                initialWorkingDirectory: await validateCwdSetting(this.logger),
                 shellIntegrationEnabled: vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled"),
             },
             errorHandler: {
@@ -845,9 +819,12 @@ Type 'help' to get help.
             const semver = new SemVer(this.versionDetails.version);
             this.languageStatusItem.text += ` ${semver.major}.${semver.minor}`;
             this.languageStatusItem.detail += ` ${this.versionDetails.commit} (${this.versionDetails.architecture.toLowerCase()})`;
-        } else if (this.PowerShellExeDetails?.displayName) { // In case it didn't start.
+        } else if (this.PowerShellExeDetails?.displayName) { // When it hasn't started yet.
             this.languageStatusItem.text += ` ${this.PowerShellExeDetails.displayName}`;
             this.languageStatusItem.detail += ` at '${this.PowerShellExeDetails.exePath}'`;
+        } else if (this.sessionSettings.powerShellDefaultVersion) { // When it hasn't been found yet.
+            this.languageStatusItem.text += ` ${this.sessionSettings.powerShellDefaultVersion}`;
+            this.languageStatusItem.detail = `Looking for '${this.sessionSettings.powerShellDefaultVersion}'...`;
         }
 
         if (detail) {
@@ -876,6 +853,11 @@ Type 'help' to get help.
         }
     }
 
+    // Refreshes the Language Status Item details with ehe same status.
+    private refreshSessionStatus(): void {
+        this.setSessionStatus("", this.sessionStatus);
+    }
+
     private setSessionRunningStatus(): void {
         this.setSessionStatus("", SessionStatus.Running);
     }
@@ -890,7 +872,8 @@ Type 'help' to get help.
             prompt: "Open an Issue",
             action: async (): Promise<void> => {
                 await vscode.commands.executeCommand("PowerShell.GenerateBugReport");
-            }}]
+            }
+        }]
         );
     }
 
@@ -901,7 +884,8 @@ Type 'help' to get help.
             action: async (): Promise<void> => {
                 await vscode.env.openExternal(
                     vscode.Uri.parse("https://aka.ms/get-powershell-vscode"));
-            }}]
+            }
+        }]
         );
     }
 
@@ -912,7 +896,8 @@ Type 'help' to get help.
             action: async (): Promise<void> => {
                 await vscode.env.openExternal(
                     vscode.Uri.parse("https://dotnet.microsoft.com/en-us/download/dotnet-framework"));
-            }}]
+            }
+        }]
         );
     }
 

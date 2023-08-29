@@ -1,12 +1,12 @@
 {
   "name": "powershell",
   "displayName": "PowerShell",
-  "version": "2023.6.0",
+  "version": "2023.9.1",
   "preview": false,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.67.0"
+    "vscode": "^1.79.2"
   },
   "author": "Microsoft Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -74,9 +74,10 @@
     "onWalkthrough:PowerShell"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "0.6.2",
-    "node-fetch": "2.6.11",
-    "semver": "7.5.1",
+    "@vscode/extension-telemetry": "0.8.4",
+    "node-fetch": "2.7.0",
+    "semver": "7.5.4",
+    "untildify": "4.0.0",
     "uuid": "9.0.0",
     "vscode-languageclient": "8.1.0",
     "vscode-languageserver-protocol": "3.17.3"
@@ -85,30 +86,31 @@
     "@types/mocha": "10.0.1",
     "@types/mock-fs": "4.13.1",
     "@types/node": "16.18.12",
-    "@types/node-fetch": "2.6.3",
+    "@types/node-fetch": "2.6.4",
     "@types/rewire": "2.5.28",
-    "@types/semver": "7.5.0",
-    "@types/sinon": "10.0.15",
+    "@types/semver": "7.5.1",
+    "@types/sinon": "10.0.16",
     "@types/ungap__structured-clone": "0.3.0",
-    "@types/uuid": "9.0.1",
-    "@types/vscode": "1.67.0",
-    "@typescript-eslint/eslint-plugin": "5.59.9",
-    "@typescript-eslint/parser": "5.59.9",
+    "@types/uuid": "9.0.2",
+    "@types/vscode": "1.79.0",
+    "@typescript-eslint/eslint-plugin": "6.5.0",
+    "@typescript-eslint/parser": "6.5.0",
     "@ungap/structured-clone": "1.2.0",
-    "@vscode/test-electron": "2.3.2",
-    "@vscode/vsce": "2.19.0",
-    "esbuild": "0.17.19",
-    "eslint": "8.42.0",
+    "@vscode/debugprotocol": "1.61.0",
+    "@vscode/test-electron": "2.3.4",
+    "@vscode/vsce": "2.20.1",
+    "esbuild": "0.19.2",
+    "eslint": "8.48.0",
     "eslint-plugin-header": "3.1.1",
-    "glob": "10.2.6",
+    "glob": "10.3.3",
     "mocha": "10.2.0",
     "mocha-explorer-launcher-scripts": "0.4.0",
     "mocha-multi-reporters": "1.5.1",
     "mock-fs": "5.2.0",
-    "rewire": "6.0.0",
-    "sinon": "15.1.0",
+    "rewire": "7.0.0",
+    "sinon": "15.2.0",
     "source-map-support": "0.5.21",
-    "typescript": "5.1.3"
+    "typescript": "5.2.2"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -116,7 +118,7 @@
   "main": "./out/main.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "build": "esbuild ./src/main.ts --outdir=out --bundle --external:vscode --platform=node",
+    "build": "esbuild ./src/main.ts --outdir=out --sourcemap --bundle --external:vscode --platform=node",
     "build-watch": "npm run build -- --watch",
     "build-test": "tsc --incremental",
     "build-test-watch": "npm run build-test -- --watch",
@@ -669,6 +671,11 @@
           "markdownDescription": "**Deprecated:** Specifies whether you should be prompted to update your version of `PackageManagement` if it's under 1.4.6.",
           "markdownDeprecationMessage": "**Deprecated:** This prompt has been removed as it's no longer strictly necessary to upgrade the `PackageManagement` module."
         },
+        "powershell.suppressAdditionalExeNotFoundWarning": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Suppresses the warning message when any of `#powershell.powerShellAdditionalExePaths#` is not found."
+        },
         "powershell.startAsLoginShell.osx": {
           "type": "boolean",
           "default": true,
@@ -729,7 +736,7 @@
         "powershell.cwd": {
           "type": "string",
           "default": "",
-          "markdownDescription": "An explicit start path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. **Path must be fully resolved: variables are not supported!**"
+          "markdownDescription": "A path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. Does not support variables, but does support the use of '~' and paths relative to a single workspace. **For multi-root workspaces, use the name of the folder you wish to have as the cwd.**"
         },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
@@ -885,6 +892,19 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Starts the Extension Terminal in the background. **If this is enabled, to access the terminal you must run the [Show Extension Terminal command](command:PowerShell.ShowSessionConsole), and once shown it cannot be put back into the background.** This option completely hides the Extension Terminal from the terminals view. You are probably looking for the `#powershell.integratedConsole.showOnStartup#` option instead."
+        },
+        "powershell.integratedConsole.startLocation": {
+          "type": "string",
+          "default": "Panel",
+          "enum": [
+            "Editor",
+            "Panel"
+          ],
+          "markdownEnumDescriptions": [
+            "Creates the Extension Terminal in Editor area",
+            "Creates the Extension Terminal in Panel area"
+          ],
+          "markdownDescription": "Sets the startup location for Extension Terminal."
         },
         "powershell.integratedConsole.focusConsoleOnExecute": {
           "type": "boolean",

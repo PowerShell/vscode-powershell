@@ -1,7 +1,7 @@
 name: CI-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
 trigger:
-  - main
+  - gh-readonly-queue/main/*
 pr:
   paths:
     exclude:
@@ -32,6 +32,7 @@ jobs:
   - template: templates/ci-general.yml
     parameters:
       pwsh: false
+  continueOnError: true
 
 - job: windows2022pwsh
   displayName: Windows 2022 PowerShell 7
@@ -48,6 +49,7 @@ jobs:
   - template: templates/ci-general.yml
     parameters:
       pwsh: false
+  continueOnError: true
 
 - job: windows2019pwsh
   displayName: Windows 2019 PowerShell 7

@@ -24,6 +24,7 @@ import {
     QuickPickOptions,
     DebugConfigurationProviderTriggerKind
 } from "vscode";
+import type { DebugProtocol } from "@vscode/debugprotocol";
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
@@ -375,25 +376,48 @@ export class DebugSessionFeature extends LanguageClientConsumer
             dotnetAttachConfig.processId = pid;
 
             // Ensure the .NET session stops before the PowerShell session so that the .NET debug session doesn't emit an error about the process unexpectedly terminating.
-            const startDebugEvent = debug.onDidStartDebugSession((dotnetAttachSession) => {
+            let tempConsoleDotnetAttachSession: DebugSession;
+            const startDebugEvent = debug.onDidStartDebugSession(dotnetAttachSession => {
+                if (dotnetAttachSession.configuration.name != dotnetAttachConfig.name) { return; }
+
                 // Makes the event one-time
                 // HACK: This seems like you would be calling a method on a variable not assigned yet, but it does work in the flow.
                 // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
                 startDebugEvent.dispose();
+
                 this.logger.writeVerbose(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
-                if (dotnetAttachSession.configuration.name == dotnetAttachConfig.name) {
-                    const stopDebugEvent = debug.onDidTerminateDebugSession(async (terminatedDebugSession) => {
-                        // Makes the event one-time
-                        stopDebugEvent.dispose();
 
-                        this.logger.writeVerbose(`Debugger session stopped: ${terminatedDebugSession.name} (${terminatedDebugSession.id})`);
+                tempConsoleDotnetAttachSession = dotnetAttachSession;
 
-                        if (terminatedDebugSession === session) {
-                            this.logger.writeVerbose("Terminating dotnet debugger session associated with PowerShell debug session!");
-                            await debug.stopDebugging(dotnetAttachSession);
+                const stopDebugEvent = debug.onDidTerminateDebugSession(async tempConsoleSession => {
+                    if (tempConsoleDotnetAttachSession.parentSession?.id !== tempConsoleSession.id) { return; }
+
+                    // Makes the event one-time
+                    stopDebugEvent.dispose();
+
+                    this.logger.writeVerbose(`Debugger session terminated: ${tempConsoleSession.name} (${tempConsoleSession.id})`);
+
+                    // HACK: As of 2023-08-17, there is no vscode debug API to request the C# debugger to detach, so we send it a custom DAP request instead.
+                    const disconnectRequest: DebugProtocol.DisconnectRequest = {
+                        command: "disconnect",
+                        seq: 0,
+                        type: "request",
+                        arguments: {
+                            restart: false,
+                            terminateDebuggee: false,
+                            suspendDebuggee: false
                         }
-                    });
-                }
+                    };
+
+                    try {
+                        await dotnetAttachSession.customRequest(
+                            disconnectRequest.command,
+                            disconnectRequest.arguments
+                        );
+                    } catch (err) {
+                        this.logger.writeWarning(`Disconnect request to dotnet debugger failed: ${err}`);
+                    }
+                });
             });
 
             // Start a child debug session to attach the dotnet debugger
@@ -567,7 +591,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    window
+                    void window
                         .showQuickPick(
                             ["Cancel"],
                             { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
@@ -692,7 +716,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
                 (resolve, reject) => {
                     this.getLanguageClientResolve = resolve;
 
-                    window
+                    void window
                         .showQuickPick(
                             ["Cancel"],
                             { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },

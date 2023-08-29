@@ -5,6 +5,15 @@ updates:
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
+  groups:
+    ESLint:
+      patterns:
+        - "esbuild"
+        - "eslint"
+        - "@typescript-eslint/*"
+  ignore:
+    - dependency-name: "untildify"
+      versions: ["5.x"]
 - package-ecosystem: github-actions
   directory: "/"
   schedule:

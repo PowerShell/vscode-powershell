@@ -5,7 +5,7 @@ import cp = require("child_process");
 import path = require("path");
 import vscode = require("vscode");
 import { ILogger } from "./logging";
-import Settings = require("./settings");
+import { Settings, validateCwdSetting } from "./settings";
 import utils = require("./utils");
 import { IEditorServicesSessionDetails } from "./session";
 import { promisify } from "util";
@@ -29,7 +29,7 @@ export class PowerShellProcess {
         private logger: ILogger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
-        private sessionSettings: Settings.Settings) {
+        private sessionSettings: Settings) {
 
         this.onExited = this.onExitedEmitter.event;
     }
@@ -103,17 +103,18 @@ export class PowerShellProcess {
             name: this.title,
             shellPath: this.exePath,
             shellArgs: powerShellArgs,
-            cwd: this.sessionSettings.cwd,
+            cwd: await validateCwdSetting(this.logger),
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
             isTransient: true,
             hideFromUser: this.sessionSettings.integratedConsole.startInBackground,
+            location: vscode.TerminalLocation[this.sessionSettings.integratedConsole.startLocation],
         };
 
         // Subscribe a log event for when the terminal closes (this fires for
         // all terminals and the event itself checks if it's our terminal). This
         // subscription should happen before we create the terminal so if it
         // fails immediately, the event fires.
-        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => this.onTerminalClose(terminal));
+        this.consoleCloseSubscription = vscode.window.onDidCloseTerminal((terminal) => { this.onTerminalClose(terminal); });
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
         this.pid = await this.getPid();
         this.logger.write(`PowerShell process started with PID: ${this.pid}`);

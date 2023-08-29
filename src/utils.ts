@@ -11,6 +11,20 @@ export function escapeSingleQuotes(p: string): string {
     return p.replace(new RegExp("'", "g"), "''");
 }
 
+export function stripQuotePair(p: string | undefined): string | undefined {
+    if (p === undefined) {
+        return p;
+    }
+
+    // Remove matching surrounding quotes from p (without regex)
+    if (p.startsWith("'") && p.endsWith("'")
+        || p.startsWith("\"") && p.endsWith("\"")) {
+        return p.slice(1, -1);
+    }
+
+    return p;
+}
+
 export function getPipePath(pipeName: string): string {
     if (os.platform() === "win32") {
         return "\\\\.\\pipe\\" + pipeName;

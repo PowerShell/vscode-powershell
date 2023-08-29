@@ -26,7 +26,7 @@ import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
-import { LogLevel, getSettings, validateCwdSetting } from "./settings";
+import { LogLevel, getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
@@ -34,8 +34,9 @@ import { LanguageClientConsumer } from "./languageClientConsumer";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
 const PackageJSON: any = require("../package.json");
 
-// the application insights key (also known as instrumentation key) used for telemetry.
-const AI_KEY = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
+// The 1DS telemetry key, which is just shared among all Microsoft extensions
+// (and isn't sensitive).
+const TELEMETRY_KEY = "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255";
 
 let languageConfigurationDisposable: vscode.Disposable;
 let logger: Logger;
@@ -54,10 +55,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         .get<string>("editorServicesLogLevel", LogLevel.Normal);
     logger = new Logger(logLevel, context.globalStorageUri);
 
-    telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
+    telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
-    // Load and validate settings (will prompt for 'cwd' if necessary).
-    await validateCwdSetting(logger);
     const settings = getSettings();
     logger.writeVerbose(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 

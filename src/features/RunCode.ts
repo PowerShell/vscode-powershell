@@ -4,7 +4,7 @@
 import vscode = require("vscode");
 import { SessionManager } from "../session";
 import { ILogger } from "../logging";
-import { getSettings, chosenWorkspace, validateCwdSetting } from "../settings";
+import { getSettings, getChosenWorkspace } from "../settings";
 
 enum LaunchType {
     Debug,
@@ -40,9 +40,7 @@ export class RunCodeFeature implements vscode.Disposable {
         // Create or show the interactive console
         // TODO: #367: Check if "newSession" mode is configured
         this.sessionManager.showDebugTerminal(true);
-
-        await validateCwdSetting(this.logger);
-        await vscode.debug.startDebugging(chosenWorkspace, launchConfig);
+        await vscode.debug.startDebugging(await getChosenWorkspace(this.logger), launchConfig);
     }
 }
 

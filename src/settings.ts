@@ -5,6 +5,8 @@ import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");
 import { ILogger } from "./logging";
+import untildify from "untildify";
+import path = require("path");
 
 // TODO: Quite a few of these settings are unused in the client and instead
 // exist just for the server. Those settings do not need to be represented in
@@ -20,9 +22,8 @@ class PartialSettings { }
 export class Settings extends PartialSettings {
     powerShellAdditionalExePaths: PowerShellAdditionalExePathSettings = {};
     powerShellDefaultVersion = "";
-    // This setting is no longer used but is here to assist in cleaning up the users settings.
-    powerShellExePath = "";
     promptToUpdatePowerShell = true;
+    suppressAdditionalExeNotFoundWarning = false;
     startAsLoginShell = new StartAsLoginShellSettings();
     startAutomatically = true;
     enableProfileLoading = true;
@@ -35,7 +36,7 @@ export class Settings extends PartialSettings {
     sideBar = new SideBarSettings();
     pester = new PesterSettings();
     buttons = new ButtonSettings();
-    cwd = "";
+    cwd = "";  // NOTE: use validateCwdSetting() instead of this directly!
     enableReferencesCodeLens = true;
     analyzeOpenDocumentsOnly = false;
     // TODO: Add (deprecated) useX86Host (for testing)
@@ -68,6 +69,11 @@ export enum CommentType {
     Disabled = "Disabled",
     BlockComment = "BlockComment",
     LineComment = "LineComment",
+}
+
+export enum StartLocation {
+    Editor = "Editor",
+    Panel = "Panel"
 }
 
 export type PowerShellAdditionalExePathSettings = Record<string, string>;
@@ -129,6 +135,7 @@ class IntegratedConsoleSettings extends PartialSettings {
     useLegacyReadLine = false;
     forceClearScrollbackBuffer = false;
     suppressStartupBanner = false;
+    startLocation = StartLocation.Panel;
 }
 
 class SideBarSettings extends PartialSettings {
@@ -206,43 +213,99 @@ export async function changeSetting(
 }
 
 // We don't want to query the user more than once, so this is idempotent.
-let hasPrompted = false;
-export let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
-
-export async function validateCwdSetting(logger: ILogger): Promise<string> {
-    let cwd: string | undefined = vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd");
-
-    // Only use the cwd setting if it exists.
-    if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
-        return cwd;
+let hasChosen = false;
+let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
+export async function getChosenWorkspace(logger: ILogger | undefined): Promise<vscode.WorkspaceFolder | undefined> {
+    if (hasChosen) {
+        return chosenWorkspace;
     }
 
     // If there is no workspace, or there is but it has no folders, fallback.
     if (vscode.workspace.workspaceFolders === undefined
         || vscode.workspace.workspaceFolders.length === 0) {
-        cwd = undefined;
+        chosenWorkspace = undefined;
         // If there is exactly one workspace folder, use that.
     } else if (vscode.workspace.workspaceFolders.length === 1) {
-        cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        chosenWorkspace = vscode.workspace.workspaceFolders[0];
         // If there is more than one workspace folder, prompt the user once.
-    } else if (vscode.workspace.workspaceFolders.length > 1 && !hasPrompted) {
-        hasPrompted = true;
+    } else if (vscode.workspace.workspaceFolders.length > 1) {
         const options: vscode.WorkspaceFolderPickOptions = {
             placeHolder: "Select a workspace folder to use for the PowerShell Extension.",
         };
+
         chosenWorkspace = await vscode.window.showWorkspaceFolderPick(options);
-        cwd = chosenWorkspace?.uri.fsPath;
-        // Save the picked 'cwd' to the workspace settings.
-        // We have to check again because the user may not have picked.
-        if (cwd !== undefined && await utils.checkIfDirectoryExists(cwd)) {
-            await changeSetting("cwd", cwd, undefined, logger);
+
+        logger?.writeVerbose(`User selected workspace: '${chosenWorkspace?.name}'`);
+        if (chosenWorkspace === undefined) {
+            chosenWorkspace = vscode.workspace.workspaceFolders[0];
+        } else {
+            const response = await vscode.window.showInformationMessage(
+                `Would you like to save this choice by setting this workspace's 'powershell.cwd' value to '${chosenWorkspace.name}'?`,
+                "Yes", "No");
+
+            if (response === "Yes") {
+                await changeSetting("cwd", chosenWorkspace.name, vscode.ConfigurationTarget.Workspace, logger);
+            }
         }
     }
 
-    // If there were no workspace folders, or somehow they don't exist, use
-    // the home directory.
-    if (cwd === undefined || !await utils.checkIfDirectoryExists(cwd)) {
+    // NOTE: We don't rely on checking if `chosenWorkspace` is undefined because
+    // that may be the case if the user dismissed the prompt, and we don't want
+    // to show it again this session.
+    hasChosen = true;
+    return chosenWorkspace;
+}
+
+export async function validateCwdSetting(logger: ILogger | undefined): Promise<string> {
+    let cwd = utils.stripQuotePair(
+        vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"))
+        ?? "";
+
+    // Replace ~ with home directory.
+    cwd = untildify(cwd);
+
+    // Use the cwd setting if it's absolute and exists. We don't use or resolve
+    // relative paths here because it'll be relative to the Code process's cwd,
+    // which is not what the user is expecting.
+    if (path.isAbsolute(cwd) && await utils.checkIfDirectoryExists(cwd)) {
+        return cwd;
+    }
+
+    // If the cwd matches the name of a workspace folder, use it. Essentially
+    // "choose" a workspace folder based off the cwd path, and so set the state
+    // appropriately for `getChosenWorkspace`.
+    if (vscode.workspace.workspaceFolders) {
+        for (const workspaceFolder of vscode.workspace.workspaceFolders) {
+            // TODO: With some more work, we could support paths relative to a
+            // workspace folder name too.
+            if (cwd === workspaceFolder.name) {
+                hasChosen = true;
+                chosenWorkspace = workspaceFolder;
+                cwd = "";
+            }
+        }
+    }
+
+    // Otherwise get a cwd from the workspace, if possible.
+    const workspace = await getChosenWorkspace(logger);
+    if (workspace === undefined) {
+        logger?.writeVerbose("Workspace was undefined, using homedir!");
         return os.homedir();
     }
-    return cwd;
+
+    const workspacePath = workspace.uri.fsPath;
+
+    // Use the chosen workspace's root to resolve the cwd.
+    const relativePath = path.join(workspacePath, cwd);
+    if (await utils.checkIfDirectoryExists(relativePath)) {
+        return relativePath;
+    }
+
+    // Just use the workspace path.
+    if (await utils.checkIfDirectoryExists(workspacePath)) {
+        return workspacePath;
+    }
+
+    // If all else fails, use the home directory.
+    return os.homedir();
 }
