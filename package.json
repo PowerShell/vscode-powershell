@@ -1,7 +1,7 @@
 {
   "name": "powershell",
   "displayName": "PowerShell",
-  "version": "2023.9.1",
+  "version": "2023.8.0",
   "preview": false,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
