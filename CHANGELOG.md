@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2023.9.2-preview
+### Wednesday, September 13, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ⚡️ 💭 [vscode-powershell #4734](https://github.com/PowerShell/vscode-powershell/pull/4734) - Remove unused telemetry.
+- ✨ 📖 [vscode-powershell #4729](https://github.com/PowerShell/vscode-powershell/pull/4729) - Add note about installing ESLint globally for VS Code extension.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.11.0
+
+- 🐛 💭 [vscode-powershell #4735](https://github.com/PowerShell/PowerShellEditorServices/pull/2066) - Add `None` to `PsesLogLevel` enum.
+- ⚡️ 💭 [PowerShellEditorServices #2065](https://github.com/PowerShell/PowerShellEditorServices/pull/2065) - Remove unused telemetry.
+- 🐛 🔍 [vscode-powershell #3904](https://github.com/PowerShell/PowerShellEditorServices/pull/2064) - Fix debugging script blocks that aren't in files.
+- 🐛 🚂 [vscode-powershell #3971](https://github.com/PowerShell/PowerShellEditorServices/pull/2062) - Import `PSDesiredStateConfiguration` by name.
+
 ## v2023.9.1-preview
 ### Friday, August 25, 2023
 
