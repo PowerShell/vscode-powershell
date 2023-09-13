@@ -11,15 +11,15 @@ export class ExamplesFeature implements vscode.Disposable {
 
     constructor() {
         this.examplesPath = vscode.Uri.file(path.resolve(__dirname, "../examples"));
-        this.command = vscode.commands.registerCommand("PowerShell.OpenExamplesFolder", () => {
-            vscode.commands.executeCommand("vscode.openFolder", this.examplesPath, true);
+        this.command = vscode.commands.registerCommand("PowerShell.OpenExamplesFolder", async () => {
+            await vscode.commands.executeCommand("vscode.openFolder", this.examplesPath, true);
             // Return existence of the path for testing. The `vscode.openFolder`
             // command should do this, but doesn't (yet).
-            return utils.fileExists(this.examplesPath);
+            return utils.checkIfFileExists(this.examplesPath);
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 }

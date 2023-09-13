@@ -1,9 +1,0 @@
-<svg width="19" height="16" xmlns="http://www.w3.org/2000/svg">
-  <line id="LeftBorder"   stroke="#000000" x1="0.5"  y1="0"    x2="0.5"  y2="16"/>
-  <line id="RightBorder"  stroke="#000000" x1="18.5" y1="0"    x2="18.5" y2="16"/>
-  <line id="TopBorder"    stroke="#000000" x1="1"    y1="0.5"  x2="18"   y2="0.5"/>
-  <line id="BottomBorder" stroke="#000000" x1="1"    y1="15.5" x2="18"   y2="15.5"/>
-  <line id="HeaderBorder" stroke="#000000" x1="1"    y1="4.5"  x2="18"   y2="4.5"/>
-  <line id="FakeButton1"  stroke="#000000" x1="13"   y1="1"    x2="13"   y2="4"/>
-  <line id="FakeButton2"  stroke="#000000" x1="16"   y1="1"    x2="16"   y2="4"/>
-</svg>

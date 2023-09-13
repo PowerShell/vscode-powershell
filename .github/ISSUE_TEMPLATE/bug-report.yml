@@ -8,12 +8,13 @@ body:
     options:
     - label: I have written a descriptive issue title.
       required: true
-    - label: I have searched all [issues](https://github.com/PowerShell/vscode-powershell/issues?q=is%3Aissue) to ensure it has not already been reported.
+    - label: I have searched all [_open and closed_ issues](https://github.com/PowerShell/vscode-powershell/issues?q=is%3Aissue) to ensure it has not already been reported.
     - label: I have read the [troubleshooting](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md) guide.
     - label: I am sure this issue is with the _extension itself_ and does not reproduce in a standalone [PowerShell](https://github.com/PowerShell/PowerShell/issues/new/choose) instance.
     - label: I have verified that I am using the latest version of Visual Studio Code and the PowerShell extension.
     - label: If this is a security issue, I have read the [security issue reporting guidance](https://github.com/PowerShell/vscode-powershell/blob/main/SECURITY.md).
 - type: textarea
+  id: summary
   attributes:
     label: Summary
     description: Explain the problem briefly below.
@@ -21,6 +22,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: powershell-version
   attributes:
     label: PowerShell Version
     description: Paste verbatim output from `$PSVersionTable` below. Please double-check that this is the PowerShell version that VS Code is set to use.
@@ -42,6 +44,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: vscode-version
   attributes:
     label: Visual Studio Code Version
     description: Paste verbatim output from `code --version` below.
@@ -55,6 +58,7 @@ body:
   validations:
     required: true
 - type: textarea
+  id: extension-version
   attributes:
     label: Extension Version
     description: Paste verbatim output from `code --list-extensions --show-versions | Select-String powershell` below.
@@ -66,16 +70,19 @@ body:
   validations:
     required: true
 - type: textarea
+  id: steps-to-reproduce
   attributes:
     label: Steps to Reproduce
     description: List of steps, sample code, failing test or link to a project that reproduces the behavior. Make sure you place a stack trace inside a code (```) block to avoid linking unrelated issues.
   validations:
     required: true
 - type: textarea
+  id: visuals
   attributes:
     label: Visuals
     description: Please upload images or animations that can be used to reproduce issues in the area below. Try the [Steps Recorder](https://support.microsoft.com/en-us/windows/record-steps-to-reproduce-a-problem-46582a9b-620f-2e36-00c9-04e25d784e47) on Windows or [Screenshot](https://support.apple.com/en-us/HT208721) on macOS.
 - type: textarea
+  id: logs
   attributes:
     label: Logs
     description: Please upload logs collected by following these [instructions](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md#logs) in the area below. Be careful to scrub sensitive information!

@@ -1,16 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
-import { NotificationType, NotificationType0,
-    Position, Range, RequestType } from "vscode-languageclient";
+import {
+    NotificationType, NotificationType0,
+    Position, Range, RequestType
+} from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { Logger } from "../logging";
-import Settings = require("../settings");
+import { ILogger } from "../logging";
+import { getSettings, validateCwdSetting } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import { DebugConfig, DebugConfigurations } from "./DebugSession";
 
 export interface IExtensionCommand {
     name: string;
@@ -29,8 +30,8 @@ export interface IEditorContext {
     currentFileContent: string;
     currentFileLanguage: string;
     currentFilePath: string;
-    cursorPosition: Position;
-    selectionRange: Range;
+    cursorPosition: Position | undefined | null;
+    selectionRange: Range | undefined | null;
 }
 
 export interface IInvokeExtensionCommandRequestArguments {
@@ -47,45 +48,15 @@ export interface IExtensionCommandAddedNotificationBody {
     displayName: string;
 }
 
-// ---------- Editor Operations ----------
-
 function asRange(value: vscode.Range): Range {
-
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
     return { start: asPosition(value.start), end: asPosition(value.end) };
 }
 
 function asPosition(value: vscode.Position): Position {
-
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
     return { line: value.line, character: value.character };
 }
 
-function asCodeRange(value: Range): vscode.Range {
-
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
-    return new vscode.Range(asCodePosition(value.start), asCodePosition(value.end));
-}
-
 function asCodePosition(value: Position): vscode.Position {
-
-    if (value === undefined) {
-        return undefined;
-    } else if (value === null) {
-        return null;
-    }
     return new vscode.Position(value.line, value.character);
 }
 
@@ -93,13 +64,15 @@ export const GetEditorContextRequestType =
     new RequestType<IGetEditorContextRequestArguments, IEditorContext, void>(
         "editor/getEditorContext");
 
-// tslint:disable-next-line:no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IGetEditorContextRequestArguments {
 }
 
+// NOTE: The server at least now expects this response, but it's not used in any
+// way. In the future we could actually communicate an error to the user.
 enum EditorOperationResponse {
-    Unsupported = 0,
     Completed,
+    Failed
 }
 
 export const InsertTextRequestType =
@@ -158,7 +131,7 @@ export const SetStatusBarMessageRequestType =
         "editor/setStatusBarMessage");
 
 export const ClearTerminalNotificationType =
-        new NotificationType0("editor/clearTerminal");
+    new NotificationType0("editor/clearTerminal");
 
 export interface ISaveFileDetails {
     filePath: string;
@@ -169,151 +142,138 @@ export interface IStatusBarMessageDetails {
     message: string;
     timeout?: number;
 }
+
 interface IInvokeRegisteredEditorCommandParameter {
     commandName: string;
 }
 
 export class ExtensionCommandsFeature extends LanguageClientConsumer {
-
-    private command: vscode.Disposable;
-    private command2: vscode.Disposable;
-    private command3: vscode.Disposable;
-    private command4: vscode.Disposable;
-    private command5: vscode.Disposable;
-    private command6: vscode.Disposable;
-    // TODO: Make a list of commands instead.
+    private commands: vscode.Disposable[];
+    private handlers: vscode.Disposable[] = [];
+    private statusBarMessages: vscode.Disposable[] = [];
     private extensionCommands: IExtensionCommand[] = [];
 
-    constructor(private log: Logger) {
+    constructor(private logger: ILogger) {
         super();
-        this.command = vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", () => {
+        this.commands = [
+            vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", async () => {
+                if (this.languageClient !== undefined) {
+                    await this.showExtensionCommands(this.languageClient);
+                }
+            }),
 
-            const editor = vscode.window.activeTextEditor;
-            let start = editor.selection.start;
-            const end = editor.selection.end;
-            if (editor.selection.isEmpty) {
-                start = new vscode.Position(start.line, 0);
-            }
+            vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
+                async (param: IInvokeRegisteredEditorCommandParameter) => {
+                    const commandToExecute = this.extensionCommands.find(
+                        (x) => x.name === param.commandName);
 
-            this.showExtensionCommands(this.languageClient);
-        });
+                    if (commandToExecute) {
+                        await this.languageClient?.sendRequest(
+                            InvokeExtensionCommandRequestType,
+                            {
+                                name: commandToExecute.name,
+                                context: this.getEditorContext()
+                            });
+                    }
+                }),
 
-        this.command2 = vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
-                                                        (param: IInvokeRegisteredEditorCommandParameter) => {
-            if (this.extensionCommands.length === 0) {
-                return;
-            }
+            vscode.commands.registerCommand("PowerShell.ClosePanel",
+                async () => { await vscode.commands.executeCommand("workbench.action.togglePanel"); }),
 
-            const commandToExecute = this.extensionCommands.find((x) => x.name === param.commandName);
+            vscode.commands.registerCommand("PowerShell.PositionPanelLeft",
+                async () => { await vscode.commands.executeCommand("workbench.action.positionPanelLeft"); }),
 
-            if (commandToExecute) {
-                this.languageClient.sendRequest(
-                    InvokeExtensionCommandRequestType,
-                    { name: commandToExecute.name,
-                    context: this.getEditorContext() });
-            }
-        });
+            vscode.commands.registerCommand("PowerShell.PositionPanelBottom",
+                async () => { await vscode.commands.executeCommand("workbench.action.positionPanelBottom"); }),
 
-        this.command3 = vscode.commands.registerCommand('PowerShell.ClosePanel',
-            () => { vscode.commands.executeCommand('workbench.action.closePanel'); }),
-
-        this.command4 = vscode.commands.registerCommand('PowerShell.PositionPanelLeft',
-            () => { vscode.commands.executeCommand('workbench.action.positionPanelLeft'); }),
-
-        this.command5 = vscode.commands.registerCommand('PowerShell.PositionPanelBottom',
-            () => { vscode.commands.executeCommand('workbench.action.positionPanelBottom'); }),
-
-        this.command6 = vscode.commands.registerCommand('PowerShell.Debug.Start',
-            () => {
-                // TODO: Use a named debug configuration.
-                vscode.debug.startDebugging(undefined, {
-                    name: "PowerShell: Launch Current File",
-                    type: "PowerShell",
-                    request: "launch",
-                    script: "${file}",
-                    cwd: "${file}",
+            vscode.commands.registerCommand("PowerShell.Debug.Start",
+                async () => {
+                    await vscode.debug.startDebugging(undefined, DebugConfigurations[DebugConfig.LaunchCurrentFile]);
                 })
-            })
+        ];
     }
 
-    public setLanguageClient(languageclient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         // Clear the current list of extension commands since they were
         // only relevant to the previous session
         this.extensionCommands = [];
 
-        this.languageClient = languageclient;
-        if (this.languageClient !== undefined) {
+        this.languageClient = languageClient;
+
+        this.handlers = [
             this.languageClient.onNotification(
                 ExtensionCommandAddedNotificationType,
-                (command) => this.addExtensionCommand(command));
+                (command) => { this.addExtensionCommand(command); }),
 
             this.languageClient.onRequest(
                 GetEditorContextRequestType,
-                (details) => this.getEditorContext());
+                (_details) => this.getEditorContext()),
 
             this.languageClient.onRequest(
                 InsertTextRequestType,
-                (details) => this.insertText(details));
+                (details) => this.insertText(details)),
 
             this.languageClient.onRequest(
                 SetSelectionRequestType,
-                (details) => this.setSelection(details));
+                (details) => this.setSelection(details)),
 
             this.languageClient.onRequest(
                 NewFileRequestType,
-                (filePath) => this.newFile());
+                (_content) => this.newFile(_content)),
 
             this.languageClient.onRequest(
                 OpenFileRequestType,
-                (filePath) => this.openFile(filePath));
+                (filePath) => this.openFile(filePath)),
 
             this.languageClient.onRequest(
                 CloseFileRequestType,
-                (filePath) => this.closeFile(filePath));
+                (filePath) => this.closeFile(filePath)),
 
             this.languageClient.onRequest(
                 SaveFileRequestType,
-                (saveFileDetails) => this.saveFile(saveFileDetails));
+                (saveFileDetails) => this.saveFile(saveFileDetails)),
 
             this.languageClient.onRequest(
                 ShowInformationMessageRequestType,
-                (message) => this.showInformationMessage(message));
+                (message) => this.showInformationMessage(message)),
 
             this.languageClient.onRequest(
                 ShowErrorMessageRequestType,
-                (message) => this.showErrorMessage(message));
+                (message) => this.showErrorMessage(message)),
 
             this.languageClient.onRequest(
                 ShowWarningMessageRequestType,
-                (message) => this.showWarningMessage(message));
+                (message) => this.showWarningMessage(message)),
 
             this.languageClient.onRequest(
                 SetStatusBarMessageRequestType,
-                (messageDetails) => this.setStatusBarMessage(messageDetails));
+                (messageDetails) => this.setStatusBarMessage(messageDetails)),
 
             this.languageClient.onNotification(
                 ClearTerminalNotificationType,
                 () => {
                     // We check to see if they have TrueClear on. If not, no-op because the
                     // overriden Clear-Host already calls [System.Console]::Clear()
-                    if (Settings.load().integratedConsole.forceClearScrollbackBuffer) {
-                        vscode.commands.executeCommand("workbench.action.terminal.clear");
+                    if (getSettings().integratedConsole.forceClearScrollbackBuffer) {
+                        void vscode.commands.executeCommand("workbench.action.terminal.clear");
                     }
-                });
+                })
+        ];
+    }
+
+    public dispose(): void {
+        for (const command of this.commands) {
+            command.dispose();
+        }
+        for (const handler of this.handlers) {
+            handler.dispose();
+        }
+        for (const statusBarMessage of this.statusBarMessages) {
+            statusBarMessage.dispose();
         }
     }
 
-    public dispose() {
-        this.command.dispose();
-        this.command2.dispose();
-        this.command3.dispose();
-        this.command4.dispose();
-        this.command5.dispose();
-        this.command6.dispose();
-    }
-
-    private addExtensionCommand(command: IExtensionCommandAddedNotificationBody) {
-
+    private addExtensionCommand(command: IExtensionCommandAddedNotificationBody): void {
         this.extensionCommands.push({
             name: command.name,
             displayName: command.displayName,
@@ -324,13 +284,10 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 a.name.localeCompare(b.name));
     }
 
-    private showExtensionCommands(client: LanguageClient): Thenable<IInvokeExtensionCommandRequestArguments> {
-
+    private async showExtensionCommands(client: LanguageClient): Promise<void> {
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
-            vscode.window.showInformationMessage(
-                "No extension commands have been loaded into the current session.");
-
+            void this.logger.writeAndShowInformation("No extension commands have been loaded into the current session.");
             return;
         }
 
@@ -343,26 +300,27 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 };
             });
 
-        vscode.window
-            .showQuickPick(
-                quickPickItems,
-                { placeHolder: "Select a command" })
-            .then((command) => this.onCommandSelected(command, client));
+        const selectedCommand = await vscode.window.showQuickPick(
+            quickPickItems,
+            { placeHolder: "Select a command..." });
+        return this.onCommandSelected(selectedCommand, client);
     }
 
-    private onCommandSelected(
-        chosenItem: IExtensionCommandQuickPickItem,
-        client: LanguageClient) {
+    private async onCommandSelected(
+        chosenItem: IExtensionCommandQuickPickItem | undefined,
+        client: LanguageClient | undefined): Promise<void> {
 
         if (chosenItem !== undefined) {
-            client.sendRequest(
+            await client?.sendRequest(
                 InvokeExtensionCommandRequestType,
-                { name: chosenItem.command.name,
-                context: this.getEditorContext() });
+                {
+                    name: chosenItem.command.name,
+                    context: this.getEditorContext()
+                });
         }
     }
 
-    private insertText(details: IInsertTextRequestArguments): EditorOperationResponse {
+    private async insertText(details: IInsertTextRequestArguments): Promise<EditorOperationResponse> {
         const edit = new vscode.WorkspaceEdit();
 
         edit.set(
@@ -374,16 +332,20 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                         details.insertRange.start.character,
                         details.insertRange.end.line,
                         details.insertRange.end.character),
-                        details.insertText),
+                    details.insertText),
             ],
         );
 
-        vscode.workspace.applyEdit(edit);
+        await vscode.workspace.applyEdit(edit);
 
         return EditorOperationResponse.Completed;
     }
 
-    private getEditorContext(): IEditorContext {
+    private getEditorContext(): IEditorContext | undefined {
+        if (vscode.window.activeTextEditor === undefined) {
+            return undefined;
+        }
+
         return {
             currentFileContent: vscode.window.activeTextEditor.document.getText(),
             currentFileLanguage: vscode.window.activeTextEditor.document.languageId,
@@ -397,40 +359,35 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         };
     }
 
-    private newFile(): Thenable<EditorOperationResponse> {
-        return vscode.workspace.openTextDocument({ content: ""})
-                     .then((doc) => vscode.window.showTextDocument(doc))
-                     .then((_) => EditorOperationResponse.Completed);
+    private async newFile(content: string): Promise<EditorOperationResponse> {
+        const doc = await vscode.workspace.openTextDocument(
+            { language: "powershell", content: content });
+        await vscode.window.showTextDocument(doc);
+        return EditorOperationResponse.Completed;
     }
 
-    private openFile(openFileDetails: IOpenFileDetails): Thenable<EditorOperationResponse> {
-
-        const filePath = this.normalizeFilePath(openFileDetails.filePath);
-
-        const promise =
-            vscode.workspace.openTextDocument(filePath)
-                .then((doc) => vscode.window.showTextDocument(
-                    doc,
-                    { preview: openFileDetails.preview }))
-                .then((_) => EditorOperationResponse.Completed);
-
-        return promise;
-    }
-
-    private closeFile(filePath: string): Thenable<EditorOperationResponse> {
-
-        let promise: Thenable<EditorOperationResponse>;
-        if (this.findTextDocument(this.normalizeFilePath(filePath))) {
-            promise =
-                vscode.workspace.openTextDocument(filePath)
-                    .then((doc) => vscode.window.showTextDocument(doc))
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
-                    .then((_) => EditorOperationResponse.Completed);
-        } else {
-            promise = Promise.resolve(EditorOperationResponse.Completed);
+    private async openFile(openFileDetails: IOpenFileDetails): Promise<EditorOperationResponse> {
+        const filePath = await this.resolveFilePathWithCwd(openFileDetails.filePath);
+        try {
+            const doc = await vscode.workspace.openTextDocument(filePath);
+            await vscode.window.showTextDocument(doc, { preview: openFileDetails.preview });
+        } catch {
+            void this.logger.writeAndShowWarning(`File to open not found: ${filePath}`);
+            return EditorOperationResponse.Failed;
         }
+        return EditorOperationResponse.Completed;
+    }
 
-        return promise;
+    private async closeFile(filePath: string): Promise<EditorOperationResponse> {
+        filePath = await this.resolveFilePathWithCwd(filePath);
+        const doc = vscode.workspace.textDocuments.find((x) => x.uri.fsPath === filePath);
+        if (doc != undefined && !doc.isClosed) {
+            await vscode.window.showTextDocument(doc);
+            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            return EditorOperationResponse.Completed;
+        }
+        void this.logger.writeAndShowWarning(`File to close not found or already closed: ${filePath}`);
+        return EditorOperationResponse.Failed;
     }
 
     /**
@@ -438,205 +395,124 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
      * @param saveFileDetails the object detailing the path of the file to save and optionally its new path to save to
      */
     private async saveFile(saveFileDetails: ISaveFileDetails): Promise<EditorOperationResponse> {
-        // Try to interpret the filepath as a URI, defaulting to "file://" if we don't succeed
+        // Try to interpret the filePath as a URI, defaulting to "file://" if we don't succeed
         let currentFileUri: vscode.Uri;
         if (saveFileDetails.filePath.startsWith("untitled") || saveFileDetails.filePath.startsWith("file")) {
             currentFileUri = vscode.Uri.parse(saveFileDetails.filePath);
         } else {
-            currentFileUri = vscode.Uri.file(saveFileDetails.filePath);
+            const filePath = await this.resolveFilePathWithCwd(saveFileDetails.filePath);
+            currentFileUri = vscode.Uri.file(filePath);
         }
 
-        let newFileAbsolutePath: string;
-        switch (currentFileUri.scheme) {
-            case "file":
-                // If the file to save can't be found, just complete the request
-                if (!this.findTextDocument(this.normalizeFilePath(currentFileUri.fsPath))) {
-                    this.log.writeAndShowError(`File to save not found: ${currentFileUri.fsPath}.`);
-                    return EditorOperationResponse.Completed;
+        const doc = vscode.workspace.textDocuments.find((x) => x.uri.fsPath === currentFileUri.fsPath);
+        if (doc === undefined) {
+            void this.logger.writeAndShowWarning(`File to save not found: ${currentFileUri.fsPath}`);
+            return EditorOperationResponse.Failed;
+        }
+
+        let newFilePath = saveFileDetails.newPath ?? undefined; // Otherwise it's null.
+        if (currentFileUri.scheme === "file") {
+            // If no newFile is given, just save the current file
+            if (newFilePath === undefined) {
+                if (doc.isDirty) {
+                    await doc.save();
                 }
-
-                // If no newFile is given, just save the current file
-                if (!saveFileDetails.newPath) {
-                    const doc = await vscode.workspace.openTextDocument(currentFileUri.fsPath);
-                    if (doc.isDirty) {
-                        await doc.save();
-                    }
-                    return EditorOperationResponse.Completed;
-                }
-
-                // Make sure we have an absolute path
-                if (path.isAbsolute(saveFileDetails.newPath)) {
-                    newFileAbsolutePath = saveFileDetails.newPath;
-                } else {
-                    // If not, interpret the path as relative to the current file
-                    newFileAbsolutePath = path.join(path.dirname(currentFileUri.fsPath), saveFileDetails.newPath);
-                }
-                break;
-
-            case "untitled":
-                // We need a new name to save an untitled file
-                if (!saveFileDetails.newPath) {
-                    // TODO: Create a class handle vscode warnings and errors so we can warn easily
-                    //       without logging
-                    this.log.writeAndShowWarning(
-                        "Cannot save untitled file. Try SaveAs(\"path/to/file.ps1\") instead.");
-                    return EditorOperationResponse.Completed;
-                }
-
-                // Make sure we have an absolute path
-                if (path.isAbsolute(saveFileDetails.newPath)) {
-                    newFileAbsolutePath = saveFileDetails.newPath;
-                } else {
-                    // In fresh contexts, workspaceFolders is not defined...
-                    if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
-                        this.log.writeAndShowWarning("Cannot save file to relative path: no workspaces are open. " +
-                            "Try saving to an absolute path, or open a workspace.");
-                        return EditorOperationResponse.Completed;
-                    }
-
-                    // If not, interpret the path as relative to the workspace root
-                    const workspaceRootUri = vscode.workspace.workspaceFolders[0].uri;
-                    // We don't support saving to a non-file URI-schemed workspace
-                    if (workspaceRootUri.scheme !== "file") {
-                        this.log.writeAndShowWarning(
-                            "Cannot save untitled file to a relative path in an untitled workspace. " +
-                            "Try saving to an absolute path or opening a workspace folder.");
-                        return EditorOperationResponse.Completed;
-                    }
-                    newFileAbsolutePath = path.join(workspaceRootUri.fsPath, saveFileDetails.newPath);
-                }
-                break;
-
-            default:
-                // Other URI schemes are not supported
-                const msg = JSON.stringify(saveFileDetails);
-                this.log.writeVerbose(
-                    `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
-                    `is currently unsupported. Message: '${msg}'`);
                 return EditorOperationResponse.Completed;
+            }
+
+            // Special case where we interpret a path as relative to the current
+            // file, not the CWD!
+            if (!path.isAbsolute(newFilePath)) {
+                newFilePath = path.join(path.dirname(currentFileUri.fsPath), newFilePath);
+            }
+        } else if (currentFileUri.scheme === "untitled") {
+            // We need a new name to save an untitled file
+            if (newFilePath === undefined) {
+                void this.logger.writeAndShowWarning("Cannot save untitled file! Try SaveAs(\"path/to/file.ps1\") instead.");
+                return EditorOperationResponse.Failed;
+            }
+
+            newFilePath = await this.resolveFilePathWithCwd(newFilePath);
+        } else {
+            // Other URI schemes are not supported
+            const msg = JSON.stringify(saveFileDetails, undefined, 2);
+            void this.logger.writeAndShowWarning(
+                `<${ExtensionCommandsFeature.name}>: Saving a document with scheme '${currentFileUri.scheme}' ` +
+                `is currently unsupported. Message: '${msg}'`);
+            return EditorOperationResponse.Failed;
         }
 
-        await this.saveDocumentContentToAbsolutePath(currentFileUri, newFileAbsolutePath);
-        return EditorOperationResponse.Completed;
-
+        return await this.saveFileAs(doc, newFilePath);
     }
 
     /**
      * Take a document available to vscode at the given URI and save it to the given absolute path
      * @param documentUri the URI of the vscode document to save
-     * @param destinationAbsolutePath the absolute path to save the document contents to
+     * @param filePath the absolute path to save the document contents to
      */
-    private async saveDocumentContentToAbsolutePath(
-        documentUri: vscode.Uri,
-        destinationAbsolutePath: string): Promise<void> {
-            // Retrieve the text out of the current document
-            const oldDocument = await vscode.workspace.openTextDocument(documentUri);
-
-            // Write it to the new document path
-            try {
-                // TODO: Change this to be asyncronous
-                await new Promise<void>((resolve, reject) => {
-                    fs.writeFile(destinationAbsolutePath, oldDocument.getText(), (err) => {
-                        if (err) {
-                            return reject(err);
-                        }
-                        return resolve();
-                    });
-                });
-            } catch (e) {
-                this.log.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
-                    `Unable to save file to path '${destinationAbsolutePath}': ${e}`);
-                return;
-            }
-
-            // Finally open the new document
-            const newFileUri = vscode.Uri.file(destinationAbsolutePath);
-            const newFile = await vscode.workspace.openTextDocument(newFileUri);
-            vscode.window.showTextDocument(newFile, { preview: true });
-    }
-
-    private normalizeFilePath(filePath: string): string {
-        const platform = os.platform();
-        if (platform === "win32") {
-            // Make sure the file path is absolute
-            if (!path.win32.isAbsolute(filePath)) {
-                filePath = path.win32.resolve(
-                    vscode.workspace.rootPath,
-                    filePath);
-            }
-
-            // Normalize file path case for comparison for Windows
-            return filePath.toLowerCase();
-        } else {
-            // Make sure the file path is absolute
-            if (!path.isAbsolute(filePath)) {
-                filePath = path.resolve(
-                    vscode.workspace.rootPath,
-                    filePath);
-            }
-
-            // macOS is case-insensitive
-            if (platform === "darwin") {
-                filePath = filePath.toLowerCase();
-            }
-
-            return  filePath;
+    private async saveFileAs(doc: vscode.TextDocument, filePath: string): Promise<EditorOperationResponse> {
+        // Write the old document's contents to the new document path
+        const newFileUri = vscode.Uri.file(filePath);
+        try {
+            await vscode.workspace.fs.writeFile(
+                newFileUri,
+                Buffer.from(doc.getText()));
+        } catch (err) {
+            void this.logger.writeAndShowWarning(`<${ExtensionCommandsFeature.name}>: ` +
+                `Unable to save file to path '${filePath}': ${err}`);
+            return EditorOperationResponse.Failed;
         }
-    }
 
-    private findTextDocument(filePath: string): boolean {
-        // since Windows and macOS are case-insensitive, we need to normalize them differently
-        const canFind = vscode.workspace.textDocuments.find((doc) => {
-            let docPath;
-            const platform = os.platform();
-            if (platform === "win32" || platform === "darwin") {
-                // for Windows and macOS paths, they are normalized to be lowercase
-                docPath = doc.fileName.toLowerCase();
-            } else {
-                docPath = doc.fileName;
-            }
-            return docPath === filePath;
-        });
-
-        return canFind != null;
-    }
-
-    private setSelection(details: ISetSelectionRequestArguments): EditorOperationResponse {
-        vscode.window.activeTextEditor.selections = [
-            new vscode.Selection(
-                asCodePosition(details.selectionRange.start),
-                asCodePosition(details.selectionRange.end)),
-        ];
-
+        // Finally open the new document
+        const newFile = await vscode.workspace.openTextDocument(newFileUri);
+        await vscode.window.showTextDocument(newFile, { preview: true });
         return EditorOperationResponse.Completed;
     }
 
-    private showInformationMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-                     .showInformationMessage(message)
-                     .then((_) => EditorOperationResponse.Completed);
+    // Resolve file path against user's CWD setting
+    private async resolveFilePathWithCwd(filePath: string): Promise<string> {
+        if (!path.isAbsolute(filePath)) {
+            const cwd = await validateCwdSetting(this.logger);
+            return path.resolve(cwd, filePath);
+        }
+        return filePath;
     }
 
-    private showErrorMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-                     .showErrorMessage(message)
-                     .then((_) => EditorOperationResponse.Completed);
+    private setSelection(details: ISetSelectionRequestArguments): EditorOperationResponse {
+        if (vscode.window.activeTextEditor !== undefined) {
+            vscode.window.activeTextEditor.selections = [
+                new vscode.Selection(
+                    asCodePosition(details.selectionRange.start)!,
+                    asCodePosition(details.selectionRange.end)!),
+            ];
+            return EditorOperationResponse.Completed;
+        }
+        return EditorOperationResponse.Failed;
     }
 
-    private showWarningMessage(message: string): Thenable<EditorOperationResponse> {
-        return vscode.window
-                     .showWarningMessage(message)
-                     .then((_) => EditorOperationResponse.Completed);
+    private showInformationMessage(message: string): EditorOperationResponse {
+        void this.logger.writeAndShowInformation(message);
+        return EditorOperationResponse.Completed;
+    }
+
+    private showErrorMessage(message: string): EditorOperationResponse {
+        void this.logger.writeAndShowError(message);
+        return EditorOperationResponse.Completed;
+    }
+
+    private showWarningMessage(message: string): EditorOperationResponse {
+        void this.logger.writeAndShowWarning(message);
+        return EditorOperationResponse.Completed;
     }
 
     private setStatusBarMessage(messageDetails: IStatusBarMessageDetails): EditorOperationResponse {
-
         if (messageDetails.timeout) {
-            vscode.window.setStatusBarMessage(messageDetails.message, messageDetails.timeout);
+            this.statusBarMessages.push(
+                vscode.window.setStatusBarMessage(messageDetails.message, messageDetails.timeout));
         } else {
-            vscode.window.setStatusBarMessage(messageDetails.message);
+            this.statusBarMessages.push(
+                vscode.window.setStatusBarMessage(messageDetails.message));
         }
-
         return EditorOperationResponse.Completed;
     }
 }

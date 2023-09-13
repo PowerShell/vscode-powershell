@@ -2,12 +2,9 @@
 
 ## Development Setup
 
-You'll need to clone two repositories and set up your development environment
-to before you can proceed.
+1. [Fork and clone][fork] the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell).
 
-1. [Fork and clone][fork] the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell)
-
-2. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices)
+2. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices).
    > The `vscode-powershell` folder and the `PowerShellEditorServices` folder should be next to each other on the file
    > system. Code in `vscode-powershell` looks for PSES at `../PowerShellEditorServices` if you're building locally so
    > PSES must be in that location.
@@ -15,12 +12,13 @@ to before you can proceed.
 3. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
    PowerShell Editor Services. **You will need to complete this step before proceeding**.
 
-4. Install the latest [Visual Studio Code Insiders release](https://code.visualstudio.com/insiders)
-   > You can also use the [standard Visual Studio Code release](https://code.visualstudio.com/). Both will work, but
-   > using VSCode Insiders means the extension can be developed ready for new features and changes in the next VSCode
-   > release.
+4. Install [Node.js](https://nodejs.org/en/) 16.x or higher.
 
-5. Install [Node.js](https://nodejs.org/en/) 10.x or higher.
+5. Install [Visual Studio Code](https://code.visualstudio.com).
+   Open the multi-root workspace file in this repo, `extension-dev.code-workspace`.
+   > This has a set of recommended extensions to install and provides tasks.
+   > The ESLint formatter will require you to install ESLint globally, using `npm install -g eslint`.
+   > Otherwise VS Code will erroneously complain that it isn't able to use it to format TypeScript files.
 
 [fork]: https://help.github.com/articles/fork-a-repo/
 
@@ -28,9 +26,7 @@ to before you can proceed.
 
 #### From Visual Studio Code
 
-> Press <kbd>Ctrl</kbd>+<kbd>P</kbd> and type `task build`
-
-This will compile the TypeScript files in the project to JavaScript files.
+Press <kbd>Ctrl+P</kbd> and type `task build`. Explore the other provided tasks for helpful commands.
 
 #### From a PowerShell prompt
 
@@ -38,23 +34,13 @@ This will compile the TypeScript files in the project to JavaScript files.
 Invoke-Build Build
 ```
 
-As a developer, you may want to use `Invoke-Build LinkEditorServices` to setup a symbolic
-link to its modules instead of copying the files. This will mean the built extension will
-always have the latest version of your PowerShell Editor Services build, but this cannot
-be used to package the extension into a VSIX. So it is a manual step.
+Explore the `vscode-powershell.build.ps1` file for other build targets.
 
 ### Launching the extension
 
-#### From Visual Studio Code
-
-> To debug the extension, press <kbd>F5</kbd>.  To run the extension without debugging, press
-> <kbd>Ctrl</kbd>+<kbd>F5</kbd> or <kbd>Cmd</kbd>+<kbd>F5</kbd> on macOS.
-
-#### From a command prompt
-
-```cmd
-code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
-```
+To debug the extension use one of the provided `Launch Extension` debug configurations (remember to rebuild first).
+You can simultaneously use the `Attach to Editor Services` configuration to attach the .NET debugger to the PowerShell process running the server.
+Try the `powershell.developer.editorServicesWaitForDebugger` setting to attach before startup.
 
 ## Contributing Snippets
 
@@ -70,15 +56,23 @@ Microsoft. The comments are manual steps.
 
 ```powershell
 Import-Module ./tools/ReleaseTools.psm1
-New-Release -PsesVersion <version> -VsceVersion <version>
+New-ReleaseBundle -PsesVersion <version> -VsceVersion <version>
 # Amend changelog as necessary
 # Push release branches to ADO
-# Permit both pipelines to draft GitHub releases
 # Download and test assets
 # Check telemetry for stability before releasing
 # Publish draft releases and merge (don't squash!) branches
 # Permit vscode-extension pipeline to publish to marketplace
 ```
+
+If rolling from pre-release to release, use:
+
+```powershell
+New-Release -RepositoryName vscode-powershell -Version <version>
+```
+
+This is because we do not change the version of PowerShell Editor Services between a
+pre-release and the subsequent release, so we only need to release the extension.
 
 ### Versioning
 
@@ -92,44 +86,56 @@ mark any specific release, that is the point of the tags.
 For PowerShellEditor Services, we simply follow semantic versioning, e.g.
 `vX.Y.Z`. We do not release previews frequently because this dependency is not
 generally used directly: it's a library consumed by other projects which
-themselves use preview releases for beta testing.
+themselves use pre-releases for beta testing.
 
-For the VS Code PowerShell Extension, our version follows `vYYYY.M.X`, that is:
-current year, current month, and patch version (not day). This is not semantic
-versioning because of issues with how the VS Code marketplace and extension
-hosting API itself uses our version number. This scheme _does not_ mean we
-release on a chronological schedule: we release based on completed work. If the
-month has changed over since the last release, the patch version resets to 0.
-Each subsequent release that month increments the patch version.
+For the VS Code PowerShell Extension, our version follows `vYYYY.X.Z`, that is: current
+year, minor version, and patch version. This is not semantic versioning because of issues
+with how the VS Code marketplace and extension hosting API itself uses our version number.
+We do not release on a chronological schedule: we release based on completed work. For
+historical reasons we are stuck with the major version being year.
 
-Before releasing a "stable" release we should almost always first release a
-"preview" of the same code. The exception to this is "hotfix" releases where we
-need to push _only_ bug fixes out as soon as possible, and these should be built
-off the last release's codebase (found from the Git tag). The preview release is
-uploaded separately to the marketplace as the "PowerShell Preview" extension. It
-should not significantly diverge from the stable release ("PowerShell"
-extension), but is used for public beta testing. The preview version should
-match the upcoming stable version, but with `-preview` appended.  When multiple
-previews are needed, the patch version is incremented, and the last preview's
-version is used for the stable release. (So the stable version may jump a few
-patch versions in between releases.)
+Before releasing a stable version (a _release_) we should almost always first release a
+preview of the same code, which is a _pre-release_. The exception to this is hotfix
+releases where we need to push _only_ bug fixes out as soon as possible, and these should
+be built off the last release's codebase (found from the Git tag). The pre-release is
+uploaded to the marketplace using the `--pre-release` flag given to `vsce` (the CLI tool
+used to do so). The previous separate "PowerShell Preview" extension has been deprecated
+in favor of using the marketplace's support for [pre-releases][] on the one-and-only
+extension.
 
-For example, the date is May 7, 2022. The last release was in April, and its
-version was `v2022.4.3`. Some significant work has been completed and we want to
-release the extension. First we create a preview release with version
-`v2022.5.0-preview` (the patch reset to 0 because the month changed, and
-`-preview` was appended). After publishing, some issues were identified and we
-decided we needed a second preview release. Its version is `v2022.5.1-preview`.
-User feedback indicates that preview is working well, so to create a stable
-release we use the same code (but with an updated changelog etc.) and use
-version `v2022.5.1`, the _first_ stable release for May (as `v2022.5.0` was
-skipped due to those identified issues in the preview). All of these releases
-may consume the same or different version of PowerShell Editor Services, say
-`v3.2.4`. It may update between preview versions or stable versions (but should
-not change between a preview and its associated stable release, as they should
-use the same code which includes dependencies).
+Because the marketplace does not actually understand Semantic Versioning pre-release tags
+(the `-preview` suffix), the patch numbers need to increment continuously, but we append
+`-preview` to _our_ version in the changelog and Git tags. When multiple pre-releases are
+needed, the patch version is incremented (again because the marketplace ignores the
+pre-release tag, we can't do `-alpha`, `-beta` etc.). The `preview` field in
+the extension's manifest (the `package.json` file) is _always_ `false`, even for
+pre-releases, because the marketplace takes the information from the latest release
+inclusive of pre-releases, hence it was causing the one-and-only extension to look like it
+was in preview. This is also why the icon no longer changes to the PowerShell Preview icon
+for pre-releases. When they support pre-releases better (ideally that means supporting the
+pre-release tags in full) we can revisit this.
 
-### Pending Improvements
+Furthermore, for releases, the minor version must be _even_ (like 0, 2, etc.) and for
+pre-releases it must be _odd_ (like 1, 3, etc.), and an upcoming release's version must be
+`n-1` of the pre-release which previews it. That is, release `v2024.0.0` is previewed in
+the pre-release `v2024.1.0`. This scheme is designed such that the "newest" (by version)
+release is always a pre-release, so that the VS Code marketplace _always_ shows a
+pre-release option. When we previously did this the other way around (incrementing the
+release as `n+1` to the pre-release), every time we released, the pre-release option
+(dropdown) in the marketplace would unfortunately disappear.
 
-* `Update-Changelog` should verify the version is in the correct format
-* `Update-Changelog` could be faster by not downloading _every_ PR
+[pre-releases]: https://code.visualstudio.com/api/working-with-extensions/publishing-extension#prerelease-extensions
+
+For example, the date is August 23, 2023. The last release was in June, and its version
+was `v2023.6.0`. Some significant work has been completed and we want to release the
+extension, so the next release will be `v2023.8.0` (the minor version is `n+2` because it
+must remain even, it only coincidentally matches the month). That means first we create a
+pre-release with version `v2023.9.0-preview` (the minor version is `n+1` of the upcoming
+release, and `-preview` was appended). After publishing, some issues were identified and
+we decided we needed a second pre-release. Its version is `v2023.9.1-preview`. User
+feedback hopefully indicates that the pre-release is working well, so to create a release
+we will use the same code (but with an updated changelog etc.) and use version
+`v2023.8.0`, the _next_ release since `v2023.6.0`. The version of PowerShell Editor
+Services may update between pre-releases or releases, but must not change between a
+pre-release and its subsequent release, as they should use the same code (which includes
+dependencies).

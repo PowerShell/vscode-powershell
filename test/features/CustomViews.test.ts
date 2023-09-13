@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
-import fs = require("fs");
 import path = require("path");
 import rewire = require("rewire");
 import vscode = require("vscode");
@@ -106,20 +105,20 @@ hello
     ];
 
     for (const testCase of testCases) {
-        it(`Correctly creates an HtmlContentView ${testCase.name}`, function () {
+        it(`Correctly creates an HtmlContentView ${testCase.name}`, async function () {
             const htmlContentView = new HtmlContentView();
 
-            const jsPaths = testCase.javaScriptFiles.map((jsFile) => {
-                const jsPath: string = path.join(__dirname, jsFile.fileName);
-                fs.writeFileSync(jsPath, jsFile.content);
-                return vscode.Uri.file(jsPath).toString();
-            });
+            const jsPaths = await Promise.all(testCase.javaScriptFiles.map(async (jsFile) => {
+                const jsPath: vscode.Uri = vscode.Uri.file(path.join(__dirname, jsFile.fileName));
+                await vscode.workspace.fs.writeFile(jsPath, Buffer.from(jsFile.content));
+                return jsPath.toString();
+            }));
 
-            const cssPaths = testCase.cssFiles.map((cssFile) => {
-                const cssPath: string = path.join(__dirname, cssFile.fileName);
-                fs.writeFileSync(cssPath, cssFile.content);
-                return vscode.Uri.file(cssPath).toString();
-            });
+            const cssPaths = await Promise.all(testCase.cssFiles.map(async (cssFile) => {
+                const cssPath: vscode.Uri = vscode.Uri.file(path.join(__dirname, cssFile.fileName));
+                await vscode.workspace.fs.writeFile(cssPath, Buffer.from(cssFile.content));
+                return cssPath.toString();
+            }));
 
             htmlContentView.htmlContent = {
                 bodyContent: testCase.htmlContent,
@@ -129,8 +128,12 @@ hello
             try {
                 assert.strictEqual(htmlContentView.getContent(), testCase.expectedHtmlString);
             } finally {
-                jsPaths.forEach((jsPath) => fs.unlinkSync(vscode.Uri.parse(jsPath).fsPath));
-                cssPaths.forEach((cssPath) => fs.unlinkSync(vscode.Uri.parse(cssPath).fsPath));
+                for (const jsPath of jsPaths) {
+                    await vscode.workspace.fs.delete(vscode.Uri.parse(jsPath));
+                }
+                for (const cssPath of cssPaths) {
+                    await vscode.workspace.fs.delete(vscode.Uri.parse(cssPath));
+                }
             }
         });
     }

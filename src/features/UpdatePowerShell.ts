@@ -1,88 +1,27 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { spawn } from "child_process";
-import * as fs from "fs";
-import fetch, { RequestInit } from "node-fetch";
-import * as os from "os";
-import * as path from "path";
-import * as semver from "semver";
-import * as stream from "stream";
-import * as util from "util";
-import { MessageItem, ProgressLocation, window } from "vscode";
+import fetch from "node-fetch";
+import { SemVer } from "semver";
+import vscode = require("vscode");
 
-import { LanguageClient } from "vscode-languageclient/node";
-import { SessionManager } from "../session";
-import * as Settings from "../settings";
-import { isMacOS, isWindows } from "../utils";
-import { EvaluateRequestType } from "./Console";
+import { ILogger } from "../logging";
+import { IPowerShellVersionDetails } from "../session";
+import { changeSetting, Settings } from "../settings";
 
-const streamPipeline = util.promisify(stream.pipeline);
-
-const PowerShellGitHubReleasesUrl =
-        "https://api.github.com/repos/PowerShell/PowerShell/releases/latest";
-const PowerShellGitHubPrereleasesUrl =
-    "https://api.github.com/repos/PowerShell/PowerShell/releases";
-
-export class GitHubReleaseInformation {
-    public static async FetchLatestRelease(preview: boolean): Promise<GitHubReleaseInformation> {
-        const requestConfig: RequestInit = {};
-
-        // For CI. This prevents GitHub from rate limiting us.
-        if (process.env.PS_TEST_GITHUB_API_USERNAME && process.env.PS_TEST_GITHUB_API_PAT) {
-            const authHeaderValue = Buffer
-                .from(`${process.env.PS_TEST_GITHUB_API_USERNAME}:${process.env.PS_TEST_GITHUB_API_PAT}`)
-                .toString("base64");
-            requestConfig.headers = {
-                Authorization: `Basic ${authHeaderValue}`,
-            };
-        }
-
-        // Fetch the latest PowerShell releases from GitHub.
-        const response = await fetch(
-            preview ? PowerShellGitHubPrereleasesUrl : PowerShellGitHubReleasesUrl,
-            requestConfig);
-
-        if (!response.ok) {
-            const json = await response.json();
-            throw new Error(json.message || json || "response was not ok.");
-        }
-
-        // For preview, we grab all the releases and then grab the first prerelease.
-        const releaseJson = preview
-            ? (await response.json()).find((release: any) => release.prerelease)
-            : await response.json();
-
-        return new GitHubReleaseInformation(
-            releaseJson.tag_name, releaseJson.assets);
-    }
-
-    public version: semver.SemVer;
-    public isPreview: boolean = false;
-    public assets: any[];
-
-    public constructor(version: string | semver.SemVer, assets: any[] = []) {
-        this.version = semver.parse(version);
-
-        if (semver.prerelease(this.version)) {
-            this.isPreview = true;
-        }
-
-        this.assets = assets;
-    }
-}
-
-interface IUpdateMessageItem extends MessageItem {
+interface IUpdateMessageItem extends vscode.MessageItem {
     id: number;
 }
 
-export async function InvokePowerShellUpdateCheck(
-    sessionManager: SessionManager,
-    languageServerClient: LanguageClient,
-    localVersion: semver.SemVer,
-    arch: string,
-    release: GitHubReleaseInformation) {
-    const options: IUpdateMessageItem[] = [
+// This attempts to mirror PowerShell's `UpdatesNotification.cs` logic as much as
+// possibly, documented at:
+// https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_update_notifications
+export class UpdatePowerShell {
+    private static LTSBuildInfoURL = "https://aka.ms/pwsh-buildinfo-lts";
+    private static StableBuildInfoURL = "https://aka.ms/pwsh-buildinfo-stable";
+    private static PreviewBuildInfoURL = "https://aka.ms/pwsh-buildinfo-preview";
+    private static GitHubWebReleaseURL = "https://github.com/PowerShell/PowerShell/releases/tag/";
+    private static promptOptions: IUpdateMessageItem[] = [
         {
             id: 0,
             title: "Yes",
@@ -96,97 +35,172 @@ export async function InvokePowerShellUpdateCheck(
             title: "Don't Show Again",
         },
     ];
+    private localVersion: SemVer;
 
-    // If our local version is up-to-date, we can return early.
-    if (semver.compare(localVersion, release.version) >= 0) {
-        return;
+    constructor(
+        private sessionSettings: Settings,
+        private logger: ILogger,
+        versionDetails: IPowerShellVersionDetails) {
+        // We use the commit field as it's like
+        // '7.3.0-preview.3-508-g07175ae0ff8eb7306fe0b0fc7d...' which translates
+        // to SemVer. The version handler in PSES handles Windows PowerShell and
+        // just returns the first three fields like '5.1.22621'.
+        this.localVersion = new SemVer(versionDetails.commit);
     }
 
-    const commonText: string = `You have an old version of PowerShell (${
-        localVersion.raw
-    }). The current latest release is ${
-        release.version.raw
-    }.`;
+    private shouldCheckForUpdate(): boolean {
+        // Respect user setting.
+        if (!this.sessionSettings.promptToUpdatePowerShell) {
+            this.logger.writeVerbose("Setting 'promptToUpdatePowerShell' was false.");
+            return false;
+        }
 
-    if (process.platform === "linux") {
-        await window.showInformationMessage(
-            `${commonText} We recommend updating to the latest version.`);
-        return;
-    }
+        // Respect environment configuration.
+        if (process.env.POWERSHELL_UPDATECHECK?.toLowerCase() === "off") {
+            this.logger.writeVerbose("Environment variable 'POWERSHELL_UPDATECHECK' was 'Off'.");
+            return false;
+        }
 
-    const result = await window.showInformationMessage(
-        `${commonText} Would you like to update the version? ${
-            isMacOS ? "(Homebrew is required on macOS)"
-                : "(This will close ALL pwsh terminals running in this Visual Studio Code session)"
-        }`, ...options);
+        // Skip prompting when using Windows PowerShell for now.
+        if (this.localVersion.compare("6.0.0") === -1) {
+            // TODO: Maybe we should announce PowerShell Core?
+            this.logger.writeVerbose("Not prompting to update Windows PowerShell.");
+            return false;
+        }
 
-    // If the user cancels the notification.
-    if (!result) { return; }
+        if (this.localVersion.prerelease.length > 1) {
+            // Daily builds look like '7.3.0-daily20221206.1' which split to
+            // ['daily20221206', '1'] and development builds look like
+            // '7.3.0-preview.3-508-g07175...' which splits to ['preview',
+            // '3-508-g0717...']. The ellipsis is hiding a 40 char hash.
+            const daily = this.localVersion.prerelease[0].toString();
+            const commit = this.localVersion.prerelease[1].toString();
 
-    // Yes choice.
-    switch (result.id) {
-        // Yes choice.
-        case 0:
-            if (isWindows) {
-                const msiMatcher = arch === "x86" ?
-                    "win-x86.msi" : "win-x64.msi";
-
-                const asset = release.assets.filter((a: any) => a.name.indexOf(msiMatcher) >= 0)[0];
-                const msiDownloadPath = path.join(os.tmpdir(), asset.name);
-
-                const res = await fetch(asset.browser_download_url);
-                if (!res.ok) {
-                    throw new Error("unable to fetch MSI");
-                }
-
-                await window.withProgress({
-                    title: "Downloading PowerShell Installer...",
-                    location: ProgressLocation.Notification,
-                    cancellable: false,
-                },
-                async () => {
-                    // Streams the body of the request to a file.
-                    await streamPipeline(res.body, fs.createWriteStream(msiDownloadPath));
-                });
-
-                // Stop the Integrated Console session because Windows likes to hold on to files.
-                sessionManager.stop();
-
-                // Close all terminals with the name "pwsh" in the current VS Code session.
-                // This will encourage folks to not close the instance of VS Code that spawned
-                // the MSI process.
-                for (const terminal of window.terminals) {
-                    if (terminal.name === "pwsh") {
-                        terminal.dispose();
-                    }
-                }
-
-                // Invoke the MSI via cmd.
-                const msi = spawn("msiexec", ["/i", msiDownloadPath]);
-
-                msi.on("close", (code) => {
-                    // Now that the MSI is finished, start the Integrated Console session.
-                    sessionManager.start();
-                    fs.unlinkSync(msiDownloadPath);
-                });
-
-            } else if (isMacOS) {
-                const script = release.isPreview
-                    ? "brew upgrade --cask powershell-preview"
-                    : "brew upgrade --cask powershell";
-
-                await languageServerClient.sendRequest(EvaluateRequestType, {
-                    expression: script,
-                });
+            // Skip if PowerShell is self-built, that is, this contains a commit hash.
+            if (commit.length >= 40) {
+                this.logger.writeVerbose("Not prompting to update development build.");
+                return false;
             }
 
-            break;
+            // Skip if preview is a daily build.
+            if (daily.toLowerCase().startsWith("daily")) {
+                this.logger.writeVerbose("Not prompting to update daily build.");
+                return false;
+            }
+        }
 
-        // Never choice.
+        // TODO: Check if network is available?
+        // TODO: Only check once a week.
+        return true;
+    }
+
+    private async getRemoteVersion(url: string): Promise<string | undefined> {
+        const response = await fetch(url);
+        if (!response.ok) {
+            return undefined;
+        }
+        // Looks like:
+        // {
+        //     "ReleaseDate": "2022-10-20T22:01:38Z",
+        //     "BlobName": "v7-2-7",
+        //     "ReleaseTag": "v7.2.7"
+        // }
+        const data = await response.json();
+        this.logger.writeVerbose(`Received from '${url}':\n${JSON.stringify(data, undefined, 2)}`);
+        return data.ReleaseTag;
+    }
+
+    private async maybeGetNewRelease(): Promise<string | undefined> {
+        if (!this.shouldCheckForUpdate()) {
+            return undefined;
+        }
+
+        this.logger.writeVerbose("Checking for PowerShell update...");
+        const tags: string[] = [];
+        if (process.env.POWERSHELL_UPDATECHECK?.toLowerCase() === "lts") {
+            // Only check for update to LTS.
+            this.logger.writeVerbose("Checking for LTS update...");
+            const tag = await this.getRemoteVersion(UpdatePowerShell.LTSBuildInfoURL);
+            if (tag != undefined) {
+                tags.push(tag);
+            }
+        } else {
+            // Check for update to stable.
+            this.logger.writeVerbose("Checking for stable update...");
+            const tag = await this.getRemoteVersion(UpdatePowerShell.StableBuildInfoURL);
+            if (tag != undefined) {
+                tags.push(tag);
+            }
+
+            // Also check for a preview update.
+            if (this.localVersion.prerelease.length > 0) {
+                this.logger.writeVerbose("Checking for preview update...");
+                const tag = await this.getRemoteVersion(UpdatePowerShell.PreviewBuildInfoURL);
+                if (tag != undefined) {
+                    tags.push(tag);
+                }
+            }
+        }
+
+        for (const tag of tags) {
+            if (this.localVersion.compare(tag) === -1) {
+                return tag;
+            }
+        }
+
+        this.logger.write("PowerShell is up-to-date.");
+        return undefined;
+    }
+
+    public async checkForUpdate(): Promise<void> {
+        try {
+            const tag = await this.maybeGetNewRelease();
+            if (tag) {
+                await this.promptToUpdate(tag);
+                return;
+            }
+        } catch (err) {
+            // Best effort. This probably failed to fetch the data from GitHub.
+            this.logger.writeWarning(err instanceof Error ? err.message : "unknown");
+        }
+    }
+
+    private async openReleaseInBrowser(tag: string): Promise<void> {
+        const url = vscode.Uri.parse(UpdatePowerShell.GitHubWebReleaseURL + tag);
+        await vscode.env.openExternal(url);
+    }
+
+    private async promptToUpdate(tag: string): Promise<void> {
+        const releaseVersion = new SemVer(tag);
+        this.logger.write(`Prompting to update PowerShell v${this.localVersion.version} to v${releaseVersion.version}.`);
+        const result = await vscode.window.showInformationMessage(
+            `PowerShell v${this.localVersion.version} is out-of-date.
+             The latest version is v${releaseVersion.version}.
+             Would you like to open the GitHub release in your browser?`,
+            ...UpdatePowerShell.promptOptions);
+
+        // If the user cancels the notification.
+        if (!result) {
+            this.logger.writeVerbose("User canceled PowerShell update prompt.");
+            return;
+        }
+
+        this.logger.writeVerbose(`User said '${UpdatePowerShell.promptOptions[result.id].title}'.`);
+
+        switch (result.id) {
+        // Yes
+        case 0:
+            await this.openReleaseInBrowser(tag);
+            break;
+            // Not Now
+        case 1:
+            break;
+            // Don't Show Again
         case 2:
-            await Settings.change("promptToUpdatePowerShell", false, true);
+            await changeSetting("promptToUpdatePowerShell", false, true, this.logger);
             break;
         default:
             break;
+        }
     }
 }

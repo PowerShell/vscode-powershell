@@ -1,23 +1,29 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as child_process from "child_process";
-import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as process from "process";
-import { IPowerShellAdditionalExePathSettings } from "./settings";
+import vscode = require("vscode");
+import { integer } from "vscode-languageserver-protocol";
+import { ILogger } from "./logging";
+import { changeSetting, getSettings, PowerShellAdditionalExePathSettings } from "./settings";
+import untildify from "untildify";
+
+// This uses require so we can rewire it in unit tests!
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
+const utils = require("./utils");
 
 const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
 const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
 
-const LinuxExePath        = "/usr/bin/pwsh";
+const LinuxExePath = "/usr/bin/pwsh";
 const LinuxPreviewExePath = "/usr/bin/pwsh-preview";
 
-const SnapExePath         = "/snap/bin/pwsh";
-const SnapPreviewExePath  = "/snap/bin/pwsh-preview";
+const SnapExePath = "/snap/bin/pwsh";
+const SnapPreviewExePath = "/snap/bin/pwsh-preview";
 
-const MacOSExePath        = "/usr/local/bin/pwsh";
+const MacOSExePath = "/usr/local/bin/pwsh";
 const MacOSPreviewExePath = "/usr/local/bin/pwsh-preview";
 
 export enum OperatingSystem {
@@ -36,6 +42,7 @@ export interface IPlatformDetails {
 export interface IPowerShellExeDetails {
     readonly displayName: string;
     readonly exePath: string;
+    readonly supportsProperArguments: boolean;
 }
 
 export function getPlatformDetails(): IPlatformDetails {
@@ -53,7 +60,7 @@ export function getPlatformDetails(): IPlatformDetails {
 
     return {
         operatingSystem,
-        isOS64Bit: isProcess64Bit || process.env.hasOwnProperty("PROCESSOR_ARCHITEW6432"),
+        isOS64Bit: isProcess64Bit || (process.env.PROCESSOR_ARCHITEW6432 !== undefined),
         isProcess64Bit,
     };
 }
@@ -65,21 +72,11 @@ export function getPlatformDetails(): IPlatformDetails {
  */
 export class PowerShellExeFinder {
     // This is required, since parseInt("7-preview") will return 7.
-    private static IntRegex: RegExp = /^\d+$/;
-
-    private static PwshMsixRegex: RegExp = /^Microsoft.PowerShell_.*/;
-
-    private static PwshPreviewMsixRegex: RegExp = /^Microsoft.PowerShellPreview_.*/;
-
-    // The platform details descriptor for the platform we're on
-    private readonly platformDetails: IPlatformDetails;
-
-    // Additional configured PowerShells
-    private readonly additionalPSExeSettings: IPowerShellAdditionalExePathSettings;
-
-    private winPS: IPossiblePowerShellExe;
-
-    private alternateBitnessWinPS: IPossiblePowerShellExe;
+    private static IntRegex = /^\d+$/;
+    private static PwshMsixRegex = /^Microsoft.PowerShell_.*/;
+    private static PwshPreviewMsixRegex = /^Microsoft.PowerShellPreview_.*/;
+    private winPS: IPossiblePowerShellExe | undefined;
+    private alternateBitnessWinPS: IPossiblePowerShellExe | undefined;
 
     /**
      * Create a new PowerShellFinder object to discover PowerShell installations.
@@ -87,34 +84,38 @@ export class PowerShellExeFinder {
      * @param additionalPowerShellExes Additional PowerShell installations as configured in the settings.
      */
     constructor(
-        platformDetails?: IPlatformDetails,
-        additionalPowerShellExes?: IPowerShellAdditionalExePathSettings) {
-
-        this.platformDetails = platformDetails || getPlatformDetails();
-        this.additionalPSExeSettings = additionalPowerShellExes || {};
-    }
+        // The platform details descriptor for the platform we're on
+        private platformDetails: IPlatformDetails,
+        // Additional configured PowerShells
+        private additionalPowerShellExes: PowerShellAdditionalExePathSettings,
+        private logger: ILogger) { }
 
     /**
      * Returns the first available PowerShell executable found in the search order.
      */
-    public getFirstAvailablePowerShellInstallation(): IPowerShellExeDetails {
-        for (const pwsh of this.enumeratePowerShellInstallations()) {
+    public async getFirstAvailablePowerShellInstallation(): Promise<IPowerShellExeDetails | undefined> {
+        for await (const pwsh of this.enumeratePowerShellInstallations()) {
             return pwsh;
         }
+        return undefined;
     }
 
     /**
      * Get an array of all PowerShell executables found when searching for PowerShell installations.
      */
-    public getAllAvailablePowerShellInstallations(): IPowerShellExeDetails[] {
-        return Array.from(this.enumeratePowerShellInstallations());
+    public async getAllAvailablePowerShellInstallations(): Promise<IPowerShellExeDetails[]> {
+        const array: IPowerShellExeDetails[] = [];
+        for await (const pwsh of this.enumeratePowerShellInstallations()) {
+            array.push(pwsh);
+        }
+        return array;
     }
 
     /**
      * Fixes PowerShell paths when Windows PowerShell is set to the non-native bitness.
      * @param configuredPowerShellPath the PowerShell path configured by the user.
      */
-    public fixWindowsPowerShellPath(configuredPowerShellPath: string): string {
+    public fixWindowsPowerShellPath(configuredPowerShellPath: string): string | undefined {
         const altWinPS = this.findWinPS({ useAlternateBitness: true });
 
         if (!altWinPS) {
@@ -125,7 +126,7 @@ export class PowerShellExeFinder {
         const lowerConfiguredPath = configuredPowerShellPath.toLocaleLowerCase();
 
         if (lowerConfiguredPath === lowerAltWinPSPath) {
-            return this.findWinPS().exePath;
+            return this.findWinPS()?.exePath;
         }
 
         return configuredPowerShellPath;
@@ -137,10 +138,10 @@ export class PowerShellExeFinder {
      * PowerShell items returned by this object are verified
      * to exist on the filesystem.
      */
-    public *enumeratePowerShellInstallations(): Iterable<IPowerShellExeDetails> {
+    public async *enumeratePowerShellInstallations(): AsyncIterable<IPowerShellExeDetails> {
         // Get the default PowerShell installations first
-        for (const defaultPwsh of this.enumerateDefaultPowerShellInstallations()) {
-            if (defaultPwsh && defaultPwsh.exists()) {
+        for await (const defaultPwsh of this.enumerateDefaultPowerShellInstallations()) {
+            if (defaultPwsh && await defaultPwsh.exists()) {
                 yield defaultPwsh;
             }
         }
@@ -148,8 +149,18 @@ export class PowerShellExeFinder {
         // Also show any additionally configured PowerShells
         // These may be duplicates of the default installations, but given a different name.
         for (const additionalPwsh of this.enumerateAdditionalPowerShellInstallations()) {
-            if (additionalPwsh && additionalPwsh.exists()) {
+            if (await additionalPwsh.exists()) {
                 yield additionalPwsh;
+            } else if (!additionalPwsh.suppressWarning) {
+                const message = `Additional PowerShell '${additionalPwsh.displayName}' not found at '${additionalPwsh.exePath}'!`;
+                this.logger.writeWarning(message);
+
+                if (!getSettings().suppressAdditionalExeNotFoundWarning) {
+                    const selection = await vscode.window.showWarningMessage(message, "Don't Show Again");
+                    if (selection !== undefined) {
+                        await changeSetting("suppressAdditionalExeNotFoundWarning", true, true, this.logger);
+                    }
+                }
             }
         }
     }
@@ -159,24 +170,24 @@ export class PowerShellExeFinder {
      * Returned values may not exist, but come with an .exists property
      * which will check whether the executable exists.
      */
-    private *enumerateDefaultPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
+    private async *enumerateDefaultPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe | undefined> {
         // Find PSCore stable first
         yield this.findPSCoreStable();
 
         switch (this.platformDetails.operatingSystem) {
-            case OperatingSystem.Linux:
-                // On Linux, find the snap
-                yield this.findPSCoreStableSnap();
-                break;
+        case OperatingSystem.Linux:
+            // On Linux, find the snap
+            yield this.findPSCoreStableSnap();
+            break;
 
-            case OperatingSystem.Windows:
-                // Windows may have a 32-bit pwsh.exe
-                yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true });
+        case OperatingSystem.Windows:
+            // Windows may have a 32-bit pwsh.exe
+            yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true });
 
-                // Also look for the MSIX/UWP installation
-                yield this.findPSCoreMsix();
+            // Also look for the MSIX/UWP installation
+            yield await this.findPSCoreMsix();
 
-                break;
+            break;
         }
 
         // Look for the .NET global tool
@@ -188,68 +199,139 @@ export class PowerShellExeFinder {
         yield this.findPSCorePreview();
 
         switch (this.platformDetails.operatingSystem) {
-            // On Linux, there might be a preview snap
-            case OperatingSystem.Linux:
-                yield this.findPSCorePreviewSnap();
-                break;
+        // On Linux, there might be a preview snap
+        case OperatingSystem.Linux:
+            yield this.findPSCorePreviewSnap();
+            break;
 
-            case OperatingSystem.Windows:
-                // Find a preview MSIX
-                yield this.findPSCoreMsix({ findPreview: true });
+        case OperatingSystem.Windows:
+            // Find a preview MSIX
+            yield this.findPSCoreMsix({ findPreview: true });
 
-                // Look for pwsh-preview with the opposite bitness
-                yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true, findPreview: true });
+            // Look for pwsh-preview with the opposite bitness
+            yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true, findPreview: true });
 
-                // Finally, get Windows PowerShell
+            // Finally, get Windows PowerShell
 
-                // Get the natural Windows PowerShell for the process bitness
-                yield this.findWinPS();
+            // Get the natural Windows PowerShell for the process bitness
+            yield this.findWinPS();
 
-                // Get the alternate bitness Windows PowerShell
-                yield this.findWinPS({ useAlternateBitness: true });
+            // Get the alternate bitness Windows PowerShell
+            yield this.findWinPS({ useAlternateBitness: true });
 
-                break;
+            break;
         }
+
+        // Look for PSCore daily
+        yield this.findPSCoreDaily();
     }
 
     /**
-     * Iterates through the configured additonal PowerShell executable locations,
+     * Iterates through the configured additional PowerShell executable locations,
      * without checking for their existence.
      */
     private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
-        for (const versionName in this.additionalPSExeSettings) {
-            if (Object.prototype.hasOwnProperty.call(this.additionalPSExeSettings, versionName)) {
-                const exePath = this.additionalPSExeSettings[versionName];
-                if (exePath) {
-                    yield new PossiblePowerShellExe(exePath, versionName);
+        for (const versionName in this.additionalPowerShellExes) {
+            if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
+                let exePath = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);
+                if (!exePath) {
+                    continue;
+                }
+
+                exePath = untildify(exePath);
+
+                // Always search for what the user gave us first
+                yield new PossiblePowerShellExe(exePath, versionName);
+
+                // Also search for `pwsh[.exe]` and `powershell[.exe]` if missing
+                const args: [string, undefined, boolean, boolean]
+                    // Must be a tuple type and is suppressing the warning
+                    = [versionName, undefined, true, true];
+
+                // Handle Windows where '.exe' and 'powershell' are things
+                if (this.platformDetails.operatingSystem === OperatingSystem.Windows) {
+                    if (!exePath.endsWith("pwsh.exe") && !exePath.endsWith("powershell.exe")) {
+                        if (exePath.endsWith("pwsh") || exePath.endsWith("powershell")) {
+                            // Add extension if that was missing
+                            yield new PossiblePowerShellExe(exePath + ".exe", ...args);
+                        }
+                        // Also add full exe names (this isn't an else just in case
+                        // the folder was named "pwsh" or "powershell")
+                        yield new PossiblePowerShellExe(path.join(exePath, "pwsh.exe"), ...args);
+                        yield new PossiblePowerShellExe(path.join(exePath, "powershell.exe"), ...args);
+                    }
+                } else if (!exePath.endsWith("pwsh")) { // Always just 'pwsh' on non-Windows
+                    yield new PossiblePowerShellExe(path.join(exePath, "pwsh"), ...args);
                 }
             }
         }
     }
 
-    private findPSCoreStable(): IPossiblePowerShellExe {
+    private async findPSCoreStable(): Promise<IPossiblePowerShellExe | undefined> {
         switch (this.platformDetails.operatingSystem) {
-            case OperatingSystem.Linux:
-                return new PossiblePowerShellExe(LinuxExePath, "PowerShell");
+        case OperatingSystem.Linux:
+            return new PossiblePowerShellExe(LinuxExePath, "PowerShell");
 
-            case OperatingSystem.MacOS:
-                return new PossiblePowerShellExe(MacOSExePath, "PowerShell");
+        case OperatingSystem.MacOS:
+            return new PossiblePowerShellExe(MacOSExePath, "PowerShell");
 
-            case OperatingSystem.Windows:
-                return this.findPSCoreWindowsInstallation();
+        case OperatingSystem.Windows:
+            return await this.findPSCoreWindowsInstallation();
+
+        case OperatingSystem.Unknown:
+            return undefined;
         }
     }
 
-    private findPSCorePreview(): IPossiblePowerShellExe {
+    private async findPSCorePreview(): Promise<IPossiblePowerShellExe | undefined> {
         switch (this.platformDetails.operatingSystem) {
-            case OperatingSystem.Linux:
-                return new PossiblePowerShellExe(LinuxPreviewExePath, "PowerShell Preview");
+        case OperatingSystem.Linux:
+            return new PossiblePowerShellExe(LinuxPreviewExePath, "PowerShell Preview");
 
-            case OperatingSystem.MacOS:
-                return new PossiblePowerShellExe(MacOSPreviewExePath, "PowerShell Preview");
+        case OperatingSystem.MacOS:
+            return new PossiblePowerShellExe(MacOSPreviewExePath, "PowerShell Preview");
 
-            case OperatingSystem.Windows:
-                return this.findPSCoreWindowsInstallation({ findPreview: true });
+        case OperatingSystem.Windows:
+            return await this.findPSCoreWindowsInstallation({ findPreview: true });
+
+        case OperatingSystem.Unknown:
+            return undefined;
+        }
+    }
+
+    /**
+    * If the daily was installed via 'https://aka.ms/install-powershell.ps1', then
+    * this is the default installation location:
+    *
+    * if ($IsWinEnv) {
+    *     $Destination = "$env:LOCALAPPDATA\Microsoft\powershell"
+    * } else {
+    *     $Destination = "~/.powershell"
+    * }
+    *
+    * if ($Daily) {
+    *     $Destination = "${Destination}-daily"
+    * }
+    */
+    private findPSCoreDaily(): IPossiblePowerShellExe | undefined {
+        switch (this.platformDetails.operatingSystem) {
+        case OperatingSystem.Linux:
+        case OperatingSystem.MacOS: {
+            const exePath = path.join(os.homedir(), ".powershell-daily", "pwsh");
+            return new PossiblePowerShellExe(exePath, "PowerShell Daily");
+        }
+
+        case OperatingSystem.Windows: {
+            // We can't proceed if there's no LOCALAPPDATA path
+            if (!process.env.LOCALAPPDATA) {
+                return undefined;
+            }
+            const exePath = path.join(process.env.LOCALAPPDATA, "Microsoft", "powershell-daily", "pwsh.exe");
+            return new PossiblePowerShellExe(exePath, "PowerShell Daily");
+        }
+
+        case OperatingSystem.Unknown:
+            return undefined;
         }
     }
 
@@ -260,20 +342,21 @@ export class PowerShellExeFinder {
 
         const dotnetGlobalToolExePath: string = path.join(os.homedir(), ".dotnet", "tools", exeName);
 
-        return new PossiblePowerShellExe(dotnetGlobalToolExePath, ".NET Core PowerShell Global Tool");
+        // The dotnet installed version of PowerShell does not support proper argument parsing, and so it fails with our multi-line startup banner.
+        return new PossiblePowerShellExe(dotnetGlobalToolExePath, ".NET Core PowerShell Global Tool", undefined, false);
     }
 
-    private findPSCoreMsix({ findPreview }: { findPreview?: boolean } = {}): IPossiblePowerShellExe {
+    private async findPSCoreMsix({ findPreview }: { findPreview?: boolean } = {}): Promise<IPossiblePowerShellExe | undefined> {
         // We can't proceed if there's no LOCALAPPDATA path
         if (!process.env.LOCALAPPDATA) {
-            return null;
+            return undefined;
         }
 
         // Find the base directory for MSIX application exe shortcuts
         const msixAppDir = path.join(process.env.LOCALAPPDATA, "Microsoft", "WindowsApps");
 
-        if (!fileExistsSync(msixAppDir)) {
-            return null;
+        if (!await utils.checkIfDirectoryExists(msixAppDir)) {
+            return undefined;
         }
 
         // Define whether we're looking for the preview or the stable
@@ -282,15 +365,13 @@ export class PowerShellExeFinder {
             : { pwshMsixDirRegex: PowerShellExeFinder.PwshMsixRegex, pwshMsixName: "PowerShell (Store)" };
 
         // We should find only one such application, so return on the first one
-        for (const subdir of fs.readdirSync(msixAppDir)) {
-            if (pwshMsixDirRegex.test(subdir)) {
-                const pwshMsixPath = path.join(msixAppDir, subdir, "pwsh.exe");
-                return new PossiblePowerShellExe(pwshMsixPath, pwshMsixName);
+        for (const name of await utils.readDirectory(msixAppDir)) {
+            if (pwshMsixDirRegex.test(name)) {
+                return new PossiblePowerShellExe(path.join(msixAppDir, name, "pwsh.exe"), pwshMsixName);
             }
         }
 
-        // If we find nothing, return null
-        return null;
+        return undefined;
     }
 
     private findPSCoreStableSnap(): IPossiblePowerShellExe {
@@ -301,39 +382,32 @@ export class PowerShellExeFinder {
         return new PossiblePowerShellExe(SnapPreviewExePath, "PowerShell Preview Snap");
     }
 
-    private findPSCoreWindowsInstallation(
+    private async findPSCoreWindowsInstallation(
         { useAlternateBitness = false, findPreview = false }:
-            { useAlternateBitness?: boolean; findPreview?: boolean } = {}): IPossiblePowerShellExe {
+            { useAlternateBitness?: boolean; findPreview?: boolean } = {}): Promise<IPossiblePowerShellExe | undefined> {
 
-        const programFilesPath: string = this.getProgramFilesPath({ useAlternateBitness });
+        const programFilesPath = this.getProgramFilesPath({ useAlternateBitness });
 
         if (!programFilesPath) {
-            return null;
+            return undefined;
         }
 
         const powerShellInstallBaseDir = path.join(programFilesPath, "PowerShell");
 
         // Ensure the base directory exists
-        try {
-            const powerShellInstallBaseDirLStat = fs.lstatSync(powerShellInstallBaseDir);
-            if (!powerShellInstallBaseDirLStat.isDirectory())
-            {
-                return null;
-            }
-        } catch {
-            return null;
+        if (!await utils.checkIfDirectoryExists(powerShellInstallBaseDir)) {
+            return undefined;
         }
 
-        let highestSeenVersion: number = -1;
-        let pwshExePath: string = null;
-        for (const item of fs.readdirSync(powerShellInstallBaseDir)) {
-
-            let currentVersion: number = -1;
+        let highestSeenVersion = -1;
+        let pwshExePath: string | undefined;
+        for (const item of await utils.readDirectory(powerShellInstallBaseDir)) {
+            let currentVersion = -1;
             if (findPreview) {
                 // We are looking for something like "7-preview"
 
                 // Preview dirs all have dashes in them
-                const dashIndex = item.indexOf("-");
+                const dashIndex: integer = item.indexOf("-");
                 if (dashIndex < 0) {
                     continue;
                 }
@@ -366,7 +440,7 @@ export class PowerShellExeFinder {
 
             // Now look for the file
             const exePath = path.join(powerShellInstallBaseDir, item, "pwsh.exe");
-            if (!fs.existsSync(exePath)) {
+            if (!await utils.checkIfFileExists(exePath)) {
                 continue;
             }
 
@@ -375,7 +449,7 @@ export class PowerShellExeFinder {
         }
 
         if (!pwshExePath) {
-            return null;
+            return undefined;
         }
 
         const bitness: string = programFilesPath.includes("x86")
@@ -387,16 +461,20 @@ export class PowerShellExeFinder {
         return new PossiblePowerShellExe(pwshExePath, `PowerShell${preview} ${bitness}`);
     }
 
-    private findWinPS({ useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): IPossiblePowerShellExe {
+    private findWinPS({ useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): IPossiblePowerShellExe | undefined {
 
         // 32-bit OSes only have one WinPS on them
         if (!this.platformDetails.isOS64Bit && useAlternateBitness) {
-            return null;
+            return undefined;
         }
 
         let winPS = useAlternateBitness ? this.alternateBitnessWinPS : this.winPS;
         if (winPS === undefined) {
-            const systemFolderPath: string = this.getSystem32Path({ useAlternateBitness });
+            const systemFolderPath = this.getSystem32Path({ useAlternateBitness });
+
+            if (!systemFolderPath) {
+                return undefined;
+            }
 
             const winPSPath = path.join(systemFolderPath, "WindowsPowerShell", "v1.0", "powershell.exe");
 
@@ -413,7 +491,7 @@ export class PowerShellExeFinder {
                 displayName = WindowsPowerShell32BitLabel;
             }
 
-            winPS = new PossiblePowerShellExe(winPSPath, displayName, { knownToExist: true });
+            winPS = new PossiblePowerShellExe(winPSPath, displayName, true);
 
             if (useAlternateBitness) {
                 this.alternateBitnessWinPS = winPS;
@@ -426,7 +504,7 @@ export class PowerShellExeFinder {
     }
 
     private getProgramFilesPath(
-        { useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): string | null {
+        { useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): string | undefined {
 
         if (!useAlternateBitness) {
             // Just use the native system bitness
@@ -444,11 +522,15 @@ export class PowerShellExeFinder {
         }
 
         // We're a 32-bit process on 32-bit Windows, there is no other Program Files dir
-        return null;
+        return undefined;
     }
 
-    private getSystem32Path({ useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): string | null {
-        const windir: string = process.env.windir;
+    private getSystem32Path({ useAlternateBitness = false }: { useAlternateBitness?: boolean } = {}): string | undefined {
+        const windir = process.env.windir;
+
+        if (!windir) {
+            return undefined;
+        }
 
         if (!useAlternateBitness) {
             // Just use the native system bitness
@@ -466,12 +548,14 @@ export class PowerShellExeFinder {
         }
 
         // We're on a 32-bit Windows, so no alternate bitness
-        return null;
+        return undefined;
     }
 }
 
-export function getWindowsSystemPowerShellPath(systemFolderName: string) {
-    return path.join(
+export function getWindowsSystemPowerShellPath(systemFolderName: string): string | undefined {
+    if (process.env.windir === undefined) {
+        return undefined;
+    } else return path.join(
         process.env.windir,
         systemFolderName,
         "WindowsPowerShell",
@@ -479,41 +563,23 @@ export function getWindowsSystemPowerShellPath(systemFolderName: string) {
         "powershell.exe");
 }
 
-function fileExistsSync(filePath: string): boolean {
-    try {
-        // This will throw if the path does not exist,
-        // and otherwise returns a value that we don't care about
-        fs.lstatSync(filePath);
-        return true;
-    } catch {
-        return false;
-    }
-}
-
 interface IPossiblePowerShellExe extends IPowerShellExeDetails {
-    exists(): boolean;
+    exists(): Promise<boolean>;
+    readonly suppressWarning: boolean;
 }
 
 class PossiblePowerShellExe implements IPossiblePowerShellExe {
-    public readonly exePath: string;
-    public readonly displayName: string;
-
-    private knownToExist: boolean;
-
     constructor(
-        pathToExe: string,
-        installationName: string,
-        { knownToExist = false }: { knownToExist?: boolean } = {}) {
+        public readonly exePath: string,
+        public readonly displayName: string,
+        private knownToExist?: boolean,
+        public readonly supportsProperArguments = true,
+        public readonly suppressWarning = false) { }
 
-        this.exePath = pathToExe;
-        this.displayName = installationName;
-        this.knownToExist = knownToExist || undefined;
-    }
-
-    public exists(): boolean {
+    public async exists(): Promise<boolean> {
         if (this.knownToExist === undefined) {
-            this.knownToExist = fileExistsSync(this.exePath);
+            this.knownToExist = await utils.checkIfFileExists(this.exePath);
         }
-        return this.knownToExist;
+        return this.knownToExist ?? false;
     }
 }

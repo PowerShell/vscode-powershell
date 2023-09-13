@@ -1,9 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
-import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter from "@vscode/extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
@@ -15,7 +12,6 @@ import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
 import { ExternalApiFeature, IPowerShellExtensionClient } from "./features/ExternalApi";
-import { FindModuleFeature } from "./features/FindModule";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
@@ -28,20 +24,22 @@ import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { RunCodeFeature } from "./features/RunCode";
 import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
-import { Logger, LogLevel } from "./logging";
+import { Logger } from "./logging";
 import { SessionManager } from "./session";
-import Settings = require("./settings");
+import { LogLevel, getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 import { BreakpointManager } from "./features/BreakpointManager";
 
 // The most reliable way to get the name and version of the current extension.
-// tslint:disable-next-line: no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
 const PackageJSON: any = require("../package.json");
 
-// the application insights key (also known as instrumentation key) used for telemetry.
-const AI_KEY: string = "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217";
+// The 1DS telemetry key, which is just shared among all Microsoft extensions
+// (and isn't sensitive).
+const TELEMETRY_KEY = "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255";
 
+let languageConfigurationDisposable: vscode.Disposable;
 let logger: Logger;
 let sessionManager: SessionManager;
 let languageClientConsumers: LanguageClientConsumer[] = [];
@@ -53,22 +51,21 @@ const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "untitled" },
 ];
 
-export function activate(context: vscode.ExtensionContext): IPowerShellExtensionClient {
-    // create telemetry reporter on extension activation
-    telemetryReporter = new TelemetryReporter(PackageJSON.name, PackageJSON.version, AI_KEY);
+export async function activate(context: vscode.ExtensionContext): Promise<IPowerShellExtensionClient> {
+    const logLevel = vscode.workspace.getConfiguration(`${PowerShellLanguageId}.developer`)
+        .get<string>("editorServicesLogLevel", LogLevel.Normal);
+    logger = new Logger(logLevel, context.globalStorageUri);
 
-    // If both extensions are enabled, this will cause unexpected behavior since both register the same commands
-    if (PackageJSON.name.toLowerCase() === "powershell-preview"
-        && vscode.extensions.getExtension("ms-vscode.powershell")) {
-        vscode.window.showWarningMessage(
-            "'PowerShell' and 'PowerShell Preview' are both enabled. Please disable one for best performance.");
-    }
+    telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
-    checkForUpdatedVersion(context, PackageJSON.version);
+    const settings = getSettings();
+    logger.writeVerbose(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
-    vscode.languages.setLanguageConfiguration(
+    languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
         {
+            // TODO: Remove the useless escapes
+            // eslint-disable-next-line no-useless-escape
             wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)/g,
 
             indentationRules: {
@@ -92,48 +89,49 @@ export function activate(context: vscode.ExtensionContext): IPowerShellExtension
             onEnterRules: [
                 {
                     // e.g. /** | */
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
+                    // eslint-disable-next-line no-useless-escape
                     afterText: /^\s*\*\/$/,
                     action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: " * " },
                 },
                 {
                     // e.g. /** ...|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: " * " },
                 },
                 {
                     // e.g.  * ...|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
                     action: { indentAction: vscode.IndentAction.None, appendText: "* " },
                 },
                 {
                     // e.g.  */|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 },
                 },
                 {
                     // e.g.  *-----*/|
+                    // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
                     action: { indentAction: vscode.IndentAction.None, removeText: 1 },
                 },
             ],
         });
 
-    // Create the logger
-    logger = new Logger();
-
-    // Set the log level
-    const extensionSettings = Settings.load();
-    logger.MinimumLogLevel = LogLevel[extensionSettings.developer.editorServicesLogLevel];
-
-    sessionManager =
-        new SessionManager(
-            context,
-            logger,
-            documentSelector,
-            PackageJSON.displayName,
-            PackageJSON.version,
-            telemetryReporter);
+    sessionManager = new SessionManager(
+        context,
+        settings,
+        logger,
+        documentSelector,
+        PackageJSON.name,
+        PackageJSON.displayName,
+        PackageJSON.version,
+        PackageJSON.publisher,
+        telemetryReporter);
 
     // Register commands that do not require Language client
     commandRegistrations = [
@@ -141,92 +139,65 @@ export function activate(context: vscode.ExtensionContext): IPowerShellExtension
         new GenerateBugReportFeature(sessionManager),
         new ISECompatibilityFeature(),
         new OpenInISEFeature(),
-        new PesterTestsFeature(sessionManager),
-        new RunCodeFeature(sessionManager),
+        new PesterTestsFeature(sessionManager, logger),
+        new RunCodeFeature(sessionManager, logger),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
-    ]
+    ];
 
     const externalApi = new ExternalApiFeature(context, sessionManager, logger);
 
     // Features and command registrations that require language client
     languageClientConsumers = [
         new ConsoleFeature(logger),
-        new ExpandAliasFeature(logger),
+        new ExpandAliasFeature(),
         new GetCommandsFeature(logger),
-        new ShowHelpFeature(logger),
-        new FindModuleFeature(),
+        new ShowHelpFeature(),
         new ExtensionCommandsFeature(logger),
-        new NewFileOrProjectFeature(),
+        new NewFileOrProjectFeature(logger),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
-        new PickPSHostProcessFeature(),
-        new HelpCompletionFeature(logger),
+        new PickPSHostProcessFeature(logger),
+        new HelpCompletionFeature(),
         new CustomViewsFeature(),
-        new PickRunspaceFeature(),
         new BreakpointManager(),
+        new PickRunspaceFeature(logger),
         externalApi
     ];
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
-    if (extensionSettings.startAutomatically) {
-        sessionManager.start();
+    if (settings.startAutomatically) {
+        await sessionManager.start();
     }
 
     return {
-        registerExternalExtension: (id: string, apiVersion: string = 'v1') => externalApi.registerExternalExtension(id, apiVersion),
+        registerExternalExtension: (id: string, apiVersion = "v1") => externalApi.registerExternalExtension(id, apiVersion),
         unregisterExternalExtension: uuid => externalApi.unregisterExternalExtension(uuid),
         getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
         waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
+        getStorageUri: () => externalApi.getStorageUri(),
     };
 }
 
-function checkForUpdatedVersion(context: vscode.ExtensionContext, version: string) {
-
-    const showReleaseNotes = "Show Release Notes";
-    const powerShellExtensionVersionKey = "powerShellExtensionVersion";
-
-    const storedVersion = context.globalState.get(powerShellExtensionVersionKey);
-
-    if (!storedVersion) {
-        // TODO: Prompt to show User Guide for first-time install
-    } else if (version !== storedVersion) {
-        vscode
-            .window
-            .showInformationMessage(
-                `The PowerShell extension has been updated to version ${version}!`,
-                showReleaseNotes)
-            .then((choice) => {
-                if (choice === showReleaseNotes) {
-                    vscode.commands.executeCommand(
-                        "markdown.showPreview",
-                        vscode.Uri.file(path.resolve(__dirname, "../CHANGELOG.md")));
-                }
-            });
+export async function deactivate(): Promise<void> {
+    // Clean up all extension features
+    for (const languageClientConsumer of languageClientConsumers) {
+        languageClientConsumer.dispose();
     }
 
-    context.globalState.update(
-        powerShellExtensionVersionKey,
-        version);
-}
-
-export function deactivate(): void {
-    // Clean up all extension features
-    languageClientConsumers.forEach((languageClientConsumer) => {
-        languageClientConsumer.dispose();
-    });
-
-    commandRegistrations.forEach((commandRegistration) => {
+    for (const commandRegistration of commandRegistrations) {
         commandRegistration.dispose();
-    });
+    }
 
     // Dispose of the current session
-    sessionManager.dispose();
+    await sessionManager.dispose();
 
     // Dispose of the logger
     logger.dispose();
 
     // Dispose of telemetry reporter
-    telemetryReporter.dispose();
+    await telemetryReporter.dispose();
+
+    languageConfigurationDisposable.dispose();
 }

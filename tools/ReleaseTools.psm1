@@ -6,40 +6,26 @@
 using module PowerShellForGitHub
 using namespace System.Management.Automation
 
-class RepoNames: IValidateSetValuesGenerator {
-    # NOTE: This is super over-engineered, but it was fun.
-    static [string[]] $Values = "vscode-powershell", "PowerShellEditorServices"
-    [String[]] GetValidValues() { return [RepoNames]::Values }
-}
-
+Import-Module $PSScriptRoot/VersionTools.psm1
 $ChangelogFile = "CHANGELOG.md"
 
 <#
 .SYNOPSIS
-  Given the repository name, execute the script in its directory.
+  Creates and checks out `release` if not already on it.
 #>
-function Use-Repository {
-    [CmdletBinding()]
+function Update-Branch {
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
-        [string]$RepositoryName,
-
-        [Parameter(Mandatory)]
-        [scriptblock]$Script
+        [string]$RepositoryName
     )
-    try {
-        switch ($RepositoryName) {
-            "vscode-powershell" {
-                Push-Location -Path "$PSScriptRoot/../"
-            }
-            "PowerShellEditorServices" {
-                Push-Location -Path "$PSScriptRoot/../../PowerShellEditorServices"
+    Use-Repository -RepositoryName $RepositoryName -Script {
+        $Branch = git branch --show-current
+        if ($Branch -ne "release") {
+            if ($PSCmdlet.ShouldProcess("release", "git checkout -B")) {
+                git checkout -B "release"
             }
         }
-        & $Script
-    } finally {
-        Pop-Location
     }
 }
 
@@ -51,7 +37,6 @@ function Get-Bullets {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
         [Parameter(Mandatory, ValueFromPipeline)]
@@ -59,7 +44,7 @@ function Get-Bullets {
     )
     begin {
         $SkipThanks = @(
-            'andschwa'
+            'andyleejordan'
             'daxian-dbw'
             'PaulHigin'
             'SeeminglyScience'
@@ -82,7 +67,7 @@ function Get-Bullets {
             'Area-Documentation'        = '📖'
             'Area-Engine'               = '🚂'
             'Area-Folding'              = '📚'
-            'Area-Integrated Console'   = '📟'
+            'Area-Extension Terminal'   = '📟'
             'Area-IntelliSense'         = '🧠'
             'Area-Logging'              = '💭'
             'Area-Pester'               = '🐢'
@@ -111,7 +96,7 @@ function Get-Bullets {
 
         # NOTE: The URL matcher must be explicit because the body of a PR may
         # contain other URLs with digits (like an image asset).
-        $IssueRegex = '(' + ($CloseKeywords -join '|') + ')\s+((https://github.com/PowerShell/(?<repo>(' + ([RepoNames]::Values -join '|') + '))/issues/)|#)(?<number>\d+)'
+        $IssueRegex = '(' + ($CloseKeywords -join '|') + ')\s+((https://github.com/PowerShell/(?<repo>(vscode-powershell|PowerShellEditorServices))/issues/)|#)(?<number>\d+)'
     }
 
     process {
@@ -126,7 +111,7 @@ function Get-Bullets {
                 $number = $Matches.number
                 $repo = $Matches.repo
                 # Handle links to issues in both repos, in both shortcode and URLs.
-                $name = [RepoNames]::Values | Where-Object { $repo -match $_ } | Select-Object -First 1
+                $name = ("vscode-powershell", "PowerShellEditorServices") | Where-Object { $repo -match $_ } | Select-Object -First 1
                 "$($name ?? $RepositoryName) #$number"
             } else {
                 "$RepositoryName #$($_.number)"
@@ -145,72 +130,6 @@ function Get-Bullets {
 
 <#
 .SYNOPSIS
-  Gets the unpublished content from the changelog.
-.DESCRIPTION
-  This is used so that we can manually touch-up the automatically updated
-  changelog, and then bring its contents into the extension's changelog or
-  the GitHub release. It just gets the first header's contents.
-#>
-function Get-FirstChangelog {
-    param(
-        [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
-        [string]$RepositoryName
-    )
-    $Changelog = Use-Repository -RepositoryName $RepositoryName -Script {
-        Get-Content -Path $ChangelogFile
-    }
-    # NOTE: The space after the header marker is important! Otherwise ### matches.
-    $Header = $Changelog.Where({$_.StartsWith("## ")}, "First")
-    $Changelog.Where(
-        { $_ -eq $Header }, "SkipUntil"
-    ).Where(
-        { $_.StartsWith("## ") -and $_ -ne $Header }, "Until"
-    )
-}
-
-<#
-.SYNOPSIS
-  Creates and checks out `release` if not already on it.
-#>
-function Update-Branch {
-    [CmdletBinding(SupportsShouldProcess)]
-    param(
-        [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
-        [string]$RepositoryName
-    )
-    Use-Repository -RepositoryName $RepositoryName -Script {
-        $Branch = git branch --show-current
-        if ($Branch -ne "release") {
-            if ($PSCmdlet.ShouldProcess("release", "git checkout -B")) {
-                git checkout -B "release"
-            }
-        }
-    }
-}
-
-<#
-.SYNOPSIS
-  Gets current version from changelog as `[semver]`.
-#>
-function Get-Version {
-    param(
-        [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
-        [string]$RepositoryName
-    )
-    # NOTE: The first line should always be the header.
-    $Changelog = (Get-FirstChangelog -RepositoryName $RepositoryName)[0]
-    if ($Changelog -match '## v(?<version>\d+\.\d+\.\d+(-preview\.?\d*)?)') {
-        return [semver]$Matches.version
-    } else {
-        Write-Error "Couldn't find version from changelog!"
-    }
-}
-
-<#
-.SYNOPSIS
   Updates the CHANGELOG file with PRs merged since the last release.
 .DESCRIPTION
   Uses the local Git repositories but does not pull, so ensure HEAD is where you
@@ -221,14 +140,15 @@ function Update-Changelog {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName,
 
-        # TODO: Validate version style for each repo.
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
         [string]$Version
     )
+
+    # Since we depend on both parameters, we can't do this with `ValidateScript`.
+    Test-VersionIsValid -RepositoryName $RepositoryName -Version $Version
 
     # Get the repo object, latest release, and commits since its tag.
     $Repo = Get-GitHubRepository -OwnerName PowerShell -RepositoryName $RepositoryName
@@ -252,7 +172,7 @@ function Update-Changelog {
                 ""
                 $Bullets
                 ""
-                "#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices)"
+                "#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v$(Get-Version -RepositoryName PowerShellEditorServices)"
                 ""
                 (Get-FirstChangelog -RepositoryName "PowerShellEditorServices").Where({ $_.StartsWith("- ") }, "SkipUntil")
             )
@@ -300,53 +220,37 @@ function Update-Changelog {
 
   - package.json:
     - `version` field with `"X.Y.Z"` and no prefix or suffix
-    - `preview` field set to `true` or `false` if version is a preview
-    - `name` field has `-preview` appended similarly
-    - `displayName` field has ` Preview` appended similarly
-    - `description` field has `(Preview) ` prepended similarly
-    - `icon` field has `_Preview ` inserted similarly
+    - `preview` field is always `false` because now we do "pre-releases"
+    - TODO: `icon` field has `_Preview ` inserted if preview
 #>
 function Update-Version {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
-    $v = "$($Version.Major).$($Version.Minor).$($Version.Patch)"
+    $v = Get-MajorMinorPatch -Version $Version
 
     Update-Branch -RepositoryName $RepositoryName
 
-    # TODO: Maybe cleanup the replacement logic.
     Use-Repository -RepositoryName $RepositoryName -Script {
         switch ($RepositoryName) {
             "vscode-powershell" {
-                $d = "Develop PowerShell modules, commands and scripts in Visual Studio Code!"
-                if ($Version.PreReleaseLabel) {
-                    $name = "powershell-preview"
-                    $displayName = "PowerShell Preview"
-                    $preview = "true"
-                    $description = "(Preview) $d"
-                    $icon = "media/PowerShell_Preview_Icon.png"
-                } else {
-                    $name = "powershell"
-                    $displayName = "PowerShell"
-                    $preview = "false"
-                    $description = $d
-                    $icon = "media/PowerShell_Icon.png"
-                }
+                # TODO: Bring this back when the marketplace supports it.
+                # if ($Version.PreReleaseLabel) {
+                #     $icon = "media/PowerShell_Preview_Icon.png"
+                # } else {
+                #     $icon = "media/PowerShell_Icon.png"
+                # }
 
                 $path = "package.json"
                 $f = Get-Content -Path $path
                 # NOTE: The prefix regex match two spaces exactly to avoid matching
                 # nested objects in the file.
-                $f = $f -replace '^(?<prefix>  "name":\s+")(.+)(?<suffix>",)$', "`${prefix}${name}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "displayName":\s+")(.+)(?<suffix>",)$', "`${prefix}${displayName}`${suffix}"
                 $f = $f -replace '^(?<prefix>  "version":\s+")(.+)(?<suffix>",)$', "`${prefix}${v}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "preview":\s+)(.+)(?<suffix>,)$', "`${prefix}${preview}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "description":\s+")(.+)(?<suffix>",)$', "`${prefix}${description}`${suffix}"
-                $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
+                # TODO: $f = $f -replace '^(?<prefix>  "icon":\s+")(.+)(?<suffix>",)$', "`${prefix}${icon}`${suffix}"
                 $f | Set-Content -Path $path
                 git add $path
             }
@@ -382,7 +286,7 @@ function New-ReleasePR {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
@@ -416,7 +320,7 @@ function New-ReleasePR {
 
 <#
 .SYNOPSIS
-  Kicks off the whole release process.
+  Kicks off the whole release process for one of the repositories.
 .DESCRIPTION
   This first updates the changelog (which creates and checks out the `release`
   branch), commits the changes, updates the version (and commits), pushes the
@@ -435,11 +339,31 @@ function New-Release {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
+        [string]$RepositoryName,
+
+        [Parameter(Mandatory)]
+        [string]$Version
+    )
+    # TODO: Automate rolling a preview to a stable release.
+    Update-Changelog -RepositoryName $RepositoryName -Version $Version
+    Update-Version -RepositoryName $RepositoryName
+    New-ReleasePR -RepositoryName $RepositoryName
+}
+
+<#
+.SYNOPSIS
+  Kicks off the whole release process for both repositories.
+.DESCRIPTION
+  This just simplifies the calling of `New-Release` for both repositories.
+#>
+function New-ReleaseBundle {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)]
         [string]$PsesVersion,
 
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
         [string]$VsceVersion
     )
     "PowerShellEditorServices", "vscode-powershell" | ForEach-Object {
@@ -447,9 +371,7 @@ function New-Release {
             "PowerShellEditorServices" { $PsesVersion }
             "vscode-powershell" { $VsceVersion }
         }
-        Update-Changelog -RepositoryName $_ -Version $Version
-        Update-Version -RepositoryName $_
-        New-ReleasePR -RepositoryName $_
+        New-Release -RepositoryName $_ -Version $Version
     }
 }
 
@@ -465,7 +387,6 @@ function New-DraftRelease {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
         [Parameter()]

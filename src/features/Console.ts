@@ -5,22 +5,20 @@ import vscode = require("vscode");
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { ICheckboxQuickPickItem, showCheckboxQuickPick } from "../controls/checkboxQuickPick";
-import { Logger } from "../logging";
-import Settings = require("../settings");
+import { ILogger } from "../logging";
+import { getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
 export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
 export const OutputNotificationType = new NotificationType<IOutputNotificationBody>("output");
-export const ExecutionStatusChangedNotificationType =
-    new NotificationType<IExecutionStatusDetails>("powerShell/executionStatusChanged");
 
 export const ShowChoicePromptRequestType =
     new RequestType<IShowChoicePromptRequestArgs,
-                    IShowChoicePromptResponseBody, string>("powerShell/showChoicePrompt");
+        IShowChoicePromptResponseBody, string>("powerShell/showChoicePrompt");
 
 export const ShowInputPromptRequestType =
     new RequestType<IShowInputPromptRequestArgs,
-                    IShowInputPromptResponseBody, string>("powerShell/showInputPrompt");
+        IShowInputPromptResponseBody, string>("powerShell/showInputPrompt");
 
 export interface IEvaluateRequestArguments {
     expression: string;
@@ -29,12 +27,6 @@ export interface IEvaluateRequestArguments {
 export interface IOutputNotificationBody {
     category: string;
     output: string;
-}
-
-interface IExecutionStatusDetails {
-    executionOptions: IExecutionOptions;
-    executionStatus: ExecutionStatus;
-    hadErrors: boolean;
 }
 
 interface IChoiceDetails {
@@ -56,33 +48,17 @@ interface IShowChoicePromptRequestArgs {
 }
 
 interface IShowChoicePromptResponseBody {
-    responseText: string;
+    responseText: string | undefined;
     promptCancelled: boolean;
 }
 
 interface IShowInputPromptResponseBody {
-    responseText: string;
+    responseText: string | undefined;
     promptCancelled: boolean;
 }
 
-enum ExecutionStatus {
-    Pending,
-    Running,
-    Failed,
-    Aborted,
-    Completed,
-}
 
-interface IExecutionOptions {
-    writeOutputToHost: boolean;
-    writeErrorsToHost: boolean;
-    addToHistory: boolean;
-    interruptCommandPrompt: boolean;
-}
-
-function showChoicePrompt(
-    promptDetails: IShowChoicePromptRequestArgs,
-    client: LanguageClient): Thenable<IShowChoicePromptResponseBody> {
+function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable<IShowChoicePromptResponseBody> {
 
     let resultThenable: Thenable<IShowChoicePromptResponseBody>;
 
@@ -95,7 +71,7 @@ function showChoicePrompt(
                 };
             });
 
-        if (promptDetails.defaultChoices && promptDetails.defaultChoices.length > 0) {
+        if (promptDetails.defaultChoices.length > 0) {
             // Shift the default items to the front of the
             // array so that the user can select it easily
             const defaultChoice = promptDetails.defaultChoices[0];
@@ -127,33 +103,26 @@ function showChoicePrompt(
             });
 
         // Select the defaults
-        promptDetails.defaultChoices.forEach((choiceIndex) => {
-            checkboxQuickPickItems[choiceIndex].isSelected = true;
-        });
+        for (const choice of promptDetails.defaultChoices) {
+            checkboxQuickPickItems[choice].isSelected = true;
+        }
 
         resultThenable =
             showCheckboxQuickPick(
-                    checkboxQuickPickItems,
-                    { confirmPlaceHolder: promptDetails.message })
+                checkboxQuickPickItems,
+                { confirmPlaceHolder: promptDetails.message })
                 .then(onItemsSelected);
     }
 
     return resultThenable;
 }
 
-function showInputPrompt(
-    promptDetails: IShowInputPromptRequestArgs,
-    client: LanguageClient): Thenable<IShowInputPromptResponseBody> {
-
-    const resultThenable =
-        vscode.window.showInputBox({
-            placeHolder: promptDetails.name + ": ",
-        }).then(onInputEntered);
-
-    return resultThenable;
+async function showInputPrompt(promptDetails: IShowInputPromptRequestArgs): Promise<IShowInputPromptResponseBody> {
+    const responseText = await vscode.window.showInputBox({ placeHolder: promptDetails.name + ": " });
+    return onInputEntered(responseText);
 }
 
-function onItemsSelected(chosenItems: ICheckboxQuickPickItem[]): IShowChoicePromptResponseBody {
+function onItemsSelected(chosenItems: ICheckboxQuickPickItem[] | undefined): IShowChoicePromptResponseBody {
     if (chosenItems !== undefined) {
         return {
             promptCancelled: false,
@@ -168,7 +137,7 @@ function onItemsSelected(chosenItems: ICheckboxQuickPickItem[]): IShowChoiceProm
     }
 }
 
-function onItemSelected(chosenItem: vscode.QuickPickItem): IShowChoicePromptResponseBody {
+function onItemSelected(chosenItem: vscode.QuickPickItem | undefined): IShowChoicePromptResponseBody {
     if (chosenItem !== undefined) {
         return {
             promptCancelled: false,
@@ -183,7 +152,7 @@ function onItemSelected(chosenItem: vscode.QuickPickItem): IShowChoicePromptResp
     }
 }
 
-function onInputEntered(responseText: string): IShowInputPromptResponseBody {
+function onInputEntered(responseText: string | undefined): IShowInputPromptResponseBody {
     if (responseText !== undefined) {
         return {
             promptCancelled: false,
@@ -199,44 +168,44 @@ function onInputEntered(responseText: string): IShowInputPromptResponseBody {
 
 export class ConsoleFeature extends LanguageClientConsumer {
     private commands: vscode.Disposable[];
-    private resolveStatusBarPromise: (value?: {} | PromiseLike<{}>) => void;
+    private handlers: vscode.Disposable[] = [];
 
-    constructor(private log: Logger) {
+    constructor(private logger: ILogger) {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
-
                 if (vscode.window.activeTerminal &&
-                    vscode.window.activeTerminal.name !== "PowerShell Integrated Console") {
-                    this.log.write("PSIC is not active terminal. Running in active terminal using 'runSelectedText'");
+                    vscode.window.activeTerminal.name !== "PowerShell Extension") {
+                    this.logger.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'.");
                     await vscode.commands.executeCommand("workbench.action.terminal.runSelectedText");
 
                     // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
                     // takes is called `preserveFocus` which when `true` the terminal will not take focus.
                     // This is the inverse of focusConsoleOnExecute so we have to inverse the boolean.
-                    vscode.window.activeTerminal.show(!Settings.load().integratedConsole.focusConsoleOnExecute);
+                    vscode.window.activeTerminal.show(!getSettings().integratedConsole.focusConsoleOnExecute);
                     await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
 
                     return;
                 }
 
                 const editor = vscode.window.activeTextEditor;
+                if (editor === undefined) {
+                    return;
+                }
+
                 let selectionRange: vscode.Range;
 
                 if (!editor.selection.isEmpty) {
-                    selectionRange =
-                        new vscode.Range(
-                            editor.selection.start,
-                            editor.selection.end);
+                    selectionRange = new vscode.Range(editor.selection.start, editor.selection.end);
                 } else {
                     selectionRange = editor.document.lineAt(editor.selection.start.line).range;
                 }
 
-                this.languageClient.sendRequest(EvaluateRequestType, {
+                await this.languageClient?.sendRequest(EvaluateRequestType, {
                     expression: editor.document.getText(selectionRange),
                 });
 
-                // Show the integrated console if it isn't already visible and
+                // Show the Extension Terminal if it isn't already visible and
                 // scroll terminal to bottom so new output is visible
                 await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
                 await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
@@ -244,59 +213,25 @@ export class ConsoleFeature extends LanguageClientConsumer {
         ];
     }
 
-    public dispose() {
-        // Make sure we cancel any status bar
-        this.clearStatusBar();
-        this.commands.forEach((command) => command.dispose());
-    }
-
-    public setLanguageClient(languageClient: LanguageClient) {
-        this.languageClient = languageClient;
-        this.languageClient.onRequest(
-            ShowChoicePromptRequestType,
-            (promptDetails) => showChoicePrompt(promptDetails, this.languageClient));
-
-        this.languageClient.onRequest(
-            ShowInputPromptRequestType,
-            (promptDetails) => showInputPrompt(promptDetails, this.languageClient));
-
-        // Set up status bar alerts for when PowerShell is executing a script
-        this.languageClient.onNotification(
-            ExecutionStatusChangedNotificationType,
-            (executionStatusDetails) => {
-                switch (executionStatusDetails.executionStatus) {
-                    // If execution has changed to running, make a notification
-                    case ExecutionStatus.Running:
-                        this.showExecutionStatus("PowerShell");
-                        break;
-
-                    // If the execution has stopped, destroy the previous notification
-                    case ExecutionStatus.Completed:
-                    case ExecutionStatus.Aborted:
-                    case ExecutionStatus.Failed:
-                        this.clearStatusBar();
-                        break;
-                }
-            });
-
-    }
-
-    private showExecutionStatus(message: string) {
-        vscode.window.withProgress({
-                location: vscode.ProgressLocation.Window,
-            }, (progress) => {
-                return new Promise((resolve, reject) => {
-                    this.clearStatusBar();
-
-                    this.resolveStatusBarPromise = resolve;
-                    progress.report({ message });
-                });
-            });
-    }
-
-    private clearStatusBar() {
-        if (this.resolveStatusBarPromise) {
-            this.resolveStatusBarPromise();
+    public dispose(): void {
+        for (const command of this.commands) {
+            command.dispose();
         }
+        for (const handler of this.handlers) {
+            handler.dispose();
+        }
+    }
+
+    public override setLanguageClient(languageClient: LanguageClient): void {
+        this.languageClient = languageClient;
+        this.handlers = [
+            this.languageClient.onRequest(
+                ShowChoicePromptRequestType,
+                (promptDetails) => showChoicePrompt(promptDetails)),
+
+            this.languageClient.onRequest(
+                ShowInputPromptRequestType,
+                (promptDetails) => showInputPrompt(promptDetails)),
+        ];
     }
 }

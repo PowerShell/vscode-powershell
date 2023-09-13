@@ -22,7 +22,7 @@ export const DidSaveTextDocumentNotificationType =
         "textDocument/didSave");
 
 export class RemoteFilesFeature extends LanguageClientConsumer {
-
+    private command: vscode.Disposable;
     private tempSessionPathPrefix: string;
 
     constructor() {
@@ -36,9 +36,9 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         // At startup, close any lingering temporary remote files
         this.closeRemoteFiles();
 
-        vscode.workspace.onDidSaveTextDocument((doc) => {
+        this.command = vscode.workspace.onDidSaveTextDocument(async (doc) => {
             if (this.isDocumentRemote(doc) && this.languageClient) {
-                this.languageClient.sendNotification(
+                await this.languageClient.sendNotification(
                     DidSaveTextDocumentNotificationType,
                     {
                         textDocument: TextDocumentIdentifier.create(doc.uri.toString()),
@@ -47,30 +47,31 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
+        this.command.dispose();
         // Close any leftover remote files before exiting
         this.closeRemoteFiles();
     }
 
-    private isDocumentRemote(doc: vscode.TextDocument) {
+    private isDocumentRemote(doc: vscode.TextDocument): boolean {
         return doc.fileName.toLowerCase().startsWith(this.tempSessionPathPrefix);
     }
 
-    private closeRemoteFiles() {
+    private closeRemoteFiles(): void {
         const remoteDocuments =
             vscode.workspace.textDocuments.filter((doc) => this.isDocumentRemote(doc));
 
-        function innerCloseFiles(): Thenable<{}> {
-            if (remoteDocuments.length > 0) {
-                const doc = remoteDocuments.pop();
-
-                return vscode.window
-                    .showTextDocument(doc)
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"))
-                    .then((_) => innerCloseFiles());
+        async function innerCloseFiles(): Promise<void> {
+            const doc = remoteDocuments.pop();
+            if (doc === undefined) {
+                return;
             }
+
+            await vscode.window.showTextDocument(doc);
+            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            await innerCloseFiles();
         }
 
-        innerCloseFiles();
+        void innerCloseFiles();
     }
 }

@@ -7,12 +7,7 @@ param(
     [string]$EditorServicesRepoPath = $null
 )
 
-#Requires -Modules @{ModuleName="InvokeBuild";ModuleVersion="3.0.0"}
-
-# Grab package.json data which is used throughout the build.
-$script:PackageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
-$script:IsPreviewExtension = $script:PackageJson.name -like "*preview*" -or $script:PackageJson.displayName -like "*preview*"
-Write-Host "`n### Extension: $($script:PackageJson.name)-$($script:PackageJson.version)`n" -ForegroundColor Green
+#Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "3.0.0" }
 
 function Get-EditorServicesPath {
     $psesRepoPath = if ($EditorServicesRepoPath) {
@@ -32,9 +27,9 @@ task RestoreNodeModules -If { !(Test-Path ./node_modules) } {
     # When in a CI build use the --loglevel=error parameter so that
     # package install warnings don't cause PowerShell to throw up
     if ($env:TF_BUILD) {
-        exec { & npm ci --loglevel=error }
+        Invoke-BuildExec { & npm ci --loglevel=error }
     } else {
-        exec { & npm install }
+        Invoke-BuildExec { & npm install }
     }
 }
 
@@ -45,26 +40,26 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
             # that developers always have the latest local bits.
             if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne "SymbolicLink") {
                 Write-Host "`n### Creating symbolic link to PSES" -ForegroundColor Green
-                remove ./modules
+                Remove-BuildItem ./modules
                 New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
             }
 
             Write-Host "`n### Building PSES`n" -ForegroundColor Green
-            Invoke-Build Build (Get-EditorServicesPath)
+            Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
         }
         "Release" {
             # When releasing, we ensure the bits are not symlinked but copied,
             # and only if they don't already exist.
             if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq "SymbolicLink") {
                 Write-Host "`n### Deleting PSES symbolic link" -ForegroundColor Green
-                remove ./modules
+                Remove-BuildItem ./modules
             }
 
             if (!(Test-Path ./modules)) {
                 # We only build if it hasn't been built at all.
                 if (!(Test-Path "$(Split-Path (Get-EditorServicesPath))/module/PowerShellEditorServices/bin")) {
                     Write-Host "`n### Building PSES`n" -ForegroundColor Green
-                    Invoke-Build Build (Get-EditorServicesPath)
+                    Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
                 }
 
                 Write-Host "`n### Copying PSES`n" -ForegroundColor Green
@@ -81,7 +76,7 @@ task Restore RestoreEditorServices, RestoreNodeModules
 
 task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
-    remove ./modules, ./out, ./node_modules, *.vsix
+    Remove-BuildItem ./modules, ./out, ./node_modules, *.vsix
 }
 
 task CleanEditorServices -If (Get-EditorServicesPath) {
@@ -94,11 +89,10 @@ task CleanEditorServices -If (Get-EditorServicesPath) {
 
 task Build Restore, {
     Write-Host "`n### Building vscode-powershell`n" -ForegroundColor Green
-    assert (Test-Path ./modules/PowerShellEditorServices/bin) "Extension requires PSES"
+    Assert-Build (Test-Path ./modules/PowerShellEditorServices/bin) "Extension requires PSES"
 
-    # TODO: TSLint is deprecated and we need to switch to ESLint.
-    # https://github.com/PowerShell/vscode-powershell/pull/3331
-    exec { & npm run lint }
+    Write-Host "`n### Linting TypeScript`n" -ForegroundColor Green
+    Invoke-BuildExec { & npm run lint }
 
     # TODO: When supported we should use `esbuild` for the tests too. Although
     # we now use `esbuild` to transpile, bundle, and minify the extension, we
@@ -107,19 +101,19 @@ task Build Restore, {
     # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
     # https://github.com/evanw/esbuild/issues/944
     switch ($Configuration) {
-        "Debug" { exec { & npm run build -- --sourcemap } }
-        "Release" { exec { & npm run build -- --minify } }
+        "Debug" { Invoke-BuildExec { & npm run build } }
+        "Release" { Invoke-BuildExec { & npm run build -- --minify } }
     }
 }
 
 #endregion
 #region Test tasks
 
-task Test -If (!($env:TF_BUILD -and $global:IsLinux)) Build, {
+task Test Build, {
     Write-Host "`n### Running extension tests" -ForegroundColor Green
-    exec { & npm run test }
+    Invoke-BuildExec { & npm run test }
     # Reset the state of files modified by tests
-    exec { git checkout package.json test/.vscode/settings.json}
+    Invoke-BuildExec { git checkout package.json test/TestEnvironment.code-workspace }
 }
 
 task TestEditorServices -If (Get-EditorServicesPath) {
@@ -130,26 +124,22 @@ task TestEditorServices -If (Get-EditorServicesPath) {
 #endregion
 #region Package tasks
 
-task UpdateReadme -If { $script:IsPreviewExtension } {
-    # Add the preview text
-    $newReadmeTop = '# PowerShell Language Support for Visual Studio Code
+task Package Build, {
+    # Sanity check our changelog version versus package.json (which lacks pre-release label)
+    Import-Module $PSScriptRoot/tools/VersionTools.psm1
+    $version = Get-Version -RepositoryName vscode-powershell
+    $packageVersion = Get-MajorMinorPatch -Version $version
+    $packageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
+    Assert-Build ($packageJson.version -eq $packageVersion)
 
-> ## ATTENTION: This is the PREVIEW version of the PowerShell extension for VSCode which contains features that are being evaluated for stable. It works with PowerShell 5.1 and up.
-> ### If you are looking for the stable version, please [go here](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell) or install the extension called "PowerShell" (not "PowerShell Preview")
-> ## NOTE: If you have both stable (aka "PowerShell") and preview (aka "PowerShell Preview") installed, you MUST [DISABLE](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension) one of them for the best performance. Docs on how to disable an extension can be found [here](https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension)'
-    $readmePath = (Join-Path $PSScriptRoot README.md)
-
-    $readmeContent = Get-Content -Path $readmePath
-    if (!($readmeContent -match "This is the PREVIEW version of the PowerShell extension")) {
-        $readmeContent[0] = $newReadmeTop
-        $readmeContent | Set-Content $readmePath -Encoding utf8
+    Write-Host "`n### Packaging powershell-$packageVersion.vsix`n" -ForegroundColor Green
+    Assert-Build ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
+    if (Test-IsPreRelease) {
+        Write-Host "`n### This is a pre-release!`n" -ForegroundColor Green
+        Invoke-BuildExec { & npm run package -- --pre-release }
+    } else {
+        Invoke-BuildExec { & npm run package }
     }
-}
-
-task Package UpdateReadme, Build, {
-    Write-Host "`n### Packaging $($script:PackageJson.name)-$($script:PackageJson.version).vsix`n" -ForegroundColor Green
-    assert ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
-    exec { & npm run package }
 }
 
 #endregion

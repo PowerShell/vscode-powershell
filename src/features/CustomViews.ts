@@ -21,11 +21,13 @@ export class CustomViewsFeature extends LanguageClientConsumer {
                 this.contentProvider));
     }
 
-    public dispose() {
-        this.commands.forEach((d) => d.dispose());
+    public dispose(): void {
+        for (const command of this.commands) {
+            command.dispose();
+        }
     }
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
 
         languageClient.onRequest(
             NewCustomViewRequestType,
@@ -70,42 +72,37 @@ export class CustomViewsFeature extends LanguageClientConsumer {
 
 class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
 
-    private count: number = 1;
-    private viewIndex: { [id: string]: CustomView } = {};
+    private viewIndex: Record<string, CustomView> = {};
     private didChangeEvent: vscode.EventEmitter<vscode.Uri> = new vscode.EventEmitter<vscode.Uri>();
 
-    // tslint:disable-next-line:member-ordering
     public onDidChange: vscode.Event<vscode.Uri> = this.didChangeEvent.event;
 
     public provideTextDocumentContent(uri: vscode.Uri): string {
         return this.viewIndex[uri.toString()].getContent();
     }
 
-    public createView(id: string, title: string, viewType: CustomViewType) {
+    public createView(id: string, title: string, viewType: CustomViewType): void {
         let view;
         switch (viewType) {
-            case CustomViewType.HtmlContent:
-                view = new HtmlContentView(id, title);
+        case CustomViewType.HtmlContent:
+            view = new HtmlContentView(id, title);
         }
 
         this.viewIndex[this.getUri(view.id)] = view;
     }
 
-    public showView(id: string, viewColumn: vscode.ViewColumn) {
+    public showView(id: string, viewColumn: vscode.ViewColumn): void {
         const uriString = this.getUri(id);
         (this.viewIndex[uriString] as HtmlContentView).showContent(viewColumn);
     }
 
-    public closeView(id: string) {
+    public closeView(id: string): void {
         const uriString = this.getUri(id);
-        const view: CustomView = this.viewIndex[uriString];
 
         vscode.workspace.textDocuments.some((doc) => {
             if (doc.uri.toString() === uriString) {
-                vscode.window
-                    .showTextDocument(doc)
-                    .then((editor) => vscode.commands.executeCommand("workbench.action.closeActiveEditor"));
-
+                void vscode.window.showTextDocument(doc);
+                void vscode.commands.executeCommand("workbench.action.closeActiveEditor");
                 return true;
             }
 
@@ -113,27 +110,23 @@ class PowerShellContentProvider implements vscode.TextDocumentContentProvider {
         });
     }
 
-    public setHtmlContentView(id: string, content: IHtmlContent) {
+    public setHtmlContentView(id: string, content: IHtmlContent): void {
         const uriString = this.getUri(id);
         const view: CustomView = this.viewIndex[uriString];
 
-        if (view.viewType === CustomViewType.HtmlContent) {
-            (view as HtmlContentView).setContent(content);
-            this.didChangeEvent.fire(vscode.Uri.parse(uriString));
-        }
+        (view as HtmlContentView).setContent(content);
+        this.didChangeEvent.fire(vscode.Uri.parse(uriString));
     }
 
-    public appendHtmlOutputView(id: string, content: string) {
+    public appendHtmlOutputView(id: string, content: string): void {
         const uriString = this.getUri(id);
         const view: CustomView = this.viewIndex[uriString];
 
-        if (view.viewType === CustomViewType.HtmlContent) {
-            (view as HtmlContentView).appendContent(content);
-            this.didChangeEvent.fire(vscode.Uri.parse(uriString));
-        }
+        (view as HtmlContentView).appendContent(content);
+        this.didChangeEvent.fire(vscode.Uri.parse(uriString));
     }
 
-    private getUri(id: string) {
+    private getUri(id: string): string {
         return `powershell://views/${id}`;
     }
 }
@@ -157,7 +150,7 @@ class HtmlContentView extends CustomView {
         styleSheetPaths: [],
     };
 
-    private webviewPanel: vscode.WebviewPanel;
+    private webviewPanel: vscode.WebviewPanel | undefined;
 
     constructor(
         id: string,
@@ -165,35 +158,27 @@ class HtmlContentView extends CustomView {
         super(id, title, CustomViewType.HtmlContent);
     }
 
-    public setContent(htmlContent: IHtmlContent) {
+    public setContent(htmlContent: IHtmlContent): void {
         this.htmlContent = htmlContent;
     }
 
-    public appendContent(content: string) {
+    public appendContent(content: string): void {
         this.htmlContent.bodyContent += content;
     }
 
     public getContent(): string {
         let styleTags = "";
-        if (this.htmlContent.styleSheetPaths &&
-            this.htmlContent.styleSheetPaths.length > 0) {
-            this.htmlContent.styleSheetPaths.forEach(
-                (styleSheetPath) => {
-                    styleTags += `<link rel="stylesheet" href="${
-                        styleSheetPath.toString().replace("file://", "vscode-resource://")
-                    }">\n`;
-                });
+        if (this.htmlContent.styleSheetPaths.length > 0) {
+            for (const styleSheetPath of this.htmlContent.styleSheetPaths) {
+                styleTags += `<link rel="stylesheet" href="${styleSheetPath.toString().replace("file://", "vscode-resource://")}">\n`;
+            }
         }
 
         let scriptTags = "";
-        if (this.htmlContent.javaScriptPaths &&
-            this.htmlContent.javaScriptPaths.length > 0) {
-            this.htmlContent.javaScriptPaths.forEach(
-                (javaScriptPath) => {
-                    scriptTags += `<script src="${
-                        javaScriptPath.toString().replace("file://", "vscode-resource://")
-                    }"></script>\n`;
-                });
+        if (this.htmlContent.javaScriptPaths.length > 0) {
+            for (const javaScriptPath of this.htmlContent.javaScriptPaths) {
+                scriptTags += `<script src="${javaScriptPath.toString().replace("file://", "vscode-resource://")}"></script>\n`;
+            }
         }
 
         // Return an HTML page with the specified content
@@ -201,22 +186,16 @@ class HtmlContentView extends CustomView {
     }
 
     public showContent(viewColumn: vscode.ViewColumn): void {
-        if (this.webviewPanel) {
-            this.webviewPanel.dispose();
-        }
+        this.webviewPanel?.dispose();
 
         let localResourceRoots: vscode.Uri[] = [];
-        if (this.htmlContent.javaScriptPaths) {
-            localResourceRoots = localResourceRoots.concat(this.htmlContent.javaScriptPaths.map((p) => {
-                return vscode.Uri.parse(path.dirname(p));
-            }));
-        }
+        localResourceRoots = localResourceRoots.concat(this.htmlContent.javaScriptPaths.map((p) => {
+            return vscode.Uri.parse(path.dirname(p));
+        }));
 
-        if (this.htmlContent.styleSheetPaths) {
-            localResourceRoots = localResourceRoots.concat(this.htmlContent.styleSheetPaths.map((p) => {
-                return vscode.Uri.parse(path.dirname(p));
-            }));
-        }
+        localResourceRoots = localResourceRoots.concat(this.htmlContent.styleSheetPaths.map((p) => {
+            return vscode.Uri.parse(path.dirname(p));
+        }));
 
         this.webviewPanel = vscode.window.createWebviewPanel(
             this.id,

@@ -1,46 +1,31 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-"use strict";
-
-import fs = require("fs");
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
 
 export const PowerShellLanguageId = "powershell";
 
-export function ensurePathExists(targetPath: string): void {
-    // Ensure that the path exists
-    try {
-        // TODO: Use vscode.workspace.fs
-        fs.mkdirSync(targetPath);
-    } catch (e) {
-        // If the exception isn't to indicate that the folder exists already, rethrow it.
-        if (e.code !== "EEXIST") {
-            throw e;
-        }
-    }
+export function escapeSingleQuotes(p: string): string {
+    return p.replace(new RegExp("'", "g"), "''");
 }
 
-// Check that the file exists in an asynchronous manner that relies solely on the VS Code API, not Node's fs library.
-export async function fileExists(targetPath: string | vscode.Uri): Promise<boolean> {
-    try {
-            await vscode.workspace.fs.stat(
-                targetPath instanceof vscode.Uri
-                    ? targetPath
-                    : vscode.Uri.file(targetPath));
-        return true;
-    } catch (e) {
-        if (e instanceof vscode.FileSystemError.FileNotFound) {
-            return false;
-        }
-        throw e;
+export function stripQuotePair(p: string | undefined): string | undefined {
+    if (p === undefined) {
+        return p;
     }
 
+    // Remove matching surrounding quotes from p (without regex)
+    if (p.startsWith("'") && p.endsWith("'")
+        || p.startsWith("\"") && p.endsWith("\"")) {
+        return p.slice(1, -1);
+    }
+
+    return p;
 }
 
-export function getPipePath(pipeName: string) {
+export function getPipePath(pipeName: string): string {
     if (os.platform() === "win32") {
         return "\\\\.\\pipe\\" + pipeName;
     } else {
@@ -50,66 +35,40 @@ export function getPipePath(pipeName: string) {
     }
 }
 
-export interface IEditorServicesSessionDetails {
-    status: string;
-    reason: string;
-    detail: string;
-    powerShellVersion: string;
-    channel: string;
-    languageServicePort: number;
-    debugServicePort: number;
-    languageServicePipeName: string;
-    debugServicePipeName: string;
-}
-
-export type IReadSessionFileCallback = (details: IEditorServicesSessionDetails) => void;
-
-const sessionsFolder = path.resolve(__dirname, "../sessions");
-const sessionFilePathPrefix = path.resolve(sessionsFolder, "PSES-VSCode-" + process.env.VSCODE_PID);
-
-// Create the sessions path if it doesn't exist already
-ensurePathExists(sessionsFolder);
-
-export function getSessionFilePath(uniqueId: number) {
-    return `${sessionFilePathPrefix}-${uniqueId}`;
-}
-
-export function getDebugSessionFilePath() {
-    return `${sessionFilePathPrefix}-Debug`;
-}
-
-export function writeSessionFile(sessionFilePath: string, sessionDetails: IEditorServicesSessionDetails) {
-    ensurePathExists(sessionsFolder);
-
-    const writeStream = fs.createWriteStream(sessionFilePath);
-    writeStream.write(JSON.stringify(sessionDetails));
-    writeStream.close();
-}
-
-
-export function readSessionFile(sessionFilePath: string): IEditorServicesSessionDetails {
-    const fileContents = fs.readFileSync(sessionFilePath, "utf-8");
-    return JSON.parse(fileContents);
-}
-
-export function deleteSessionFile(sessionFilePath: string) {
-    try {
-        fs.unlinkSync(sessionFilePath);
-    } catch (e) {
-        // TODO: Be more specific about what we're catching
+// Check that the file or directory exists in an asynchronous manner that relies
+// solely on the VS Code API, not Node's fs library, ignoring symlinks.
+async function checkIfFileOrDirectoryExists(targetPath: string | vscode.Uri, type: vscode.FileType): Promise<boolean> {
+    if (targetPath === "") {
+        return false;
     }
-}
-
-export function checkIfFileExists(filePath: string): boolean {
     try {
-        fs.accessSync(filePath, fs.constants.R_OK);
-        return true;
-    } catch (e) {
+        const stat: vscode.FileStat = await vscode.workspace.fs.stat(
+            targetPath instanceof vscode.Uri
+                ? targetPath
+                : vscode.Uri.file(targetPath));
+        return (stat.type & type) !== 0;
+    } catch {
         return false;
     }
 }
 
-export function getTimestampString() {
+export async function checkIfFileExists(filePath: string | vscode.Uri): Promise<boolean> {
+    return await checkIfFileOrDirectoryExists(filePath, vscode.FileType.File);
+}
+
+export async function checkIfDirectoryExists(directoryPath: string | vscode.Uri): Promise<boolean> {
+    return await checkIfFileOrDirectoryExists(directoryPath, vscode.FileType.Directory);
+}
+
+export async function readDirectory(directoryPath: string | vscode.Uri): Promise<string[]> {
+    const items = await vscode.workspace.fs.readDirectory(
+        directoryPath instanceof vscode.Uri
+            ? directoryPath
+            : vscode.Uri.file(directoryPath));
+    return items.map(([name, _type]) => name);
+}
+
+export function getTimestampString(): string {
     const time = new Date();
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;
 }

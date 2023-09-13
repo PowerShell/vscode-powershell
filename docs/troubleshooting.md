@@ -5,12 +5,13 @@ This document contains troubleshooting steps for commonly reported issues when u
 
 ## How do I change the PowerShell version?
 
-Starting VS Code 1.65, extensions now use the [language status item API][]
-instead of manually adding a button to the status bar. That means the PowerShell icon
-button in the status bar now exists under the language status menu, which looks like:
-`{}`. You can then pin the icon back to the status bar by hovering over that menu and
-clicking the pin button. The PowerShell icon will show you the current session's version,
-and clicking it will let you change to another session.
+Starting VS Code 1.65, extensions now use the [language status item API][] instead of
+manually adding a button to the status bar. That means the PowerShell icon button in the
+status bar now exists under the language status menu, which looks like: `{}`. You can then
+pin the icon back to the status bar by hovering over that menu and clicking the pin
+button. The PowerShell icon will show you the current session's version, and clicking it
+will let you change to another session. The language status icon will only appear when the
+active editor's language mode is PowerShell.
 
 ### Using Windows PowerShell 5.1
 
@@ -20,7 +21,7 @@ major versions behind and in maintenance mode, Windows PowerShell is missing man
 bug fixes and APIs we use to make the extension experience great. So please, if you can,
 use PowerShell Core. That said, when using Windows PowerShell on older versions of the
 Windows operating system, if the extension is failing to start (e.g. [#2571][]), try
-installing [WMF 5.1][].
+installing [WMF 5.1][] and [.NET Framework 4.8][dotnet-framework].
 
 ## How do I debug my PowerShell script?
 
@@ -35,6 +36,19 @@ Scripting Guys blog posts (thanks community!):
 Script analysis is provided by the [PSScriptAnalyzer][] project on GitHub. If the warning
 message starts with `[PSScriptAnalyzer]` or if you are getting faulty script diagnostics
 (red and green squiggly lines under PowerShell in scripts) please [open an issue there][].
+
+## Completions aren't appearing
+
+First, please ensure that the extension itself has properly started. Do this by opening
+the PowerShell Extension Terminal and checking the value of the variable `$psEditor`,
+it should return a version and other fields. If it does not, you're probably in a
+different "PowerShell" terminal in VS Code, and not the PowerShell Extension Terminal.
+So please open a bug about your extension failing to start instead.
+
+If the extension _is_ started and the Extension Terminal functional, completions should appear! Please
+double-check that your `editor.suggest.showFunctions` VS Code setting is `true`, as
+setting it to `false` _will_ disable completions (from all extensions). You may also want
+to check other related settings under "Text Editor -> Suggestions" in VS Code.
 
 ## Double-click isn't selecting the whole variable
 
@@ -72,9 +86,9 @@ This will cause `-` to register as a word boundary, meaning for example on the `
 
 PowerShell syntax highlighting is performed in combination by the [PowerShell Extension][]
 (semantic highlighting) and [Editor Syntax][]. Syntax highlighting for VS Code, Atom,
-SublimeText and even GitHub is provided by the [Editor Syntax] repository on GitHub.
+SublimeText and even GitHub is provided by the [Editor Syntax][] repository on GitHub.
 
-We introduced [Semantic Highlighting][] in [v2021.2.2], a feature that applies tokenized
+We introduced [Semantic Highlighting][] in [v2021.2.2][], a feature that applies tokenized
 colors at a layer above [Editor Syntax][]. However, after [community feedback][#3221] and
 multiple bug reports (including colors changing unexpectedly and [randomly][#3295]), we
 have decided to disable it by default.
@@ -83,7 +97,7 @@ To enable semantic highlighting and use this "experimental" feature, set:
 
 ```json
 "[powershell]": {
-    "editor.semanticHighlighting.enabled": false
+    "editor.semanticHighlighting.enabled": true
 }
 ```
 
@@ -97,7 +111,8 @@ issues there in [Editor Syntax][].
 
 Due to a known issue in [Electron][], windows spawned by VS Code (such as those for
 `Get-Credential`, `Connect-MsolService`, `Connect-AzAccount`, `Connect-AzureAd`, etc.) do
-not appear above VS Code.
+not appear above VS Code. Use <kbd>Alt</kbd>+<kbd>Tab</kbd> on Windows or
+<kbd>Cmd</kbd>+<kbd>Tab</kbd> on macOS to switch to the other window.
 
 ## Visual Studio Code is not working like the ISE
 
@@ -113,11 +128,12 @@ and you can ask for new features [in their repository](https://github.com/Micros
 
 ## Known issues in the extension
 
-* If you are running the preview version "PowerShell Preview" side-by-side with the stable
-  version "PowerShell" you _will_ experience performance and debug issues. This is
-  expected until we adopt VS Code's extension channels in [#3716][].
+* "CorruptZip: end of central directory record signature not found" when installing the
+  extension, [#4474][].
 
-  * You MUST [DISABLE][] one of them.
+  * Unfortunately it appears that a common corporate VPN with a firewall by Palo Alto is
+    disrupting the download of the extension binary from the VS Code marketplace. Please
+    reach out to your network administrators about this.
 
 * "The Language Service could not be started" but it does start with the x86 version of
   PowerShell.
@@ -126,18 +142,29 @@ and you can ask for new features [in their repository](https://github.com/Micros
     other privilege management software dramatically slow down the start up of Windows
     PowerShell x64. Please give the privilege management software feedback.
 
-* Variable renaming doesn't work properly, [#261].
+* `Write-Output` is broken in Windows PowerShell 5.1, [#3991][].
+
+  * We seem to have recently narrowed this down! If `Start-Transcript` has been called
+    within the Extension Terminal, say in your PowerShell profile, this will eventually
+    cause output to no longer appear. Please try removing the call to `Start-Transcript`
+    and restarting the extension. We are investigating a fix.
+
+* Variable renaming doesn't work as expected, [#261][].
 
   * PowerShell's usage of [dynamic scope][] rather than [lexical scope][] makes it
     [formally undecidable][] to statically rename variables correctly (the only way to
     know for sure which `$x`s refer to the same variable is to run the PowerShell script).
     However, like with many features, we attempt a best effort.
 
-* "Go to Definition" doesn't work through module imports, [#499].
+* `$PSScriptRoot` is not populated when running a code block (via F8), [#633][].
 
-  * Again this is a best-effort task.
+  * This is by design. The value of `$PSScriptRoot` is only populated by PowerShell when
+    the caller is a script. Since <kbd>F8</kbd> or "Run Selection" is essentially
+    copy-pasting the selection into the terminal, it's behavior is the same as if you the
+    user pasted it. That is, it's a block of code and not a script file, and therefore
+    there is no relevant context to populate `$PSScriptRoot`.
 
-* Completions don't cycle when <kbd>Tab</kbd> is pressed like in the ISE, [#25].
+* Completions don't cycle when <kbd>Tab</kbd> is pressed like in the ISE, [#25][].
 
   * Use the tab completion settings recommended in the [ISE compatibility doc][].
 
@@ -145,12 +172,6 @@ and you can ask for new features [in their repository](https://github.com/Micros
 
   * Check that the dialog hasn't opened behind VS Code. This is a known issue in
     [Electron][], the framework used by VS Code.
-
-* PowerShell classes don't have proper reference / symbol support, [#3][].
-
-  * One of the blockers for this was that we still supported Windows PowerShell v3 and v4.
-    However, we don't support v3 and v4 anymore so we can do this work but it's not on the
-    roadmap at this time.
 
 * Document formatting takes a long time, [#984][].
 
@@ -218,7 +239,7 @@ To fix the issue, we need to be able to reproduce it. To do that, we need:
 
 In some cases, a GIF of the issue occurring is also very helpful.
 
-When you open a new issue, the GitHub issue template will have sections to guide you
+When you [open a new issue][], the GitHub issue template will have sections to guide you
 through providing all of this information as well as environment information discussed
 below.
 
@@ -295,7 +316,7 @@ these messages. To do this:
 
 ### Visual Studio Code version
 
-[Your VS Code version][] can be obtained from the Integrated Console or any terminal:
+[Your VS Code version][] can be obtained from the Extension Terminal or any terminal:
 
 ```powershell
 code --version
@@ -340,7 +361,7 @@ Extensions` and list your extensions.
 
 ### Editor Services version
 
-To get the [PowerShell Editor Services][] version, in the Integrated Console, enter:
+To get the [PowerShell Editor Services][] version, in the Extension Terminal, enter:
 
 ```powershell
 > $psEditor.EditorServicesVersion
@@ -351,7 +372,7 @@ Major  Minor  Build  Revision
 
 ### PowerShell version table
 
-You can get [your PowerShell version table][] from the Integrated Console through the
+You can get [your PowerShell version table][] from the Extension Terminal through the
 variable `$PSVersionTable`:
 
 ```powershell
@@ -382,9 +403,6 @@ WSManStackVersion              3.0
 [PSScriptAnalyzer]: https://github.com/PowerShell/PSScriptAnalyzer
 
 [Command Palette]: https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
-[Coordinated Vulnerability Disclosure]: https://technet.microsoft.com/security/dn467923
-[custom host]: https://docs.microsoft.com/en-us/powershell/developer/hosting/custom-host-samples
-[DISABLE]: https://code.visualstudio.com/docs/editor/extension-gallery#_disable-an-extension
 [dynamic scope]: http://ig2600.blogspot.com/2010/01/powershell-is-dynamically-scoped-and.html
 [Electron]: https://github.com/Microsoft/vscode/issues/42356
 [existing issues]: https://github.com/PowerShell/vscode-powershell/issues
@@ -394,35 +412,28 @@ WSManStackVersion              3.0
 [lexical scope]: https://stackoverflow.com/questions/1047454/what-is-lexical-scope
 [look there]: https://github.com/PowerShell/PowerShellEditorServices/issues
 [more information]: #providing-information-about-your-environment
-[open an issue]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
-[open a new issue]: #opening-a-new-issue
+[open a new issue]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
 [open an issue there]: https://github.com/PowerShell/PSScriptAnalyzer/issues/new/choose
 [PowerShell Core 7.2]: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2
-[Reporting Problems]: ../README.md#reporting-problems
 [semantic highlighting]: https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
 [tackling an issue]: ./development.md
 [v2021.2.2]: https://github.com/PowerShell/vscode-powershell/releases/tag/v2021.2.2
 [VS Code Settings]: https://code.visualstudio.com/docs/getstarted/settings
-[will break this compatibility]: https://github.com/PowerShell/vscode-powershell/issues/1310
 [WMF 5.1]: https://docs.microsoft.com/en-us/powershell/scripting/windows-powershell/wmf/setup/install-configure
+[dotnet-framework]: https://dotnet.microsoft.com/en-us/download/dotnet-framework
 [word separators]: https://stackoverflow.com/questions/31632351/visual-studio-code-customizing-word-separators
 [Your installed PowerShell Extension version]: https://code.visualstudio.com/docs/editor/extension-gallery#_list-installed-extensions
 [your PowerShell version table]: http://www.powertheshell.com/topic/learnpowershell/firststeps/psversion/
 [Your VS Code version]: https://code.visualstudio.com/docs/supporting/FAQ#_how-do-i-find-the-vs-code-version
 
-[#3]: https://github.com/PowerShell/vscode-powershell/issues/3
 [#25]: https://github.com/PowerShell/vscode-powershell/issues/25
-[#140]: https://github.com/PowerShell/vscode-powershell/issues/140
+[#4474]: https://github.com/PowerShell/vscode-powershell/issues/4474
+[#3991]: https://github.com/PowerShell/vscode-powershell/issues/3991
 [#261]: https://github.com/PowerShell/vscode-powershell/issues/261
 [#410 (comment)]: https://github.com/PowerShell/vscode-powershell/issues/410#issuecomment-397531817
-[#499]: https://github.com/PowerShell/vscode-powershell/issues/499
-[#535]: https://github.com/PowerShell/vscode-powershell/issues/535
-[#550]: https://github.com/PowerShell/vscode-powershell/issues/550
-[#647]: https://github.com/PowerShell/vscode-powershell/issues/647
 [#984]: https://github.com/PowerShell/vscode-powershell/issues/984
 [#2571]: https://github.com/PowerShell/vscode-powershell/issues/2572
 [#3221]: https://github.com/PowerShell/vscode-powershell/issues/3221#issuecomment-810563456
 [#3295]: https://github.com/PowerShell/vscode-powershell/issues/3295
-[#3378]: https://github.com/PowerShell/vscode-powershell/issues/3378
 [#3701]: https://github.com/PowerShell/vscode-powershell/issues/3701
-[#3716]: https://github.com/PowerShell/vscode-powershell/issues/3716
+[#633]: https://github.com/PowerShell/vscode-powershell/issues/633
