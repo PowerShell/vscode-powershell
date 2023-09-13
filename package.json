@@ -78,7 +78,7 @@
     "node-fetch": "2.7.0",
     "semver": "7.5.4",
     "untildify": "4.0.0",
-    "uuid": "9.0.0",
+    "uuid": "9.0.1",
     "vscode-languageclient": "8.1.0",
     "vscode-languageserver-protocol": "3.17.3"
   },
