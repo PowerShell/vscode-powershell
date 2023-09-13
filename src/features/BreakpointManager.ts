@@ -5,6 +5,7 @@ import vscode = require("vscode");
 import { LanguageClient } from "vscode-languageclient/node";
 import { Range, NotificationType, RequestType } from "vscode-languageserver-protocol";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import { Logger } from "../logging";
 
 export const BreakpointChangedNotificationType = new NotificationType<IPsesBreakpointChangedEventArgs>("powerShell/breakpointsChanged");
 export const SetBreakpointRequestType = new RequestType<IPsesBreakpoint, string, void>("powerShell/setBreakpoint");
@@ -33,41 +34,61 @@ interface IPsesBreakpointChangedEventArgs {
 }
 
 export class BreakpointManager extends LanguageClientConsumer{
-    private eventRegistration: vscode.Disposable;
+    private eventRegistration: vscode.Disposable | undefined;
 
-    private notificationRegistration: vscode.Disposable;
+    private notificationRegistration: vscode.Disposable | undefined;
 
-    private requestRegistration: vscode.Disposable;
+    private requestRegistration: vscode.Disposable | undefined;
 
-    public setLanguageClient(languageClient: LanguageClient): void {
+    private logger: Logger;
+
+    constructor(logger: Logger) {
+        super();
+
+        this.logger = logger;
+    }
+
+    public override setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
-        if (this.languageClient === undefined) {
-            return;
-        }
 
         this.requestRegistration = this.languageClient.onRequest(
             SetBreakpointRequestType,
             bp => {
-                const clientBp: vscode.Breakpoint = this.toVSCodeBreakpoint(bp);
+                const clientBp: vscode.Breakpoint | undefined = this.toVSCodeBreakpoint(bp);
+                if (clientBp === undefined) {
+                    return -1;
+                }
+
                 vscode.debug.addBreakpoints([clientBp]);
                 return clientBp.id;
             });
 
         this.notificationRegistration = this.languageClient.onNotification(
             BreakpointChangedNotificationType.method,
-            (eventArgs) => this.handleServerBreakpointChanged(this.toVSCodeBreakpointsChanged(eventArgs)));
+            (eventArgs) => {
+                this.handleServerBreakpointChanged(this.toVSCodeBreakpointsChanged(eventArgs));
+            });
 
         this.eventRegistration = vscode.debug.onDidChangeBreakpoints(
-            (eventArgs) => this.handleClientBreakpointChanged(eventArgs),
-            this)
+            (eventArgs) => {
+                this.handleClientBreakpointChanged(eventArgs)
+                    .catch((reason) => {
+                        this.logger.writeError(`Error occurred while handling client breakpoint changed: ${reason}`);
+                    });
+            },
+            this);
     }
 
     private handleServerBreakpointChanged(eventArgs: vscode.BreakpointsChangeEvent): void {
         vscode.debug.removeBreakpoints(eventArgs.removed);
     }
 
-    private handleClientBreakpointChanged(eventArgs: vscode.BreakpointsChangeEvent): void {
-        this.languageClient.sendNotification(
+    private async handleClientBreakpointChanged(eventArgs: vscode.BreakpointsChangeEvent): Promise<void> {
+        if (this.languageClient === undefined) {
+            return;
+        }
+
+        await this.languageClient.sendNotification(
             BreakpointChangedNotificationType,
             this.toPsesBreakpointsChanged(eventArgs));
     }
@@ -76,10 +97,11 @@ export class BreakpointManager extends LanguageClientConsumer{
         const map: Map<string, vscode.Breakpoint> = new Map<string, vscode.Breakpoint>(
             vscode.debug.breakpoints.map(bp => [bp.id, bp]));
 
+        const isBreakpoint = (bp: vscode.Breakpoint | undefined): bp is vscode.Breakpoint => bp !== undefined;
         return {
-            added: eventArgs.added.map((bp) => this.toVSCodeBreakpoint(bp, map)),
-            removed: eventArgs.removed.map((bp) => this.toVSCodeBreakpoint(bp, map)),
-            changed: eventArgs.changed.map((bp) => this.toVSCodeBreakpoint(bp, map)),
+            added: eventArgs.added.map((bp) => this.toVSCodeBreakpoint(bp, map)).filter(isBreakpoint),
+            removed: eventArgs.removed.map((bp) => this.toVSCodeBreakpoint(bp, map)).filter(isBreakpoint),
+            changed: eventArgs.changed.map((bp) => this.toVSCodeBreakpoint(bp, map)).filter(isBreakpoint),
         };
     }
 
@@ -91,13 +113,13 @@ export class BreakpointManager extends LanguageClientConsumer{
         };
     }
 
-    private toVSCodeBreakpoint(breakpoint: IPsesBreakpoint, map?: Map<string, vscode.Breakpoint>): vscode.Breakpoint {
-        const existing: vscode.Breakpoint = map?.get(breakpoint.id);
-        if (existing) {
+    private toVSCodeBreakpoint(breakpoint: IPsesBreakpoint, map?: Map<string, vscode.Breakpoint>): vscode.Breakpoint | undefined {
+        const existing: vscode.Breakpoint | undefined = map?.get(breakpoint.id);
+        if (existing !== undefined) {
             return existing;
         }
 
-        if (breakpoint.location !== null && breakpoint.location !== undefined) {
+        if (breakpoint.location !== undefined) {
             const bp = new vscode.SourceBreakpoint(
                 new vscode.Location(
                     vscode.Uri.parse(breakpoint.location.uri),
@@ -114,7 +136,7 @@ export class BreakpointManager extends LanguageClientConsumer{
             return bp;
         }
 
-        if (breakpoint.functionName !== null && breakpoint.functionName !== undefined) {
+        if (breakpoint.functionName !== undefined) {
             const fbp = new vscode.FunctionBreakpoint(
                 breakpoint.functionName,
                 breakpoint.enabled,
@@ -125,29 +147,33 @@ export class BreakpointManager extends LanguageClientConsumer{
             return fbp;
         }
 
+        this.logger.writeError(`Unable to translate PSES breakpoint: ${JSON.stringify(breakpoint)}`);
         return undefined;
     }
 
     private toPsesBreakpoint(breakpoint: vscode.Breakpoint): IPsesBreakpoint {
-        const location = (breakpoint as vscode.SourceBreakpoint).location;
-        let psesLocation: IPsesLocation;
-        if (location !== null && location !== undefined) {
+        let psesLocation: IPsesLocation | undefined = undefined;
+        if (breakpoint instanceof vscode.SourceBreakpoint) {
             psesLocation = {
-                uri: location.uri.toString(),
+                uri: breakpoint.location.uri.toString(),
                 range: {
                     start: {
-                        character: location.range.start.character,
-                        line: location.range.start.line,
+                        character: breakpoint.location.range.start.character,
+                        line: breakpoint.location.range.start.line,
                     },
                     end: {
-                        character: location.range.end.character,
-                        line: location.range.end.line,
+                        character: breakpoint.location.range.end.character,
+                        line: breakpoint.location.range.end.line,
                     },
                 },
             };
         }
 
-        const functionName = (breakpoint as vscode.FunctionBreakpoint).functionName;
+        let functionName: string | undefined = undefined;
+        if (breakpoint instanceof vscode.FunctionBreakpoint) {
+            functionName = breakpoint.functionName;
+        }
+
         return {
             id: breakpoint.id,
             enabled: breakpoint.enabled,

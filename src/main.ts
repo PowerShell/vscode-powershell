@@ -160,7 +160,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new PickPSHostProcessFeature(logger),
         new HelpCompletionFeature(),
         new CustomViewsFeature(),
-        new BreakpointManager(),
+        new BreakpointManager(logger),
         new PickRunspaceFeature(logger),
         externalApi
     ];
