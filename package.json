@@ -302,11 +302,6 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.WalkthroughTelemetry",
-        "title": "Walkthrough Telemetry",
-        "category": "PowerShell"
-      },
-      {
         "command": "PowerShell.ClosePanel",
         "title": "Close panel",
         "category": "PowerShell"
@@ -1119,14 +1114,6 @@
               "markdown": "media/walkthrough.md"
             },
             "description": "Now you are ready to start using the PowerShell Extension on your own and explore more resources!\n📚 See the PowerShell Extension's [documentation](https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode?view=powershell-7.2)\nℹ️ View Visual Studio Code's [documentation](https://code.visualstudio.com/docs/languages/powershell)\n🔌 Plug into the [PowerShell Community](https://docs.microsoft.com/en-us/powershell/scripting/community/community-support?view=powershell-7.2)\n📄 Take a look at our [Release Notes](https://docs.microsoft.com/en-us/powershell/scripting/whats-new/what-s-new-in-powershell-73?view=powershell-7.2)"
-          },
-          {
-            "id": "feedback",
-            "title": "Share your feedback",
-            "media": {
-              "markdown": "media/walkthrough.md"
-            },
-            "description": "How has this walkthrough affected your confidence level when using the PowerShell Extension?\n[I feel less confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A3%7D)\n[My confidence has not been affected](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A2%7D)\n[I feel more confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A1%7D)"
           }
         ]
       }

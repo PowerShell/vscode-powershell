@@ -470,12 +470,7 @@ export class SessionManager implements Middleware {
             vscode.commands.registerCommand(this.ShowSessionMenuCommandName, async () => { await this.showSessionMenu(); }),
             vscode.workspace.onDidChangeConfiguration(async () => { await this.onConfigurationUpdated(); }),
             vscode.commands.registerCommand(
-                "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionTerminal(isExecute); }),
-            vscode.commands.registerCommand(
-                "PowerShell.WalkthroughTelemetry", (satisfaction: number) => {
-                    this.sendTelemetryEvent("powershellWalkthroughSatisfaction", undefined, { level: satisfaction });
-                }
-            )
+                "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionTerminal(isExecute); })
         ];
     }
 
@@ -645,6 +640,8 @@ export class SessionManager implements Middleware {
         // TODO: We should only turn this on in preview.
         languageClient.registerProposedFeatures();
 
+        // NOTE: We don't currently send any events from PSES, but may again in
+        // the future so we're leaving this side wired up.
         languageClient.onTelemetry((event) => {
             const eventName: string = event.eventName ? event.eventName : "PSESEvent";
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -753,6 +750,8 @@ Type 'help' to get help.
         const versionDetails = await this.languageClient?.sendRequest(
             PowerShellVersionRequestType, timeout.token);
 
+        // This is pretty much the only telemetry event we care about.
+        // TODO: We actually could send this earlier from PSES itself.
         this.sendTelemetryEvent("powershellVersionCheck",
             { powershellVersion: versionDetails?.version ?? "unknown" });
 
