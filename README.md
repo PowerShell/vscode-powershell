@@ -90,16 +90,7 @@ button and choosing **Install Another Version**.
 
 ## Getting Help
 
-If you experience any problems with the PowerShell Extension, see the
-[troubleshooting docs](docs/troubleshooting.md) for common issues.
-
-If you find a bug, please [open an issue][] so we can fix it.
-
-Don't forget to check out the official guide on
-[Using VS Code for PowerShell Development][].
-
-[Using VS Code for PowerShell Development]: https://learn.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode
-[open an issue]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
+Please our [support](SUPPORT.md) document.
 
 ## Contributing to the Code
 
@@ -114,7 +105,7 @@ For any security issues, please see [here](./SECURITY.md).
 
 ### Current
 
-- Andy Jordan - [@andschwa](https://github.com/andschwa)
+- Andy Jordan - [@andyleejordan](https://github.com/andyleejordan)
 - Patrick Meinecke - [@SeeminglyScience](https://github.com/SeeminglyScience)
 - Sydney Smith - [@SydneyhSmith](https://github.com/SydneyhSmith)
 
