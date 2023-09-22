@@ -8,7 +8,7 @@ export abstract class LanguageClientConsumer {
 
     private _languageClient: LanguageClient | undefined;
 
-    public setLanguageClient(languageClient: LanguageClient) {
+    public setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
     }
 

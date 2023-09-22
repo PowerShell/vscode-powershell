@@ -19,7 +19,7 @@ export class ExamplesFeature implements vscode.Disposable {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 }

@@ -37,7 +37,7 @@ export class ShowHelpFeature extends LanguageClientConsumer {
         });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.command.dispose();
     }
 

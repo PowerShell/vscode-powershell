@@ -69,6 +69,12 @@ steps:
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
     pwsh: true
 
+# Necessary on Linux to run VS Code unit tests
+- bash: |
+    /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+  displayName: Start X virtual framebuffer
+  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
 # Tests in particular are run with either PowerShell Core or Windows PowerShell
 - task: PowerShell@2
   displayName: Run unit tests
@@ -82,6 +88,8 @@ steps:
       Invoke-Build -Configuration Release Test
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
     pwsh: ${{ parameters.pwsh }}
+  env:
+    DISPLAY: ':99.0'
 
 - task: PowerShell@2
   displayName: Assert PowerShellEditorServices release configuration

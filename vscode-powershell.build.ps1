@@ -101,7 +101,7 @@ task Build Restore, {
     # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
     # https://github.com/evanw/esbuild/issues/944
     switch ($Configuration) {
-        "Debug" { Invoke-BuildExec { & npm run build -- --sourcemap } }
+        "Debug" { Invoke-BuildExec { & npm run build } }
         "Release" { Invoke-BuildExec { & npm run build -- --minify } }
     }
 }
@@ -109,11 +109,11 @@ task Build Restore, {
 #endregion
 #region Test tasks
 
-task Test -If (!($env:TF_BUILD -and $global:IsLinux)) Build, {
+task Test Build, {
     Write-Host "`n### Running extension tests" -ForegroundColor Green
     Invoke-BuildExec { & npm run test }
     # Reset the state of files modified by tests
-    Invoke-BuildExec { git checkout package.json test/.vscode/settings.json}
+    Invoke-BuildExec { git checkout package.json test/TestEnvironment.code-workspace }
 }
 
 task TestEditorServices -If (Get-EditorServicesPath) {

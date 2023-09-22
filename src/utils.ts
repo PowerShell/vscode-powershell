@@ -11,7 +11,21 @@ export function escapeSingleQuotes(p: string): string {
     return p.replace(new RegExp("'", "g"), "''");
 }
 
-export function getPipePath(pipeName: string) {
+export function stripQuotePair(p: string | undefined): string | undefined {
+    if (p === undefined) {
+        return p;
+    }
+
+    // Remove matching surrounding quotes from p (without regex)
+    if (p.startsWith("'") && p.endsWith("'")
+        || p.startsWith("\"") && p.endsWith("\"")) {
+        return p.slice(1, -1);
+    }
+
+    return p;
+}
+
+export function getPipePath(pipeName: string): string {
     if (os.platform() === "win32") {
         return "\\\\.\\pipe\\" + pipeName;
     } else {
@@ -34,7 +48,6 @@ async function checkIfFileOrDirectoryExists(targetPath: string | vscode.Uri, typ
                 : vscode.Uri.file(targetPath));
         return (stat.type & type) !== 0;
     } catch {
-        // TODO: Maybe throw if it's not a FileNotFound exception.
         return false;
     }
 }
@@ -55,7 +68,7 @@ export async function readDirectory(directoryPath: string | vscode.Uri): Promise
     return items.map(([name, _type]) => name);
 }
 
-export function getTimestampString() {
+export function getTimestampString(): string {
     const time = new Date();
     return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;
 }

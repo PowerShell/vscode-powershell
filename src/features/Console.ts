@@ -176,7 +176,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
             vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
                 if (vscode.window.activeTerminal &&
                     vscode.window.activeTerminal.name !== "PowerShell Extension") {
-                    this.logger.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'");
+                    this.logger.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'.");
                     await vscode.commands.executeCommand("workbench.action.terminal.runSelectedText");
 
                     // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
@@ -213,7 +213,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this.commands) {
             command.dispose();
         }
@@ -222,7 +222,7 @@ export class ConsoleFeature extends LanguageClientConsumer {
         }
     }
 
-    public override setLanguageClient(languageClient: LanguageClient) {
+    public override setLanguageClient(languageClient: LanguageClient): void {
         this.languageClient = languageClient;
         this.handlers = [
             this.languageClient.onRequest(

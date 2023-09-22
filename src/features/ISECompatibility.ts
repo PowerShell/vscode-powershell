@@ -32,7 +32,6 @@ export class ISECompatibilityFeature implements vscode.Disposable {
     private _originalSettings: Record<string, boolean | string | undefined> = {};
 
     constructor() {
-        // TODO: This test isn't great.
         const testSetting = ISECompatibilityFeature.settings[ISECompatibilityFeature.settings.length - 1];
         this._iseModeEnabled = vscode.workspace.getConfiguration(testSetting.path).get(testSetting.name) === testSetting.value;
         this._commandRegistrations = [
@@ -42,13 +41,13 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         ];
     }
 
-    public dispose() {
+    public dispose(): void {
         for (const command of this._commandRegistrations) {
             command.dispose();
         }
     }
 
-    private async EnableISEMode() {
+    private async EnableISEMode(): Promise<void> {
         this._iseModeEnabled = true;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             try {
@@ -73,7 +72,7 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         }
     }
 
-    private async DisableISEMode() {
+    private async DisableISEMode(): Promise<void> {
         this._iseModeEnabled = false;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             const config = vscode.workspace.getConfiguration(iseSetting.path);
@@ -84,7 +83,7 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         }
     }
 
-    private async ToggleISEMode() {
+    private async ToggleISEMode(): Promise<void> {
         if (this._iseModeEnabled) {
             await this.DisableISEMode();
         } else {

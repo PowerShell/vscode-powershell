@@ -30,12 +30,12 @@ export class CodeActionsFeature implements vscode.Disposable {
             });
     }
 
-    public dispose() {
+    public dispose(): void {
         this.applyEditsCommand.dispose();
         this.showDocumentationCommand.dispose();
     }
 
-    public async showRuleDocumentation(ruleId: string) {
+    public async showRuleDocumentation(ruleId: string): Promise<void> {
         const pssaDocBaseURL = "https://docs.microsoft.com/powershell/utility-modules/psscriptanalyzer/rules/";
 
         if (!ruleId) {

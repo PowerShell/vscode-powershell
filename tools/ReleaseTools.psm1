@@ -7,6 +7,7 @@ using module PowerShellForGitHub
 using namespace System.Management.Automation
 
 Import-Module $PSScriptRoot/VersionTools.psm1
+$ChangelogFile = "CHANGELOG.md"
 
 <#
 .SYNOPSIS
@@ -16,7 +17,6 @@ function Update-Branch {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
         [string]$RepositoryName
     )
     Use-Repository -RepositoryName $RepositoryName -Script {
@@ -37,7 +37,6 @@ function Get-Bullets {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
         [Parameter(Mandatory, ValueFromPipeline)]
@@ -45,7 +44,7 @@ function Get-Bullets {
     )
     begin {
         $SkipThanks = @(
-            'andschwa'
+            'andyleejordan'
             'daxian-dbw'
             'PaulHigin'
             'SeeminglyScience'
@@ -97,7 +96,7 @@ function Get-Bullets {
 
         # NOTE: The URL matcher must be explicit because the body of a PR may
         # contain other URLs with digits (like an image asset).
-        $IssueRegex = '(' + ($CloseKeywords -join '|') + ')\s+((https://github.com/PowerShell/(?<repo>(' + ([RepoNames]::Values -join '|') + '))/issues/)|#)(?<number>\d+)'
+        $IssueRegex = '(' + ($CloseKeywords -join '|') + ')\s+((https://github.com/PowerShell/(?<repo>(vscode-powershell|PowerShellEditorServices))/issues/)|#)(?<number>\d+)'
     }
 
     process {
@@ -112,7 +111,7 @@ function Get-Bullets {
                 $number = $Matches.number
                 $repo = $Matches.repo
                 # Handle links to issues in both repos, in both shortcode and URLs.
-                $name = [RepoNames]::Values | Where-Object { $repo -match $_ } | Select-Object -First 1
+                $name = ("vscode-powershell", "PowerShellEditorServices") | Where-Object { $repo -match $_ } | Select-Object -First 1
                 "$($name ?? $RepositoryName) #$number"
             } else {
                 "$RepositoryName #$($_.number)"
@@ -141,7 +140,7 @@ function Update-Changelog {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName,
 
         [Parameter(Mandatory)]
@@ -228,7 +227,7 @@ function Update-Version {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
@@ -287,7 +286,7 @@ function New-ReleasePR {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName
     )
     $Version = Get-Version -RepositoryName $RepositoryName
@@ -340,11 +339,10 @@ function New-Release {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
+        [ValidateSet("vscode-powershell", "PowerShellEditorServices")]
         [string]$RepositoryName,
 
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
         [string]$Version
     )
     # TODO: Automate rolling a preview to a stable release.
@@ -363,11 +361,9 @@ function New-ReleaseBundle {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
         [string]$PsesVersion,
 
         [Parameter(Mandatory)]
-        [ValidateScript({ $_.StartsWith("v") })]
         [string]$VsceVersion
     )
     "PowerShellEditorServices", "vscode-powershell" | ForEach-Object {
@@ -391,7 +387,6 @@ function New-DraftRelease {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]
-        [ValidateSet([RepoNames])]
         [string]$RepositoryName,
 
         [Parameter()]

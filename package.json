@@ -1,12 +1,12 @@
 {
   "name": "powershell",
   "displayName": "PowerShell",
-  "version": "2023.3.1",
+  "version": "2023.9.2",
   "preview": false,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.67.0"
+    "vscode": "^1.79.2"
   },
   "author": "Microsoft Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -74,38 +74,43 @@
     "onWalkthrough:PowerShell"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "0.6.2",
-    "node-fetch": "2.6.9",
-    "semver": "7.3.8",
-    "uuid": "9.0.0",
+    "@vscode/extension-telemetry": "0.8.4",
+    "node-fetch": "2.7.0",
+    "semver": "7.5.4",
+    "untildify": "4.0.0",
+    "uuid": "9.0.1",
     "vscode-languageclient": "8.1.0",
     "vscode-languageserver-protocol": "3.17.3"
   },
   "devDependencies": {
-    "@types/glob": "8.0.1",
     "@types/mocha": "10.0.1",
     "@types/mock-fs": "4.13.1",
     "@types/node": "16.18.12",
-    "@types/node-fetch": "2.6.2",
+    "@types/node-fetch": "2.6.4",
     "@types/rewire": "2.5.28",
-    "@types/semver": "7.3.13",
-    "@types/sinon": "10.0.13",
-    "@types/uuid": "9.0.1",
-    "@types/vscode": "1.67.0",
-    "@typescript-eslint/eslint-plugin": "5.56.0",
-    "@typescript-eslint/parser": "5.55.0",
-    "@vscode/test-electron": "2.3.0",
-    "@vscode/vsce": "2.18.0",
-    "esbuild": "0.17.12",
-    "eslint": "8.36.0",
+    "@types/semver": "7.5.2",
+    "@types/sinon": "10.0.16",
+    "@types/ungap__structured-clone": "0.3.0",
+    "@types/uuid": "9.0.4",
+    "@types/vscode": "1.79.0",
+    "@typescript-eslint/eslint-plugin": "6.7.2",
+    "@typescript-eslint/parser": "6.7.2",
+    "@ungap/structured-clone": "1.2.0",
+    "@vscode/debugprotocol": "1.63.0",
+    "@vscode/test-electron": "2.3.4",
+    "@vscode/vsce": "2.21.0",
+    "esbuild": "0.19.3",
+    "eslint": "8.49.0",
     "eslint-plugin-header": "3.1.1",
-    "glob": "8.1.0",
+    "glob": "10.3.4",
     "mocha": "10.2.0",
+    "mocha-explorer-launcher-scripts": "0.4.0",
     "mocha-multi-reporters": "1.5.1",
     "mock-fs": "5.2.0",
-    "rewire": "6.0.0",
-    "sinon": "15.0.2",
-    "typescript": "5.0.2"
+    "rewire": "7.0.0",
+    "sinon": "16.0.0",
+    "source-map-support": "0.5.21",
+    "typescript": "5.2.2"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -113,8 +118,11 @@
   "main": "./out/main.js",
   "scripts": {
     "lint": "eslint . --ext .ts",
-    "build": "tsc --project tsconfig.json && esbuild ./src/main.ts --outdir=out --bundle --external:vscode --platform=node",
-    "test": "node ./out/test/runTests.js",
+    "build": "esbuild ./src/main.ts --outdir=out --sourcemap --bundle --external:vscode --platform=node",
+    "build-watch": "npm run build -- --watch",
+    "build-test": "tsc --incremental",
+    "build-test-watch": "npm run build-test -- --watch",
+    "test": "npm run build-test && node ./out/test/runTests.js",
     "package": "vsce package --no-gitHubIssueLinking",
     "publish": "vsce publish"
   },
@@ -291,11 +299,6 @@
       {
         "command": "PowerShell.InvokeRegisteredEditorCommand",
         "title": "Invoke Registered Editor Command",
-        "category": "PowerShell"
-      },
-      {
-        "command": "PowerShell.WalkthroughTelemetry",
-        "title": "Walkthrough Telemetry",
         "category": "PowerShell"
       },
       {
@@ -496,6 +499,52 @@
               "request": "attach",
               "processId": "current"
             }
+          },
+          {
+            "label": "PowerShell: Run Pester Tests",
+            "description": "Debug Pester Tests detected in your current directory (runs Invoke-Pester)",
+            "body": {
+              "name": "PowerShell Run Pester Tests",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Invoke-Pester",
+              "createTemporaryIntegratedConsole": true,
+              "attachDotnetDebugger": true
+            }
+          },
+          {
+            "label": "PowerShell: Interactive Session (Module)",
+            "description": "Debug commands executed from the PowerShell Extension Terminal after auto-loading your module",
+            "body": {
+              "name": "PowerShell: Module Interactive Session",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Enter command to import your binary module, for example: \"Import-Module -Force ${workspaceFolder}/path/to/module.psd1|dll\""
+            }
+          },
+          {
+            "label": "PowerShell: Interactive Session (Binary Module)",
+            "description": "Debug a .NET binary or hybrid module loaded into a PowerShell session. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
+            "body": {
+              "name": "PowerShell: Binary Module Interactive",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Enter command to import your binary module, for example: \"Import-Module -Force ${workspaceFolder}/path/to/module.psd1|dll\"",
+              "createTemporaryIntegratedConsole": true,
+              "attachDotnetDebugger": true
+            }
+          },
+          {
+            "label": "Run Pester Tests (Binary Module)",
+            "description": "Debug a .NET binary or hybrid module by running Pester tests. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
+            "body": {
+              "name": "PowerShell: Binary Module Pester Tests",
+              "type": "PowerShell",
+              "request": "launch",
+              "script": "Invoke-Pester",
+              "createTemporaryIntegratedConsole": true,
+              "attachDotnetDebugger": true
+            }
           }
         ],
         "configurationAttributes": {
@@ -521,6 +570,16 @@
               "createTemporaryIntegratedConsole": {
                 "type": "boolean",
                 "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
+                "default": false
+              },
+              "attachDotnetDebugger": {
+                "type": "boolean",
+                "description": "If specified, a C# debug session will be started and attached to the new temporary extension terminal. This does nothing unless 'powershell.debugging.createTemporaryIntegratedConsole' is also specified.",
+                "default": false
+              },
+              "dotnetDebuggerConfigName": {
+                "type": "string",
+                "description": "If you would like to use a custom coreclr attach debug launch configuration for the debug session, specify the name here. Otherwise a default basic config will be used. The config must be a coreclr attach config. Launch configs are not supported.",
                 "default": false
               }
             }
@@ -607,6 +666,11 @@
           "markdownDescription": "**Deprecated:** Specifies whether you should be prompted to update your version of `PackageManagement` if it's under 1.4.6.",
           "markdownDeprecationMessage": "**Deprecated:** This prompt has been removed as it's no longer strictly necessary to upgrade the `PackageManagement` module."
         },
+        "powershell.suppressAdditionalExeNotFoundWarning": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Suppresses the warning message when any of `#powershell.powerShellAdditionalExePaths#` is not found."
+        },
         "powershell.startAsLoginShell.osx": {
           "type": "boolean",
           "default": true,
@@ -667,7 +731,7 @@
         "powershell.cwd": {
           "type": "string",
           "default": "",
-          "markdownDescription": "An explicit start path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. **Path must be fully resolved: variables are not supported!**"
+          "markdownDescription": "A path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. Does not support variables, but does support the use of '~' and paths relative to a single workspace. **For multi-root workspaces, use the name of the folder you wish to have as the cwd.**"
         },
         "powershell.scriptAnalysis.enable": {
           "type": "boolean",
@@ -823,6 +887,19 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Starts the Extension Terminal in the background. **If this is enabled, to access the terminal you must run the [Show Extension Terminal command](command:PowerShell.ShowSessionConsole), and once shown it cannot be put back into the background.** This option completely hides the Extension Terminal from the terminals view. You are probably looking for the `#powershell.integratedConsole.showOnStartup#` option instead."
+        },
+        "powershell.integratedConsole.startLocation": {
+          "type": "string",
+          "default": "Panel",
+          "enum": [
+            "Editor",
+            "Panel"
+          ],
+          "markdownEnumDescriptions": [
+            "Creates the Extension Terminal in Editor area",
+            "Creates the Extension Terminal in Panel area"
+          ],
+          "markdownDescription": "Sets the startup location for Extension Terminal."
         },
         "powershell.integratedConsole.focusConsoleOnExecute": {
           "type": "boolean",
@@ -1037,14 +1114,6 @@
               "markdown": "media/walkthrough.md"
             },
             "description": "Now you are ready to start using the PowerShell Extension on your own and explore more resources!\n📚 See the PowerShell Extension's [documentation](https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode?view=powershell-7.2)\nℹ️ View Visual Studio Code's [documentation](https://code.visualstudio.com/docs/languages/powershell)\n🔌 Plug into the [PowerShell Community](https://docs.microsoft.com/en-us/powershell/scripting/community/community-support?view=powershell-7.2)\n📄 Take a look at our [Release Notes](https://docs.microsoft.com/en-us/powershell/scripting/whats-new/what-s-new-in-powershell-73?view=powershell-7.2)"
-          },
-          {
-            "id": "feedback",
-            "title": "Share your feedback",
-            "media": {
-              "markdown": "media/walkthrough.md"
-            },
-            "description": "How has this walkthrough affected your confidence level when using the PowerShell Extension?\n[I feel less confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A3%7D)\n[My confidence has not been affected](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A2%7D)\n[I feel more confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A1%7D)"
           }
         ]
       }

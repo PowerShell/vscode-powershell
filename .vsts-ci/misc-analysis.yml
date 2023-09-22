@@ -1,12 +1,11 @@
-name: PR-$(System.PullRequest.PullRequestNumber)-$(Date:yyyyMMdd)$(Rev:.rr)
+name: Misc-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
 trigger:
-  branches:
-    include:
-    - main
-
+  - gh-readonly-queue/main/*
 pr:
-- main
+  paths:
+    exclude:
+    - '**/*.md'
 
 resources:
   repositories:
@@ -23,6 +22,7 @@ jobs:
   - checkout: self
   - checkout: ComplianceRepo
   - template: ci-compliance.yml@ComplianceRepo
+
 # NOTE: This enables our project to work with Visual Studio's Rich Navigation:
 # https://visualstudio.microsoft.com/services/rich-code-navigation/
 - job: RichCodeNav

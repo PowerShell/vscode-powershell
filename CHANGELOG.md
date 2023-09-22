@@ -1,5 +1,246 @@
 # PowerShell Extension Release History
 
+## v2023.9.2-preview
+### Wednesday, September 13, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ⚡️ 💭 [vscode-powershell #4734](https://github.com/PowerShell/vscode-powershell/pull/4734) - Remove unused telemetry.
+- ✨ 📖 [vscode-powershell #4729](https://github.com/PowerShell/vscode-powershell/pull/4729) - Add note about installing ESLint globally for VS Code extension.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.11.0
+
+- 🐛 💭 [vscode-powershell #4735](https://github.com/PowerShell/PowerShellEditorServices/pull/2066) - Add `None` to `PsesLogLevel` enum.
+- ⚡️ 💭 [PowerShellEditorServices #2065](https://github.com/PowerShell/PowerShellEditorServices/pull/2065) - Remove unused telemetry.
+- 🐛 🔍 [vscode-powershell #3904](https://github.com/PowerShell/PowerShellEditorServices/pull/2064) - Fix debugging script blocks that aren't in files.
+- 🐛 🚂 [vscode-powershell #3971](https://github.com/PowerShell/PowerShellEditorServices/pull/2062) - Import `PSDesiredStateConfiguration` by name.
+
+## v2023.9.1-preview
+### Friday, August 25, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4711](https://github.com/PowerShell/vscode-powershell/pull/4711) - Update extension telemetry dependency.
+- ✨ 👷 [vscode-powershell #4707](https://github.com/PowerShell/vscode-powershell/pull/4707) - Move `--sourcemap` to scripts instead of `Invoke-Build`. (Thanks @JustinGrote!)
+- #️⃣ 🙏 [vscode-powershell #4702](https://github.com/PowerShell/vscode-powershell/pull/4704) - Use a CustomRequest to disconnect the dotnet debugger from attach sessions.. (Thanks @JustinGrote!)
+- 🐛 🙏 [vscode-powershell #2960](https://github.com/PowerShell/vscode-powershell/pull/4703) - Respect file path casing in extension commands.
+- 🐛 📺 [vscode-powershell #4696](https://github.com/PowerShell/vscode-powershell/pull/4696) - Fix race condition with displaying PowerShell name on icon.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.10.0
+
+- 🐛 🔍 [PowerShellEditorServices #2037](https://github.com/PowerShell/PowerShellEditorServices/pull/2058) - Ignore not finding DSC module.
+- ✨ 🚨 [vscode-powershell #3484](https://github.com/PowerShell/PowerShellEditorServices/pull/2055) - Move `ConstrainedLanguageMode` tests to separate task.
+- ✨ 📟 [PowerShellEditorServices #2054](https://github.com/PowerShell/PowerShellEditorServices/pull/2054) - Update PSReadLine to `v2.3.2-beta2`.
+- ✨ 🙏 [PowerShellEditorServices #2053](https://github.com/PowerShell/PowerShellEditorServices/pull/2053) - Fix up extension API.
+- 🐛 📟 [PowerShellEditorServices #2050](https://github.com/PowerShell/PowerShellEditorServices/pull/2052) - Fix shell integration for PowerShell 5.1 with strict mode.
+
+## v2023.9.0-preview
+### Wednesday, August 09, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🔧 [vscode-powershell #4557](https://github.com/PowerShell/vscode-powershell/pull/4687) - Support `~`, `./` and named workspace folders in `cwd`.
+- ✨ 🔧 [vscode-powershell #4686](https://github.com/PowerShell/vscode-powershell/pull/4686) - Enhance `additionalPowerShellExes` setting.
+- #️⃣ 🙏 [vscode-powershell #4684](https://github.com/PowerShell/vscode-powershell/pull/4684) - Remove LinkEditorServices comment in development.md. (Thanks @fflaten!)
+- #️⃣ 🙏 [vscode-powershell #4676](https://github.com/PowerShell/vscode-powershell/pull/4676) - Move ESLint Dependabot group to npm. (Thanks @fflaten!)
+- #️⃣ 🙏 [vscode-powershell #4667](https://github.com/PowerShell/vscode-powershell/pull/4667) - Bump ESLint packages to v6.
+- #️⃣ 🙏 [vscode-powershell #4661](https://github.com/PowerShell/vscode-powershell/pull/4661) - Update readme.
+- 🐛 👷 [vscode-powershell #4651](https://github.com/PowerShell/vscode-powershell/pull/4651) - Fix unit test for Windows running on arm64.
+- ✨ 👷 [vscode-powershell #4641](https://github.com/PowerShell/vscode-powershell/pull/4641) - Update VS Code engine to 1.79.0.
+- ✨ 🔧 [vscode-powershell #4181](https://github.com/PowerShell/vscode-powershell/pull/4639) - Add `startLocation` setting for Extension Terminal. (Thanks @krishankanumuri!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.9.0
+
+- ✨ 📟 [PowerShellEditorServices #2046](https://github.com/PowerShell/PowerShellEditorServices/pull/2046) - Bump PSReadLine to beta for extension preview.
+
+## v2023.6.0
+### Tuesday, June 06, 2023
+
+This release focused on fixing the "disappearing output" bug present in PowerShell 5.1,
+where an old bug with the `Out-Default` cmdlet's `TranscribeOnly` flag could cause the
+Extension Terminal to stop displaying output. While the root cause in the cmdlet is fixed
+upstream, that fix is only in PowerShell Core, and not backported to Windows PowerShell.
+We were able to workaround the bug with a very careful use of reflection to reset the
+flag's value at the appropriate times (see the three takes it took to get this right).
+
+We also refactored the client's startup logic so that it should be impossible to create a
+ghost Extension Terminal, and the error handling and logging was given a thorough cleanup.
+Finally, two noisy bugs were fixed: when completions are canceled the useless error
+message is no longer produced, and when the DSC module is only loaded in one attempt
+instead of repeatedly.
+
+Please enjoy these bugfixes! We sure enjoy making the extension more stable.
+
+Don't forget to catch Andy's talk, "PowerShell Extension for VS Code Deep Dive" at
+[PSConfEU](https://psconf.eu) on Thursday, 22 June 2023!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4599](https://github.com/PowerShell/vscode-powershell/pull/4599) - Make `sessionManager.start()` idempotent.
+- 🐛 🛫 [vscode-powershell #4584](https://github.com/PowerShell/vscode-powershell/pull/4584) - Robustify startup, error handling, and logging.
+- 🐛 📺 [vscode-powershell #4553](https://github.com/PowerShell/vscode-powershell/pull/4570) - Remove the MSI install logic (it's unreliable).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.7
+
+- 🐛 📟 [PowerShellEditorServices #2031](https://github.com/PowerShell/PowerShellEditorServices/pull/2031) - Fix the `TranscribeOnly` bug (take three).
+- 🐛 💭 [vscode-powershell #4582](https://github.com/PowerShell/PowerShellEditorServices/pull/2028) - Ignore cancellation of completion requests.
+- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2026) - Fix the `TranscribeOnly` bug (take two).
+- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2023) - Fix disappearing output in PowerShell 5.1.
+- 🐛 🔍 [PowerShellEditorServices #2020](https://github.com/PowerShell/PowerShellEditorServices/pull/2020) - Fix repeated failure to load DSC module.
+
+## v2023.5.4-preview
+### Tuesday, May 30, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+No changes, just pulling in PSES.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.7
+
+- 🐛 📟 [PowerShellEditorServices #2031](https://github.com/PowerShell/PowerShellEditorServices/pull/2031) - Fix the `TranscribeOnly` bug (take three).
+
+## v2023.5.3-preview
+### Wednesday, May 24, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4599](https://github.com/PowerShell/vscode-powershell/pull/4599) - Make `sessionManager.start()` idempotent.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.6
+
+No changes.
+
+## v2023.5.2-preview
+### Tuesday, May 23, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🛫 [vscode-powershell #4584](https://github.com/PowerShell/vscode-powershell/pull/4584) - Robustify startup, error handling, and logging.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.6
+
+- 🐛 💭 [vscode-powershell #4582](https://github.com/PowerShell/PowerShellEditorServices/pull/2028) - Ignore cancellation of completion requests.
+- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2026) - Fix the `TranscribeOnly` bug (take two).
+
+## v2023.5.1-preview
+### Friday, May 12, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 📺 [vscode-powershell #4553](https://github.com/PowerShell/vscode-powershell/pull/4570) - Remove the MSI install logic (it's unreliable).
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.5
+
+- 🐛 📟 [vscode-powershell #3991](https://github.com/PowerShell/PowerShellEditorServices/pull/2023) - Fix disappearing output in PowerShell 5.1.
+- 🐛 🔍 [PowerShellEditorServices #2020](https://github.com/PowerShell/PowerShellEditorServices/pull/2020) - Fix repeated failure to load DSC module.
+
+## v2023.5.0
+### Wednesday, May 03, 2023
+
+This release focused on include Justin Grote's new "attach .NET debugger" debug
+configuration for binary PowerShell modules, and on handling start-up failures more
+gracefully. If the start-up fails because the configured PowerShell is out-of-date,
+instead of a confusing "undefined" error message we now detect the problem, inform the
+user with a pop-up message of it, and offer to open the installation and/or update
+instructions.
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4549](https://github.com/PowerShell/vscode-powershell/pull/4549) - Update readme and troubleshooting docs.
+- ✨ 🙏 [vscode-powershell #4548](https://github.com/PowerShell/vscode-powershell/pull/4548) - Use named debug configurations instead of duplicating them.
+- 🐛 🚨 [vscode-powershell #4547](https://github.com/PowerShell/vscode-powershell/pull/4547) - Fix flaky test.
+- 🐛 🛫 [vscode-powershell #4543](https://github.com/PowerShell/vscode-powershell/pull/4543) - Update startup logic to handle session failure reasons.
+- #️⃣ 🙏 [vscode-powershell #4534](https://github.com/PowerShell/vscode-powershell/pull/4534) - Add ESBuild Problem Matcher Extension. (Thanks @JustinGrote!)
+- 🐛 🙏 [vscode-powershell #4521](https://github.com/PowerShell/vscode-powershell/pull/4532) - Handle end-of-support PowerShell with error message.
+- ✨ 👷 [vscode-powershell #4518](https://github.com/PowerShell/vscode-powershell/pull/4518) - Enable Mocha Test Explorer Integration. (Thanks @JustinGrote!)
+- 🐛 🔍 [vscode-powershell #4517](https://github.com/PowerShell/vscode-powershell/pull/4517) - Fix `attachDotnetDebugger` with custom config. (Thanks @fflaten!)
+- 🐛 🔍 [vscode-powershell #4516](https://github.com/PowerShell/vscode-powershell/pull/4516) - Add new debug configurations to `package.json`. (Thanks @JustinGrote!)
+- #️⃣ 🔍 [vscode-powershell #4511](https://github.com/PowerShell/vscode-powershell/pull/4511) - Add additional debug configuration templates for Pester and binary modules. (Thanks @JustinGrote!)
+- #️⃣ 🔍🙏 [vscode-powershell #4510](https://github.com/PowerShell/vscode-powershell/pull/4510) - Improve extension authoring experience with new Build Tasks and Launch Configs. (Thanks @JustinGrote!)
+- ✨ 👷 [vscode-powershell #4502](https://github.com/PowerShell/vscode-powershell/pull/4503) - Enable VS Code unit tests in Linux CI.
+- ✨ 🙏 [vscode-powershell #4498](https://github.com/PowerShell/vscode-powershell/pull/4500) - Enable ESLint `explicit-function-return-type`.
+- ✨ 🔍 [vscode-powershell #3903](https://github.com/PowerShell/vscode-powershell/pull/3903) - Add `attachDotnetDebugger` debug option. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.4
+
+- 🐛 🛫 [vscode-powershell #4509](https://github.com/PowerShell/PowerShellEditorServices/pull/2018) - Set session failure with reason when applicable.
+- ✨ 📖 [PowerShellEditorServices #2016](https://github.com/PowerShell/PowerShellEditorServices/pull/2016) - Add guide to configure Neovim. (Thanks @csc027!)
+
+## v2023.4.1-preview
+### Tuesday, April 25, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🛫 [vscode-powershell #4543](https://github.com/PowerShell/vscode-powershell/pull/4543) - Update startup logic to handle session failure reasons.
+- #️⃣ 🙏 [vscode-powershell #4534](https://github.com/PowerShell/vscode-powershell/pull/4534) - Add ESBuild Problem Matcher Extension. (Thanks @JustinGrote!)
+- 🐛 🙏 [vscode-powershell #4521](https://github.com/PowerShell/vscode-powershell/pull/4532) - Handle end-of-support PowerShell with error message.
+- ✨ 👷 [vscode-powershell #4518](https://github.com/PowerShell/vscode-powershell/pull/4518) - Enable Mocha Test Explorer Integration. (Thanks @JustinGrote!)
+- 🐛 🔍 [vscode-powershell #4517](https://github.com/PowerShell/vscode-powershell/pull/4517) - Fix `attachDotnetDebugger` with custom config. (Thanks @fflaten!)
+- 🐛 🔍 [vscode-powershell #4516](https://github.com/PowerShell/vscode-powershell/pull/4516) - Add new debug configurations to `package.json`. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.4
+
+- 🐛 🛫 [vscode-powershell #4509](https://github.com/PowerShell/PowerShellEditorServices/pull/2018) - Set session failure with reason when applicable.
+- ✨ 📖 [PowerShellEditorServices #2016](https://github.com/PowerShell/PowerShellEditorServices/pull/2016) - Add guide to configure Neovim. (Thanks @csc027!)
+
+## v2023.4.0-preview
+### Wednesday, April 12, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🔍 [vscode-powershell #4511](https://github.com/PowerShell/vscode-powershell/pull/4511) - Add additional debug configuration templates for Pester and binary modules. (Thanks @JustinGrote!)
+- #️⃣ 🔍🙏 [vscode-powershell #4510](https://github.com/PowerShell/vscode-powershell/pull/4510) - Improve extension authoring experience with new Build Tasks and Launch Configs. (Thanks @JustinGrote!)
+- ✨ 👷 [vscode-powershell #4502](https://github.com/PowerShell/vscode-powershell/pull/4503) - Enable VS Code unit tests in Linux CI.
+- ✨ 🙏 [vscode-powershell #4498](https://github.com/PowerShell/vscode-powershell/pull/4500) - Enable ESLint `explicit-function-return-type`.
+- ✨ 🔍 [vscode-powershell #3903](https://github.com/PowerShell/vscode-powershell/pull/3903) - Add `attachDotnetDebugger` debug option. (Thanks @JustinGrote!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.3
+
+- No update.
+
+## v2023.3.3
+### Thursday, March 30, 2023
+
+This is primarily a bug-fix focused release, and we want to say thanks to all our loyal
+preview extension users! The "PowerShell Preview" extension has now been officially
+deprecated, with "preview" releases now available via the "pre-release" option on the
+stable "PowerShell" extension in the marketplace. While you should be migrated
+automatically, feel free to just uninstall the preview and install the now one-and-only
+extension, but please keep testing our pre-releases! This change makes it much simpler to
+use, as you no longer have to switch between two different extensions and instead can use
+VS Code's marketplace to install your choice of version!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 👷 [vscode-powershell #4481](https://github.com/PowerShell/vscode-powershell/pull/4481) - Remove problematic `[RepoNames]` PowerShell class.
+- ✨ 👷 [vscode-powershell #4464](https://github.com/PowerShell/vscode-powershell/pull/4464) - Remove `preview` label from marketplace.
+- ✨ 👷 [vscode-powershell #3716](https://github.com/PowerShell/vscode-powershell/pull/4462) - Adopt the pre-release extension feature.
+- 🐛 ✂️ [vscode-powershell #4455](https://github.com/PowerShell/vscode-powershell/pull/4455) - Fix up "Calculated Property" snippet. (Thanks @DougDyreng!)
+- 🐛 📺 [vscode-powershell #4453](https://github.com/PowerShell/vscode-powershell/pull/4454) - Fix `GenerateBugReport` command to pre-fill template.
+- ✨ 🙏 [vscode-powershell #4425](https://github.com/PowerShell/vscode-powershell/pull/4425) - Hide last line in folded ranges for ISE Mode. (Thanks @fflaten!)
+- #️⃣ 🙏 [vscode-powershell #4417](https://github.com/PowerShell/vscode-powershell/pull/4417) - Fix up dependencies.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.3
+
+- Documentation update and CI fix.
+- 🐛 🙏 [vscode-powershell #4443](https://github.com/PowerShell/PowerShellEditorServices/pull/2006) - Fix declaration detection for variables with type constraints.
+- ✨ 🙏 [vscode-powershell #3604](https://github.com/PowerShell/PowerShellEditorServices/pull/2003) - Add document symbols for `#region`.
+- ✨ 🙏 [PowerShellEditorServices #2000](https://github.com/PowerShell/PowerShellEditorServices/pull/2000) - Code clean-up and fixing end-to-end tests.
+- 🐛 🐢 [PowerShellEditorServices #1998](https://github.com/PowerShell/PowerShellEditorServices/pull/1998) - Support module-qualified calls for Pester keywords. (Thanks @fflaten!)
+- 🐛 🙏 [vscode-powershell #3192](https://github.com/PowerShell/PowerShellEditorServices/pull/1997) - Fix New-EditorFile adding content in current file. (Thanks @fflaten!)
+
+## v2023.3.2-preview
+### Monday, March 27, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 👷 [vscode-powershell #4481](https://github.com/PowerShell/vscode-powershell/pull/4481) - Remove problematic `[RepoNames]` PowerShell class.
+- ✨ 👷 [vscode-powershell #4464](https://github.com/PowerShell/vscode-powershell/pull/4464) - Remove `preview` label from marketplace.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.8.3
+
+- Documentation update and CI fix.
+
 ## v2023.3.1-preview
 ### Wednesday, March 15, 2023
 
