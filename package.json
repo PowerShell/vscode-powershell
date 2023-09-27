@@ -80,7 +80,7 @@
     "untildify": "4.0.0",
     "uuid": "9.0.1",
     "vscode-languageclient": "9.0.0",
-    "vscode-languageserver-protocol": "3.17.3"
+    "vscode-languageserver-protocol": "3.17.5"
   },
   "devDependencies": {
     "@types/mocha": "10.0.1",
