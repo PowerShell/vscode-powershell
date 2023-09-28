@@ -1,5 +1,19 @@
 # PowerShell Extension Release History
 
+## v2023.9.3-preview
+### Thursday, September 28, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 📖 [vscode-powershell #4739](https://github.com/PowerShell/vscode-powershell/pull/4739) - Add official support policy document.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.12.0
+
+- 🐛 🔍 [PowerShellEditorServices #2081](https://github.com/PowerShell/PowerShellEditorServices/pull/2081) - Silence progress output of `Get-DscResource` (take two).
+- 🐛 🚂 [PowerShellEditorServices #2083](https://github.com/PowerShell/PowerShellEditorServices/pull/2083) - Upgrade OmniSharp to v0.19.9.
+- ✨ 📟 [PowerShellEditorServices #2080](https://github.com/PowerShell/PowerShellEditorServices/pull/2080) - Bump to new PSReadLine stable release v2.3.3.
+- 🐛 🔍 [PowerShellEditorServices #2068](https://github.com/PowerShell/PowerShellEditorServices/pull/2068) - Wrap import of DSC module with `ProgressPreference = SilentlyContinue`.
+
 ## v2023.9.2-preview
 ### Wednesday, September 13, 2023
 
