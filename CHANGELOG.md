@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2023.9.4-preview
+### Friday, September 29, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4762](https://github.com/PowerShell/vscode-powershell/pull/4763) - Downgrade `vscode-languageclient` to v8.1.0.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.12.0
+
+Just updating the client above.
+
 ## v2023.9.3-preview
 ### Thursday, September 28, 2023
 
