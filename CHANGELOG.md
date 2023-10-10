@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2023.9.5-preview
+### Tuesday, October 10, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🙏 [vscode-powershell #4780](https://github.com/PowerShell/vscode-powershell/pull/4780) - Stop hiding Activity Bar in ISE Mode.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.13.0
+
+- ✨ 📟 [PowerShellEditorServices #2087](https://github.com/PowerShell/PowerShellEditorServices/pull/2087) - Upgrade bundled PSReadLine module to v2.3.4.
+
 ## v2023.9.4-preview
 ### Friday, September 29, 2023
 
