@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import * as vscode from "vscode";
-import { getSettings } from "../settings";
 
 interface ISetting {
     path: string;
@@ -16,7 +15,6 @@ interface ISetting {
 export class ISECompatibilityFeature implements vscode.Disposable {
     // Marking settings as public so we can use it within the tests without needing to duplicate the list of settings.
     public static settings: ISetting[] = [
-        { path: "workbench.activityBar", name: "visible", value: false },
         { path: "debug", name: "openDebug", value: "neverOpen" },
         { path: "editor", name: "tabCompletion", value: "on" },
         { path: "powershell.integratedConsole", name: "focusConsoleOnExecute", value: false },
@@ -65,11 +63,6 @@ export class ISECompatibilityFeature implements vscode.Disposable {
 
         // Show the PowerShell view container which has the Command Explorer view
         await vscode.commands.executeCommand("workbench.view.extension.PowerShell");
-
-        if (!getSettings().sideBar.CommandExplorerVisibility) {
-            // Hide the explorer if the setting says so.
-            await vscode.commands.executeCommand("workbench.action.toggleSidebarVisibility");
-        }
     }
 
     private async DisableISEMode(): Promise<void> {
