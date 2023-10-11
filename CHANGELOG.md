@@ -1,5 +1,85 @@
 # PowerShell Extension Release History
 
+## v2023.8.0
+### Wednesday, October 11, 2023
+
+This one took a while! As always, these changes were available in the pre-release channel
+which went through six versions to get us to today's release.
+
+The `cwd` setting now supports `~` for home directory, relative paths, and named workspace
+folders. The `additionalPowerShellExes` setting also now supports `~`, checks for missing
+extensions if necessary, and both settings smartly strip surrounding quotes from the
+user-supplied value. These two settings are now far more user-friendly.
+
+Thanks to efforts across the team, we are shipping the extension with the latest and
+greatest PSReadLine, `v2.3.4`!
+
+The extension commands AKA `$psEditor` API was reworked and no longer mangles path casing.
+It also now exposes the `CloseFile` and `SaveFile` methods, and supports multi-root
+workspaces.
+
+A new setting `integratedConsole.startLocation` was added to control the Extension
+Terminal's starting position. Thanks @krishankanumuri!
+
+To wrap things up, another crash when `$ErrorActionPreference = "stop"` was resolved. A
+race condition for the language status item's name and icon was fixed. Our telemetry went
+down after a package upgrade which required a cross-team effort to resolve (it's now also
+cleaned up to send just what we're using). The DSC breakpoints capability now works as
+intended without causing module load errors or emitting "sticky" progress information. A
+bug when the log level was set to `None` broke the server was fixed. Our server's major
+dependency, OmniSharp's `csharp-language-server-protocol`, was updated to v0.19.9 which
+means we can now use the current LSP spec v3.17. We had to work with the project to
+resolve a serialization regression. Finally, a lot of various build improvements were
+made.
+
+Please note the change in our versioning schema: the middle version number no longer
+corresponds to the month, but is simply incremented. Even versions are stable, and odd
+versions are pre-release, with the latter purposefully being versioned higher than the
+former in order to keep both channels available in the Visual Studio Code marketplace.
+
+Thanks to all the many community contributors whose efforts make releases such as these
+possible!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- 🐛 🙏 [vscode-powershell #4780](https://github.com/PowerShell/vscode-powershell/pull/4780) - Stop hiding Activity Bar in ISE Mode.
+- #️⃣ 🙏 [vscode-powershell #4762](https://github.com/PowerShell/vscode-powershell/pull/4763) - Downgrade `vscode-languageclient` to v8.1.0.
+- ✨ 📖 [vscode-powershell #4739](https://github.com/PowerShell/vscode-powershell/pull/4739) - Add official support policy document.
+- ⚡️ 💭 [vscode-powershell #4734](https://github.com/PowerShell/vscode-powershell/pull/4734) - Remove unused telemetry.
+- ✨ 📖 [vscode-powershell #4729](https://github.com/PowerShell/vscode-powershell/pull/4729) - Add note about installing ESLint globally for VS Code extension.
+- #️⃣ 🙏 [vscode-powershell #4711](https://github.com/PowerShell/vscode-powershell/pull/4711) - Update extension telemetry dependency.
+- ✨ 👷 [vscode-powershell #4707](https://github.com/PowerShell/vscode-powershell/pull/4707) - Move `--sourcemap` to scripts instead of `Invoke-Build`. (Thanks @JustinGrote!)
+- #️⃣ 🙏 [vscode-powershell #4702](https://github.com/PowerShell/vscode-powershell/pull/4704) - Use a `CustomRequest` to disconnect the dotnet debugger from attach sessions. (Thanks @JustinGrote!)
+- 🐛 🙏 [vscode-powershell #2960](https://github.com/PowerShell/vscode-powershell/pull/4703) - Respect file path casing in extension commands.
+- 🐛 📺 [vscode-powershell #4696](https://github.com/PowerShell/vscode-powershell/pull/4696) - Fix race condition with displaying PowerShell name on icon.
+- 🐛 🔧 [vscode-powershell #4557](https://github.com/PowerShell/vscode-powershell/pull/4687) - Support `~`, `./` and named workspace folders in `cwd`.
+- ✨ 🔧 [vscode-powershell #4686](https://github.com/PowerShell/vscode-powershell/pull/4686) - Enhance `additionalPowerShellExes` setting.
+- #️⃣ 🙏 [vscode-powershell #4684](https://github.com/PowerShell/vscode-powershell/pull/4684) - Remove LinkEditorServices comment in development.md. (Thanks @fflaten!)
+- #️⃣ 🙏 [vscode-powershell #4676](https://github.com/PowerShell/vscode-powershell/pull/4676) - Move ESLint Dependabot group to npm. (Thanks @fflaten!)
+- #️⃣ 🙏 [vscode-powershell #4667](https://github.com/PowerShell/vscode-powershell/pull/4667) - Bump ESLint packages to v6.
+- #️⃣ 🙏 [vscode-powershell #4661](https://github.com/PowerShell/vscode-powershell/pull/4661) - Update readme.
+- 🐛 👷 [vscode-powershell #4651](https://github.com/PowerShell/vscode-powershell/pull/4651) - Fix unit test for Windows running on arm64.
+- ✨ 👷 [vscode-powershell #4641](https://github.com/PowerShell/vscode-powershell/pull/4641) - Update VS Code engine to 1.79.0.
+- ✨ 🔧 [vscode-powershell #4181](https://github.com/PowerShell/vscode-powershell/pull/4639) - Add `startLocation` setting for Extension Terminal. (Thanks @krishankanumuri!)
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.13.0
+
+- ✨ 📟 [PowerShellEditorServices #2087](https://github.com/PowerShell/PowerShellEditorServices/pull/2087) - Upgrade bundled PSReadLine module to v2.3.4.
+- 🐛 🔍 [PowerShellEditorServices #2081](https://github.com/PowerShell/PowerShellEditorServices/pull/2081) - Silence progress output of `Get-DscResource` (take two).
+- 🐛 🚂 [PowerShellEditorServices #2083](https://github.com/PowerShell/PowerShellEditorServices/pull/2083) - Upgrade OmniSharp to v0.19.9.
+- ✨ 📟 [PowerShellEditorServices #2080](https://github.com/PowerShell/PowerShellEditorServices/pull/2080) - Bump to new PSReadLine stable release v2.3.3.
+- 🐛 🔍 [PowerShellEditorServices #2068](https://github.com/PowerShell/PowerShellEditorServices/pull/2068) - Wrap import of DSC module with `ProgressPreference = SilentlyContinue`.
+- 🐛 💭 [vscode-powershell #4735](https://github.com/PowerShell/PowerShellEditorServices/pull/2066) - Add `None` to `PsesLogLevel` enum.
+- ⚡️ 💭 [PowerShellEditorServices #2065](https://github.com/PowerShell/PowerShellEditorServices/pull/2065) - Remove unused telemetry.
+- 🐛 🔍 [vscode-powershell #3904](https://github.com/PowerShell/PowerShellEditorServices/pull/2064) - Fix debugging script blocks that aren't in files.
+- 🐛 🚂 [vscode-powershell #3971](https://github.com/PowerShell/PowerShellEditorServices/pull/2062) - Import `PSDesiredStateConfiguration` by name.
+- 🐛 🔍 [PowerShellEditorServices #2037](https://github.com/PowerShell/PowerShellEditorServices/pull/2058) - Ignore not finding DSC module.
+- ✨ 🚨 [vscode-powershell #3484](https://github.com/PowerShell/PowerShellEditorServices/pull/2055) - Move `ConstrainedLanguageMode` tests to separate task.
+- ✨ 📟 [PowerShellEditorServices #2054](https://github.com/PowerShell/PowerShellEditorServices/pull/2054) - Update PSReadLine to `v2.3.2-beta2`.
+- ✨ 🙏 [PowerShellEditorServices #2053](https://github.com/PowerShell/PowerShellEditorServices/pull/2053) - Fix up extension API.
+- 🐛 📟 [PowerShellEditorServices #2050](https://github.com/PowerShell/PowerShellEditorServices/pull/2052) - Fix shell integration for PowerShell 5.1 with strict mode.
+- ✨ 📟 [PowerShellEditorServices #2046](https://github.com/PowerShell/PowerShellEditorServices/pull/2046) - Bump PSReadLine to beta for extension preview.
+
 ## v2023.9.5-preview
 ### Tuesday, October 10, 2023
 
