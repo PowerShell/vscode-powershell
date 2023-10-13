@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import vscode = require("vscode");
-import {  RequestType } from "vscode-languageclient";
+import { RequestType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import { RenameProvider, WorkspaceEdit, TextDocument, CancellationToken, Position,Uri,Range } from "vscode";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -89,9 +89,7 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
         }
     }
     public async prepareRename(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.Range | {
-        range: vscode.
-        Range; placeholder: string;
-    } | null | undefined> {
+        range: vscode.Range; placeholder: string;} | null> {
 
         const req:IRenameSymbolRequestArguments = {
             FileName : document.fileName,
@@ -103,12 +101,25 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
             const response = await this.languageClient?.sendRequest(PrepareRenameSymbolRequestType, req);
 
             if (!response) {
-                return undefined;
+                return null;
             }
-            return Promise.reject(response.message);
+            const wordRange = document.getWordRangeAtPosition(position);
+            if (!wordRange) {
+                return Promise.reject("Not a valid location for renaming.");
 
+            }
+            const wordText = document.getText(wordRange);
+            if (response.message) {
+                return Promise.reject(response.message);
+
+            }
+
+            return {
+                range: wordRange,
+                placeholder: wordText.substring(1)
+            };
         }catch (error) {
-            return undefined;
+            return null;
         }
     }
 
