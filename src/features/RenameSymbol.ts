@@ -43,7 +43,7 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
 
         });
     }
-    public dispose() {
+    public dispose() :void{
         this.command.dispose();
     }
     public async provideRenameEdits(document: TextDocument, position: Position, newName: string, _token: CancellationToken): Promise<WorkspaceEdit | undefined> {
