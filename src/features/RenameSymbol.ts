@@ -116,7 +116,7 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
 
             return {
                 range: wordRange,
-                placeholder: wordText.substring(1)
+                placeholder: wordText
             };
         }catch (error) {
             return null;
