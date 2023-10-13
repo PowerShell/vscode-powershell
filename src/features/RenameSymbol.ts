@@ -10,7 +10,13 @@ interface IRenameSymbolRequestArguments {
     FileName?:string
     Line?:number
     Column?:number
-    RenameTo:string
+    RenameTo?:string
+}
+interface IPrepareRenameSymbolRequestArguments {
+    FileName?:string
+    Line?:number
+    Column?:number
+    RenameTo?:string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -31,7 +37,12 @@ interface IRenameSymbolRequestResponse {
     changes : ModifiedFileResponse[]
 }
 
+interface IPrepareRenameSymbolRequestResponse {
+    message : string
+}
+
 export const RenameSymbolRequestType = new RequestType<IRenameSymbolRequestArguments, IRenameSymbolRequestResponse, void>("powerShell/renameSymbol");
+export const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolRequestArguments, IPrepareRenameSymbolRequestResponse, void>("powerShell/PrepareRenameSymbol");
 
 export class RenameSymbolFeature extends LanguageClientConsumer implements RenameProvider {
     private command: vscode.Disposable;
@@ -73,6 +84,29 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
                 });
             });
             return edit;
+        }catch (error) {
+            return undefined;
+        }
+    }
+    public async prepareRename(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.Range | {
+        range: vscode.
+        Range; placeholder: string;
+    } | null | undefined> {
+
+        const req:IRenameSymbolRequestArguments = {
+            FileName : document.fileName,
+            Line: position.line,
+            Column : position.character,
+        };
+
+        try {
+            const response = await this.languageClient?.sendRequest(PrepareRenameSymbolRequestType, req);
+
+            if (!response) {
+                return undefined;
+            }
+            return Promise.reject(response.message);
+
         }catch (error) {
             return undefined;
         }
