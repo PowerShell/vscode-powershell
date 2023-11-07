@@ -98,7 +98,7 @@
     "@ungap/structured-clone": "1.2.0",
     "@vscode/debugprotocol": "1.64.0",
     "@vscode/test-electron": "2.3.6",
-    "@vscode/vsce": "2.21.1",
+    "@vscode/vsce": "2.22.0",
     "esbuild": "0.19.5",
     "eslint": "8.53.0",
     "eslint-plugin-header": "3.1.1",
