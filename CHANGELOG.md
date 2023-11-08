@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2023.11.0-preview
+### Tuesday, November 07, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.14.0
+
+- 🐛 📟 [vscode-powershell #4788](https://github.com/PowerShell/PowerShellEditorServices/pull/2091) - Run `SetInitialWorkingDirectoryAsync` before `LoadProfiles`.
+- 🐛 🙏 [vscode-powershell #4784](https://github.com/PowerShell/PowerShellEditorServices/pull/2090) - Ignore `didOpen` notifications for `git` schemed documents from VS Code.
+- 🐛 🙏 [PowerShellEditorServices #2084](https://github.com/PowerShell/PowerShellEditorServices/pull/2084) - Add `SortDocumentSymbols` to make the outline hierarchical (again).
+
 ## v2023.8.0
 ### Wednesday, October 11, 2023
 
