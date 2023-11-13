@@ -83,7 +83,7 @@
     "vscode-languageserver-protocol": "3.17.5"
   },
   "devDependencies": {
-    "@types/mocha": "10.0.3",
+    "@types/mocha": "10.0.4",
     "@types/mock-fs": "4.13.3",
     "@types/node": "16.18.12",
     "@types/node-fetch": "2.6.4",
