@@ -87,7 +87,7 @@
     "@types/mock-fs": "4.13.3",
     "@types/node": "16.18.12",
     "@types/node-fetch": "2.6.4",
-    "@types/rewire": "2.5.29",
+    "@types/rewire": "2.5.30",
     "@types/semver": "7.5.4",
     "@types/sinon": "17.0.0",
     "@types/ungap__structured-clone": "0.3.1",
