@@ -88,7 +88,7 @@
     "@types/node": "16.18.12",
     "@types/node-fetch": "2.6.4",
     "@types/rewire": "2.5.29",
-    "@types/semver": "7.5.4",
+    "@types/semver": "7.5.5",
     "@types/sinon": "17.0.0",
     "@types/ungap__structured-clone": "0.3.1",
     "@types/uuid": "9.0.6",
