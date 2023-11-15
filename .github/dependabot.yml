@@ -2,6 +2,7 @@ version: 2
 updates:
 - package-ecosystem: npm
   directory: "/"
+  labels: [ ]
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
@@ -16,5 +17,6 @@ updates:
       versions: ["5.x"]
 - package-ecosystem: github-actions
   directory: "/"
+  labels: [ ]
   schedule:
     interval: weekly
