@@ -1,0 +1,21 @@
+name: Close Stale Issues
+
+permissions:
+  issues: write
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Every hour on the hour
+
+jobs:
+  stale-resolved-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v8
+        name: Close issues labeled as resolved after 1 day of inactivity
+        with:
+          any-of-labels: "Resolution-Answered,Resolution-Duplicate,Resolution-External, Resolution-Fixed,Resolution-Inactive"
+          days-before-stale: 1
+          days-before-close: 0
+          close-issue-reason: completed
+          close-issue-message: "This issue has been marked as resolved and has not had any activity for **1 day**. It has been closed for housekeeping purposes."
