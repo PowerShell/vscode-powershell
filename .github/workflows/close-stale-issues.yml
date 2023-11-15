@@ -19,3 +19,17 @@ jobs:
           days-before-close: 0
           close-issue-reason: completed
           close-issue-message: "This issue has been marked as resolved and has not had any activity for **1 day**. It has been closed for housekeeping purposes."
+  stale-feedback-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v8
+        name: Close issues labeled as needs feedback after 1 week of inactivity
+        with:
+          any-of-labels: "Needs: Author Feedback,Needs: Fix Verification,Needs: Repro Info"
+          days-before-stale: 2
+          days-before-close: 5
+          labels-to-remove-when-stale: "Needs: Maintainer Attention"
+          labels-to-add-when-unstale: "Needs: Maintainer Attention"
+          labels-to-remove-when-unstale: "Needs: Author Feedback,Needs: Fix Verification,Needs: Repro Info"
+          close-issue-reason: completed
+          close-issue-message: "This issue has been marked as needing feedback and has not had any activity for **1 daweekys**. It has been closed for housekeeping purposes."
