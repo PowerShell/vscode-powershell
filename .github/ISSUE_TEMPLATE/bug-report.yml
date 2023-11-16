@@ -1,6 +1,6 @@
 name: 🐛 Bug report
 description: Open an issue about a bug that needs fixing.
-labels: Issue-Bug
+labels: ["Issue-Bug", "Needs: Triage"]
 body:
 - type: checkboxes
   attributes:
