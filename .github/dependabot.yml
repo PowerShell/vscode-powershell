@@ -12,6 +12,7 @@ updates:
         - "esbuild"
         - "eslint"
         - "@typescript-eslint/*"
+        - "@types/*"
   ignore:
     - dependency-name: "untildify"
       versions: ["5.x"]
