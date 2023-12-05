@@ -26,8 +26,8 @@ jobs:
         name: Close issues labeled as needs feedback after 1 week of inactivity
         with:
           any-of-labels: "Needs: Author Feedback,Needs: Fix Verification,Needs: Repro Info"
-          days-before-stale: 2
-          days-before-close: 5
+          days-before-stale: 7
+          days-before-close: 0
           labels-to-remove-when-stale: "Needs: Maintainer Attention"
           labels-to-add-when-unstale: "Needs: Maintainer Attention"
           labels-to-remove-when-unstale: "Needs: Author Feedback,Needs: Fix Verification,Needs: Repro Info"
