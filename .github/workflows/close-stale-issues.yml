@@ -15,8 +15,8 @@ jobs:
         name: Close issues labeled as resolved after 1 day of inactivity
         with:
           any-of-labels: "Resolution-Answered,Resolution-Duplicate,Resolution-External,Resolution-Fixed,Resolution-Inactive"
-          days-before-stale: 1
-          days-before-close: 0
+          days-before-stale: 0
+          days-before-close: 1
           close-issue-reason: completed
           close-issue-message: "This issue has been labeled as resolved and has not had any activity for one or more days. It has been closed for housekeeping purposes."
   stale-feedback-issues:
@@ -26,8 +26,8 @@ jobs:
         name: Close issues labeled as needs feedback after 1 week of inactivity
         with:
           any-of-labels: "Needs: Author Feedback,Needs: Fix Verification,Needs: Repro Info"
-          days-before-stale: 2
-          days-before-close: 5
+          days-before-stale: 0
+          days-before-close: 7
           labels-to-remove-when-stale: "Needs: Maintainer Attention"
           labels-to-add-when-unstale: "Needs: Maintainer Attention"
           labels-to-remove-when-unstale: "Needs: Author Feedback,Needs: Fix Verification,Needs: Repro Info"
