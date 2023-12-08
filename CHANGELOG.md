@@ -1,5 +1,17 @@
 # PowerShell Extension Release History
 
+## v2023.11.1-preview
+### Thursday, December 07, 2023
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4833](https://github.com/PowerShell/vscode-powershell/pull/4833) - Setup ``actions/stale`` for issue management.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.15.0
+
+- 🐛 🔍 [vscode-powershell #4816](https://github.com/PowerShell/PowerShellEditorServices/pull/2097) - When the built-in `$null` was watched its value was incorrect.
+- 🐛 🚂 [vscode-powershell #4814](https://github.com/PowerShell/PowerShellEditorServices/pull/2096) - Allow `WorkspacePaths` to be empty if we're not in a workspace.
+
 ## v2023.11.0-preview
 ### Tuesday, November 07, 2023
 
