@@ -1,7 +1,4 @@
 parameters:
-  - name: pwsh
-    type: boolean
-    default: true
   - name: usePipelineArtifact
     type: boolean
     default: false
@@ -34,11 +31,6 @@ steps:
     archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
     destinationFolder: $(Build.SourcesDirectory)/vscode-powershell/modules
 
-- task: NodeTool@0
-  displayName: Install Node.js
-  inputs:
-    versionSpec: 16.x
-
 - task: UseDotNet@2
   condition: not(${{ parameters.usePipelineArtifact }})
   displayName: Install .NET 7.0.x SDK
@@ -55,19 +47,23 @@ steps:
     version: 6.0.x
     performMultiLevelLookup: true
 
-# The build script is always run with PowerShell Core
+- task: UseNode@1
+  inputs:
+    version: 18.x
+
+# We don't just use installPSResources.ps1 because we haven't always cloned PowerShellEditorServices
 - task: PowerShell@2
   displayName: Build and package
   inputs:
     targetType: inline
+    pwsh: true
     script: |
-      Install-Module InvokeBuild -Scope CurrentUser -Force
-      Install-Module platyPS -Scope CurrentUser -Force
+      Install-Module -Name InvokeBuild -Scope CurrentUser -Force
+      Install-Module -Name platyPS -Scope CurrentUser -Force
       Invoke-Build -Configuration Release Package
       $PackageJson = Get-Content -Raw package.json | ConvertFrom-Json
       Write-Host "##vso[task.setvariable variable=vsixPath]$(Resolve-Path powershell-$($PackageJson.version).vsix)"
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
-    pwsh: true
 
 # Necessary on Linux to run VS Code unit tests
 - bash: |
@@ -75,19 +71,17 @@ steps:
   displayName: Start X virtual framebuffer
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
-# Tests in particular are run with either PowerShell Core or Windows PowerShell
 - task: PowerShell@2
   displayName: Run unit tests
   inputs:
     targetType: inline
+    pwsh: true
     script: |
       $PSVersionTable
       Get-ChildItem env:
       Get-Module -ListAvailable Pester
-      Install-Module InvokeBuild -Scope CurrentUser -Force
       Invoke-Build -Configuration Release Test
     workingDirectory: $(Build.SourcesDirectory)/vscode-powershell
-    pwsh: ${{ parameters.pwsh }}
   env:
     DISPLAY: ':99.0'
 
@@ -95,13 +89,13 @@ steps:
   displayName: Assert PowerShellEditorServices release configuration
   inputs:
     targetType: inline
+    pwsh: true
     script: |
       $assembly = [Reflection.Assembly]::LoadFile('$(Build.SourcesDirectory)/vscode-powershell/modules/PowerShellEditorServices.VSCode/bin/Microsoft.PowerShell.EditorServices.VSCode.dll')
       if ($assembly.GetCustomAttributes([System.Diagnostics.DebuggableAttribute], $true).IsJITOptimizerDisabled) {
         Write-Host '##vso[task.LogIssue type=error;]PowerShell Editor Services bits were not built in release configuration!'
         exit 1
       }
-    pwsh: true
 
 - publish: $(vsixPath)
   artifact: vscode-powershell-vsix-$(System.JobId)

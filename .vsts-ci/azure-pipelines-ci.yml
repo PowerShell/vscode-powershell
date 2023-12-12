@@ -1,19 +1,22 @@
 name: CI-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
+pr: none
+
 trigger:
-  - gh-readonly-queue/main/*
-pr:
-  paths:
-    exclude:
-    - '**/*.md'
+  branches:
+    include:
+      - release
 
 variables:
   # Don't download unneeded packages
-  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+  - name: DOTNET_NOLOGO
     value: 'true'
   # Improve performance by not sending telemetry
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
     value: 'true'
+  # Improve performance by not generating certificates
+  - name: DOTNET_GENERATE_ASPNET_CERTIFICATE
+    value: 'false'
 
 resources:
   repositories:
@@ -25,34 +28,14 @@ resources:
 
 jobs:
 - job: windows2022
-  displayName: Windows 2022 PowerShell 5.1
-  pool:
-    vmImage: windows-2022
-  steps:
-  - template: templates/ci-general.yml
-    parameters:
-      pwsh: false
-  continueOnError: true
-
-- job: windows2022pwsh
-  displayName: Windows 2022 PowerShell 7
+  displayName: Windows 2022
   pool:
     vmImage: windows-2022
   steps:
   - template: templates/ci-general.yml
 
 - job: windows2019
-  displayName: Windows 2019 PowerShell 5.1
-  pool:
-    vmImage: windows-2019
-  steps:
-  - template: templates/ci-general.yml
-    parameters:
-      pwsh: false
-  continueOnError: true
-
-- job: windows2019pwsh
-  displayName: Windows 2019 PowerShell 7
+  displayName: Windows 2019
   pool:
     vmImage: windows-2019
   steps:

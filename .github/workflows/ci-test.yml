@@ -1,0 +1,79 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+    paths-ignore: [ '**/*.md' ]
+  merge_group:
+    types: [ checks_requested ]
+
+jobs:
+  ci:
+    name: node
+    strategy:
+      matrix:
+        os: [ windows-latest, macos-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+      DISPLAY: ':99.0'
+    defaults:
+      run:
+        working-directory: vscode-powershell
+    steps:
+      - name: Checkout PowerShellEditorServices
+        uses: actions/checkout@v4
+        with:
+          repository: PowerShell/PowerShellEditorServices
+          path: PowerShellEditorServices
+
+      - name: Checkout vscode-powershell
+        uses: actions/checkout@v4
+        with:
+          path: vscode-powershell
+
+      - name: Install dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          cache: true
+          cache-dependency-path: 'PowerShellEditorServices/**/packages.lock.json'
+          dotnet-version: |
+            6.0.x
+            7.0.x
+
+      - name: Install PSResources
+        shell: pwsh
+        run: ../PowerShellEditorServices/tools/installPSResources.ps1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: vscode-powershell/package-lock.json
+
+      - name: Start X virtual framebuffer
+        if: matrix.os == 'ubuntu-latest'
+        run: /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+
+      - name: Build, test and package
+        shell: pwsh
+        run: Invoke-Build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: vscode-powershell-vsix-${{ matrix.os }}
+          path: vscode-powershell/powershell-*.vsix
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: vscode-powershell-test-results-${{ matrix.os }}
+          path: '**/test-results.xml'

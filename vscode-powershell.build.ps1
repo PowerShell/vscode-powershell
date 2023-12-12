@@ -133,7 +133,16 @@ task Package Build, {
     Assert-Build ($packageJson.version -eq $packageVersion)
 
     Write-Host "`n### Packaging powershell-$packageVersion.vsix`n" -ForegroundColor Green
-    Assert-Build ((Get-Item ./modules).LinkType -ne "SymbolicLink") "Packaging requires a copy of PSES, not a symlink!"
+
+    # Packaging requires a copy of the modules folder, not a symbolic link. But
+    # we might have built in Debug configuration, not Release, and still want to
+    # package it. So delete the symlink and copy what we just built.
+    if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq "SymbolicLink") {
+        Write-Host "`n### PSES is a symbolic link, replacing with copy!" -ForegroundColor Green
+        Remove-BuildItem ./modules
+        Copy-Item -Recurse -Force "$(Split-Path (Get-EditorServicesPath))/module" ./modules
+    }
+
     if (Test-IsPreRelease) {
         Write-Host "`n### This is a pre-release!`n" -ForegroundColor Green
         Invoke-BuildExec { & npm run package -- --pre-release }
