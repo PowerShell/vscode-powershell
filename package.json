@@ -85,7 +85,7 @@
   "devDependencies": {
     "@types/mocha": "10.0.6",
     "@types/mock-fs": "4.13.4",
-    "@types/node": "16.18.12",
+    "@types/node": "18.19.3",
     "@types/node-fetch": "2.6.4",
     "@types/rewire": "2.5.30",
     "@types/semver": "7.5.6",
