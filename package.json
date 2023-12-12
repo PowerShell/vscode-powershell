@@ -6,7 +6,7 @@
   "publisher": "ms-vscode",
   "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.79.2"
+    "vscode": "^1.82.0"
   },
   "author": "Microsoft Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
