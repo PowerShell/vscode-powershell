@@ -41,10 +41,10 @@ jobs:
   steps:
   - template: templates/ci-general.yml
 
-- job: macOS11
-  displayName: macOS 11
+- job: macOS12
+  displayName: macOS 12
   pool:
-    vmImage: macOS-11
+    vmImage: macOS-12
   steps:
   - template: templates/ci-general.yml
 

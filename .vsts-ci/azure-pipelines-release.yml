@@ -1,14 +1,17 @@
 name: Release-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
+trigger: none
+
 variables:
   # Don't download unneeded packages
-  - name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+  - name: DOTNET_NOLOGO
     value: 'true'
   # Improve performance by not sending telemetry
   - name: DOTNET_CLI_TELEMETRY_OPTOUT
     value: 'true'
-
-trigger: none
+  # Improve performance by not generating certificates
+  - name: DOTNET_GENERATE_ASPNET_CERTIFICATE
+    value: 'false'
 
 resources:
   repositories:
