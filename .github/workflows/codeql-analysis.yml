@@ -3,15 +3,10 @@ name: CodeQL Analysis
 on:
   push:
     branches: [ main ]
-    tags: [ v* ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
     paths-ignore: [ '**/*.md' ]
-  merge_group:
-    types: [ checks_requested ]
-  schedule:
-    - cron: '00 14 * * *' # Every morning at 7:00am PDT
 
 jobs:
   analyze:
