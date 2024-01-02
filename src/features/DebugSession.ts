@@ -650,7 +650,7 @@ export class PickPSHostProcessFeature extends LanguageClientConsumer {
         };
         const item = await window.showQuickPick(items, options);
 
-        return item ? `${item.pid}` : undefined;
+        return item ? item.pid : undefined;
     }
 
     private clearWaitingToken(): void {
@@ -766,7 +766,7 @@ export class PickRunspaceFeature extends LanguageClientConsumer {
         };
         const item = await window.showQuickPick(items, options);
 
-        return item ? `${item.id}` : undefined;
+        return item ? item.id : undefined;
     }
 
     private clearWaitingToken(): void {
