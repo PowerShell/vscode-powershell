@@ -1,5 +1,20 @@
 # PowerShell Extension Release History
 
+## v2024.1.0-preview
+### Wednesday, January 03, 2024
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4865](https://github.com/PowerShell/vscode-powershell/pull/4865) - Update CI to install .NET SDK 8.0.
+- ✨ 👷 [vscode-powershell #4860](https://github.com/PowerShell/vscode-powershell/pull/4860) - Bump VS Code engine.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.16.0
+
+- 🐛 📟 [vscode-powershell #4854](https://github.com/PowerShell/PowerShellEditorServices/pull/2125) - Update shell integration script to fix command decorations.
+- ✨ 🚨 [PowerShellEditorServices #2124](https://github.com/PowerShell/PowerShellEditorServices/pull/2124) - Test end-to-end with PowerShell Daily.
+- ✨ 👷 [PowerShellEditorServices #2114](https://github.com/PowerShell/PowerShellEditorServices/pull/2114) - Add PowerShell 7.4 SDK and `net8.0` framework.
+- ✨ 🚨 [PowerShellEditorServices #2110](https://github.com/PowerShell/PowerShellEditorServices/pull/2110) - Switch to GitHub Actions for all CI.
+
 ## v2023.11.1-preview
 ### Thursday, December 07, 2023
 
