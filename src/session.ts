@@ -449,6 +449,7 @@ export class SessionManager implements Middleware {
                 || settings.developer.editorServicesLogLevel !== this.sessionSettings.developer.editorServicesLogLevel
                 || settings.developer.bundledModulesPath !== this.sessionSettings.developer.bundledModulesPath
                 || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
+                || settings.developer.setExecutionPolicy !== this.sessionSettings.developer.setExecutionPolicy
                 || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
                 || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
                 || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation)) {

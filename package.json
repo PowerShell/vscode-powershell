@@ -957,6 +957,11 @@
           "default": false,
           "markdownDescription": "Launches the LSP server with the `/waitForDebugger` flag to force it to wait for a .NET debugger to attach before proceeding, and emit its PID until then. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
         },
+        "powershell.developer.setExecutionPolicy": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "On Windows we launch the PowerShell executable with `-ExecutionPolicy Bypass` so that the LSP server (PowerShell Editor Services module) will launch without issue. Some anti-virus programs disallow this command-line argument and this flag can be used to remove it. **Using this setting may require trusting the script manually in order for it to launch!**"
+        },
         "powershell.developer.featureFlags": {
           "type": "array",
           "items": {
