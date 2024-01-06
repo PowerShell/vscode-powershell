@@ -71,7 +71,7 @@ export class PowerShellProcess {
         powerShellArgs.push("-NoProfile");
 
         // Only add ExecutionPolicy param on Windows
-        if (utils.isWindows) {
+        if (utils.isWindows && this.sessionSettings.developer.setExecutionPolicy) {
             powerShellArgs.push("-ExecutionPolicy", "Bypass");
         }
 

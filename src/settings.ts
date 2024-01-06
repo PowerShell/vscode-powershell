@@ -116,6 +116,7 @@ class DeveloperSettings extends PartialSettings {
     bundledModulesPath = "../../PowerShellEditorServices/module";
     editorServicesLogLevel = LogLevel.Normal;
     editorServicesWaitForDebugger = false;
+    setExecutionPolicy = true;
     waitForSessionFileTimeoutSeconds = 240;
 }
 
