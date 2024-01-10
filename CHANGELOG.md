@@ -1,5 +1,31 @@
 # PowerShell Extension Release History
 
+## v2024.0.0
+### Wednesday, January 10, 2024
+
+Happy New Year! This stable release includes a bunch if improvements to the LSP server,
+PowerShell Editor Services and comes with a major upgrade to our testing system. Please
+see the below changelog! Going forward we plan to release on a quarterly basis. Thanks for
+being such fantastic users!
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- #️⃣ 🙏 [vscode-powershell #4865](https://github.com/PowerShell/vscode-powershell/pull/4865) - Update CI to install .NET SDK 8.0.
+- ✨ 👷 [vscode-powershell #4860](https://github.com/PowerShell/vscode-powershell/pull/4860) - Bump VS Code engine.
+- #️⃣ 🙏 [vscode-powershell #4833](https://github.com/PowerShell/vscode-powershell/pull/4833) - Setup ``actions/stale`` for issue management.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.14.0-v3.16.0
+
+- 🐛 📟 [vscode-powershell #4854](https://github.com/PowerShell/PowerShellEditorServices/pull/2125) - Update shell integration script to fix command decorations.
+- ✨ 🚨 [PowerShellEditorServices #2124](https://github.com/PowerShell/PowerShellEditorServices/pull/2124) - Test end-to-end with PowerShell Daily.
+- ✨ 👷 [PowerShellEditorServices #2114](https://github.com/PowerShell/PowerShellEditorServices/pull/2114) - Add PowerShell 7.4 SDK and `net8.0` framework.
+- ✨ 🚨 [PowerShellEditorServices #2110](https://github.com/PowerShell/PowerShellEditorServices/pull/2110) - Switch to GitHub Actions for all CI.
+- 🐛 🔍 [vscode-powershell #4816](https://github.com/PowerShell/PowerShellEditorServices/pull/2097) - When the built-in `$null` was watched its value was incorrect.
+- 🐛 🚂 [vscode-powershell #4814](https://github.com/PowerShell/PowerShellEditorServices/pull/2096) - Allow `WorkspacePaths` to be empty if we're not in a workspace.
+- 🐛 📟 [vscode-powershell #4788](https://github.com/PowerShell/PowerShellEditorServices/pull/2091) - Run `SetInitialWorkingDirectoryAsync` before `LoadProfiles`.
+- 🐛 🙏 [vscode-powershell #4784](https://github.com/PowerShell/PowerShellEditorServices/pull/2090) - Ignore `didOpen` notifications for `git` schemed documents from VS Code.
+- 🐛 🙏 [PowerShellEditorServices #2084](https://github.com/PowerShell/PowerShellEditorServices/pull/2084) - Add `SortDocumentSymbols` to make the outline hierarchical (again).
+
 ## v2024.1.0-preview
 ### Wednesday, January 03, 2024
 
