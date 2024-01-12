@@ -29,6 +29,7 @@ import { SessionManager } from "./session";
 import { LogLevel, getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
+import { BreakpointManager } from "./features/BreakpointManager";
 
 // The most reliable way to get the name and version of the current extension.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
@@ -159,6 +160,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new PickPSHostProcessFeature(logger),
         new HelpCompletionFeature(),
         new CustomViewsFeature(),
+        new BreakpointManager(logger),
         new PickRunspaceFeature(logger),
         externalApi
     ];

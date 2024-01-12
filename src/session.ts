@@ -614,6 +614,7 @@ export class SessionManager implements Middleware {
                 enableProfileLoading: this.sessionSettings.enableProfileLoading,
                 initialWorkingDirectory: await validateCwdSetting(this.logger),
                 shellIntegrationEnabled: vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled"),
+                supportsBreakpointSync: true,
             },
             errorHandler: {
                 // Override the default error handler to prevent it from
