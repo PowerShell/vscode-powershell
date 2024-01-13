@@ -303,6 +303,13 @@ export class SessionManager implements Middleware {
         return this.sessionDetails;
     }
 
+    public async getLanguageServerPid(): Promise<number | undefined> {
+        if (this.languageServerProcess === undefined) {
+            void this.logger.writeAndShowError("PowerShell Extension Terminal unavailable!");
+        }
+        return this.languageServerProcess?.getPid();
+    }
+
     public getPowerShellVersionDetails(): IPowerShellVersionDetails | undefined {
         return this.versionDetails;
     }
