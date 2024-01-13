@@ -486,18 +486,7 @@
             "body": {
               "name": "PowerShell Attach to Host Process",
               "type": "PowerShell",
-              "request": "attach",
-              "runspaceId": 1
-            }
-          },
-          {
-            "label": "PowerShell: Attach Interactive Session Runspace",
-            "description": "Open runspace picker to select runspace to attach debugger to",
-            "body": {
-              "name": "PowerShell Attach Interactive Session Runspace",
-              "type": "PowerShell",
-              "request": "attach",
-              "processId": "current"
+              "request": "attach"
             }
           },
           {
@@ -588,29 +577,27 @@
             "properties": {
               "computerName": {
                 "type": "string",
-                "description": "Optional: The computer name to which a remote session will be established.  Works only on PowerShell 4 and above."
+                "description": "Optional: The computer name to which a remote session will be established.",
+                "default": null
               },
               "processId": {
-                "type": "string",
-                "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
+                "type": "number",
+                "description": "Optional: The ID of the PowerShell host process that should be attached. Will prompt if unspecified.",
                 "default": null
               },
               "runspaceId": {
-                "type": [
-                  "string",
-                  "number"
-                ],
-                "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
+                "type": "number",
+                "description": "Optional: The ID of the runspace to debug in the attached process. Will prompt if unspecified.",
                 "default": null
               },
               "runspaceName": {
                 "type": "string",
-                "description": "Optional: The Name of the runspace to debug in the attached process.  Works only on PowerShell 5 and above.",
+                "description": "Optional: The name of the runspace to debug in the attached process.",
                 "default": null
               },
               "customPipeName": {
                 "type": "string",
-                "description": "The custom pipe name of the PowerShell host process to attach to.  Works only on PowerShell 6.2 and above.",
+                "description": "The custom pipe name of the PowerShell host process to attach to.",
                 "default": null
               }
             }
