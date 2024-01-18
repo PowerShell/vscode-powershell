@@ -21,7 +21,6 @@ import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
 import { PickPSHostProcessFeature, PickRunspaceFeature } from "./features/DebugSession";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
-import { RunCodeFeature } from "./features/RunCode";
 import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger } from "./logging";
@@ -139,7 +138,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new ISECompatibilityFeature(),
         new OpenInISEFeature(),
         new PesterTestsFeature(sessionManager, logger),
-        new RunCodeFeature(sessionManager, logger),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
     ];
