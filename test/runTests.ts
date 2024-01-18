@@ -23,13 +23,6 @@ async function main(): Promise<void> {
         process.exit(1);
     }
 
-    // Test for the presence of modules folder and error if not found
-    const PSESPath = path.resolve(__dirname, "../../modules/PowerShellEditorServices.VSCode/bin/Microsoft.PowerShell.EditorServices.VSCode.dll");
-    if (!existsSync(PSESPath)) {
-        console.error("ERROR: A PowerShell Editor Services build was not found in the modules directory. Please run a build first, using either the 'Run Build Task' in VSCode or ./build.ps1 in PowerShell.");
-        process.exit(1);
-    }
-
     try {
         /** The folder containing the Extension Manifest package.json. Passed to `--extensionDevelopmentPath */
         const extensionDevelopmentPath = path.resolve(__dirname, "../../");

@@ -6,7 +6,6 @@ import TelemetryReporter from "@vscode/extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
-import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
@@ -156,7 +155,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new DebugSessionFeature(context, sessionManager, logger),
         new PickPSHostProcessFeature(logger),
         new HelpCompletionFeature(),
-        new CustomViewsFeature(),
         new PickRunspaceFeature(logger),
         externalApi
     ];
