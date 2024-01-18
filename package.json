@@ -97,9 +97,11 @@
     "@typescript-eslint/parser": "6.18.0",
     "@ungap/structured-clone": "1.2.0",
     "@vscode/debugprotocol": "1.64.0",
+    "@vscode/test-cli": "0.0.4",
     "@vscode/test-electron": "2.3.9",
     "@vscode/vsce": "2.22.0",
     "esbuild": "0.19.11",
+    "esbuild-register": "3.5.0",
     "eslint": "8.56.0",
     "eslint-plugin-header": "3.1.1",
     "glob": "10.3.10",
@@ -109,7 +111,6 @@
     "mock-fs": "5.2.0",
     "rewire": "7.0.0",
     "sinon": "17.0.1",
-    "source-map-support": "0.5.21",
     "typescript": "5.3.3"
   },
   "extensionDependencies": [
@@ -117,12 +118,13 @@
   ],
   "main": "./out/main.js",
   "scripts": {
+    "esbuild-base": "esbuild --bundle --platform=node --target=node18.15 --format=cjs --sourcemap --external:mocha --external:vscode --external:eslint",
     "lint": "eslint . --ext .ts",
-    "build": "esbuild ./src/main.ts --outdir=out --sourcemap --bundle --external:vscode --platform=node",
+    "build": "npm run esbuild-base -- src/main.ts --outdir=out",
     "build-watch": "npm run build -- --watch",
-    "build-test": "tsc --incremental",
+    "build-test": "npm run esbuild-base -- test/**/*.test.ts --outdir=out/test --sources-content=false",
     "build-test-watch": "npm run build-test -- --watch",
-    "test": "npm run build-test && node ./out/test/runTests.js",
+    "test": "npm run build-test && vscode-test",
     "package": "vsce package --no-gitHubIssueLinking",
     "publish": "vsce publish"
   },
