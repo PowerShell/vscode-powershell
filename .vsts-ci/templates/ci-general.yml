@@ -96,7 +96,7 @@ steps:
     targetType: inline
     pwsh: true
     script: |
-      $assembly = [Reflection.Assembly]::LoadFile('$(Build.SourcesDirectory)/vscode-powershell/modules/PowerShellEditorServices.VSCode/bin/Microsoft.PowerShell.EditorServices.VSCode.dll')
+      $assembly = [Reflection.Assembly]::LoadFile("$(Build.SourcesDirectory)/vscode-powershell/modules/PowerShellEditorServices/bin/Core/Microsoft.PowerShell.EditorServices.Hosting.dll")
       if ($assembly.GetCustomAttributes([System.Diagnostics.DebuggableAttribute], $true).IsJITOptimizerDisabled) {
         Write-Host '##vso[task.LogIssue type=error;]PowerShell Editor Services bits were not built in release configuration!'
         exit 1
