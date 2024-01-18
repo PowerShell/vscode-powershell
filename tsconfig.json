@@ -5,12 +5,8 @@
     "module": "commonjs",
     "outDir": "out",
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
+    "lib": ["ES2022"],
     "sourceMap": true,
-    "rootDir": ".",
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
@@ -19,7 +15,8 @@
     "noUnusedParameters": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "types": ["node", "mocha", "sinon"]
   },
   "include": [ "src", "test" ],
   "exclude": [ "node_modules/@ungap/structured-clone" ]
