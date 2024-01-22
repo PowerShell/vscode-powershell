@@ -9,22 +9,8 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}"
-      ],
-      "env": {
-        "__TEST_WORKSPACE_PATH": "${workspaceFolder}/examples",
-      },
-      "sourceMaps": true,
-      // This speeds up source map detection and makes smartStep work correctly
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
-        "!**/node_modules/**",
-        "!**/.vscode-test/**"
-      ],
-      "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**",
-        "**/.vscode-test/**"
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "${workspaceFolder}/examples"
       ],
       "presentation": {
         "hidden": false,
@@ -35,6 +21,7 @@
     {
       // Runs the extension in an empty temp profile that is automatically cleaned up after use
       // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
+      // BUG: Breakpoints will not work with temp profile currently
       "name": "Launch Extension - Temp Profile",
       "type": "extensionHost",
       "request": "launch",
@@ -44,18 +31,20 @@
         "--extensionDevelopmentPath=${workspaceFolder}",
         "${workspaceFolder}/examples"
       ],
-      "sourceMaps": true,
-      // This speeds up source map detection and makes smartStep work correctly
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
         "!**/node_modules/**",
         "!**/.vscode-test/**"
       ],
-      "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**",
-        "**/.vscode-test/**"
-      ],
+      "outFiles": ["${workspaceFolder}/**/*.js", "!**/node_modules/**"],
+      "sourceMapRenames": true,
+      "sourceMaps": true,
+      // This speeds up source map detection and makes smartStep work correctly
+      // "skipFiles": [
+      //   "<node_internals>/**",
+      //   "**/node_modules/**",
+      //   "**/.vscode-test/**"
+      // ],
       "presentation": {
         "hidden": false,
         "group": "test",
@@ -74,54 +63,11 @@
         "--extensionDevelopmentPath=${workspaceFolder}",
         "${workspaceFolder}/examples"
       ],
-      "sourceMaps": true,
-      // This speeds up source map detection and makes smartStep work correctly
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
-        "!**/node_modules/**",
-        "!**/.vscode-test/**"
-      ],
-      "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**",
-        "**/.vscode-test/**"
-      ],
       "presentation": {
         "hidden": false,
         "group": "test",
         "order": 2
       }
-    },
-    {
-      "name": "Test Extension",
-      "type": "node",
-      "request": "launch",
-      "program": "${workspaceFolder}/out/test/runTests.js",
-      "cascadeTerminateToConfigurations": [
-        "ExtensionTests",
-      ],
-      // This speeds up source map detection and makes smartStep work correctly
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
-        "!**/node_modules/**",
-        "!**/.vscode-test/**"
-      ],
-      "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**",
-        "**/.vscode-test/**"
-      ],
-      "attachSimplePort": 59229, // THe default is 9229 but we want to avoid conflicts because we will have two vscode instances running.
-      "env": {
-        "__TEST_DEBUG_INSPECT_PORT": "59229" // Needs to match attachSimplePort
-      },
-      "presentation": {
-        "hidden": false,
-      },
-      "internalConsoleOptions": "neverOpen",
-      "console": "integratedTerminal",
-      "autoAttachChildProcesses": false,
-      "preLaunchTask": "test-watch"
     }
   ]
 }
