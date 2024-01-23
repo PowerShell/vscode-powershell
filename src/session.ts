@@ -531,6 +531,8 @@ export class SessionManager implements Middleware {
 
         languageServerProcess.onExited(
             async () => {
+                LanguageClientConsumer.onLanguageClientExited();
+
                 if (this.sessionStatus === SessionStatus.Running
                     || this.sessionStatus === SessionStatus.Busy) {
                     this.setSessionStatus("Session Exited!", SessionStatus.Failed);
@@ -661,7 +663,7 @@ export class SessionManager implements Middleware {
         // so that they can register their message handlers
         // before the connection is established.
         for (const consumer of this.languageClientConsumers) {
-            consumer.setLanguageClient(languageClient);
+            consumer.onLanguageClientSet(languageClient);
         }
 
         this.registeredHandlers = [
@@ -684,6 +686,7 @@ export class SessionManager implements Middleware {
 
         try {
             await languageClient.start();
+            LanguageClientConsumer.onLanguageClientStarted(languageClient);
         } catch (err) {
             void this.setSessionFailedOpenBug("Language client failed to start: " + (err instanceof Error ? err.message : "unknown"));
         }

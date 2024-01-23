@@ -43,11 +43,11 @@ export class HelpCompletionFeature extends LanguageClientConsumer {
         this.disposable?.dispose();
     }
 
-    public override setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
-        if (this.helpCompletionProvider) {
-            this.helpCompletionProvider.languageClient = languageClient;
-        }
+    public override onLanguageClientSet(languageClient: LanguageClient): void {
+        // Our helper class isn't in the session's list of language client
+        // consumers since we optionally create it, so we have to set it
+        // manually.
+        this.helpCompletionProvider?.onLanguageClientSet(languageClient);
     }
 
     public async onEvent(changeEvent: TextDocumentChangeEvent): Promise<void> {
@@ -120,14 +120,14 @@ class TriggerFinder {
     }
 }
 
-class HelpCompletionProvider {
+class HelpCompletionProvider extends LanguageClientConsumer {
     private triggerFinderHelpComment: TriggerFinder;
     private lastChangeRange: Range | undefined;
     private lastDocument: TextDocument | undefined;
-    private langClient: LanguageClient | undefined;
     private settings: Settings;
 
     constructor() {
+        super();
         this.triggerFinderHelpComment = new TriggerFinder("##");
         this.settings = getSettings();
     }
@@ -136,9 +136,8 @@ class HelpCompletionProvider {
         return this.triggerFinderHelpComment.found;
     }
 
-    public set languageClient(value: LanguageClient) {
-        this.langClient = value;
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public updateState(document: TextDocument, changeText: string, changeRange: Range): void {
         this.lastDocument = document;
@@ -151,14 +150,15 @@ class HelpCompletionProvider {
     }
 
     public async complete(): Promise<void> {
-        if (this.langClient === undefined || this.lastChangeRange === undefined || this.lastDocument === undefined) {
+        if (this.lastChangeRange === undefined || this.lastDocument === undefined) {
             return;
         }
 
         const triggerStartPos = this.lastChangeRange.start;
         const doc = this.lastDocument;
 
-        const result = await this.langClient.sendRequest(CommentHelpRequestType, {
+        const client = await LanguageClientConsumer.getLanguageClient();
+        const result = await client.sendRequest(CommentHelpRequestType, {
             documentUri: doc.uri.toString(),
             triggerPosition: triggerStartPos,
             blockComment: this.settings.helpCompletion === CommentType.BlockComment,

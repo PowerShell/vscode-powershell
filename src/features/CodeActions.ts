@@ -5,7 +5,7 @@ import vscode = require("vscode");
 import { ILogger } from "../logging";
 
 export class CodeActionsFeature implements vscode.Disposable {
-    private showDocumentationCommand: vscode.Disposable;
+    private command: vscode.Disposable;
 
     constructor(private log: ILogger) {
         // NOTE: While not exposed to the user via package.json, this is
@@ -13,17 +13,17 @@ export class CodeActionsFeature implements vscode.Disposable {
         //
         // TODO: In the far future with LSP 3.19 the server can just set a URL
         // and this can go away. See https://github.com/microsoft/language-server-protocol/issues/1548
-        this.showDocumentationCommand =
+        this.command =
             vscode.commands.registerCommand("PowerShell.ShowCodeActionDocumentation", async (ruleName: string) => {
                 await this.showRuleDocumentation(ruleName);
             });
     }
 
     public dispose(): void {
-        this.showDocumentationCommand.dispose();
+        this.command.dispose();
     }
 
-    public async showRuleDocumentation(ruleId: string): Promise<void> {
+    private async showRuleDocumentation(ruleId: string): Promise<void> {
         const pssaDocBaseURL = "https://docs.microsoft.com/powershell/utility-modules/psscriptanalyzer/rules/";
 
         if (!ruleId) {

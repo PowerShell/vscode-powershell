@@ -3,7 +3,6 @@
 
 import * as vscode from "vscode";
 import { v4 as uuidv4 } from "uuid";
-import { LanguageClientConsumer } from "../languageClientConsumer";
 import { ILogger } from "../logging";
 import { SessionManager } from "../session";
 
@@ -33,14 +32,13 @@ NOTE: At some point, we should release a helper npm package that wraps the API a
 * Manages session id for you
 
 */
-export class ExternalApiFeature extends LanguageClientConsumer implements IPowerShellExtensionClient {
+export class ExternalApiFeature implements IPowerShellExtensionClient {
     private static readonly registeredExternalExtension: Map<string, IExternalExtension> = new Map<string, IExternalExtension>();
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionManager: SessionManager,
         private logger: ILogger) {
-        super();
     }
 
     /*
