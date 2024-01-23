@@ -25,14 +25,14 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         { path: "powershell.codeFolding", name: "showLastLine", value: false }
     ];
 
-    private _commandRegistrations: vscode.Disposable[] = [];
-    private _iseModeEnabled: boolean;
-    private _originalSettings: Record<string, boolean | string | undefined> = {};
+    private commands: vscode.Disposable[] = [];
+    private iseModeEnabled: boolean;
+    private originalSettings: Record<string, boolean | string | undefined> = {};
 
     constructor() {
         const testSetting = ISECompatibilityFeature.settings[ISECompatibilityFeature.settings.length - 1];
-        this._iseModeEnabled = vscode.workspace.getConfiguration(testSetting.path).get(testSetting.name) === testSetting.value;
-        this._commandRegistrations = [
+        this.iseModeEnabled = vscode.workspace.getConfiguration(testSetting.path).get(testSetting.name) === testSetting.value;
+        this.commands = [
             vscode.commands.registerCommand("PowerShell.EnableISEMode", async () => { await this.EnableISEMode(); }),
             vscode.commands.registerCommand("PowerShell.DisableISEMode", async () => { await this.DisableISEMode(); }),
             vscode.commands.registerCommand("PowerShell.ToggleISEMode", async () => { await this.ToggleISEMode(); })
@@ -40,17 +40,17 @@ export class ISECompatibilityFeature implements vscode.Disposable {
     }
 
     public dispose(): void {
-        for (const command of this._commandRegistrations) {
+        for (const command of this.commands) {
             command.dispose();
         }
     }
 
     private async EnableISEMode(): Promise<void> {
-        this._iseModeEnabled = true;
+        this.iseModeEnabled = true;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             try {
                 const config = vscode.workspace.getConfiguration(iseSetting.path);
-                this._originalSettings[iseSetting.path + iseSetting.name] = config.get(iseSetting.name);
+                this.originalSettings[iseSetting.path + iseSetting.name] = config.get(iseSetting.name);
                 await config.update(iseSetting.name, iseSetting.value, true);
             } catch {
                 // The `update` call can fail if the setting doesn't exist. This
@@ -66,18 +66,18 @@ export class ISECompatibilityFeature implements vscode.Disposable {
     }
 
     private async DisableISEMode(): Promise<void> {
-        this._iseModeEnabled = false;
+        this.iseModeEnabled = false;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             const config = vscode.workspace.getConfiguration(iseSetting.path);
             const currently = config.get(iseSetting.name);
             if (currently === iseSetting.value) {
-                await config.update(iseSetting.name, this._originalSettings[iseSetting.path + iseSetting.name], true);
+                await config.update(iseSetting.name, this.originalSettings[iseSetting.path + iseSetting.name], true);
             }
         }
     }
 
     private async ToggleISEMode(): Promise<void> {
-        if (this._iseModeEnabled) {
+        if (this.iseModeEnabled) {
             await this.DisableISEMode();
         } else {
             await this.EnableISEMode();

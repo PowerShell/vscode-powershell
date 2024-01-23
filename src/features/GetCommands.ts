@@ -4,7 +4,6 @@
 import * as vscode from "vscode";
 import { RequestType0 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { ILogger } from "../logging";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import { getSettings } from "../settings";
 
@@ -30,7 +29,7 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private commandsExplorerProvider: CommandsExplorerProvider;
     private commandsExplorerTreeView: vscode.TreeView<Command>;
 
-    constructor(private logger: ILogger) {
+    constructor() {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
@@ -56,25 +55,20 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         }
     }
 
-    public override setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
+    public override onLanguageClientSet(_languageClient: LanguageClient): void {
         if (this.commandsExplorerTreeView.visible) {
             void vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
         }
     }
 
     private async CommandExplorerRefresh(): Promise<void> {
-        if (this.languageClient === undefined) {
-            this.logger.writeVerbose(`<${GetCommandsFeature.name}>: Unable to send getCommand request!`);
-            return;
-        }
-        await this.languageClient.sendRequest(GetCommandRequestType).then((result) => {
-            const exclusions = getSettings().sideBar.CommandExplorerExcludeFilter;
-            const excludeFilter = exclusions.map((filter: string) => filter.toLowerCase());
-            result = result.filter((command) => (!excludeFilter.includes(command.moduleName.toLowerCase())));
-            this.commandsExplorerProvider.powerShellCommands = result.map(toCommand);
-            this.commandsExplorerProvider.refresh();
-        });
+        const client = await LanguageClientConsumer.getLanguageClient();
+        const result = await client.sendRequest(GetCommandRequestType);
+        const exclusions = getSettings().sideBar.CommandExplorerExcludeFilter;
+        const excludeFilter = exclusions.map((filter: string) => filter.toLowerCase());
+        const filteredResult = result.filter((command) => (!excludeFilter.includes(command.moduleName.toLowerCase())));
+        this.commandsExplorerProvider.powerShellCommands = filteredResult.map(toCommand);
+        this.commandsExplorerProvider.refresh();
     }
 
     private async InsertCommand(item: { Name: string; }): Promise<void> {
@@ -148,5 +142,4 @@ class Command extends vscode.TreeItem {
         // Returning an empty array because we need to return something.
         return [];
     }
-
 }

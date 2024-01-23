@@ -4,6 +4,7 @@
 import vscode = require("vscode");
 import { NotificationType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import type { LanguageClient } from "vscode-languageclient/node";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IShowHelpNotificationArguments {
@@ -30,12 +31,17 @@ export class ShowHelpFeature extends LanguageClientConsumer {
                 const cwr = doc.getWordRangeAtPosition(selection.active);
                 const text = doc.getText(cwr);
 
-                await this.languageClient?.sendNotification(ShowHelpNotificationType, { text });
+                const client = await LanguageClientConsumer.getLanguageClient();
+                await client.sendNotification(ShowHelpNotificationType, { text });
             } else {
-                await this.languageClient?.sendNotification(ShowHelpNotificationType, { text: item.Name });
+                const client = await LanguageClientConsumer.getLanguageClient();
+                await client.sendNotification(ShowHelpNotificationType, { text: item.Name });
             }
         });
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public dispose(): void {
         this.command.dispose();

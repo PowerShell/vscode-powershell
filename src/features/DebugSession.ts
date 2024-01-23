@@ -126,27 +126,56 @@ export class DebugSessionFeature extends LanguageClientConsumer
     private sessionCount = 1;
     private tempDebugProcess: PowerShellProcess | undefined;
     private tempSessionDetails: IEditorServicesSessionDetails | undefined;
+    private commands: Disposable[] = [];
     private handlers: Disposable[] = [];
 
     constructor(context: ExtensionContext, private sessionManager: SessionManager, private logger: ILogger) {
         super();
-        // This "activates" the debug adapter. You can only do this once.
-        [
-            DebugConfigurationProviderTriggerKind.Initial,
-            DebugConfigurationProviderTriggerKind.Dynamic
-        ].forEach(triggerKind => {
-            context.subscriptions.push(debug.registerDebugConfigurationProvider("PowerShell", this, triggerKind));
-        });
-        context.subscriptions.push(debug.registerDebugAdapterDescriptorFactory("PowerShell", this));
+
+        this.activateDebugAdaptor(context);
+
+        // NOTE: While process and runspace IDs are numbers, command
+        // substitutions in VS Code debug configurations are required to return
+        // strings. Hence to the `toString()` on these.
+        this.commands = [
+            commands.registerCommand("PowerShell.PickPSHostProcess", async () => {
+                const processId = await this.pickPSHostProcess();
+                return processId?.toString();
+            }),
+
+            commands.registerCommand("PowerShell.PickRunspace", async (processId) => {
+                const runspace = await this.pickRunspace(processId);
+                return runspace?.toString();
+            }, this),
+        ];
     }
 
     public dispose(): void {
+        for (const command of this.commands) {
+            command.dispose();
+        }
+
         for (const handler of this.handlers) {
             handler.dispose();
         }
     }
 
-    public override setLanguageClient(languageClient: LanguageClient): void {
+    // This "activates" the debug adapter. You can only do this once.
+    public activateDebugAdaptor(context: ExtensionContext): void {
+        const triggers = [
+            DebugConfigurationProviderTriggerKind.Initial,
+            DebugConfigurationProviderTriggerKind.Dynamic
+        ];
+
+        for (const triggerKind of triggers) {
+            context.subscriptions.push(
+                debug.registerDebugConfigurationProvider("PowerShell", this, triggerKind));
+        }
+
+        context.subscriptions.push(debug.registerDebugAdapterDescriptorFactory("PowerShell", this));
+    }
+
+    public override onLanguageClientSet(languageClient: LanguageClient): void {
         this.handlers = [
             languageClient.onNotification(
                 StartDebuggerNotificationType,
@@ -477,7 +506,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
         // If nothing is set, prompt for the processId.
         if (!config.customPipeName && !config.processId) {
-            config.processId = await commands.executeCommand("PowerShell.PickPSHostProcess");
+            config.processId = await this.pickPSHostProcess();
             // No process selected. Cancel attach.
             if (!config.processId) {
                 return PREVENT_DEBUG_START;
@@ -502,7 +531,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
 
         if (!config.runspaceId && !config.runspaceName) {
-            config.runspaceId = await commands.executeCommand("PowerShell.PickRunspace", config.processId);
+            config.runspaceId = await this.pickRunspace(config.processId);
             // No runspace selected. Cancel attach.
             if (!config.runspaceId) {
                 return PREVENT_DEBUG_START;
@@ -511,10 +540,64 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
         return config;
     }
+
+    private async pickPSHostProcess(): Promise<number | undefined> {
+        const client = await LanguageClientConsumer.getLanguageClient();
+        const response = await client.sendRequest(GetPSHostProcessesRequestType, {});
+        const items: IProcessItem[] = [];
+        for (const process of response) {
+            let windowTitle = "";
+            if (process.mainWindowTitle) {
+                windowTitle = `, ${process.mainWindowTitle}`;
+            }
+
+            items.push({
+                label: process.processName,
+                description: `PID: ${process.processId.toString()}${windowTitle}`,
+                processId: process.processId,
+            });
+        }
+
+        if (items.length === 0) {
+            return Promise.reject("There are no PowerShell host processes to attach.");
+        }
+
+        const options: QuickPickOptions = {
+            placeHolder: "Select a PowerShell host process to attach.",
+            matchOnDescription: true,
+            matchOnDetail: true,
+        };
+
+        const item = await window.showQuickPick(items, options);
+
+        return item?.processId ?? undefined;
+    }
+
+    private async pickRunspace(processId: number): Promise<number | undefined> {
+        const client = await LanguageClientConsumer.getLanguageClient();
+        const response = await client.sendRequest(GetRunspaceRequestType, { processId });
+        const items: IRunspaceItem[] = [];
+        for (const runspace of response) {
+            items.push({
+                label: runspace.name,
+                description: `ID: ${runspace.id} - ${runspace.availability}`,
+                id: runspace.id,
+            });
+        }
+
+        const options: QuickPickOptions = {
+            placeHolder: "Select PowerShell runspace to debug",
+            matchOnDescription: true,
+            matchOnDetail: true,
+        };
+
+        const item = await window.showQuickPick(items, options);
+
+        return item?.id ?? undefined;
+    }
 }
 
 export class SpecifyScriptArgsFeature implements Disposable {
-
     private command: Disposable;
     private context: ExtensionContext;
 
@@ -572,111 +655,6 @@ interface IPSHostProcessInfo {
 export const GetPSHostProcessesRequestType =
     new RequestType<IGetPSHostProcessesArguments, IPSHostProcessInfo[], string>("powerShell/getPSHostProcesses");
 
-export class PickPSHostProcessFeature extends LanguageClientConsumer {
-    private command: Disposable;
-    private waitingForClientToken?: CancellationTokenSource;
-    private getLanguageClientResolve?: (value: LanguageClient) => void;
-
-    constructor(private logger: ILogger) {
-        super();
-
-        this.command = commands.registerCommand("PowerShell.PickPSHostProcess", async () => {
-            return this.pickPSHostProcess();
-        });
-    }
-
-    public override setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
-
-        if (this.waitingForClientToken && this.getLanguageClientResolve) {
-            this.getLanguageClientResolve(this.languageClient);
-            this.clearWaitingToken();
-        }
-    }
-
-    public dispose(): void {
-        this.command.dispose();
-    }
-
-    private getLanguageClient(): Promise<LanguageClient> {
-        if (this.languageClient !== undefined) {
-            return Promise.resolve(this.languageClient);
-        } else {
-            // If PowerShell isn't finished loading yet, show a loading message
-            // until the LanguageClient is passed on to us
-            this.waitingForClientToken = new CancellationTokenSource();
-
-            return new Promise<LanguageClient>(
-                (resolve, reject) => {
-                    this.getLanguageClientResolve = resolve;
-
-                    void window
-                        .showQuickPick(
-                            ["Cancel"],
-                            { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
-                            this.waitingForClientToken?.token)
-                        .then((response) => {
-                            if (response === "Cancel") {
-                                this.clearWaitingToken();
-                                reject();
-                            }
-                        }, undefined);
-
-                    // Cancel the loading prompt after 60 seconds
-                    setTimeout(() => {
-                        if (this.waitingForClientToken) {
-                            this.clearWaitingToken();
-                            reject();
-
-                            void this.logger.writeAndShowError("Attach to PowerShell host process: PowerShell session took too long to start.");
-                        }
-                    }, 60000);
-                },
-            );
-        }
-    }
-
-    private async pickPSHostProcess(): Promise<number | undefined> {
-        // We need the language client in order to send the request.
-        await this.getLanguageClient();
-
-        // Start with the current PowerShell process in the list.
-        const items: IProcessItem[] = [];
-
-        const response = await this.languageClient?.sendRequest(GetPSHostProcessesRequestType, {});
-        for (const process of response ?? []) {
-            let windowTitle = "";
-            if (process.mainWindowTitle) {
-                windowTitle = `, ${process.mainWindowTitle}`;
-            }
-
-            items.push({
-                label: process.processName,
-                description: `PID: ${process.processId.toString()}${windowTitle}`,
-                processId: process.processId,
-            });
-        }
-
-        if (items.length === 0) {
-            return Promise.reject("There are no PowerShell host processes to attach to.");
-        }
-
-        const options: QuickPickOptions = {
-            placeHolder: "Select a PowerShell host process to attach to",
-            matchOnDescription: true,
-            matchOnDetail: true,
-        };
-
-        const item = await window.showQuickPick(items, options);
-
-        return item?.processId ?? undefined;
-    }
-
-    private clearWaitingToken(): void {
-        this.waitingForClientToken?.dispose();
-        this.waitingForClientToken = undefined;
-    }
-}
 
 interface IRunspaceItem extends QuickPickItem {
     id: number; // payload for the QuickPick UI
@@ -694,99 +672,3 @@ interface IRunspace {
 
 export const GetRunspaceRequestType =
     new RequestType<IGetRunspaceRequestArguments, IRunspace[], string>("powerShell/getRunspace");
-
-export class PickRunspaceFeature extends LanguageClientConsumer {
-    private command: Disposable;
-    private waitingForClientToken?: CancellationTokenSource;
-    private getLanguageClientResolve?: (value: LanguageClient) => void;
-
-    constructor(private logger: ILogger) {
-        super();
-
-        this.command = commands.registerCommand("PowerShell.PickRunspace",
-            async (processId) => { return this.pickRunspace(processId); },
-            this);
-    }
-
-    public override setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
-
-        if (this.waitingForClientToken && this.getLanguageClientResolve) {
-            this.getLanguageClientResolve(this.languageClient);
-            this.clearWaitingToken();
-        }
-    }
-
-    public dispose(): void {
-        this.command.dispose();
-    }
-
-    private getLanguageClient(): Promise<LanguageClient> {
-        if (this.languageClient) {
-            return Promise.resolve(this.languageClient);
-        } else {
-            // If PowerShell isn't finished loading yet, show a loading message
-            // until the LanguageClient is passed on to us
-            this.waitingForClientToken = new CancellationTokenSource();
-
-            return new Promise<LanguageClient>(
-                (resolve, reject) => {
-                    this.getLanguageClientResolve = resolve;
-
-                    void window
-                        .showQuickPick(
-                            ["Cancel"],
-                            { placeHolder: "Attach to PowerShell host process: Please wait, starting PowerShell..." },
-                            this.waitingForClientToken?.token)
-                        .then((response) => {
-                            if (response === "Cancel") {
-                                this.clearWaitingToken();
-                                reject();
-                            }
-                        }, undefined);
-
-                    // Cancel the loading prompt after 60 seconds
-                    setTimeout(() => {
-                        if (this.waitingForClientToken) {
-                            this.clearWaitingToken();
-                            reject();
-
-                            void this.logger.writeAndShowError(
-                                "Attach to PowerShell host process: PowerShell session took too long to start.");
-                        }
-                    }, 60000);
-                },
-            );
-        }
-    }
-
-    private async pickRunspace(processId: number): Promise<number | undefined> {
-        // We need the language client in order to send the request.
-        await this.getLanguageClient();
-
-        const response = await this.languageClient?.sendRequest(GetRunspaceRequestType, { processId });
-        const items: IRunspaceItem[] = [];
-        for (const runspace of response ?? []) {
-            items.push({
-                label: runspace.name,
-                description: `ID: ${runspace.id} - ${runspace.availability}`,
-                id: runspace.id,
-            });
-        }
-
-        const options: QuickPickOptions = {
-            placeHolder: "Select PowerShell runspace to debug",
-            matchOnDescription: true,
-            matchOnDetail: true,
-        };
-
-        const item = await window.showQuickPick(items, options);
-
-        return item?.id ?? undefined;
-    }
-
-    private clearWaitingToken(): void {
-        this.waitingForClientToken?.dispose();
-        this.waitingForClientToken = undefined;
-    }
-}
