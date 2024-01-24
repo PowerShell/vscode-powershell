@@ -11,15 +11,18 @@
   ],
   "extensions": {
     "recommendations": [
+      "connor4312.esbuild-problem-matchers",
       "davidanson.vscode-markdownlint",
       "dbaeumer.vscode-eslint",
       "editorconfig.editorconfig",
-      "josefpihrt-vscode.roslynator",
-      "ms-azure-devops.azure-pipelines",
-      "ms-dotnettools.csharp",
-      "ms-vscode.powershell",
+      "github.vscode-github-actions",
+      "GitHub.vscode-pull-request-github",
       "hbenl.vscode-mocha-test-adapter",
-      "connor4312.esbuild-problem-matchers"
+      "josefpihrt-vscode.roslynator",
+      "ms-dotnettools.csharp",
+      "ms-vscode.extension-test-runner",
+      "ms-vscode.powershell",
+      "redhat.vscode-yaml"
     ]
   },
   "settings": {
@@ -31,7 +34,7 @@
     "files.insertFinalNewline": true,
     "files.associations": {
       "**/snippets/*.json": "jsonc", // Use JSONC instead of JSON because that's how VS Code interprets snippet files, and it enables better source documentation.
-      "**/.vsts-ci/**/*.yml": "azure-pipelines",
+      "**/.vsts-ci/**/*.yml": "azure-pipelines"
     },
     // Ignore the Markdown rule:
     "markdownlint.config": {
@@ -54,18 +57,7 @@
       "editor.formatOnSave": true,
       "editor.formatOnSaveMode": "modificationsIfAvailable"
     },
-    "mochaExplorer.configFile": ".mocharc.json",
-    "mochaExplorer.launcherScript": "out/test/runTests",
-    "mochaExplorer.autoload": false, // The test instance pops up every time discovery or run is done, this could be annoying on startup.
-    "mochaExplorer.debuggerPort": 59229, // Matches the launch config, we dont want to use the default port as we are launching a duplicate instance of vscode and it might conflict.
-    "mochaExplorer.ipcRole": "server",
-    "mochaExplorer.ipcTimeout": 30000, // 30 seconds
-    "testExplorer.useNativeTesting": true,
-    "mochaExplorer.env": {
-      "VSCODE_VERSION": "insiders",
-      "ELECTRON_RUN_AS_NODE": null
-    },
-    "powershell.cwd": "Client",
+    "powershell.cwd": "Client"
   },
   "tasks": {
     "version": "2.0.0",
@@ -73,12 +65,7 @@
       "options": {
         "shell": {
           "executable": "pwsh.exe",
-          "args": [
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command"
-          ]
+          "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
         }
       }
     },
@@ -86,10 +73,7 @@
       "options": {
         "shell": {
           "executable": "pwsh",
-          "args": [
-            "-NoProfile",
-            "-Command"
-          ]
+          "args": ["-NoProfile", "-Command"]
         }
       }
     },
@@ -97,10 +81,7 @@
       "options": {
         "shell": {
           "executable": "/usr/local/bin/pwsh",
-          "args": [
-            "-NoProfile",
-            "-Command"
-          ]
+          "args": ["-NoProfile", "-Command"]
         }
       }
     },
@@ -112,10 +93,7 @@
           "cwd": "${workspaceFolder:Client}"
         },
         "command": "Invoke-Build Build",
-        "problemMatcher": [
-          "$msCompile",
-          "$tsc"
-        ],
+        "problemMatcher": ["$msCompile", "$tsc"],
         "group": {
           "kind": "build",
           "isDefault": true
@@ -128,10 +106,7 @@
           "cwd": "${workspaceFolder:Client}"
         },
         "command": "Invoke-Build Test",
-        "problemMatcher": [
-          "$msCompile",
-          "$tsc"
-        ],
+        "problemMatcher": ["$msCompile", "$tsc"],
         "group": {
           "kind": "test",
           "isDefault": true
@@ -143,9 +118,7 @@
         "options": {
           "cwd": "${workspaceFolder:Server}"
         },
-        "problemMatcher": [
-          "$msCompile"
-        ],
+        "problemMatcher": ["$msCompile"],
         "command": "Invoke-Build TestServerPS72",
         "group": {
           "kind": "test",
@@ -176,13 +149,7 @@
         "type": "pickString",
         "id": "clientBuildCommand",
         "description": "Which Invoke-Build Client Task?",
-        "options": [
-          "Restore",
-          "Clean",
-          "Build",
-          "Test",
-          "Package"
-        ],
+        "options": ["Restore", "Clean", "Build", "Test", "Package"],
         "default": "Clean"
       },
       {
@@ -197,7 +164,7 @@
           "Test",
           "TestServer",
           "TestServerPS72",
-          "TestE2E",
+          "TestE2E"
         ],
         "default": "Clean"
       }

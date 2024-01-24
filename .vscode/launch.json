@@ -16,7 +16,8 @@
         "hidden": false,
         "group": "test",
         "order": 2
-      }
+      },
+      "preLaunchTask": "build-watch"
     },
     {
       // Runs the extension in an empty temp profile that is automatically cleaned up after use
@@ -49,7 +50,8 @@
         "hidden": false,
         "group": "test",
         "order": 2
-      }
+      },
+      "preLaunchTask": "build-watch"
     },
     {
       // Runs the extension in an isolated but persistent profile separate from the user settings
@@ -67,7 +69,22 @@
         "hidden": false,
         "group": "test",
         "order": 2
-      }
+      },
+      "preLaunchTask": "build-watch"
+    },
+    {
+      // Runs the extension in an isolated but persistent profile separate from the user settings
+      // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
+      "name": "Test Extension",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm test",
+      "presentation": {
+        "hidden": false,
+        "group": "test",
+        "order": 2
+      },
+      "preLaunchTask": "test-watch"
     }
   ]
 }
