@@ -530,13 +530,13 @@ export class SessionManager implements Middleware {
                 this.sessionSettings);
 
         languageServerProcess.onExited(
-            async () => {
+            () => {
                 LanguageClientConsumer.onLanguageClientExited();
 
                 if (this.sessionStatus === SessionStatus.Running
                     || this.sessionStatus === SessionStatus.Busy) {
                     this.setSessionStatus("Session Exited!", SessionStatus.Failed);
-                    await this.promptForRestart();
+                    void this.promptForRestart();
                 }
             });
 
