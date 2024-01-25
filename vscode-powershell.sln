@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{40AA3D4C-66ED-4EB6-919C-DC43B1D92BA4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mocks", "mocks", "{BAFF8A86-610A-4176-94B9-3584E518DE1A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinaryModule", "test\mocks\BinaryModule\BinaryModule.csproj", "{E4F60A73-FD0B-4FD7-AF6B-D27BDA7C71F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4F60A73-FD0B-4FD7-AF6B-D27BDA7C71F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4F60A73-FD0B-4FD7-AF6B-D27BDA7C71F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4F60A73-FD0B-4FD7-AF6B-D27BDA7C71F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4F60A73-FD0B-4FD7-AF6B-D27BDA7C71F9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BAFF8A86-610A-4176-94B9-3584E518DE1A} = {40AA3D4C-66ED-4EB6-919C-DC43B1D92BA4}
+		{E4F60A73-FD0B-4FD7-AF6B-D27BDA7C71F9} = {BAFF8A86-610A-4176-94B9-3584E518DE1A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {77AC5BBB-E646-4FFF-93AA-710BC8F64673}
+	EndGlobalSection
+EndGlobal
