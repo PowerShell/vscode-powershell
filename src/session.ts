@@ -644,7 +644,7 @@ export class SessionManager implements Middleware {
             middleware: this,
         };
 
-        const languageClient = new LanguageClient("PowerShell Editor Services", connectFunc, clientOptions);
+        const languageClient = new LanguageClient("powershell", "PowerShell Editor Services Client", connectFunc, clientOptions);
 
         // This enables handling Semantic Highlighting messages in PowerShell Editor Services
         // TODO: We should only turn this on in preview.

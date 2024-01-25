@@ -287,25 +287,22 @@ your logs for any sensitive information you would not like to share online!**
 
 #### Provide Language Server Protocol payload logs
 
-The extension works mostly from exchanging messages with [PowerShell Editor Services][].
+A lot of the features of the PowerShell extension actually come from Visual Studio Code directly interacting with the [PowerShell Editor Services](https://github.com/PowerShell/PowerShellEditorServices) process via a [Language Server Protocol client](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide#logging-support-for-language-server).
 In some cases, getting to the bottom of a bug will require looking at the payloads of
-these messages. To do this:
+these messages. To enable viewing these messages:
 
 * Add the following setting to your settings file:
 
   ```json
-  "powershell editor services.trace.server":"verbose"
+  "powershell.trace.server":"verbose"
   ```
-
-> While VS Code will not recognize and highlight it, it is a valid option and enables
-> tracer logs on the server.
 
 * Restart VS Code and reproduce the issue.
 
 * Go into the "Output" panel (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd> or
   <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>U</kbd>).
 
-* In the drop down on the right, select "PowerShell Editor Services".
+* In the drop down on the right, select "PowerShell Editor Services Client".
 
 * Copy the entire contents of the Output panel and paste it into the GitHub issue in the
   browser. At this point, you may delete the setting if you want.
