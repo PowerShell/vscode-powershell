@@ -1,5 +1,21 @@
 # PowerShell Extension Release History
 
+## v2024.3.0-preview
+### Thursday, January 25, 2024
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🚂 [vscode-powershell #4902](https://github.com/PowerShell/vscode-powershell/pull/4902) - Enable the native vscode-languageclient tracing option. (Thanks @JustinGrote!)
+- 🐛 📟 [vscode-powershell #4900](https://github.com/PowerShell/vscode-powershell/pull/4900) - Fix `PowerShellProcess.dipose()` to fire the `onExited` event idempotently.
+- ✨ 🚂 [vscode-powershell #4892](https://github.com/PowerShell/vscode-powershell/pull/4893) - Remove deprecated features.
+- 🐛 🔍 [vscode-powershell #4843](https://github.com/PowerShell/vscode-powershell/pull/4888) - Fix up debugger configuration resolvers .
+- ✨ 🔧 [vscode-powershell #3034](https://github.com/PowerShell/vscode-powershell/pull/4883) - Add developer setting to disable `-ExecutionPolicy Bypass` flags.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.17.0
+
+- ✨ 🚂 [PowerShellEditorServices #2132](https://github.com/PowerShell/PowerShellEditorServices/pull/2132) - Remove `PowerShellEditorServices.VSCode` module / `ContentViews` feature.
+- 🐛 🔍 [PowerShellEditorServices #2130](https://github.com/PowerShell/PowerShellEditorServices/pull/2130) - Fix up debugger attach handlers.
+
 ## v2024.0.0
 ### Wednesday, January 10, 2024
 
