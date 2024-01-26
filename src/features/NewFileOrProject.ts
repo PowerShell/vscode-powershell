@@ -53,7 +53,7 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
         if (response.needsModuleInstall) {
             // TODO: Offer to install Plaster
             void this.logger.writeAndShowError("Plaster is not installed!");
-            return Promise.reject<ITemplateQuickPickItem[]>("Plaster needs to be installed");
+            return Promise.reject<ITemplateQuickPickItem[]>(new Error("Plaster needs to be installed"));
         }
 
         let templates = response.templates.map<ITemplateQuickPickItem>(

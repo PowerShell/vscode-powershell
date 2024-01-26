@@ -332,7 +332,7 @@ export class SessionManager implements Middleware {
         this.debugEventHandler?.dispose();
 
         if (this.PowerShellExeDetails === undefined) {
-            return Promise.reject("Required PowerShellExeDetails undefined!");
+            return Promise.reject(new Error("Required PowerShellExeDetails undefined!"));
         }
 
         // TODO: It might not be totally necessary to update the session
