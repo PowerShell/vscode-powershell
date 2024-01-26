@@ -478,8 +478,8 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         if (vscode.window.activeTextEditor !== undefined) {
             vscode.window.activeTextEditor.selections = [
                 new vscode.Selection(
-                    asCodePosition(details.selectionRange.start)!,
-                    asCodePosition(details.selectionRange.end)!),
+                    asCodePosition(details.selectionRange.start),
+                    asCodePosition(details.selectionRange.end)),
             ];
             return EditorOperationResponse.Completed;
         }

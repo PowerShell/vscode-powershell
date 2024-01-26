@@ -58,7 +58,7 @@ export abstract class LanguageClientConsumer {
                         // Store the resolve function to be called in resetLanguageClient.
                         LanguageClientConsumer.getLanguageClientResolve = resolve;
                         // Reject the promise if the operation is cancelled.
-                        token.onCancellationRequested(() => { reject(); });
+                        token.onCancellationRequested(() => { reject(new Error("Cancelled PowerShell Extension Terminal start-up.")); });
                     }
                 );
             });

@@ -559,7 +559,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
         }
 
         if (items.length === 0) {
-            return Promise.reject("There are no PowerShell host processes to attach.");
+            return Promise.reject(new Error("There are no PowerShell host processes to attach."));
         }
 
         const options: QuickPickOptions = {
