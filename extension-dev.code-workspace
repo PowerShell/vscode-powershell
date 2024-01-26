@@ -146,7 +146,7 @@
         "problemMatcher": [
           "$msCompile"
         ],
-        "command": "Invoke-Build TestServerPS72",
+        "command": "Invoke-Build TestPS74",
         "group": {
           "kind": "test",
           "isDefault": true
@@ -195,9 +195,10 @@
           "Clean",
           "Build",
           "Test",
-          "TestServer",
-          "TestServerPS72",
-          "TestE2E",
+          "TestPS74",
+          "TestE2EPwsh",
+          "TestPS51",
+          "TestE2EPowerShell",
         ],
         "default": "Clean"
       }
