@@ -1,6 +1,6 @@
 name: 🐛 Bug report
 description: Open an issue about a bug that needs fixing.
-labels: Issue-Bug
+labels: ["Issue-Bug", "Needs: Triage"]
 body:
 - type: checkboxes
   attributes:
@@ -25,22 +25,33 @@ body:
   id: powershell-version
   attributes:
     label: PowerShell Version
-    description: Paste verbatim output from `$PSVersionTable` below. Please double-check that this is the PowerShell version that VS Code is set to use.
+    description: Paste verbatim output from `$PSVersionTable; $Host` below. **Please include `$Host`** so we know this version is from the Extension Terminal!
     render: console
     placeholder: |
-      PS> $PSVersionTable
+      PS> $PSVersionTable; $Host
 
       Name                           Value
       ----                           -----
-      PSVersion                      7.1.3
+      PSVersion                      7.4.0
       PSEdition                      Core
-      GitCommitId                    7.1.3
-      OS                             Darwin 20.4.0 Darwin Kernel
-      Platform                       Unix
+      GitCommitId                    7.4.0
+      OS                             Microsoft Windows 10.0.22631
+      Platform                       Win32NT
       PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0…}
       PSRemotingProtocolVersion      2.3
       SerializationVersion           1.1.0.1
       WSManStackVersion              3.0
+
+      Name             : Visual Studio Code Host
+      Version          : 2023.11.0
+      InstanceId       : 803ce61b-6187-4574-9c1f-827ebb11b8b6
+      UI               : System.Management.Automation.Internal.Host.InternalHostUserInterface
+      CurrentCulture   : en-US
+      CurrentUICulture : en-US
+      PrivateData      : Microsoft.PowerShell.ConsoleHost+ConsoleColorProxy
+      DebuggerEnabled  : True
+      IsRunspacePushed : False
+      Runspace         : System.Management.Automation.Runspaces.LocalRunspace
   validations:
     required: true
 - type: textarea

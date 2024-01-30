@@ -200,8 +200,8 @@ export class ConsoleFeature extends LanguageClientConsumer {
                 } else {
                     selectionRange = editor.document.lineAt(editor.selection.start.line).range;
                 }
-
-                await this.languageClient?.sendRequest(EvaluateRequestType, {
+                const client = await LanguageClientConsumer.getLanguageClient();
+                await client.sendRequest(EvaluateRequestType, {
                     expression: editor.document.getText(selectionRange),
                 });
 
@@ -217,19 +217,19 @@ export class ConsoleFeature extends LanguageClientConsumer {
         for (const command of this.commands) {
             command.dispose();
         }
+
         for (const handler of this.handlers) {
             handler.dispose();
         }
     }
 
-    public override setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
+    public override onLanguageClientSet(languageClient: LanguageClient): void {
         this.handlers = [
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 ShowChoicePromptRequestType,
                 (promptDetails) => showChoicePrompt(promptDetails)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 ShowInputPromptRequestType,
                 (promptDetails) => showInputPrompt(promptDetails)),
         ];

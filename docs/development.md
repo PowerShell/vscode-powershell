@@ -2,12 +2,9 @@
 
 ## Development Setup
 
-You'll need to clone two repositories and set up your development environment
-to before you can proceed.
+1. [Fork and clone][fork] the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell).
 
-1. [Fork and clone][fork] the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell)
-
-2. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices)
+2. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices).
    > The `vscode-powershell` folder and the `PowerShellEditorServices` folder should be next to each other on the file
    > system. Code in `vscode-powershell` looks for PSES at `../PowerShellEditorServices` if you're building locally so
    > PSES must be in that location.
@@ -15,12 +12,13 @@ to before you can proceed.
 3. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
    PowerShell Editor Services. **You will need to complete this step before proceeding**.
 
-4. Install the latest [Visual Studio Code Insiders release](https://code.visualstudio.com/insiders)
-   > You can also use the [standard Visual Studio Code release](https://code.visualstudio.com/). Both will work, but
-   > using VSCode Insiders means the extension can be developed ready for new features and changes in the next VSCode
-   > release.
+4. Install [Node.js](https://nodejs.org/en/) 18.x or higher.
 
-5. Install [Node.js](https://nodejs.org/en/) 16.x or higher.
+5. Install [Visual Studio Code](https://code.visualstudio.com).
+   Open the multi-root workspace file in this repo, `extension-dev.code-workspace`.
+   > This has a set of recommended extensions to install and provides tasks.
+   > The ESLint formatter will require you to install ESLint globally, using `npm install -g eslint`.
+   > Otherwise VS Code will erroneously complain that it isn't able to use it to format TypeScript files.
 
 [fork]: https://help.github.com/articles/fork-a-repo/
 
@@ -28,9 +26,7 @@ to before you can proceed.
 
 #### From Visual Studio Code
 
-> Press <kbd>Ctrl</kbd>+<kbd>P</kbd> and type `task build`
-
-This will compile the TypeScript files in the project to JavaScript files.
+Press <kbd>Ctrl+P</kbd> and type `task build`. Explore the other provided tasks for helpful commands.
 
 #### From a PowerShell prompt
 
@@ -38,18 +34,13 @@ This will compile the TypeScript files in the project to JavaScript files.
 Invoke-Build Build
 ```
 
+Explore the `vscode-powershell.build.ps1` file for other build targets.
+
 ### Launching the extension
 
-#### From Visual Studio Code
-
-> To debug the extension, press <kbd>F5</kbd>.  To run the extension without debugging, press
-> <kbd>Ctrl</kbd>+<kbd>F5</kbd> or <kbd>Cmd</kbd>+<kbd>F5</kbd> on macOS.
-
-#### From a command prompt
-
-```cmd
-code --extensionDevelopmentPath="c:\path\to\vscode-powershell" .
-```
+To debug the extension use one of the provided `Launch Extension` debug configurations (remember to rebuild first).
+You can simultaneously use the `Attach to Editor Services` configuration to attach the .NET debugger to the PowerShell process running the server.
+Try the `powershell.developer.editorServicesWaitForDebugger` setting to attach before startup.
 
 ## Contributing Snippets
 

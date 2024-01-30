@@ -1,12 +1,12 @@
 {
   "name": "powershell",
   "displayName": "PowerShell",
-  "version": "2023.9.1",
+  "version": "2024.3.0",
   "preview": false,
   "publisher": "ms-vscode",
   "description": "Develop PowerShell modules, commands and scripts in Visual Studio Code!",
   "engines": {
-    "vscode": "^1.79.2"
+    "vscode": "^1.82.0"
   },
   "author": "Microsoft Corporation",
   "license": "SEE LICENSE IN LICENSE.txt",
@@ -74,43 +74,43 @@
     "onWalkthrough:PowerShell"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "0.8.4",
+    "@vscode/extension-telemetry": "0.9.2",
     "node-fetch": "2.7.0",
     "semver": "7.5.4",
     "untildify": "4.0.0",
-    "uuid": "9.0.0",
-    "vscode-languageclient": "8.1.0",
-    "vscode-languageserver-protocol": "3.17.3"
+    "uuid": "9.0.1",
+    "vscode-languageclient": "9.0.1",
+    "vscode-languageserver-protocol": "3.17.5"
   },
   "devDependencies": {
-    "@types/mocha": "10.0.1",
-    "@types/mock-fs": "4.13.1",
-    "@types/node": "16.18.12",
+    "@types/mocha": "10.0.6",
+    "@types/mock-fs": "4.13.4",
+    "@types/node": "18.19.3",
     "@types/node-fetch": "2.6.4",
-    "@types/rewire": "2.5.28",
-    "@types/semver": "7.5.1",
-    "@types/sinon": "10.0.16",
-    "@types/ungap__structured-clone": "0.3.0",
-    "@types/uuid": "9.0.2",
-    "@types/vscode": "1.79.0",
-    "@typescript-eslint/eslint-plugin": "6.5.0",
-    "@typescript-eslint/parser": "6.5.0",
+    "@types/rewire": "2.5.30",
+    "@types/semver": "7.5.6",
+    "@types/sinon": "17.0.3",
+    "@types/ungap__structured-clone": "1.2.0",
+    "@types/uuid": "9.0.7",
+    "@types/vscode": "1.82.0",
+    "@typescript-eslint/eslint-plugin": "6.19.1",
+    "@typescript-eslint/parser": "6.19.1",
     "@ungap/structured-clone": "1.2.0",
-    "@vscode/debugprotocol": "1.61.0",
-    "@vscode/test-electron": "2.3.4",
-    "@vscode/vsce": "2.20.1",
-    "esbuild": "0.19.2",
-    "eslint": "8.48.0",
+    "@vscode/debugprotocol": "1.64.0",
+    "@vscode/test-electron": "2.3.9",
+    "@vscode/vsce": "2.23.0",
+    "esbuild": "0.19.12",
+    "eslint": "8.56.0",
     "eslint-plugin-header": "3.1.1",
-    "glob": "10.3.3",
+    "glob": "10.3.10",
     "mocha": "10.2.0",
     "mocha-explorer-launcher-scripts": "0.4.0",
     "mocha-multi-reporters": "1.5.1",
     "mock-fs": "5.2.0",
     "rewire": "7.0.0",
-    "sinon": "15.2.0",
+    "sinon": "17.0.1",
     "source-map-support": "0.5.21",
-    "typescript": "5.2.2"
+    "typescript": "5.3.3"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -302,11 +302,6 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.WalkthroughTelemetry",
-        "title": "Walkthrough Telemetry",
-        "category": "PowerShell"
-      },
-      {
         "command": "PowerShell.ClosePanel",
         "title": "Close panel",
         "category": "PowerShell"
@@ -491,18 +486,7 @@
             "body": {
               "name": "PowerShell Attach to Host Process",
               "type": "PowerShell",
-              "request": "attach",
-              "runspaceId": 1
-            }
-          },
-          {
-            "label": "PowerShell: Attach Interactive Session Runspace",
-            "description": "Open runspace picker to select runspace to attach debugger to",
-            "body": {
-              "name": "PowerShell Attach Interactive Session Runspace",
-              "type": "PowerShell",
-              "request": "attach",
-              "processId": "current"
+              "request": "attach"
             }
           },
           {
@@ -593,29 +577,27 @@
             "properties": {
               "computerName": {
                 "type": "string",
-                "description": "Optional: The computer name to which a remote session will be established.  Works only on PowerShell 4 and above."
+                "description": "Optional: The computer name to which a remote session will be established.",
+                "default": null
               },
               "processId": {
-                "type": "string",
-                "description": "The process id of the PowerShell host process to attach to.  Works only on PowerShell 5 and above.",
+                "type": "number",
+                "description": "Optional: The ID of the PowerShell host process that should be attached. Will prompt if unspecified.",
                 "default": null
               },
               "runspaceId": {
-                "type": [
-                  "string",
-                  "number"
-                ],
-                "description": "Optional: The ID of the runspace to debug in the attached process.  Defaults to 1.  Works only on PowerShell 5 and above.",
+                "type": "number",
+                "description": "Optional: The ID of the runspace to debug in the attached process. Will prompt if unspecified.",
                 "default": null
               },
               "runspaceName": {
                 "type": "string",
-                "description": "Optional: The Name of the runspace to debug in the attached process.  Works only on PowerShell 5 and above.",
+                "description": "Optional: The name of the runspace to debug in the attached process.",
                 "default": null
               },
               "customPipeName": {
                 "type": "string",
-                "description": "The custom pipe name of the PowerShell host process to attach to.  Works only on PowerShell 6.2 and above.",
+                "description": "The custom pipe name of the PowerShell host process to attach to.",
                 "default": null
               }
             }
@@ -962,6 +944,11 @@
           "default": false,
           "markdownDescription": "Launches the LSP server with the `/waitForDebugger` flag to force it to wait for a .NET debugger to attach before proceeding, and emit its PID until then. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
         },
+        "powershell.developer.setExecutionPolicy": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "On Windows we launch the PowerShell executable with `-ExecutionPolicy Bypass` so that the LSP server (PowerShell Editor Services module) will launch without issue. Some anti-virus programs disallow this command-line argument and this flag can be used to remove it. **Using this setting may require trusting the script manually in order for it to launch!**"
+        },
         "powershell.developer.featureFlags": {
           "type": "array",
           "items": {
@@ -1019,6 +1006,16 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Show buttons in the editor's title bar for moving the terminals pane (with the PowerShell Extension Terminal) around."
+        },
+        "powershell.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the PowerShell Editor Services language server. **This setting is only meant for extension developers!**"
         }
       }
     },
@@ -1119,14 +1116,6 @@
               "markdown": "media/walkthrough.md"
             },
             "description": "Now you are ready to start using the PowerShell Extension on your own and explore more resources!\n📚 See the PowerShell Extension's [documentation](https://docs.microsoft.com/en-us/powershell/scripting/dev-cross-plat/vscode/using-vscode?view=powershell-7.2)\nℹ️ View Visual Studio Code's [documentation](https://code.visualstudio.com/docs/languages/powershell)\n🔌 Plug into the [PowerShell Community](https://docs.microsoft.com/en-us/powershell/scripting/community/community-support?view=powershell-7.2)\n📄 Take a look at our [Release Notes](https://docs.microsoft.com/en-us/powershell/scripting/whats-new/what-s-new-in-powershell-73?view=powershell-7.2)"
-          },
-          {
-            "id": "feedback",
-            "title": "Share your feedback",
-            "media": {
-              "markdown": "media/walkthrough.md"
-            },
-            "description": "How has this walkthrough affected your confidence level when using the PowerShell Extension?\n[I feel less confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A3%7D)\n[My confidence has not been affected](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A2%7D)\n[I feel more confident](command:PowerShell.WalkthroughTelemetry?%7B%22satisfaction%22%3A1%7D)"
           }
         ]
       }

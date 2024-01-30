@@ -15,7 +15,7 @@ export class PowerShellProcess {
     private static warnUserThreshold = 30;
 
     public onExited: vscode.Event<void>;
-    private onExitedEmitter = new vscode.EventEmitter<void>();
+    private onExitedEmitter?: vscode.EventEmitter<void>;
 
     private consoleTerminal?: vscode.Terminal;
     private consoleCloseSubscription?: vscode.Disposable;
@@ -31,6 +31,7 @@ export class PowerShellProcess {
         private sessionFilePath: vscode.Uri,
         private sessionSettings: Settings) {
 
+        this.onExitedEmitter = new vscode.EventEmitter<void>();
         this.onExited = this.onExitedEmitter.event;
     }
 
@@ -71,7 +72,7 @@ export class PowerShellProcess {
         powerShellArgs.push("-NoProfile");
 
         // Only add ExecutionPolicy param on Windows
-        if (utils.isWindows) {
+        if (utils.isWindows && this.sessionSettings.developer.setExecutionPolicy) {
             powerShellArgs.push("-ExecutionPolicy", "Bypass");
         }
 
@@ -148,6 +149,9 @@ export class PowerShellProcess {
         this.logger.writeVerbose(`Disposing PowerShell process with PID: ${this.pid}`);
 
         void this.deleteSessionFile(this.sessionFilePath);
+
+        this.onExitedEmitter?.fire();
+        this.onExitedEmitter = undefined;
 
         this.consoleTerminal?.dispose();
         this.consoleTerminal = undefined;
@@ -230,7 +234,6 @@ export class PowerShellProcess {
         }
 
         this.logger.writeWarning(`PowerShell process terminated or Extension Terminal was closed, PID: ${this.pid}`);
-        this.onExitedEmitter.fire();
         this.dispose();
     }
 }

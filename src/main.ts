@@ -6,7 +6,6 @@ import TelemetryReporter from "@vscode/extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
-import { CustomViewsFeature } from "./features/CustomViews";
 import { DebugSessionFeature } from "./features/DebugSession";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
@@ -19,9 +18,7 @@ import { ISECompatibilityFeature } from "./features/ISECompatibility";
 import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
-import { PickPSHostProcessFeature, PickRunspaceFeature } from "./features/DebugSession";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
-import { RunCodeFeature } from "./features/RunCode";
 import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger } from "./logging";
@@ -139,7 +136,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new ISECompatibilityFeature(),
         new OpenInISEFeature(),
         new PesterTestsFeature(sessionManager, logger),
-        new RunCodeFeature(sessionManager, logger),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
     ];
@@ -150,17 +146,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     languageClientConsumers = [
         new ConsoleFeature(logger),
         new ExpandAliasFeature(),
-        new GetCommandsFeature(logger),
+        new GetCommandsFeature(),
         new ShowHelpFeature(),
         new ExtensionCommandsFeature(logger),
         new NewFileOrProjectFeature(logger),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
-        new PickPSHostProcessFeature(logger),
         new HelpCompletionFeature(),
-        new CustomViewsFeature(),
-        new PickRunspaceFeature(logger),
-        externalApi
     ];
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);
@@ -180,10 +172,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
 export async function deactivate(): Promise<void> {
     // Clean up all extension features
-    for (const languageClientConsumer of languageClientConsumers) {
-        languageClientConsumer.dispose();
-    }
-
     for (const commandRegistration of commandRegistrations) {
         commandRegistration.dispose();
     }
