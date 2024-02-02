@@ -56,6 +56,10 @@ steps:
   inputs:
     version: 18.x
 
+- task: npmAuthenticate@0
+  inputs:
+    workingFile: $(Build.SourcesDirectory)/vscode-powershell/.npmrc
+
 # We don't just use installPSResources.ps1 because we haven't always cloned PowerShellEditorServices
 - task: PowerShell@2
   displayName: Build and package
