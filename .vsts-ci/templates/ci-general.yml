@@ -56,6 +56,15 @@ steps:
   inputs:
     version: 18.x
 
+- task: PowerShell@2
+  displayName: Add private NPM registry
+  inputs:
+    targetType: inline
+    pwsh: true
+    script: |
+      Add-Content .npmrc "always-auth=true"
+      Add-Content .npmrc "registry=https://pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/"
+
 - task: npmAuthenticate@0
   inputs:
     workingFile: $(Build.SourcesDirectory)/vscode-powershell/.npmrc
