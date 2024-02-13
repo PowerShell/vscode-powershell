@@ -26,8 +26,8 @@ task RestoreNodeModules -If { !(Test-Path ./node_modules) } {
     Write-Host "`n### Restoring vscode-powershell dependencies`n" -ForegroundColor Green
     # When in a CI build use the --loglevel=error parameter so that
     # package install warnings don't cause PowerShell to throw up
-    if ($env:TF_BUILD) {
-        Invoke-BuildExec { & npm ci --loglevel=error }
+    if ($env:CI -or $env:TF_BUILD) {
+        Invoke-BuildExec { & npm ci --loglevel=error --ignore-scripts }
     } else {
         Invoke-BuildExec { & npm install }
     }

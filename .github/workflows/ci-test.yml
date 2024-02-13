@@ -48,6 +48,10 @@ jobs:
         shell: pwsh
         run: ../PowerShellEditorServices/tools/installPSResources.ps1
 
+      - name: Deploy NPM configuration
+        shell: pwsh
+        run: Copy-Item .github/workflows/npmrc .npmrc
+
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -61,6 +65,8 @@ jobs:
       - name: Build, test and package
         shell: pwsh
         run: Invoke-Build
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.AZURE_NPM_TOKEN }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
