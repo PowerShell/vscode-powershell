@@ -1,7 +1,15 @@
 version: 2
+registries:
+  npm-azure:
+    type: npm-registry
+    url: https://pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/
+    username: powershell-rel
+    password: ${{ secrets.AZURE_NPM_TOKEN }}
 updates:
 - package-ecosystem: npm
   directory: "/"
+  registries:
+    - npm-azure
   labels: [ ]
   schedule:
     interval: weekly
