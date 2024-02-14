@@ -55,8 +55,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
-          cache-dependency-path: vscode-powershell/package-lock.json
 
       - name: Start X virtual framebuffer
         if: matrix.os == 'ubuntu-latest'
@@ -64,7 +62,9 @@ jobs:
 
       - name: Build, test and package
         shell: pwsh
-        run: Invoke-Build
+        run: |
+          Get-Content .npmrc
+          Invoke-Build
         env:
           NPM_AUTH_TOKEN: ${{ secrets.AZURE_NPM_TOKEN }}
 
