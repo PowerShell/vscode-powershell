@@ -51,10 +51,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
-          cache-dependency-path: vscode-powershell/package-lock.json
-          registry-url: https://pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/
-          always-auth: true
+          # cache: npm
+          # cache-dependency-path: vscode-powershell/package-lock.json
+
+      - name: Deploy CI NPM configuration
+        shell: pwsh
+        run: Copy-Item .github/workflows/npmrc .npmrc
 
       - name: Start X virtual framebuffer
         if: matrix.os == 'ubuntu-latest'
@@ -64,7 +66,7 @@ jobs:
         shell: pwsh
         run: Invoke-Build
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.AZURE_NPM_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.AZURE_NPM_TOKEN }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
