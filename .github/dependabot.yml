@@ -4,7 +4,7 @@ registries:
     type: npm-registry
     url: https://pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/
     username: powershell-rel
-    password: ${{ secrets.AZURE_NPM_TOKEN }}
+    password: ${{ secrets.AZURE_NPM_PASSWORD }}
 updates:
 - package-ecosystem: npm
   directory: "/"

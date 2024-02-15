@@ -66,7 +66,7 @@ jobs:
         shell: pwsh
         run: Invoke-Build
         env:
-          NPM_AUTH_TOKEN: ${{ secrets.AZURE_NPM_TOKEN }}
+          NPM_PASSWORD: ${{ secrets.AZURE_NPM_PASSWORD_BASE64}}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
