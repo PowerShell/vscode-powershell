@@ -1,12 +1,12 @@
-; This requires NPM_AUTH_TOKEN to be available as a base64 encoded secret, since
+; This requires NPM_PASSWORD to be available as a base64 encoded secret, since
 ; Azure DevOps does not support actual auth tokens.
 
 ; begin auth token
 //pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/:username=powershell-rel
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/:_password=${NPM_AUTH_TOKEN}
+//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/:_password=${NPM_PASSWORD}
 //pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/:email=powershell-rel
 //pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/:username=powershell-rel
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/:_password=${NPM_AUTH_TOKEN}
+//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/:_password=${NPM_PASSWORD}
 //pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/:email=powershell-rel
 ; end auth token
 registry=https://pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/
