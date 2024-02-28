@@ -140,7 +140,7 @@ class IntegratedConsoleSettings extends PartialSettings {
 }
 
 class SideBarSettings extends PartialSettings {
-    CommandExplorerVisibility = true;
+    CommandExplorerVisibility = false;
     CommandExplorerExcludeFilter: string[] = [];
 }
 
