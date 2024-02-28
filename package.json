@@ -611,7 +611,7 @@
       "properties": {
         "powershell.sideBar.CommandExplorerVisibility": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "markdownDescription": "Specifies the visibility of the Command Explorer in the side bar."
         },
         "powershell.sideBar.CommandExplorerExcludeFilter": {
