@@ -35,9 +35,7 @@ export class PowerShellProcess {
         this.onExited = this.onExitedEmitter.event;
     }
 
-    public async start(logFileName: string, cancellationToken: vscode.CancellationToken): Promise<IEditorServicesSessionDetails | undefined> {
-        const editorServicesLogPath = this.logger.getLogFilePath(logFileName);
-
+    public async start(cancellationToken: vscode.CancellationToken): Promise<IEditorServicesSessionDetails | undefined> {
         const psesModulePath =
             path.resolve(
                 __dirname,
@@ -50,7 +48,7 @@ export class PowerShellProcess {
                 : "";
 
         this.startPsesArgs +=
-            `-LogPath '${utils.escapeSingleQuotes(editorServicesLogPath.fsPath)}' ` +
+            `-LogPath '${utils.escapeSingleQuotes(this.logger.logDirectoryPath.fsPath)}' ` +
             `-SessionDetailsPath '${utils.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 
