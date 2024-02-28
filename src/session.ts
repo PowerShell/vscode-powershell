@@ -540,7 +540,7 @@ export class SessionManager implements Middleware {
                 }
             });
 
-        this.sessionDetails = await languageServerProcess.start("EditorServices", cancellationToken);
+        this.sessionDetails = await languageServerProcess.start(cancellationToken);
 
         return languageServerProcess;
     }
