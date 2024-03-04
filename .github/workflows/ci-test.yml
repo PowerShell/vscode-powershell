@@ -64,7 +64,7 @@ jobs:
 
       - name: Build, test and package
         shell: pwsh
-        run: Invoke-Build
+        run: Invoke-Build -Configuration Release
         env:
           NPM_PASSWORD: ${{ secrets.AZURE_NPM_PASSWORD_BASE64}}
 

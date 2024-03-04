@@ -1,11 +1,8 @@
 name: CI-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
+# NOTE: This was superceded by the GitHub Actions workflow.
 pr: none
-
-trigger:
-  branches:
-    include:
-      - release
+trigger: none
 
 variables:
   # Don't download unneeded packages
