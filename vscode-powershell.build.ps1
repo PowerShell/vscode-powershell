@@ -27,7 +27,7 @@ task RestoreNodeModules -If { !(Test-Path ./node_modules) } {
     # When in a CI build use the --loglevel=error parameter so that
     # package install warnings don't cause PowerShell to throw up
     if ($env:CI -or $env:TF_BUILD) {
-        Invoke-BuildExec { & npm ci --loglevel=error --ignore-scripts }
+        Invoke-BuildExec { & npm ci --loglevel=error }
     } else {
         Invoke-BuildExec { & npm install }
     }

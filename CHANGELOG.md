@@ -1,5 +1,22 @@
 # PowerShell Extension Release History
 
+## v2024.3.1-preview
+### Tuesday, March 5, 2024
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🙏 [vscode-powershell #4932](https://github.com/PowerShell/vscode-powershell/pull/4934) - Don't make the Command Explorer visible by default.
+- ✨ 💭 [vscode-powershell #4933](https://github.com/PowerShell/vscode-powershell/pull/4933) - Fix how we pass the log directory to Editor Services.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.18.0
+
+- ✨ 👷 [PowerShellEditorServices #2138](https://github.com/PowerShell/PowerShellEditorServices/pull/2138) - Fixed sln file. (Thanks @dkattan!)
+- #️⃣ 🙏 [PowerShellEditorServices #2137](https://github.com/PowerShell/PowerShellEditorServices/pull/2137) - Fixed TextReader disposal. (Thanks @dkattan!)
+- 🐛#️⃣ 🙏 [PowerShellEditorServices #2135](https://github.com/PowerShell/PowerShellEditorServices/pull/2135) - Fix PowerShell 7.2 E2E unit test for last change.
+- ✨ 🛫 [PowerShellEditorServices #1855](https://github.com/PowerShell/PowerShellEditorServices/pull/2129) - Add sane defaults to `Start-EditorServices`.
+- ✨#️⃣ 🙏 [PowerShellEditorServices #2122](https://github.com/PowerShell/PowerShellEditorServices/pull/2122) - Add `UseNullPSHostUI` config so apps hosting PSES can disable it. (Thanks @dkattan!)
+- 🐛 🧠 [PowerShellEditorServices #2115](https://github.com/PowerShell/PowerShellEditorServices/pull/2115) - Added null check to `GetCompletionsAsync`. (Thanks @dkattan!)
+
 ## v2024.3.0-preview
 ### Thursday, January 25, 2024
 
