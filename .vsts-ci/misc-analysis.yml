@@ -2,10 +2,6 @@ name: Misc-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.rr)
 
 trigger:
   - gh-readonly-queue/main/*
-pr:
-  paths:
-    exclude:
-    - '**/*.md'
 
 resources:
   repositories:
@@ -22,19 +18,3 @@ jobs:
   - checkout: self
   - checkout: ComplianceRepo
   - template: ci-compliance.yml@ComplianceRepo
-
-# NOTE: This enables our project to work with Visual Studio's Rich Navigation:
-# https://visualstudio.microsoft.com/services/rich-code-navigation/
-- job: RichCodeNav
-  pool:
-    vmImage: windows-latest
-  steps:
-  # TODO: Move to GitHub Action
-  - task: RichCodeNavIndexer@0
-    continueOnError: true
-    inputs:
-      serviceConnection: rich-nav
-      nugetServiceConnection: rich-nav-nuget
-      githubServiceConnection: PowerShell
-      languages: typescript,csharp
-      serviceEndpoint: https://prod.richnav.vsengsaas.visualstudio.com

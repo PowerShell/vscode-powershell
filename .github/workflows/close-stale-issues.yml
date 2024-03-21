@@ -1,0 +1,45 @@
+name: Issue Housekeeping
+
+permissions:
+  issues: write
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  stale-resolved-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        name: Label resolved issues as needing fix verification
+        with:
+          any-of-labels: "Resolution-Answered,Resolution-Duplicate,Resolution-External,Resolution-Fixed,Resolution-Inactive"
+          stale-issue-label: "Needs: Fix Verification"
+          days-before-stale: 0
+          days-before-close: -1
+          stale-issue-message: "This issue has been labeled as resolved, please verify the provided fix (or other reason)."
+          labels-to-remove-when-stale: "Needs: Maintainer Attention,Needs: Triage"
+  stale-fixed-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        name: Close issues needing fix verification after 1 week of inactivity
+        with:
+          stale-issue-label: "Needs: Fix Verification"
+          days-before-stale: -1
+          labels-to-add-when-unstale: "Needs: Maintainer Attention"
+          close-issue-reason: completed
+          close-issue-message: "This issue has been labeled as needing fix verification and has not had any activity a week. It has been closed for housekeeping purposes."
+  stale-feedback-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        name: Close issues needing author feedback after 1 week of inactivity
+        with:
+          stale-issue-label: "Needs: Author Feedback"
+          days-before-stale: -1
+          labels-to-add-when-unstale: "Needs: Maintainer Attention"
+          labels-to-remove-when-unstale: "Needs: Triage"
+          close-issue-reason: completed
+          close-issue-message: "This issue has been labeled as needing feedback and has not had any activity a week. It has been closed for housekeeping purposes."

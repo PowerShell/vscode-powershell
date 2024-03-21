@@ -60,21 +60,16 @@ function runTestsInner(testsRoot: string): Promise<void> {
         }
     });
 
-    return new Promise((c, e) => {
-        try {
-            mocha.run(failures => {
-                console.log(`Mocha Run Finished with ${failures} failures.`);
-                if (failures > 0) {
-                    throw new Error(`${failures} tests failed.`);
-                } else {
-                    console.log("\n\n=====\nTest Runner STOP\n=====");
-                    c();
-                    return;
-                }
-            });
-        } catch (err) {
-            console.error("Failed to run tests");
-            e(err);
-        }
+    return new Promise((resolve) => {
+        mocha.run(failures => {
+            console.log(`Mocha Run Finished with ${failures} failures.`);
+            if (failures > 0) {
+                throw new Error(`${failures} tests failed.`);
+            } else {
+                console.log("\n\n=====\nTest Runner STOP\n=====");
+                resolve();
+                return;
+            }
+        });
     });
 }

@@ -12,7 +12,7 @@
 3. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
    PowerShell Editor Services. **You will need to complete this step before proceeding**.
 
-4. Install [Node.js](https://nodejs.org/en/) 16.x or higher.
+4. Install [Node.js](https://nodejs.org/en/) 18.x or higher.
 
 5. Install [Visual Studio Code](https://code.visualstudio.com).
    Open the multi-root workspace file in this repo, `extension-dev.code-workspace`.

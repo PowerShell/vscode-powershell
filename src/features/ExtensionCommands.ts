@@ -157,9 +157,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         super();
         this.commands = [
             vscode.commands.registerCommand("PowerShell.ShowAdditionalCommands", async () => {
-                if (this.languageClient !== undefined) {
-                    await this.showExtensionCommands(this.languageClient);
-                }
+                await this.showExtensionCommands();
             }),
 
             vscode.commands.registerCommand("PowerShell.InvokeRegisteredEditorCommand",
@@ -168,7 +166,9 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                         (x) => x.name === param.commandName);
 
                     if (commandToExecute) {
-                        await this.languageClient?.sendRequest(
+
+                        const client = await LanguageClientConsumer.getLanguageClient();
+                        await client.sendRequest(
                             InvokeExtensionCommandRequestType,
                             {
                                 name: commandToExecute.name,
@@ -193,63 +193,60 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         ];
     }
 
-    public override setLanguageClient(languageClient: LanguageClient): void {
+    public override onLanguageClientSet(languageClient: LanguageClient): void {
         // Clear the current list of extension commands since they were
         // only relevant to the previous session
         this.extensionCommands = [];
-
-        this.languageClient = languageClient;
-
         this.handlers = [
-            this.languageClient.onNotification(
+            languageClient.onNotification(
                 ExtensionCommandAddedNotificationType,
                 (command) => { this.addExtensionCommand(command); }),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 GetEditorContextRequestType,
                 (_details) => this.getEditorContext()),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 InsertTextRequestType,
                 (details) => this.insertText(details)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 SetSelectionRequestType,
                 (details) => this.setSelection(details)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 NewFileRequestType,
                 (_content) => this.newFile(_content)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 OpenFileRequestType,
                 (filePath) => this.openFile(filePath)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 CloseFileRequestType,
                 (filePath) => this.closeFile(filePath)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 SaveFileRequestType,
                 (saveFileDetails) => this.saveFile(saveFileDetails)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 ShowInformationMessageRequestType,
                 (message) => this.showInformationMessage(message)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 ShowErrorMessageRequestType,
                 (message) => this.showErrorMessage(message)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 ShowWarningMessageRequestType,
                 (message) => this.showWarningMessage(message)),
 
-            this.languageClient.onRequest(
+            languageClient.onRequest(
                 SetStatusBarMessageRequestType,
                 (messageDetails) => this.setStatusBarMessage(messageDetails)),
 
-            this.languageClient.onNotification(
+            languageClient.onNotification(
                 ClearTerminalNotificationType,
                 () => {
                     // We check to see if they have TrueClear on. If not, no-op because the
@@ -284,7 +281,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
                 a.name.localeCompare(b.name));
     }
 
-    private async showExtensionCommands(client: LanguageClient): Promise<void> {
+    private async showExtensionCommands(): Promise<void> {
         // If no extension commands are available, show a message
         if (this.extensionCommands.length === 0) {
             void this.logger.writeAndShowInformation("No extension commands have been loaded into the current session.");
@@ -303,15 +300,14 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         const selectedCommand = await vscode.window.showQuickPick(
             quickPickItems,
             { placeHolder: "Select a command..." });
-        return this.onCommandSelected(selectedCommand, client);
+
+        return this.onCommandSelected(selectedCommand);
     }
 
-    private async onCommandSelected(
-        chosenItem: IExtensionCommandQuickPickItem | undefined,
-        client: LanguageClient | undefined): Promise<void> {
-
+    private async onCommandSelected(chosenItem?: IExtensionCommandQuickPickItem): Promise<void> {
         if (chosenItem !== undefined) {
-            await client?.sendRequest(
+            const client = await LanguageClientConsumer.getLanguageClient();
+            await client.sendRequest(
                 InvokeExtensionCommandRequestType,
                 {
                     name: chosenItem.command.name,
@@ -482,8 +478,8 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         if (vscode.window.activeTextEditor !== undefined) {
             vscode.window.activeTextEditor.selections = [
                 new vscode.Selection(
-                    asCodePosition(details.selectionRange.start)!,
-                    asCodePosition(details.selectionRange.end)!),
+                    asCodePosition(details.selectionRange.start),
+                    asCodePosition(details.selectionRange.end)),
             ];
             return EditorOperationResponse.Completed;
         }

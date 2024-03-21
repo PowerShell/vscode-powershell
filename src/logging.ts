@@ -19,7 +19,7 @@ export enum LogLevel {
  *  This will allow for easy mocking of the logger during unit tests.
  */
 export interface ILogger {
-    getLogFilePath(baseName: string): vscode.Uri;
+    logDirectoryPath: vscode.Uri;
     updateLogLevel(logLevelName: string): void;
     write(message: string, ...additionalMessages: string[]): void;
     writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void>;
@@ -35,12 +35,11 @@ export interface ILogger {
 }
 
 export class Logger implements ILogger {
-    public logDirectoryPath: vscode.Uri;
-
+    public logDirectoryPath: vscode.Uri; // The folder for all the logs
     private logLevel: LogLevel;
     private commands: vscode.Disposable[];
     private logChannel: vscode.OutputChannel;
-    private logFilePath: vscode.Uri;
+    private logFilePath: vscode.Uri; // The client's logs
     private logDirectoryCreated = false;
     private writingLog = false;
 
@@ -53,7 +52,7 @@ export class Logger implements ILogger {
             globalStorageUri.with({ scheme: "file" }),
             "logs",
             `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
-        this.logFilePath = this.getLogFilePath("vscode-powershell");
+        this.logFilePath = vscode.Uri.joinPath(this.logDirectoryPath, "vscode-powershell.log");
 
         // Early logging of the log paths for debugging.
         if (LogLevel.Diagnostic >= this.logLevel) {
@@ -77,10 +76,6 @@ export class Logger implements ILogger {
         for (const command of this.commands) {
             command.dispose();
         }
-    }
-
-    public getLogFilePath(baseName: string): vscode.Uri {
-        return vscode.Uri.joinPath(this.logDirectoryPath, `${baseName}.log`);
     }
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {

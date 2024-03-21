@@ -988,7 +988,7 @@ describe("Platform module", function () {
 
                 function getWinPSPath(systemDir: string): string {
                     return path.join(
-                        testPlatform.environmentVars.windir!,
+                        testPlatform.environmentVars.windir,
                         systemDir,
                         "WindowsPowerShell",
                         "v1.0",

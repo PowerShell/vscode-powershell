@@ -116,6 +116,7 @@ class DeveloperSettings extends PartialSettings {
     bundledModulesPath = "../../PowerShellEditorServices/module";
     editorServicesLogLevel = LogLevel.Normal;
     editorServicesWaitForDebugger = false;
+    setExecutionPolicy = true;
     waitForSessionFileTimeoutSeconds = 240;
 }
 
@@ -139,7 +140,7 @@ class IntegratedConsoleSettings extends PartialSettings {
 }
 
 class SideBarSettings extends PartialSettings {
-    CommandExplorerVisibility = true;
+    CommandExplorerVisibility = false;
     CommandExplorerExcludeFilter: string[] = [];
 }
 

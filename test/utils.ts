@@ -15,9 +15,7 @@ const packageJSON: any = require(path.resolve(rootPath, "package.json"));
 export const extensionId = `${packageJSON.publisher}.${packageJSON.name}`;
 
 export class TestLogger implements ILogger {
-    getLogFilePath(_baseName: string): vscode.Uri {
-        return vscode.Uri.file("");
-    }
+    logDirectoryPath: vscode.Uri = vscode.Uri.file("");
     updateLogLevel(_logLevelName: string): void {
         return;
     }

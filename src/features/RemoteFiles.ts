@@ -6,6 +6,7 @@ import path = require("path");
 import vscode = require("vscode");
 import { NotificationType, TextDocumentIdentifier } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import type { LanguageClient } from "vscode-languageclient/node";
 
 // NOTE: The following two DidSaveTextDocument* types will
 // be removed when #593 gets fixed.
@@ -37,8 +38,9 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         this.closeRemoteFiles();
 
         this.command = vscode.workspace.onDidSaveTextDocument(async (doc) => {
-            if (this.isDocumentRemote(doc) && this.languageClient) {
-                await this.languageClient.sendNotification(
+            if (this.isDocumentRemote(doc)) {
+                const client = await LanguageClientConsumer.getLanguageClient();
+                await client.sendNotification(
                     DidSaveTextDocumentNotificationType,
                     {
                         textDocument: TextDocumentIdentifier.create(doc.uri.toString()),
@@ -46,6 +48,9 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
             }
         });
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public dispose(): void {
         this.command.dispose();

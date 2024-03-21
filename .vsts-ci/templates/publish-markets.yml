@@ -5,8 +5,12 @@ steps:
   artifact: vscode-powershell
   displayName: Download signed artifacts
 
+- task: npmAuthenticate@0
+  inputs:
+    workingFile: .npmrc
+
 - pwsh: |
-    npm ci --loglevel=error
+    npm ci --loglevel=error --ignore-scripts
     Import-Module $(Build.SourcesDirectory)/tools/VersionTools.psm1
     $Version = Get-Version -RepositoryName vscode-powershell
     $PackageVersion = Get-MajorMinorPatch -Version $Version

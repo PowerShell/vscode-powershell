@@ -11,50 +11,21 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
 
     private readonly loadIcon = "  $(sync)  ";
     private command: vscode.Disposable;
-    private waitingForClientToken?: vscode.CancellationTokenSource;
 
     constructor(private logger: ILogger) {
         super();
         this.command =
-            vscode.commands.registerCommand("PowerShell.NewProjectFromTemplate", async () => {
-                if (!this.languageClient && !this.waitingForClientToken) {
-                    // If PowerShell isn't finished loading yet, show a loading message
-                    // until the LanguageClient is passed on to us
-                    this.waitingForClientToken = new vscode.CancellationTokenSource();
-                    const response = await vscode.window.showQuickPick(
-                        ["Cancel"],
-                        { placeHolder: "New Project: Please wait, starting PowerShell..." },
-                        this.waitingForClientToken.token);
-
-                    if (response === "Cancel") {
-                        this.clearWaitingToken();
-                    }
-
-                    // Cancel the loading prompt after 60 seconds
-                    setTimeout(() => {
-                        if (this.waitingForClientToken) {
-                            this.clearWaitingToken();
-                            void this.logger.writeAndShowError("New Project: PowerShell session took too long to start.");
-                        }
-                    }, 60000);
-                } else {
-                    await this.showProjectTemplates();
-                }
-            });
+            vscode.commands.registerCommand(
+                "PowerShell.NewProjectFromTemplate",
+                async () => { await this.showProjectTemplates(); });
     }
 
     public dispose(): void {
         this.command.dispose();
     }
 
-    public override setLanguageClient(languageClient: LanguageClient): void {
-        this.languageClient = languageClient;
-
-        if (this.waitingForClientToken) {
-            this.clearWaitingToken();
-            void this.showProjectTemplates();
-        }
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     private async showProjectTemplates(includeInstalledModules = false): Promise<void> {
         const template = await vscode.window.showQuickPick(
@@ -74,49 +45,46 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
     }
 
     private async getProjectTemplates(includeInstalledModules: boolean): Promise<ITemplateQuickPickItem[]> {
-        if (this.languageClient === undefined) {
-            return Promise.reject<ITemplateQuickPickItem[]>("Language client not defined!");
-        }
-
-        const response = await this.languageClient.sendRequest(
+        const client = await LanguageClientConsumer.getLanguageClient();
+        const response = await client.sendRequest(
             GetProjectTemplatesRequestType,
             { includeInstalledModules });
 
         if (response.needsModuleInstall) {
             // TODO: Offer to install Plaster
             void this.logger.writeAndShowError("Plaster is not installed!");
-            return Promise.reject<ITemplateQuickPickItem[]>("Plaster needs to be installed");
-        } else {
-            let templates = response.templates.map<ITemplateQuickPickItem>(
-                (template) => {
-                    return {
-                        label: template.title,
-                        description: `v${template.version} by ${template.author}, tags: ${template.tags}`,
-                        detail: template.description,
-                        template,
-                    };
-                });
-
-            if (!includeInstalledModules) {
-                templates =
-                    [({
-                        label: this.loadIcon,
-                        description: "Load additional templates from installed modules",
-                        template: undefined,
-                    } as ITemplateQuickPickItem)]
-                        .concat(templates);
-            } else {
-                templates =
-                    [({
-                        label: this.loadIcon,
-                        description: "Refresh template list",
-                        template: undefined,
-                    } as ITemplateQuickPickItem)]
-                        .concat(templates);
-            }
-
-            return templates;
+            return Promise.reject<ITemplateQuickPickItem[]>(new Error("Plaster needs to be installed"));
         }
+
+        let templates = response.templates.map<ITemplateQuickPickItem>(
+            (template) => {
+                return {
+                    label: template.title,
+                    description: `v${template.version} by ${template.author}, tags: ${template.tags}`,
+                    detail: template.description,
+                    template,
+                };
+            });
+
+        if (!includeInstalledModules) {
+            templates =
+                [({
+                    label: this.loadIcon,
+                    description: "Load additional templates from installed modules",
+                    template: undefined,
+                } as ITemplateQuickPickItem)]
+                    .concat(templates);
+        } else {
+            templates =
+                [({
+                    label: this.loadIcon,
+                    description: "Refresh template list",
+                    template: undefined,
+                } as ITemplateQuickPickItem)]
+                    .concat(templates);
+        }
+
+        return templates;
     }
 
     private async createProjectFromTemplate(template: ITemplateDetails): Promise<void> {
@@ -129,10 +97,12 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
         if (destinationPath !== undefined) {
             await vscode.commands.executeCommand("PowerShell.ShowSessionConsole");
 
-            const result = await this.languageClient?.sendRequest(
+            const client = await LanguageClientConsumer.getLanguageClient();
+            const result = await client.sendRequest(
                 NewProjectFromTemplateRequestType,
                 { templatePath: template.templatePath, destinationPath });
-            if (result?.creationSuccessful) {
+
+            if (result.creationSuccessful) {
                 await this.openWorkspacePath(destinationPath);
             } else {
                 void this.logger.writeAndShowError("Project creation failed, read the Output window for more details.");
@@ -160,11 +130,6 @@ export class NewFileOrProjectFeature extends LanguageClientConsumer {
             "vscode.openFolder",
             vscode.Uri.file(workspacePath),
             true);
-    }
-
-    private clearWaitingToken(): void {
-        this.waitingForClientToken?.dispose();
-        this.waitingForClientToken = undefined;
     }
 }
 

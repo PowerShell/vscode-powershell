@@ -1,6 +1,6 @@
 name: ✨ Feature request
 description: Open an issue about a potential new feature or improvement.
-labels: Issue-Enhancement
+labels: ["Issue-Enhancement", "Needs: Triage"]
 body:
 - type: checkboxes
   attributes:

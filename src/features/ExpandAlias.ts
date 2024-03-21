@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 import vscode = require("vscode");
-import Window = vscode.window;
 import { RequestType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
+import type { LanguageClient } from "vscode-languageclient/node";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IExpandAliasRequestArguments {
@@ -23,7 +23,7 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
     constructor() {
         super();
         this.command = vscode.commands.registerCommand("PowerShell.ExpandAlias", async () => {
-            const editor = Window.activeTextEditor;
+            const editor = vscode.window.activeTextEditor;
             if (editor === undefined) {
                 return;
             }
@@ -44,14 +44,16 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
                 range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
             }
 
-            const result = await this.languageClient?.sendRequest(ExpandAliasRequestType, { text });
-            if (result !== undefined) {
-                await editor.edit((editBuilder) => {
-                    editBuilder.replace(range, result.text);
-                });
-            }
+            const client = await LanguageClientConsumer.getLanguageClient();
+            const result = await client.sendRequest(ExpandAliasRequestType, { text });
+            await editor.edit((editBuilder) => {
+                editBuilder.replace(range, result.text);
+            });
         });
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public dispose(): void {
         this.command.dispose();

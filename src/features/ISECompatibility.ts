@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import * as vscode from "vscode";
-import { getSettings } from "../settings";
 
 interface ISetting {
     path: string;
@@ -16,7 +15,6 @@ interface ISetting {
 export class ISECompatibilityFeature implements vscode.Disposable {
     // Marking settings as public so we can use it within the tests without needing to duplicate the list of settings.
     public static settings: ISetting[] = [
-        { path: "workbench.activityBar", name: "visible", value: false },
         { path: "debug", name: "openDebug", value: "neverOpen" },
         { path: "editor", name: "tabCompletion", value: "on" },
         { path: "powershell.integratedConsole", name: "focusConsoleOnExecute", value: false },
@@ -24,17 +22,18 @@ export class ISECompatibilityFeature implements vscode.Disposable {
         { path: "workbench", name: "colorTheme", value: "PowerShell ISE" },
         { path: "editor", name: "wordSeparators", value: "`~!@#%^&*()-=+[{]}\\|;:'\",.<>/?" },
         { path: "powershell.buttons", name: "showPanelMovementButtons", value: true },
-        { path: "powershell.codeFolding", name: "showLastLine", value: false }
+        { path: "powershell.codeFolding", name: "showLastLine", value: false },
+        { path: "powershell.sideBar", name: "CommandExplorerVisibility", value: true }
     ];
 
-    private _commandRegistrations: vscode.Disposable[] = [];
-    private _iseModeEnabled: boolean;
-    private _originalSettings: Record<string, boolean | string | undefined> = {};
+    private commands: vscode.Disposable[] = [];
+    private iseModeEnabled: boolean;
+    private originalSettings: Record<string, boolean | string | undefined> = {};
 
     constructor() {
         const testSetting = ISECompatibilityFeature.settings[ISECompatibilityFeature.settings.length - 1];
-        this._iseModeEnabled = vscode.workspace.getConfiguration(testSetting.path).get(testSetting.name) === testSetting.value;
-        this._commandRegistrations = [
+        this.iseModeEnabled = vscode.workspace.getConfiguration(testSetting.path).get(testSetting.name) === testSetting.value;
+        this.commands = [
             vscode.commands.registerCommand("PowerShell.EnableISEMode", async () => { await this.EnableISEMode(); }),
             vscode.commands.registerCommand("PowerShell.DisableISEMode", async () => { await this.DisableISEMode(); }),
             vscode.commands.registerCommand("PowerShell.ToggleISEMode", async () => { await this.ToggleISEMode(); })
@@ -42,17 +41,17 @@ export class ISECompatibilityFeature implements vscode.Disposable {
     }
 
     public dispose(): void {
-        for (const command of this._commandRegistrations) {
+        for (const command of this.commands) {
             command.dispose();
         }
     }
 
     private async EnableISEMode(): Promise<void> {
-        this._iseModeEnabled = true;
+        this.iseModeEnabled = true;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             try {
                 const config = vscode.workspace.getConfiguration(iseSetting.path);
-                this._originalSettings[iseSetting.path + iseSetting.name] = config.get(iseSetting.name);
+                this.originalSettings[iseSetting.path + iseSetting.name] = config.get(iseSetting.name);
                 await config.update(iseSetting.name, iseSetting.value, true);
             } catch {
                 // The `update` call can fail if the setting doesn't exist. This
@@ -65,26 +64,21 @@ export class ISECompatibilityFeature implements vscode.Disposable {
 
         // Show the PowerShell view container which has the Command Explorer view
         await vscode.commands.executeCommand("workbench.view.extension.PowerShell");
-
-        if (!getSettings().sideBar.CommandExplorerVisibility) {
-            // Hide the explorer if the setting says so.
-            await vscode.commands.executeCommand("workbench.action.toggleSidebarVisibility");
-        }
     }
 
     private async DisableISEMode(): Promise<void> {
-        this._iseModeEnabled = false;
+        this.iseModeEnabled = false;
         for (const iseSetting of ISECompatibilityFeature.settings) {
             const config = vscode.workspace.getConfiguration(iseSetting.path);
             const currently = config.get(iseSetting.name);
             if (currently === iseSetting.value) {
-                await config.update(iseSetting.name, this._originalSettings[iseSetting.path + iseSetting.name], true);
+                await config.update(iseSetting.name, this.originalSettings[iseSetting.path + iseSetting.name], true);
             }
         }
     }
 
     private async ToggleISEMode(): Promise<void> {
-        if (this._iseModeEnabled) {
+        if (this.iseModeEnabled) {
             await this.DisableISEMode();
         } else {
             await this.EnableISEMode();
