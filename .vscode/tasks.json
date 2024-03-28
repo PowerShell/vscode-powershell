@@ -2,29 +2,29 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "test-watch",
+      "label": "watch-tests",
       "icon": {
         "color": "terminal.ansiCyan",
         "id": "sync"
       },
       "type": "npm",
-      "script": "build-test-watch",
+      "script": "watch-tests",
       "group": "test",
       "problemMatcher": "$tsc-watch",
       "isBackground": true,
-      "dependsOn": "build-watch" // We need to also build main.js extension for testing or it leads to sourcemap errors
+      "dependsOn": "watch"
     },
     {
-      "label": "build-watch",
+      "label": "watch",
       "icon": {
         "color": "terminal.ansiCyan",
         "id": "sync"
       },
       "type": "npm",
-      "script": "build-watch",
+      "script": "watch",
       "group": "build",
       "problemMatcher": "$esbuild-watch",
-      "isBackground": true,
+      "isBackground": true
     }
   ]
 }

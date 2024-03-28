@@ -37,6 +37,7 @@
     "markdownlint.config": {
       "MD024": false // no-duplicate-header
     },
+    "powershell.cwd": "Client",
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
@@ -55,7 +56,7 @@
       "editor.formatOnSaveMode": "modificationsIfAvailable"
     },
     "mochaExplorer.configFile": ".mocharc.json",
-    "mochaExplorer.launcherScript": "out/test/runTests",
+    "mochaExplorer.launcherScript": "test/runTests",
     "mochaExplorer.autoload": false, // The test instance pops up every time discovery or run is done, this could be annoying on startup.
     "mochaExplorer.debuggerPort": 59229, // Matches the launch config, we dont want to use the default port as we are launching a duplicate instance of vscode and it might conflict.
     "mochaExplorer.ipcRole": "server",
@@ -64,8 +65,7 @@
     "mochaExplorer.env": {
       "VSCODE_VERSION": "insiders",
       "ELECTRON_RUN_AS_NODE": null
-    },
-    "powershell.cwd": "Client",
+    }
   },
   "tasks": {
     "version": "2.0.0",

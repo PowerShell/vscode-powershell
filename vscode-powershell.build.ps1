@@ -76,7 +76,7 @@ task Restore RestoreEditorServices, RestoreNodeModules
 
 task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
-    Remove-BuildItem ./modules, ./out, ./node_modules, *.vsix
+    Remove-BuildItem *.js, *.js.map, *.vsix, ./dist, ./modules, ./node_modules
 }
 
 task CleanEditorServices -If (Get-EditorServicesPath) {
@@ -101,8 +101,8 @@ task Build Restore, {
     # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
     # https://github.com/evanw/esbuild/issues/944
     switch ($Configuration) {
-        "Debug" { Invoke-BuildExec { & npm run build } }
-        "Release" { Invoke-BuildExec { & npm run build -- --minify } }
+        "Debug" { Invoke-BuildExec { & npm run compile } }
+        "Release" { Invoke-BuildExec { & npm run compile -- --minify } }
     }
 }
 
@@ -133,6 +133,7 @@ task Package Build, {
     Assert-Build ($packageJson.version -eq $packageVersion)
 
     Write-Host "`n### Packaging powershell-$packageVersion.vsix`n" -ForegroundColor Green
+    Remove-BuildItem ./*.vsix
 
     # Packaging requires a copy of the modules folder, not a symbolic link. But
     # we might have built in Debug configuration, not Release, and still want to
