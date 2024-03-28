@@ -2,12 +2,12 @@
 ; Azure DevOps does not support actual auth tokens.
 
 ; begin auth token
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/:username=powershell-rel
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/:_password=${NPM_PASSWORD}
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/:email=powershell-rel
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/:username=powershell-rel
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/:_password=${NPM_PASSWORD}
-//pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/:email=powershell-rel
+//pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/registry/:username=powershell
+//pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/registry/:_password=${NPM_PASSWORD}
+//pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/registry/:email=powershell
+//pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/:username=powershell
+//pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/:_password=${NPM_PASSWORD}
+//pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/:email=powershell
 ; end auth token
-registry=https://pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/
+registry=https://pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/registry/
 always-auth=true

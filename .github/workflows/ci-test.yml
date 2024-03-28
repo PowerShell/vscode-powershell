@@ -43,10 +43,18 @@ jobs:
           cache: true
           cache-dependency-path: 'PowerShellEditorServices/**/packages.lock.json'
           global-json-file: PowerShellEditorServices/global.json
+          source-url: https://pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/nuget/v3/index.json
+          config-file: PowerShellEditorServices/NuGet.config
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.AZURE_NUGET_TOKEN }}
 
       - name: Install PSResources
         shell: pwsh
         run: ../PowerShellEditorServices/tools/installPSResources.ps1
+
+      - name: Deploy generated NuGet configuration
+        shell: pwsh
+        run: Copy-Item ../../nuget.config ../PowerShellEditorServices/NuGet.config
 
       - name: Deploy NPM configuration
         shell: pwsh
@@ -66,7 +74,7 @@ jobs:
         shell: pwsh
         run: Invoke-Build -Configuration Release
         env:
-          NPM_PASSWORD: ${{ secrets.AZURE_NPM_PASSWORD_BASE64}}
+          NPM_PASSWORD: ${{ secrets.AZURE_NPM_PASSWORD_BASE64 }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
