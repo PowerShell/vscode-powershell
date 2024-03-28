@@ -8,8 +8,8 @@ import { IPowerShellExtensionClient } from "../src/features/ExternalApi";
 import { execSync } from "child_process";
 
 // This lets us test the rest of our path assumptions against the baseline of
-// this test file existing at `<root>/out/test/utils.js`.
-export const rootPath = path.resolve(__dirname, "../../");
+// this test file existing at `<root>/test/utils.js`.
+export const rootPath = path.resolve(__dirname, "../");
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
 const packageJSON: any = require(path.resolve(rootPath, "package.json"));
 export const extensionId = `${packageJSON.publisher}.${packageJSON.name}`;
@@ -75,7 +75,7 @@ export function stubInterface<T>(object?: Partial<T>): T {
 
 /** Builds the sample binary module code. We need to do this because the source maps have absolute paths so they are not portable between machines, and while we could do deterministic with source maps, that's way more complicated and everywhere we build has dotnet already anyways */
 export function BuildBinaryModuleMock(): void {
-    const projectPath = path.resolve(`${__dirname}/../../test/mocks/BinaryModule/BinaryModule.csproj`); //Relative to "out/test" when testing.
+    const projectPath = path.resolve(`${__dirname}/../test/mocks/BinaryModule/BinaryModule.csproj`);
     try {
         execSync(`dotnet publish ${projectPath}`, {
             encoding: "utf8"

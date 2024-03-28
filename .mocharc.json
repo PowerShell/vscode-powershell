@@ -8,5 +8,5 @@
   "require": "source-map-support/register",
   "timeout": 600000,
   "slow": 2000,
-  "spec": "out/test/**/*.test.js"
+  "spec": "test/**/*.test.js"
 }

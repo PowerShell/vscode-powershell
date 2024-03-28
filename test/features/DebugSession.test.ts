@@ -480,7 +480,7 @@ describe("DebugSessionFeature E2E", function() {
         let binaryModulePath: Uri;
 
         before(async function binarySetup() {
-            if (process.env.BUILD_SOURCEBRANCHNAME === "release") {
+            if (process.env.TF_BUILD) {
                 // The binary modules tests won't work in the release pipeline
                 // due to dependency requirements.
                 this.skip();

@@ -115,16 +115,16 @@
   "extensionDependencies": [
     "vscode.powershell"
   ],
-  "main": "./out/main.js",
+  "main": "./dist/extension.js",
   "scripts": {
-    "lint": "eslint . --ext .ts",
-    "build": "esbuild ./src/main.ts --outdir=out --sourcemap --bundle --external:vscode --platform=node",
-    "build-watch": "npm run build -- --watch",
-    "build-test": "tsc --incremental",
-    "build-test-watch": "npm run build-test -- --watch",
-    "test": "npm run build-test && node ./out/test/runTests.js",
+    "compile": "esbuild ./src/extension.ts --outdir=dist --sourcemap --bundle --external:vscode --platform=node",
+    "watch": "npm run compile -- --watch",
+    "lint": "eslint src test --ext .ts",
     "package": "vsce package --no-gitHubIssueLinking",
-    "publish": "vsce publish"
+    "publish": "vsce publish",
+    "compile-test": "npm run compile && tsc --incremental",
+    "watch-tests": "npm run compile-test -- --watch",
+    "test": "npm run compile-test && node ./test/runTests.js"
   },
   "contributes": {
     "breakpoints": [
