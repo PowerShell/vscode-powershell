@@ -2,8 +2,8 @@ version: 2
 registries:
   npm-azure:
     type: npm-registry
-    url: https://pkgs.dev.azure.com/powershell-rel/PowerShellEditorServices/_packaging/PSESFeed/npm/registry/
-    username: powershell-rel
+    url: https://pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/registry/
+    username: powershell
     password: ${{ secrets.AZURE_NPM_PASSWORD }}
 updates:
 - package-ecosystem: npm
@@ -25,7 +25,7 @@ updates:
         - "@types/*"
   ignore:
     - dependency-name: "untildify"
-      versions: ["5.x"]
+      versions: [ "5.x" ]
 - package-ecosystem: github-actions
   directory: "/"
   labels: [ ]
