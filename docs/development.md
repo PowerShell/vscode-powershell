@@ -50,29 +50,29 @@ For more information on contributing snippets please read our
 ## Creating a Release
 
 These are the current steps for creating a release for both the editor services
-and the extension. ADO access is restricted to Microsoft employees and is used
-to sign and validate the produced binaries before publishing on behalf of
-Microsoft. The comments are manual steps.
+and the extension. Azure DevOps access is restricted to Microsoft employees and
+is used to sign and validate the produced binaries before publishing on behalf
+of Microsoft.
 
 ```powershell
-Import-Module ./tools/ReleaseTools.psm1
-New-ReleaseBundle -PsesVersion <version> -VsceVersion <version>
-# Amend changelog as necessary
-# Push release branches to ADO
-# Download and test assets
-# Check telemetry for stability before releasing
-# Publish draft releases and merge (don't squash!) branches
-# Permit vscode-extension pipeline to publish to marketplace
+cd ./PowerShellEditorServices
+git checkout -B release
+./tools/updateVersion.ps1 -Version "4.0.0" -Changes "Major release!"
+
+cd ../vscode-powershell
+git checkout -B release
+./tools/updateVersion.ps1 -Version "2024.4.0" -Changes "Major release!"
 ```
 
-If rolling from pre-release to release, use:
+1. Amend changelogs as necessary.
+2. Push release branches to ADO and GitHub.
+3. Download and test assets!
+4. Publish draft releases and merge (don't squash!) branches.
+5. Permit pipeline to publish to marketplace.
 
-```powershell
-New-Release -RepositoryName vscode-powershell -Version <version>
-```
-
-This is because we do not change the version of PowerShell Editor Services between a
-pre-release and the subsequent release, so we only need to release the extension.
+If rolling from pre-release to release, do not change the version of PowerShell
+Editor Services between a pre-release and the subsequent release! We only
+need to release the extension.
 
 ### Versioning
 
@@ -118,7 +118,7 @@ pre-release tags in full) we can revisit this.
 Furthermore, for releases, the minor version must be _even_ (like 0, 2, etc.) and for
 pre-releases it must be _odd_ (like 1, 3, etc.), and an upcoming release's version must be
 `n-1` of the pre-release which previews it. That is, release `v2024.0.0` is previewed in
-the pre-release `v2024.1.0`. This scheme is designed such that the "newest" (by version)
+the pre-release `v2024.1.0-preview`. This scheme is designed such that the "newest" (by version)
 release is always a pre-release, so that the VS Code marketplace _always_ shows a
 pre-release option. When we previously did this the other way around (incrementing the
 release as `n+1` to the pre-release), every time we released, the pre-release option

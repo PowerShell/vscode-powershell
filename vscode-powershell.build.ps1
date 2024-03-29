@@ -125,14 +125,8 @@ task TestEditorServices -If (Get-EditorServicesPath) {
 #region Package tasks
 
 task Package Build, {
-    # Sanity check our changelog version versus package.json (which lacks pre-release label)
-    Import-Module $PSScriptRoot/tools/VersionTools.psm1
-    $version = Get-Version -RepositoryName vscode-powershell
-    $packageVersion = Get-MajorMinorPatch -Version $version
-    $packageJson = Get-Content -Raw $PSScriptRoot/package.json | ConvertFrom-Json
-    Assert-Build ($packageJson.version -eq $packageVersion)
-
-    Write-Host "`n### Packaging powershell-$packageVersion.vsix`n" -ForegroundColor Green
+    [semver]$version = $((Get-Content -Raw -Path package.json | ConvertFrom-Json).version)
+    Write-Host "`n### Packaging powershell-$version.vsix`n" -ForegroundColor Green
     Remove-BuildItem ./*.vsix
 
     # Packaging requires a copy of the modules folder, not a symbolic link. But
@@ -144,7 +138,7 @@ task Package Build, {
         Copy-Item -Recurse -Force "$(Split-Path (Get-EditorServicesPath))/module" ./modules
     }
 
-    if (Test-IsPreRelease) {
+    if ($version.Minor % 2 -ne 0) {
         Write-Host "`n### This is a pre-release!`n" -ForegroundColor Green
         Invoke-BuildExec { & npm run package -- --pre-release }
     } else {
