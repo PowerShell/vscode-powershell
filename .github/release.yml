@@ -1,0 +1,16 @@
+changelog:
+  exclude:
+    labels:
+      - Ignore
+    authors:
+      - dependabot
+  categories:
+    - title: Enhancements & Features ✨
+      labels:
+        - Issue-Enhancement
+    - title: Squashed Bugs 🐛
+      labels:
+        - Issue-Bug
+    - title: Other Changes 🙏
+      labels:
+        - "*"
