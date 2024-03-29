@@ -10,10 +10,15 @@
 
 trigger: none
 
+parameters:
+- name: debug
+  displayName: Enable debug output
+  type: boolean
+  default: false
+
 variables:
-  CDP_DEFINITION_BUILD_COUNT: $[counter('', 0)] # needed for onebranch.pipeline.version task https://aka.ms/obpipelines/versioning
-  LinuxContainerImage: 'mcr.microsoft.com/onebranch/cbl-mariner/build:2.0' # Docker image which is used to build the project https://aka.ms/obpipelines/containers
-  DEBIAN_FRONTEND: noninteractive
+  system.debug: ${{ parameters.debug }}
+  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
 
 resources:
   repositories: 
@@ -23,65 +28,133 @@ resources:
       ref: refs/heads/main
 
 extends:
-  template: v2/OneBranch.Official.CrossPlat.yml@templates # https://aka.ms/obpipelines/templates
+  # https://aka.ms/obpipelines/templates
+  template: v2/OneBranch.Official.CrossPlat.yml@templates 
   parameters:
-    cloudvault: # https://aka.ms/obpipelines/cloudvault
-      enabled: false # set to true to enable cloudvault
-      runmode: stage # linux can run CloudVault upload as a separate stage
-      dependsOn: linux_build
-      artifacts:
-        - drop_linux_stage_linux_job
-
     globalSdl: # https://aka.ms/obpipelines/sdl
-      # tsa:
-      #  enabled: true # SDL results of non-official builds aren't uploaded to TSA by default.
-      # credscan:
-      #   suppressionsFile: $(Build.SourcesDirectory)\.config\CredScanSuppressions.json
-      policheck:
-        break: true # always break the build on policheck issues. You can disable it by setting to 'false'
-      # suppression:
-      #   suppressionFile: $(Build.SourcesDirectory)\.gdn\global.gdnsuppress
-
+      asyncSdl:
+        enabled: true
+        forStages: [build]
     stages:
-    - stage: linux_stage
+    - stage: build
       jobs:
-      - job: linux_job
+      - job: main
+        displayName: Build package
         pool:
-          type: linux
-
-        variables: # More settings at https://aka.ms/obpipelines/yaml/jobs
-          ob_outputDirectory: '$(Build.SourcesDirectory)/out' # this directory is uploaded to pipeline artifacts, reddog and cloudvault. More info at https://aka.ms/obpipelines/artifacts
-
-        steps: # These steps will be run in unrestricted container's network
+          type: windows
+        variables:
+          ob_outputDirectory: $(Build.SourcesDirectory)/out
+        steps:
+          - pwsh: Write-Output "##vso[task.setvariable variable=version;isOutput=true]$((Get-Content -Raw -Path package.json | ConvertFrom-Json).version)"
+            name: package
+            displayName: Get version from package.json
           - task: onebranch.pipeline.version@1
-            displayName: 'Setup BuildNumber'
+            displayName: Set OneBranch version
             inputs:
-              system: 'RevisionCounter'
-              major: '1'
-              minor: '0'
-              exclude_commit: true
-
-          - task: Bash@3
-            displayName: 'Restore'
+              system: Custom
+              customVersion: $(package.version)
+          - task: UseNode@1
+            displayName: Use Node 18.x
             inputs:
-              filePath: '$(Build.SourcesDirectory)/restore.sh'
-
-          - task: Bash@3
-            displayName: 'Build'
+              version: 18.x
+          - task: npmAuthenticate@0
+            displayName: Authenticate NPM with Azure Artifacts
             inputs:
-              filePath: '$(Build.SourcesDirectory)/build.sh'
-
-          - task: Bash@3
-            displayName: 'Package'
+              workingFile: .npmrc
+          - pwsh: npm ci
+            displayName: Install NPM packages
+          - pwsh: npm run compile -- --minify
+            displayName: Build minified extension
+          - task: onebranch.pipeline.signing@1
+            displayName: Sign 1st-party files
             inputs:
-              filePath: '$(Build.SourcesDirectory)/package.sh'
-
-          - task: Bash@3
-            displayName: 'Copy Extra Files'
+              command: sign
+              signing_environment: external_distribution
+              search_root: $(Build.SourcesDirectory)/dist
+              files_to_sign: extension.js
+          - pwsh: New-Item -ItemType Directory -Force out && npm run package -- --out out/
+            displayName: Create package
+      - job: test
+        displayName: Build and run tests
+        pool:
+          type: windows
+          isCustom: true
+          name: Azure Pipelines
+          vmImage: windows-latest
+        variables:
+          ob_outputDirectory: $(Build.SourcesDirectory)/out
+          skipComponentGovernanceDetection: true
+        steps:
+          - task: UseNode@1
+            displayName: Use Node 18.x
             inputs:
-              targetType: 'inline'
-              script: |
-                mkdir -p $(Build.SourcesDirectory)/out
-                cp -a $(Build.SourcesDirectory)/linux_deploy $(Build.SourcesDirectory)/out
-                cp $(Build.SourcesDirectory)/*.tgz $(Build.SourcesDirectory)/out
-                cp $(Build.SourcesDirectory)/*.tgz.sha256 $(Build.SourcesDirectory)/out
+              version: 18.x
+          - task: npmAuthenticate@0
+            displayName: Authenticate NPM with Azure Artifacts
+            inputs:
+              workingFile: .npmrc
+          - pwsh: npm ci
+            displayName: Install NPM packages
+          - pwsh: npm run test
+            displayName: Run tests
+    - stage: release
+      dependsOn: build
+      variables:
+        version: $[ stageDependencies.build.main.outputs['package.version'] ]
+        drop: $(Pipeline.Workspace)/drop_build_main
+      jobs:
+      - job: validation
+        displayName: Manual validation
+        pool:
+          type: agentless
+        timeoutInMinutes: 1440
+        steps:
+        - task: ManualValidation@0
+          displayName: Wait 24 hours for validation
+          inputs:
+            notifyUsers: $(Build.RequestedForEmail)
+            instructions: Please validate the release
+            timeoutInMinutes: 1440
+      - job: github
+        dependsOn: validation
+        displayName: Publish draft to GitHub
+        pool:
+          type: windows
+        variables:
+          ob_outputDirectory: $(Build.SourcesDirectory)/out
+        steps:
+        - download: current
+          displayName: Download artifacts
+        - task: GitHubRelease@1
+          displayName: Create GitHub release
+          inputs:
+            gitHubConnection: GitHub
+            repositoryName: microsoft/vscode-azurearcenabledmachines
+            assets: $(drop)/vscode-azurearcenabledmachines-$(version).vsix
+            tagSource: userSpecifiedTag
+            tag: v$(version)
+            isDraft: true
+            addChangeLog: false
+            releaseNotesSource: inline
+            releaseNotesInline: |
+              # TODO: Generate release notes on GitHub!
+      - job: vscode
+        dependsOn: validation
+        displayName: Publish to VS Code Marketplace
+        pool:
+          type: windows
+        variables:
+          - group: VSCodeMarketplace
+          - name: ob_outputDirectory
+            value: $(Build.SourcesDirectory)/out
+        steps:
+        - download: current
+          displayName: Download artifacts
+        - task: npmAuthenticate@0
+          displayName: Install NPM packages (for vsce)
+          inputs:
+            workingFile: .npmrc
+        - pwsh: npm ci
+          displayName: Install NPM packages (for vsce)
+        - pwsh: npm run publish -- --pat $(token) --packagePath $(drop)/vscode-azurearcenabledmachines-$(version).vsix
+          displayName: Run vsce publish
