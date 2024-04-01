@@ -18,18 +18,29 @@ parameters:
 
 variables:
   system.debug: ${{ parameters.debug }}
+  BuildConfiguration: Release
   WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
 
 resources:
-  repositories: 
+  repositories:
     - repository: templates
       type: git
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
+    - repository: PowerShellEditorServices
+      type: git
+      name: PowerShellEditorServices
+      ref: release
+  pipelines:
+  - pipeline: PowerShellEditorServices-Official
+    source: PowerShellEditorServices-Official
+    trigger:
+      branches:
+      - release
 
 extends:
   # https://aka.ms/obpipelines/templates
-  template: v2/OneBranch.Official.CrossPlat.yml@templates 
+  template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
     globalSdl: # https://aka.ms/obpipelines/sdl
       asyncSdl:
@@ -45,7 +56,13 @@ extends:
         variables:
           ob_outputDirectory: $(Build.SourcesDirectory)/out
         steps:
-          - pwsh: Write-Output "##vso[task.setvariable variable=version;isOutput=true]$((Get-Content -Raw -Path package.json | ConvertFrom-Json).version)"
+          - pwsh: |
+              $version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
+              Write-Output "##vso[task.setvariable variable=vsixVersion;isOutput=true]$version"
+              $prerelease = ([semver]$version).Minor % 2 -ne 0
+              if ($prerelease) { $version += "-preview" }
+              Write-Output "##vso[task.setvariable variable=version;isOutput=true]$version"
+              Write-Output "##vso[task.setvariable variable=prerelease;isOutput=true]$prerelease"
             name: package
             displayName: Get version from package.json
           - task: onebranch.pipeline.version@1
@@ -61,18 +78,42 @@ extends:
             displayName: Authenticate NPM with Azure Artifacts
             inputs:
               workingFile: .npmrc
-          - pwsh: npm ci
-            displayName: Install NPM packages
-          - pwsh: npm run compile -- --minify
-            displayName: Build minified extension
+          - task: PowerShell@2
+            displayName: Install PSResources
+            inputs:
+              pwsh: true
+              filePath: tools/installPSResources.ps1
+          - task: DownloadPipelineArtifact@2
+            displayName: Download PowerShellEditorServices
+            inputs:
+              source: specific
+              project: PowerShellCore
+              definition: 2905
+              specificBuildWithTriggering: true
+              artifact: drop_release_github
+              itemPattern: PowerShellEditorServices.zip
+          - task: ExtractFiles@1
+            displayName: Extract PowerShellEditorServices module
+            inputs:
+              archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
+              destinationFolder: $(Build.SourcesDirectory)/modules
+          - pwsh: Invoke-Build Build -Configuration $(BuildConfiguration)
+            displayName: Build
           - task: onebranch.pipeline.signing@1
-            displayName: Sign 1st-party files
+            displayName: Sign 1st-party extension files
             inputs:
               command: sign
               signing_environment: external_distribution
               search_root: $(Build.SourcesDirectory)/dist
-              files_to_sign: extension.js
-          - pwsh: New-Item -ItemType Directory -Force out && npm run package -- --out out/
+              files_to_sign: '**/*.js'
+          - task: onebranch.pipeline.signing@1
+            displayName: Sign 1st-party example files
+            inputs:
+              command: sign
+              signing_environment: external_distribution
+              search_root: $(Build.SourcesDirectory)/examples
+              files_to_sign: '**/*.js;**/*.ps1;**/*.psd1;**/*.psm1'
+          - pwsh: Invoke-Build Package
             displayName: Create package
       - job: test
         displayName: Build and run tests
@@ -85,6 +126,8 @@ extends:
           ob_outputDirectory: $(Build.SourcesDirectory)/out
           skipComponentGovernanceDetection: true
         steps:
+          - checkout: self
+          - checkout: PowerShellEditorServices
           - task: UseNode@1
             displayName: Use Node 18.x
             inputs:
@@ -92,31 +135,29 @@ extends:
           - task: npmAuthenticate@0
             displayName: Authenticate NPM with Azure Artifacts
             inputs:
-              workingFile: .npmrc
-          - pwsh: npm ci
-            displayName: Install NPM packages
-          - pwsh: npm run test
+              workingFile: vscode-powershell/.npmrc
+          - task: UseDotNet@2
+            displayName: Use .NET 8.x SDK
+            inputs:
+              packageType: sdk
+              version: 8.x
+          - task: PowerShell@2
+            displayName: Install PSResources
+            inputs:
+              pwsh: true
+              filePath: vscode-powershell/tools/installPSResources.ps1
+          - pwsh: Invoke-Build Test -Configuration $(BuildConfiguration)
             displayName: Run tests
+            workingDirectory: vscode-powershell
     - stage: release
       dependsOn: build
       variables:
         version: $[ stageDependencies.build.main.outputs['package.version'] ]
+        vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
+        prerelease: $[ stageDependencies.build.main.outputs['package.prerelease'] ]
         drop: $(Pipeline.Workspace)/drop_build_main
       jobs:
-      - job: validation
-        displayName: Manual validation
-        pool:
-          type: agentless
-        timeoutInMinutes: 1440
-        steps:
-        - task: ManualValidation@0
-          displayName: Wait 24 hours for validation
-          inputs:
-            notifyUsers: $(Build.RequestedForEmail)
-            instructions: Please validate the release
-            timeoutInMinutes: 1440
       - job: github
-        dependsOn: validation
         displayName: Publish draft to GitHub
         pool:
           type: windows
@@ -129,15 +170,27 @@ extends:
           displayName: Create GitHub release
           inputs:
             gitHubConnection: GitHub
-            repositoryName: microsoft/vscode-azurearcenabledmachines
-            assets: $(drop)/vscode-azurearcenabledmachines-$(version).vsix
+            repositoryName: PowerShell/vscode-powershell
+            assets: $(drop)/vscode-powershell-$(vsixVersion).vsix
             tagSource: userSpecifiedTag
             tag: v$(version)
             isDraft: true
+            isPreRelease: $(prerelease)
             addChangeLog: false
             releaseNotesSource: inline
-            releaseNotesInline: |
-              # TODO: Generate release notes on GitHub!
+            releaseNotesInline: "<!-- TODO: Generate release notes on GitHub! -->"
+      - job: validation
+        displayName: Manual validation
+        pool:
+          type: agentless
+        timeoutInMinutes: 1440
+        steps:
+        - task: ManualValidation@0
+          displayName: Wait 24 hours for validation
+          inputs:
+            notifyUsers: $(Build.RequestedForEmail)
+            instructions: Please validate the release and then publish it!
+            timeoutInMinutes: 1440
       - job: vscode
         dependsOn: validation
         displayName: Publish to VS Code Marketplace
@@ -156,5 +209,13 @@ extends:
             workingFile: .npmrc
         - pwsh: npm ci
           displayName: Install NPM packages (for vsce)
-        - pwsh: npm run publish -- --pat $(token) --packagePath $(drop)/vscode-azurearcenabledmachines-$(version).vsix
+        - pwsh: |
+            $publishArgs = @(
+              '--pat'
+              '$(token)'
+              '--packagePath'
+              '$(drop)/vscode-powershell-$(vsixVersion).vsix'
+              if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
+            )
+            npm run publish -- @publishArgs
           displayName: Run vsce publish
