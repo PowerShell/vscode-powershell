@@ -120,7 +120,7 @@
     "compile": "esbuild ./src/extension.ts --outdir=dist --sourcemap --bundle --external:vscode --platform=node",
     "watch": "npm run compile -- --watch",
     "lint": "eslint src test --ext .ts",
-    "package": "vsce package --no-gitHubIssueLinking",
+    "package": "vsce package --out out/ --no-gitHubIssueLinking",
     "publish": "vsce publish",
     "compile-test": "npm run compile && tsc --incremental",
     "watch-tests": "npm run compile-test -- --watch",
