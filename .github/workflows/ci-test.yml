@@ -6,7 +6,6 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
-    paths-ignore: [ '**/*.md' ]
   merge_group:
     types: [ checks_requested ]
 
@@ -50,7 +49,7 @@ jobs:
 
       - name: Install PSResources
         shell: pwsh
-        run: ../PowerShellEditorServices/tools/installPSResources.ps1
+        run: ./tools/installPSResources.ps1
 
       - name: Deploy generated NuGet configuration
         shell: pwsh
