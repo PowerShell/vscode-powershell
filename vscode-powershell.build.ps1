@@ -76,7 +76,7 @@ task Restore RestoreEditorServices, RestoreNodeModules
 
 task Clean {
     Write-Host "`n### Cleaning vscode-powershell`n" -ForegroundColor Green
-    Remove-BuildItem *.js, *.js.map, *.vsix, ./dist, ./modules, ./node_modules
+    Remove-BuildItem *.js, *.js.map, ./dist, ./modules, ./node_modules, ./out
 }
 
 task CleanEditorServices -If (Get-EditorServicesPath) {
@@ -124,10 +124,13 @@ task TestEditorServices -If (Get-EditorServicesPath) {
 #endregion
 #region Package tasks
 
-task Package Build, {
+task Package {
     [semver]$version = $((Get-Content -Raw -Path package.json | ConvertFrom-Json).version)
     Write-Host "`n### Packaging powershell-$version.vsix`n" -ForegroundColor Green
-    Remove-BuildItem ./*.vsix
+    Remove-BuildItem ./out
+    New-Item -ItemType Directory -Force out
+
+    Assert-Build (Test-Path ./dist/extension.js) "Extension must be built!"
 
     # Packaging requires a copy of the modules folder, not a symbolic link. But
     # we might have built in Debug configuration, not Release, and still want to
