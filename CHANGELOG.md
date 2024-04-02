@@ -4641,7 +4641,7 @@ for more details on how it can be used and how you can create your own templates
 The PowerShell extension now uses any "suggested corrections" which are returned with
 a rule violation in your script file to provide a "quick fix" option for the affected
 section of code.  For example, when the `PSAvoidUsingCmdletAliases` rule finds the use
-of a non-whitelisted alias, you will see a light bulb icon that gives the option to
+of a non-allowlisted alias, you will see a light bulb icon that gives the option to
 change to the full name (right click or <kbd>Ctrl+.</kbd> on the marker):
 
 ![Screenshot of PSScriptAnalyzer quick fix](https://cloud.githubusercontent.com/assets/79405/21247558/05887e86-c2e5-11e6-9c67-e4558a7e2dba.png)
