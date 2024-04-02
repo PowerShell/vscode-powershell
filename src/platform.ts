@@ -233,7 +233,7 @@ export class PowerShellExeFinder {
     private *enumerateAdditionalPowerShellInstallations(): Iterable<IPossiblePowerShellExe> {
         for (const versionName in this.additionalPowerShellExes) {
             if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
-                let exePath = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);
+                let exePath: string | undefined = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);
                 if (!exePath) {
                     continue;
                 }
