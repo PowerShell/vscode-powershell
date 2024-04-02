@@ -74,7 +74,7 @@
     "onWalkthrough:PowerShell"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "0.9.3",
+    "@vscode/extension-telemetry": "0.9.6",
     "node-fetch": "2.7.0",
     "semver": "7.6.0",
     "untildify": "4.0.0",
