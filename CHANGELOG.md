@@ -1,5 +1,14 @@
 # PowerShell Extension Release History
 
+## v2024.3.2-preview
+### Wednesday, April 03, 2024
+
+With PowerShell Editor Services [v3.19.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.19.0)!
+
+Overhauled Terminal Shell Integration!
+
+See more details at the GitHub Release for [v2024.3.2-preview](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.3.2-preview).
+
 ## v2024.3.1-preview
 ### Tuesday, March 5, 2024
 
