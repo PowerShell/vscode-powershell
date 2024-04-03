@@ -610,6 +610,11 @@ export class SessionManager implements Middleware {
                 });
         };
 
+        // When Terminal Shell Integration is enabled, we pass the path to the script that the server should execute.
+        // Passing an empty string implies integration is disabled.
+        const shellIntegrationEnabled = vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled");
+        const shellIntegrationScript = path.join(vscode.env.appRoot, "out", "vs", "workbench", "contrib", "terminal", "browser", "media", "shellIntegration.ps1");
+
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
             synchronize: {
@@ -622,7 +627,7 @@ export class SessionManager implements Middleware {
             initializationOptions: {
                 enableProfileLoading: this.sessionSettings.enableProfileLoading,
                 initialWorkingDirectory: await validateCwdSetting(this.logger),
-                shellIntegrationEnabled: vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled"),
+                shellIntegrationScript: shellIntegrationEnabled ? shellIntegrationScript : "",
             },
             errorHandler: {
                 // Override the default error handler to prevent it from
