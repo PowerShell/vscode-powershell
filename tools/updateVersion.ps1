@@ -14,16 +14,16 @@ if ($LASTEXITCODE -ne 0) {
     throw "There are staged changes in the repository. Please commit or reset them before running this script."
 }
 
-if ($SemanticVersion.Major -ne $(Get-Date).Year) {
+if ($Version.Major -ne $(Get-Date).Year) {
     throw "Major version should be the current year!"
 }
 
-if ($SemanticVersion.PreReleaseLabel) {
-    if ($SemanticVersion.Minor % 2 -eq 0) {
+if ($Version.PreReleaseLabel) {
+    if ($Version.Minor % 2 -eq 0) {
         throw "Minor version must be odd for pre-release!"
     }
 } else {
-    if ($SemanticVersion.Minor % 2 -ne 0) {
+    if ($Version.Minor % 2 -ne 0) {
         throw "Minor version must be even for pre-release!"
     }
 }
