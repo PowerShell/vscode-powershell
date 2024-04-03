@@ -52,20 +52,24 @@ For more information on contributing snippets please read our
 These are the current steps for creating a release for both the editor services
 and the extension. Azure DevOps access is restricted to Microsoft employees and
 is used to sign and validate the produced binaries before publishing on behalf
-of Microsoft.
+of Microsoft. Assume `origin` is GitHub and `ado` is Azure DevOps.
 
 ```powershell
 cd ./PowerShellEditorServices
 git checkout -B release
 ./tools/updateVersion.ps1 -Version "4.0.0" -Changes "Major release!"
+git push --force-with-lease origin
+git push ado HEAD:main
 
 cd ../vscode-powershell
 git checkout -B release
 ./tools/updateVersion.ps1 -Version "2024.4.0" -Changes "Major release!"
+git push --force-with-lease origin
+git push ado HEAD:main
 ```
 
 1. Amend changelogs as necessary.
-2. Push release branches to ADO and GitHub.
+2. Push `release` branches to GitHub and to Azure DevOps `main` branch.
 3. Download and test assets!
 4. Publish draft releases and merge (don't squash!) branches.
 5. Permit pipeline to publish to marketplace.
@@ -73,6 +77,10 @@ git checkout -B release
 If rolling from pre-release to release, do not change the version of PowerShell
 Editor Services between a pre-release and the subsequent release! We only
 need to release the extension.
+
+The Azure DevOps pipelines have to build off `main` branch for _reasons_,
+but we still want to use PRs. Hence pushing `release` to `main` and then
+merging (not squashing nor rebasing) those PRs so the commit stays the same.
 
 ### Versioning
 

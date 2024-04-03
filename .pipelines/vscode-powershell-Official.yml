@@ -27,16 +27,12 @@ resources:
       type: git
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
-    - repository: PowerShellEditorServices
-      type: git
-      name: PowerShellEditorServices
-      ref: release
   pipelines:
   - pipeline: PowerShellEditorServices-Official
     source: PowerShellEditorServices-Official
     trigger:
       branches:
-      - release
+      - main
 
 extends:
   # https://aka.ms/obpipelines/templates
@@ -126,8 +122,6 @@ extends:
           ob_outputDirectory: $(Build.SourcesDirectory)/out
           skipComponentGovernanceDetection: true
         steps:
-          - checkout: self
-          - checkout: PowerShellEditorServices
           - task: UseNode@1
             displayName: Use Node 18.x
             inputs:
@@ -135,7 +129,7 @@ extends:
           - task: npmAuthenticate@0
             displayName: Authenticate NPM with Azure Artifacts
             inputs:
-              workingFile: vscode-powershell/.npmrc
+              workingFile: .npmrc
           - task: UseDotNet@2
             displayName: Use .NET 8.x SDK
             inputs:
@@ -145,10 +139,23 @@ extends:
             displayName: Install PSResources
             inputs:
               pwsh: true
-              filePath: vscode-powershell/tools/installPSResources.ps1
+              filePath: tools/installPSResources.ps1
+          - task: DownloadPipelineArtifact@2
+            displayName: Download PowerShellEditorServices
+            inputs:
+              source: specific
+              project: PowerShellCore
+              definition: 2905
+              specificBuildWithTriggering: true
+              artifact: drop_release_github
+              itemPattern: PowerShellEditorServices.zip
+          - task: ExtractFiles@1
+            displayName: Extract PowerShellEditorServices module
+            inputs:
+              archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
+              destinationFolder: $(Build.SourcesDirectory)/modules
           - pwsh: Invoke-Build Test -Configuration $(BuildConfiguration)
             displayName: Run tests
-            workingDirectory: vscode-powershell
     - stage: release
       dependsOn: build
       variables:
@@ -171,7 +178,7 @@ extends:
           inputs:
             gitHubConnection: GitHub
             repositoryName: PowerShell/vscode-powershell
-            assets: $(drop)/vscode-powershell-$(vsixVersion).vsix
+            assets: $(drop)/powershell-$(vsixVersion).vsix
             tagSource: userSpecifiedTag
             tag: v$(version)
             isDraft: true
@@ -214,7 +221,7 @@ extends:
               '--pat'
               '$(token)'
               '--packagePath'
-              '$(drop)/vscode-powershell-$(vsixVersion).vsix'
+              '$(drop)/powershell-$(vsixVersion).vsix'
               if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
             )
             npm run publish -- @publishArgs
