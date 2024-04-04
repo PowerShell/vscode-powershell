@@ -80,7 +80,7 @@ jobs:
         if: always()
         with:
           name: vscode-powershell-vsix-${{ matrix.os }}
-          path: vscode-powershell/powershell-*.vsix
+          path: '**/*.vsix'
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
