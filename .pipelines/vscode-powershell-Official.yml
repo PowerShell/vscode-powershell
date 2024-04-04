@@ -211,7 +211,7 @@ extends:
         - download: current
           displayName: Download artifacts
         - task: npmAuthenticate@0
-          displayName: Install NPM packages (for vsce)
+          displayName: Authenticate NPM with Azure Artifacts (for vsce)
           inputs:
             workingFile: .npmrc
         - pwsh: npm ci
