@@ -89,6 +89,7 @@ export class SessionManager implements Middleware {
     private sessionDetails: IEditorServicesSessionDetails | undefined;
     private sessionsFolder: vscode.Uri;
     private sessionStatus: SessionStatus = SessionStatus.NotStarted;
+    private shellIntegrationEnabled = false;
     private startCancellationTokenSource: vscode.CancellationTokenSource | undefined;
     private suppressRestartPrompt = false;
     private versionDetails: IPowerShellVersionDetails | undefined;
@@ -109,6 +110,7 @@ export class SessionManager implements Middleware {
         // We have to override the scheme because it defaults to
         // 'vscode-userdata' which breaks UNC paths.
         this.sessionsFolder = vscode.Uri.joinPath(extensionContext.globalStorageUri.with({ scheme: "file" }), "sessions");
+
         this.platformDetails = getPlatformDetails();
         this.HostName = hostName;
         this.DisplayName = displayName;
@@ -188,6 +190,9 @@ export class SessionManager implements Middleware {
 
         // Migrate things.
         await this.migrateWhitespaceAroundPipeSetting();
+
+        // Update non-PowerShell settings.
+        this.shellIntegrationEnabled = vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled") ?? false;
 
         // Find the PowerShell executable to use for the server.
         this.PowerShellExeDetails = await this.findPowerShell();
@@ -447,19 +452,23 @@ export class SessionManager implements Middleware {
 
     private async onConfigurationUpdated(): Promise<void> {
         const settings = getSettings();
+        const shellIntegrationEnabled = vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled");
         this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
         // Detect any setting changes that would affect the session.
-        if (!this.suppressRestartPrompt && this.sessionStatus === SessionStatus.Running &&
-            (settings.cwd !== this.sessionSettings.cwd
-                || settings.powerShellDefaultVersion !== this.sessionSettings.powerShellDefaultVersion
-                || settings.developer.editorServicesLogLevel !== this.sessionSettings.developer.editorServicesLogLevel
-                || settings.developer.bundledModulesPath !== this.sessionSettings.developer.bundledModulesPath
-                || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
-                || settings.developer.setExecutionPolicy !== this.sessionSettings.developer.setExecutionPolicy
-                || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
-                || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
-                || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation)) {
+        if (!this.suppressRestartPrompt
+            && this.sessionStatus === SessionStatus.Running
+            && ((shellIntegrationEnabled !== this.shellIntegrationEnabled
+                && !settings.integratedConsole.startInBackground)
+            || settings.cwd !== this.sessionSettings.cwd
+            || settings.powerShellDefaultVersion !== this.sessionSettings.powerShellDefaultVersion
+            || settings.developer.editorServicesLogLevel !== this.sessionSettings.developer.editorServicesLogLevel
+            || settings.developer.bundledModulesPath !== this.sessionSettings.developer.bundledModulesPath
+            || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
+            || settings.developer.setExecutionPolicy !== this.sessionSettings.developer.setExecutionPolicy
+            || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
+            || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
+            || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation)) {
 
             this.logger.writeVerbose("Settings changed, prompting to restart...");
             const response = await vscode.window.showInformationMessage(
@@ -610,10 +619,6 @@ export class SessionManager implements Middleware {
                 });
         };
 
-        // When Terminal Shell Integration is enabled, we pass the path to the script that the server should execute.
-        // Passing an empty string implies integration is disabled.
-        const shellIntegrationEnabled = vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled");
-        const shellIntegrationScript = path.join(vscode.env.appRoot, "out", "vs", "workbench", "contrib", "terminal", "browser", "media", "shellIntegration.ps1");
 
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
@@ -624,10 +629,13 @@ export class SessionManager implements Middleware {
                 // TODO: fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
             },
             // NOTE: Some settings are only applicable on startup, so we send them during initialization.
+            // When Terminal Shell Integration is enabled, we pass the path to the script that the server should execute.
+            // Passing an empty string implies integration is disabled.
             initializationOptions: {
                 enableProfileLoading: this.sessionSettings.enableProfileLoading,
                 initialWorkingDirectory: await validateCwdSetting(this.logger),
-                shellIntegrationScript: shellIntegrationEnabled ? shellIntegrationScript : "",
+                shellIntegrationScript: this.shellIntegrationEnabled
+                    ? utils.ShellIntegrationScript : "",
             },
             errorHandler: {
                 // Override the default error handler to prevent it from

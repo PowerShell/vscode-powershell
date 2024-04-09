@@ -7,6 +7,8 @@ import vscode = require("vscode");
 
 export const PowerShellLanguageId = "powershell";
 
+export const ShellIntegrationScript = path.join(vscode.env.appRoot, "out", "vs", "workbench", "contrib", "terminal", "browser", "media", "shellIntegration.ps1");
+
 export function escapeSingleQuotes(p: string): string {
     return p.replace(new RegExp("'", "g"), "''");
 }
