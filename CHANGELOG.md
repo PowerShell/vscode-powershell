@@ -1,5 +1,28 @@
 # PowerShell Extension Release History
 
+## v2024.2.0
+### Monday, April 08, 2024
+
+With PowerShell Editor Services [v3.19.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.19.0)!
+
+New stable release!
+
+This release comes with PSReadLine v2.4.0-beta0 and PSScriptAnalyzer v1.22.0.
+
+It includes an overhauled support for Terminal Shell Integration,
+so it always supports VS Code's latest features!
+
+The codebase was cleaned up by the removal of several deprecated features.
+Multiple bugs were fixed in the shutdown process,
+default debugger configurations and IntelliSense.
+A setting was added to allow the exclusion of the execution policy CLI argument at startup,
+so that users in restricted environments are better able to launch the extension.
+
+This release went through three pre-releases.
+Thank you so much to all our beta testers and users for your contributions.
+
+See more details at the GitHub Release for [v2024.2.0](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.2.0).
+
 ## v2024.3.2-preview
 ### Wednesday, April 03, 2024
 
