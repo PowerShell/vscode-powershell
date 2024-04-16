@@ -414,7 +414,13 @@ describe("DebugSessionFeature", () => {
 
             const config = await debugSessionFeature.resolveDebugConfigurationWithSubstitutedVariables(undefined, attachConfig);
 
-            assert.deepStrictEqual(config!.dotnetAttachConfig, foundDotnetConfig);
+            // This config will only be present if the C# extension is installed.
+            if (extensions.getExtension("ms-dotnettools.csharp")) {
+                assert.ok(config);
+                assert.deepStrictEqual(config.dotnetAttachConfig, foundDotnetConfig);
+            } else {
+                assert.ok(!config);
+            }
         });
     });
 

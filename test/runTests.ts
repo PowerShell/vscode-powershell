@@ -105,9 +105,10 @@ function InstallExtension(vscodeExePath: string, extensionIdOrVSIXPath: string):
     });
 
     if (installResult.status !== 0) {
-        console.error(installResult.stderr);
-        throw new Error(`Failed to install extension: ${installResult.stderr}`);
+        console.error(`Failed to install extension: ${installResult.stderr}`);
+        console.log("Binary Module Tests will fail if not skipped!");
     }
+    
     return installResult.stdout;
 }
 
