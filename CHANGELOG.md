@@ -1,5 +1,16 @@
 # PowerShell Extension Release History
 
+## v2024.2.1
+### Tuesday, April 16, 2024
+
+With PowerShell Editor Services [v3.20.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.20.0)!
+
+Hotfix for incorrect signing certificate, sorry about that!
+
+Also removed Plaster integration as we were unable to correctly sign it since we no longer own it.
+
+See more details at the GitHub Release for [v2024.2.1](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.2.1).
+
 ## v2024.2.0
 ### Monday, April 08, 2024
 
