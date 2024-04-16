@@ -111,9 +111,10 @@ describe("UpdatePowerShell feature", function () {
             };
             const updater = new UpdatePowerShell(settings, testLogger, version);
             // @ts-expect-error method is private.
-            const tag: string | undefined = await updater.maybeGetNewRelease();
+            const tag: string = await updater.maybeGetNewRelease() ?? "";
             // NOTE: This will need to be updated each time an LTS is released.
-            assert(tag?.startsWith("v7.4"));
+            // Also sometimes the prior LTS is more recently updated than the latest LTS.
+            assert(tag.startsWith("v7.4") || tag.startsWith("v7.2"));
         });
 
         it("Would update to stable", async function() {
