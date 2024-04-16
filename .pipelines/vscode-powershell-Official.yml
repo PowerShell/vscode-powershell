@@ -51,6 +51,7 @@ extends:
           type: windows
         variables:
           ob_outputDirectory: $(Build.SourcesDirectory)/out
+          ob_sdl_codeSignValidation_excludes: -|**\*.js # Node.js JavaScript signatures are not supported
         steps:
           - pwsh: |
               $version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
@@ -96,19 +97,12 @@ extends:
           - pwsh: Invoke-Build Build -Configuration $(BuildConfiguration)
             displayName: Build
           - task: onebranch.pipeline.signing@1
-            displayName: Sign 1st-party extension files
+            displayName: Sign 1st-party example PowerShell files
             inputs:
               command: sign
-              signing_environment: external_distribution
-              search_root: $(Build.SourcesDirectory)/dist
-              files_to_sign: '**/*.js'
-          - task: onebranch.pipeline.signing@1
-            displayName: Sign 1st-party example files
-            inputs:
-              command: sign
-              signing_environment: external_distribution
+              signing_profile: external_distribution
               search_root: $(Build.SourcesDirectory)/examples
-              files_to_sign: '**/*.js;**/*.ps1;**/*.psd1;**/*.psm1'
+              files_to_sign: '**/*.ps1;**/*.psd1;**/*.psm1'
           - pwsh: Invoke-Build Package
             displayName: Create package
       - job: test
