@@ -55,7 +55,6 @@
   "activationEvents": [
     "onDebugResolve:PowerShell",
     "onLanguage:powershell",
-    "onCommand:PowerShell.NewProjectFromTemplate",
     "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.PickPSHostProcess",
     "onCommand:PowerShell.PickRunspace",
@@ -274,11 +273,6 @@
       {
         "command": "PowerShell.ShowSessionConsole",
         "title": "Show Extension Terminal",
-        "category": "PowerShell"
-      },
-      {
-        "command": "PowerShell.NewProjectFromTemplate",
-        "title": "Create New Project from Plaster Template",
         "category": "PowerShell"
       },
       {
@@ -916,7 +910,7 @@
         "powershell.developer.bundledModulesPath": {
           "type": "string",
           "default": "../../PowerShellEditorServices/module",
-          "markdownDescription": "Specifies an alternative path to the folder containing modules that are bundled with the PowerShell extension, that is: PowerShell Editor Services, PSScriptAnalyzer, Plaster, and PSReadLine. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
+          "markdownDescription": "Specifies an alternative path to the folder containing modules that are bundled with the PowerShell extension, that is: PowerShell Editor Services, PSScriptAnalyzer and PSReadLine. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
         },
         "powershell.developer.editorServicesLogLevel": {
           "type": "string",
