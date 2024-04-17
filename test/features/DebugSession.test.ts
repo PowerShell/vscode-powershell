@@ -486,9 +486,8 @@ describe("DebugSessionFeature E2E", function() {
         let binaryModulePath: Uri;
 
         before(async function binarySetup() {
-            if (process.env.TF_BUILD) {
-                // The binary modules tests won't work in the release pipeline
-                // due to dependency requirements.
+            if (!extensions.getExtension("ms-dotnettools.csharp")) {
+                // These tests require that extension to be installed in the test environment.
                 this.skip();
             }
             binaryModulePath = Uri.joinPath(workspace.workspaceFolders![0].uri, "BinaryModule");
