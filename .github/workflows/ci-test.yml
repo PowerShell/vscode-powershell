@@ -21,9 +21,6 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: true
       DOTNET_GENERATE_ASPNET_CERTIFICATE: false
       DISPLAY: ':99.0'
-    defaults:
-      run:
-        working-directory: vscode-powershell
     steps:
       - name: Checkout PowerShellEditorServices
         uses: actions/checkout@v4
@@ -40,24 +37,20 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           cache: true
-          cache-dependency-path: 'PowerShellEditorServices/**/packages.lock.json'
+          cache-dependency-path: PowerShellEditorServices/**/packages.lock.json
           global-json-file: PowerShellEditorServices/global.json
-          source-url: https://pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/nuget/v3/index.json
-          config-file: PowerShellEditorServices/NuGet.config
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.AZURE_NUGET_TOKEN }}
+
+      - name: Remove Azure Artifact Feed configurations
+        shell: pwsh
+        run: |
+          Remove-Item -Force .npmrc
+          Remove-Item test/mocks/BinaryModule/NuGet.Config
+          Remove-Item ../PowerShellEditorServices/NuGet.Config
+        working-directory: vscode-powershell
 
       - name: Install PSResources
         shell: pwsh
-        run: ./tools/installPSResources.ps1
-
-      - name: Deploy generated NuGet configuration
-        shell: pwsh
-        run: Copy-Item ../../nuget.config ../PowerShellEditorServices/NuGet.config
-
-      - name: Deploy NPM configuration
-        shell: pwsh
-        run: Copy-Item .github/workflows/npmrc .npmrc
+        run: ./vscode-powershell/tools/installPSResources.ps1
 
       - uses: actions/setup-node@v4
         with:
@@ -72,8 +65,7 @@ jobs:
       - name: Build, test and package
         shell: pwsh
         run: Invoke-Build -Configuration Release
-        env:
-          NPM_PASSWORD: ${{ secrets.AZURE_NPM_PASSWORD_BASE64 }}
+        working-directory: vscode-powershell
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
