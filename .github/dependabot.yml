@@ -1,15 +1,7 @@
 version: 2
-registries:
-  npm-azure:
-    type: npm-registry
-    url: https://pkgs.dev.azure.com/mscodehub/PowerShellCore/_packaging/PowerShellCore_PublicPackages/npm/registry/
-    username: powershell
-    password: ${{ secrets.AZURE_NPM_PASSWORD }}
 updates:
 - package-ecosystem: npm
   directory: "/"
-  registries:
-    - npm-azure
   labels: [ ]
   schedule:
     interval: weekly

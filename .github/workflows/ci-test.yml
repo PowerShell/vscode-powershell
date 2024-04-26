@@ -37,16 +37,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           cache: true
-          cache-dependency-path: PowerShellEditorServices/**/packages.lock.json
+          cache-dependency-path: PowerShellEditorServices/**/*.csproj
           global-json-file: PowerShellEditorServices/global.json
-
-      - name: Remove Azure Artifact Feed configurations
-        shell: pwsh
-        run: |
-          Remove-Item -Force .npmrc
-          Remove-Item test/mocks/BinaryModule/NuGet.Config
-          Remove-Item ../PowerShellEditorServices/NuGet.Config
-        working-directory: vscode-powershell
+          config-file: PowerShellEditorServices/nuget.config
 
       - name: Install PSResources
         shell: pwsh
