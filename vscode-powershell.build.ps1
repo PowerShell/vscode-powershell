@@ -128,7 +128,7 @@ task Package {
     [semver]$version = $((Get-Content -Raw -Path package.json | ConvertFrom-Json).version)
     Write-Host "`n### Packaging powershell-$version.vsix`n" -ForegroundColor Green
     Remove-BuildItem ./out
-    New-Item -ItemType Directory -Force out
+    New-Item -ItemType Directory -Force out | Out-Null
 
     Assert-Build (Test-Path ./dist/extension.js) "Extension must be built!"
 

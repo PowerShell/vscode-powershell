@@ -58,10 +58,11 @@ The extension should work anywhere VS Code itself and PowerShell Core 7.2 or hig
 basis. PowerShell Core 6, 7.0, and 7.1 have reached end-of-support. We test the following
 configurations:
 
-- **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell Core 7.2
-- **Windows Server 2019** with Windows PowerShell 5.1 and PowerShell Core 7.2
-- **macOS 11** with PowerShell Core 7.2
-- **Ubuntu 20.04** with PowerShell Core 7.2
+- **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell Core 7.2, 7.3 and 7.4
+- **macOS 12** with PowerShell Core 7.2, 7.3 and 7.4
+- **Ubuntu 22.04** with PowerShell Core 7.2, 7.3 and 7.4
+
+On Windows, we also test with and without Constrained Language Mode enabled.
 
 Read the [installation instructions][]
 to get more details on how to use the extension on these platforms.
