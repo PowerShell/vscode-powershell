@@ -30,8 +30,8 @@
   },
   "badges": [
     {
-      "url": "https://dev.azure.com/powershell/vscode-powershell/_apis/build/status/PowerShell.vscode-powershell?branchName=main",
-      "href": "https://dev.azure.com/powershell/vscode-powershell/_build/latest?definitionId=51&branchName=main",
+      "url": "https://github.com/PowerShell/vscode-powershell/actions/workflows/ci-test.yml/badge.svg",
+      "href": "https://github.com/PowerShell/vscode-powershell/actions/workflows/ci-test.yml?query=branch%3Amain",
       "description": "Build Status"
     },
     {
