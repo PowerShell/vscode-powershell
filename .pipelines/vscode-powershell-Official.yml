@@ -71,10 +71,6 @@ extends:
             displayName: Use Node 18.x
             inputs:
               version: 18.x
-          - task: npmAuthenticate@0
-            displayName: Authenticate NPM with Azure Artifacts
-            inputs:
-              workingFile: .npmrc
           - task: PowerShell@2
             displayName: Install PSResources
             inputs:
@@ -120,10 +116,6 @@ extends:
             displayName: Use Node 18.x
             inputs:
               version: 18.x
-          - task: npmAuthenticate@0
-            displayName: Authenticate NPM with Azure Artifacts
-            inputs:
-              workingFile: .npmrc
           - task: UseDotNet@2
             displayName: Use .NET 8.x SDK
             inputs:
@@ -204,10 +196,6 @@ extends:
         steps:
         - download: current
           displayName: Download artifacts
-        - task: npmAuthenticate@0
-          displayName: Authenticate NPM with Azure Artifacts (for vsce)
-          inputs:
-            workingFile: .npmrc
         - pwsh: npm ci
           displayName: Install NPM packages (for vsce)
         - pwsh: |
