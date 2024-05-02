@@ -1,5 +1,6 @@
 **
 !*.md
+!*.txt
 !dist/extension.js
 !docs/
 !examples/
@@ -7,4 +8,3 @@
 !modules/
 !snippets/
 !themes/
-!LICENSE.txt
