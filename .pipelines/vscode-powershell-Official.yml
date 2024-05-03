@@ -190,21 +190,23 @@ extends:
         pool:
           type: windows
         variables:
-          - group: VSCodeMarketplace
-          - name: ob_outputDirectory
-            value: $(Build.SourcesDirectory)/out
+          ob_outputDirectory: $(Build.SourcesDirectory)/out
         steps:
         - download: current
           displayName: Download artifacts
         - pwsh: npm ci
           displayName: Install NPM packages (for vsce)
-        - pwsh: |
-            $publishArgs = @(
-              '--pat'
-              '$(token)'
-              '--packagePath'
-              '$(drop)/powershell-$(vsixVersion).vsix'
-              if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
-            )
-            npm run publish -- @publishArgs
+        - task: AzureCLI@2
           displayName: Run vsce publish
+          inputs:
+            azureSubscription: vscode-marketplace
+            scriptType: pscore
+            scriptLocation: inlineScript
+            inlineScript: |
+              $publishArgs = @(
+                '--azure-credential'
+                '--packagePath'
+                '$(drop)/powershell-$(vsixVersion).vsix'
+                if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
+              )
+              npm run publish -- @publishArgs
