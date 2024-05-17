@@ -1009,7 +1009,7 @@
             "verbose"
           ],
           "default": "off",
-          "description": "Traces the communication between VS Code and the PowerShell Editor Services language server. **This setting is only meant for extension developers!**"
+          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services language server. **This setting is only meant for extension developers!**"
         }
       }
     },
