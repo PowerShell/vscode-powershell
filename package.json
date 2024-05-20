@@ -101,7 +101,7 @@
     "esbuild": "^0.21.3",
     "eslint": "^8.57.0",
     "eslint-plugin-header": "^3.1.1",
-    "glob": "^10.3.12",
+    "glob": "^10.3.15",
     "mocha": "^10.4.0",
     "mocha-explorer-launcher-scripts": "^0.4.0",
     "mocha-multi-reporters": "^1.5.1",
