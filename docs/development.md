@@ -22,6 +22,28 @@
 
 [fork]: https://help.github.com/articles/fork-a-repo/
 
+## Tracking Upstream Dependencies
+
+As a VS Code extension, we first rely on the `engine` field of `package.json` to
+state the lowest version of VS Code we support. This extension in particular
+must not update past what Azure Data Studio supports, which can be found in the
+[`vscodeVersion`][] field of their `product.json` file. We periodically check
+that for updates, and when available update our own.
+
+When our `engine` field is updated the development dependency `@types/vscode`
+must be updated to match. Note that it uses `~` (not `^`) so as to accept new
+patches with `npm update` but not new minor versions. Then we check that version
+of VS Code's own `package.json` file for their [`electron`][] dependency. The
+major version of [Electron][] will tell us which [Node.js][] is included, which
+dictates which version of Node.js the extension is eventually run with. This
+lets us finally update our `@types/node` development dependency to match, our
+developer machines if necessary, and the CI and OneBranch pipeline tasks.
+
+[`vscodeVersion`]: https://github.com/microsoft/azuredatastudio/blob/4970733324ef8254b7c22a5dc55af7f8a1dea93f/product.json#L50
+[`electron`]: https://github.com/microsoft/vscode/blob/8b617bd08fd9e3fc94d14adb8d358b56e3f72314/package.json#L153
+[Electron]: https://www.electronjs.org/blog/electron-25-0
+[Node.js]: https://nodejs.org/en/download/package-manager
+
 ### Building the Code
 
 #### From Visual Studio Code
