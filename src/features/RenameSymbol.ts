@@ -5,7 +5,6 @@ import vscode = require("vscode");
 import { RequestType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import { RenameProvider, WorkspaceEdit, TextDocument, CancellationToken, Position,Uri,Range } from "vscode";
-import type { LanguageClient } from "vscode-languageclient/node";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IRenameSymbolRequestArguments {
     FileName?:string
@@ -46,21 +45,7 @@ export const RenameSymbolRequestType = new RequestType<IRenameSymbolRequestArgum
 export const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolRequestArguments, IPrepareRenameSymbolRequestResponse, void>("powerShell/PrepareRenameSymbol");
 
 export class RenameSymbolFeature extends LanguageClientConsumer implements RenameProvider {
-    public override onLanguageClientSet(_languageClient: LanguageClient): void {
-        throw new Error("Method not implemented.");
-    }
-    private command: vscode.Disposable;
 
-    constructor() {
-        super();
-        this.command = vscode.commands.registerCommand("PowerShell.RenameSymbol", () => {
-            throw new Error("Not implemented");
-
-        });
-    }
-    public dispose() :void{
-        this.command.dispose();
-    }
     public async provideRenameEdits(document: TextDocument, position: Position, newName: string, _token: CancellationToken): Promise<WorkspaceEdit | undefined> {
 
         const req:IRenameSymbolRequestArguments = {
