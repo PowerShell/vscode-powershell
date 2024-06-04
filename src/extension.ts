@@ -152,7 +152,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new HelpCompletionFeature(),
-        new RenameSymbolFeature(documentSelector)
+        new RenameSymbolFeature(documentSelector,logger)
     ];
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);

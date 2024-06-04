@@ -6,6 +6,7 @@ import { RequestType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import { RenameProvider, WorkspaceEdit, TextDocument, CancellationToken, Position,Uri,Range, DocumentSelector } from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
+import { ILogger } from "../logging";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IRenameSymbolRequestArguments {
     FileName?:string
@@ -42,14 +43,15 @@ interface IPrepareRenameSymbolRequestResponse {
     message : string
 }
 
-export const RenameSymbolRequestType = new RequestType<IRenameSymbolRequestArguments, IRenameSymbolRequestResponse, void>("powerShell/renameSymbol");
-export const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolRequestArguments, IPrepareRenameSymbolRequestResponse, void>("powerShell/PrepareRenameSymbol");
+const RenameSymbolRequestType = new RequestType<IRenameSymbolRequestArguments, IRenameSymbolRequestResponse, void>("powerShell/renameSymbol");
+const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolRequestArguments, IPrepareRenameSymbolRequestResponse, void>("powerShell/PrepareRenameSymbol");
 
 export class RenameSymbolFeature extends LanguageClientConsumer implements RenameProvider {
     private languageRenameProvider:vscode.Disposable;
 
-    constructor(documentSelector:DocumentSelector){
+    constructor(documentSelector:DocumentSelector,private logger: ILogger){
         super();
+
         this.languageRenameProvider = vscode.languages.registerRenameProvider(documentSelector,this);
     }
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -72,15 +74,16 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
             }
 
             const edit = new WorkspaceEdit();
-            response.changes.forEach(change => {
-                const uri = Uri.file(change.fileName);
+            for (const file of response.changes) {
 
-                change.changes.forEach(change => {
+                const uri = Uri.file(file.fileName);
+
+                for (const change of file.changes) {
                     edit.replace(uri,
                         new Range(change.startLine, change.startColumn, change.endLine, change.endColumn),
                         change.newText);
-                });
-            });
+                }
+            }
             return edit;
         }catch (error) {
             return undefined;
@@ -104,13 +107,12 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
             }
             const wordRange = document.getWordRangeAtPosition(position);
             if (!wordRange) {
-                return Promise.reject("Not a valid location for renaming.");
+                throw new Error("Not a valid location for renaming.");
 
             }
             const wordText = document.getText(wordRange);
             if (response.message) {
-                return Promise.reject(response.message);
-
+                throw new Error(response.message);
             }
 
             return {
@@ -118,7 +120,9 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
                 placeholder: wordText
             };
         }catch (error) {
-            return null;
+            const msg = `RenameSymbol unhandled error: ${error}`;
+            this.logger.writeError(msg);
+            throw new Error(msg);
         }
     }
     public dispose(): void {
