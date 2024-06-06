@@ -120,7 +120,7 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
                 placeholder: wordText
             };
         }catch (error) {
-            const msg = `RenameSymbol unhandled error: ${error}`;
+            const msg = `RenameSymbol: ${error}`;
             this.logger.writeError(msg);
             throw new Error(msg);
         }
