@@ -93,6 +93,10 @@ button and choosing **Install Another Version**.
 
 Please our [support](SUPPORT.md) document.
 
+## Code of Conduct
+
+Please see our [Code of Conduct](CODE_OF_CONDUCT.md) before participating in this project.
+
 ## Contributing to the Code
 
 Check out the [development documentation](docs/development.md) for more details
@@ -100,7 +104,7 @@ on how to contribute to this extension!
 
 ## Security Note
 
-For any security issues, please see [here](./SECURITY.md).
+For any security issues, please see [here](SECURITY.md).
 
 ## Maintainers
 
@@ -109,6 +113,7 @@ For any security issues, please see [here](./SECURITY.md).
 - Andy Jordan - [@andyleejordan](https://github.com/andyleejordan)
 - Patrick Meinecke - [@SeeminglyScience](https://github.com/SeeminglyScience)
 - Sydney Smith - [@SydneyhSmith](https://github.com/SydneyhSmith)
+- Justin Grote - [@JustinGrote](https://github.com/JustinGrote)
 
 ### Emeriti
 
@@ -120,15 +125,5 @@ For any security issues, please see [here](./SECURITY.md).
 ## License
 
 This extension is [licensed under the MIT License](LICENSE.txt). Please see the
-[third-party notices](Third%20Party%20Notices.txt) file for details on the third-party
+[third-party notices](NOTICE.txt) file for details on the third-party
 binaries that we include with releases of this project.
-
-## [Code of Conduct][conduct-md]
-
-This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
-For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
-
-[conduct-code]: http://opensource.microsoft.com/codeofconduct/
-[conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
-[conduct-email]: mailto:opencode@microsoft.com
-[conduct-md]: https://github.com/PowerShell/vscode-powershell/blob/main/CODE_OF_CONDUCT.md
