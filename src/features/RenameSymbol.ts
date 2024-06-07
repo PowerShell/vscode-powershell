@@ -8,11 +8,15 @@ import { RenameProvider, WorkspaceEdit, TextDocument, CancellationToken, Positio
 import { LanguageClient } from "vscode-languageclient/node";
 import { ILogger } from "../logging";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface RenameSymbolOptions {
+    ShouldGenerateAlias?:boolean
+}
 interface IRenameSymbolRequestArguments {
     FileName?:string
     Line?:number
     Column?:number
     RenameTo?:string
+    Options?:RenameSymbolOptions
 }
 interface IPrepareRenameSymbolRequestArguments {
     FileName?:string
@@ -63,6 +67,10 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
             Line: position.line,
             Column : position.character,
             RenameTo : newName,
+        };
+        const config = vscode.workspace.getConfiguration();
+        req.Options =  {
+            ShouldGenerateAlias: config.get("powershell.renameSymbol.shouldGenerateAlias")
         };
 
         try {
