@@ -1011,7 +1011,12 @@
             "verbose"
           ],
           "default": "off",
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services language server. **This setting is only meant for extension developers!**"
+          "description": "Traces the communication between VS Code and the PowerShell Editor Services language server. **This setting is only meant for extension developers!**"
+        },
+        "powershell.renameSymbol.shouldGenerateAlias": {
+          "type": "boolean",
+          "default": true,
+          "description": "Should an Alias be genereted when renaming a function parameter"
         }
       }
     },

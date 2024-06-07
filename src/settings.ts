@@ -39,6 +39,7 @@ export class Settings extends PartialSettings {
     cwd = "";  // NOTE: use validateCwdSetting() instead of this directly!
     enableReferencesCodeLens = true;
     analyzeOpenDocumentsOnly = false;
+    renameSymbol = new RenameSymbolSettings();
     // TODO: Add (deprecated) useX86Host (for testing)
 }
 
@@ -153,6 +154,10 @@ class PesterSettings extends PartialSettings {
 class ButtonSettings extends PartialSettings {
     showRunButtons = true;
     showPanelMovementButtons = false;
+}
+
+class RenameSymbolSettings extends PartialSettings {
+    shouldGenerateAlias = true;
 }
 
 // This is a recursive function which unpacks a WorkspaceConfiguration into our settings.
