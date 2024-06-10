@@ -157,7 +157,7 @@ class ButtonSettings extends PartialSettings {
 }
 
 class RenameSymbolSettings extends PartialSettings {
-    shouldGenerateAlias = true;
+    createAlias = true;
 }
 
 // This is a recursive function which unpacks a WorkspaceConfiguration into our settings.
