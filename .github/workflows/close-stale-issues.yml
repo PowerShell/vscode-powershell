@@ -5,7 +5,7 @@ permissions:
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "1 * * * *"
 
 jobs:
   stale-resolved-issues:
