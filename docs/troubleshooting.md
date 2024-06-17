@@ -267,13 +267,12 @@ your logs for any sensitive information you would not like to share online!**
   "powershell.developer.editorServicesLogLevel": "Normal"
   ```
 
-* Logs are located at
-  `~/.vscode[-insiders]/extensions/ms-vscode.powershell[-preview]-<version>/logs`.
-  For example: `~/.vscode/extensions/ms-vscode.powershell-2019.5.1/logs`.
+* Logs are located at:
+  * Unix: `~/.config/Code/User/globalStorage/ms-vscode.powershell/logs`.
+  * Windows: `%APPDATA%\Code\User\globalStorage\ms-vscode.powershell\logs`
 
 * In VS Code you can open and read the logs directly from the [Command Palette][]
-  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) with `PowerShell: Open PowerShell
-  Extension Logs Folder`.
+  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) with `PowerShell: Open PowerShell Extension Logs Folder`.
 
   > NOTE: Don't forget to also attach the [Language Server Protocol payload
   > logs](#provide-language-server-protocol-payload-logs)!
