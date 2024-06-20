@@ -10,6 +10,14 @@
 
 trigger: none
 
+schedules:
+- cron: '25 9 * * 3'
+  displayName: Weekly CodeQL
+  branches:
+    include:
+    - main
+  always: true
+
 parameters:
 - name: debug
   displayName: Enable debug output
@@ -144,6 +152,7 @@ extends:
             displayName: Run tests
     - stage: release
       dependsOn: build
+      condition: ne(variables['Build.Reason'], 'Schedule')
       variables:
         version: $[ stageDependencies.build.main.outputs['package.version'] ]
         vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
