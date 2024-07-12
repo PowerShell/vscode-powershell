@@ -5,7 +5,7 @@
 // https://github.com/microsoft/vscode-extension-samples/tree/main/helloworld-test-sample/src/test
 
 import * as path from "path";
-import { ConsoleReporter, downloadAndUnzipVSCode, resolveCliArgsFromVSCodeExecutablePath, runTests } from "@vscode/test-electron";
+import { makeConsoleReporter, downloadAndUnzipVSCode, resolveCliArgsFromVSCodeExecutablePath, runTests } from "@vscode/test-electron";
 import { existsSync } from "fs";
 import { spawnSync } from "child_process";
 
@@ -38,7 +38,7 @@ async function main(): Promise<void> {
         const vsCodeVersion = process.env.__TEST_VSCODE_VERSION ?? "insiders";
 
         /** Install a temporary vscode. This must be done ahead of RunTests in order to install extensions ahead of time. @see https://github.com/microsoft/vscode-test/blob/addc23e100b744de598220adbbf0761da870eda9/README.md?plain=1#L71-L89 **/
-        const testVSCodePath = await downloadAndUnzipVSCode(vsCodeVersion, undefined, new ConsoleReporter(true));
+        const testVSCodePath = await downloadAndUnzipVSCode(vsCodeVersion, undefined, await makeConsoleReporter());
         InstallExtension(testVSCodePath, "ms-dotnettools.csharp");
 
         const launchArgs = [
@@ -108,7 +108,7 @@ function InstallExtension(vscodeExePath: string, extensionIdOrVSIXPath: string):
         console.error(`Failed to install extension: ${installResult.stderr}`);
         console.log("Binary Module Tests will fail if not skipped!");
     }
-    
+
     return installResult.stdout;
 }
 
