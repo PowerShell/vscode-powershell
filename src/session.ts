@@ -350,7 +350,7 @@ export class SessionManager implements Middleware {
             new PowerShellProcess(
                 this.PowerShellExeDetails.exePath,
                 bundledModulesPath,
-                "[TEMP] PowerShell Extension",
+                true,
                 this.logger,
                 this.getEditorServicesArgs(bundledModulesPath, this.PowerShellExeDetails) + "-DebugServiceOnly ",
                 this.getNewSessionFilePath(),
@@ -528,11 +528,14 @@ export class SessionManager implements Middleware {
         cancellationToken: vscode.CancellationToken): Promise<PowerShellProcess> {
 
         const bundledModulesPath = await this.getBundledModulesPath();
+
+        // Dispose any stale terminals from previous killed sessions.
+        PowerShellProcess.cleanUpTerminals();
         const languageServerProcess =
             new PowerShellProcess(
                 powerShellExeDetails.exePath,
                 bundledModulesPath,
-                "PowerShell Extension",
+                false,
                 this.logger,
                 this.getEditorServicesArgs(bundledModulesPath, powerShellExeDetails),
                 this.getNewSessionFilePath(),
