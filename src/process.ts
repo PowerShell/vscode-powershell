@@ -14,6 +14,8 @@ export class PowerShellProcess {
     // This is used to warn the user that the extension is taking longer than expected to startup.
     private static warnUserThreshold = 30;
 
+    private static title = "PowerShell Extension";
+
     public onExited: vscode.Event<void>;
     private onExitedEmitter?: vscode.EventEmitter<void>;
 
@@ -25,7 +27,7 @@ export class PowerShellProcess {
     constructor(
         public exePath: string,
         private bundledModulesPath: string,
-        private title: string,
+        private isTemp: boolean,
         private logger: ILogger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
@@ -99,7 +101,7 @@ export class PowerShellProcess {
 
         // Launch PowerShell in the integrated terminal
         const terminalOptions: vscode.TerminalOptions = {
-            name: this.title,
+            name: this.isTemp ? `${PowerShellProcess.title} (TEMP)` : PowerShellProcess.title,
             shellPath: this.exePath,
             shellArgs: powerShellArgs,
             cwd: await validateCwdSetting(this.logger),
@@ -125,6 +127,17 @@ export class PowerShellProcess {
         }
 
         return await this.waitForSessionFile(cancellationToken);
+    }
+
+    // This function is used to clean-up stale PowerShell Extension terminals,
+    // which can happen with `restartExtensionHost` is called because we are
+    // unable to finish diposing before we're gone.
+    public static cleanUpTerminals(): void {
+        for (const terminal of vscode.window.terminals) {
+            if (terminal.name.startsWith(PowerShellProcess.title)) {
+                terminal.dispose();
+            }
+        }
     }
 
     // This function should only be used after a failure has occurred because it is slow!
