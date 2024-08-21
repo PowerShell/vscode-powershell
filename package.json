@@ -82,6 +82,10 @@
     "vscode-languageserver-protocol": "^3.17.5"
   },
   "devDependencies": {
+    "@vscode/vsce": "^2.30.0",
+    "esbuild": "^0.21.5"
+  },
+  "optionalDependencies": {
     "@types/mocha": "^10.0.7",
     "@types/mock-fs": "^4.13.4",
     "@types/node": "~18.15.0",
@@ -97,8 +101,6 @@
     "@ungap/structured-clone": "^1.2.0",
     "@vscode/debugprotocol": "^1.66.0",
     "@vscode/test-electron": "^2.4.1",
-    "@vscode/vsce": "^2.30.0",
-    "esbuild": "^0.21.5",
     "eslint": "^8.57.0",
     "eslint-plugin-header": "^3.1.1",
     "glob": "^10.4.5",

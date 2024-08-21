@@ -1,11 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-Set-PSRepository -Name PSGallery -InstallationPolicy Trusted | Out-Null
-if ($PSVersionTable.PSVersion.Major -lt 6) {
-    throw "The build script requires PowerShell 7!"
+if ($PSVersionTable.PSVersion -lt [Version]"7.4") {
+    throw "The build script requires PowerShell 7.4 or higher!"
 }
 
-# TODO: Switch to Install-PSResource when CI uses PowerShell 7.4
-Install-Module -Name InvokeBuild -Scope CurrentUser
-Install-Module -Name platyPS -Scope CurrentUser
+Register-PSResourceRepository -PSGallery -Trusted -Force
+
+Install-PSResource -Name InvokeBuild -Scope CurrentUser
+Install-PSResource -Name platyPS -Scope CurrentUser
