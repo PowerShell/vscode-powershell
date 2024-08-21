@@ -27,7 +27,7 @@ parameters:
 variables:
   system.debug: ${{ parameters.debug }}
   BuildConfiguration: Release
-  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2019/vse2022:latest
+  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2022/vse2022:latest
 
 resources:
   repositories:
@@ -41,6 +41,8 @@ resources:
     trigger:
       branches:
       - main
+      stages:
+      - release
 
 extends:
   # https://aka.ms/obpipelines/templates
@@ -50,6 +52,10 @@ extends:
       asyncSdl:
         enabled: true
         forStages: [build]
+    featureFlags:
+      WindowsHostVersion:
+        Version: 2022
+        Network: Netlock
     stages:
     - stage: build
       jobs:
@@ -75,15 +81,6 @@ extends:
             inputs:
               system: Custom
               customVersion: $(package.version)
-          - task: UseNode@1
-            displayName: Use Node 18.x
-            inputs:
-              version: 18.x
-          - task: PowerShell@2
-            displayName: Install PSResources
-            inputs:
-              pwsh: true
-              filePath: tools/installPSResources.ps1
           - task: DownloadPipelineArtifact@2
             displayName: Download PowerShellEditorServices
             inputs:
@@ -91,14 +88,14 @@ extends:
               project: PowerShellCore
               definition: 2905
               specificBuildWithTriggering: true
-              artifact: drop_release_github
-              itemPattern: PowerShellEditorServices.zip
-          - task: ExtractFiles@1
-            displayName: Extract PowerShellEditorServices module
-            inputs:
-              archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
-              destinationFolder: $(Build.SourcesDirectory)/modules
-          - pwsh: Invoke-Build Build -Configuration $(BuildConfiguration)
+              branchName: refs/heads/main
+              artifact: drop_build_main
+              targetPath: $(Build.SourcesDirectory)/modules
+          - pwsh: |
+              Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
+              Install-Module -Name InvokeBuild -Repository CFS -RequiredVersion 5.11.3 -Verbose
+              Invoke-Build Build -Configuration $(BuildConfiguration)
+            # TODO: When the OneBuild container updates to 7.4, update to PSResourceGet
             displayName: Build
           - task: onebranch.pipeline.signing@1
             displayName: Sign 1st-party example PowerShell files
@@ -141,13 +138,9 @@ extends:
               project: PowerShellCore
               definition: 2905
               specificBuildWithTriggering: true
-              artifact: drop_release_github
-              itemPattern: PowerShellEditorServices.zip
-          - task: ExtractFiles@1
-            displayName: Extract PowerShellEditorServices module
-            inputs:
-              archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
-              destinationFolder: $(Build.SourcesDirectory)/modules
+              branchName: refs/heads/main
+              artifact: drop_build_main
+              targetPath: $(Build.SourcesDirectory)/modules
           - pwsh: Invoke-Build Test -Configuration $(BuildConfiguration)
             displayName: Run tests
     - stage: release
