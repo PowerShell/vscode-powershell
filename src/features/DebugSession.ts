@@ -290,6 +290,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
         const settings = getSettings();
         config.createTemporaryIntegratedConsole ??= settings.debugging.createTemporaryIntegratedConsole;
+        config.executeMode ??= settings.debugging.executeMode;
         if (config.request === "attach") {
             resolvedConfig = await this.resolveAttachDebugConfiguration(config);
         } else if (config.request === "launch") {

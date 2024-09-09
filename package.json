@@ -462,7 +462,7 @@
               "name": "PowerShell Launch Script",
               "type": "PowerShell",
               "request": "launch",
-              "script": "^\"enter path or command to execute e.g.: \\${workspaceFolder}/src/foo.ps1 or Invoke-Pester\"",
+              "script": "^\"Enter path or command to execute, for example, \\${workspaceFolder}/src/foo.ps1 or Invoke-Pester\"",
               "cwd": "^\"\\${cwd}\""
             }
           },
@@ -908,6 +908,20 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Creates a temporary PowerShell Extension Terminal for each debugging session. This is useful for debugging PowerShell classes and binary modules."
+        },
+        "powershell.debugging.executeMode": {
+          "type": "string",
+          "enum": [
+            "DotSource",
+            "Call"
+          ],
+          "default": "DotSource",
+          "markdownEnumDescriptions": [
+            "Use the Dot-Source operator `.` to launch the script, for example, `. 'C:\\Data\\MyScript.ps1'`",
+            "Use the Call operator `&` to launch the script, for example, `& 'C:\\Data\\MyScript.ps1'`"
+          ],
+          "markdownDescription": "Sets the operator used to launch scripts."
+
         },
         "powershell.developer.bundledModulesPath": {
           "type": "string",
