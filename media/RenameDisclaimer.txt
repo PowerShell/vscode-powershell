@@ -7,6 +7,7 @@ There are several edge case scenarios which may exist where rename is difficult 
 🤚🤚 Unsupported Scenarios
 
 ❌ Renaming can only be done within a single file. Renaming symbols across multiple files is not supported.
+❌ Unsaved/Virtual files are currently not supported, you must save a file to disk before you can rename values.
 
 👍👍 Implemented and Tested Rename Scenaiors
 
