@@ -7,7 +7,7 @@ param(
     [string]$EditorServicesRepoPath = $null
 )
 
-#Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "3.0.0" }
+#Requires -Modules @{ ModuleName = "InvokeBuild"; ModuleVersion = "5.0.0" }
 
 function Get-EditorServicesPath {
     $psesRepoPath = if ($EditorServicesRepoPath) {
@@ -77,7 +77,7 @@ task Clean {
 }
 
 task CleanEditorServices -If (Get-EditorServicesPath) {
-    Write-Build DarkMagenta "Cleaning PowerShellEditorServices"
+    Write-Build DarkMagenta "Cleaning PSES"
     Invoke-Build Clean (Get-EditorServicesPath)
 }
 
@@ -115,7 +115,7 @@ task Test Lint, Build, {
 }
 
 task TestEditorServices -If (Get-EditorServicesPath) {
-    Write-Build DarkMagenta "Testing PowerShellEditorServices"
+    Write-Build DarkMagenta "Testing PSES"
     Invoke-Build Test (Get-EditorServicesPath)
 }
 

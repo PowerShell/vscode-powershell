@@ -54,6 +54,7 @@ extends:
         enabled: true
         forStages: [build]
     featureFlags:
+      EnableCDPxPAT: false
       WindowsHostVersion:
         Version: 2022
         Network: Netlock
@@ -94,9 +95,10 @@ extends:
               targetPath: $(Build.SourcesDirectory)/modules
           - pwsh: |
               Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
-              Install-Module -Name InvokeBuild -Repository CFS -RequiredVersion 5.11.3 -Verbose
-              Invoke-Build Build -Configuration $(BuildConfiguration)
-            # TODO: When the OneBuild container updates to 7.4, update to PSResourceGet
+              Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
+              ./tools/installPSResources.ps1 -PSRepository CFS
+            displayName: Install PSResources
+          - pwsh: Invoke-Build Build -Configuration $(BuildConfiguration)
             displayName: Build
           - task: onebranch.pipeline.signing@1
             displayName: Sign 1st-party example PowerShell files
@@ -127,11 +129,6 @@ extends:
             inputs:
               packageType: sdk
               version: 8.x
-          - task: PowerShell@2
-            displayName: Install PSResources
-            inputs:
-              pwsh: true
-              filePath: tools/installPSResources.ps1
           - task: DownloadPipelineArtifact@2
             displayName: Download PowerShellEditorServices
             inputs:
@@ -142,6 +139,11 @@ extends:
               branchName: refs/heads/main
               artifact: drop_build_main
               targetPath: $(Build.SourcesDirectory)/modules
+          - pwsh: |
+              Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
+              Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
+              ./tools/installPSResources.ps1 -PSRepository CFS
+            displayName: Install PSResources
           - pwsh: Invoke-Build Test -Configuration $(BuildConfiguration)
             displayName: Run tests
     - stage: release
