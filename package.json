@@ -1016,7 +1016,12 @@
         "powershell.renameSymbol.createAlias": {
           "type": "boolean",
           "default": true,
-          "description": "Should an Alias be created when renaming a function parameter"
+          "description": "If set, an [Alias] attribute will be added when renaming a function parameter so that the previous parameter name still works. This helps avoid breaking changes."
+        },
+        "powershell.renameSymbol.acceptRenameDisclaimer": {
+          "type": "boolean",
+          "default": false,
+          "description": "Accepts the disclaimer about risks and limitations to the PowerShell rename functionality"
         }
       }
     },

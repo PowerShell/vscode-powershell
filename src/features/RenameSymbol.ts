@@ -53,15 +53,22 @@ const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolReque
 
 export class RenameSymbolFeature extends LanguageClientConsumer implements RenameProvider {
     private languageRenameProvider:vscode.Disposable;
+    // Used to singleton the disclaimer prompt in case multiple renames are triggered
+    private disclaimerPromise?: Promise<boolean>;
 
     constructor(documentSelector:DocumentSelector,private logger: ILogger){
         super();
 
         this.languageRenameProvider = vscode.languages.registerRenameProvider(documentSelector,this);
     }
+
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     public override onLanguageClientSet(_languageClient: LanguageClient): void {}
-    public async provideRenameEdits(document: TextDocument, position: Position, newName: string, _token: CancellationToken): Promise<WorkspaceEdit | undefined> {
+
+    public async provideRenameEdits(document: TextDocument, position: Position, newName: string, _token: CancellationToken): Promise<WorkspaceEdit | undefined | null> {
+
+        const disclaimerAccepted = await this.acknowledgeDisclaimer();
+        if (!disclaimerAccepted) {return undefined;}
 
         const req:IRenameSymbolRequestArguments = {
             FileName : document.fileName,
@@ -84,22 +91,29 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
 
             const edit = new WorkspaceEdit();
             for (const file of response.changes) {
-
                 const uri = Uri.file(file.fileName);
-
                 for (const change of file.changes) {
-                    edit.replace(uri,
+                    edit.replace(
+                        uri,
                         new Range(change.startLine, change.startColumn, change.endLine, change.endColumn),
-                        change.newText);
+                        change.newText
+                    );
                 }
             }
             return edit;
-        }catch (error) {
+        } catch (error) {
             return undefined;
         }
     }
-    public async prepareRename(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.Range | {
-        range: vscode.Range; placeholder: string;} | null> {
+
+    public async prepareRename(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        _token: vscode.CancellationToken
+    ): Promise<vscode.Range | {range: vscode.Range; placeholder: string;} | undefined | null> {
+
+        const disclaimerAccepted = await this.acknowledgeDisclaimer();
+        if (!disclaimerAccepted) {return undefined;}
 
         const req:IRenameSymbolRequestArguments = {
             FileName : document.fileName,
@@ -134,7 +148,49 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
             throw new Error(msg);
         }
     }
+
+
+    /** Prompts the user to acknowledge the risks inherent with the rename provider and does not proceed until it is accepted */
+    async acknowledgeDisclaimer(): Promise<boolean> {
+        if (!this.disclaimerPromise) {
+            this.disclaimerPromise = this.acknowledgeDisclaimerImpl();
+        }
+        return this.disclaimerPromise;
+    }
+
+    /** This is a separate function so that it only runs once as a singleton and the promise only resolves once */
+    async acknowledgeDisclaimerImpl(): Promise<boolean>
+    {
+        const config = vscode.workspace.getConfiguration();
+        const acceptRenameDisclaimer = config.get<boolean>("powershell.renameSymbol.acceptRenameDisclaimer", false);
+
+        if (!acceptRenameDisclaimer) {
+            const result = await vscode.window.showWarningMessage(
+                //TODO: Provide a link to a markdown document that appears in the editor window, preferably one hosted with the extension itself.
+                "The PowerShell Rename functionality has limitations. Do you accept the limitations and risks?",
+                "Yes",
+                "Workspace Only",
+                "No"
+            );
+
+            switch (result) {
+            case "Yes":
+                await config.update("powershell.renameSymbol.acceptRenameDisclaimer", true, vscode.ConfigurationTarget.Global);
+                break;
+            case "Workspace Only":
+                await config.update("powershell.renameSymbol.acceptRenameDisclaimer", true, vscode.ConfigurationTarget.Workspace);
+                break;
+            default:
+                void vscode.window.showInformationMessage("Rename operation cancelled and rename has been disabled until the extension is restarted.");
+                break;
+            }
+        }
+
+        return config.get<boolean>("powershell.renameSymbol.acceptRenameDisclaimer", false);
+    }
+
     public dispose(): void {
         this.languageRenameProvider.dispose();
     }
+
 }
