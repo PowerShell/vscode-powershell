@@ -7,7 +7,6 @@ import { LanguageClientConsumer } from "../languageClientConsumer";
 import { RenameProvider, WorkspaceEdit, TextDocument, CancellationToken, Position,Uri,Range, DocumentSelector } from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
 import { ILogger } from "../logging";
-import { PartialSettings } from "../settings";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface RenameSymbolOptions {
     CreateAlias?:boolean
@@ -48,10 +47,6 @@ interface IPrepareRenameSymbolRequestResponse {
     message : string
 }
 
-export class RenameSymbolSettings extends PartialSettings {
-    createAlias = true;
-    acceptRenameDisclaimer = false;
-}
 
 const RenameSymbolRequestType = new RequestType<IRenameSymbolRequestArguments, IRenameSymbolRequestResponse, void>("powerShell/renameSymbol");
 const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolRequestArguments, IPrepareRenameSymbolRequestResponse, void>("powerShell/PrepareRenameSymbol");

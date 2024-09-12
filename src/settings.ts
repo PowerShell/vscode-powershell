@@ -7,7 +7,6 @@ import os = require("os");
 import { ILogger } from "./logging";
 import untildify from "untildify";
 import path = require("path");
-import { RenameSymbolSettings } from "./features/RenameSymbol";
 
 // TODO: Quite a few of these settings are unused in the client and instead
 // exist just for the server. Those settings do not need to be represented in
@@ -157,6 +156,10 @@ class ButtonSettings extends PartialSettings {
     showPanelMovementButtons = false;
 }
 
+class RenameSymbolSettings extends PartialSettings {
+    createAlias = true;
+    acceptRenameDisclaimer = false;
+}
 
 
 // This is a recursive function which unpacks a WorkspaceConfiguration into our settings.
