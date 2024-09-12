@@ -165,19 +165,22 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
         const acceptRenameDisclaimer = config.get<boolean>("powershell.renameSymbol.acceptRenameDisclaimer", false);
 
         if (!acceptRenameDisclaimer) {
+            const extensionPath = vscode.extensions.getExtension("ms-vscode.PowerShell")?.extensionPath;
+            const disclaimerPath = vscode.Uri.file(`${extensionPath}/media/RenameDisclaimer.txt`);
+
             const result = await vscode.window.showWarningMessage(
                 //TODO: Provide a link to a markdown document that appears in the editor window, preferably one hosted with the extension itself.
-                "The PowerShell Rename functionality has limitations. Do you accept the limitations and risks?",
-                "Yes",
-                "Workspace Only",
+                `The PowerShell Rename functionality has limitations and risks, please [review the disclaimer](${disclaimerPath}).`,
+                "I Accept",
+                "I Accept [Workspace]",
                 "No"
             );
 
             switch (result) {
-            case "Yes":
+            case "I Accept":
                 await config.update("powershell.renameSymbol.acceptRenameDisclaimer", true, vscode.ConfigurationTarget.Global);
                 break;
-            case "Workspace Only":
+            case "I Accept [Workspace]":
                 await config.update("powershell.renameSymbol.acceptRenameDisclaimer", true, vscode.ConfigurationTarget.Workspace);
                 break;
             default:
