@@ -7,6 +7,7 @@ import os = require("os");
 import { ILogger } from "./logging";
 import untildify from "untildify";
 import path = require("path");
+import { RenameSymbolSettings } from "./features/RenameSymbol";
 
 // TODO: Quite a few of these settings are unused in the client and instead
 // exist just for the server. Those settings do not need to be represented in
@@ -17,7 +18,7 @@ import path = require("path");
 // Perhaps we just get rid of this entirely?
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-class PartialSettings { }
+export class PartialSettings { }
 
 export class Settings extends PartialSettings {
     powerShellAdditionalExePaths: PowerShellAdditionalExePathSettings = {};
@@ -156,9 +157,7 @@ class ButtonSettings extends PartialSettings {
     showPanelMovementButtons = false;
 }
 
-class RenameSymbolSettings extends PartialSettings {
-    createAlias = true;
-}
+
 
 // This is a recursive function which unpacks a WorkspaceConfiguration into our settings.
 function getSetting<TSetting>(key: string | undefined, value: TSetting, configuration: vscode.WorkspaceConfiguration): TSetting {
