@@ -113,6 +113,18 @@ extends:
               files_to_sign: '**/*.ps1;**/*.psd1;**/*.psm1'
           - pwsh: Invoke-Build Package
             displayName: Create package
+          - pwsh: |
+              npx vsce generate-manifest --packagePath out/powershell-$(package.vsixVersion).vsix
+              cp out/powershell-$(package.vsixVersion).manifest out/powershell-$(package.vsixVersion).signature.p7s
+            displayName: Generate VSIX manifest
+          - task: onebranch.pipeline.signing@1
+            displayName: Sign VSIX manifest
+            inputs:
+              command: sign
+              cp_code: 'CP-401405-VSCodePublisherSign'
+              search_root: $(Build.SourcesDirectory)/out
+              files_to_sign: |
+                *.signature.p7s;
       - job: test
         displayName: Build and run tests
         pool:
@@ -220,6 +232,10 @@ extends:
                 '--azure-credential'
                 '--packagePath'
                 '$(drop)/powershell-$(vsixVersion).vsix'
+                '--manifestPath'
+                '$(drop)/powershell-$(vsixVersion).manifest'
+                '--signaturePath'
+                '$(drop)/powershell-$(vsixVersion).signature.p7s'
                 if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
               )
               npm run publish -- @publishArgs
