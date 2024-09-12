@@ -189,7 +189,8 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
             }
         }
 
-        return config.get<boolean>("powershell.renameSymbol.acceptRenameDisclaimer", false);
+        // Refresh the config to ensure it was set
+        return vscode.workspace.getConfiguration().get<boolean>("powershell.renameSymbol.acceptRenameDisclaimer", false);
     }
 
     public dispose(): void {
