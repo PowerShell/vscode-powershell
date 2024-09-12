@@ -1,9 +1,18 @@
-### PowerShell Extension Rename Disclaimer ###
+⚠️⚠️⚠️ PowerShell Extension Rename Disclaimer ⚠️⚠️⚠️
 
 PowerShell is not a statically typed language. As such, the renaming of functions, parameters, and other symbols can only be done on a best effort basis. While this is sufficient for the majority of use cases, it cannot be relied upon to find all instances of a symbol and rename them across an entire code base such as in C# or TypeScript.
 
 There are several edge case scenarios which may exist where rename is difficult or impossible, or unable to be determined due to the dynamic scoping nature of PowerShell.
 
-# Known Rename Limitations
+🤚🤚 Unsupported Scenarios
 
-- Renaming can only be done within a single file. Renaming symbols across multiple files is not supported.
+❌ Renaming can only be done within a single file. Renaming symbols across multiple files is not supported.
+
+👍👍 Implemented and Tested Rename Scenaiors
+
+See the supported rename scenarios we are currently testing at:
+https://github.com/PowerShell/PowerShellEditorServices/blob/main/test/PowerShellEditorServices.Test.Shared/Refactoring
+
+📄📄 Filing a Rename Issue
+
+If there is a rename scenario you feel can be reasonably supported in PowerShell, please file a bug report in the PowerShellEditorServices repository with the "Expected" and "Actual" being the before and after rename. We will evaluate it and accept or reject it and give reasons why. Items that fall under the Unsupported Scenarios above will be summarily rejected, however that does not mean that they may not be supported in the future if we come up with a reasonably safe way to implement a scenario.
