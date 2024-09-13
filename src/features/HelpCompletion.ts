@@ -175,7 +175,7 @@ class HelpCompletionProvider extends LanguageClientConsumer {
         // Trim the last empty line and join the strings.
         const lines: string[] = result.content;
         const text = lines
-            .map((x) => x.trimLeft())
+            .map((x) => x.trimStart())
             .join(this.getEOL(doc.eol));
 
         const snippetString = new SnippetString(text);
