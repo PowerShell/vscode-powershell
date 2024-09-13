@@ -57,7 +57,7 @@ extends:
       EnableCDPxPAT: false
       WindowsHostVersion:
         Version: 2022
-        Network: Netlock
+        Network: KS3
     stages:
     - stage: build
       jobs:
@@ -83,6 +83,10 @@ extends:
             inputs:
               system: Custom
               customVersion: $(package.version)
+          - task: UseNode@1
+            displayName: Use Node 20.x
+            inputs:
+              version: 20.x
           - task: DownloadPipelineArtifact@2
             displayName: Download PowerShellEditorServices
             inputs:
@@ -121,9 +125,9 @@ extends:
           skipComponentGovernanceDetection: true
         steps:
           - task: UseNode@1
-            displayName: Use Node 18.x
+            displayName: Use Node 20.x
             inputs:
-              version: 18.x
+              version: 20.x
           - task: UseDotNet@2
             displayName: Use .NET 8.x SDK
             inputs:
@@ -199,6 +203,10 @@ extends:
         steps:
         - download: current
           displayName: Download artifacts
+        - task: UseNode@1
+          displayName: Use Node 20.x
+          inputs:
+            version: 20.x
         - pwsh: npm ci
           displayName: Install NPM packages (for vsce)
         - task: AzureCLI@2
