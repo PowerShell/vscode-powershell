@@ -8,7 +8,8 @@
 # Support:        https://aka.ms/onebranchsup                                   #
 #################################################################################
 
-trigger: none
+trigger:
+- main
 
 schedules:
 - cron: '25 9 * * 3'
@@ -145,7 +146,7 @@ extends:
             displayName: Run tests
     - stage: release
       dependsOn: build
-      condition: ne(variables['Build.Reason'], 'Schedule')
+      condition: eq(variables['Build.Reason'], 'Manual')
       variables:
         version: $[ stageDependencies.build.main.outputs['package.version'] ]
         vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
