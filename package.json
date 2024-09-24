@@ -1012,6 +1012,23 @@
           ],
           "default": "off",
           "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services language server. **This setting is only meant for extension developers!**"
+        },
+        "powershell.rename.acceptDisclaimer": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Auto-accepts the disclaimer for the PowerShell Rename Symbol feature which has support limitations and risks."
+        },
+        "powershell.rename.createFunctionAlias": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Defines an alias above the function definition for the previous function.",
+          "deprecationMessage": "This has not been implemented yet."
+        },
+        "powershell.rename.createParameterAlias": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Creates an alias attribute for a parameter when renaming a parameter definition.",
+          "deprecationMessage": "This has not been implemented yet."
         }
       }
     },
