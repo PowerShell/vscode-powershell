@@ -2,27 +2,22 @@
 // Licensed under the MIT License.
 
 import vscode = require("vscode");
-import { RequestType } from "vscode-languageclient";
+import { RequestType, TextDocumentIdentifier } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import { RenameProvider, WorkspaceEdit, TextDocument, CancellationToken, Position,Uri,Range, DocumentSelector } from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
 import { ILogger } from "../logging";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface RenameSymbolOptions {
-    CreateAlias?:boolean
-}
+
 interface IRenameSymbolRequestArguments {
-    FileName?:string
-    Line?:number
-    Column?:number
-    RenameTo?:string
-    Options?:RenameSymbolOptions
+    TextDocument:TextDocumentIdentifier
+    Position:Position
+    NewName:string
 }
 interface IPrepareRenameSymbolRequestArguments {
-    FileName?:string
-    Line?:number
-    Column?:number
-    RenameTo?:string
+    TextDocument:TextDocumentIdentifier
+    Position:Position
+    NewName:string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -48,8 +43,8 @@ interface IPrepareRenameSymbolRequestResponse {
 }
 
 
-const RenameSymbolRequestType = new RequestType<IRenameSymbolRequestArguments, IRenameSymbolRequestResponse, void>("powerShell/renameSymbol");
-const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolRequestArguments, IPrepareRenameSymbolRequestResponse, void>("powerShell/PrepareRenameSymbol");
+const RenameSymbolRequestType = new RequestType<IRenameSymbolRequestArguments, IRenameSymbolRequestResponse, void>("textDocument/rename");
+const PrepareRenameSymbolRequestType = new RequestType<IPrepareRenameSymbolRequestArguments, IPrepareRenameSymbolRequestResponse, void>("textDocument/prepareRename");
 
 export class RenameSymbolFeature extends LanguageClientConsumer implements RenameProvider {
     private languageRenameProvider:vscode.Disposable;
@@ -71,14 +66,9 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
         if (!disclaimerAccepted) {return undefined;}
 
         const req:IRenameSymbolRequestArguments = {
-            FileName : document.fileName,
-            Line: position.line,
-            Column : position.character,
-            RenameTo : newName,
-        };
-        const config = vscode.workspace.getConfiguration();
-        req.Options =  {
-            CreateAlias: config.get("powershell.renameSymbol.createAlias")
+            TextDocument : {uri:document.uri.toString()},
+            Position : position,
+            NewName : newName
         };
 
         try {
@@ -116,9 +106,9 @@ export class RenameSymbolFeature extends LanguageClientConsumer implements Renam
         if (!disclaimerAccepted) {return undefined;}
 
         const req:IRenameSymbolRequestArguments = {
-            FileName : document.fileName,
-            Line: position.line,
-            Column : position.character,
+            TextDocument : {uri:document.uri.toString()},
+            Position : position,
+            NewName : ""
         };
 
         try {
