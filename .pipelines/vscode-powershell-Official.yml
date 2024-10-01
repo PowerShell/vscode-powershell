@@ -8,7 +8,8 @@
 # Support:        https://aka.ms/onebranchsup                                   #
 #################################################################################
 
-trigger: none
+trigger:
+- main
 
 schedules:
 - cron: '25 9 * * 3'
@@ -53,9 +54,10 @@ extends:
         enabled: true
         forStages: [build]
     featureFlags:
+      EnableCDPxPAT: false
       WindowsHostVersion:
         Version: 2022
-        Network: Netlock
+        Network: KS3
     stages:
     - stage: build
       jobs:
@@ -81,6 +83,10 @@ extends:
             inputs:
               system: Custom
               customVersion: $(package.version)
+          - task: UseNode@1
+            displayName: Use Node 20.x
+            inputs:
+              version: 20.x
           - task: DownloadPipelineArtifact@2
             displayName: Download PowerShellEditorServices
             inputs:
@@ -93,9 +99,10 @@ extends:
               targetPath: $(Build.SourcesDirectory)/modules
           - pwsh: |
               Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
-              Install-Module -Name InvokeBuild -Repository CFS -RequiredVersion 5.11.3 -Verbose
-              Invoke-Build Build -Configuration $(BuildConfiguration)
-            # TODO: When the OneBuild container updates to 7.4, update to PSResourceGet
+              Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
+              ./tools/installPSResources.ps1 -PSRepository CFS
+            displayName: Install PSResources
+          - pwsh: Invoke-Build Build -Configuration $(BuildConfiguration)
             displayName: Build
           - task: onebranch.pipeline.signing@1
             displayName: Sign 1st-party example PowerShell files
@@ -106,6 +113,18 @@ extends:
               files_to_sign: '**/*.ps1;**/*.psd1;**/*.psm1'
           - pwsh: Invoke-Build Package
             displayName: Create package
+          - pwsh: |
+              npx vsce generate-manifest --packagePath out/powershell-$(package.vsixVersion).vsix
+              cp out/powershell-$(package.vsixVersion).manifest out/powershell-$(package.vsixVersion).signature.p7s
+            displayName: Generate VSIX manifest
+          - task: onebranch.pipeline.signing@1
+            displayName: Sign VSIX manifest
+            inputs:
+              command: sign
+              cp_code: 'CP-401405-VSCodePublisherSign'
+              search_root: $(Build.SourcesDirectory)/out
+              files_to_sign: |
+                *.signature.p7s;
       - job: test
         displayName: Build and run tests
         pool:
@@ -118,19 +137,14 @@ extends:
           skipComponentGovernanceDetection: true
         steps:
           - task: UseNode@1
-            displayName: Use Node 18.x
+            displayName: Use Node 20.x
             inputs:
-              version: 18.x
+              version: 20.x
           - task: UseDotNet@2
             displayName: Use .NET 8.x SDK
             inputs:
               packageType: sdk
               version: 8.x
-          - task: PowerShell@2
-            displayName: Install PSResources
-            inputs:
-              pwsh: true
-              filePath: tools/installPSResources.ps1
           - task: DownloadPipelineArtifact@2
             displayName: Download PowerShellEditorServices
             inputs:
@@ -141,11 +155,16 @@ extends:
               branchName: refs/heads/main
               artifact: drop_build_main
               targetPath: $(Build.SourcesDirectory)/modules
+          - pwsh: |
+              Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
+              Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
+              ./tools/installPSResources.ps1 -PSRepository CFS
+            displayName: Install PSResources
           - pwsh: Invoke-Build Test -Configuration $(BuildConfiguration)
             displayName: Run tests
     - stage: release
       dependsOn: build
-      condition: ne(variables['Build.Reason'], 'Schedule')
+      condition: eq(variables['Build.Reason'], 'Manual')
       variables:
         version: $[ stageDependencies.build.main.outputs['package.version'] ]
         vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
@@ -196,6 +215,10 @@ extends:
         steps:
         - download: current
           displayName: Download artifacts
+        - task: UseNode@1
+          displayName: Use Node 20.x
+          inputs:
+            version: 20.x
         - pwsh: npm ci
           displayName: Install NPM packages (for vsce)
         - task: AzureCLI@2
@@ -209,6 +232,10 @@ extends:
                 '--azure-credential'
                 '--packagePath'
                 '$(drop)/powershell-$(vsixVersion).vsix'
+                '--manifestPath'
+                '$(drop)/powershell-$(vsixVersion).manifest'
+                '--signaturePath'
+                '$(drop)/powershell-$(vsixVersion).signature.p7s'
                 if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
               )
               npm run publish -- @publishArgs

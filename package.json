@@ -73,22 +73,22 @@
     "onWalkthrough:PowerShell"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "^0.9.6",
+    "@vscode/extension-telemetry": "^0.9.7",
     "node-fetch": "^2.7.0",
-    "semver": "^7.6.2",
+    "semver": "^7.6.3",
     "untildify": "^4.0.0",
     "uuid": "^9.0.1",
     "vscode-languageclient": "^9.0.1",
     "vscode-languageserver-protocol": "^3.17.5"
   },
   "devDependencies": {
-    "@vscode/vsce": "^2.30.0",
+    "@vscode/vsce": "^3.1.0",
     "esbuild": "^0.21.5"
   },
   "optionalDependencies": {
     "@types/mocha": "^10.0.7",
     "@types/mock-fs": "^4.13.4",
-    "@types/node": "~18.15.0",
+    "@types/node": "^18.19.50",
     "@types/node-fetch": "^2.6.11",
     "@types/rewire": "^2.5.30",
     "@types/semver": "^7.5.8",
@@ -96,22 +96,22 @@
     "@types/ungap__structured-clone": "^1.2.0",
     "@types/uuid": "^9.0.8",
     "@types/vscode": "~1.82.0",
-    "@typescript-eslint/eslint-plugin": "^7.16.0",
-    "@typescript-eslint/parser": "^7.16.0",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
+    "@typescript-eslint/parser": "^8.5.0",
     "@ungap/structured-clone": "^1.2.0",
-    "@vscode/debugprotocol": "^1.66.0",
+    "@vscode/debugprotocol": "^1.67.0",
     "@vscode/test-electron": "^2.4.1",
     "eslint": "^8.57.0",
     "eslint-plugin-header": "^3.1.1",
-    "glob": "^10.4.5",
-    "mocha": "^10.6.0",
+    "glob": "^11.0.0",
+    "mocha": "^10.7.3",
     "mocha-explorer-launcher-scripts": "^0.4.0",
     "mocha-multi-reporters": "^1.5.1",
     "mock-fs": "^5.2.0",
     "rewire": "^7.0.0",
-    "sinon": "^18.0.0",
+    "sinon": "^18.0.1",
     "source-map-support": "^0.5.21",
-    "typescript": "^5.5.3"
+    "typescript": "^5.6.2"
   },
   "extensionDependencies": [
     "vscode.powershell"

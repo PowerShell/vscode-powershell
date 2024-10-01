@@ -1,11 +1,13 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
+param(
+    [ValidateSet("PSGallery", "CFS")]
+    [string]$PSRepository = "PSGallery"
+)
 
-if ($PSVersionTable.PSVersion -lt [Version]"7.4") {
-    throw "The build script requires PowerShell 7.4 or higher!"
+if ($PSRepository -eq "CFS" -and -not (Get-PSResourceRepository -Name CFS -ErrorAction SilentlyContinue)) {
+    Register-PSResourceRepository -Name CFS -Uri "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v3/index.json"
 }
 
-Register-PSResourceRepository -PSGallery -Trusted -Force
-
-Install-PSResource -Name InvokeBuild -Scope CurrentUser
-Install-PSResource -Name platyPS -Scope CurrentUser
+Install-PSResource -Repository $PSRepository -TrustRepository -Name InvokeBuild
+Install-PSResource -Repository $PSRepository -TrustRepository -Name platyPS
