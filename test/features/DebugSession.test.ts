@@ -414,7 +414,13 @@ describe("DebugSessionFeature", () => {
 
             const config = await debugSessionFeature.resolveDebugConfigurationWithSubstitutedVariables(undefined, attachConfig);
 
-            assert.deepStrictEqual(config!.dotnetAttachConfig, foundDotnetConfig);
+            // This config will only be present if the C# extension is installed.
+            if (extensions.getExtension("ms-dotnettools.csharp")) {
+                assert.ok(config);
+                assert.deepStrictEqual(config.dotnetAttachConfig, foundDotnetConfig);
+            } else {
+                assert.ok(!config);
+            }
         });
     });
 
@@ -480,9 +486,8 @@ describe("DebugSessionFeature E2E", function() {
         let binaryModulePath: Uri;
 
         before(async function binarySetup() {
-            if (process.env.BUILD_SOURCEBRANCHNAME === "release") {
-                // The binary modules tests won't work in the release pipeline
-                // due to dependency requirements.
+            if (!extensions.getExtension("ms-dotnettools.csharp")) {
+                // These tests require that extension to be installed in the test environment.
                 this.skip();
             }
             binaryModulePath = Uri.joinPath(workspace.workspaceFolders![0].uri, "BinaryModule");

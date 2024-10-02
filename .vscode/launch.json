@@ -17,7 +17,7 @@
       "sourceMaps": true,
       // This speeds up source map detection and makes smartStep work correctly
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
+        "${workspaceFolder}/**/*.js",
         "!**/node_modules/**",
         "!**/.vscode-test/**"
       ],
@@ -47,7 +47,7 @@
       "sourceMaps": true,
       // This speeds up source map detection and makes smartStep work correctly
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
+        "${workspaceFolder}/**/*.js",
         "!**/node_modules/**",
         "!**/.vscode-test/**"
       ],
@@ -77,7 +77,7 @@
       "sourceMaps": true,
       // This speeds up source map detection and makes smartStep work correctly
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
+        "${workspaceFolder}/**/*.js",
         "!**/node_modules/**",
         "!**/.vscode-test/**"
       ],
@@ -96,13 +96,13 @@
       "name": "Test Extension",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/out/test/runTests.js",
+      "program": "${workspaceFolder}/test/runTests.js",
       "cascadeTerminateToConfigurations": [
         "ExtensionTests",
       ],
       // This speeds up source map detection and makes smartStep work correctly
       "outFiles": [
-        "${workspaceFolder}/out/**/*.js",
+        "${workspaceFolder}/**/*.js",
         "!**/node_modules/**",
         "!**/.vscode-test/**"
       ],
@@ -111,7 +111,7 @@
         "**/node_modules/**",
         "**/.vscode-test/**"
       ],
-      "attachSimplePort": 59229, // THe default is 9229 but we want to avoid conflicts because we will have two vscode instances running.
+      "attachSimplePort": 59229, // The default is 9229 but we want to avoid conflicts because we will have two Code instances running.
       "env": {
         "__TEST_DEBUG_INSPECT_PORT": "59229" // Needs to match attachSimplePort
       },
@@ -121,7 +121,7 @@
       "internalConsoleOptions": "neverOpen",
       "console": "integratedTerminal",
       "autoAttachChildProcesses": false,
-      "preLaunchTask": "test-watch"
+      "preLaunchTask": "watch-tests"
     }
   ]
 }

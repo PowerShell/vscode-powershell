@@ -1,5 +1,76 @@
 # PowerShell Extension Release History
 
+## v2024.2.2
+### Friday, May 03, 2024
+
+With PowerShell Editor Services [v3.20.1](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.20.1)!
+
+Update third-party notices.
+
+See more details at the GitHub Release for [v2024.2.2](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.2.2).
+
+## v2024.2.1
+### Tuesday, April 16, 2024
+
+With PowerShell Editor Services [v3.20.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.20.0)!
+
+Hotfix for incorrect signing certificate, sorry about that!
+
+Also removed Plaster integration as we were unable to correctly sign it since we no longer own it.
+
+See more details at the GitHub Release for [v2024.2.1](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.2.1).
+
+## v2024.2.0
+### Monday, April 08, 2024
+
+With PowerShell Editor Services [v3.19.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.19.0)!
+
+New stable release!
+
+This release comes with PSReadLine v2.4.0-beta0 and PSScriptAnalyzer v1.22.0.
+
+It includes an overhauled support for Terminal Shell Integration,
+so it always supports VS Code's latest features!
+
+The codebase was cleaned up by the removal of several deprecated features.
+Multiple bugs were fixed in the shutdown process,
+default debugger configurations and IntelliSense.
+A setting was added to allow the exclusion of the execution policy CLI argument at startup,
+so that users in restricted environments are better able to launch the extension.
+
+This release went through three pre-releases.
+Thank you so much to all our beta testers and users for your contributions.
+
+See more details at the GitHub Release for [v2024.2.0](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.2.0).
+
+## v2024.3.2-preview
+### Wednesday, April 03, 2024
+
+With PowerShell Editor Services [v3.19.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.19.0)!
+
+Overhauled Terminal Shell Integration!
+
+See more details at the GitHub Release for [v2024.3.2-preview](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.3.2-preview).
+
+## v2024.3.1-preview
+### Tuesday, March 5, 2024
+
+#### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
+
+- ✨ 🙏 [vscode-powershell #4932](https://github.com/PowerShell/vscode-powershell/pull/4934) - Don't make the Command Explorer visible by default.
+- ✨ 💭 [vscode-powershell #4933](https://github.com/PowerShell/vscode-powershell/pull/4933) - Fix how we pass the log directory to Editor Services.
+
+#### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.18.0
+
+- ✨ 📟 [PowerShellEditorServices #2148](https://github.com/PowerShell/PowerShellEditorServices/pull/2148) - Update to PSReadLine v2.4.0-beta0.
+- ✨ 📟 [PowerShellEditorServices #2141](https://github.com/PowerShell/PowerShellEditorServices/pull/2141) - Update to PSScriptAnalyzer v1.22.0.
+- ✨ 👷 [PowerShellEditorServices #2138](https://github.com/PowerShell/PowerShellEditorServices/pull/2138) - Fixed sln file. (Thanks @dkattan!)
+- #️⃣ 🙏 [PowerShellEditorServices #2137](https://github.com/PowerShell/PowerShellEditorServices/pull/2137) - Fixed TextReader disposal. (Thanks @dkattan!)
+- 🐛#️⃣ 🙏 [PowerShellEditorServices #2135](https://github.com/PowerShell/PowerShellEditorServices/pull/2135) - Fix PowerShell 7.2 E2E unit test for last change.
+- ✨ 🛫 [PowerShellEditorServices #1855](https://github.com/PowerShell/PowerShellEditorServices/pull/2129) - Add sane defaults to `Start-EditorServices`.
+- ✨#️⃣ 🙏 [PowerShellEditorServices #2122](https://github.com/PowerShell/PowerShellEditorServices/pull/2122) - Add `UseNullPSHostUI` config so apps hosting PSES can disable it. (Thanks @dkattan!)
+- 🐛 🧠 [PowerShellEditorServices #2115](https://github.com/PowerShell/PowerShellEditorServices/pull/2115) - Added null check to `GetCompletionsAsync`. (Thanks @dkattan!)
+
 ## v2024.3.0-preview
 ### Thursday, January 25, 2024
 
@@ -4622,7 +4693,7 @@ for more details on how it can be used and how you can create your own templates
 The PowerShell extension now uses any "suggested corrections" which are returned with
 a rule violation in your script file to provide a "quick fix" option for the affected
 section of code.  For example, when the `PSAvoidUsingCmdletAliases` rule finds the use
-of a non-whitelisted alias, you will see a light bulb icon that gives the option to
+of a non-allowlisted alias, you will see a light bulb icon that gives the option to
 change to the full name (right click or <kbd>Ctrl+.</kbd> on the marker):
 
 ![Screenshot of PSScriptAnalyzer quick fix](https://cloud.githubusercontent.com/assets/79405/21247558/05887e86-c2e5-11e6-9c67-e4558a7e2dba.png)

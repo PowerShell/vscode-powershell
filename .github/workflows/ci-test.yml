@@ -6,7 +6,6 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ main ]
-    paths-ignore: [ '**/*.md' ]
   merge_group:
     types: [ checks_requested ]
 
@@ -19,12 +18,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       DOTNET_NOLOGO: true
-      DOTNET_CLI_TELEMETRY_OPTOUT: true
       DOTNET_GENERATE_ASPNET_CERTIFICATE: false
       DISPLAY: ':99.0'
-    defaults:
-      run:
-        working-directory: vscode-powershell
     steps:
       - name: Checkout PowerShellEditorServices
         uses: actions/checkout@v4
@@ -41,16 +36,17 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           cache: true
-          cache-dependency-path: 'PowerShellEditorServices/**/packages.lock.json'
+          cache-dependency-path: PowerShellEditorServices/**/*.csproj
           global-json-file: PowerShellEditorServices/global.json
+          config-file: PowerShellEditorServices/nuget.config
 
       - name: Install PSResources
         shell: pwsh
-        run: ../PowerShellEditorServices/tools/installPSResources.ps1
+        run: ./vscode-powershell/tools/installPSResources.ps1
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
           cache-dependency-path: vscode-powershell/package-lock.json
 
@@ -60,14 +56,15 @@ jobs:
 
       - name: Build, test and package
         shell: pwsh
-        run: Invoke-Build
+        run: Invoke-Build -Configuration Release
+        working-directory: vscode-powershell
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: vscode-powershell-vsix-${{ matrix.os }}
-          path: vscode-powershell/powershell-*.vsix
+          path: '**/*.vsix'
 
       - name: Upload test results
         uses: actions/upload-artifact@v4

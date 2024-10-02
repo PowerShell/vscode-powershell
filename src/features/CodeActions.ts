@@ -32,7 +32,7 @@ export class CodeActionsFeature implements vscode.Disposable {
         }
 
         if (ruleId.startsWith("PS")) {
-            ruleId = ruleId.substr(2);
+            ruleId = ruleId.substring(2);
         }
 
         await vscode.commands.executeCommand("vscode.open", vscode.Uri.parse(pssaDocBaseURL + ruleId));

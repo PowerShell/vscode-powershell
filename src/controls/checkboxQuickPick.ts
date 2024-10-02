@@ -73,7 +73,7 @@ async function showInner(
 }
 
 function getItemIndex(items: ICheckboxQuickPickItem[], itemLabel: string): number {
-    const trimmedLabel = itemLabel.substr(itemLabel.indexOf("]") + 2);
+    const trimmedLabel = itemLabel.substring(itemLabel.indexOf("]") + 2);
     return items.findIndex((item) => item.label === trimmedLabel);
 }
 

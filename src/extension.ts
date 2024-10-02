@@ -15,7 +15,6 @@ import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { ISECompatibilityFeature } from "./features/ISECompatibility";
-import { NewFileOrProjectFeature } from "./features/NewFileOrProject";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
@@ -149,7 +148,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new GetCommandsFeature(),
         new ShowHelpFeature(),
         new ExtensionCommandsFeature(logger),
-        new NewFileOrProjectFeature(logger),
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new HelpCompletionFeature(),

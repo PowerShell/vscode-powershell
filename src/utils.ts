@@ -4,8 +4,17 @@
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
+import { satisfies } from "semver";
 
 export const PowerShellLanguageId = "powershell";
+
+// Path to the shell integration script in the VS Code installation
+// See https://github.com/microsoft/vscode/pull/227244
+const shellIntegrationMoved = satisfies(vscode.version, ">=1.94", { includePrerelease: true });
+export const ShellIntegrationScript = path.join(vscode.env.appRoot, "out", "vs", "workbench", "contrib", "terminal",
+    shellIntegrationMoved ? "common" : "browser",
+    shellIntegrationMoved ? "scripts" : "media",
+    "shellIntegration.ps1");
 
 export function escapeSingleQuotes(p: string): string {
     return p.replace(new RegExp("'", "g"), "''");
