@@ -1027,8 +1027,7 @@
         "powershell.rename.createParameterAlias": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Creates an alias attribute for a parameter when renaming a parameter definition.",
-          "deprecationMessage": "This has not been implemented yet."
+          "markdownDescription": "Creates an alias attribute for a parameter when renaming a parameter definition."
         }
       }
     },
