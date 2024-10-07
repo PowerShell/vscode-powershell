@@ -169,7 +169,7 @@
 
 Write-Progress -Activity \"${3:activityName}\" -Status \"\\$i of \\$array.count - \\$progPercent% Complete:\" -PercentComplete \\$progPercent",
 		  "\\$i = 1",
-		  "Foreach ($${2:item} in $${1:array}) {",
+		  "foreach ($${2:item} in $${1:array}) {",
 		  "    \\$progPercent = \"{0:n2}\" -f ([math]::round(\\$i/\\$total,4) * 100)",
 		  "    Write-Progress -Activity \"${3:activityName}\" -Status \"\\$i of \\$total - \\$progPercent% Complete:\" -PercentComplete \\$progPercent",
 		  "    # Insert Code Here",
