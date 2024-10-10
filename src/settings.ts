@@ -76,6 +76,11 @@ export enum StartLocation {
     Panel = "Panel"
 }
 
+export enum ExecuteMode{
+    Call = "Call",
+    DotSource = "DotSource"
+}
+
 export type PowerShellAdditionalExePathSettings = Record<string, string>;
 
 class CodeFormattingSettings extends PartialSettings {
@@ -107,6 +112,7 @@ class ScriptAnalysisSettings extends PartialSettings {
 
 class DebuggingSettings extends PartialSettings {
     createTemporaryIntegratedConsole = false;
+    executeMode = ExecuteMode.DotSource;
 }
 
 class DeveloperSettings extends PartialSettings {
