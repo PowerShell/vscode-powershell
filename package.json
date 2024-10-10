@@ -55,22 +55,9 @@
   "activationEvents": [
     "onDebugResolve:PowerShell",
     "onLanguage:powershell",
-    "onCommand:PowerShell.OpenExamplesFolder",
     "onCommand:PowerShell.PickPSHostProcess",
     "onCommand:PowerShell.PickRunspace",
-    "onCommand:PowerShell.SpecifyScriptArgs",
-    "onCommand:PowerShell.ShowSessionConsole",
-    "onCommand:PowerShell.ShowSessionMenu",
-    "onCommand:PowerShell.RestartSession",
-    "onCommand:PowerShell.ShowLogs",
-    "onCommand:PowerShell.OpenLogFolder",
-    "onCommand:PowerShell.GenerateBugReport",
-    "onCommand:PowerShell.OpenExamplesFolder",
-    "onCommand:PowerShell.EnableISEMode",
-    "onCommand:PowerShell.DisableISEMode",
-    "onCommand:PowerShell.ToggleISEMode",
-    "onView:PowerShellCommands",
-    "onWalkthrough:PowerShell"
+    "onCommand:PowerShell.SpecifyScriptArgs"
   ],
   "dependencies": {
     "@vscode/extension-telemetry": "^0.9.7",
