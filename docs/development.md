@@ -25,10 +25,7 @@
 ## Tracking Upstream Dependencies
 
 As a VS Code extension, we first rely on the `engine` field of `package.json` to
-state the lowest version of VS Code we support. This extension in particular
-must not update past what Azure Data Studio supports, which can be found in the
-[`vscodeVersion`][] field of their `product.json` file. We periodically check
-that for updates, and when available update our own.
+state the lowest version of VS Code we support.
 
 When our `engine` field is updated the development dependency `@types/vscode`
 must be updated to match. Note that it uses `~` (not `^`) so as to accept new
@@ -40,8 +37,8 @@ lets us finally update our `@types/node` development dependency to match, our
 developer machines if necessary, and the CI and OneBranch pipeline tasks.
 
 [`vscodeVersion`]: https://github.com/microsoft/azuredatastudio/blob/4970733324ef8254b7c22a5dc55af7f8a1dea93f/product.json#L50
-[`electron`]: https://github.com/microsoft/vscode/blob/8b617bd08fd9e3fc94d14adb8d358b56e3f72314/package.json#L153
-[Electron]: https://www.electronjs.org/blog/electron-25-0
+[`electron`]: https://github.com/microsoft/vscode/blob/384ff7382de624fb94dbaf6da11977bba1ecd427/package.json#L159
+[Electron]: https://www.electronjs.org/blog/electron-30-0
 [Node.js]: https://nodejs.org/en/download/package-manager
 
 ### Building the Code
