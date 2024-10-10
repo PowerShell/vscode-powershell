@@ -28,6 +28,7 @@ export class PowerShellProcess {
         public exePath: string,
         private bundledModulesPath: string,
         private isTemp: boolean,
+        private shellIntegrationEnabled: boolean,
         private logger: ILogger,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
@@ -99,12 +100,27 @@ export class PowerShellProcess {
         // Make sure no old session file exists
         await this.deleteSessionFile(this.sessionFilePath);
 
+        // When VS Code shell integration is enabled, the script expects certain
+        // variables to be added to the environment.
+        let envMixin = undefined;
+        if (this.shellIntegrationEnabled) {
+            envMixin = {
+                "VSCODE_INJECTION": "1",
+                // There is no great way to check if we are running stable VS
+                // Code. Since this is used to disable experimental features, we
+                // default to stable unless we're definitely running Insiders.
+                "VSCODE_STABLE": vscode.env.appName.includes("Insiders") ? "0" : "1",
+                // Maybe one day we can set VSCODE_NONCE...
+            };
+        }
+
         // Launch PowerShell in the integrated terminal
         const terminalOptions: vscode.TerminalOptions = {
             name: this.isTemp ? `${PowerShellProcess.title} (TEMP)` : PowerShellProcess.title,
             shellPath: this.exePath,
             shellArgs: powerShellArgs,
             cwd: await validateCwdSetting(this.logger),
+            env: envMixin,
             iconPath: new vscode.ThemeIcon("terminal-powershell"),
             isTransient: true,
             hideFromUser: this.sessionSettings.integratedConsole.startInBackground,
