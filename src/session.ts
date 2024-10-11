@@ -623,8 +623,6 @@ export class SessionManager implements Middleware {
                         });
                 });
         };
-
-
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
             synchronize: {
@@ -660,6 +658,7 @@ export class SessionManager implements Middleware {
             },
             revealOutputChannelOn: RevealOutputChannelOn.Never,
             middleware: this,
+            traceOutputChannel: vscode.window.createOutputChannel("PowerShell Trace - LSP", {log: true}),
         };
 
         const languageClient = new LanguageClient("powershell", "PowerShell Editor Services Client", connectFunc, clientOptions);
