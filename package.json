@@ -1016,7 +1016,7 @@
         "powershell.trace.dap": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). **only for extension developers and issue troubleshooting!**"
+          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). **This setting is only meant for extension developers and issue troubleshooting!**"
         }
       }
     },
