@@ -69,7 +69,7 @@ describe("DebugSessionFeature", () => {
             createDebugSessionFeatureStub({context: context});
             assert.ok(registerFactoryStub.calledOnce, "Debug adapter factory method called");
             assert.ok(registerProviderStub.calledTwice, "Debug config provider registered for both Initial and Dynamic");
-            assert.equal(context.subscriptions.length, 3, "DebugSessionFeature disposables populated");
+            assert.equal(context.subscriptions.length, 4, "DebugSessionFeature disposables populated");
             // TODO: Validate the registration content, such as the language name
         });
     });

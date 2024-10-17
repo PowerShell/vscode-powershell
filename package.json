@@ -1011,7 +1011,12 @@
             "verbose"
           ],
           "default": "off",
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services language server. **This setting is only meant for extension developers!**"
+          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). **only for extension developers and issue troubleshooting!**"
+        },
+        "powershell.trace.dap": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). **This setting is only meant for extension developers and issue troubleshooting!**"
         }
       }
     },
