@@ -43,7 +43,7 @@ const documentSelector: DocumentSelector = [
 ];
 
 export async function activate(context: vscode.ExtensionContext): Promise<IPowerShellExtensionClient> {
-    logger = new Logger(context.globalStorageUri);
+    logger = new Logger(context.logUri);
 
     telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
