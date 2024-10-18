@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import os = require("os");
-import { sleep, checkIfFileExists } from "./utils";
-import { LogOutputChannel, Uri, Disposable, LogLevel, window, env, commands, workspace } from "vscode";
+import { LogOutputChannel, Uri, Disposable, LogLevel, window, commands } from "vscode";
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
  *  This will allow for easy mocking of the logger during unit tests.
@@ -28,23 +26,16 @@ export class Logger implements ILogger {
     private commands: Disposable[];
     // Log output channel handles all the verbosity management so we don't have to.
     private logChannel: LogOutputChannel;
-    private logFilePath: Uri; // The client's logs
-    private logDirectoryCreated = false;
-    private writingLog = false;
     public get logLevel(): LogLevel { return this.logChannel.logLevel;}
 
-    constructor(globalStorageUri: Uri, logChannel?: LogOutputChannel) {
+    constructor(logPath: Uri, logChannel?: LogOutputChannel) {
         this.logChannel = logChannel ?? window.createOutputChannel("PowerShell", {log: true});
         // We have to override the scheme because it defaults to
         // 'vscode-userdata' which breaks UNC paths.
-        this.logDirectoryPath = Uri.joinPath(
-            globalStorageUri.with({ scheme: "file" }),
-            "logs",
-            `${Math.floor(Date.now() / 1000)}-${env.sessionId}`);
-        this.logFilePath = Uri.joinPath(this.logDirectoryPath, "vscode-powershell.log");
+        this.logDirectoryPath = logPath;
 
         // Early logging of the log paths for debugging.
-        if (this.logLevel >= LogLevel.Trace) {
+        if (this.logLevel > LogLevel.Off) {
             this.logChannel.trace(`Log directory: ${this.logDirectoryPath.fsPath}`);
         }
 
@@ -151,57 +142,21 @@ export class Logger implements ILogger {
     }
 
     private async openLogFolder(): Promise<void> {
-        if (this.logDirectoryCreated) {
-            // Open the folder in VS Code since there isn't an easy way to
-            // open the folder in the platform's file browser
-            await commands.executeCommand("openFolder", this.logDirectoryPath, true);
-        } else {
-            void this.writeAndShowError("Cannot open PowerShell log directory as it does not exist!");
-        }
+        await commands.executeCommand("openFolder", this.logDirectoryPath, true);
     }
 
-    private static timestampMessage(message: string, level: LogLevel): string {
-        const now = new Date();
-        return `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}${os.EOL}`;
-    }
-
-    // TODO: Should we await this function above?
     private async writeLine(message: string, level: LogLevel = LogLevel.Info): Promise<void> {
-        switch (level) {
-        case LogLevel.Trace: this.logChannel.trace(message); break;
-        case LogLevel.Debug: this.logChannel.debug(message); break;
-        case LogLevel.Info: this.logChannel.info(message); break;
-        case LogLevel.Warning: this.logChannel.warn(message); break;
-        case LogLevel.Error: this.logChannel.error(message); break;
-        default: this.logChannel.appendLine(message); break;
-        }
-
-        if (this.logLevel !== LogLevel.Off) {
-            // A simple lock because this function isn't re-entrant.
-            while (this.writingLog) {
-                await sleep(300);
+        return new Promise<void>((resolve) => {
+            switch (level) {
+            case LogLevel.Off: break;
+            case LogLevel.Trace: this.logChannel.trace(message); break;
+            case LogLevel.Debug: this.logChannel.debug(message); break;
+            case LogLevel.Info: this.logChannel.info(message); break;
+            case LogLevel.Warning: this.logChannel.warn(message); break;
+            case LogLevel.Error: this.logChannel.error(message); break;
+            default: this.logChannel.appendLine(message); break;
             }
-            try {
-                this.writingLog = true;
-                if (!this.logDirectoryCreated) {
-                    this.writeVerbose(`Creating log directory at: '${this.logDirectoryPath}'`);
-                    await workspace.fs.createDirectory(this.logDirectoryPath);
-                    this.logDirectoryCreated = true;
-                }
-                let log = new Uint8Array();
-                if (await checkIfFileExists(this.logFilePath)) {
-                    log = await workspace.fs.readFile(this.logFilePath);
-                }
-
-                const timestampedMessage = Logger.timestampMessage(message, level);
-                await workspace.fs.writeFile(
-                    this.logFilePath,
-                    Buffer.concat([log, Buffer.from(timestampedMessage)]));
-            } catch (err) {
-                console.log(`Error writing to vscode-powershell log file: ${err}`);
-            } finally {
-                this.writingLog = false;
-            }
-        }
+            resolve();
+        });
     }
 }
