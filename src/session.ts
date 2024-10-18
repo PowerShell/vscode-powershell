@@ -14,7 +14,7 @@ import utils = require("./utils");
 import {
     CloseAction, CloseHandlerResult, DocumentSelector, ErrorAction, ErrorHandlerResult,
     LanguageClientOptions, Middleware, NotificationType,
-    RequestType0, ResolveCodeLensSignature, RevealOutputChannelOn
+    RequestType0, ResolveCodeLensSignature
 } from "vscode-languageclient";
 import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
 
@@ -454,7 +454,6 @@ export class SessionManager implements Middleware {
     private async onConfigurationUpdated(): Promise<void> {
         const settings = getSettings();
         const shellIntegrationEnabled = vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled");
-        this.logger.updateLogLevel(settings.developer.editorServicesLogLevel);
 
         // Detect any setting changes that would affect the session.
         if (!this.suppressRestartPrompt
@@ -656,9 +655,9 @@ export class SessionManager implements Middleware {
                     };
                 },
             },
-            revealOutputChannelOn: RevealOutputChannelOn.Never,
             middleware: this,
             traceOutputChannel: vscode.window.createOutputChannel("PowerShell Trace - LSP", {log: true}),
+            outputChannel: vscode.window.createOutputChannel("PowerShell Editor Services", {log: true}),
         };
 
         const languageClient = new LanguageClient("powershell", "PowerShell Editor Services Client", connectFunc, clientOptions);
