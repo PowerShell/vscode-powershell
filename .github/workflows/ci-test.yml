@@ -20,6 +20,7 @@ jobs:
       DOTNET_NOLOGO: true
       DOTNET_GENERATE_ASPNET_CERTIFICATE: false
       DISPLAY: ':99.0'
+    timeout-minutes: 10
     steps:
       - name: Checkout PowerShellEditorServices
         uses: actions/checkout@v4
