@@ -22,7 +22,7 @@ import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
-import { LogLevel, getSettings } from "./settings";
+import { getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
@@ -47,9 +47,7 @@ const documentSelector: DocumentSelector = [
 ];
 
 export async function activate(context: vscode.ExtensionContext): Promise<IPowerShellExtensionClient> {
-    const logLevel = vscode.workspace.getConfiguration(`${PowerShellLanguageId}.developer`)
-        .get<string>("editorServicesLogLevel", LogLevel.Normal);
-    logger = new Logger(logLevel, context.globalStorageUri);
+    logger = new Logger(context.logUri);
 
     telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
