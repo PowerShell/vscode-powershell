@@ -96,7 +96,11 @@ extends:
               specificBuildWithTriggering: true
               branchName: refs/heads/main
               artifact: drop_build_main
-              targetPath: $(Build.SourcesDirectory)/modules
+          - task: ExtractFiles@1
+            displayName: Extract PowerShellEditorServices
+            inputs:
+              archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
+              destinationFolder: $(Build.SourcesDirectory)/modules
           - pwsh: |
               Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
               Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
@@ -154,7 +158,11 @@ extends:
               specificBuildWithTriggering: true
               branchName: refs/heads/main
               artifact: drop_build_main
-              targetPath: $(Build.SourcesDirectory)/modules
+          - task: ExtractFiles@1
+            displayName: Extract PowerShellEditorServices
+            inputs:
+              archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
+              destinationFolder: $(Build.SourcesDirectory)/modules
           - pwsh: |
               Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
               Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
