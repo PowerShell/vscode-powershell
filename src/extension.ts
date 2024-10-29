@@ -26,10 +26,6 @@ import { getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
-// The most reliable way to get the name and version of the current extension.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
-const PackageJSON: any = require("../package.json");
-
 // The 1DS telemetry key, which is just shared among all Microsoft extensions
 // (and isn't sensitive).
 const TELEMETRY_KEY = "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255";
@@ -115,15 +111,23 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
             ],
         });
 
+    interface IPackageInfo {
+        name: string;
+        displayName: string;
+        version: string;
+        publisher: string;
+    }
+    const packageInfo:IPackageInfo = context.extension.packageJSON;
+
     sessionManager = new SessionManager(
         context,
         settings,
         logger,
         documentSelector,
-        PackageJSON.name,
-        PackageJSON.displayName,
-        PackageJSON.version,
-        PackageJSON.publisher,
+        packageInfo.name,
+        packageInfo.displayName,
+        packageInfo.version,
+        packageInfo.publisher,
         telemetryReporter);
 
     // Register commands that do not require Language client
