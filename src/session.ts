@@ -94,6 +94,20 @@ export class SessionManager implements Middleware {
     private suppressRestartPrompt = false;
     private versionDetails: IPowerShellVersionDetails | undefined;
 
+    private _outputChannel?: vscode.LogOutputChannel;
+    /** Omnisharp and PSES messages sent via LSP are surfaced here. */
+    private get outputChannel(): vscode.LogOutputChannel {
+        return this._outputChannel
+            ??= vscode.window.createOutputChannel("PowerShell: Editor Services", { log: true });
+    }
+
+    private _traceOutputChannel?: vscode.LogOutputChannel;
+    /** The LanguageClient LSP message trace is surfaced here. */
+    private get traceOutputChannel(): vscode.LogOutputChannel {
+        return this._traceOutputChannel
+            ??= vscode.window.createOutputChannel("PowerShell: Trace LSP", { log: true });
+    }
+
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionSettings: Settings,
@@ -131,12 +145,15 @@ export class SessionManager implements Middleware {
         this.HostVersion = this.HostVersion.split("-")[0];
 
         this.registerCommands();
+
     }
+
 
     public async dispose(): Promise<void> {
         await this.stop(); // A whole lot of disposals.
 
         this.languageStatusItem.dispose();
+
 
         for (const handler of this.registeredHandlers) {
             handler.dispose();
@@ -622,6 +639,7 @@ export class SessionManager implements Middleware {
                         });
                 });
         };
+
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
             synchronize: {
@@ -645,9 +663,11 @@ export class SessionManager implements Middleware {
                 // hangs up (ECONNRESET errors).
                 error: (_error: Error, _message: Message, _count: number): ErrorHandlerResult => {
                     // TODO: Is there any error worth terminating on?
+                    this.logger.writeError(`${_error.name}: ${_error.message} ${_error.cause}`);
                     return { action: ErrorAction.Continue };
                 },
                 closed: (): CloseHandlerResult => {
+                    this.logger.write("Language service connection closed.");
                     // We have our own restart experience
                     return {
                         action: CloseAction.DoNotRestart,
@@ -656,8 +676,8 @@ export class SessionManager implements Middleware {
                 },
             },
             middleware: this,
-            traceOutputChannel: vscode.window.createOutputChannel("PowerShell Trace - LSP", {log: true}),
-            outputChannel: vscode.window.createOutputChannel("PowerShell Editor Services", {log: true}),
+            traceOutputChannel: this.traceOutputChannel,
+            outputChannel: this.outputChannel
         };
 
         const languageClient = new LanguageClient("powershell", "PowerShell Editor Services Client", connectFunc, clientOptions);
@@ -665,6 +685,7 @@ export class SessionManager implements Middleware {
         // This enables handling Semantic Highlighting messages in PowerShell Editor Services
         // TODO: We should only turn this on in preview.
         languageClient.registerProposedFeatures();
+
 
         // NOTE: We don't currently send any events from PSES, but may again in
         // the future so we're leaving this side wired up.

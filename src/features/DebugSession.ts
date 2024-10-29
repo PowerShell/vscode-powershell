@@ -37,7 +37,7 @@ import { PowerShellProcess } from "../process";
 import { IEditorServicesSessionDetails, SessionManager } from "../session";
 import { getSettings } from "../settings";
 import path from "path";
-import { checkIfFileExists } from "../utils";
+import { checkIfFileExists, onPowerShellSettingChange } from "../utils";
 
 export const StartDebuggerNotificationType =
     new NotificationType<void>("powerShell/startDebugger");
@@ -608,17 +608,9 @@ class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory
     disposables: Disposable[] = [];
     dapLogEnabled: boolean = workspace.getConfiguration("powershell").get<boolean>("trace.dap") ?? false;
     constructor(private adapterName = "PowerShell") {
-        this.disposables.push(workspace.onDidChangeConfiguration(change => {
-            if (
-                change.affectsConfiguration("powershell.trace.dap")
-            ) {
-                this.dapLogEnabled = workspace.getConfiguration("powershell").get<boolean>("trace.dap") ?? false;
-                if (this.dapLogEnabled) {
-                    // Trigger the output pane to appear. This gives the user time to position it before starting a debug.
-                    this.log?.show(true);
-                }
-            }
-        }));
+        this.disposables.push(
+            onPowerShellSettingChange("trace.dap", (visible:boolean | undefined) => {this.setLogVisibility(visible);})
+        );
     }
 
     /* We want to use a shared output log for separate debug sessions as usually only one is running at a time and we
@@ -630,10 +622,20 @@ class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory
     _log: LogOutputChannel | undefined;
     get log(): LogOutputChannel | undefined {
         if (this.dapLogEnabled && this._log === undefined) {
-            this._log = window.createOutputChannel(`${this.adapterName} Trace - DAP`, { log: true });
+            this._log = window.createOutputChannel(`${this.adapterName}: Trace DAP`, { log: true });
             this.disposables.push(this._log);
         }
-        return this.dapLogEnabled ? this._log : undefined;
+        return this._log;
+    }
+
+    private setLogVisibility(visible?: boolean): void {
+        if (this.log !== undefined) {
+            if (visible) {
+                this.log.show(true);
+            } else {
+                this.log.hide();
+            }
+        }
     }
 
     createDebugAdapterTracker(session: DebugSession): DebugAdapterTracker {
@@ -662,6 +664,8 @@ class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory
             onError: e => this.log?.error(e),
         };
     }
+
+
 
     dispose(): void {
         this.disposables.forEach(d => d.dispose());
