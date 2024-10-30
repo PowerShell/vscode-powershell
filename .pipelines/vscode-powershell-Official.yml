@@ -193,6 +193,7 @@ extends:
           inputs:
             gitHubConnection: GitHub
             repositoryName: PowerShell/vscode-powershell
+            target: main
             assets: $(drop)/powershell-$(vsixVersion).vsix
             tagSource: userSpecifiedTag
             tag: v$(version)
