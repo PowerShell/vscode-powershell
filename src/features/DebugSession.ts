@@ -643,7 +643,7 @@ class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory
             onWillStopSession: () => this.log?.info(`Stopping ${sessionInfo}`),
             onExit: code => this.log?.info(`${sessionInfo} exited with code ${code}`),
             onWillReceiveMessage: (m): void => {
-                this.log?.debug(`▶️${m.seq} ${m.type}: ${m.command}`);
+                this.log?.debug(`➡️${m.seq} ${m.type}: ${m.command}`);
                 if (m.arguments && (Array.isArray(m.arguments) ? m.arguments.length > 0 : Object.keys(m.arguments).length > 0)) {
                     this.log?.trace(`${m.seq}: ` + JSON.stringify(m.arguments, undefined, 2));
                 }
@@ -651,7 +651,7 @@ class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory
             onDidSendMessage: (m):void => {
                 const responseSummary = m.request_seq !== undefined
                     ? `${m.success ? "✅" : "❌"}${m.request_seq} ${m.type}(${m.seq}): ${m.command}`
-                    : `◀️${m.seq} ${m.type}: ${m.event ?? m.command}`;
+                    : `⬅️${m.seq} ${m.type}: ${m.event ?? m.command}`;
                 this.log?.debug(
                     responseSummary
                 );
