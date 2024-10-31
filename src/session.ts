@@ -6,7 +6,7 @@ import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
 import { Message } from "vscode-jsonrpc";
-import { ILogger } from "./logging";
+import { ILogger, LanguageClientOutputChannelAdapter, LanguageClientTraceFormatter } from "./logging";
 import { PowerShellProcess } from "./process";
 import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
@@ -96,16 +96,24 @@ export class SessionManager implements Middleware {
 
     private _outputChannel?: vscode.LogOutputChannel;
     /** Omnisharp and PSES messages sent via LSP are surfaced here. */
-    private get outputChannel(): vscode.LogOutputChannel {
-        return this._outputChannel
-            ??= vscode.window.createOutputChannel("PowerShell: Editor Services", { log: true });
+    private get outputChannel(): vscode.LogOutputChannel | undefined {
+        return vscode.workspace.getConfiguration("powershell.developer").get<boolean>("traceLsp", false)
+            ? this._outputChannel
+                ??= new LanguageClientOutputChannelAdapter(
+                    vscode.window.createOutputChannel("PowerShell: Editor Services", { log: true })
+                )
+            : undefined;
     }
 
     private _traceOutputChannel?: vscode.LogOutputChannel;
     /** The LanguageClient LSP message trace is surfaced here. */
-    private get traceOutputChannel(): vscode.LogOutputChannel {
-        return this._traceOutputChannel
-            ??= vscode.window.createOutputChannel("PowerShell: Trace LSP", { log: true });
+    private get traceOutputChannel(): vscode.LogOutputChannel | undefined {
+        return vscode.workspace.getConfiguration("powershell.developer").get<boolean>("traceLsp", false)
+            ? this._traceOutputChannel
+            ??= new LanguageClientTraceFormatter(
+                    vscode.window.createOutputChannel("PowerShell: Trace LSP", { log: true })
+                )
+            : undefined;
     }
 
     constructor(
@@ -145,15 +153,12 @@ export class SessionManager implements Middleware {
         this.HostVersion = this.HostVersion.split("-")[0];
 
         this.registerCommands();
-
     }
-
 
     public async dispose(): Promise<void> {
         await this.stop(); // A whole lot of disposals.
 
         this.languageStatusItem.dispose();
-
 
         for (const handler of this.registeredHandlers) {
             handler.dispose();
@@ -468,16 +473,37 @@ export class SessionManager implements Middleware {
         }
     }
 
-    private async onConfigurationUpdated(): Promise<void> {
+    /** There are some changes we cannot "hot" set, so these require a restart of the session */
+    private async restartOnCriticalConfigChange(changeEvent: vscode.ConfigurationChangeEvent): Promise<void> {
+        if (this.suppressRestartPrompt) {return;}
+        if (this.sessionStatus !== SessionStatus.Running) {return;}
+
+        // Restart not needed if shell integration is enabled but the shell is backgrounded.
         const settings = getSettings();
-        const shellIntegrationEnabled = vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled");
+        if (changeEvent.affectsConfiguration("terminal.integrated.shellIntegration.enabled")) {
+            const shellIntegrationEnabled = vscode.workspace.getConfiguration("terminal.integrated.shellIntegration").get<boolean>("enabled") ?? false;
+            if (shellIntegrationEnabled && !settings.integratedConsole.startInBackground) {
+                return this.restartWithPrompt();
+            }
+        }
+
+        // Early return if the change doesn't affect the PowerShell extension settings from this point forward
+        if (!changeEvent.affectsConfiguration("powershell")) {return;}
+
 
         // Detect any setting changes that would affect the session.
-        if (!this.suppressRestartPrompt
-            && this.sessionStatus === SessionStatus.Running
-            && ((shellIntegrationEnabled !== this.shellIntegrationEnabled
-                && !settings.integratedConsole.startInBackground)
-            || settings.cwd !== this.sessionSettings.cwd
+        const coldRestartSettingNames = [
+            "developer.traceLsp",
+            "developer.traceDap"
+        ];
+        for (const settingName of coldRestartSettingNames) {
+            if (changeEvent.affectsConfiguration("powershell" + "." + settingName)) {
+                return this.restartWithPrompt();
+            }
+        }
+
+        // TODO: Migrate these to affectsConfiguration style above
+        if (settings.cwd !== this.sessionSettings.cwd
             || settings.powerShellDefaultVersion !== this.sessionSettings.powerShellDefaultVersion
             || settings.developer.editorServicesLogLevel !== this.sessionSettings.developer.editorServicesLogLevel
             || settings.developer.bundledModulesPath !== this.sessionSettings.developer.bundledModulesPath
@@ -485,16 +511,20 @@ export class SessionManager implements Middleware {
             || settings.developer.setExecutionPolicy !== this.sessionSettings.developer.setExecutionPolicy
             || settings.integratedConsole.useLegacyReadLine !== this.sessionSettings.integratedConsole.useLegacyReadLine
             || settings.integratedConsole.startInBackground !== this.sessionSettings.integratedConsole.startInBackground
-            || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation)) {
+            || settings.integratedConsole.startLocation !== this.sessionSettings.integratedConsole.startLocation
+        ) {
+            return this.restartWithPrompt();
+        }
+    }
 
-            this.logger.writeVerbose("Settings changed, prompting to restart...");
-            const response = await vscode.window.showInformationMessage(
-                "The PowerShell runtime configuration has changed, would you like to start a new session?",
-                "Yes", "No");
+    private async restartWithPrompt(): Promise<void> {
+        this.logger.writeVerbose("Settings changed, prompting to restart...");
+        const response = await vscode.window.showInformationMessage(
+            "The PowerShell runtime configuration has changed, would you like to start a new session?",
+            "Yes", "No");
 
-            if (response === "Yes") {
-                await this.restartSession();
-            }
+        if (response === "Yes") {
+            await this.restartSession();
         }
     }
 
@@ -502,7 +532,7 @@ export class SessionManager implements Middleware {
         this.registeredCommands = [
             vscode.commands.registerCommand("PowerShell.RestartSession", async () => { await this.restartSession(); }),
             vscode.commands.registerCommand(this.ShowSessionMenuCommandName, async () => { await this.showSessionMenu(); }),
-            vscode.workspace.onDidChangeConfiguration(async () => { await this.onConfigurationUpdated(); }),
+            vscode.workspace.onDidChangeConfiguration((e) => this.restartOnCriticalConfigChange(e)),
             vscode.commands.registerCommand(
                 "PowerShell.ShowSessionConsole", (isExecute?: boolean) => { this.showSessionTerminal(isExecute); })
         ];
@@ -639,7 +669,6 @@ export class SessionManager implements Middleware {
                         });
                 });
         };
-
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
             synchronize: {
@@ -685,7 +714,6 @@ export class SessionManager implements Middleware {
         // This enables handling Semantic Highlighting messages in PowerShell Editor Services
         // TODO: We should only turn this on in preview.
         languageClient.registerProposedFeatures();
-
 
         // NOTE: We don't currently send any events from PSES, but may again in
         // the future so we're leaving this side wired up.

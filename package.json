@@ -953,6 +953,27 @@
           "default": [],
           "markdownDescription": "An array of strings that enable experimental features in the PowerShell extension. **No flags are currently available!**"
         },
+        "powershell.developer.traceLsp": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Traces the LSP communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
+        },
+        "powershell.developer.traceDap": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Traces the DAP communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
+        },
+        "powershell.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**",
+          "markdownDeprecationMessage": "Please use the `powershell.developer.traceLsp` setting instead and control verbosity via the Output Window settings."
+        },
         "powershell.developer.waitForSessionFileTimeoutSeconds": {
           "type": "number",
           "default": 240,
@@ -1002,21 +1023,6 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Show buttons in the editor's title bar for moving the terminals pane (with the PowerShell Extension Terminal) around."
-        },
-        "powershell.trace.server": {
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). **Only for extension developers and issue troubleshooting!**"
-        },
-        "powershell.trace.dap": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). **Only meant for extension developers and issue troubleshooting!**"
         }
       }
     },

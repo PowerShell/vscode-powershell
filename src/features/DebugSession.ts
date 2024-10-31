@@ -37,7 +37,7 @@ import { PowerShellProcess } from "../process";
 import { IEditorServicesSessionDetails, SessionManager } from "../session";
 import { getSettings } from "../settings";
 import path from "path";
-import { checkIfFileExists, onPowerShellSettingChange } from "../utils";
+import { checkIfFileExists } from "../utils";
 
 export const StartDebuggerNotificationType =
     new NotificationType<void>("powerShell/startDebugger");
@@ -606,36 +606,24 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
 class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory, Disposable {
     disposables: Disposable[] = [];
-    dapLogEnabled: boolean = workspace.getConfiguration("powershell").get<boolean>("trace.dap") ?? false;
-    constructor(private adapterName = "PowerShell") {
-        this.disposables.push(
-            onPowerShellSettingChange("trace.dap", (visible:boolean | undefined) => {this.setLogVisibility(visible);})
-        );
-    }
+    constructor(private adapterName = "PowerShell") {}
 
-    /* We want to use a shared output log for separate debug sessions as usually only one is running at a time and we
-    *  dont need an output window for every debug session. We also want to leave it active so user can copy and paste
-    *  even on run end. When user changes the setting and disables it getter will return undefined, which will result
+
+    _log: LogOutputChannel | undefined;
+    /** Lazily creates a {@link LogOutputChannel} for debug tracing, and presents it only when DAP logging is enabled.
+    *
+    * We want to use a shared output log for separate debug sessions as usually only one is running at a time and we
+    * dont need an output window for every debug session. We also want to leave it active so user can copy and paste
+    * even on run end. When user changes the setting and disables it getter will return undefined, which will result
     * in a noop for the logging activities, effectively pausing logging but not disposing the output channel. If the
     * user re-enables, then logging resumes.
     */
-    _log: LogOutputChannel | undefined;
     get log(): LogOutputChannel | undefined {
-        if (this.dapLogEnabled && this._log === undefined) {
+        if (workspace.getConfiguration("powershell.developer").get<boolean>("traceDap") && this._log === undefined) {
             this._log = window.createOutputChannel(`${this.adapterName}: Trace DAP`, { log: true });
             this.disposables.push(this._log);
         }
         return this._log;
-    }
-
-    private setLogVisibility(visible?: boolean): void {
-        if (this.log !== undefined) {
-            if (visible) {
-                this.log.show(true);
-            } else {
-                this.log.hide();
-            }
-        }
     }
 
     createDebugAdapterTracker(session: DebugSession): DebugAdapterTracker {
@@ -664,8 +652,6 @@ class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory
             onError: e => this.log?.error(e),
         };
     }
-
-
 
     dispose(): void {
         this.disposables.forEach(d => d.dispose());

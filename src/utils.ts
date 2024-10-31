@@ -86,57 +86,6 @@ export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * Invokes the specified action when a setting changes
- * @param setting a string representation of the setting you wish to evaluate, e.g. `trace.server`
- * @param action the action to take when the setting changes
- * @param section the section of the vscode settings to evaluate. Defaults to `powershell`
- * @param scope the scope in which the vscode setting should be evaluated.
- * @param workspace
- * @param onDidChangeConfiguration
- * @example onPowerShellSettingChange("settingName", (newValue) => console.log(newValue));
- * @returns a Disposable object that can be used to stop listening for changes
- */
-
-// Because we actually do use the constraint in the callback
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-export function onSettingChange<T>(
-    section: string,
-    setting: string,
-    action: (newValue: T | undefined) => void,
-    scope?: vscode.ConfigurationScope,
-): vscode.Disposable {
-    const settingPath = `${section}.${setting}`;
-    return vscode.workspace.onDidChangeConfiguration(e => {
-        if (!e.affectsConfiguration(settingPath, scope)) { return; }
-        const value = vscode.workspace.getConfiguration(section, scope).get<T>(setting);
-        action(value);
-    });
-}
-
-/**
- * Invokes the specified action when a PowerShell setting changes. Convenience function for `onSettingChange`
- * @param setting a string representation of the setting you wish to evaluate, e.g. `trace.server`
- * @param action the action to take when the setting changes
- * @param section the section of the vscode settings to evaluate. Defaults to `powershell`
- * @param scope the scope in which the vscode setting should be evaluated.
- * @param workspace
- * @param onDidChangeConfiguration
- * @example onPowerShellSettingChange("settingName", (newValue) => console.log(newValue));
- * @returns a Disposable object that can be used to stop listening for changes
- */
-
-// Because we actually do use the constraint in the callback
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-export function onPowerShellSettingChange<T>(
-    setting: string,
-    action: (newValue: T | undefined) => void,
-    scope?: vscode.ConfigurationScope,
-): vscode.Disposable {
-    const section = "powershell";
-    return onSettingChange(section, setting, action, scope);
-}
-
 export const isMacOS: boolean = process.platform === "darwin";
 export const isWindows: boolean = process.platform === "win32";
 export const isLinux: boolean = !isMacOS && !isWindows;

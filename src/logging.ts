@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { LogOutputChannel, Uri, Disposable, LogLevel, window, commands } from "vscode";
+import { LogOutputChannel, Uri, Disposable, LogLevel, window, commands, Event } from "vscode";
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
  *  This will allow for easy mocking of the logger during unit tests.
@@ -158,5 +158,161 @@ export class Logger implements ILogger {
             }
             resolve();
         });
+    }
+}
+
+/** Parses logs received via the legacy OutputChannel to LogOutputChannel with proper severity.
+ *
+ * HACK: This is for legacy compatability and can be removed when https://github.com/microsoft/vscode-languageserver-node/issues/1116 is merged and replaced with a normal LogOutputChannel. We don't use a middleware here because any direct logging calls like client.warn() would not be captured by middleware.
+ */
+export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
+    private channel: LogOutputChannel;
+    constructor(channel: LogOutputChannel) {
+        this.channel = channel;
+    }
+
+    public appendLine(message: string): void {
+        this.append(message);
+    }
+
+    public append(message: string): void {
+        const [parsedMessage, level] = this.parse(message);
+        this.sendLogMessage(parsedMessage, level);
+    }
+
+    protected parse(message: string): [string, LogLevel] {
+        const logLevelMatch = /^\[(?<level>Trace|Debug|Info|Warn|Error) +- \d+:\d+:\d+ [AP]M\] (?<message>.+)/.exec(message);
+        if (logLevelMatch) {
+            const { level, message } = logLevelMatch.groups!;
+            let logLevel: LogLevel;
+            switch (level) {
+            case "Trace":
+                logLevel = LogLevel.Trace;
+                break;
+            case "Debug":
+                logLevel = LogLevel.Debug;
+                break;
+            case "Info":
+                logLevel = LogLevel.Info;
+                break;
+            case "Warn":
+                logLevel = LogLevel.Warning;
+                break;
+            case "Error":
+                logLevel = LogLevel.Error;
+                break;
+            default:
+                logLevel = LogLevel.Info;
+                break;
+            }
+            return [message, logLevel];
+        } else {
+            return [message, LogLevel.Info];
+        }
+    }
+
+    protected sendLogMessage(message: string, level: LogLevel): void {
+        switch (level) {
+        case LogLevel.Trace:
+            this.channel.trace(message);
+            break;
+        case LogLevel.Debug:
+            this.channel.debug(message);
+            break;
+        case LogLevel.Info:
+            this.channel.info(message);
+            break;
+        case LogLevel.Warning:
+            this.channel.warn(message);
+            break;
+        case LogLevel.Error:
+            this.channel.error(message);
+            break;
+        default:
+            this.channel.trace(message);
+            break;
+        }
+    }
+
+    // #region Passthru Implementation
+    public get name(): string {
+        return this.channel.name;
+    }
+    public get logLevel(): LogLevel {
+        return this.channel.logLevel;
+    }
+    replace(value: string): void {
+        this.channel.replace(value);
+    }
+    show(_column?: undefined, preserveFocus?: boolean): void {
+        this.channel.show(preserveFocus);
+    }
+    public get onDidChangeLogLevel(): Event<LogLevel> {
+        return this.channel.onDidChangeLogLevel;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public trace(message: string, ...args: any[]): void {
+        this.channel.trace(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public debug(message: string, ...args: any[]): void {
+        this.channel.debug(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public info(message: string, ...args: any[]): void {
+        this.channel.info(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public warn(message: string, ...args: any[]): void {
+        this.channel.warn(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public error(message: string, ...args: any[]): void {
+        this.channel.error(message, ...args);
+    }
+    public clear(): void {
+        this.channel.clear();
+    }
+    public hide(): void {
+        this.channel.hide();
+    }
+    public dispose(): void {
+        this.channel.dispose();
+    }
+    // #endregion
+}
+
+/** Overrides the severity of some LSP traces to be more logical */
+export class LanguageClientTraceFormatter extends LanguageClientOutputChannelAdapter {
+
+    public override appendLine(message: string): void {
+        this.append(message);
+    }
+
+    public override append(message: string): void {
+        // eslint-disable-next-line prefer-const
+        let [parsedMessage, level] = this.parse(message);
+
+        // Override some LSP traces to be more logical
+        if (parsedMessage.startsWith("Sending ")) {
+            parsedMessage = parsedMessage.replace("Sending", "▶️");
+            level = LogLevel.Debug;
+        }
+        if (parsedMessage.startsWith("Received ")) {
+            parsedMessage = parsedMessage.replace("Received", "◀️");
+            level = LogLevel.Debug;
+        }
+        if (parsedMessage.startsWith("Params:")
+            || parsedMessage.startsWith("Result:")
+        ) {
+            level = LogLevel.Trace;
+        }
+
+        // These are PSES messages we don't really need to see so we drop these to trace
+        if (parsedMessage.startsWith("◀️ notification 'window/logMessage'")) {
+            level = LogLevel.Trace;
+        }
+
+        this.sendLogMessage(parsedMessage.trimEnd(), level);
     }
 }
