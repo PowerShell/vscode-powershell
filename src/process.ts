@@ -30,6 +30,7 @@ export class PowerShellProcess {
         private isTemp: boolean,
         private shellIntegrationEnabled: boolean,
         private logger: ILogger,
+        private logDirectoryPath: vscode.Uri,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
         private sessionSettings: Settings) {
@@ -51,7 +52,7 @@ export class PowerShellProcess {
                 : "";
 
         this.startPsesArgs +=
-            `-LogPath '${utils.escapeSingleQuotes(this.logger.logDirectoryPath.fsPath)}' ` +
+            `-LogPath '${utils.escapeSingleQuotes(this.logDirectoryPath.fsPath)}' ` +
             `-SessionDetailsPath '${utils.escapeSingleQuotes(this.sessionFilePath.fsPath)}' ` +
             `-FeatureFlags @(${featureFlags}) `;
 

@@ -1,13 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { LogOutputChannel, Uri, Disposable, LogLevel, window, commands, Event } from "vscode";
+import { LogOutputChannel, LogLevel, window, Event } from "vscode";
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
  *  This will allow for easy mocking of the logger during unit tests.
  */
 export interface ILogger {
-    logDirectoryPath: Uri;
     write(message: string, ...additionalMessages: string[]): void;
     writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void>;
     writeDiagnostic(message: string, ...additionalMessages: string[]): void;
@@ -22,39 +21,16 @@ export interface ILogger {
 }
 
 export class Logger implements ILogger {
-    public logDirectoryPath: Uri; // The folder for all the logs
-    private commands: Disposable[];
     // Log output channel handles all the verbosity management so we don't have to.
     private logChannel: LogOutputChannel;
     public get logLevel(): LogLevel { return this.logChannel.logLevel;}
 
-    constructor(logPath: Uri, logChannel?: LogOutputChannel) {
+    constructor(logChannel?: LogOutputChannel) {
         this.logChannel = logChannel ?? window.createOutputChannel("PowerShell", {log: true});
-        // We have to override the scheme because it defaults to
-        // 'vscode-userdata' which breaks UNC paths.
-        this.logDirectoryPath = logPath;
-
-        // Early logging of the log paths for debugging.
-        if (this.logLevel > LogLevel.Off) {
-            this.logChannel.trace(`Log directory: ${this.logDirectoryPath.fsPath}`);
-        }
-
-        this.commands = [
-            commands.registerCommand(
-                "PowerShell.ShowLogs",
-                () => { this.showLogPanel(); }),
-
-            commands.registerCommand(
-                "PowerShell.OpenLogFolder",
-                async () => { await this.openLogFolder(); }),
-        ];
     }
 
     public dispose(): void {
         this.logChannel.dispose();
-        for (const command of this.commands) {
-            command.dispose();
-        }
     }
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
@@ -137,12 +113,8 @@ export class Logger implements ILogger {
         }
     }
 
-    private showLogPanel(): void {
+    public showLogPanel(): void {
         this.logChannel.show();
-    }
-
-    private async openLogFolder(): Promise<void> {
-        await commands.executeCommand("openFolder", this.logDirectoryPath, true);
     }
 
     private async writeLine(message: string, level: LogLevel = LogLevel.Info): Promise<void> {
@@ -163,12 +135,13 @@ export class Logger implements ILogger {
 
 /** Parses logs received via the legacy OutputChannel to LogOutputChannel with proper severity.
  *
- * HACK: This is for legacy compatability and can be removed when https://github.com/microsoft/vscode-languageserver-node/issues/1116 is merged and replaced with a normal LogOutputChannel. We don't use a middleware here because any direct logging calls like client.warn() would not be captured by middleware.
+ * HACK: This is for legacy compatability and can be removed when https://github.com/microsoft/vscode-languageserver-node/issues/1116 is merged and replaced with a normal LogOutputChannel. We don't use a middleware here because any direct logging calls like client.warn() and server-initiated messages would not be captured by middleware.
  */
 export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
     private channel: LogOutputChannel;
-    constructor(channel: LogOutputChannel) {
-        this.channel = channel;
+
+    constructor(public channelName: string) {
+        this.channel = window.createOutputChannel(channelName, {log: true});
     }
 
     public appendLine(message: string): void {
@@ -229,7 +202,7 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
             this.channel.error(message);
             break;
         default:
-            this.channel.trace(message);
+            this.channel.error("!UNKNOWN LOG LEVEL!: " + message);
             break;
         }
     }
@@ -284,7 +257,6 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
 
 /** Overrides the severity of some LSP traces to be more logical */
 export class LanguageClientTraceFormatter extends LanguageClientOutputChannelAdapter {
-
     public override appendLine(message: string): void {
         this.append(message);
     }
@@ -293,7 +265,6 @@ export class LanguageClientTraceFormatter extends LanguageClientOutputChannelAda
         // eslint-disable-next-line prefer-const
         let [parsedMessage, level] = this.parse(message);
 
-        // Override some LSP traces to be more logical
         if (parsedMessage.startsWith("Sending ")) {
             parsedMessage = parsedMessage.replace("Sending", "▶️");
             level = LogLevel.Debug;

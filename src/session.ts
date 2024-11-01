@@ -5,8 +5,8 @@ import net = require("net");
 import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
-import { Message } from "vscode-jsonrpc";
-import { ILogger, LanguageClientOutputChannelAdapter, LanguageClientTraceFormatter } from "./logging";
+import { Message, Trace } from "vscode-jsonrpc";
+import { ILogger } from "./logging";
 import { PowerShellProcess } from "./process";
 import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
@@ -14,7 +14,8 @@ import utils = require("./utils");
 import {
     CloseAction, CloseHandlerResult, DocumentSelector, ErrorAction, ErrorHandlerResult,
     LanguageClientOptions, Middleware, NotificationType,
-    RequestType0, ResolveCodeLensSignature
+    RequestType0, ResolveCodeLensSignature,
+    RevealOutputChannelOn,
 } from "vscode-languageclient";
 import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
 
@@ -93,28 +94,7 @@ export class SessionManager implements Middleware {
     private startCancellationTokenSource: vscode.CancellationTokenSource | undefined;
     private suppressRestartPrompt = false;
     private versionDetails: IPowerShellVersionDetails | undefined;
-
-    private _outputChannel?: vscode.LogOutputChannel;
-    /** Omnisharp and PSES messages sent via LSP are surfaced here. */
-    private get outputChannel(): vscode.LogOutputChannel | undefined {
-        return vscode.workspace.getConfiguration("powershell.developer").get<boolean>("traceLsp", false)
-            ? this._outputChannel
-                ??= new LanguageClientOutputChannelAdapter(
-                    vscode.window.createOutputChannel("PowerShell: Editor Services", { log: true })
-                )
-            : undefined;
-    }
-
-    private _traceOutputChannel?: vscode.LogOutputChannel;
-    /** The LanguageClient LSP message trace is surfaced here. */
-    private get traceOutputChannel(): vscode.LogOutputChannel | undefined {
-        return vscode.workspace.getConfiguration("powershell.developer").get<boolean>("traceLsp", false)
-            ? this._traceOutputChannel
-            ??= new LanguageClientTraceFormatter(
-                    vscode.window.createOutputChannel("PowerShell: Trace LSP", { log: true })
-                )
-            : undefined;
-    }
+    private traceLogLevelHandler?: vscode.Disposable;
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
@@ -126,7 +106,6 @@ export class SessionManager implements Middleware {
         hostVersion: string,
         publisher: string,
         private telemetryReporter: TelemetryReporter) {
-
         // Create the language status item
         this.languageStatusItem = this.createStatusBarItem();
         // We have to override the scheme because it defaults to
@@ -299,6 +278,8 @@ export class SessionManager implements Middleware {
         this.startCancellationTokenSource?.dispose();
         this.startCancellationTokenSource = undefined;
         this.sessionDetails = undefined;
+        this.traceLogLevelHandler?.dispose();
+        this.traceLogLevelHandler = undefined;
 
         this.setSessionStatus("Not Started", SessionStatus.NotStarted);
     }
@@ -375,6 +356,7 @@ export class SessionManager implements Middleware {
                 true,
                 false,
                 this.logger,
+                this.extensionContext.logUri,
                 this.getEditorServicesArgs(bundledModulesPath, this.PowerShellExeDetails) + "-DebugServiceOnly ",
                 this.getNewSessionFilePath(),
                 this.sessionSettings);
@@ -585,6 +567,7 @@ export class SessionManager implements Middleware {
                 false,
                 this.shellIntegrationEnabled,
                 this.logger,
+                this.extensionContext.logUri,
                 this.getEditorServicesArgs(bundledModulesPath, powerShellExeDetails),
                 this.getNewSessionFilePath(),
                 this.sessionSettings);
@@ -669,6 +652,7 @@ export class SessionManager implements Middleware {
                         });
                 });
         };
+
         const clientOptions: LanguageClientOptions = {
             documentSelector: this.documentSelector,
             synchronize: {
@@ -705,8 +689,9 @@ export class SessionManager implements Middleware {
                 },
             },
             middleware: this,
-            traceOutputChannel: this.traceOutputChannel,
-            outputChannel: this.outputChannel
+            // traceOutputChannel: traceOutputChannel,
+            // outputChannel: outputChannel,
+            revealOutputChannelOn: RevealOutputChannelOn.Never
         };
 
         const languageClient = new LanguageClient("powershell", "PowerShell Editor Services Client", connectFunc, clientOptions);
@@ -758,6 +743,19 @@ export class SessionManager implements Middleware {
 
         return languageClient;
     }
+
+    /** Synchronizes a vscode LogOutputChannel log level to the LSP trace setting to minimize traffic */
+    private async setLspTrace(languageClient: LanguageClient, level: vscode.LogLevel): Promise<void> {
+        this.logger.writeVerbose("LSP Trace level changed to: " + level.toString());
+        if (level == vscode.LogLevel.Trace) {
+            return languageClient.setTrace(Trace.Verbose);
+        } else if (level == vscode.LogLevel.Debug) {
+            return languageClient.setTrace(Trace.Messages);
+        } else {
+            return languageClient.setTrace(Trace.Off);
+        }
+    }
+
 
     private async getBundledModulesPath(): Promise<string> {
         // Because the extension is always at `<root>/out/main.js`
