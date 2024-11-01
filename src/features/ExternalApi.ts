@@ -19,6 +19,7 @@ export interface IPowerShellExtensionClient {
     getPowerShellVersionDetails(uuid: string): Promise<IExternalPowerShellDetails>;
     waitUntilStarted(uuid: string): Promise<void>;
     getStorageUri(): vscode.Uri;
+    getLogUri(): vscode.Uri;
 }
 
 /*
@@ -169,6 +170,10 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
         // We have to override the scheme because it defaults to
         // 'vscode-userdata' which breaks UNC paths.
         return this.extensionContext.globalStorageUri.with({ scheme: "file"});
+    }
+
+    public getLogUri(): vscode.Uri {
+        return this.getLogUri().with({ scheme: "file"});
     }
 
     public dispose(): void {
