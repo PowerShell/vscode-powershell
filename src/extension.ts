@@ -139,6 +139,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new PesterTestsFeature(sessionManager, logger),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
+
+        vscode.commands.registerCommand(
+            "PowerShell.OpenLogFolder",
+            async () => {await vscode.commands.executeCommand(
+                "vscode.openFolder",
+                context.logUri,
+                { forceNewWindow: true }
+            );}
+        ),
+        vscode.commands.registerCommand(
+            "PowerShell.ShowLogs",
+            () => {logger.showLogPanel();}
+        )
     ];
 
     const externalApi = new ExternalApiFeature(context, sessionManager, logger);
