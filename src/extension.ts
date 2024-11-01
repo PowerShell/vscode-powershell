@@ -167,6 +167,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
         waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
         getStorageUri: () => externalApi.getStorageUri(),
+        getLogUri: () => externalApi.getLogUri(),
     };
 }
 
