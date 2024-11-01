@@ -173,7 +173,7 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
     }
 
     public getLogUri(): vscode.Uri {
-        return this.getLogUri().with({ scheme: "file"});
+        return this.extensionContext.logUri.with({ scheme: "file"});
     }
 
     public dispose(): void {
