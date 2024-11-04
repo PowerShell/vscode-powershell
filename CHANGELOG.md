@@ -1,11 +1,20 @@
 # PowerShell Extension Release History
 
+## v2024.4.0
+### Monday, November 04, 2024
+
+With PowerShell Editor Services [v3.21.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.21.0)!
+
+Call-operator support and various bug fixes.
+
+See more details at the GitHub Release for [v2024.4.0](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.4.0).
+
 ## v2024.5.0-preview
 ### Wednesday, October 30, 2024
 
 With PowerShell Editor Services [v3.21.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v3.21.0)!
 
-Call-operator support and various bug fixes
+Call-operator support and various bug fixes.
 
 See more details at the GitHub Release for [v2024.5.0-preview](https://github.com/PowerShell/vscode-powershell/releases/tag/v2024.5.0-preview).
 
