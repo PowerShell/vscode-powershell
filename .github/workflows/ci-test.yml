@@ -2,19 +2,19 @@ name: CI Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ main ]
+    branches: [main]
   merge_group:
-    types: [ checks_requested ]
+    types: [checks_requested]
 
 jobs:
   ci:
     name: node
     strategy:
       matrix:
-        os: [ windows-latest, macos-latest, ubuntu-latest ]
+        os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     env:
       DOTNET_NOLOGO: true
@@ -32,6 +32,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: vscode-powershell
+
+      - name: Make sure JSON files are valid
+        shell: pwsh
+        run: ./vscode-powershell/tools/testValidJson.ps1
 
       - name: Install dotnet
         uses: actions/setup-dotnet@v4
