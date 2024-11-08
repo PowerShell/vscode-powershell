@@ -33,9 +33,10 @@ jobs:
         with:
           path: vscode-powershell
 
-      - name: Make sure JSON files are valid
+      - name: Make sure JSON files in ./vscode-powershell/ are valid
         shell: pwsh
         run: ./vscode-powershell/tools/testValidJson.ps1
+        working-directory: vscode-powershell
 
       - name: Install dotnet
         uses: actions/setup-dotnet@v4
