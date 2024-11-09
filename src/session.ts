@@ -689,7 +689,8 @@ export class SessionManager implements Middleware {
             },
             middleware: this,
             traceOutputChannel: new LanguageClientTraceFormatter("PowerShell: Trace LSP"),
-            outputChannel: new LanguageClientOutputChannelAdapter("PowerShell: Editor Services"),
+            // This is named the same as the Client log to merge the logs, but will be handled and disposed separately.
+            outputChannel: new LanguageClientOutputChannelAdapter("PowerShell"),
             revealOutputChannelOn: RevealOutputChannelOn.Never
         };
 
