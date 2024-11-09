@@ -6,7 +6,7 @@ import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
 import { Message, Trace } from "vscode-jsonrpc";
-import { ILogger, LanguageClientOutputChannelAdapter, LanguageClientTraceFormatter } from "./logging";
+import { ILogger, LanguageClientOutputChannelAdapter, LanguageClientTraceFormatter, PsesMergedOutputChannel } from "./logging";
 import { PowerShellProcess } from "./process";
 import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
@@ -690,7 +690,7 @@ export class SessionManager implements Middleware {
             middleware: this,
             traceOutputChannel: new LanguageClientTraceFormatter("PowerShell: Trace LSP"),
             // This is named the same as the Client log to merge the logs, but will be handled and disposed separately.
-            outputChannel: new LanguageClientOutputChannelAdapter("PowerShell"),
+            outputChannel: new PsesMergedOutputChannel("PowerShell"),
             revealOutputChannelOn: RevealOutputChannelOn.Never
         };
 

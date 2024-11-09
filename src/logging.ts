@@ -255,6 +255,20 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
     // #endregion
 }
 
+/** Appends additional  */
+export class PsesMergedOutputChannel extends LanguageClientOutputChannelAdapter {
+    public override appendLine(message: string): void {
+        this.append(message);
+    }
+
+    public override append(message: string): void {
+        const [parsedMessage, level] = this.parse(message);
+
+        // Append PSES prefix to log messages to differentiate them from Client messages
+        this.sendLogMessage("[PSES] " + parsedMessage, level);
+    }
+}
+
 /** Overrides the severity of some LSP traces to be more logical */
 export class LanguageClientTraceFormatter extends LanguageClientOutputChannelAdapter {
     public override appendLine(message: string): void {
