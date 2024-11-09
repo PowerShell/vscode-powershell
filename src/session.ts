@@ -6,7 +6,7 @@ import path = require("path");
 import vscode = require("vscode");
 import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
 import { Message, Trace } from "vscode-jsonrpc";
-import { ILogger, LanguageClientOutputChannelAdapter, LanguageClientTraceFormatter, PsesMergedOutputChannel } from "./logging";
+import { ILogger, LanguageClientTraceFormatter, PsesMergedOutputChannel } from "./logging";
 import { PowerShellProcess } from "./process";
 import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
 import utils = require("./utils");
