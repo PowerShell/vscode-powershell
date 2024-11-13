@@ -33,9 +33,9 @@ jobs:
         with:
           path: vscode-powershell
 
-      - name: Validate JSON files
+      - name: Validate snippets JSON files
         shell: pwsh
-        run: ./tools/testValidJson.ps1
+        run: $null = ConvertFrom-Json -InputObject (Get-Content -Raw -Path './snippets/PowerShell.json')
         working-directory: vscode-powershell
 
       - name: Install dotnet
