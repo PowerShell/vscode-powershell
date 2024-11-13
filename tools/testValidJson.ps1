@@ -5,7 +5,7 @@
         Get all JSON files recursively and test if they are valid by trying to import them.
 
     .EXAMPLE
-        & $psEditor.GetEditorContext().CurrentFile.Path -WorkingDir '.\'
+        & $psEditor.GetEditorContext().CurrentFile.Path -WorkingDir $PWD
 #>
 
 # Input and expected output
@@ -13,7 +13,7 @@
 Param(
     [Parameter()]
     [ValidateScript({[System.IO.Directory]::Exists($_)})]
-    [string] $WorkingDir = '.\'
+    [string] $WorkingDir = $PWD
 )
 
 # PowerShell preferences
