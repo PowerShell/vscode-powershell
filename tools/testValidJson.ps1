@@ -21,7 +21,7 @@ $ErrorActionPreference = 'Stop'
 
 # Try to import all JSON files in the repo
 $TestValidJson = [PSCustomObject[]](
-    [System.IO.Directory]::GetFiles($WorkingDir,'*.json',[System.IO.SearchOption]::AllDirectories).ForEach{
+    [System.IO.Directory]::GetFiles($WorkingDir, '*.json', [System.IO.SearchOption]::AllDirectories).ForEach{
         [PSCustomObject]@{
             'Path'        = [string] $_
             'IsValidJson' = [bool]$(
