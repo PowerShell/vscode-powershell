@@ -33,7 +33,7 @@ jobs:
         with:
           path: vscode-powershell
 
-      - name: Validate snippets JSON files
+      - name: Validate snippets JSON file
         shell: pwsh
         run: $null = ConvertFrom-Json -InputObject (Get-Content -Raw -Path './snippets/PowerShell.json')
         working-directory: vscode-powershell
