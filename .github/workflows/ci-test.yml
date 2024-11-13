@@ -35,7 +35,7 @@ jobs:
 
       - name: Validate JSON files
         shell: pwsh
-        run: ./vscode-powershell/tools/testValidJson.ps1
+        run: ./tools/testValidJson.ps1
         working-directory: vscode-powershell
 
       - name: Install dotnet
