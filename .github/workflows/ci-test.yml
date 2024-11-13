@@ -33,7 +33,7 @@ jobs:
         with:
           path: vscode-powershell
 
-      - name: Make sure JSON files in ./vscode-powershell/ are valid
+      - name: Validate JSON files
         shell: pwsh
         run: ./vscode-powershell/tools/testValidJson.ps1
         working-directory: vscode-powershell
