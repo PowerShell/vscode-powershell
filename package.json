@@ -916,20 +916,20 @@
         },
         "powershell.developer.editorServicesLogLevel": {
           "type": "string",
-          "default": "Normal",
+          "default": "Warning",
           "enum": [
-            "Diagnostic",
-            "Verbose",
-            "Normal",
+            "Trace",
+            "Debug",
+            "Information",
             "Warning",
             "Error",
             "None"
           ],
           "markdownEnumDescriptions": [
             "Enables all logging possible, please use this setting when submitting logs for bug reports!",
-            "Enables more logging than normal.",
-            "The default logging level.",
-            "Only log warnings and errors.",
+            "Enables more detailed logging of the extension",
+            "Logs high-level information about what the extension is doing.",
+            "Only log warnings and errors. This is the default setting",
             "Only log errors.",
             "Disable all logging possible. No log files will be written!"
           ],
