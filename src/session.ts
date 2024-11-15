@@ -744,19 +744,6 @@ export class SessionManager implements Middleware {
         return languageClient;
     }
 
-    /** Synchronizes a vscode LogOutputChannel log level to the LSP trace setting to minimize traffic */
-    private async setLspTrace(languageClient: LanguageClient, level: vscode.LogLevel): Promise<void> {
-        this.logger.writeVerbose("LSP Trace level changed to: " + level.toString());
-        if (level == vscode.LogLevel.Trace) {
-            return languageClient.setTrace(Trace.Verbose);
-        } else if (level == vscode.LogLevel.Debug) {
-            return languageClient.setTrace(Trace.Messages);
-        } else {
-            return languageClient.setTrace(Trace.Off);
-        }
-    }
-
-
     private async getBundledModulesPath(): Promise<string> {
         // Because the extension is always at `<root>/out/main.js`
         let bundledModulesPath = path.resolve(__dirname, "../modules");
