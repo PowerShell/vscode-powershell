@@ -140,7 +140,16 @@ export class Logger implements ILogger {
 export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
     private channel: LogOutputChannel;
 
-    constructor(public channelName: string) {
+    /**
+     * Creates an instance of the logging class.
+     *
+     * @param channelName - The name of the output channel.
+     * @param parser - A function that parses a log message and returns a tuple containing the parsed message and its log level, or undefined if the log should be filtered.
+     */
+    constructor(
+        channelName: string,
+        private parser: (message: string) => [string, LogLevel] | undefined = LanguageClientOutputChannelAdapter.omnisharpLspParser.bind(this)
+    ) {
         this.channel = window.createOutputChannel(channelName, {log: true});
     }
 
@@ -149,41 +158,19 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
     }
 
     public append(message: string): void {
-        const [parsedMessage, level] = this.parse(message);
-        this.sendLogMessage(parsedMessage, level);
+        const parseResult = this.parser(message);
+        if (parseResult !== undefined) {this.sendLogMessage(...parseResult);}
     }
 
-    // We include the log level inline from PSES for VSCode because our LanguageClient doesn't support middleware for logMessages yet.
-    // BUG:
-    protected parse(message: string): [string, LogLevel] {
-        const logLevelMatch = /^<(?<level>Trace|Debug|Info|Warning|Error)>(?<message>.+)/.exec(message);
-        if (logLevelMatch) {
-            const { level, message } = logLevelMatch.groups!;
-            let logLevel: LogLevel;
-            switch (level) {
-            case "Trace":
-                logLevel = LogLevel.Trace;
-                break;
-            case "Debug":
-                logLevel = LogLevel.Debug;
-                break;
-            case "Info":
-                logLevel = LogLevel.Info;
-                break;
-            case "Warning":
-                logLevel = LogLevel.Warning;
-                break;
-            case "Error":
-                logLevel = LogLevel.Error;
-                break;
-            default:
-                logLevel = LogLevel.Info;
-                break;
-            }
-            return [message, logLevel];
-        } else {
-            return [message, LogLevel.Info];
-        }
+    /** Converts from Omnisharp logs since middleware for LogMessage does not currently exist **/
+    public static omnisharpLspParser(message: string): [string, LogLevel] {
+        const logLevelMatch = /^\[(?<level>Trace|Debug|Info|Warn|Error) +- \d+:\d+:\d+ [AP]M\] (?<message>.+)/.exec(message);
+        const logLevel: LogLevel = logLevelMatch?.groups?.level
+            ? LogLevel[logLevelMatch.groups.level as keyof typeof LogLevel]
+            : LogLevel.Info;
+        const logMessage = logLevelMatch?.groups?.message ?? message;
+
+        return [logMessage, logLevel];
     }
 
     protected sendLogMessage(message: string, level: LogLevel): void {
@@ -257,49 +244,40 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
     // #endregion
 }
 
-/** Appends additional  */
-export class PsesMergedOutputChannel extends LanguageClientOutputChannelAdapter {
-    public override appendLine(message: string): void {
-        this.append(message);
-    }
+/** Special parsing for PowerShell Editor Services LSP messages since the LogLevel cannot be read due to vscode
+ * LanguageClient Limitations (https://github.com/microsoft/vscode-languageserver-node/issues/1116)
+  */
+export function PsesParser(message: string): [string, LogLevel] {
+    const logLevelMatch = /^<(?<level>Trace|Debug|Info|Warning|Error)>(?<message>.+)/.exec(message);
+    const logLevel: LogLevel = logLevelMatch?.groups?.level
+        ? LogLevel[logLevelMatch.groups.level as keyof typeof LogLevel]
+        : LogLevel.Info;
+    const logMessage = logLevelMatch?.groups?.message ?? message;
 
-    public override append(message: string): void {
-        const [parsedMessage, level] = this.parse(message);
-
-        // Append PSES prefix to log messages to differentiate them from Client messages
-        this.sendLogMessage("[PSES] " + parsedMessage, level);
-    }
+    return ["[PSES] " + logMessage, logLevel];
 }
 
-/** Overrides the severity of some LSP traces to be more logical */
-export class LanguageClientTraceFormatter extends LanguageClientOutputChannelAdapter {
-    public override appendLine(message: string): void {
-        this.append(message);
+/** Lsp Trace Parser that does some additional parsing and formatting to make it look nicer */
+export function LspTraceParser(message: string): [string, LogLevel] {
+    let [parsedMessage, level] = LanguageClientOutputChannelAdapter.omnisharpLspParser(message);
+    if (parsedMessage.startsWith("Sending ")) {
+        parsedMessage = parsedMessage.replace("Sending", "➡️");
+        level = LogLevel.Debug;
+    }
+    if (parsedMessage.startsWith("Received ")) {
+        parsedMessage = parsedMessage.replace("Received", "⬅️");
+        level = LogLevel.Debug;
+    }
+    if (parsedMessage.startsWith("Params:")
+        || parsedMessage.startsWith("Result:")
+    ) {
+        level = LogLevel.Trace;
     }
 
-    public override append(message: string): void {
-        // eslint-disable-next-line prefer-const
-        let [parsedMessage, level] = this.parse(message);
-
-        if (parsedMessage.startsWith("Sending ")) {
-            parsedMessage = parsedMessage.replace("Sending", "▶️");
-            level = LogLevel.Debug;
-        }
-        if (parsedMessage.startsWith("Received ")) {
-            parsedMessage = parsedMessage.replace("Received", "◀️");
-            level = LogLevel.Debug;
-        }
-        if (parsedMessage.startsWith("Params:")
-            || parsedMessage.startsWith("Result:")
-        ) {
-            level = LogLevel.Trace;
-        }
-
-        // These are PSES messages we don't really need to see so we drop these to trace
-        if (parsedMessage.startsWith("◀️ notification 'window/logMessage'")) {
-            level = LogLevel.Trace;
-        }
-
-        this.sendLogMessage(parsedMessage.trimEnd(), level);
+    // These are PSES messages we don't really need to see so we drop these to trace
+    if (parsedMessage.startsWith("⬅️ notification 'window/logMessage'")) {
+        level = LogLevel.Trace;
     }
+
+    return [parsedMessage.trimEnd(), level];
 }
