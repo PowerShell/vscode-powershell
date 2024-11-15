@@ -162,7 +162,7 @@ export class SessionManager implements Middleware {
             return;
         case SessionStatus.Running:
             // We're started, just return.
-            this.logger.writeVerbose("Already started.");
+            this.logger.writeDebug("Already started.");
             return;
         case SessionStatus.Busy:
             // We're started but busy so notify and return.
@@ -171,12 +171,12 @@ export class SessionManager implements Middleware {
             return;
         case SessionStatus.Stopping:
             // Wait until done stopping, then start.
-            this.logger.writeVerbose("Still stopping.");
+            this.logger.writeDebug("Still stopping.");
             await this.waitWhileStopping();
             break;
         case SessionStatus.Failed:
             // Try to start again.
-            this.logger.writeVerbose("Previously failed, starting again.");
+            this.logger.writeDebug("Previously failed, starting again.");
             break;
         }
 
@@ -294,7 +294,7 @@ export class SessionManager implements Middleware {
         if (exeNameOverride) {
             // Reset the version and PowerShell details since we're launching a
             // new executable.
-            this.logger.writeVerbose(`Starting with executable overriden to: ${exeNameOverride}`);
+            this.logger.writeDebug(`Starting with executable overriden to: ${exeNameOverride}`);
             this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
             this.versionDetails = undefined;
             this.PowerShellExeDetails = undefined;
@@ -475,7 +475,8 @@ export class SessionManager implements Middleware {
         // Detect any setting changes that would affect the session.
         const coldRestartSettingNames = [
             "developer.traceLsp",
-            "developer.traceDap"
+            "developer.traceDap",
+            "developer.editorServicesLogLevel",
         ];
         for (const settingName of coldRestartSettingNames) {
             if (changeEvent.affectsConfiguration("powershell" + "." + settingName)) {
@@ -486,7 +487,6 @@ export class SessionManager implements Middleware {
         // TODO: Migrate these to affectsConfiguration style above
         if (settings.cwd !== this.sessionSettings.cwd
             || settings.powerShellDefaultVersion !== this.sessionSettings.powerShellDefaultVersion
-            || settings.developer.editorServicesLogLevel !== this.sessionSettings.developer.editorServicesLogLevel
             || settings.developer.bundledModulesPath !== this.sessionSettings.developer.bundledModulesPath
             || settings.developer.editorServicesWaitForDebugger !== this.sessionSettings.developer.editorServicesWaitForDebugger
             || settings.developer.setExecutionPolicy !== this.sessionSettings.developer.setExecutionPolicy
@@ -499,7 +499,7 @@ export class SessionManager implements Middleware {
     }
 
     private async restartWithPrompt(): Promise<void> {
-        this.logger.writeVerbose("Settings changed, prompting to restart...");
+        this.logger.writeDebug("Settings changed, prompting to restart...");
         const response = await vscode.window.showInformationMessage(
             "The PowerShell runtime configuration has changed, would you like to start a new session?",
             "Yes", "No");
@@ -520,7 +520,7 @@ export class SessionManager implements Middleware {
     }
 
     private async findPowerShell(): Promise<IPowerShellExeDetails | undefined> {
-        this.logger.writeVerbose("Finding PowerShell...");
+        this.logger.writeDebug("Finding PowerShell...");
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
             this.sessionSettings.powerShellAdditionalExePaths,
@@ -619,7 +619,7 @@ export class SessionManager implements Middleware {
     }
 
     private sessionStarted(sessionDetails: IEditorServicesSessionDetails): boolean {
-        this.logger.writeVerbose(`Session details: ${JSON.stringify(sessionDetails, undefined, 2)}`);
+        this.logger.writeDebug(`Session details: ${JSON.stringify(sessionDetails, undefined, 2)}`);
         if (sessionDetails.status === "started") { // Successful server start with a session file
             return true;
         }
@@ -638,7 +638,7 @@ export class SessionManager implements Middleware {
     }
 
     private async startLanguageClient(sessionDetails: IEditorServicesSessionDetails): Promise<LanguageClient> {
-        this.logger.writeVerbose("Connecting to language service...");
+        this.logger.writeDebug("Connecting to language service...");
         const connectFunc = (): Promise<StreamInfo> => {
             return new Promise<StreamInfo>(
                 (resolve, _reject) => {
@@ -646,7 +646,7 @@ export class SessionManager implements Middleware {
                     socket.on(
                         "connect",
                         () => {
-                            this.logger.writeVerbose("Language service connected.");
+                            this.logger.writeDebug("Language service connected.");
                             resolve({ writer: socket, reader: socket });
                         });
                 });
@@ -796,8 +796,8 @@ Type 'help' to get help.
             && this.extensionContext.extensionMode === vscode.ExtensionMode.Development) {
             editorServicesArgs += "-WaitForDebugger ";
         }
-
-        editorServicesArgs += `-LogLevel '${this.sessionSettings.developer.editorServicesLogLevel}' `;
+        const logLevel = vscode.workspace.getConfiguration("powershell.developer").get<string>("editorServicesLogLevel");
+        editorServicesArgs += `-LogLevel '${logLevel}' `;
 
         return editorServicesArgs;
     }
@@ -869,7 +869,7 @@ Type 'help' to get help.
     }
 
     private setSessionStatus(detail: string, status: SessionStatus): void {
-        this.logger.writeVerbose(`Session status changing from '${this.sessionStatus}' to '${status}'.`);
+        this.logger.writeDebug(`Session status changing from '${this.sessionStatus}' to '${status}'.`);
         this.sessionStatus = status;
         this.languageStatusItem.text = "$(terminal-powershell)";
         this.languageStatusItem.detail = "PowerShell";

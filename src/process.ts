@@ -90,13 +90,13 @@ export class PowerShellProcess {
                 startEditorServices);
         } else {
             // Otherwise use -EncodedCommand for better quote support.
-            this.logger.writeVerbose("Using Base64 -EncodedCommand but logging as -Command equivalent.");
+            this.logger.writeDebug("Using Base64 -EncodedCommand but logging as -Command equivalent.");
             powerShellArgs.push(
                 "-EncodedCommand",
                 Buffer.from(startEditorServices, "utf16le").toString("base64"));
         }
 
-        this.logger.writeVerbose(`Starting process: ${this.exePath} ${powerShellArgs.slice(0, -2).join(" ")} -Command ${startEditorServices}`);
+        this.logger.writeDebug(`Starting process: ${this.exePath} ${powerShellArgs.slice(0, -2).join(" ")} -Command ${startEditorServices}`);
 
         // Make sure no old session file exists
         await this.deleteSessionFile(this.sessionFilePath);
@@ -174,7 +174,7 @@ export class PowerShellProcess {
     }
 
     public dispose(): void {
-        this.logger.writeVerbose(`Disposing PowerShell process with PID: ${this.pid}`);
+        this.logger.writeDebug(`Disposing PowerShell process with PID: ${this.pid}`);
 
         void this.deleteSessionFile(this.sessionFilePath);
 
@@ -227,7 +227,7 @@ export class PowerShellProcess {
         const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
 
         // Check every second.
-        this.logger.writeVerbose(`Waiting for session file: ${this.sessionFilePath}`);
+        this.logger.writeDebug(`Waiting for session file: ${this.sessionFilePath}`);
         for (let i = numOfTries; i > 0; i--) {
             if (cancellationToken.isCancellationRequested) {
                 this.logger.writeWarning("Canceled while waiting for session file.");
@@ -240,7 +240,7 @@ export class PowerShellProcess {
             }
 
             if (await utils.checkIfFileExists(this.sessionFilePath)) {
-                this.logger.writeVerbose("Session file found.");
+                this.logger.writeDebug("Session file found.");
                 return await this.readSessionFile(this.sessionFilePath);
             }
 

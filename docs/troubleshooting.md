@@ -253,11 +253,11 @@ Logs provide context for what was happening when the issue occurred. **You shoul
 your logs for any sensitive information you would not like to share online!**
 
 * Before sending through logs, try and reproduce the issue with **log level set to
-  Diagnostic**. You can set this in the [VS Code Settings][]
+  Trace**. You can set this in the [VS Code Settings][]
   (<kbd>Ctrl</kbd>+<kbd>,</kbd>) with:
 
   ```json
-  "powershell.developer.editorServicesLogLevel": "Diagnostic"
+  "powershell.developer.editorServicesLogLevel": "Trace"
   ```
 
 * After you have captured the issue with the log level turned up, you may want to return

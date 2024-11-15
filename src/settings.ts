@@ -56,15 +56,6 @@ export enum PipelineIndentationStyle {
     None = "None",
 }
 
-export enum LogLevel {
-    Diagnostic = "Diagnostic",
-    Verbose = "Verbose",
-    Normal = "Normal",
-    Warning = "Warning",
-    Error = "Error",
-    None = "None",
-}
-
 export enum CommentType {
     Disabled = "Disabled",
     BlockComment = "BlockComment",
@@ -120,7 +111,6 @@ class DeveloperSettings extends PartialSettings {
     // From `<root>/out/main.js` we go to the directory before <root> and
     // then into the other repo.
     bundledModulesPath = "../../PowerShellEditorServices/module";
-    editorServicesLogLevel = LogLevel.Normal;
     editorServicesWaitForDebugger = false;
     setExecutionPolicy = true;
     waitForSessionFileTimeoutSeconds = 240;
@@ -209,7 +199,7 @@ export async function changeSetting(
     configurationTarget: vscode.ConfigurationTarget | boolean | undefined,
     logger: ILogger | undefined): Promise<void> {
 
-    logger?.writeVerbose(`Changing '${settingName}' at scope '${configurationTarget}' to '${newValue}'.`);
+    logger?.writeDebug(`Changing '${settingName}' at scope '${configurationTarget}' to '${newValue}'.`);
 
     try {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
@@ -242,7 +232,7 @@ export async function getChosenWorkspace(logger: ILogger | undefined): Promise<v
 
         chosenWorkspace = await vscode.window.showWorkspaceFolderPick(options);
 
-        logger?.writeVerbose(`User selected workspace: '${chosenWorkspace?.name}'`);
+        logger?.writeDebug(`User selected workspace: '${chosenWorkspace?.name}'`);
         if (chosenWorkspace === undefined) {
             chosenWorkspace = vscode.workspace.workspaceFolders[0];
         } else {
@@ -296,7 +286,7 @@ export async function validateCwdSetting(logger: ILogger | undefined): Promise<s
     // Otherwise get a cwd from the workspace, if possible.
     const workspace = await getChosenWorkspace(logger);
     if (workspace === undefined) {
-        logger?.writeVerbose("Workspace was undefined, using homedir!");
+        logger?.writeDebug("Workspace was undefined, using homedir!");
         return os.homedir();
     }
 

@@ -9,8 +9,8 @@ import { LogOutputChannel, LogLevel, window, Event } from "vscode";
 export interface ILogger {
     write(message: string, ...additionalMessages: string[]): void;
     writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void>;
-    writeDiagnostic(message: string, ...additionalMessages: string[]): void;
-    writeVerbose(message: string, ...additionalMessages: string[]): void;
+    writeTrace(message: string, ...additionalMessages: string[]): void;
+    writeDebug(message: string, ...additionalMessages: string[]): void;
     writeWarning(message: string, ...additionalMessages: string[]): void;
     writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void>;
     writeError(message: string, ...additionalMessages: string[]): void;
@@ -56,11 +56,11 @@ export class Logger implements ILogger {
         }
     }
 
-    public writeDiagnostic(message: string, ...additionalMessages: string[]): void {
+    public writeTrace(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Trace, message, ...additionalMessages);
     }
 
-    public writeVerbose(message: string, ...additionalMessages: string[]): void {
+    public writeDebug(message: string, ...additionalMessages: string[]): void {
         this.writeAtLevel(LogLevel.Debug, message, ...additionalMessages);
     }
 

@@ -933,7 +933,7 @@
             "Only log errors.",
             "Disable all logging possible. No log files will be written!"
           ],
-          "markdownDescription": "Sets the log verbosity for both the extension and its LSP server, PowerShell Editor Services. **Please set to `Diagnostic` when recording logs for a bug report!**"
+          "markdownDescription": "Sets the log verbosity for both the extension and its LSP server, PowerShell Editor Services. **Please set to `Trace` when recording logs for a bug report!**"
         },
         "powershell.developer.editorServicesWaitForDebugger": {
           "type": "boolean",

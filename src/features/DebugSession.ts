@@ -335,8 +335,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
         // Create or show the debug terminal (either temporary or session).
         this.sessionManager.showDebugTerminal(true);
 
-        this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
-        this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration, undefined, 2)}`);
+        this.logger.writeDebug(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
+        this.logger.writeDebug(`Debug configuration: ${JSON.stringify(session.configuration, undefined, 2)}`);
 
         return new DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
     }
@@ -424,7 +424,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
                 startDebugEvent.dispose();
 
-                this.logger.writeVerbose(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
+                this.logger.writeDebug(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
 
                 tempConsoleDotnetAttachSession = dotnetAttachSession;
 
@@ -434,7 +434,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                     // Makes the event one-time
                     stopDebugEvent.dispose();
 
-                    this.logger.writeVerbose(`Debugger session terminated: ${tempConsoleSession.name} (${tempConsoleSession.id})`);
+                    this.logger.writeDebug(`Debugger session terminated: ${tempConsoleSession.name} (${tempConsoleSession.id})`);
 
                     // HACK: As of 2023-08-17, there is no vscode debug API to request the C# debugger to detach, so we send it a custom DAP request instead.
                     const disconnectRequest: DebugProtocol.DisconnectRequest = {
@@ -462,8 +462,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
             // Start a child debug session to attach the dotnet debugger
             // TODO: Accommodate multi-folder workspaces if the C# code is in a different workspace folder
             await debug.startDebugging(undefined, dotnetAttachConfig, session);
-            this.logger.writeVerbose(`Dotnet attach debug configuration: ${JSON.stringify(dotnetAttachConfig, undefined, 2)}`);
-            this.logger.writeVerbose(`Attached dotnet debugger to process: ${pid}`);
+            this.logger.writeDebug(`Dotnet attach debug configuration: ${JSON.stringify(dotnetAttachConfig, undefined, 2)}`);
+            this.logger.writeDebug(`Attached dotnet debugger to process: ${pid}`);
         }
 
         return this.tempSessionDetails;

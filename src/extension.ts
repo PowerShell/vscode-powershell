@@ -48,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
     const settings = getSettings();
-    logger.writeVerbose(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
+    logger.writeDebug(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
