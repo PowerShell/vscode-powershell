@@ -138,7 +138,13 @@ export class Logger implements ILogger {
  * HACK: This is for legacy compatability and can be removed when https://github.com/microsoft/vscode-languageserver-node/issues/1116 is merged and replaced with a normal LogOutputChannel. We don't use a middleware here because any direct logging calls like client.warn() and server-initiated messages would not be captured by middleware.
  */
 export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
-    private channel: LogOutputChannel;
+    private _channel: LogOutputChannel | undefined;
+    private get channel(): LogOutputChannel {
+        if (!this._channel) {
+            this._channel = window.createOutputChannel(this.channelName, {log: true});
+        }
+        return this._channel;
+    }
 
     /**
      * Creates an instance of the logging class.
@@ -147,10 +153,9 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
      * @param parser - A function that parses a log message and returns a tuple containing the parsed message and its log level, or undefined if the log should be filtered.
      */
     constructor(
-        channelName: string,
+        private channelName: string,
         private parser: (message: string) => [string, LogLevel] | undefined = LanguageClientOutputChannelAdapter.omnisharpLspParser.bind(this)
     ) {
-        this.channel = window.createOutputChannel(channelName, {log: true});
     }
 
     public appendLine(message: string): void {
@@ -198,7 +203,8 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
 
     // #region Passthru Implementation
     public get name(): string {
-        return this.channel.name;
+        // prevents the window from being created unless we get a log request
+        return this.channelName;
     }
     public get logLevel(): LogLevel {
         return this.channel.logLevel;
