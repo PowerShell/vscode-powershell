@@ -25,10 +25,10 @@ export class TestLogger implements ILogger {
     writeAndShowInformation(_message: string, ..._additionalMessages: string[]): Promise<void> {
         return Promise.resolve();
     }
-    writeDiagnostic(_message: string, ..._additionalMessages: string[]): void {
+    writeTrace(_message: string, ..._additionalMessages: string[]): void {
         return;
     }
-    writeVerbose(_message: string, ..._additionalMessages: string[]): void {
+    writeDebug(_message: string, ..._additionalMessages: string[]): void {
         return;
     }
     writeWarning(_message: string, ..._additionalMessages: string[]): void {

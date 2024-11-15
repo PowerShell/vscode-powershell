@@ -22,7 +22,7 @@ import { ShowHelpFeature } from "./features/ShowHelp";
 import { SpecifyScriptArgsFeature } from "./features/DebugSession";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
-import { LogLevel, getSettings } from "./settings";
+import { getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 
@@ -43,14 +43,12 @@ const documentSelector: DocumentSelector = [
 ];
 
 export async function activate(context: vscode.ExtensionContext): Promise<IPowerShellExtensionClient> {
-    const logLevel = vscode.workspace.getConfiguration(`${PowerShellLanguageId}.developer`)
-        .get<string>("editorServicesLogLevel", LogLevel.Normal);
-    logger = new Logger(logLevel, context.globalStorageUri);
+    logger = new Logger();
 
     telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
     const settings = getSettings();
-    logger.writeVerbose(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
+    logger.writeDebug(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
 
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
@@ -141,6 +139,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         new PesterTestsFeature(sessionManager, logger),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
+
+        vscode.commands.registerCommand(
+            "PowerShell.OpenLogFolder",
+            async () => {await vscode.commands.executeCommand(
+                "vscode.openFolder",
+                context.logUri,
+                { forceNewWindow: true }
+            );}
+        ),
+        vscode.commands.registerCommand(
+            "PowerShell.ShowLogs",
+            () => {logger.showLogPanel();}
+        )
     ];
 
     const externalApi = new ExternalApiFeature(context, sessionManager, logger);
@@ -169,6 +180,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
         waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
         getStorageUri: () => externalApi.getStorageUri(),
+        getLogUri: () => externalApi.getLogUri(),
     };
 }
 

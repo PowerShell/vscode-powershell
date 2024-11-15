@@ -9,9 +9,11 @@ import { checkIfDirectoryExists, checkIfFileExists, ShellIntegrationScript } fro
 
 describe("Path assumptions", function () {
     let globalStorageUri: vscode.Uri;
+    let logUri: vscode.Uri;
     before(async () => {
         const extension: IPowerShellExtensionClient = await utils.ensureEditorServicesIsConnected();
         globalStorageUri = extension.getStorageUri();
+        logUri = extension.getLogUri();
     });
 
     it("Creates the session folder at the correct path", async function () {
@@ -19,7 +21,7 @@ describe("Path assumptions", function () {
     });
 
     it("Creates the log folder at the correct path", async function () {
-        assert(await checkIfDirectoryExists(vscode.Uri.joinPath(globalStorageUri, "logs")));
+        assert(await checkIfDirectoryExists(logUri));
     });
 
     it("Finds the Terminal Shell Integration Script", async function () {

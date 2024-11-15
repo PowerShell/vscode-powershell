@@ -56,15 +56,6 @@ export enum PipelineIndentationStyle {
     None = "None",
 }
 
-export enum LogLevel {
-    Diagnostic = "Diagnostic",
-    Verbose = "Verbose",
-    Normal = "Normal",
-    Warning = "Warning",
-    Error = "Error",
-    None = "None",
-}
-
 export enum CommentType {
     Disabled = "Disabled",
     BlockComment = "BlockComment",
@@ -120,7 +111,6 @@ class DeveloperSettings extends PartialSettings {
     // From `<root>/out/main.js` we go to the directory before <root> and
     // then into the other repo.
     bundledModulesPath = "../../PowerShellEditorServices/module";
-    editorServicesLogLevel = LogLevel.Normal;
     editorServicesWaitForDebugger = false;
     setExecutionPolicy = true;
     waitForSessionFileTimeoutSeconds = 240;
@@ -209,7 +199,7 @@ export async function changeSetting(
     configurationTarget: vscode.ConfigurationTarget | boolean | undefined,
     logger: ILogger | undefined): Promise<void> {
 
-    logger?.writeVerbose(`Changing '${settingName}' at scope '${configurationTarget}' to '${newValue}'.`);
+    logger?.writeDebug(`Changing '${settingName}' at scope '${configurationTarget}' to '${newValue}'.`);
 
     try {
         const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
@@ -242,7 +232,7 @@ export async function getChosenWorkspace(logger: ILogger | undefined): Promise<v
 
         chosenWorkspace = await vscode.window.showWorkspaceFolderPick(options);
 
-        logger?.writeVerbose(`User selected workspace: '${chosenWorkspace?.name}'`);
+        logger?.writeDebug(`User selected workspace: '${chosenWorkspace?.name}'`);
         if (chosenWorkspace === undefined) {
             chosenWorkspace = vscode.workspace.workspaceFolders[0];
         } else {
@@ -296,7 +286,7 @@ export async function validateCwdSetting(logger: ILogger | undefined): Promise<s
     // Otherwise get a cwd from the workspace, if possible.
     const workspace = await getChosenWorkspace(logger);
     if (workspace === undefined) {
-        logger?.writeVerbose("Workspace was undefined, using homedir!");
+        logger?.writeDebug("Workspace was undefined, using homedir!");
         return os.homedir();
     }
 
@@ -315,4 +305,85 @@ export async function validateCwdSetting(logger: ILogger | undefined): Promise<s
 
     // If all else fails, use the home directory.
     return os.homedir();
+}
+
+
+/**
+ * Options for the `onSettingChange` function.
+ * @param scope the scope in which the vscode setting should be evaluated.
+ * @param run Indicates whether the function should be run now in addition to when settings change, or if it should be run only once and stop listening after a single change. If this is undefined, the function will be run only when the setting changes.
+ */
+interface onSettingChangeOptions {
+    scope?: vscode.ConfigurationScope;
+    run?: "now" | "once";
+}
+
+/**
+ * Invokes the specified action when a setting changes
+ * @param section the section of the vscode settings to evaluate. Defaults to `powershell`
+ * @param setting a string representation of the setting you wish to evaluate, e.g. `trace.server`
+ * @param action the action to take when the setting changes
+ * @param scope the scope in which the vscode setting should be evaluated.
+ * @returns a Disposable object that can be used to stop listening for changes with dispose()
+ * @example
+ * onSettingChange("powershell", "settingName", (newValue) => console.log(newValue));
+ */
+
+// Because we actually do use the constraint in the callback
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export function onSettingChange<T>(
+    section: string,
+    setting: string,
+    action: (newValue: T | undefined) => void,
+    options?: onSettingChangeOptions,
+): vscode.Disposable {
+    const settingPath = `${section}.${setting}`;
+    const disposable = vscode.workspace.onDidChangeConfiguration(e => {
+        if (!e.affectsConfiguration(settingPath, options?.scope)) { return; }
+
+        doOnSettingsChange(section, setting, action, options?.scope);
+        if (options?.run === "once") {
+            disposable.dispose(); // Javascript black magic, referring to an outer reference before it exists
+        }
+    });
+    if (options?.run === "now") {
+        doOnSettingsChange(section, setting, action, options.scope);
+    }
+    return disposable;
+}
+
+/** Implementation is separate to avoid duplicate code for run now */
+
+// Because we actually do use the constraint in the callback
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+function doOnSettingsChange<T>(
+    section: string,
+    setting: string,
+    action: (newValue: T | undefined) => void,
+    scope?: vscode.ConfigurationScope,
+): void {
+    const value = vscode.workspace.getConfiguration(section, scope).get<T>(setting);
+    action(value);
+}
+
+/**
+ * Invokes the specified action when a PowerShell setting changes. Convenience function for `onSettingChange`
+ * @param setting a string representation of the setting you wish to evaluate, e.g. `trace.server`
+ * @param action the action to take when the setting changes
+ * @param scope the scope in which the vscode setting should be evaluated.n
+ * @returns a Disposable object that can be used to stop listening for changes
+ * @example
+ * onPowerShellSettingChange("settingName", (newValue) => console.log(newValue));
+ */
+
+// Because we actually do use the constraint in the callback
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export function onPowerShellSettingChange<T>(
+    setting: string,
+    action: (newValue: T | undefined) => void,
+    options?: onSettingChangeOptions
+
+): vscode.Disposable {
+    const section = "powershell";
+    return onSettingChange(section, setting, action, options);
 }

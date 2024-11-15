@@ -1,30 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import utils = require("./utils");
-import os = require("os");
-import vscode = require("vscode");
-
-// NOTE: This is not a string enum because the order is used for comparison.
-export enum LogLevel {
-    Diagnostic,
-    Verbose,
-    Normal,
-    Warning,
-    Error,
-    None,
-}
+import { LogOutputChannel, LogLevel, window, Event } from "vscode";
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
  *  This will allow for easy mocking of the logger during unit tests.
  */
 export interface ILogger {
-    logDirectoryPath: vscode.Uri;
-    updateLogLevel(logLevelName: string): void;
     write(message: string, ...additionalMessages: string[]): void;
     writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void>;
-    writeDiagnostic(message: string, ...additionalMessages: string[]): void;
-    writeVerbose(message: string, ...additionalMessages: string[]): void;
+    writeTrace(message: string, ...additionalMessages: string[]): void;
+    writeDebug(message: string, ...additionalMessages: string[]): void;
     writeWarning(message: string, ...additionalMessages: string[]): void;
     writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void>;
     writeError(message: string, ...additionalMessages: string[]): void;
@@ -35,47 +21,16 @@ export interface ILogger {
 }
 
 export class Logger implements ILogger {
-    public logDirectoryPath: vscode.Uri; // The folder for all the logs
-    private logLevel: LogLevel;
-    private commands: vscode.Disposable[];
-    private logChannel: vscode.OutputChannel;
-    private logFilePath: vscode.Uri; // The client's logs
-    private logDirectoryCreated = false;
-    private writingLog = false;
+    // Log output channel handles all the verbosity management so we don't have to.
+    private logChannel: LogOutputChannel;
+    public get logLevel(): LogLevel { return this.logChannel.logLevel;}
 
-    constructor(logLevelName: string, globalStorageUri: vscode.Uri) {
-        this.logLevel = Logger.logLevelNameToValue(logLevelName);
-        this.logChannel = vscode.window.createOutputChannel("PowerShell Extension Logs");
-        // We have to override the scheme because it defaults to
-        // 'vscode-userdata' which breaks UNC paths.
-        this.logDirectoryPath = vscode.Uri.joinPath(
-            globalStorageUri.with({ scheme: "file" }),
-            "logs",
-            `${Math.floor(Date.now() / 1000)}-${vscode.env.sessionId}`);
-        this.logFilePath = vscode.Uri.joinPath(this.logDirectoryPath, "vscode-powershell.log");
-
-        // Early logging of the log paths for debugging.
-        if (LogLevel.Diagnostic >= this.logLevel) {
-            const uriMessage = Logger.timestampMessage(`Log file path: '${this.logFilePath}'`, LogLevel.Verbose);
-            this.logChannel.appendLine(uriMessage);
-        }
-
-        this.commands = [
-            vscode.commands.registerCommand(
-                "PowerShell.ShowLogs",
-                () => { this.showLogPanel(); }),
-
-            vscode.commands.registerCommand(
-                "PowerShell.OpenLogFolder",
-                async () => { await this.openLogFolder(); }),
-        ];
+    constructor(logChannel?: LogOutputChannel) {
+        this.logChannel = logChannel ?? window.createOutputChannel("PowerShell", {log: true});
     }
 
     public dispose(): void {
         this.logChannel.dispose();
-        for (const command of this.commands) {
-            command.dispose();
-        }
     }
 
     private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
@@ -89,24 +44,24 @@ export class Logger implements ILogger {
     }
 
     public write(message: string, ...additionalMessages: string[]): void {
-        this.writeAtLevel(LogLevel.Normal, message, ...additionalMessages);
+        this.writeAtLevel(LogLevel.Info, message, ...additionalMessages);
     }
 
     public async writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void> {
         this.write(message, ...additionalMessages);
 
-        const selection = await vscode.window.showInformationMessage(message, "Show Logs", "Okay");
+        const selection = await window.showInformationMessage(message, "Show Logs", "Okay");
         if (selection === "Show Logs") {
             this.showLogPanel();
         }
     }
 
-    public writeDiagnostic(message: string, ...additionalMessages: string[]): void {
-        this.writeAtLevel(LogLevel.Diagnostic, message, ...additionalMessages);
+    public writeTrace(message: string, ...additionalMessages: string[]): void {
+        this.writeAtLevel(LogLevel.Trace, message, ...additionalMessages);
     }
 
-    public writeVerbose(message: string, ...additionalMessages: string[]): void {
-        this.writeAtLevel(LogLevel.Verbose, message, ...additionalMessages);
+    public writeDebug(message: string, ...additionalMessages: string[]): void {
+        this.writeAtLevel(LogLevel.Debug, message, ...additionalMessages);
     }
 
     public writeWarning(message: string, ...additionalMessages: string[]): void {
@@ -116,7 +71,7 @@ export class Logger implements ILogger {
     public async writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void> {
         this.writeWarning(message, ...additionalMessages);
 
-        const selection = await vscode.window.showWarningMessage(message, "Show Logs");
+        const selection = await window.showWarningMessage(message, "Show Logs");
         if (selection !== undefined) {
             this.showLogPanel();
         }
@@ -129,7 +84,7 @@ export class Logger implements ILogger {
     public async writeAndShowError(message: string, ...additionalMessages: string[]): Promise<void> {
         this.writeError(message, ...additionalMessages);
 
-        const choice = await vscode.window.showErrorMessage(message, "Show Logs");
+        const choice = await window.showErrorMessage(message, "Show Logs");
         if (choice !== undefined) {
             this.showLogPanel();
         }
@@ -147,7 +102,7 @@ export class Logger implements ILogger {
 
         const actionKeys: string[] = fullActions.map((action) => action.prompt);
 
-        const choice = await vscode.window.showErrorMessage(message, ...actionKeys);
+        const choice = await window.showErrorMessage(message, ...actionKeys);
         if (choice) {
             for (const action of fullActions) {
                 if (choice === action.prompt && action.action !== undefined ) {
@@ -158,70 +113,177 @@ export class Logger implements ILogger {
         }
     }
 
-    // TODO: Make the enum smarter about strings so this goes away.
-    private static logLevelNameToValue(logLevelName: string): LogLevel {
-        switch (logLevelName.trim().toLowerCase()) {
-        case "diagnostic": return LogLevel.Diagnostic;
-        case "verbose": return LogLevel.Verbose;
-        case "normal": return LogLevel.Normal;
-        case "warning": return LogLevel.Warning;
-        case "error": return LogLevel.Error;
-        case "none": return LogLevel.None;
-        default: return LogLevel.Normal;
-        }
-    }
-
-    public updateLogLevel(logLevelName: string): void {
-        this.logLevel = Logger.logLevelNameToValue(logLevelName);
-    }
-
-    private showLogPanel(): void {
+    public showLogPanel(): void {
         this.logChannel.show();
     }
 
-    private async openLogFolder(): Promise<void> {
-        if (this.logDirectoryCreated) {
-            // Open the folder in VS Code since there isn't an easy way to
-            // open the folder in the platform's file browser
-            await vscode.commands.executeCommand("vscode.openFolder", this.logDirectoryPath, true);
-        } else {
-            void this.writeAndShowError("Cannot open PowerShell log directory as it does not exist!");
+    private async writeLine(message: string, level: LogLevel = LogLevel.Info): Promise<void> {
+        return new Promise<void>((resolve) => {
+            switch (level) {
+            case LogLevel.Off: break;
+            case LogLevel.Trace: this.logChannel.trace(message); break;
+            case LogLevel.Debug: this.logChannel.debug(message); break;
+            case LogLevel.Info: this.logChannel.info(message); break;
+            case LogLevel.Warning: this.logChannel.warn(message); break;
+            case LogLevel.Error: this.logChannel.error(message); break;
+            default: this.logChannel.appendLine(message); break;
+            }
+            resolve();
+        });
+    }
+}
+
+/** Parses logs received via the legacy OutputChannel to LogOutputChannel with proper severity.
+ *
+ * HACK: This is for legacy compatability and can be removed when https://github.com/microsoft/vscode-languageserver-node/issues/1116 is merged and replaced with a normal LogOutputChannel. We don't use a middleware here because any direct logging calls like client.warn() and server-initiated messages would not be captured by middleware.
+ */
+export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
+    private _channel: LogOutputChannel | undefined;
+    private get channel(): LogOutputChannel {
+        if (!this._channel) {
+            this._channel = window.createOutputChannel(this.channelName, {log: true});
+        }
+        return this._channel;
+    }
+
+    /**
+     * Creates an instance of the logging class.
+     *
+     * @param channelName - The name of the output channel.
+     * @param parser - A function that parses a log message and returns a tuple containing the parsed message and its log level, or undefined if the log should be filtered.
+     */
+    constructor(
+        private channelName: string,
+        private parser: (message: string) => [string, LogLevel] | undefined = LanguageClientOutputChannelAdapter.omnisharpLspParser.bind(this)
+    ) {
+    }
+
+    public appendLine(message: string): void {
+        this.append(message);
+    }
+
+    public append(message: string): void {
+        const parseResult = this.parser(message);
+        if (parseResult !== undefined) {this.sendLogMessage(...parseResult);}
+    }
+
+    /** Converts from Omnisharp logs since middleware for LogMessage does not currently exist **/
+    public static omnisharpLspParser(message: string): [string, LogLevel] {
+        const logLevelMatch = /^\[(?<level>Trace|Debug|Info|Warn|Error) +- \d+:\d+:\d+ [AP]M\] (?<message>.+)/.exec(message);
+        const logLevel: LogLevel = logLevelMatch?.groups?.level
+            ? LogLevel[logLevelMatch.groups.level as keyof typeof LogLevel]
+            : LogLevel.Info;
+        const logMessage = logLevelMatch?.groups?.message ?? message;
+
+        return [logMessage, logLevel];
+    }
+
+    protected sendLogMessage(message: string, level: LogLevel): void {
+        switch (level) {
+        case LogLevel.Trace:
+            this.channel.trace(message);
+            break;
+        case LogLevel.Debug:
+            this.channel.debug(message);
+            break;
+        case LogLevel.Info:
+            this.channel.info(message);
+            break;
+        case LogLevel.Warning:
+            this.channel.warn(message);
+            break;
+        case LogLevel.Error:
+            this.channel.error(message);
+            break;
+        default:
+            this.channel.error("!UNKNOWN LOG LEVEL!: " + message);
+            break;
         }
     }
 
-    private static timestampMessage(message: string, level: LogLevel): string {
-        const now = new Date();
-        return `${now.toLocaleDateString()} ${now.toLocaleTimeString()} [${LogLevel[level].toUpperCase()}] - ${message}${os.EOL}`;
+    // #region Passthru Implementation
+    public get name(): string {
+        // prevents the window from being created unless we get a log request
+        return this.channelName;
+    }
+    public get logLevel(): LogLevel {
+        return this.channel.logLevel;
+    }
+    replace(value: string): void {
+        this.channel.replace(value);
+    }
+    show(_column?: undefined, preserveFocus?: boolean): void {
+        this.channel.show(preserveFocus);
+    }
+    public get onDidChangeLogLevel(): Event<LogLevel> {
+        return this.channel.onDidChangeLogLevel;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public trace(message: string, ...args: any[]): void {
+        this.channel.trace(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public debug(message: string, ...args: any[]): void {
+        this.channel.debug(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public info(message: string, ...args: any[]): void {
+        this.channel.info(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public warn(message: string, ...args: any[]): void {
+        this.channel.warn(message, ...args);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public error(message: string, ...args: any[]): void {
+        this.channel.error(message, ...args);
+    }
+    public clear(): void {
+        this.channel.clear();
+    }
+    public hide(): void {
+        this.channel.hide();
+    }
+    public dispose(): void {
+        this.channel.dispose();
+    }
+    // #endregion
+}
+
+/** Special parsing for PowerShell Editor Services LSP messages since the LogLevel cannot be read due to vscode
+ * LanguageClient Limitations (https://github.com/microsoft/vscode-languageserver-node/issues/1116)
+  */
+export function PsesParser(message: string): [string, LogLevel] {
+    const logLevelMatch = /^<(?<level>Trace|Debug|Info|Warning|Error)>(?<message>.+)/.exec(message);
+    const logLevel: LogLevel = logLevelMatch?.groups?.level
+        ? LogLevel[logLevelMatch.groups.level as keyof typeof LogLevel]
+        : LogLevel.Info;
+    const logMessage = logLevelMatch?.groups?.message ?? message;
+
+    return ["[PSES] " + logMessage, logLevel];
+}
+
+/** Lsp Trace Parser that does some additional parsing and formatting to make it look nicer */
+export function LspTraceParser(message: string): [string, LogLevel] {
+    let [parsedMessage, level] = LanguageClientOutputChannelAdapter.omnisharpLspParser(message);
+    if (parsedMessage.startsWith("Sending ")) {
+        parsedMessage = parsedMessage.replace("Sending", "➡️");
+        level = LogLevel.Debug;
+    }
+    if (parsedMessage.startsWith("Received ")) {
+        parsedMessage = parsedMessage.replace("Received", "⬅️");
+        level = LogLevel.Debug;
+    }
+    if (parsedMessage.startsWith("Params:")
+        || parsedMessage.startsWith("Result:")
+    ) {
+        level = LogLevel.Trace;
     }
 
-    // TODO: Should we await this function above?
-    private async writeLine(message: string, level: LogLevel = LogLevel.Normal): Promise<void> {
-        const timestampedMessage = Logger.timestampMessage(message, level);
-        this.logChannel.appendLine(timestampedMessage);
-        if (this.logLevel !== LogLevel.None) {
-            // A simple lock because this function isn't re-entrant.
-            while (this.writingLog) {
-                await utils.sleep(300);
-            }
-            try {
-                this.writingLog = true;
-                if (!this.logDirectoryCreated) {
-                    this.writeVerbose(`Creating log directory at: '${this.logDirectoryPath}'`);
-                    await vscode.workspace.fs.createDirectory(this.logDirectoryPath);
-                    this.logDirectoryCreated = true;
-                }
-                let log = new Uint8Array();
-                if (await utils.checkIfFileExists(this.logFilePath)) {
-                    log = await vscode.workspace.fs.readFile(this.logFilePath);
-                }
-                await vscode.workspace.fs.writeFile(
-                    this.logFilePath,
-                    Buffer.concat([log, Buffer.from(timestampedMessage)]));
-            } catch (err) {
-                console.log(`Error writing to vscode-powershell log file: ${err}`);
-            } finally {
-                this.writingLog = false;
-            }
-        }
+    // These are PSES messages that get logged to the output channel anyways so we drop these to trace for easy noise filtering
+    if (parsedMessage.startsWith("⬅️ notification 'window/logMessage'")) {
+        level = LogLevel.Trace;
     }
+
+    return [parsedMessage.trimEnd(), level];
 }

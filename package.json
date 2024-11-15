@@ -916,24 +916,24 @@
         },
         "powershell.developer.editorServicesLogLevel": {
           "type": "string",
-          "default": "Normal",
+          "default": "Warning",
           "enum": [
-            "Diagnostic",
-            "Verbose",
-            "Normal",
+            "Trace",
+            "Debug",
+            "Information",
             "Warning",
             "Error",
             "None"
           ],
           "markdownEnumDescriptions": [
             "Enables all logging possible, please use this setting when submitting logs for bug reports!",
-            "Enables more logging than normal.",
-            "The default logging level.",
-            "Only log warnings and errors.",
+            "Enables more detailed logging of the extension",
+            "Logs high-level information about what the extension is doing.",
+            "Only log warnings and errors. This is the default setting",
             "Only log errors.",
             "Disable all logging possible. No log files will be written!"
           ],
-          "markdownDescription": "Sets the log verbosity for both the extension and its LSP server, PowerShell Editor Services. **Please set to `Diagnostic` when recording logs for a bug report!**"
+          "markdownDescription": "Sets the log verbosity for both the extension and its LSP server, PowerShell Editor Services. **Please set to `Trace` when recording logs for a bug report!**"
         },
         "powershell.developer.editorServicesWaitForDebugger": {
           "type": "boolean",
@@ -952,6 +952,21 @@
           },
           "default": [],
           "markdownDescription": "An array of strings that enable experimental features in the PowerShell extension. **No flags are currently available!**"
+        },
+        "powershell.developer.traceDap": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Traces the DAP communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
+        },
+        "powershell.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
         },
         "powershell.developer.waitForSessionFileTimeoutSeconds": {
           "type": "number",
@@ -1002,21 +1017,6 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Show buttons in the editor's title bar for moving the terminals pane (with the PowerShell Extension Terminal) around."
-        },
-        "powershell.trace.server": {
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). **only for extension developers and issue troubleshooting!**"
-        },
-        "powershell.trace.dap": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). **This setting is only meant for extension developers and issue troubleshooting!**"
         }
       }
     },

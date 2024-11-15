@@ -335,8 +335,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
         // Create or show the debug terminal (either temporary or session).
         this.sessionManager.showDebugTerminal(true);
 
-        this.logger.writeVerbose(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
-        this.logger.writeVerbose(`Debug configuration: ${JSON.stringify(session.configuration, undefined, 2)}`);
+        this.logger.writeDebug(`Connecting to pipe: ${sessionDetails.debugServicePipeName}`);
+        this.logger.writeDebug(`Debug configuration: ${JSON.stringify(session.configuration, undefined, 2)}`);
 
         return new DebugAdapterNamedPipeServer(sessionDetails.debugServicePipeName);
     }
@@ -424,7 +424,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                 // The dispose shorthand demonry for making an event one-time courtesy of: https://github.com/OmniSharp/omnisharp-vscode/blob/b8b07bb12557b4400198895f82a94895cb90c461/test/integrationTests/launchConfiguration.integration.test.ts#L41-L45
                 startDebugEvent.dispose();
 
-                this.logger.writeVerbose(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
+                this.logger.writeDebug(`Debugger session detected: ${dotnetAttachSession.name} (${dotnetAttachSession.id})`);
 
                 tempConsoleDotnetAttachSession = dotnetAttachSession;
 
@@ -434,7 +434,7 @@ export class DebugSessionFeature extends LanguageClientConsumer
                     // Makes the event one-time
                     stopDebugEvent.dispose();
 
-                    this.logger.writeVerbose(`Debugger session terminated: ${tempConsoleSession.name} (${tempConsoleSession.id})`);
+                    this.logger.writeDebug(`Debugger session terminated: ${tempConsoleSession.name} (${tempConsoleSession.id})`);
 
                     // HACK: As of 2023-08-17, there is no vscode debug API to request the C# debugger to detach, so we send it a custom DAP request instead.
                     const disconnectRequest: DebugProtocol.DisconnectRequest = {
@@ -462,8 +462,8 @@ export class DebugSessionFeature extends LanguageClientConsumer
             // Start a child debug session to attach the dotnet debugger
             // TODO: Accommodate multi-folder workspaces if the C# code is in a different workspace folder
             await debug.startDebugging(undefined, dotnetAttachConfig, session);
-            this.logger.writeVerbose(`Dotnet attach debug configuration: ${JSON.stringify(dotnetAttachConfig, undefined, 2)}`);
-            this.logger.writeVerbose(`Attached dotnet debugger to process: ${pid}`);
+            this.logger.writeDebug(`Dotnet attach debug configuration: ${JSON.stringify(dotnetAttachConfig, undefined, 2)}`);
+            this.logger.writeDebug(`Attached dotnet debugger to process: ${pid}`);
         }
 
         return this.tempSessionDetails;
@@ -606,36 +606,27 @@ export class DebugSessionFeature extends LanguageClientConsumer
 
 class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory, Disposable {
     disposables: Disposable[] = [];
-    dapLogEnabled: boolean = workspace.getConfiguration("powershell").get<boolean>("trace.dap") ?? false;
-    constructor(private adapterName = "PowerShell") {
-        this.disposables.push(workspace.onDidChangeConfiguration(change => {
-            if (
-                change.affectsConfiguration("powershell.trace.dap")
-            ) {
-                this.dapLogEnabled = workspace.getConfiguration("powershell").get<boolean>("trace.dap") ?? false;
-                if (this.dapLogEnabled) {
-                    // Trigger the output pane to appear. This gives the user time to position it before starting a debug.
-                    this.log?.show(true);
-                }
-            }
-        }));
-    }
+    constructor(private adapterName = "PowerShell") {}
 
-    /* We want to use a shared output log for separate debug sessions as usually only one is running at a time and we
-    *  dont need an output window for every debug session. We also want to leave it active so user can copy and paste
-    *  even on run end. When user changes the setting and disables it getter will return undefined, which will result
+
+    _log: LogOutputChannel | undefined;
+    /** Lazily creates a {@link LogOutputChannel} for debug tracing, and presents it only when DAP logging is enabled.
+    *
+    * We want to use a shared output log for separate debug sessions as usually only one is running at a time and we
+    * dont need an output window for every debug session. We also want to leave it active so user can copy and paste
+    * even on run end. When user changes the setting and disables it getter will return undefined, which will result
     * in a noop for the logging activities, effectively pausing logging but not disposing the output channel. If the
     * user re-enables, then logging resumes.
     */
-    _log: LogOutputChannel | undefined;
     get log(): LogOutputChannel | undefined {
-        if (this.dapLogEnabled && this._log === undefined) {
-            this._log = window.createOutputChannel(`${this.adapterName} Trace - DAP`, { log: true });
+        if (workspace.getConfiguration("powershell.developer").get<boolean>("traceDap") && this._log === undefined) {
+            this._log = window.createOutputChannel(`${this.adapterName}: Trace DAP`, { log: true });
             this.disposables.push(this._log);
         }
-        return this.dapLogEnabled ? this._log : undefined;
+        return this._log;
     }
 
+    // This tracker effectively implements the logging for the debug adapter to a LogOutputChannel
     createDebugAdapterTracker(session: DebugSession): DebugAdapterTracker {
         const sessionInfo = `${this.adapterName} Debug Session: ${session.name} [${session.id}]`;
         return {
