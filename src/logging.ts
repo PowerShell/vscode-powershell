@@ -274,7 +274,7 @@ export function LspTraceParser(message: string): [string, LogLevel] {
         level = LogLevel.Trace;
     }
 
-    // These are PSES messages we don't really need to see so we drop these to trace
+    // These are PSES messages that get logged to the output channel anyways so we drop these to trace for easy noise filtering
     if (parsedMessage.startsWith("⬅️ notification 'window/logMessage'")) {
         level = LogLevel.Trace;
     }

@@ -626,6 +626,7 @@ class PowerShellDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory
         return this._log;
     }
 
+    // This tracker effectively implements the logging for the debug adapter to a LogOutputChannel
     createDebugAdapterTracker(session: DebugSession): DebugAdapterTracker {
         const sessionInfo = `${this.adapterName} Debug Session: ${session.name} [${session.id}]`;
         return {
