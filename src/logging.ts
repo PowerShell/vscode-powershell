@@ -153,8 +153,10 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
         this.sendLogMessage(parsedMessage, level);
     }
 
+    // We include the log level inline from PSES for VSCode because our LanguageClient doesn't support middleware for logMessages yet.
+    // BUG:
     protected parse(message: string): [string, LogLevel] {
-        const logLevelMatch = /^\[(?<level>Trace|Debug|Info|Warn|Error) +- \d+:\d+:\d+ [AP]M\] (?<message>.+)/.exec(message);
+        const logLevelMatch = /^<(?<level>Trace|Debug|Info|Warning|Error)>(?<message>.+)/.exec(message);
         if (logLevelMatch) {
             const { level, message } = logLevelMatch.groups!;
             let logLevel: LogLevel;
@@ -168,7 +170,7 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
             case "Info":
                 logLevel = LogLevel.Info;
                 break;
-            case "Warn":
+            case "Warning":
                 logLevel = LogLevel.Warning;
                 break;
             case "Error":
