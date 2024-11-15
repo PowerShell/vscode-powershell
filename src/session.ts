@@ -569,7 +569,7 @@ export class SessionManager implements Middleware {
             void this.setSessionFailedGetPowerShell(`PowerShell v${version} is not supported, please update!`);
         } else if (satisfies(version, ">=5.1.0 <6.0.0")) {
             void this.setSessionFailedGetPowerShell("It looks like you're trying to use Windows PowerShell, which is supported on a best-effort basis. Can you try PowerShell 7?");
-        } else if (satisfies(version, ">=6.0.0 <7.2.0")) {
+        } else if (satisfies(version, ">=6.0.0 <7.4.0")) {
             void this.setSessionFailedGetPowerShell(`PowerShell v${version} has reached end-of-support, please update!`);
         } else {
             shouldUpdate = false;
