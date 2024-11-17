@@ -56,10 +56,19 @@ Invoke-Build Build
 Explore the `vscode-powershell.build.ps1` file for other build targets.
 
 ### Launching the extension
+First, ensure you have completed a build as instructed above, as the launch templates do not check some prerequisites for performance reasons.
 
-To debug the extension use one of the provided `Launch Extension` debug configurations (remember to rebuild first).
-You can simultaneously use the `Attach to Editor Services` configuration to attach the .NET debugger to the PowerShell process running the server.
-Try the `powershell.developer.editorServicesWaitForDebugger` setting to attach before startup.
+To debug the extension use one of the provided `Launch Extension` debug configurations.
+1. `Launch Extension`: Launches the debugger using your personal profile settings.
+2. `Temp Profile`: Launches VS Code with a temp profile that resets on every launch. Useful for "out of the box" environment testing.
+3. `Isolated Profile`: Launches the debugger with a persistent debug profile specific to the extension, so you can preserve some settings or test certain prerequisites.
+
+All three templates use pre-launch tasks to build the code, and support automatic restart of the extension host on changes to the Extension source code. [Hot Reload](https://devblogs.microsoft.com/dotnet/introducing-net-hot-reload/) is also enabled for PowerShell Editor Services.
+
+> [!WARNING]  
+> There is a current limitation that, if you restart the extension/extension host or it is restarted due to a extension code change, the editor services attachment will be disconnected due to the PSES terminal being terminated, and you will either need to restart the debug session completely, or do a manual build of PSES and run the `Attach to Editor Services` debug launch manually.
+
+Try the `powershell.developer.editorServicesWaitForDebugger` setting to ensure that you are fully attached before the extension startup process continues.
 
 ## Contributing Snippets
 

@@ -23,6 +23,7 @@ export class PowerShellProcess {
     private consoleCloseSubscription?: vscode.Disposable;
 
     private pid?: number;
+    private pidUpdateEmitter?: vscode.EventEmitter<number | undefined>;
 
     constructor(
         public exePath: string,
@@ -33,10 +34,13 @@ export class PowerShellProcess {
         private logDirectoryPath: vscode.Uri,
         private startPsesArgs: string,
         private sessionFilePath: vscode.Uri,
-        private sessionSettings: Settings) {
+        private sessionSettings: Settings,
+        private devMode = false
+    ) {
 
         this.onExitedEmitter = new vscode.EventEmitter<void>();
         this.onExited = this.onExitedEmitter.event;
+        this.pidUpdateEmitter = new vscode.EventEmitter<number | undefined>();
     }
 
     public async start(cancellationToken: vscode.CancellationToken): Promise<IEditorServicesSessionDetails | undefined> {
@@ -103,7 +107,7 @@ export class PowerShellProcess {
 
         // When VS Code shell integration is enabled, the script expects certain
         // variables to be added to the environment.
-        let envMixin = undefined;
+        let envMixin = {};
         if (this.shellIntegrationEnabled) {
             envMixin = {
                 "VSCODE_INJECTION": "1",
@@ -113,6 +117,12 @@ export class PowerShellProcess {
                 "VSCODE_STABLE": vscode.env.appName.includes("Insiders") ? "0" : "1",
                 // Maybe one day we can set VSCODE_NONCE...
             };
+        }
+
+        // Enables Hot Reload in .NET for the attached process
+        // https://devblogs.microsoft.com/devops/net-enc-support-for-lambdas-and-other-improvements-in-visual-studio-2015/
+        if (this.devMode) {
+            (envMixin as Record<string,string>).COMPLUS_FORCEENC = "1";
         }
 
         // Launch PowerShell in the integrated terminal
@@ -136,6 +146,7 @@ export class PowerShellProcess {
         this.consoleTerminal = vscode.window.createTerminal(terminalOptions);
         this.pid = await this.getPid();
         this.logger.write(`PowerShell process started with PID: ${this.pid}`);
+        this.pidUpdateEmitter?.fire(this.pid);
 
         if (this.sessionSettings.integratedConsole.showOnStartup
             && !this.sessionSettings.integratedConsole.startInBackground) {
@@ -186,6 +197,9 @@ export class PowerShellProcess {
 
         this.consoleCloseSubscription?.dispose();
         this.consoleCloseSubscription = undefined;
+
+        this.pidUpdateEmitter?.dispose();
+        this.pidUpdateEmitter = undefined;
     }
 
     public sendKeyPress(): void {

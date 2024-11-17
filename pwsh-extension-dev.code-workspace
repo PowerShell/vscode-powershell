@@ -1,0 +1,477 @@
+{
+  "folders": [
+    {
+      "name": "Client",
+      "path": "."
+    },
+    {
+      "name": "Server",
+      "path": "../PowerShellEditorServices"
+    }
+  ],
+
+  "extensions": {
+    "recommendations": [
+      "davidanson.vscode-markdownlint",
+      "dbaeumer.vscode-eslint",
+      "editorconfig.editorconfig",
+      "ms-dotnettools.csharp",
+      "ms-vscode.powershell",
+      "hbenl.vscode-mocha-test-adapter",
+      "connor4312.esbuild-problem-matchers"
+    ]
+  },
+  "settings": {
+    "window.title": "PowerShell VS Code Extension Development",
+    "debug.onTaskErrors": "prompt",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.associations": {
+      "**/snippets/*.json": "jsonc", // Use JSONC instead of JSON because that's how VS Code interprets snippet files, and it enables better source documentation.
+    },
+    // Ignore the Markdown rule:
+    "markdownlint.config": {
+      "MD024": false // no-duplicate-header
+    },
+    "powershell.cwd": "Client",
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
+    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
+    "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "typescript.tsdk": "Client/node_modules/typescript/lib", // Lock the TypeScript SDK path to the version we use
+    "typescript.format.semicolons": "insert", // Code actions like "organize imports" ignore ESLint, so we need this here
+    "eslint.format.enable": true, // Enable ESLint as defaut formatter so quick fixes can be applied directly
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnPaste": true,
+      "editor.formatOnSave": true,
+      "editor.formatOnSaveMode": "modificationsIfAvailable"
+    },
+    "mochaExplorer.configFile": ".mocharc.json",
+    "mochaExplorer.launcherScript": "test/runTests",
+    "mochaExplorer.autoload": false, // The test instance pops up every time discovery or run is done, this could be annoying on startup.
+    "mochaExplorer.debuggerPort": 59229, // Matches the launch config, we dont want to use the default port as we are launching a duplicate instance of vscode and it might conflict.
+    "mochaExplorer.ipcRole": "server",
+    "mochaExplorer.ipcTimeout": 30000, // 30 seconds
+    "testExplorer.useNativeTesting": true,
+    "mochaExplorer.env": {
+      "VSCODE_VERSION": "insiders",
+      "ELECTRON_RUN_AS_NODE": null
+    }
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "windows": {
+      "options": {
+        "shell": {
+          "executable": "pwsh.exe",
+          "args": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "linux": {
+      "options": {
+        "shell": {
+          "executable": "pwsh",
+          "args": [
+            "-NoProfile",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "osx": {
+      "options": {
+        "shell": {
+          "executable": "/usr/local/bin/pwsh",
+          "args": [
+            "-NoProfile",
+            "-Command"
+          ]
+        }
+      }
+    },
+    "tasks": [
+      {
+        "label": "Build",
+        "icon": {
+          "id": "tools",
+        },
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build Build",
+        "problemMatcher": [
+          "$msCompile",
+          "$tsc"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Extension: Watch",
+        "type": "shell",
+        "isBackground": true,
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "npm run watch",
+        "problemMatcher": {
+          "owner": "esbuild-watch",
+          "pattern": {
+            "regexp": "^\\[ERROR\\] (.+)\\n\\n\\s+([^:]+):(\\d+):(\\d+):",
+            "message": 1,
+            "file": 2,
+            "line": 3,
+            "column": 4,
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^\\[watch\\] build started",
+            "endsPattern": "^\\[watch\\] build finished"
+          }
+        },
+        "icon": {
+          "id": "sync",
+          "color": "terminal.ansiCyan"
+        },
+        "group": {
+          "kind": "build",
+        }
+      },
+      {
+        "label": "PSES: BuildIfChanged",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Server}"
+        },
+        "command": "Invoke-Build BuildIfChanged",
+        "problemMatcher": "$msCompile",
+        "icon": {
+          "id": "tools",
+          "color": "terminal.ansiCyan"
+        },
+        "group": {
+          "kind": "build",
+        }
+      },
+      {
+        "label": "PreLaunch",
+        "dependsOn": [
+          "Extension: Watch",
+          "PSES: BuildIfChanged"
+        ],
+        "dependsOrder": "parallel"
+      },
+      {
+        "label": "Test Client",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build Test",
+        "problemMatcher": [
+          "$msCompile",
+          "$tsc"
+        ],
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Test Server",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Server}"
+        },
+        "problemMatcher": [
+          "$msCompile"
+        ],
+        "command": "Invoke-Build TestPS74",
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "Invoke-Build Client",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Client}"
+        },
+        "command": "Invoke-Build ${input:clientBuildCommand}",
+        "group": "build"
+      },
+      {
+        "label": "Invoke-Build Server",
+        "type": "shell",
+        "options": {
+          "cwd": "${workspaceFolder:Server}"
+        },
+        "command": "Invoke-Build ${input:serverBuildCommand}",
+        "group": "build"
+      }
+    ],
+    "inputs": [
+      {
+        "type": "pickString",
+        "id": "clientBuildCommand",
+        "description": "Which Invoke-Build Client Task?",
+        "options": [
+          "Restore",
+          "Clean",
+          "Build",
+          "Test",
+          "Package"
+        ],
+        "default": "Clean"
+      },
+      {
+        "type": "pickString",
+        "id": "serverBuildCommand",
+        "description": "Which Invoke-Build Server Task?",
+        "options": [
+          "SetupDotNet",
+          "BinClean",
+          "Clean",
+          "Build",
+          "Test",
+          "TestPS74",
+          "TestE2EPwsh",
+          "TestPS51",
+          "TestE2EPowerShell",
+        ],
+        "default": "Clean"
+      }
+    ],
+
+  },
+  "launch": {
+    "version": "0.2.0",
+    "compounds": [
+      {
+        "name": "Launch Extension",
+        "configurations": [
+          "Launch",
+          "PowerShell Editor Services"
+        ],
+        "preLaunchTask": "Build",
+        "stopAll": true,
+        "presentation": {
+          "hidden": false,
+          "group": "Test",
+          "order": 1
+        }
+      },
+      {
+        "name": "Launch Extension - Temp Profile",
+        "configurations": [
+          "Launch-Temp",
+          "PowerShell Editor Services"
+        ],
+        "preLaunchTask": "PreLaunch",
+        "stopAll": true,
+        "presentation": {
+          "hidden": false,
+          "group": "Test",
+          "order": 2
+        }
+      },
+      {
+        "name": "Launch Extension - Isolated Profile",
+        "configurations": [
+          "Launch-Isolated",
+          "PowerShell Editor Services"
+        ],
+        "preLaunchTask": "Build",
+        "stopAll": true,
+        "presentation": {
+          "hidden": false,
+          "group": "Test",
+          "order": 3
+        }
+      }
+    ],
+    "configurations": [
+      {
+        "name": "Launch",
+        "type": "extensionHost",
+        "request": "launch",
+        "env": {
+          "VSCODE_PARENT_SESSION_ID": "${command:GetVsCodeSessionId}",
+        },
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          "--extensionDevelopmentPath=${workspaceFolder:Client}",
+          "${workspaceFolder:Client}/examples"
+        ],
+        "sourceMaps": true,
+        // This speeds up source map detection and makes smartStep work correctly
+        "outFiles": [
+          "${workspaceFolder:Client}/**/*.js",
+          "!**/node_modules/**",
+          "!**/.vscode-test/**"
+        ],
+        "skipFiles": [
+          "<node_internals>/**",
+          "**/node_modules/**",
+          "**/.vscode-test/**",
+          "**/app/out/vs/**" //Skips Extension Host internals
+        ],
+        "presentation": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "Launch-Temp",
+        "type": "extensionHost",
+        "request": "launch",
+        "env": {
+          "VSCODE_PARENT_SESSION_ID": "${command:GetVsCodeSessionId}",
+        },
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          // Runs the extension in an empty temp profile that is automatically cleaned up after use
+          // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
+          "--profile-temp",
+          "--extensionDevelopmentPath=${workspaceFolder:Client}",
+          "${workspaceFolder:Client}/examples"
+        ],
+        "sourceMaps": true,
+        // This speeds up source map detection and makes smartStep work correctly
+        "outFiles": [
+          "${workspaceFolder:Client}/**/*.js",
+          "!**/node_modules/**",
+          "!**/.vscode-test/**"
+        ],
+        "skipFiles": [
+          "<node_internals>/**",
+          "**/node_modules/**",
+          "**/.vscode-test/**",
+          "**/app/out/vs/**", // Skips Extension Host internals
+        ],
+        "presentation": {
+          "hidden": true
+        }
+      },
+      {
+        "name": "Launch-Isolated",
+        "type": "extensionHost",
+        "request": "launch",
+        "env": {
+          "VSCODE_PARENT_SESSION_ID": "${command:GetVsCodeSessionId}",
+        },
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          // Runs the extension in an empty temp profile that is automatically cleaned up after use
+          // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
+          "--profile=pwsh-debug",
+          "--extensionDevelopmentPath=${workspaceFolder:Client}",
+          "${workspaceFolder:Client}/examples"
+        ],
+        "sourceMaps": true,
+        // This speeds up source map detection and makes smartStep work correctly
+        "outFiles": [
+          "${workspaceFolder:Client}/**/*.js",
+          "!**/node_modules/**",
+          "!**/.vscode-test/**",
+        ],
+        "skipFiles": [
+          "<node_internals>/**",
+          "**/node_modules/**",
+          "**/.vscode-test/**",
+          "**/app/out/vs/**" //Skips Extension Host internals
+        ],
+        "presentation": {
+          "hidden": true
+        }
+      },
+      {
+        // https://code.visualstudio.com/docs/csharp/debugger-settings
+        "name": "Attach to Editor Services",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "${command:PowerShell.PickPSHostProcess}",
+        "justMyCode": true,
+        "suppressJITOptimizations": true,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false
+        },
+        "presentation": {
+          "hidden": false,
+          "group": "Test",
+          "order": 5
+        },
+        "logging": {
+          "moduleLoad": false
+        },
+      },
+      {
+        // https://code.visualstudio.com/docs/csharp/debugger-settings
+        "name": "PowerShell Editor Services",
+        "type": "coreclr",
+        "request": "attach",
+        // Waits for the extension terminal to become available and gets the PID, saves having to enter it manually.
+        "processId": "${command:PowerShell.WaitForPsesActivationAndReturnProcessId}",
+        "justMyCode": true,
+        "suppressJITOptimizations": true,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false
+        },
+        "presentation": {
+          "hidden": true
+        },
+        "logging": {
+          "moduleLoad": false
+        }
+      },
+      {
+        // Runs the extension in an isolated but persistent profile separate from the user settings
+        // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
+        "name": "Launch Extension - Rename Test Cases",
+        "type": "extensionHost",
+        "request": "launch",
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          "--profile=debug",
+          "--extensionDevelopmentPath=${workspaceFolder:Client}",
+          "${workspaceFolder:Server}/test/PowerShellEditorServices.Test.Shared/Refactoring"
+        ],
+        "sourceMaps": true,
+        // This speeds up source map detection and makes smartStep work correctly
+        "outFiles": [
+          "${workspaceFolder:Client}/**/*.js",
+          "!**/node_modules/**",
+          "!**/.vscode-test/**"
+        ],
+        "skipFiles": [
+          "<node_internals>/**",
+          "**/node_modules/**",
+          "**/.vscode-test/**" // Skips Extension Host internals
+        ],
+        "presentation": {
+          "hidden": true,
+        }
+      },
+    ]
+  }
+}
