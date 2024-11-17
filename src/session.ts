@@ -240,6 +240,8 @@ export class SessionManager implements Middleware {
             this.logger.write(`Started PowerShell v${this.versionDetails.version}.`);
             this.setSessionRunningStatus(); // Yay, we made it!
 
+            await this.writePidIfInDevMode(this.languageServerProcess);
+
             // Fire and forget the updater.
             const updater = new UpdatePowerShell(this.sessionSettings, this.logger, this.versionDetails);
             void updater.checkForUpdate();
@@ -301,6 +303,26 @@ export class SessionManager implements Middleware {
         }
 
         await this.start();
+    }
+
+    /** In Development mode, write the PID to a file where the parent session can find it, to attach the dotnet debugger. */
+    private async writePidIfInDevMode(pwshProcess: PowerShellProcess): Promise<void> {
+        if (this.extensionContext.extensionMode !== vscode.ExtensionMode.Development) { return; }
+        const parentSessionId = process.env.VSCODE_PARENT_SESSION_ID;
+        const pidFilePath = vscode.Uri.joinPath(this.sessionsFolder, `PSES-${parentSessionId}.pid`);
+
+        if (parentSessionId === undefined) { return; }
+
+        const fs = vscode.workspace.fs;
+        const pid = (await pwshProcess.getPid())!.toString();
+        await fs.writeFile(pidFilePath, Buffer.from(pid));
+        const deletePidOnExit = pwshProcess.onExited(() => {
+            deletePidOnExit.dispose();
+            fs.delete(pidFilePath, {useTrash: false});
+            console.log(`Deleted PID file: ${pidFilePath}`);
+        });
+        this.registeredCommands.push(deletePidOnExit);
+        this.extensionContext.subscriptions.push(deletePidOnExit);
     }
 
     public getSessionDetails(): IEditorServicesSessionDetails | undefined {
@@ -569,7 +591,8 @@ export class SessionManager implements Middleware {
                 this.extensionContext.logUri,
                 this.getEditorServicesArgs(bundledModulesPath, powerShellExeDetails),
                 this.getNewSessionFilePath(),
-                this.sessionSettings);
+                this.sessionSettings,
+                this.extensionContext.extensionMode == vscode.ExtensionMode.Development);
 
         languageServerProcess.onExited(
             () => {

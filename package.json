@@ -300,7 +300,19 @@
         "title": "Move panel to bottom",
         "category": "PowerShell",
         "icon": "$(layout-panel-right)"
+      },
+      {
+        "title": "[PowerShell Debug Input Task] Wait for and return PSES startup PID",
+        "command": "PowerShell.WaitForPsesActivationAndReturnProcessId",
+        "enablement": "false"
+      },
+      {
+        "title": "[PowerShell Debug Input Task] Get the VS Code Session ID for writing the PID file",
+        "command": "GetVsCodeSessionId",
+        "enablement": "false"
       }
+
+
     ],
     "menus": {
       "commandPalette": [
