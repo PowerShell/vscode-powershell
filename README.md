@@ -53,23 +53,27 @@ picker][] and select **PowerShell ISE**.
 
 ## Platform Support
 
-The extension should work anywhere VS Code itself and PowerShell Core 7.2 or higher is
-[supported][]. For Windows PowerShell, only version 5.1 is supported and only on a best-effort
-basis. PowerShell Core 6, 7.0, and 7.1 have reached end-of-support. We test the following
-configurations:
+The extension should work everywhere [Visual Studio Code](https://code.visualstudio.com/docs/supporting/requirements) is supported using [PowerShell 7+ currently supported versions][].
 
-- **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell Core 7.2, 7.3 and 7.4
-- **macOS 12** with PowerShell Core 7.2, 7.3 and 7.4
-- **Ubuntu 22.04** with PowerShell Core 7.2, 7.3 and 7.4
+> [!IMPORTANT]
+> For Windows PowerShell, only version 5.1 is supported and only on a best-effort basis. [.NET Framework 4.8][dotnet-framework] or higher is required.
+
+> [!IMPORTANT]
+> [Visual Studio Code for the Web](https://code.visualstudio.com/docs/editor/vscode-web) is only supported for limited functionality such as basic syntax highlighting, as the PowerShell engine cannot run in this environment currently.
+
+[VS Code Remote Development](https://code.visualstudio.com/docs/remote/remote-overview) Environments, including [Github Codespaces](https://github.com/features/codespaces) and [VS Code Server](https://code.visualstudio.com/docs/remote/vscode-server) are supported.
+
+We actively test the following configurations [in Github Actions on every commit](https://github.com/PowerShell/vscode-powershell/actions/workflows/ci-test.yml):
+- **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell 7+
+- **macOS 14.7** with PowerShell 7+
+- **Ubuntu 22.04** with PowerShell 7+
 
 On Windows, we also test with and without Constrained Language Mode enabled.
 
 Read the [installation instructions][]
 to get more details on how to use the extension on these platforms.
 
-For Windows PowerShell 5.1, [.NET Framework 4.8][dotnet-framework] or higher is required.
-
-[supported]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle
+[PowerShell 7+ currently supported versions]: https://docs.microsoft.com/en-us/powershell/scripting/powershell-support-lifecycle
 [installation instructions]: https://docs.microsoft.com/en-us/powershell/scripting/components/vscode/using-vscode
 [dotnet-framework]: https://dotnet.microsoft.com/en-us/download/dotnet-framework
 
