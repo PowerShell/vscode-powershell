@@ -94,6 +94,8 @@ extends:
               project: PowerShellCore
               definition: 2905
               specificBuildWithTriggering: true
+              allowPartiallySucceededBuilds: true
+              buildVersionToDownload: latestFromBranch
               branchName: refs/heads/main
               artifact: drop_build_main
           - task: ExtractFiles@1
@@ -101,6 +103,10 @@ extends:
             inputs:
               archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
               destinationFolder: $(Build.SourcesDirectory)/modules
+          - pwsh: |
+              $manifest = Test-ModuleManifest $(Build.SourcesDirectory)/modules/PowerShellEditorServices/PowerShellEditorServices.psd1
+              Write-Host Using PowerShellEditorServices v$($manifest.Version)
+            displayName: PowerShellEditorServices version
           - pwsh: |
               Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
               Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
@@ -156,6 +162,8 @@ extends:
               project: PowerShellCore
               definition: 2905
               specificBuildWithTriggering: true
+              allowPartiallySucceededBuilds: true
+              buildVersionToDownload: latestFromBranch
               branchName: refs/heads/main
               artifact: drop_build_main
           - task: ExtractFiles@1
@@ -163,6 +171,10 @@ extends:
             inputs:
               archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
               destinationFolder: $(Build.SourcesDirectory)/modules
+          - pwsh: |
+              $manifest = Test-ModuleManifest $(Build.SourcesDirectory)/modules/PowerShellEditorServices/PowerShellEditorServices.psd1
+              Write-Host Using PowerShellEditorServices v$($manifest.Version)
+            displayName: PowerShellEditorServices version
           - pwsh: |
               Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
               Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
