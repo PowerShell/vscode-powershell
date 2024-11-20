@@ -239,17 +239,17 @@ export class PowerShellExeFinder {
                 }
 
                 exePath = untildify(exePath);
-
-                // Always search for what the user gave us first
-                yield new PossiblePowerShellExe(exePath, versionName);
-
-                // Also search for `pwsh[.exe]` and `powershell[.exe]` if missing
                 const args: [string, undefined, boolean, boolean]
                     // Must be a tuple type and is suppressing the warning
                     = [versionName, undefined, true, true];
 
-                // Handle Windows where '.exe' and 'powershell' are things
+                // Always search for what the user gave us first, but with the warning
+                // suppressed so we can display it after all possibilities are exhausted
+                yield new PossiblePowerShellExe(exePath, ...args);
+
+                // Also search for `pwsh[.exe]` and `powershell[.exe]` if missing
                 if (this.platformDetails.operatingSystem === OperatingSystem.Windows) {
+                    // Handle Windows where '.exe' and 'powershell' are things
                     if (!exePath.endsWith("pwsh.exe") && !exePath.endsWith("powershell.exe")) {
                         if (exePath.endsWith("pwsh") || exePath.endsWith("powershell")) {
                             // Add extension if that was missing
@@ -260,9 +260,13 @@ export class PowerShellExeFinder {
                         yield new PossiblePowerShellExe(path.join(exePath, "pwsh.exe"), ...args);
                         yield new PossiblePowerShellExe(path.join(exePath, "powershell.exe"), ...args);
                     }
-                } else if (!exePath.endsWith("pwsh")) { // Always just 'pwsh' on non-Windows
+                } else if (!exePath.endsWith("pwsh")) {
+                    // Always just 'pwsh' on non-Windows
                     yield new PossiblePowerShellExe(path.join(exePath, "pwsh"), ...args);
                 }
+
+                // If we're still being iterated over, no permutation of the given path existed so yield an object with the warning unsuppressed
+                yield new PossiblePowerShellExe(exePath, versionName, false, undefined, false);
             }
         }
     }

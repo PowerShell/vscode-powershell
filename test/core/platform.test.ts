@@ -468,10 +468,25 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             environmentVars: {},
+            // Note that for each given path, we expect:
+            // 1. The path as-is.
+            // 2. Any expected permutations of the path (for example, with a tilde or folder expanded, and/or '.exe' added).
+            // 3. The path as-is again (in order for a warning to be displayed at the correct time).
+            // An improvement here would be to check the suppressWarning field, but it's not currently exposed.
             expectedPowerShellSequence: [
                 {
                     exePath: "C:\\Users\\test\\pwsh\\pwsh.exe",
                     displayName: "pwsh",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "C:\\Users\\test\\pwsh\\pwsh.exe",
+                    displayName: "pwsh",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: path.join(os.homedir(), "pwsh", "pwsh.exe"),
+                    displayName: "pwsh-tilde",
                     supportsProperArguments: true
                 },
                 {
@@ -500,6 +515,11 @@ if (process.platform === "win32") {
                     supportsProperArguments: true
                 },
                 {
+                    exePath: "C:\\Users\\test\\pwsh\\pwsh",
+                    displayName: "pwsh-no-exe",
+                    supportsProperArguments: true
+                },
+                {
                     exePath: "C:\\Users\\test\\pwsh\\",
                     displayName: "pwsh-folder",
                     supportsProperArguments: true
@@ -511,6 +531,11 @@ if (process.platform === "win32") {
                 },
                 {
                     exePath: "C:\\Users\\test\\pwsh\\powershell.exe",
+                    displayName: "pwsh-folder",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "C:\\Users\\test\\pwsh\\",
                     displayName: "pwsh-folder",
                     supportsProperArguments: true
                 },
@@ -535,8 +560,23 @@ if (process.platform === "win32") {
                     supportsProperArguments: true
                 },
                 {
+                    exePath: "C:\\Users\\test\\pwsh",
+                    displayName: "pwsh-folder-no-slash",
+                    supportsProperArguments: true
+                },
+                {
                     exePath: "C:\\Users\\test\\pwsh\\pwsh.exe",
                     displayName: "pwsh-single-quotes",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "C:\\Users\\test\\pwsh\\pwsh.exe",
+                    displayName: "pwsh-single-quotes",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "C:\\Users\\test\\pwsh\\pwsh.exe",
+                    displayName: "pwsh-double-quotes",
                     supportsProperArguments: true
                 },
                 {
@@ -760,17 +800,32 @@ if (process.platform === "win32") {
 
     successAdditionalTestCases = [
         {   // Also sufficient for macOS as the behavior is the same
-            name: "Linux (Additional PowerShell Executables)",
+            name: "Linux/macOS (Additional PowerShell Executables)",
             platformDetails: {
                 operatingSystem: platform.OperatingSystem.Linux,
                 isOS64Bit: true,
                 isProcess64Bit: true,
             },
             environmentVars: {},
+            // Note that for each given path, we expect:
+            // 1. The path as-is.
+            // 2. Any expected permutations of the path (for example, with a tilde or folder expanded).
+            // 3. The path as-is again (in order for a warning to be displayed at the correct time).
+            // An improvement here would be to check the suppressWarning field, but it's not currently exposed.
             expectedPowerShellSequence: [
                 {
                     exePath: "/home/bin/pwsh",
                     displayName: "pwsh",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/home/bin/pwsh",
+                    displayName: "pwsh",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: path.join(os.homedir(), "bin", "pwsh"),
+                    displayName: "pwsh-tilde",
                     supportsProperArguments: true
                 },
                 {
@@ -789,6 +844,11 @@ if (process.platform === "win32") {
                     supportsProperArguments: true
                 },
                 {
+                    exePath: "/home/bin/",
+                    displayName: "pwsh-folder",
+                    supportsProperArguments: true
+                },
+                {
                     exePath: "/home/bin",
                     displayName: "pwsh-folder-no-slash",
                     supportsProperArguments: true
@@ -799,8 +859,23 @@ if (process.platform === "win32") {
                     supportsProperArguments: true
                 },
                 {
+                    exePath: "/home/bin",
+                    displayName: "pwsh-folder-no-slash",
+                    supportsProperArguments: true
+                },
+                {
                     exePath: "/home/bin/pwsh",
                     displayName: "pwsh-single-quotes",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/home/bin/pwsh",
+                    displayName: "pwsh-single-quotes",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/home/bin/pwsh",
+                    displayName: "pwsh-double-quotes",
                     supportsProperArguments: true
                 },
                 {
