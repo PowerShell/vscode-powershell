@@ -601,437 +601,464 @@
         "initialConfigurations": []
       }
     ],
-    "configuration": {
-      "title": "PowerShell",
-      "properties": {
-        "powershell.sideBar.CommandExplorerVisibility": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Specifies the visibility of the Command Explorer in the side bar."
-        },
-        "powershell.sideBar.CommandExplorerExcludeFilter": {
-          "type": "array",
-          "items": {
-            "type": "string"
+    "configuration": [
+      {
+        "title": "Interface",
+        "properties": {
+          "powershell.buttons.showRunButtons": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Show the `Run` and `Run Selection` buttons in the editor's title bar."
           },
-          "default": [],
-          "markdownDescription": "Specifies an array of modules to exclude from Command Explorer listing."
-        },
-        "powershell.powerShellAdditionalExePaths": {
-          "type": "object",
-          "default": {},
-          "markdownDescription": "Specifies a list of Item / Value pairs where the **Item** is a user-chosen name and the **Value** is an absolute path to a PowerShell executable. The name appears in the [Session Menu Command](command:PowerShell.ShowSessionMenu) and is used to reference this executable in the `#powershell.powerShellDefaultVersion#` setting.",
-          "additionalProperties": {
-            "type": "string"
+          "powershell.buttons.showPanelMovementButtons": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Show buttons in the editor's title bar for moving the terminals pane (with the PowerShell Extension Terminal) around."
+          },
+          "powershell.enableReferencesCodeLens": {
+          "type": "boolean",
+            "default": true,
+            "markdownDescription": "Specifies if Code Lenses are displayed above function definitions, used to show the number of times the function is referenced in the workspace and navigate to those references. Large workspaces may want to disable this setting if performance is compromised. See also `#powershell.analyzeOpenDocumentsOnly#`."
+          },
+          "powershell.codeFolding.enable": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Enables syntax based code folding. When disabled, the default indentation based code folding is used."
+          },
+          "powershell.codeFolding.showLastLine": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Shows the last line of a folded section similar to the default VS Code folding style. When disabled, the entire folded region is hidden."
+          },
+          "powershell.helpCompletion": {
+            "type": "string",
+            "default": "BlockComment",
+            "enum": [
+              "Disabled",
+              "BlockComment",
+              "LineComment"
+            ],
+            "markdownEnumDescriptions": [
+              "Disables the feature.",
+              "Inserts a block style help comment, for example:\n\n`<#`\n\n`.<help keyword>`\n\n`<help content>`\n\n`#>`",
+              "Inserts a line style help comment, for example:\n\n`# .<help keyword>`\n\n`# <help content>`"
+            ],
+            "markdownDescription": "Specifies the [comment based help](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help) completion style triggered by typing ` ##`."
+          },
+          "powershell.sideBar.CommandExplorerVisibility": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Specifies the visibility of the Command Explorer in the side bar."
+          },
+          "powershell.sideBar.CommandExplorerExcludeFilter": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "markdownDescription": "Specifies an array of modules to exclude from Command Explorer listing."
+          },
+          "powershell.promptToUpdatePowerShell": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Specifies whether you may be prompted to update your version of PowerShell."
+          },
+          "powershell.promptToUpdatePackageManagement": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "**Deprecated:** Specifies whether you should be prompted to update your version of `PackageManagement` if it's under 1.4.6.",
+            "markdownDeprecationMessage": "**Deprecated:** This prompt has been removed as it's no longer strictly necessary to upgrade the `PackageManagement` module."
+          },
+          "powershell.suppressAdditionalExeNotFoundWarning": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Suppresses the warning message when any of `#powershell.powerShellAdditionalExePaths#` is not found."
           }
-        },
-        "powershell.powerShellDefaultVersion": {
-          "type": "string",
-          "default": "",
-          "markdownDescription": "Specifies the default PowerShell version started by the extension. The name must match what is displayed in the [Session Menu command](command:PowerShell.ShowSessionMenu), for example, `Windows PowerShell (x86)`. You can specify additional PowerShell executables with the `#powershell.powerShellAdditionalExePaths#` setting."
-        },
-        "powershell.powerShellExePath": {
-          "type": "string",
-          "default": "",
-          "scope": "machine",
-          "markdownDescription": "**Deprecated:** Specifies the path to the PowerShell executable.",
-          "markdownDeprecationMessage": "**Deprecated:** Please use the `#powershell.powerShellAdditionalExePaths#` setting instead."
-        },
-        "powershell.promptToUpdatePowerShell": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Specifies whether you may be prompted to update your version of PowerShell."
-        },
-        "powershell.promptToUpdatePackageManagement": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "**Deprecated:** Specifies whether you should be prompted to update your version of `PackageManagement` if it's under 1.4.6.",
-          "markdownDeprecationMessage": "**Deprecated:** This prompt has been removed as it's no longer strictly necessary to upgrade the `PackageManagement` module."
-        },
-        "powershell.suppressAdditionalExeNotFoundWarning": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Suppresses the warning message when any of `#powershell.powerShellAdditionalExePaths#` is not found."
-        },
-        "powershell.startAsLoginShell.osx": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable."
-        },
-        "powershell.startAsLoginShell.linux": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable."
-        },
-        "powershell.startAutomatically": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Starts the PowerShell extension automatically when a PowerShell file is opened. If `false`, to start the extension use the [Restart Session command](command:PowerShell.RestartSession). **IntelliSense, code navigation, the Extension Terminal, code formatting, and other features are not enabled until the extension starts.**"
-        },
-        "powershell.useX86Host": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "**Deprecated:** Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration.",
-          "markdownDeprecationMessage": "**Deprecated:** This setting was removed when the PowerShell installation searcher was added. Please use the `#powershell.powerShellAdditionalExePaths#` setting instead."
-        },
-        "powershell.enableProfileLoading": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Specifies whether the extension loads [PowerShell profiles](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles). Note that the extension's \"Current Host\" profile is `Microsoft.VSCode_profile.ps1`, which will be loaded instead of the default \"Current Host\" profile of `Microsoft.PowerShell_profile.ps1`. Use the \"All Hosts\" profile `profile.ps1` for common configuration."
-        },
-        "powershell.enableReferencesCodeLens": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Specifies if Code Lenses are displayed above function definitions, used to show the number of times the function is referenced in the workspace and navigate to those references. Large workspaces may want to disable this setting if performance is compromised. See also `#powershell.analyzeOpenDocumentsOnly#`."
-        },
-        "powershell.analyzeOpenDocumentsOnly": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Specifies to search for references only within open documents instead of all workspace files. An alternative to `#powershell.enableReferencesCodeLens#` that allows large workspaces to support some references without the performance impact."
-        },
-        "powershell.bugReporting.project": {
-          "type": "string",
-          "default": "https://github.com/PowerShell/vscode-powershell",
-          "markdownDescription": "**Deprecated:** Specifies the URL of the GitHub project in which to generate bug reports.",
-          "markdownDeprecationMessage": "**Deprecated:** This setting was never meant to be changed!"
-        },
-        "powershell.helpCompletion": {
-          "type": "string",
-          "default": "BlockComment",
-          "enum": [
-            "Disabled",
-            "BlockComment",
-            "LineComment"
-          ],
-          "markdownEnumDescriptions": [
-            "Disables the feature.",
-            "Inserts a block style help comment, for example:\n\n`<#`\n\n`.<help keyword>`\n\n`<help content>`\n\n`#>`",
-            "Inserts a line style help comment, for example:\n\n`# .<help keyword>`\n\n`# <help content>`"
-          ],
-          "markdownDescription": "Specifies the [comment based help](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comment_based_help) completion style triggered by typing ` ##`."
-        },
-        "powershell.cwd": {
-          "type": "string",
-          "default": "",
-          "markdownDescription": "A path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. Does not support variables, but does support the use of '~' and paths relative to a single workspace. **For multi-root workspaces, use the name of the folder you wish to have as the cwd.**"
-        },
-        "powershell.scriptAnalysis.enable": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Enables real-time script analysis using [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) that populates the [Problems view](command:workbench.panel.markers.view.focus)."
-        },
-        "powershell.scriptAnalysis.settingsPath": {
-          "type": "string",
-          "default": "PSScriptAnalyzerSettings.psd1",
-          "markdownDescription": "Specifies the path to a [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) settings file. **This setting may not work as expected currently!**"
-        },
-        "powershell.codeFolding.enable": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Enables syntax based code folding. When disabled, the default indentation based code folding is used."
-        },
-        "powershell.codeFolding.showLastLine": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Shows the last line of a folded section similar to the default VS Code folding style. When disabled, the entire folded region is hidden."
-        },
-        "powershell.codeFormatting.autoCorrectAliases": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Replaces aliases with their aliased name."
-        },
-        "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Removes redundant semicolon(s) at the end of a line where a line terminator is sufficient."
-        },
-        "powershell.codeFormatting.preset": {
-          "type": "string",
-          "default": "Custom",
-          "enum": [
-            "Custom",
-            "Allman",
-            "OTBS",
-            "Stroustrup"
-          ],
-          "markdownEnumDescriptions": [
-            "The three brace settings are respected as-is.",
-            "Sets `#powershell.codeFormatting.openBraceOnSameLine#` to `false`, `#powershell.codeFormatting.newLineAfterOpenBrace#` to `true`, and `#powershell.codeFormatting.newLineAfterCloseBrace#` to `true`.",
-            "Sets `#powershell.codeFormatting.openBraceOnSameLine#` to `true`, `#powershell.codeFormatting.newLineAfterOpenBrace#` to `true`, and `#powershell.codeFormatting.newLineAfterCloseBrace#` to `false`.",
-            "Sets `#powershell.codeFormatting.openBraceOnSameLine#` to `true`, `#powershell.codeFormatting.newLineAfterOpenBrace#` to `true`, and `#powershell.codeFormatting.newLineAfterCloseBrace#` to `true`."
-          ],
-          "markdownDescription": "Sets the code formatting options to follow the given indent style in a way that is compatible with PowerShell syntax. Any setting other than `Custom` will configure (and override) the settings:\n\n* `#powershell.codeFormatting.openBraceOnSameLine#`\n\n* `#powershell.codeFormatting.newLineAfterOpenBrace#`\n\n* `#powershell.codeFormatting.newLineAfterCloseBrace#`\n\nFor more information about the brace styles, please see [PoshCode's discussion](https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81)."
-        },
-        "powershell.codeFormatting.openBraceOnSameLine": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Places open brace on the same line as its associated statement."
-        },
-        "powershell.codeFormatting.newLineAfterOpenBrace": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds a newline (line break) after an open brace."
-        },
-        "powershell.codeFormatting.newLineAfterCloseBrace": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds a newline (line break) after a closing brace."
-        },
-        "powershell.codeFormatting.pipelineIndentationStyle": {
-          "type": "string",
-          "default": "NoIndentation",
-          "enum": [
-            "IncreaseIndentationForFirstPipeline",
-            "IncreaseIndentationAfterEveryPipeline",
-            "NoIndentation",
-            "None"
-          ],
-          "markdownEnumDescriptions": [
-            "Indent once after the first pipeline and keep this indentation.",
-            "Indent more after the first pipeline and keep this indentation.",
-            "Do not increase indentation.",
-            "Do not change any existing pipeline indentation (disables feature)."
-          ],
-          "markdownDescription": "Whether to increase indentation after a pipeline for multi-line statements. See [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer/blob/a94d9f5666bba9f569cdf9c1bc99556934f2b8f4/docs/Rules/UseConsistentIndentation.md#pipelineindentation-string-default-value-is-increaseindentationforfirstpipeline) for examples. It is suggested to use `IncreaseIndentationForFirstPipeline` instead of the default `NoIndentation`. **This default may change in the future,** please see the [Request For Comment](https://github.com/PowerShell/vscode-powershell/issues/4296)."
-        },
-        "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds a space between a keyword and its associated script-block expression."
-        },
-        "powershell.codeFormatting.whitespaceBeforeOpenParen": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds a space between a keyword (`if`, `elseif`, `while`, `switch`, etc.) and its associated conditional expression."
-        },
-        "powershell.codeFormatting.whitespaceAroundOperator": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds spaces before and after an operator (`=`, `+`, `-`, etc.)."
-        },
-        "powershell.codeFormatting.whitespaceAfterSeparator": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds a space after a separator (`,` and `;`)."
-        },
-        "powershell.codeFormatting.whitespaceInsideBrace": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds a space after an opening brace (`{`) and before a closing brace (`}`)."
-        },
-        "powershell.codeFormatting.whitespaceBetweenParameters": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Removes redundant whitespace between parameters."
-        },
-        "powershell.codeFormatting.whitespaceAroundPipe": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "**Deprecated:** Please use the `#powershell.codeFormatting.addWhitespaceAroundPipe#` setting instead. If you've used this setting before, we have moved it for you automatically.",
-          "markdownDeprecationMessage": "**Deprecated:** Please use the `#powershell.codeFormatting.addWhitespaceAroundPipe#` setting instead. If you've used this setting before, we have moved it for you automatically."
-        },
-        "powershell.codeFormatting.addWhitespaceAroundPipe": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Adds a space before and after the pipeline operator (`|`) if it is missing."
-        },
-        "powershell.codeFormatting.trimWhitespaceAroundPipe": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Trims extraneous whitespace (more than one character) before and after the pipeline operator (`|`)."
-        },
-        "powershell.codeFormatting.ignoreOneLineBlock": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Does not reformat one-line code blocks, such as: `if (...) {...} else {...}`."
-        },
-        "powershell.codeFormatting.alignPropertyValuePairs": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Align assignment statements in a hashtable or a DSC Configuration."
-        },
-        "powershell.codeFormatting.useConstantStrings": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Use single quotes if a string is not interpolated and its value does not contain a single quote."
-        },
-        "powershell.codeFormatting.useCorrectCasing": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Use correct casing for cmdlets."
-        },
-        "powershell.integratedConsole.showOnStartup": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Shows the Extension Terminal when the PowerShell extension is initialized. When disabled, the pane is not opened on startup, but the Extension Terminal is still created in order to power the extension's features."
-        },
-        "powershell.integratedConsole.startInBackground": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Starts the Extension Terminal in the background. **If this is enabled, to access the terminal you must run the [Show Extension Terminal command](command:PowerShell.ShowSessionConsole), and once shown it cannot be put back into the background.** This option completely hides the Extension Terminal from the terminals view. You are probably looking for the `#powershell.integratedConsole.showOnStartup#` option instead."
-        },
-        "powershell.integratedConsole.startLocation": {
-          "type": "string",
-          "default": "Panel",
-          "enum": [
-            "Editor",
-            "Panel"
-          ],
-          "markdownEnumDescriptions": [
-            "Creates the Extension Terminal in Editor area",
-            "Creates the Extension Terminal in Panel area"
-          ],
-          "markdownDescription": "Sets the startup location for Extension Terminal."
-        },
-        "powershell.integratedConsole.focusConsoleOnExecute": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Switches focus to the console when a script selection is run or a script file is debugged."
-        },
-        "powershell.integratedConsole.useLegacyReadLine": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "This will disable the use of PSReadLine in the PowerShell Extension Terminal and use a legacy implementation. **This setting is not recommended and likely to be deprecated!**"
-        },
-        "powershell.integratedConsole.forceClearScrollbackBuffer": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Use the VS Code API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're used to `Clear-Host` clearing scroll history. **This setting is not recommended and likely to be deprecated!**"
-        },
-        "powershell.integratedConsole.suppressStartupBanner": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Do not show the startup banner in the PowerShell Extension Terminal."
-        },
-        "powershell.debugging.createTemporaryIntegratedConsole": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Creates a temporary PowerShell Extension Terminal for each debugging session. This is useful for debugging PowerShell classes and binary modules."
-        },
-        "powershell.debugging.executeMode": {
-          "type": "string",
-          "enum": [
-            "DotSource",
-            "Call"
-          ],
-          "default": "DotSource",
-          "markdownEnumDescriptions": [
-            "Use the Dot-Source operator `.` to launch the script, for example, `. 'C:\\Data\\MyScript.ps1'`",
-            "Use the Call operator `&` to launch the script, for example, `& 'C:\\Data\\MyScript.ps1'`"
-          ],
-          "markdownDescription": "Sets the operator used to launch scripts."
-        },
-        "powershell.developer.bundledModulesPath": {
-          "type": "string",
-          "default": "../../PowerShellEditorServices/module",
-          "markdownDescription": "Specifies an alternative path to the folder containing modules that are bundled with the PowerShell extension, that is: PowerShell Editor Services, PSScriptAnalyzer and PSReadLine. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
-        },
-        "powershell.developer.editorServicesLogLevel": {
-          "type": "string",
-          "default": "Warning",
-          "enum": [
-            "Trace",
-            "Debug",
-            "Information",
-            "Warning",
-            "Error",
-            "None"
-          ],
-          "markdownEnumDescriptions": [
-            "Enables all logging possible, please use this setting when submitting logs for bug reports!",
-            "Enables more detailed logging of the extension",
-            "Logs high-level information about what the extension is doing.",
-            "Only log warnings and errors. This is the default setting",
-            "Only log errors.",
-            "Disable all logging possible. No log files will be written!"
-          ],
-          "markdownDescription": "Sets the log verbosity for both the extension and its LSP server, PowerShell Editor Services. **Please set to `Trace` when recording logs for a bug report!**"
-        },
-        "powershell.developer.editorServicesWaitForDebugger": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Launches the LSP server with the `/waitForDebugger` flag to force it to wait for a .NET debugger to attach before proceeding, and emit its PID until then. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
-        },
-        "powershell.developer.setExecutionPolicy": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "On Windows we launch the PowerShell executable with `-ExecutionPolicy Bypass` so that the LSP server (PowerShell Editor Services module) will launch without issue. Some anti-virus programs disallow this command-line argument and this flag can be used to remove it. **Using this setting may require trusting the script manually in order for it to launch!**"
-        },
-        "powershell.developer.featureFlags": {
-          "type": "array",
-          "items": {
-            "type": "string"
+        }
+      },
+            {
+        "title": "Formatting",
+        "properties": {
+          "powershell.codeFormatting.preset": {
+            "type": "string",
+            "default": "Custom",
+            "enum": [
+              "Custom",
+              "Allman",
+              "OTBS",
+              "Stroustrup"
+            ],
+            "markdownEnumDescriptions": [
+              "The three brace settings are respected as-is.",
+              "Sets `#powershell.codeFormatting.openBraceOnSameLine#` to `false`, `#powershell.codeFormatting.newLineAfterOpenBrace#` to `true`, and `#powershell.codeFormatting.newLineAfterCloseBrace#` to `true`.",
+              "Sets `#powershell.codeFormatting.openBraceOnSameLine#` to `true`, `#powershell.codeFormatting.newLineAfterOpenBrace#` to `true`, and `#powershell.codeFormatting.newLineAfterCloseBrace#` to `false`.",
+              "Sets `#powershell.codeFormatting.openBraceOnSameLine#` to `true`, `#powershell.codeFormatting.newLineAfterOpenBrace#` to `true`, and `#powershell.codeFormatting.newLineAfterCloseBrace#` to `true`."
+            ],
+            "markdownDescription": "Sets the code formatting options to follow the given indent style in a way that is compatible with PowerShell syntax. Any setting other than `Custom` will configure (and override) the settings:\n\n* `#powershell.codeFormatting.openBraceOnSameLine#`\n\n* `#powershell.codeFormatting.newLineAfterOpenBrace#`\n\n* `#powershell.codeFormatting.newLineAfterCloseBrace#`\n\nFor more information about the brace styles, please see [PoshCode's discussion](https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81)."
           },
-          "default": [],
-          "markdownDescription": "An array of strings that enable experimental features in the PowerShell extension. **No flags are currently available!**"
-        },
-        "powershell.developer.traceDap": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Traces the DAP communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
-        },
-        "powershell.trace.server": {
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
-        },
-        "powershell.developer.waitForSessionFileTimeoutSeconds": {
-          "type": "number",
-          "default": 240,
-          "markdownDescription": "Specifies how many seconds the extension will wait for the LSP server, PowerShell Editor Services, to connect. The default is four minutes; try increasing this value if your computer is particularly slow (often caused by overactive anti-malware programs)."
-        },
-        "powershell.pester.useLegacyCodeLens": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Use a CodeLens that is compatible with Pester 4. Disabling this will show `Run Tests` on all `It`, `Describe` and `Context` blocks, and will correctly work only with Pester 5 and newer."
-        },
-        "powershell.pester.codeLens": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "This setting controls the appearance of the `Run Tests` and `Debug Tests` CodeLenses that appears above Pester tests."
-        },
-        "powershell.pester.outputVerbosity": {
-          "type": "string",
-          "default": "FromPreference",
-          "enum": [
-            "FromPreference",
-            "None",
-            "Minimal",
-            "Normal",
-            "Detailed",
-            "Diagnostic"
-          ],
-          "markdownDescription": "Defines the verbosity of output to be used. For Pester 5 and newer the default value `FromPreference` will use the `Output` settings from the `$PesterPreference` defined in the caller's context, and will default to `Normal` if there is none. For Pester 4 the `FromPreference` and `Normal` options map to `All`, and `Minimal` option maps to `Fails`."
-        },
-        "powershell.pester.debugOutputVerbosity": {
-          "type": "string",
-          "enum": [
-            "None",
-            "Minimal",
-            "Normal",
-            "Detailed",
-            "Diagnostic"
-          ],
-          "default": "Diagnostic",
-          "markdownDescription": "Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value `Diagnostic` will print additional information about discovery, skipped and filtered tests, mocking and more."
-        },
-        "powershell.buttons.showRunButtons": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Show the `Run` and `Run Selection` buttons in the editor's title bar."
-        },
-        "powershell.buttons.showPanelMovementButtons": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Show buttons in the editor's title bar for moving the terminals pane (with the PowerShell Extension Terminal) around."
+          "powershell.codeFormatting.autoCorrectAliases": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Replaces aliases with their aliased name."
+          },
+          "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Removes redundant semicolon(s) at the end of a line where a line terminator is sufficient."
+          },
+          "powershell.codeFormatting.openBraceOnSameLine": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Places open brace on the same line as its associated statement."
+          },
+          "powershell.codeFormatting.newLineAfterOpenBrace": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds a newline (line break) after an open brace."
+          },
+          "powershell.codeFormatting.newLineAfterCloseBrace": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds a newline (line break) after a closing brace."
+          },
+          "powershell.codeFormatting.pipelineIndentationStyle": {
+            "type": "string",
+            "default": "NoIndentation",
+            "enum": [
+              "IncreaseIndentationForFirstPipeline",
+              "IncreaseIndentationAfterEveryPipeline",
+              "NoIndentation",
+              "None"
+            ],
+            "markdownEnumDescriptions": [
+              "Indent once after the first pipeline and keep this indentation.",
+              "Indent more after the first pipeline and keep this indentation.",
+              "Do not increase indentation.",
+              "Do not change any existing pipeline indentation (disables feature)."
+            ],
+            "markdownDescription": "Whether to increase indentation after a pipeline for multi-line statements. See [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer/blob/a94d9f5666bba9f569cdf9c1bc99556934f2b8f4/docs/Rules/UseConsistentIndentation.md#pipelineindentation-string-default-value-is-increaseindentationforfirstpipeline) for examples. It is suggested to use `IncreaseIndentationForFirstPipeline` instead of the default `NoIndentation`. **This default may change in the future,** please see the [Request For Comment](https://github.com/PowerShell/vscode-powershell/issues/4296)."
+          },
+          "powershell.codeFormatting.whitespaceBeforeOpenBrace": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds a space between a keyword and its associated script-block expression."
+          },
+          "powershell.codeFormatting.whitespaceBeforeOpenParen": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds a space between a keyword (`if`, `elseif`, `while`, `switch`, etc.) and its associated conditional expression."
+          },
+          "powershell.codeFormatting.whitespaceAroundOperator": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds spaces before and after an operator (`=`, `+`, `-`, etc.)."
+          },
+          "powershell.codeFormatting.whitespaceAfterSeparator": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds a space after a separator (`,` and `;`)."
+          },
+          "powershell.codeFormatting.whitespaceInsideBrace": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds a space after an opening brace (`{`) and before a closing brace (`}`)."
+          },
+          "powershell.codeFormatting.whitespaceBetweenParameters": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Removes redundant whitespace between parameters."
+          },
+          "powershell.codeFormatting.whitespaceAroundPipe": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "**Deprecated:** Please use the `#powershell.codeFormatting.addWhitespaceAroundPipe#` setting instead. If you've used this setting before, we have moved it for you automatically.",
+            "markdownDeprecationMessage": "**Deprecated:** Please use the `#powershell.codeFormatting.addWhitespaceAroundPipe#` setting instead. If you've used this setting before, we have moved it for you automatically."
+          },
+          "powershell.codeFormatting.addWhitespaceAroundPipe": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Adds a space before and after the pipeline operator (`|`) if it is missing."
+          },
+          "powershell.codeFormatting.trimWhitespaceAroundPipe": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Trims extraneous whitespace (more than one character) before and after the pipeline operator (`|`)."
+          },
+          "powershell.codeFormatting.ignoreOneLineBlock": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Does not reformat one-line code blocks, such as: `if (...) {...} else {...}`."
+          },
+          "powershell.codeFormatting.alignPropertyValuePairs": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Align assignment statements in a hashtable or a DSC Configuration."
+          },
+          "powershell.codeFormatting.useConstantStrings": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Use single quotes if a string is not interpolated and its value does not contain a single quote."
+          },
+          "powershell.codeFormatting.useCorrectCasing": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Use correct casing for cmdlets."
+          }
+        }
+      },
+      {
+        "title": "Editor Services",
+        "properties": {
+          "powershell.powerShellDefaultVersion": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "Specifies the default PowerShell version started by the extension. The name must match what is displayed in the [Session Menu command](command:PowerShell.ShowSessionMenu), for example, `Windows PowerShell (x86)`. You can specify additional PowerShell executables with the `#powershell.powerShellAdditionalExePaths#` setting."
+          },
+          "powershell.enableProfileLoading": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Specifies whether the extension loads [PowerShell profiles](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles). Note that the extension's \"Current Host\" profile is `Microsoft.VSCode_profile.ps1`, which will be loaded instead of the default \"Current Host\" profile of `Microsoft.PowerShell_profile.ps1`. Use the \"All Hosts\" profile `profile.ps1` for common configuration."
+          },
+          "powershell.startAutomatically": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Starts the PowerShell extension automatically when a PowerShell file is opened. If `false`, to start the extension use the [Restart Session command](command:PowerShell.RestartSession). **IntelliSense, code navigation, the Extension Terminal, code formatting, and other features are not enabled until the extension starts.**"
+          },
+          "powershell.scriptAnalysis.enable": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Enables real-time script analysis using [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) that populates the [Problems view](command:workbench.panel.markers.view.focus)."
+          },
+          "powershell.scriptAnalysis.settingsPath": {
+            "type": "string",
+            "default": "PSScriptAnalyzerSettings.psd1",
+            "markdownDescription": "Specifies the path to a [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer) settings file. **This setting may not work as expected currently!**"
+          },
+          "powershell.analyzeOpenDocumentsOnly": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Specifies to search for references only within open documents instead of all workspace files. An alternative to `#powershell.enableReferencesCodeLens#` that allows large workspaces to support some references without the performance impact."
+          },
+          "powershell.debugging.createTemporaryIntegratedConsole": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Creates a temporary PowerShell Extension Terminal for each debugging session. This is useful for debugging PowerShell classes and binary modules."
+          },
+          "powershell.debugging.executeMode": {
+            "type": "string",
+            "enum": [
+              "DotSource",
+              "Call"
+            ],
+            "default": "DotSource",
+            "markdownEnumDescriptions": [
+              "Use the Dot-Source operator `.` to launch the script, for example, `. 'C:\\Data\\MyScript.ps1'`",
+              "Use the Call operator `&` to launch the script, for example, `& 'C:\\Data\\MyScript.ps1'`"
+            ],
+            "markdownDescription": "Sets the operator used to launch scripts."
+          },
+          "powershell.powerShellExePath": {
+            "type": "string",
+            "default": "",
+            "scope": "machine",
+            "markdownDescription": "**Deprecated:** Specifies the path to the PowerShell executable.",
+            "markdownDeprecationMessage": "**Deprecated:** Please use the `#powershell.powerShellAdditionalExePaths#` setting instead."
+          },
+          "powershell.powerShellAdditionalExePaths": {
+            "type": "object",
+            "default": {},
+            "markdownDescription": "Specifies a list of Item / Value pairs where the **Item** is a user-chosen name and the **Value** is an absolute path to a PowerShell executable. The name appears in the [Session Menu Command](command:PowerShell.ShowSessionMenu) and is used to reference this executable in the `#powershell.powerShellDefaultVersion#` setting.",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "powershell.cwd": {
+            "type": "string",
+            "default": "",
+            "markdownDescription": "A path where the Extension Terminal will be launched. Both the PowerShell process's and the shell's location will be set to this directory. Does not support variables, but does support the use of '~' and paths relative to a single workspace. **For multi-root workspaces, use the name of the folder you wish to have as the cwd.**"
+          },
+          "powershell.startAsLoginShell.osx": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable."
+          },
+          "powershell.startAsLoginShell.linux": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Starts the PowerShell extension's underlying PowerShell process as a login shell, if applicable."
+          },
+          "powershell.useX86Host": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "**Deprecated:** Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration.",
+            "markdownDeprecationMessage": "**Deprecated:** This setting was removed when the PowerShell installation searcher was added. Please use the `#powershell.powerShellAdditionalExePaths#` setting instead."
+          }
+        }
+      },
+            {
+        "title": "Pester",
+        "properties": {
+          "powershell.pester.useLegacyCodeLens": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Use a CodeLens that is compatible with Pester 4. Disabling this will show `Run Tests` on all `It`, `Describe` and `Context` blocks, and will correctly work only with Pester 5 and newer."
+          },
+          "powershell.pester.codeLens": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "This setting controls the appearance of the `Run Tests` and `Debug Tests` CodeLenses that appears above Pester tests."
+          },
+          "powershell.pester.outputVerbosity": {
+            "type": "string",
+            "default": "FromPreference",
+            "enum": [
+              "FromPreference",
+              "None",
+              "Minimal",
+              "Normal",
+              "Detailed",
+              "Diagnostic"
+            ],
+            "markdownDescription": "Defines the verbosity of output to be used. For Pester 5 and newer the default value `FromPreference` will use the `Output` settings from the `$PesterPreference` defined in the caller's context, and will default to `Normal` if there is none. For Pester 4 the `FromPreference` and `Normal` options map to `All`, and `Minimal` option maps to `Fails`."
+          },
+          "powershell.pester.debugOutputVerbosity": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Minimal",
+              "Normal",
+              "Detailed",
+              "Diagnostic"
+            ],
+            "default": "Diagnostic",
+            "markdownDescription": "Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value `Diagnostic` will print additional information about discovery, skipped and filtered tests, mocking and more."
+          }
+        }
+      },
+      {
+        "title": "Terminal",
+        "properties": {
+          "powershell.integratedConsole.suppressStartupBanner": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Do not show the startup banner in the PowerShell Extension Terminal."
+          },
+          "powershell.integratedConsole.showOnStartup": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Shows the Extension Terminal when the PowerShell extension is initialized. When disabled, the pane is not opened on startup, but the Extension Terminal is still created in order to power the extension's features."
+          },
+          "powershell.integratedConsole.startInBackground": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Starts the Extension Terminal in the background. **If this is enabled, to access the terminal you must run the [Show Extension Terminal command](command:PowerShell.ShowSessionConsole), and once shown it cannot be put back into the background.** This option completely hides the Extension Terminal from the terminals view. You are probably looking for the `#powershell.integratedConsole.showOnStartup#` option instead."
+          },
+          "powershell.integratedConsole.startLocation": {
+            "type": "string",
+            "default": "Panel",
+            "enum": [
+              "Editor",
+              "Panel"
+            ],
+            "markdownEnumDescriptions": [
+              "Creates the Extension Terminal in Editor area",
+              "Creates the Extension Terminal in Panel area"
+            ],
+            "markdownDescription": "Sets the startup location for Extension Terminal."
+          },
+          "powershell.integratedConsole.focusConsoleOnExecute": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Switches focus to the console when a script selection is run or a script file is debugged."
+          },
+          "powershell.integratedConsole.useLegacyReadLine": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "This will disable the use of PSReadLine in the PowerShell Extension Terminal and use a legacy implementation. **This setting is not recommended and likely to be deprecated!**"
+          },
+          "powershell.integratedConsole.forceClearScrollbackBuffer": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Use the VS Code API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're used to `Clear-Host` clearing scroll history. **This setting is not recommended and likely to be deprecated!**"
+          }
+        }
+      },
+      {
+        "title": "Developer",
+        "properties": {
+          "powershell.developer.editorServicesLogLevel": {
+            "type": "string",
+            "default": "Warning",
+            "enum": [
+              "Trace",
+              "Debug",
+              "Information",
+              "Warning",
+              "Error",
+              "None"
+            ],
+            "markdownEnumDescriptions": [
+              "Enables all logging possible, please use this setting when submitting logs for bug reports!",
+              "Enables more detailed logging of the extension",
+              "Logs high-level information about what the extension is doing.",
+              "Only log warnings and errors. This is the default setting",
+              "Only log errors.",
+              "Disable all logging possible. No log files will be written!"
+            ],
+            "markdownDescription": "Sets the log verbosity for both the extension and its LSP server, PowerShell Editor Services. **Please set to `Trace` when recording logs for a bug report!**"
+          },
+          "powershell.trace.server": {
+            "type": "string",
+            "enum": [
+              "off",
+              "messages",
+              "verbose"
+            ],
+            "default": "off",
+            "markdownDescription": "Traces the communication between VS Code and the PowerShell Editor Services [LSP Server](https://microsoft.github.io/language-server-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
+          },
+          "powershell.developer.traceDap": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Traces the DAP communication between VS Code and the PowerShell Editor Services [DAP Server](https://microsoft.github.io/debug-adapter-protocol/). The output will be logged and also visible in the Output pane, where the verbosity is configurable. **For extension developers and issue troubleshooting only!**"
+          },
+          "powershell.developer.editorServicesWaitForDebugger": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Launches the LSP server with the `/waitForDebugger` flag to force it to wait for a .NET debugger to attach before proceeding, and emit its PID until then. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
+          },
+          "powershell.developer.setExecutionPolicy": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "On Windows we launch the PowerShell executable with `-ExecutionPolicy Bypass` so that the LSP server (PowerShell Editor Services module) will launch without issue. Some anti-virus programs disallow this command-line argument and this flag can be used to remove it. **Using this setting may require trusting the script manually in order for it to launch!**"
+          },
+          "powershell.developer.bundledModulesPath": {
+            "type": "string",
+            "default": "../../PowerShellEditorServices/module",
+            "markdownDescription": "Specifies an alternative path to the folder containing modules that are bundled with the PowerShell extension, that is: PowerShell Editor Services, PSScriptAnalyzer and PSReadLine. **This setting is only meant for extension developers and requires the extension to be run in development mode!**"
+          },
+          "powershell.developer.featureFlags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "markdownDescription": "An array of strings that enable experimental features in the PowerShell extension. **No flags are currently available!**"
+          },
+          "powershell.developer.waitForSessionFileTimeoutSeconds": {
+            "type": "number",
+            "default": 240,
+            "markdownDescription": "Specifies how many seconds the extension will wait for the LSP server, PowerShell Editor Services, to connect. The default is four minutes; try increasing this value if your computer is particularly slow (often caused by overactive anti-malware programs)."
+          },
+          "powershell.bugReporting.project": {
+            "type": "string",
+            "default": "https://github.com/PowerShell/vscode-powershell",
+            "markdownDescription": "**Deprecated:** Specifies the URL of the GitHub project in which to generate bug reports.",
+            "markdownDeprecationMessage": "**Deprecated:** This setting was never meant to be changed!"
+          }
         }
       }
-    },
+    ],
     "capabilities": {
       "untrustedWorkspaces": {
         "supported": false
