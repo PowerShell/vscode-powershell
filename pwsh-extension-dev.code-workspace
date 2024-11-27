@@ -15,6 +15,7 @@
       "davidanson.vscode-markdownlint",
       "dbaeumer.vscode-eslint",
       "editorconfig.editorconfig",
+      "esbenp.prettier-vscode",
       "ms-dotnettools.csharp",
       "ms-vscode.powershell",
       "hbenl.vscode-mocha-test-adapter",
