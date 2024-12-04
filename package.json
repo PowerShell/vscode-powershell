@@ -60,7 +60,7 @@
     "onCommand:PowerShell.SpecifyScriptArgs"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "^0.9.7",
+    "@vscode/extension-telemetry": "^0.9.8",
     "node-fetch": "^2.7.0",
     "semver": "^7.6.3",
     "untildify": "^4.0.0",
@@ -73,9 +73,9 @@
     "esbuild": "^0.21.5"
   },
   "optionalDependencies": {
-    "@types/mocha": "^10.0.9",
+    "@types/mocha": "^10.0.10",
     "@types/mock-fs": "^4.13.4",
-    "@types/node": "^20.17.6",
+    "@types/node": "^20.17.9",
     "@types/node-fetch": "^2.6.12",
     "@types/rewire": "^2.5.30",
     "@types/semver": "^7.5.8",
@@ -83,8 +83,8 @@
     "@types/ungap__structured-clone": "^1.2.0",
     "@types/uuid": "^9.0.8",
     "@types/vscode": "~1.94.0",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "@typescript-eslint/parser": "^8.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
     "@ungap/structured-clone": "^1.2.0",
     "@vscode/debugprotocol": "^1.68.0",
     "@vscode/test-electron": "^2.4.1",
@@ -98,7 +98,7 @@
     "rewire": "^7.0.0",
     "sinon": "^18.0.1",
     "source-map-support": "^0.5.21",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   },
   "extensionDependencies": [
     "vscode.powershell"
@@ -311,8 +311,6 @@
         "command": "GetVsCodeSessionId",
         "enablement": "false"
       }
-
-
     ],
     "menus": {
       "commandPalette": [
@@ -616,7 +614,7 @@
             "markdownDescription": "Show buttons in the editor's title bar for moving the terminals pane (with the PowerShell Extension Terminal) around."
           },
           "powershell.enableReferencesCodeLens": {
-          "type": "boolean",
+            "type": "boolean",
             "default": true,
             "markdownDescription": "Specifies if Code Lenses are displayed above function definitions, used to show the number of times the function is referenced in the workspace and navigate to those references. Large workspaces may want to disable this setting if performance is compromised. See also `#powershell.analyzeOpenDocumentsOnly#`."
           },
@@ -676,7 +674,7 @@
           }
         }
       },
-            {
+      {
         "title": "Formatting",
         "properties": {
           "powershell.codeFormatting.preset": {
@@ -895,7 +893,7 @@
           }
         }
       },
-            {
+      {
         "title": "Pester",
         "properties": {
           "powershell.pester.useLegacyCodeLens": {
