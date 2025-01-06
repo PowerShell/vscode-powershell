@@ -166,9 +166,9 @@
     "description": "Insert a foreach loop with Write-Progress initialized",
     "body": [
       "\\$total = \\$${1:array}.count",
+      "\\$i = 1",
       "\\$progPercent = \"{0:n2}\" -f ([math]::round(\\$i/\\$total,4) * 100)",
       "Write-Progress -Activity \"${3:activityName}\" -Status \"\\$i of \\$total - \\$progPercent% Complete:\" -PercentComplete \\$progPercent",
-      "\\$i = 1",
       "foreach ($${2:item} in $${1:array}) {",
       "    \\$progPercent = \"{0:n2}\" -f ([math]::round(\\$i/\\$total,4) * 100)",
       "    Write-Progress -Activity \"${3:activityName}\" -Status \"\\$i of \\$total - \\$progPercent% Complete:\" -PercentComplete \\$progPercent",
