@@ -34,11 +34,12 @@ of VS Code's own `package.json` file for their [`electron`][] dependency. The
 major version of [Electron][] will tell us which [Node.js][] is included, which
 dictates which version of Node.js the extension is eventually run with. This
 lets us finally update our `@types/node` development dependency to match, our
-developer machines if necessary, and the CI and OneBranch pipeline tasks.
+developer machines if necessary, the CI and OneBranch pipeline tasks, and the
+`.tsconfig` file. Note that the version of `@types/node` will not necessarily
+exactly match the version of Node.js, but the major version should.
 
-[`vscodeVersion`]: https://github.com/microsoft/azuredatastudio/blob/4970733324ef8254b7c22a5dc55af7f8a1dea93f/product.json#L50
-[`electron`]: https://github.com/microsoft/vscode/blob/384ff7382de624fb94dbaf6da11977bba1ecd427/package.json#L159
-[Electron]: https://www.electronjs.org/blog/electron-30-0
+[`electron`]: https://github.com/microsoft/vscode/blob/138f619c86f1199955d53b4166bef66ef252935c/package.json#L156
+[Electron]: https://releases.electronjs.org/release/v32.2.6
 [Node.js]: https://nodejs.org/en/download/package-manager
 
 ### Building the Code
@@ -65,7 +66,7 @@ To debug the extension use one of the provided `Launch Extension` debug configur
 
 All three templates use pre-launch tasks to build the code, and support automatic restart of the extension host on changes to the Extension source code. [Hot Reload](https://devblogs.microsoft.com/dotnet/introducing-net-hot-reload/) is also enabled for PowerShell Editor Services.
 
-> [!WARNING]  
+> [!WARNING]
 > There is a current limitation that, if you restart the extension/extension host or it is restarted due to a extension code change, the editor services attachment will be disconnected due to the PSES terminal being terminated, and you will either need to restart the debug session completely, or do a manual build of PSES and run the `Attach to Editor Services` debug launch manually.
 
 Try the `powershell.developer.editorServicesWaitForDebugger` setting to ensure that you are fully attached before the extension startup process continues.
