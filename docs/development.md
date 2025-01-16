@@ -87,29 +87,34 @@ of Microsoft. Assume `origin` is GitHub and `ado` is Azure DevOps.
 cd ./PowerShellEditorServices
 git checkout -B release
 ./tools/updateVersion.ps1 -Version "4.0.0" -Changes "Major release!"
+# Amend changelog as necessary
 git push --force-with-lease origin
-git push ado HEAD:main
-
+# Open, approve, and merge PR on GitHub
 cd ../vscode-powershell
 git checkout -B release
 ./tools/updateVersion.ps1 -Version "2024.4.0" -Changes "Major release!"
+# Amend changelog as necessary
 git push --force-with-lease origin
-git push ado HEAD:main
+# Open, approve, and merge PR on GitHub
+cd ../PowerShellEditorServices
+git checkout main
+git pull
+git push ado HEAD:release
+cd ../vscode-powershell
+git checkout main
+git pull
+git push ado HEAD:release
+# Download and test assets from draft GitHub Releases
+# Publish releases, ensuring tag is at release commit in `main`
+# Permit pipeline to publish to marketplace
 ```
-
-1. Amend changelogs as necessary.
-2. Push `release` branches to GitHub and to Azure DevOps `main` branch.
-3. Download and test assets!
-4. Publish draft releases and merge (don't squash!) branches.
-5. Permit pipeline to publish to marketplace.
 
 If rolling from pre-release to release, do not change the version of PowerShell
 Editor Services between a pre-release and the subsequent release! We only
 need to release the extension.
 
-The Azure DevOps pipelines have to build off `main` branch for _reasons_,
-but we still want to use PRs. Hence pushing `release` to `main` and then
-merging (not squashing nor rebasing) those PRs so the commit stays the same.
+The Azure DevOps pipelines have to build off a PR merged to `main` for _reasons_,
+hence that repo is a superset including all our commits plus signed PR merge commits.
 
 ### Versioning
 
