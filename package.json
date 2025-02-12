@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@vscode/vsce": "^3.2.1",
-    "esbuild": "^0.21.5"
+    "esbuild": "^0.25.0"
   },
   "optionalDependencies": {
     "@tsconfig/node20": "^20.1.4",
