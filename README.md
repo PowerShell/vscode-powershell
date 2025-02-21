@@ -66,7 +66,7 @@ The extension should work everywhere [Visual Studio Code](https://code.visualstu
 We actively test the following configurations [in Github Actions on every commit](https://github.com/PowerShell/vscode-powershell/actions/workflows/ci-test.yml):
 - **Windows Server 2022** with Windows PowerShell 5.1 and PowerShell 7+
 - **macOS 14.7** with PowerShell 7+
-- **Ubuntu 22.04** with PowerShell 7+
+- **Ubuntu 24.04** with PowerShell 7+
 
 On Windows, we also test with and without Constrained Language Mode enabled.
 
