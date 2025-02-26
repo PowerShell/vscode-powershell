@@ -111,7 +111,7 @@ task Test Lint, Build, {
     Write-Build DarkMagenta "Running extension tests"
     Invoke-BuildExec { & npm run test }
     # Reset the state of files modified by tests
-    Invoke-BuildExec { git checkout package.json test/TestEnvironment.code-workspace }
+    Invoke-BuildExec { git checkout test/TestEnvironment.code-workspace }
 }
 
 task TestEditorServices -If (Get-EditorServicesPath) {
