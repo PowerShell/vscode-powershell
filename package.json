@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@vscode/vsce": "^3.2.2",
-    "esbuild": "^0.21.5"
+    "esbuild": "^0.25.0"
   },
   "optionalDependencies": {
     "@tsconfig/node20": "^20.1.4",
@@ -92,12 +92,12 @@
     "eslint": "^8.57.0",
     "eslint-plugin-header": "^3.1.1",
     "glob": "^11.0.1",
-    "mocha": "^10.8.2",
+    "mocha": "^11.1.0",
     "mocha-explorer-launcher-scripts": "^0.4.0",
     "mocha-multi-reporters": "^1.5.1",
     "mock-fs": "^5.5.0",
     "rewire": "^7.0.0",
-    "sinon": "^18.0.1",
+    "sinon": "^19.0.2",
     "source-map-support": "^0.5.21",
     "typescript": "^5.7.3"
   },
