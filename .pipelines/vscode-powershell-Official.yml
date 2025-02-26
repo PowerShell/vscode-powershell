@@ -107,10 +107,7 @@ extends:
               $manifest = Test-ModuleManifest $(Build.SourcesDirectory)/modules/PowerShellEditorServices/PowerShellEditorServices.psd1
               Write-Host Using PowerShellEditorServices v$($manifest.Version)
             displayName: PowerShellEditorServices version
-          - pwsh: |
-              Register-PSRepository -Name CFS -SourceLocation "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v2" -InstallationPolicy Trusted
-              Install-Module -Repository CFS -Name Microsoft.PowerShell.PSResourceGet
-              ./tools/installPSResources.ps1 -PSRepository CFS
+          - pwsh: ./tools/installPSResources.ps1 -PSRepository CFS
             displayName: Install PSResources
           - pwsh: Invoke-Build Build -Configuration $(BuildConfiguration)
             displayName: Build
