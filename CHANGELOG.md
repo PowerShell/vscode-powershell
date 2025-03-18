@@ -1,5 +1,15 @@
 # PowerShell Extension Release History
 
+## v2025.3.0-preview
+### Tuesday, March 18, 2025
+
+With PowerShell Editor Services [v4.3.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v4.3.0)!
+
+Now with [PSScriptAnalyzer v1.2.4](https://github.com/PowerShell/PSScriptAnalyzer/releases/tag/1.24.0)
+and [PSReadLine v2.4.1-beta1](https://github.com/PowerShell/PSReadLine/releases/tag/v2.4.1-beta1).
+
+See more details at the GitHub Release for [v2025.3.0-preview](https://github.com/PowerShell/vscode-powershell/releases/tag/v2025.3.0-preview).
+
 ## v2025.0.0
 ### Tuesday, January 21, 2025
 
