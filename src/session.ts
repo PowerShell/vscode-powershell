@@ -726,9 +726,9 @@ export class SessionManager implements Middleware {
         // NOTE: We don't currently send any events from PSES, but may again in
         // the future so we're leaving this side wired up.
         languageClient.onTelemetry((event) => {
-            const eventName: string = event.eventName ? event.eventName : "PSESEvent";
+            const eventName: string = event.eventName ?? "PSESEvent";
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const data: any = event.data ? event.data : event;
+            const data: any = event.data ?? event;
             this.sendTelemetryEvent(eventName, data);
         });
 
