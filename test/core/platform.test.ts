@@ -596,8 +596,23 @@ if (process.platform === "win32") {
                     supportsProperArguments: true
                 },
                 {
+                    exePath: "/opt/homebrew/bin/pwsh",
+                    displayName: "PowerShell (Homebrew)",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/opt/homebrew/bin/pwsh-lts",
+                    displayName: "PowerShell LTS (Homebrew)",
+                    supportsProperArguments: true
+                },
+                {
                     exePath: "/usr/local/bin/pwsh-preview",
                     displayName: "PowerShell Preview",
+                    supportsProperArguments: true
+                },
+                {
+                    exePath: "/opt/homebrew/bin/pwsh-preview",
+                    displayName: "PowerShell Preview (Homebrew)",
                     supportsProperArguments: true
                 },
                 {
@@ -609,6 +624,11 @@ if (process.platform === "win32") {
             filesystem: {
                 "/usr/local/bin": {
                     "pwsh": "",
+                    "pwsh-preview": "",
+                },
+                "/opt/homebrew/bin/": {
+                    "pwsh": "",
+                    "pwsh-lts": "",
                     "pwsh-preview": "",
                 },
                 [pwshDailyDir]: {
