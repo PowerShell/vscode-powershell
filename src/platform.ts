@@ -26,6 +26,10 @@ const SnapPreviewExePath = "/snap/bin/pwsh-preview";
 const MacOSExePath = "/usr/local/bin/pwsh";
 const MacOSPreviewExePath = "/usr/local/bin/pwsh-preview";
 
+const MacOSHomebrewExePath = "/opt/homebrew/bin/pwsh";
+const MacOSHomebrewLTSExePath = "/opt/homebrew/bin/pwsh-lts";
+const MacOSHomebrewPreviewExePath = "/opt/homebrew/bin/pwsh-preview";
+
 export enum OperatingSystem {
     Unknown,
     Windows,
@@ -169,6 +173,7 @@ export class PowerShellExeFinder {
      * Iterates through all the possible well-known PowerShell installations on a machine.
      * Returned values may not exist, but come with an .exists property
      * which will check whether the executable exists.
+     * TODO: We really need to define the order in which we search for stable/LTS/preview/daily
      */
     private async *enumerateDefaultPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe | undefined> {
         // Find PSCore stable first
@@ -183,10 +188,14 @@ export class PowerShellExeFinder {
         case OperatingSystem.Windows:
             // Windows may have a 32-bit pwsh.exe
             yield this.findPSCoreWindowsInstallation({ useAlternateBitness: true });
-
             // Also look for the MSIX/UWP installation
             yield await this.findPSCoreMsix();
+            break;
 
+        case OperatingSystem.MacOS:
+            // On MacOS, find the Homebrew installations
+            yield this.findPSCoreHomebrewStable();
+            yield this.findPSCoreHomebrewLTS();
             break;
         }
 
@@ -219,6 +228,11 @@ export class PowerShellExeFinder {
             // Get the alternate bitness Windows PowerShell
             yield this.findWinPS({ useAlternateBitness: true });
 
+            break;
+
+        case OperatingSystem.MacOS:
+            // On MacOS, find the Homebrew preview
+            yield this.findPSCoreHomebrewPreview();
             break;
         }
 
@@ -336,6 +350,8 @@ export class PowerShellExeFinder {
     * if ($Daily) {
     *     $Destination = "${Destination}-daily"
     * }
+    *
+    * TODO: Remove this after the daily is officially no longer supported.
     */
     private findPSCoreDaily(): IPossiblePowerShellExe | undefined {
         switch (this.platformDetails.operatingSystem) {
@@ -357,6 +373,19 @@ export class PowerShellExeFinder {
         case OperatingSystem.Unknown:
             return undefined;
         }
+    }
+
+    // The Homebrew installations of PowerShell on Apple Silicon are no longer in the default PATH.
+    private findPSCoreHomebrewStable(): IPossiblePowerShellExe {
+        return new PossiblePowerShellExe(MacOSHomebrewExePath, "PowerShell (Homebrew)");
+    }
+
+    private findPSCoreHomebrewLTS(): IPossiblePowerShellExe {
+        return new PossiblePowerShellExe(MacOSHomebrewLTSExePath, "PowerShell LTS (Homebrew)");
+    }
+
+    private findPSCoreHomebrewPreview(): IPossiblePowerShellExe {
+        return new PossiblePowerShellExe(MacOSHomebrewPreviewExePath, "PowerShell Preview (Homebrew)");
     }
 
     private findPSCoreDotnetGlobalTool(): IPossiblePowerShellExe {
@@ -398,6 +427,7 @@ export class PowerShellExeFinder {
         return undefined;
     }
 
+    // TODO: Are snaps still a thing?
     private findPSCoreStableSnap(): IPossiblePowerShellExe {
         return new PossiblePowerShellExe(SnapExePath, "PowerShell Snap");
     }
