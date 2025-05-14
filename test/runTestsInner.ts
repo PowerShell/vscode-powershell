@@ -39,8 +39,9 @@ function runTestsInner(testsRoot: string): Promise<void> {
     // Test if files is empty
     const files = globSync(config.spec, { cwd: rootDir });
     if (files.length === 0) {
-        console.log("No tests found for glob pattern: test.ts in directory: " + rootDir);
-        throw new Error("No tests found for glob pattern: test.ts in directory: " + rootDir);
+        const msg = `No tests found for glob pattern: ${config.spec} in directory: ${rootDir}`;
+        console.log(msg);
+        throw new Error(msg);
     }
 
     // Add files to the test suite

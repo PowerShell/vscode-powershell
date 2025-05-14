@@ -1,18 +1,16 @@
-// NOTE: The TypeScript compiler is only used for building the tests (and
-// the sources which the tests need). The extension is built with `esbuild`.
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
-    "sourceMap": true,
-    "rootDir": ".",
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "allowSyntheticDefaultImports": true,
-    "useUnknownInCatchVariables": true
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "noEmit": true,
+    "module": "Preserve"
   },
-  "include": [ "src", "test" ],
-  "exclude": [ "node_modules/@ungap/structured-clone" ]
+  "include": ["src/**/*.ts", "test/**/*.ts", "*.mjs"],
+  "exclude": ["node_modules"]
 }

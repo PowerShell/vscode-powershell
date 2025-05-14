@@ -17,7 +17,7 @@ import { spawnSync } from "child_process";
  * */
 async function main(): Promise<void> {
     // Verify that the extension is built
-    const compiledExtensionPath = path.resolve(__dirname, "../src/extension.js");
+    const compiledExtensionPath = path.resolve(__dirname, "../dist/extension.js");
     if (!existsSync(compiledExtensionPath)) {
         console.error("ERROR: The extension is not built yet. Please run a build first, using either the 'Run Build Task' in VSCode or ./build.ps1 in PowerShell.");
         process.exit(1);
@@ -28,7 +28,7 @@ async function main(): Promise<void> {
         const extensionDevelopmentPath = path.resolve(__dirname, "../");
 
         /** The path to the test script that will run inside the vscode instance. Passed to --extensionTestsPath */
-        const extensionTestsPath = path.resolve(__dirname, "./runTestsInner");
+        const extensionTestsPath = path.resolve(extensionDevelopmentPath, "dist", "runTestsInner");
 
         /** The starting workspace/folder to open in vscode. By default this is a testing instance pointed to the Examples folder */
         const workspacePath = process.env.__TEST_WORKSPACE_PATH ?? "test/TestEnvironment.code-workspace";

@@ -92,7 +92,7 @@ export class PowerShellExeFinder {
         private platformDetails: IPlatformDetails,
         // Additional configured PowerShells
         private additionalPowerShellExes: PowerShellAdditionalExePathSettings,
-        private logger: ILogger) { }
+        private logger?: ILogger) { }
 
     /**
      * Returns the first available PowerShell executable found in the search order.
@@ -244,7 +244,7 @@ export class PowerShellExeFinder {
      * Iterates through the configured additional PowerShell executable locations,
      * without checking for their existence.
      */
-    private async *enumerateAdditionalPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe> {
+    public async *enumerateAdditionalPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe> {
         for (const versionName in this.additionalPowerShellExes) {
             if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
                 let exePath: string | undefined = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);

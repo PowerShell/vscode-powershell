@@ -1,12 +1,8 @@
 {
+  "require": "tsx",
   "color": true,
   "enable-source-maps": true,
-  "extensions": [
-    ".js",
-    ".jsx"
-  ],
-  "require": "source-map-support/register",
   "timeout": 600000,
   "slow": 2000,
-  "spec": "test/**/*.test.js"
+  "spec": "test/**/*.test.ts"
 }
