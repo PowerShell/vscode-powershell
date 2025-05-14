@@ -6,7 +6,7 @@ import { NotificationType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import type { LanguageClient } from "vscode-languageclient/node";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 interface IShowHelpNotificationArguments {
 }
 
@@ -40,7 +40,7 @@ export class ShowHelpFeature extends LanguageClientConsumer {
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+     
     public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public dispose(): void {

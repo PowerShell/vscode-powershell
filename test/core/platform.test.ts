@@ -8,45 +8,33 @@ import * as os from "os";
 import * as path from "path";
 import * as sinon from "sinon";
 import * as platform from "../../src/platform";
+import * as utils from "../../src/utils";
 import * as fs from "fs"; // NOTE: Necessary for mock-fs.
 import * as vscode from "vscode";
-import * as utils from "../../src/utils";
 
 // eslint-disable-next-line @typescript-eslint/require-await
-async function fakeCheckIfFileExists(
-  targetPath: string | vscode.Uri,
-): Promise<boolean> {
-  try {
-    const stat = fs.lstatSync(
-      targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath,
-    );
-    return stat.isFile();
-  } catch {
-    return false;
-  }
+async function fakeCheckIfFileExists(targetPath: string | vscode.Uri): Promise<boolean> {
+    try {
+        const stat = fs.lstatSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
+        return stat.isFile();
+    } catch {
+        return false;
+    }
 }
 
 // eslint-disable-next-line @typescript-eslint/require-await
-async function fakeCheckIfDirectoryExists(
-  targetPath: string | vscode.Uri,
-): Promise<boolean> {
-  try {
-    const stat = fs.lstatSync(
-      targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath,
-    );
-    return stat.isDirectory();
-  } catch {
-    return false;
-  }
+async function fakeCheckIfDirectoryExists(targetPath: string | vscode.Uri): Promise<boolean> {
+    try {
+        const stat = fs.lstatSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
+        return stat.isDirectory();
+    } catch {
+        return false;
+    }
 }
 
 // eslint-disable-next-line @typescript-eslint/require-await
-async function fakeReadDirectory(
-  targetPath: string | vscode.Uri,
-): Promise<string[]> {
-  return fs.readdirSync(
-    targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath,
-  );
+async function fakeReadDirectory(targetPath: string | vscode.Uri): Promise<string[]> {
+    return fs.readdirSync(targetPath instanceof vscode.Uri ? targetPath.fsPath : targetPath);
 }
 
 /**
@@ -845,22 +833,22 @@ function setupTestEnvironment(testPlatform: ITestPlatform): void {
 }
 
 describe("Platform module", function () {
-    beforeEach(function () {
+    before(function () {
       sinon.stub(utils, "checkIfFileExists").callsFake(fakeCheckIfFileExists);
-      sinon
-        .stub(utils, "checkIfDirectoryExists")
-        .callsFake(fakeCheckIfDirectoryExists);
+      sinon.stub(utils, "checkIfDirectoryExists").callsFake(fakeCheckIfDirectoryExists);
       sinon.stub(utils, "readDirectory").callsFake(fakeReadDirectory);
     });
 
-    afterEach(function () {
+    after(function () {
       sinon.restore();
+    })
+
+    afterEach(function () {
       mockFS.restore();
     });
 
     it("Gets the correct platform details", function () {
-        const platformDetails: platform.IPlatformDetails =
-          platform.getPlatformDetails();
+        const platformDetails: platform.IPlatformDetails = platform.getPlatformDetails();
         switch (process.platform) {
         case "darwin":
             assert.strictEqual(
@@ -913,181 +901,124 @@ describe("Platform module", function () {
     });
 
     describe("Default PowerShell installation", function () {
-      for (const testPlatform of successTestCases) {
-        it(`Finds it on ${testPlatform.name}`, async function () {
-          setupTestEnvironment(testPlatform);
+        for (const testPlatform of successTestCases) {
+            it(`Finds it on ${testPlatform.name}`, async function () {
+                setupTestEnvironment(testPlatform);
 
-          const powerShellExeFinder = new platform.PowerShellExeFinder(
-            testPlatform.platformDetails, {}
-          );
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails, {});
 
-          const defaultPowerShell =
-            await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
-          const expectedPowerShell = testPlatform.expectedPowerShellSequence[0];
+                const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                const expectedPowerShell = testPlatform.expectedPowerShellSequence[0];
 
-          assert.strictEqual(
-            defaultPowerShell!.exePath,
-            expectedPowerShell.exePath,
-          );
-          assert.strictEqual(
-            defaultPowerShell!.displayName,
-            expectedPowerShell.displayName,
-          );
-          assert.strictEqual(
-            defaultPowerShell!.supportsProperArguments,
-            expectedPowerShell.supportsProperArguments,
-          );
-        });
-      }
+                assert.strictEqual(defaultPowerShell!.exePath, expectedPowerShell.exePath);
+                assert.strictEqual(defaultPowerShell!.displayName, expectedPowerShell.displayName);
+                assert.strictEqual(defaultPowerShell!.supportsProperArguments, expectedPowerShell.supportsProperArguments);
+            });
+        }
 
-      for (const testPlatform of errorTestCases) {
-        it(`Fails gracefully on ${testPlatform.name}`, async function () {
-          setupTestEnvironment(testPlatform);
+        for (const testPlatform of errorTestCases) {
+            it(`Fails gracefully on ${testPlatform.name}`, async function () {
+                setupTestEnvironment(testPlatform);
 
-          const powerShellExeFinder = new platform.PowerShellExeFinder(
-            testPlatform.platformDetails, {}
-          );
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails, {});
 
-          const defaultPowerShell =
-            await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
-          assert.strictEqual(defaultPowerShell, undefined);
-        });
-      }
+                const defaultPowerShell = await powerShellExeFinder.getFirstAvailablePowerShellInstallation();
+                assert.strictEqual(defaultPowerShell, undefined);
+            });
+        }
     });
 
     describe("Expected PowerShell installation list", function () {
-      for (const testPlatform of successTestCases) {
-        it(`Finds them on ${testPlatform.name}`, async function () {
-          setupTestEnvironment(testPlatform);
+        for (const testPlatform of successTestCases) {
+            it(`Finds them on ${testPlatform.name}`, async function () {
+                setupTestEnvironment(testPlatform);
 
-          const powerShellExeFinder = new platform.PowerShellExeFinder(
-            testPlatform.platformDetails, {}
-          );
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails, {});
 
-          const foundPowerShells =
-            await powerShellExeFinder.getAllAvailablePowerShellInstallations();
+                const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
 
-          for (
-            let i = 0;
-            i < testPlatform.expectedPowerShellSequence.length;
-            i++
-          ) {
-            const foundPowerShell = foundPowerShells[i];
-            const expectedPowerShell =
-              testPlatform.expectedPowerShellSequence[i];
+                for (let i = 0; i < testPlatform.expectedPowerShellSequence.length; i++) {
+                    const foundPowerShell = foundPowerShells[i];
+                    const expectedPowerShell = testPlatform.expectedPowerShellSequence[i];
 
-            assert.strictEqual(
-              foundPowerShell.exePath,
-              expectedPowerShell.exePath,
-            );
-            assert.strictEqual(
-              foundPowerShell.displayName,
-              expectedPowerShell.displayName,
-            );
-            assert.strictEqual(
-              foundPowerShell.supportsProperArguments,
-              expectedPowerShell.supportsProperArguments,
-            );
-          }
+                    assert.strictEqual(foundPowerShell.exePath, expectedPowerShell.exePath);
+                    assert.strictEqual(foundPowerShell.displayName, expectedPowerShell.displayName);
+                    assert.strictEqual(foundPowerShell.supportsProperArguments, expectedPowerShell.supportsProperArguments);
+                }
 
-          assert.strictEqual(
-            foundPowerShells.length,
-            testPlatform.expectedPowerShellSequence.length,
-            "Number of expected PowerShells found does not match",
-          );
-        });
-      }
+                assert.strictEqual(
+                    foundPowerShells.length,
+                    testPlatform.expectedPowerShellSequence.length,
+                    "Number of expected PowerShells found does not match");
+            });
+        }
 
-      for (const testPlatform of errorTestCases) {
-        it(`Fails gracefully on ${testPlatform.name}`, async function () {
-          setupTestEnvironment(testPlatform);
+        for (const testPlatform of errorTestCases) {
+            it(`Fails gracefully on ${testPlatform.name}`, async function () {
+                setupTestEnvironment(testPlatform);
 
-          const powerShellExeFinder = new platform.PowerShellExeFinder(
-            testPlatform.platformDetails, {}
-          );
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails, {});
 
-          const foundPowerShells =
-            await powerShellExeFinder.getAllAvailablePowerShellInstallations();
-          assert.strictEqual(foundPowerShells.length, 0);
-        });
-      }
+                const foundPowerShells = await powerShellExeFinder.getAllAvailablePowerShellInstallations();
+                assert.strictEqual(foundPowerShells.length, 0);
+            });
+        }
     });
 
     describe("Windows PowerShell path fix", function () {
-      for (const testPlatform of successTestCases.filter(
-        (tp) =>
-          tp.platformDetails.operatingSystem ===
-          platform.OperatingSystem.Windows,
-      )) {
-        it(`Corrects the Windows PowerShell path on ${testPlatform.name}`, function () {
-          setupTestEnvironment(testPlatform);
+        for (const testPlatform of successTestCases
+            .filter((tp) => tp.platformDetails.operatingSystem === platform.OperatingSystem.Windows)) {
 
-          function getWinPSPath(systemDir: string): string {
-            return path.join(
-              testPlatform.environmentVars.windir,
-              systemDir,
-              "WindowsPowerShell",
-              "v1.0",
-              "powershell.exe",
-            );
-          }
+            it(`Corrects the Windows PowerShell path on ${testPlatform.name}`, function () {
+                setupTestEnvironment(testPlatform);
 
-          const winPSPath = getWinPSPath("System32");
+                function getWinPSPath(systemDir: string): string {
+                    return path.join(
+                        testPlatform.environmentVars.windir,
+                        systemDir,
+                        "WindowsPowerShell",
+                        "v1.0",
+                        "powershell.exe");
+                }
 
-          let altWinPSPath;
-          if (testPlatform.platformDetails.isProcess64Bit) {
-            altWinPSPath = getWinPSPath("SysWOW64");
-          } else if (testPlatform.platformDetails.isOS64Bit) {
-            altWinPSPath = getWinPSPath("Sysnative");
-          } else {
-            altWinPSPath = null;
-          }
+                const winPSPath = getWinPSPath("System32");
 
-          const powerShellExeFinder = new platform.PowerShellExeFinder(
-            testPlatform.platformDetails, {}
-          );
+                let altWinPSPath;
+                if (testPlatform.platformDetails.isProcess64Bit) {
+                    altWinPSPath = getWinPSPath("SysWOW64");
+                } else if (testPlatform.platformDetails.isOS64Bit) {
+                    altWinPSPath = getWinPSPath("Sysnative");
+                } else {
+                    altWinPSPath = null;
+                }
 
-          assert.strictEqual(
-            powerShellExeFinder.fixWindowsPowerShellPath(winPSPath),
-            winPSPath,
-          );
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails, {});
 
-          if (altWinPSPath) {
-            assert.strictEqual(
-              powerShellExeFinder.fixWindowsPowerShellPath(altWinPSPath),
-              winPSPath,
-            );
-          }
-        });
-      }
+                assert.strictEqual(powerShellExeFinder.fixWindowsPowerShellPath(winPSPath), winPSPath);
+
+                if (altWinPSPath) {
+                    assert.strictEqual(powerShellExeFinder.fixWindowsPowerShellPath(altWinPSPath), winPSPath);
+                }
+            });
+        }
     });
 
     describe("PowerShell executables from 'powerShellAdditionalExePaths' are found", function () {
-      for (const testPlatform of successAdditionalTestCases) {
-        it(`Guesses for ${testPlatform.name}`, async function () {
-          setupTestEnvironment(testPlatform);
+        for (const testPlatform of successAdditionalTestCases) {
+            it(`Guesses for ${testPlatform.name}`, async function () {
+                setupTestEnvironment(testPlatform);
 
-          const powerShellExeFinder = new platform.PowerShellExeFinder(
-            testPlatform.platformDetails,
-            additionalPowerShellExes,
-          );
+                const powerShellExeFinder = new platform.PowerShellExeFinder(testPlatform.platformDetails, additionalPowerShellExes);
 
-          let i = 0;
-          for await (const additionalPwsh of powerShellExeFinder.enumerateAdditionalPowerShellInstallations()) {
-            const expectedPowerShell =
-              testPlatform.expectedPowerShellSequence[i];
-            i++;
+                let i = 0;
+                for await (const additionalPwsh of powerShellExeFinder.enumerateAdditionalPowerShellInstallations()) {
+                    const expectedPowerShell = testPlatform.expectedPowerShellSequence[i];
+                    i++;
 
-            assert.strictEqual(
-              additionalPwsh.exePath,
-              expectedPowerShell.exePath,
-            );
-            assert.strictEqual(
-              additionalPwsh.displayName,
-              expectedPowerShell.displayName,
-            );
-          }
-        });
-      }
+                    assert.strictEqual(additionalPwsh.exePath, expectedPowerShell.exePath);
+                    assert.strictEqual(additionalPwsh.displayName, expectedPowerShell.displayName);
+                }
+            });
+        }
     });
 });

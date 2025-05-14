@@ -167,6 +167,7 @@ describe("DebugSessionFeature", () => {
 
             assert.equal(actual, undefined);
             assert.match(logger.writeAndShowError.firstCall.args[0], /debugging this file type/);
+            Sinon.restore();
         });
 
         it("Prevents debugging untitled files in a temp console", async () => {

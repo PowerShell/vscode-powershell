@@ -49,7 +49,7 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+     
     public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public dispose(): void {

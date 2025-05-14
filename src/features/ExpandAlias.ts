@@ -6,11 +6,11 @@ import { RequestType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import type { LanguageClient } from "vscode-languageclient/node";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 interface IExpandAliasRequestArguments {
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 interface IExpandAliasRequestResponse {
     text: string
 }
@@ -52,7 +52,7 @@ export class ExpandAliasFeature extends LanguageClientConsumer {
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+     
     public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public dispose(): void {

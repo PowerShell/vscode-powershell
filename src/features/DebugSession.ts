@@ -703,7 +703,7 @@ interface IProcessItem extends QuickPickItem {
     processId: number; // payload for the QuickPick UI
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 interface IGetPSHostProcessesArguments {
 }
 
@@ -722,7 +722,7 @@ interface IRunspaceItem extends QuickPickItem {
     id: number; // payload for the QuickPick UI
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+ 
 interface IGetRunspaceRequestArguments {
 }
 

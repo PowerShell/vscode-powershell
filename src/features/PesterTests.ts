@@ -3,7 +3,7 @@
 
 import * as path from "path";
 import vscode = require("vscode");
-import { ILogger } from "../logging";
+import type { ILogger } from "../logging";
 import { SessionManager } from "../session";
 import { getSettings, getChosenWorkspace } from "../settings";
 import utils = require("../utils");
@@ -53,9 +53,7 @@ export class PesterTestsFeature implements vscode.Disposable {
         launchType: LaunchType,
         fileUri?: vscode.Uri): Promise<boolean> {
 
-        if (fileUri === undefined) {
-            fileUri = vscode.window.activeTextEditor?.document.uri;
-        }
+        fileUri ??= vscode.window.activeTextEditor?.document.uri;
 
         if (fileUri === undefined) {
             return false;

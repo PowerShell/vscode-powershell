@@ -24,12 +24,12 @@ function Get-EditorServicesPath {
 
 task RestoreNode -If { !(Test-Path ./node_modules/esbuild) } {
     Write-Build DarkGreen "Restoring build dependencies"
-    Invoke-BuildExec { & npm ci --omit=optional }
+    Invoke-BuildExec { & npm ci --omit optional }
 }
 
 task RestoreNodeOptional -If { !(Test-Path ./node_modules/eslint) } {
     Write-Build DarkMagenta "Restoring build, test, and lint dependencies"
-    Invoke-BuildExec { & npm ci --include=optional }
+    Invoke-BuildExec { & npm ci --include optional }
 }
 
 task RestoreEditorServices -If (Get-EditorServicesPath) {

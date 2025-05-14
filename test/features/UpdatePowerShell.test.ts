@@ -4,7 +4,7 @@
 import assert from "assert";
 import { UpdatePowerShell } from "../../src/features/UpdatePowerShell";
 import { Settings } from "../../src/settings";
-import { IPowerShellVersionDetails } from "../../src/session";
+import type { IPowerShellVersionDetails } from "../../src/session";
 import { testLogger } from "../utils";
 
 describe("UpdatePowerShell feature", function () {

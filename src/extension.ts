@@ -82,7 +82,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
                     // e.g. /** | */
                     // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
-                    // eslint-disable-next-line no-useless-escape
+                     
                     afterText: /^\s*\*\/$/,
                     action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: " * " },
                 },
@@ -201,7 +201,7 @@ function registerWaitForPsesActivationCommand(context: vscode.ExtensionContext):
             const pidFile = vscode.Uri.joinPath(context.globalStorageUri, "sessions", pidFileName);
             const fs = vscode.workspace.fs;
             // Wait for the file to be created
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-constant-condition
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             while (true) {
                 try {
                     const pidContent = await fs.readFile(pidFile);

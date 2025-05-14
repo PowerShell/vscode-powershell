@@ -10,7 +10,7 @@ import { execSync } from "child_process";
 // This lets us test the rest of our path assumptions against the baseline of
 // this test file existing at `<root>/test/utils.js`.
 export const rootPath = path.resolve(__dirname, "../");
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const packageJSON: any = require(path.resolve(rootPath, "package.json"));
 export const extensionId = `${packageJSON.publisher}.${packageJSON.name}`;
 

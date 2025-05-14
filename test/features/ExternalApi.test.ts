@@ -3,7 +3,7 @@
 
 import * as assert from "assert";
 import utils = require("../utils");
-import { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
+import type { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 
 describe("ExternalApi feature", function () {
     describe("External extension registration", function () {

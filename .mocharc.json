@@ -1,5 +1,5 @@
 {
-  "require": "tsx",
+  "require": "esbuild-register",
   "color": true,
   "enable-source-maps": true,
   "timeout": 600000,
