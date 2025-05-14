@@ -128,7 +128,9 @@ describe("UpdatePowerShell feature", function () {
             // @ts-expect-error method is private.
             const tag: string | undefined = await updater.maybeGetNewRelease();
             // NOTE: This will need to be updated each new major stable.
-            assert(tag?.startsWith("v7.5"));
+            // TODO: Upstream bug causes LTS releases to update the stable info.
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            assert(tag?.startsWith("v7.5") || tag?.startsWith("v7.4"));
         });
     });
 });

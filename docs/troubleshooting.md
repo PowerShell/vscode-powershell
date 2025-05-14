@@ -15,7 +15,7 @@ active editor's language mode is PowerShell.
 
 ### Using Windows PowerShell 5.1
 
-While we _highly encourage_ the use of [PowerShell Core 7.2][], if you must use Windows
+While we _highly encourage_ the use of [PowerShell 7.4 LTS][], if you must use Windows
 PowerShell 5.1 we attempt to support it on a best-effort basis. Unfortunately, being two
 major versions behind and in maintenance mode, Windows PowerShell is missing many of the
 bug fixes and APIs we use to make the extension experience great. So please, if you can,
@@ -410,7 +410,7 @@ WSManStackVersion              3.0
 [more information]: #providing-information-about-your-environment
 [open a new issue]: https://github.com/PowerShell/vscode-powershell/issues/new/choose
 [open an issue there]: https://github.com/PowerShell/PSScriptAnalyzer/issues/new/choose
-[PowerShell Core 7.2]: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2
+[PowerShell 7.4 LTS]: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.4
 [semantic highlighting]: https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
 [tackling an issue]: ./development.md
 [v2021.2.2]: https://github.com/PowerShell/vscode-powershell/releases/tag/v2021.2.2
