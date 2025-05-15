@@ -1,5 +1,5 @@
 # It's easier to restore node/typescript than dotnet, which is why we use this as the base
-FROM mcr.microsoft.com/devcontainers/dotnet:9.0
+FROM mcr.microsoft.com/devcontainers/dotnet:8.0
 
 # Install VSCode which includes the library prereqs to run vscode-test
 RUN <<SCRIPT
