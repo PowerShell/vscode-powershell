@@ -12,3 +12,5 @@ apt-get install -y code
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 SCRIPT
+
+RUN pwsh -noni -c 'Install-PSResource -TrustRepository -Confirm:$false -Verbose Platyps'
