@@ -9,7 +9,6 @@
       "path": "../PowerShellEditorServices"
     }
   ],
-
   "extensions": {
     "recommendations": [
       "davidanson.vscode-markdownlint",
@@ -18,17 +17,22 @@
       "esbenp.prettier-vscode",
       "ms-dotnettools.csharp",
       "ms-vscode.powershell",
-      "hbenl.vscode-mocha-test-adapter",
-      "connor4312.esbuild-problem-matchers"
+      "connor4312.esbuild-problem-matchers",
+      "ms-vscode.extension-test-runner"
     ]
   },
   "settings": {
     "window.title": "PowerShell VS Code Extension Development",
     "debug.onTaskErrors": "prompt",
-    "editor.tabSize": 4,
-    "editor.insertSpaces": true,
-    "files.trimTrailingWhitespace": true,
-    "files.insertFinalNewline": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+    },
+    "[typescript][javascript][json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnPaste": true,
+      "editor.formatOnSave": true,
+      "editor.formatOnSaveMode": "modificationsIfAvailable",
+    },
     "files.associations": {
       "**/snippets/*.json": "jsonc", // Use JSONC instead of JSON because that's how VS Code interprets snippet files, and it enables better source documentation.
     },
@@ -46,25 +50,8 @@
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "typescript.tsdk": "Client/node_modules/typescript/lib", // Lock the TypeScript SDK path to the version we use
-    "typescript.format.semicolons": "insert", // Code actions like "organize imports" ignore ESLint, so we need this here
-    "eslint.format.enable": true, // Enable ESLint as defaut formatter so quick fixes can be applied directly
-    "[typescript]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode",
-      "editor.formatOnPaste": true,
-      "editor.formatOnSave": true,
-      "editor.formatOnSaveMode": "modificationsIfAvailable"
-    },
-    "mochaExplorer.configFile": ".mocharc.json",
-    "mochaExplorer.launcherScript": "test/runTests",
-    "mochaExplorer.autoload": false, // The test instance pops up every time discovery or run is done, this could be annoying on startup.
-    "mochaExplorer.debuggerPort": 59229, // Matches the launch config, we dont want to use the default port as we are launching a duplicate instance of vscode and it might conflict.
-    "mochaExplorer.ipcRole": "server",
-    "mochaExplorer.ipcTimeout": 30000, // 30 seconds
+    "typescript.tsserver.experimental.enableProjectDiagnostics": true,
     "testExplorer.useNativeTesting": true,
-    "mochaExplorer.env": {
-      "VSCODE_VERSION": "insiders",
-      "ELECTRON_RUN_AS_NODE": null
-    }
   },
   "tasks": {
     "version": "2.0.0",
@@ -95,7 +82,7 @@
     "osx": {
       "options": {
         "shell": {
-          "executable": "/usr/local/bin/pwsh",
+          "executable": "pwsh",
           "args": [
             "-NoProfile",
             "-Command"
@@ -324,15 +311,13 @@
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
         "outFiles": [
-          "${workspaceFolder:Client}/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
+          "${workspaceFolder:Client}/dist/*.js"
         ],
         "skipFiles": [
           "<node_internals>/**",
           "**/node_modules/**",
           "**/.vscode-test/**",
-          "**/app/out/vs/**" //Skips Extension Host internals
+          "**/app/out/vs/**" // Skips Extension Host internals
         ],
         "presentation": {
           "hidden": true
@@ -356,9 +341,7 @@
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
         "outFiles": [
-          "${workspaceFolder:Client}/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
+          "${workspaceFolder:Client}/dist/*.js"
         ],
         "skipFiles": [
           "<node_internals>/**",
@@ -388,15 +371,13 @@
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
         "outFiles": [
-          "${workspaceFolder:Client}/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**",
+          "${workspaceFolder:Client}/dist/*.js"
         ],
         "skipFiles": [
           "<node_internals>/**",
           "**/node_modules/**",
           "**/.vscode-test/**",
-          "**/app/out/vs/**" //Skips Extension Host internals
+          "**/app/out/vs/**" // Skips Extension Host internals
         ],
         "presentation": {
           "hidden": true
@@ -460,9 +441,7 @@
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
         "outFiles": [
-          "${workspaceFolder:Client}/**/*.js",
-          "!**/node_modules/**",
-          "!**/.vscode-test/**"
+          "${workspaceFolder:Client}/dist/*.js"
         ],
         "skipFiles": [
           "<node_internals>/**",
