@@ -40,8 +40,6 @@ if (process.platform === "win32") {
     const msixAppDir = path.join(process.env.LOCALAPPDATA!, "Microsoft", "WindowsApps");
     const pwshMsixPath = path.join(msixAppDir, "Microsoft.PowerShell_8wekyb3d8bbwe", "pwsh.exe");
     const pwshPreviewMsixPath = path.join(msixAppDir, "Microsoft.PowerShellPreview_8wekyb3d8bbwe", "pwsh.exe");
-    const pwshDailyDir = path.join(process.env.LOCALAPPDATA!, "Microsoft", "powershell-daily");
-    const pwshDailyPath = path.join(pwshDailyDir, "pwsh.exe");
 
     successTestCases = [
         {
@@ -96,11 +94,6 @@ if (process.platform === "win32") {
                     exePath: "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
                     displayName: "Windows PowerShell (x86)",
                     supportsProperArguments: true
-                },
-                {
-                    exePath: pwshDailyPath,
-                    displayName: "PowerShell Daily",
-                    supportsProperArguments: true
                 }
             ],
             filesystem: {
@@ -133,9 +126,6 @@ if (process.platform === "win32") {
                 },
                 "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
                     "powershell.exe": "",
-                },
-                [pwshDailyDir]: {
-                    "pwsh.exe": "",
                 }
             },
         },
@@ -487,8 +477,6 @@ if (process.platform === "win32") {
         }
     ];
 } else {
-    const pwshDailyDir = path.join(os.homedir(), ".powershell-daily");
-
     successTestCases = [
         {
             name: "Linux (all installations)",
@@ -502,41 +490,33 @@ if (process.platform === "win32") {
                 {
                     exePath: "/usr/bin/pwsh",
                     displayName: "PowerShell",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
                 {
                     exePath: "/snap/bin/pwsh",
                     displayName: "PowerShell Snap",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
                 {
                     exePath: "/usr/bin/pwsh-preview",
                     displayName: "PowerShell Preview",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
                 {
                     exePath: "/snap/bin/pwsh-preview",
                     displayName: "PowerShell Preview Snap",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
-                {
-                    exePath: path.join(pwshDailyDir, "pwsh"),
-                    displayName: "PowerShell Daily",
-                    supportsProperArguments: true
-                }
             ],
             filesystem: {
                 "/usr/bin": {
-                    "pwsh": "",
+                    pwsh: "",
                     "pwsh-preview": "",
                 },
                 "/snap/bin": {
-                    "pwsh": "",
+                    pwsh: "",
                     "pwsh-preview": "",
                 },
-                [pwshDailyDir]: {
-                    "pwsh": ""
-                }
             },
         },
         {
@@ -551,47 +531,39 @@ if (process.platform === "win32") {
                 {
                     exePath: "/usr/local/bin/pwsh",
                     displayName: "PowerShell",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
                 {
                     exePath: "/opt/homebrew/bin/pwsh",
                     displayName: "PowerShell (Homebrew)",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
                 {
                     exePath: "/opt/homebrew/bin/pwsh-lts",
                     displayName: "PowerShell LTS (Homebrew)",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
                 {
                     exePath: "/usr/local/bin/pwsh-preview",
                     displayName: "PowerShell Preview",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
                 {
                     exePath: "/opt/homebrew/bin/pwsh-preview",
                     displayName: "PowerShell Preview (Homebrew)",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
-                {
-                    exePath: path.join(pwshDailyDir, "pwsh"),
-                    displayName: "PowerShell Daily",
-                    supportsProperArguments: true
-                }
             ],
             filesystem: {
                 "/usr/local/bin": {
-                    "pwsh": "",
+                    pwsh: "",
                     "pwsh-preview": "",
                 },
                 "/opt/homebrew/bin/": {
-                    "pwsh": "",
+                    pwsh: "",
                     "pwsh-lts": "",
                     "pwsh-preview": "",
                 },
-                [pwshDailyDir]: {
-                    "pwsh": ""
-                }
             },
         },
         {
@@ -606,12 +578,12 @@ if (process.platform === "win32") {
                 {
                     exePath: "/usr/bin/pwsh",
                     displayName: "PowerShell",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
             ],
             filesystem: {
                 "/usr/bin": {
-                    "pwsh": "",
+                    pwsh: "",
                 },
             },
         },
@@ -627,12 +599,12 @@ if (process.platform === "win32") {
                 {
                     exePath: "/snap/bin/pwsh",
                     displayName: "PowerShell Snap",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
             ],
             filesystem: {
                 "/snap/bin": {
-                    "pwsh": "",
+                    pwsh: "",
                 },
             },
         },
@@ -648,12 +620,12 @@ if (process.platform === "win32") {
                 {
                     exePath: "/usr/local/bin/pwsh",
                     displayName: "PowerShell",
-                    supportsProperArguments: true
+                    supportsProperArguments: true,
                 },
             ],
             filesystem: {
                 "/usr/local/bin": {
-                    "pwsh": "",
+                    pwsh: "",
                 },
             },
         },
@@ -665,19 +637,19 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             environmentVars: {
-                "USER": "test",
-                "HOME": "/Users/test",
+                USER: "test",
+                HOME: "/Users/test",
             },
             expectedPowerShellSequence: [
                 {
                     exePath: "/Users/test/.dotnet/tools/pwsh",
                     displayName: ".NET Core PowerShell Global Tool",
-                    supportsProperArguments: false
+                    supportsProperArguments: false,
                 },
             ],
             filesystem: {
                 "/Users/test/.dotnet/tools": {
-                    "pwsh": "",
+                    pwsh: "",
                 },
             },
         },
@@ -689,19 +661,19 @@ if (process.platform === "win32") {
                 isProcess64Bit: true,
             },
             environmentVars: {
-                "USER": "test",
-                "HOME": "/home/test",
+                USER: "test",
+                HOME: "/home/test",
             },
             expectedPowerShellSequence: [
                 {
                     exePath: "/home/test/.dotnet/tools/pwsh",
                     displayName: ".NET Core PowerShell Global Tool",
-                    supportsProperArguments: false
+                    supportsProperArguments: false,
                 },
             ],
             filesystem: {
                 "/home/test/.dotnet/tools": {
-                    "pwsh": "",
+                    pwsh: "",
                 },
             },
         },
