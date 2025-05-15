@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { LogOutputChannel, LogLevel, window, Event } from "vscode";
+import { type LogOutputChannel, LogLevel, window, type Event } from "vscode";
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
  *  This will allow for easy mocking of the logger during unit tests.
@@ -140,9 +140,7 @@ export class Logger implements ILogger {
 export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
     private _channel: LogOutputChannel | undefined;
     private get channel(): LogOutputChannel {
-        if (!this._channel) {
-            this._channel = window.createOutputChannel(this.channelName, {log: true});
-        }
+        this._channel ??= window.createOutputChannel(this.channelName, {log: true});
         return this._channel;
     }
 

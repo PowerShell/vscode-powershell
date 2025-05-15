@@ -6,7 +6,6 @@ import { NotificationType } from "vscode-languageclient";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import type { LanguageClient } from "vscode-languageclient/node";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IShowHelpNotificationArguments {
 }
 

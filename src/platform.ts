@@ -6,12 +6,11 @@ import * as path from "path";
 import * as process from "process";
 import vscode = require("vscode");
 import { integer } from "vscode-languageserver-protocol";
-import { ILogger } from "./logging";
-import { changeSetting, getSettings, PowerShellAdditionalExePathSettings } from "./settings";
+import type { ILogger } from "./logging";
+import { changeSetting, getSettings, type PowerShellAdditionalExePathSettings } from "./settings";
 import untildify from "untildify";
 
 // This uses require so we can rewire it in unit tests!
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-var-requires
 const utils = require("./utils");
 
 const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
@@ -631,9 +630,7 @@ class PossiblePowerShellExe implements IPossiblePowerShellExe {
         public readonly suppressWarning = false) { }
 
     public async exists(): Promise<boolean> {
-        if (this.knownToExist === undefined) {
-            this.knownToExist = await utils.checkIfFileExists(this.exePath);
-        }
+        this.knownToExist ??= await utils.checkIfFileExists(this.exePath);
         return this.knownToExist ?? false;
     }
 }

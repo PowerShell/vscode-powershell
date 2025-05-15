@@ -3,7 +3,7 @@
 
 import * as vscode from "vscode";
 import { v4 as uuidv4 } from "uuid";
-import { ILogger } from "../logging";
+import type { ILogger } from "../logging";
 import { SessionManager } from "../session";
 
 export interface IExternalPowerShellDetails {

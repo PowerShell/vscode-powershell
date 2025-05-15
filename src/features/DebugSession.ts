@@ -2,39 +2,39 @@
 // Licensed under the MIT License.
 
 import {
-    debug,
-    CancellationToken,
-    CancellationTokenSource,
-    DebugAdapterDescriptor,
-    DebugAdapterDescriptorFactory,
-    DebugAdapterExecutable,
-    DebugAdapterNamedPipeServer,
-    DebugConfiguration,
-    DebugConfigurationProvider,
-    DebugSession,
-    ExtensionContext,
-    WorkspaceFolder,
-    Disposable,
-    window,
-    extensions,
-    workspace,
-    commands,
-    InputBoxOptions,
-    QuickPickItem,
-    QuickPickOptions,
-    DebugConfigurationProviderTriggerKind,
-    DebugAdapterTrackerFactory,
-    DebugAdapterTracker,
-    LogOutputChannel
+  debug,
+  type CancellationToken,
+  CancellationTokenSource,
+  type DebugAdapterDescriptor,
+  type DebugAdapterDescriptorFactory,
+  DebugAdapterExecutable,
+  DebugAdapterNamedPipeServer,
+  type DebugConfiguration,
+  type DebugConfigurationProvider,
+  type DebugSession,
+  type ExtensionContext,
+  type WorkspaceFolder,
+  Disposable,
+  window,
+  extensions,
+  workspace,
+  commands,
+  type InputBoxOptions,
+  type QuickPickItem,
+  type QuickPickOptions,
+  DebugConfigurationProviderTriggerKind,
+  type DebugAdapterTrackerFactory,
+  type DebugAdapterTracker,
+  type LogOutputChannel,
 } from "vscode";
 import type { DebugProtocol } from "@vscode/debugprotocol";
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
-import { ILogger } from "../logging";
+import type { ILogger } from "../logging";
 import { OperatingSystem, getPlatformDetails } from "../platform";
 import { PowerShellProcess } from "../process";
-import { IEditorServicesSessionDetails, SessionManager } from "../session";
+import { type IEditorServicesSessionDetails, SessionManager } from "../session";
 import { getSettings } from "../settings";
 import path from "path";
 import { checkIfFileExists } from "../utils";
@@ -703,7 +703,6 @@ interface IProcessItem extends QuickPickItem {
     processId: number; // payload for the QuickPick UI
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IGetPSHostProcessesArguments {
 }
 
@@ -722,7 +721,6 @@ interface IRunspaceItem extends QuickPickItem {
     id: number; // payload for the QuickPick UI
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IGetRunspaceRequestArguments {
 }
 

@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import vscode = require("vscode");
-import { ILogger } from "../logging";
+import type { ILogger } from "../logging";
 
 export class CodeActionsFeature implements vscode.Disposable {
     private command: vscode.Disposable;
