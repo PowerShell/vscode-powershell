@@ -15,7 +15,7 @@
 			"version": "20.19.0" // Keep in sync with package.json for what target vscode version uses
 		}
 	},
-	"postCreateCommand": "git clone https://github.com/PowerShell/PowerShellEditorServices.git /workspaces/PowerShellEditorServices"
+	"postCreateCommand": "pwsh -c 'if (-not (Test-Path /workspaces/PowerShellEditorServices)) {git clone https://github.com/PowerShell/PowerShellEditorServices.git /workspaces/PowerShellEditorServices}'"
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
