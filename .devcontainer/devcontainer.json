@@ -3,13 +3,15 @@
 {
 	"name": "PowerShell Extension",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+	"hostRequirements": {
+		"cpus": 4 // Primarily for GitHub Codespaces, as the 2 CPU is not generally good enough for C# compilation
+	},
+	"image": "./Dockerfile",
 	"features": {
-		"ghcr.io/devcontainers/features/dotnet:2": {},
-		"ghcr.io/devcontainers/features/powershell:1": {
-			"version": "latest"
-		},
-		"ghcr.io/devcontainers/features/git:1": {}
+		"ghcr.io/devcontainers/features/node:1": {
+			"nvmVersion": "latest", // Can be used to change node versions as needed
+			"version": "20.19.0" // Keep in sync with package.json for what target vscode version uses
+		}
 	},
 	"postCreateCommand": "git clone https://github.com/PowerShell/PowerShellEditorServices.git /workspaces/PowerShellEditorServices"
 
