@@ -8,10 +8,8 @@ import vscode = require("vscode");
 import { integer } from "vscode-languageserver-protocol";
 import type { ILogger } from "./logging";
 import { changeSetting, getSettings, type PowerShellAdditionalExePathSettings } from "./settings";
+import * as utils from "./utils";
 import untildify from "untildify";
-
-// This uses require so we can rewire it in unit tests!
-const utils = require("./utils");
 
 const WindowsPowerShell64BitLabel = "Windows PowerShell (x64)";
 const WindowsPowerShell32BitLabel = "Windows PowerShell (x86)";
@@ -91,7 +89,7 @@ export class PowerShellExeFinder {
         private platformDetails: IPlatformDetails,
         // Additional configured PowerShells
         private additionalPowerShellExes: PowerShellAdditionalExePathSettings,
-        private logger: ILogger) { }
+        private logger?: ILogger) { }
 
     /**
      * Returns the first available PowerShell executable found in the search order.
@@ -156,7 +154,7 @@ export class PowerShellExeFinder {
                 yield additionalPwsh;
             } else if (!additionalPwsh.suppressWarning) {
                 const message = `Additional PowerShell '${additionalPwsh.displayName}' not found at '${additionalPwsh.exePath}'!`;
-                this.logger.writeWarning(message);
+                this.logger?.writeWarning(message);
 
                 if (!getSettings().suppressAdditionalExeNotFoundWarning) {
                     const selection = await vscode.window.showWarningMessage(message, "Don't Show Again");
@@ -243,7 +241,7 @@ export class PowerShellExeFinder {
      * Iterates through the configured additional PowerShell executable locations,
      * without checking for their existence.
      */
-    private async *enumerateAdditionalPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe> {
+    public async *enumerateAdditionalPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe> {
         for (const versionName in this.additionalPowerShellExes) {
             if (Object.prototype.hasOwnProperty.call(this.additionalPowerShellExes, versionName)) {
                 let exePath: string | undefined = utils.stripQuotePair(this.additionalPowerShellExes[versionName]);
