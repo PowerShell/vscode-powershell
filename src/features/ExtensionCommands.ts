@@ -8,7 +8,7 @@ import {
     Position, Range, RequestType
 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { ILogger } from "../logging";
+import type { ILogger } from "../logging";
 import { getSettings, validateCwdSetting } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import { DebugConfig, DebugConfigurations } from "./DebugSession";
@@ -64,7 +64,7 @@ export const GetEditorContextRequestType =
     new RequestType<IGetEditorContextRequestArguments, IEditorContext, void>(
         "editor/getEditorContext");
 
- 
+
 export interface IGetEditorContextRequestArguments {
 }
 

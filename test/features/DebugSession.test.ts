@@ -4,13 +4,37 @@
 import structuredClone from "@ungap/structured-clone"; //Polyfill for structuredClone which will be present in Node 17.
 import * as assert from "assert";
 import Sinon from "sinon";
-import { DebugAdapterNamedPipeServer, DebugConfiguration, DebugSession, Extension, ExtensionContext, Range, SourceBreakpoint, TextDocument, TextEditor, Uri, commands, debug, extensions, window, workspace } from "vscode";
+import {
+  DebugAdapterNamedPipeServer,
+  type DebugConfiguration,
+  type DebugSession,
+  type Extension,
+  type ExtensionContext,
+  Range,
+  SourceBreakpoint,
+  type TextDocument,
+  type TextEditor,
+  Uri,
+  commands,
+  debug,
+  extensions,
+  window,
+  workspace,
+} from "vscode";
 import { Disposable } from "vscode-languageserver-protocol";
-import { DebugConfig, DebugSessionFeature, DebugConfigurations } from "../../src/features/DebugSession";
-import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
+import {
+  DebugConfig,
+  DebugSessionFeature,
+  DebugConfigurations,
+} from "../../src/features/DebugSession";
+import type { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import * as platform from "../../src/platform";
-import { IPlatformDetails } from "../../src/platform";
-import { IEditorServicesSessionDetails, IPowerShellVersionDetails, SessionManager } from "../../src/session";
+import type { IPlatformDetails } from "../../src/platform";
+import {
+  type IEditorServicesSessionDetails,
+  type IPowerShellVersionDetails,
+  SessionManager,
+} from "../../src/session";
 import * as utils from "../../src/utils";
 import { BuildBinaryModuleMock, WaitEvent, ensureEditorServicesIsConnected, stubInterface, testLogger } from "../utils";
 

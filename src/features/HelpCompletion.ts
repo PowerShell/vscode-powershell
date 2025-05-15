@@ -3,18 +3,18 @@
 
 import {
     Disposable, EndOfLine, Range, SnippetString,
-    TextDocument, TextDocumentChangeEvent, window, workspace
+    type TextDocument, type TextDocumentChangeEvent, window, workspace
 } from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { Settings, CommentType, getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
- 
+
 interface ICommentHelpRequestArguments {
 }
 
- 
+
 interface ICommentHelpRequestResponse {
     content: string[]
 }
@@ -88,7 +88,7 @@ class TriggerFinder {
     public updateState(document: TextDocument, changeText: string): void {
         switch (this.state) {
         case SearchState.Searching:
-             
+
             if (changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
                 this.state = SearchState.Locked;
                 this.document = document;
@@ -97,7 +97,7 @@ class TriggerFinder {
             break;
 
         case SearchState.Locked:
-             
+
             if (document === this.document && changeText.length === 1 && changeText[0] === this.triggerCharacters[this.count]) {
                 this.count++;
                 if (this.count === this.triggerCharacters.length) {
@@ -136,7 +136,7 @@ class HelpCompletionProvider extends LanguageClientConsumer {
         return this.triggerFinderHelpComment.found;
     }
 
-     
+
     public override onLanguageClientSet(_languageClient: LanguageClient): void {}
 
     public updateState(document: TextDocument, changeText: string, changeRange: Range): void {

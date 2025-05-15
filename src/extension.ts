@@ -10,7 +10,10 @@ import { DebugSessionFeature } from "./features/DebugSession";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
-import { ExternalApiFeature, IPowerShellExtensionClient } from "./features/ExternalApi";
+import {
+  ExternalApiFeature,
+  type IPowerShellExtensionClient,
+} from "./features/ExternalApi";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
@@ -82,7 +85,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
                     // e.g. /** | */
                     // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
-                     
+
                     afterText: /^\s*\*\/$/,
                     action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: " * " },
                 },

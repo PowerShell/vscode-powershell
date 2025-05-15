@@ -4,25 +4,49 @@
 import net = require("net");
 import path = require("path");
 import vscode = require("vscode");
-import TelemetryReporter, { TelemetryEventProperties, TelemetryEventMeasurements } from "@vscode/extension-telemetry";
+import TelemetryReporter, {
+  type TelemetryEventProperties,
+  type TelemetryEventMeasurements,
+} from "@vscode/extension-telemetry";
 import { Message } from "vscode-jsonrpc";
-import { ILogger, LanguageClientOutputChannelAdapter, LspTraceParser, PsesParser } from "./logging";
+import {
+  type ILogger,
+  LanguageClientOutputChannelAdapter,
+  LspTraceParser,
+  PsesParser,
+} from "./logging";
 import { PowerShellProcess } from "./process";
-import { Settings, changeSetting, getSettings, getEffectiveConfigurationTarget, validateCwdSetting } from "./settings";
+import {
+  Settings,
+  changeSetting,
+  getSettings,
+  getEffectiveConfigurationTarget,
+  validateCwdSetting,
+} from "./settings";
 import utils = require("./utils");
 
 import {
-    CloseAction, CloseHandlerResult, DocumentSelector, ErrorAction, ErrorHandlerResult,
-    LanguageClientOptions, Middleware, NotificationType,
-    RequestType0, ResolveCodeLensSignature,
-    RevealOutputChannelOn,
+  CloseAction,
+  type CloseHandlerResult,
+  DocumentSelector,
+  ErrorAction,
+  type ErrorHandlerResult,
+  type LanguageClientOptions,
+  type Middleware,
+  NotificationType,
+  RequestType0,
+  type ResolveCodeLensSignature,
+  RevealOutputChannelOn,
 } from "vscode-languageclient";
-import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
+import { LanguageClient, type StreamInfo } from "vscode-languageclient/node";
 
 import { UpdatePowerShell } from "./features/UpdatePowerShell";
 import {
-    getPlatformDetails, IPlatformDetails, IPowerShellExeDetails,
-    OperatingSystem, PowerShellExeFinder
+  getPlatformDetails,
+  type IPlatformDetails,
+  type IPowerShellExeDetails,
+  OperatingSystem,
+  PowerShellExeFinder,
 } from "./platform";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 import { SemVer, satisfies } from "semver";
@@ -1067,7 +1091,7 @@ class SessionMenuItem implements vscode.QuickPickItem {
 
     constructor(
         public readonly label: string,
-         
+
         public readonly callback = async (): Promise<void> => { }) {
     }
 }

@@ -4,7 +4,7 @@
 import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");
-import { ILogger } from "./logging";
+import type { ILogger } from "./logging";
 import untildify from "untildify";
 import path = require("path");
 

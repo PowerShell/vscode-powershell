@@ -3,8 +3,8 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import { ILogger } from "../src/logging";
-import { IPowerShellExtensionClient } from "../src/features/ExternalApi";
+import type { ILogger } from "../src/logging";
+import type { IPowerShellExtensionClient } from "../src/features/ExternalApi";
 import { execSync } from "child_process";
 
 // This lets us test the rest of our path assumptions against the baseline of

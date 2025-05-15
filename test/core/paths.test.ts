@@ -3,7 +3,7 @@
 
 import assert from "assert";
 import * as vscode from "vscode";
-import { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
+import type { IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 import utils = require("../utils");
 import { checkIfDirectoryExists, checkIfFileExists, ShellIntegrationScript } from "../../src/utils";
 

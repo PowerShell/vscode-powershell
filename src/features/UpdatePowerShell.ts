@@ -5,8 +5,8 @@ import fetch from "node-fetch";
 import { SemVer } from "semver";
 import vscode = require("vscode");
 
-import { ILogger } from "../logging";
-import { IPowerShellVersionDetails } from "../session";
+import type { ILogger } from "../logging";
+import type { IPowerShellVersionDetails } from "../session";
 import { changeSetting, Settings } from "../settings";
 
 interface IUpdateMessageItem extends vscode.MessageItem {
