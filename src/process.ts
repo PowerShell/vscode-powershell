@@ -4,10 +4,10 @@
 import cp = require("child_process");
 import path = require("path");
 import vscode = require("vscode");
-import { ILogger } from "./logging";
+import type { ILogger } from "./logging";
 import { Settings, validateCwdSetting } from "./settings";
 import utils = require("./utils");
-import { IEditorServicesSessionDetails } from "./session";
+import type { IEditorServicesSessionDetails } from "./session";
 import { promisify } from "util";
 
 export class PowerShellProcess {

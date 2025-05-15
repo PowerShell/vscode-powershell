@@ -3,18 +3,16 @@
 
 import {
     Disposable, EndOfLine, Range, SnippetString,
-    TextDocument, TextDocumentChangeEvent, window, workspace
+    type TextDocument, type TextDocumentChangeEvent, window, workspace
 } from "vscode";
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { Settings, CommentType, getSettings } from "../settings";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ICommentHelpRequestArguments {
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface ICommentHelpRequestResponse {
     content: string[]
 }
