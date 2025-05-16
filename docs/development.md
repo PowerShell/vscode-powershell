@@ -4,21 +4,23 @@
 
 1. [Fork and clone][fork] the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell).
 
-2. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices).
+1. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices).
    > The `vscode-powershell` folder and the `PowerShellEditorServices` folder should be next to each other on the file
    > system. Code in `vscode-powershell` looks for PSES at `../PowerShellEditorServices` if you're building locally so
    > PSES must be in that location.
 
-3. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
+1. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
    PowerShell Editor Services. **You will need to complete this step before proceeding**.
 
-4. Install [Node.js](https://nodejs.org/en/) 18.x or higher.
+1. Install [Node.js](https://nodejs.org/en/) 18.x or higher.
 
-5. Install [Visual Studio Code](https://code.visualstudio.com).
+1. Install [Visual Studio Code](https://code.visualstudio.com).
    Open the multi-root workspace file in this repo, `extension-dev.code-workspace`.
    > This has a set of recommended extensions to install and provides tasks.
    > The ESLint formatter will require you to install ESLint globally, using `npm install -g eslint`.
    > Otherwise VS Code will erroneously complain that it isn't able to use it to format TypeScript files.
+
+1. (optional) Set `git config blame.ignoreRevsFile .git-blame-ignore-revs` to ignore formatting-related commits.
 
 [fork]: https://help.github.com/articles/fork-a-repo/
 
