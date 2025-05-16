@@ -86,6 +86,8 @@ task CleanEditorServices -If (Get-EditorServicesPath) {
 task Lint RestoreNodeOptional, {
     Write-Build DarkMagenta "Linting TypeScript"
     Invoke-BuildExec { & npm run lint }
+    Write-Build DarkMagenta "Checking formatting of TypeScript, JSON, etc."
+    Invoke-BuildExec { & npm run format }
 }
 
 task Build RestoreEditorServices, RestoreNode, {
