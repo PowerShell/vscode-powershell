@@ -1,0 +1,6 @@
+# Enabled on GitHub automatically
+# Enable this file in your git config:
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Prettier reformatting
+f978bae02ad48ddb5f8d4eb21512fe9b17541c5b
