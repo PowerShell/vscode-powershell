@@ -4,9 +4,12 @@
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
-import { NotificationType, TextDocumentIdentifier } from "vscode-languageclient";
-import { LanguageClientConsumer } from "../languageClientConsumer";
+import {
+    NotificationType,
+    TextDocumentIdentifier,
+} from "vscode-languageclient";
 import type { LanguageClient } from "vscode-languageclient/node";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 
 // NOTE: The following two DidSaveTextDocument* types will
 // be removed when #593 gets fixed.
@@ -19,8 +22,7 @@ export interface IDidSaveTextDocumentParams {
 }
 
 export const DidSaveTextDocumentNotificationType =
-    new NotificationType<IDidSaveTextDocumentParams>(
-        "textDocument/didSave");
+    new NotificationType<IDidSaveTextDocumentParams>("textDocument/didSave");
 
 export class RemoteFilesFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
@@ -30,9 +32,9 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
         super();
         // Get the common PowerShell Editor Services temporary file path
         // so that remote files from previous sessions can be closed.
-        this.tempSessionPathPrefix =
-            path.join(os.tmpdir(), "PSES-")
-                .toLowerCase();
+        this.tempSessionPathPrefix = path
+            .join(os.tmpdir(), "PSES-")
+            .toLowerCase();
 
         // At startup, close any lingering temporary remote files
         this.closeRemoteFiles();
@@ -43,14 +45,19 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
                 await client.sendNotification(
                     DidSaveTextDocumentNotificationType,
                     {
-                        textDocument: TextDocumentIdentifier.create(doc.uri.toString()),
-                    });
+                        textDocument: TextDocumentIdentifier.create(
+                            doc.uri.toString(),
+                        ),
+                    },
+                );
             }
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public override onLanguageClientSet(_languageClient: LanguageClient): void {}
+    public override onLanguageClientSet(
+        _languageClient: LanguageClient,
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+    ): void {}
 
     public dispose(): void {
         this.command.dispose();
@@ -59,12 +66,15 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
     }
 
     private isDocumentRemote(doc: vscode.TextDocument): boolean {
-        return doc.fileName.toLowerCase().startsWith(this.tempSessionPathPrefix);
+        return doc.fileName
+            .toLowerCase()
+            .startsWith(this.tempSessionPathPrefix);
     }
 
     private closeRemoteFiles(): void {
-        const remoteDocuments =
-            vscode.workspace.textDocuments.filter((doc) => this.isDocumentRemote(doc));
+        const remoteDocuments = vscode.workspace.textDocuments.filter((doc) =>
+            this.isDocumentRemote(doc),
+        );
 
         async function innerCloseFiles(): Promise<void> {
             const doc = remoteDocuments.pop();
@@ -73,7 +83,9 @@ export class RemoteFilesFeature extends LanguageClientConsumer {
             }
 
             await vscode.window.showTextDocument(doc);
-            await vscode.commands.executeCommand("workbench.action.closeActiveEditor");
+            await vscode.commands.executeCommand(
+                "workbench.action.closeActiveEditor",
+            );
             await innerCloseFiles();
         }
 

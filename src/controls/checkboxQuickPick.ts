@@ -6,7 +6,8 @@ import vscode = require("vscode");
 const confirmItemLabel = "$(checklist) Confirm";
 const checkedPrefix = "[ $(check) ]";
 const uncheckedPrefix = "[     ]";
-const defaultPlaceHolder = "Select 'Confirm' to confirm or press 'Esc' key to cancel";
+const defaultPlaceHolder =
+    "Select 'Confirm' to confirm or press 'Esc' key to cancel";
 
 export interface ICheckboxQuickPickItem {
     label: string;
@@ -18,17 +19,21 @@ export interface ICheckboxQuickPickOptions {
     confirmPlaceHolder: string;
 }
 
-const defaultOptions: ICheckboxQuickPickOptions = { confirmPlaceHolder: defaultPlaceHolder };
+const defaultOptions: ICheckboxQuickPickOptions = {
+    confirmPlaceHolder: defaultPlaceHolder,
+};
 
 export async function showCheckboxQuickPick(
     items: ICheckboxQuickPickItem[],
-    options: ICheckboxQuickPickOptions = defaultOptions): Promise<ICheckboxQuickPickItem[] | undefined> {
-
+    options: ICheckboxQuickPickOptions = defaultOptions,
+): Promise<ICheckboxQuickPickItem[] | undefined> {
     const selectedItem = await showInner(items, options);
     return selectedItem !== undefined ? items : undefined;
 }
 
-function getQuickPickItems(items: ICheckboxQuickPickItem[]): vscode.QuickPickItem[] {
+function getQuickPickItems(
+    items: ICheckboxQuickPickItem[],
+): vscode.QuickPickItem[] {
     const quickPickItems: vscode.QuickPickItem[] = [];
     quickPickItems.push({ label: confirmItemLabel, description: "" });
 
@@ -44,15 +49,16 @@ function getQuickPickItems(items: ICheckboxQuickPickItem[]): vscode.QuickPickIte
 
 async function showInner(
     items: ICheckboxQuickPickItem[],
-    options: ICheckboxQuickPickOptions): Promise<vscode.QuickPickItem | undefined> {
-
+    options: ICheckboxQuickPickOptions,
+): Promise<vscode.QuickPickItem | undefined> {
     const selection = await vscode.window.showQuickPick(
         getQuickPickItems(items),
         {
             ignoreFocusOut: true,
             matchOnDescription: true,
             placeHolder: options.confirmPlaceHolder,
-        });
+        },
+    );
 
     if (selection === undefined) {
         return undefined;
@@ -66,13 +72,18 @@ async function showInner(
     if (index >= 0) {
         toggleSelection(items[index]);
     } else {
-        console.log(`Couldn't find CheckboxQuickPickItem for label '${selection.label}'`);
+        console.log(
+            `Couldn't find CheckboxQuickPickItem for label '${selection.label}'`,
+        );
     }
 
     return showInner(items, options);
 }
 
-function getItemIndex(items: ICheckboxQuickPickItem[], itemLabel: string): number {
+function getItemIndex(
+    items: ICheckboxQuickPickItem[],
+    itemLabel: string,
+): number {
     const trimmedLabel = itemLabel.substring(itemLabel.indexOf("]") + 2);
     return items.findIndex((item) => item.label === trimmedLabel);
 }

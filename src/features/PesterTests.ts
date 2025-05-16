@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 import * as path from "path";
-import vscode = require("vscode");
 import type { ILogger } from "../logging";
 import { SessionManager } from "../session";
-import { getSettings, getChosenWorkspace } from "../settings";
+import { getChosenWorkspace, getSettings } from "../settings";
+import vscode = require("vscode");
 import utils = require("../utils");
 
 enum LaunchType {
@@ -17,29 +17,56 @@ export class PesterTestsFeature implements vscode.Disposable {
     private commands: vscode.Disposable[];
     private invokePesterStubScriptPath: string;
 
-    constructor(private sessionManager: SessionManager, private logger: ILogger) {
-        this.invokePesterStubScriptPath = path.resolve(__dirname, "../modules/PowerShellEditorServices/InvokePesterStub.ps1");
+    constructor(
+        private sessionManager: SessionManager,
+        private logger: ILogger,
+    ) {
+        this.invokePesterStubScriptPath = path.resolve(
+            __dirname,
+            "../modules/PowerShellEditorServices/InvokePesterStub.ps1",
+        );
         this.commands = [
             // File context-menu command - Run Pester Tests
             vscode.commands.registerCommand(
                 "PowerShell.RunPesterTestsFromFile",
                 (fileUri?) => {
-                    return this.launchAllTestsInActiveEditor(LaunchType.Run, fileUri);
-                }),
+                    return this.launchAllTestsInActiveEditor(
+                        LaunchType.Run,
+                        fileUri,
+                    );
+                },
+            ),
 
             // File context-menu command - Debug Pester Tests
             vscode.commands.registerCommand(
                 "PowerShell.DebugPesterTestsFromFile",
                 (fileUri?) => {
-                    return this.launchAllTestsInActiveEditor(LaunchType.Debug, fileUri);
-                }),
+                    return this.launchAllTestsInActiveEditor(
+                        LaunchType.Debug,
+                        fileUri,
+                    );
+                },
+            ),
 
             // This command is provided for usage by PowerShellEditorServices (PSES) only
             vscode.commands.registerCommand(
                 "PowerShell.RunPesterTests",
-                (uriString, runInDebugger, describeBlockName?, describeBlockLineNumber?, outputPath?) => {
-                    return this.launchTests(vscode.Uri.parse(uriString), runInDebugger, describeBlockName, describeBlockLineNumber, outputPath);
-                })
+                (
+                    uriString,
+                    runInDebugger,
+                    describeBlockName?,
+                    describeBlockLineNumber?,
+                    outputPath?,
+                ) => {
+                    return this.launchTests(
+                        vscode.Uri.parse(uriString),
+                        runInDebugger,
+                        describeBlockName,
+                        describeBlockLineNumber,
+                        outputPath,
+                    );
+                },
+            ),
         ];
     }
 
@@ -51,8 +78,8 @@ export class PesterTestsFeature implements vscode.Disposable {
 
     private async launchAllTestsInActiveEditor(
         launchType: LaunchType,
-        fileUri?: vscode.Uri): Promise<boolean> {
-
+        fileUri?: vscode.Uri,
+    ): Promise<boolean> {
         fileUri ??= vscode.window.activeTextEditor?.document.uri;
 
         if (fileUri === undefined) {
@@ -68,10 +95,16 @@ export class PesterTestsFeature implements vscode.Disposable {
         runInDebugger: boolean,
         describeBlockName?: string,
         describeBlockLineNumber?: number,
-        outputPath?: string): Promise<boolean> {
-
+        outputPath?: string,
+    ): Promise<boolean> {
         const launchType = runInDebugger ? LaunchType.Debug : LaunchType.Run;
-        const launchConfig = this.createLaunchConfig(fileUri, launchType, describeBlockName, describeBlockLineNumber, outputPath);
+        const launchConfig = this.createLaunchConfig(
+            fileUri,
+            launchType,
+            describeBlockName,
+            describeBlockLineNumber,
+            outputPath,
+        );
         return this.launch(launchConfig);
     }
 
@@ -80,8 +113,8 @@ export class PesterTestsFeature implements vscode.Disposable {
         launchType: LaunchType,
         testName?: string,
         lineNum?: number,
-        outputPath?: string): vscode.DebugConfiguration {
-
+        outputPath?: string,
+    ): vscode.DebugConfiguration {
         const settings = getSettings();
         const launchConfig = {
             request: "launch",
@@ -93,14 +126,18 @@ export class PesterTestsFeature implements vscode.Disposable {
                 `'${utils.escapeSingleQuotes(fileUri.fsPath)}'`,
             ],
             internalConsoleOptions: "neverOpen",
-            noDebug: (launchType === LaunchType.Run),
-            createTemporaryIntegratedConsole: settings.debugging.createTemporaryIntegratedConsole
+            noDebug: launchType === LaunchType.Run,
+            createTemporaryIntegratedConsole:
+                settings.debugging.createTemporaryIntegratedConsole,
         };
 
         if (lineNum) {
             launchConfig.args.push("-LineNumber", `${lineNum}`);
         } else if (testName) {
-            launchConfig.args.push("-TestName", `'${utils.escapeSingleQuotes(testName)}'`);
+            launchConfig.args.push(
+                "-TestName",
+                `'${utils.escapeSingleQuotes(testName)}'`,
+            );
         } else {
             launchConfig.args.push("-All");
         }
@@ -110,10 +147,15 @@ export class PesterTestsFeature implements vscode.Disposable {
         }
 
         if (launchType === LaunchType.Debug) {
-            launchConfig.args.push("-Output", `'${settings.pester.debugOutputVerbosity}'`);
-        }
-        else {
-            launchConfig.args.push("-Output", `'${settings.pester.outputVerbosity}'`);
+            launchConfig.args.push(
+                "-Output",
+                `'${settings.pester.debugOutputVerbosity}'`,
+            );
+        } else {
+            launchConfig.args.push(
+                "-Output",
+                `'${settings.pester.outputVerbosity}'`,
+            );
         }
 
         if (outputPath) {
@@ -123,14 +165,21 @@ export class PesterTestsFeature implements vscode.Disposable {
         return launchConfig;
     }
 
-    private async launch(launchConfig: vscode.DebugConfiguration): Promise<boolean> {
+    private async launch(
+        launchConfig: vscode.DebugConfiguration,
+    ): Promise<boolean> {
         // Create or show the interactive console
         // TODO: #367 Check if "newSession" mode is configured
         this.sessionManager.showDebugTerminal(true);
 
         // Ensure the necessary script exists (for testing). The debugger will
         // start regardless, but we also pass its success along.
-        return await utils.checkIfFileExists(this.invokePesterStubScriptPath)
-            && vscode.debug.startDebugging(await getChosenWorkspace(this.logger), launchConfig);
+        return (
+            (await utils.checkIfFileExists(this.invokePesterStubScriptPath)) &&
+            vscode.debug.startDebugging(
+                await getChosenWorkspace(this.logger),
+                launchConfig,
+            )
+        );
     }
 }

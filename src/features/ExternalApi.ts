@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import * as vscode from "vscode";
 import { v4 as uuidv4 } from "uuid";
+import * as vscode from "vscode";
 import type { ILogger } from "../logging";
 import { SessionManager } from "../session";
 
@@ -16,7 +16,9 @@ export interface IExternalPowerShellDetails {
 export interface IPowerShellExtensionClient {
     registerExternalExtension(id: string, apiVersion?: string): string;
     unregisterExternalExtension(uuid: string): boolean;
-    getPowerShellVersionDetails(uuid: string): Promise<IExternalPowerShellDetails>;
+    getPowerShellVersionDetails(
+        uuid: string,
+    ): Promise<IExternalPowerShellDetails>;
     waitUntilStarted(uuid: string): Promise<void>;
     getStorageUri(): vscode.Uri;
     getLogUri(): vscode.Uri;
@@ -34,13 +36,16 @@ NOTE: At some point, we should release a helper npm package that wraps the API a
 
 */
 export class ExternalApiFeature implements IPowerShellExtensionClient {
-    private static readonly registeredExternalExtension: Map<string, IExternalExtension> = new Map<string, IExternalExtension>();
+    private static readonly registeredExternalExtension: Map<
+        string,
+        IExternalExtension
+    > = new Map<string, IExternalExtension>();
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionManager: SessionManager,
-        private logger: ILogger) {
-    }
+        private logger: ILogger,
+    ) {}
 
     /*
     DESCRIPTION:
@@ -56,10 +61,14 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
         string session uuid
     */
     public registerExternalExtension(id: string, apiVersion = "v1"): string {
-        this.logger.writeDebug(`Registering extension '${id}' for use with API version '${apiVersion}'.`);
+        this.logger.writeDebug(
+            `Registering extension '${id}' for use with API version '${apiVersion}'.`,
+        );
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        for (const [_name, externalExtension] of ExternalApiFeature.registeredExternalExtension) {
+        for (const [
+            _name,
+            externalExtension,
+        ] of ExternalApiFeature.registeredExternalExtension) {
             if (externalExtension.id === id) {
                 const message = `The extension '${id}' is already registered.`;
                 this.logger.writeWarning(message);
@@ -67,19 +76,26 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
             }
         }
 
-        if (!vscode.extensions.all.some(ext => ext.id === id)) {
-            throw new Error(`No extension installed with id '${id}'. You must use a valid extension id.`);
+        if (!vscode.extensions.all.some((ext) => ext.id === id)) {
+            throw new Error(
+                `No extension installed with id '${id}'. You must use a valid extension id.`,
+            );
         }
 
         // Our ID is only only allowed to be used in our unit tests.
-        if (id === "ms-vscode.powershell" && !(this.extensionContext.extensionMode === vscode.ExtensionMode.Test)) {
-            throw new Error("You can't use the PowerShell extension's id in this registration.");
+        if (
+            id === "ms-vscode.powershell" &&
+            !(this.extensionContext.extensionMode === vscode.ExtensionMode.Test)
+        ) {
+            throw new Error(
+                "You can't use the PowerShell extension's id in this registration.",
+            );
         }
 
         const uuid = uuidv4();
         ExternalApiFeature.registeredExternalExtension.set(uuid, {
             id,
-            apiVersion
+            apiVersion,
         });
         return uuid;
     }
@@ -97,9 +113,13 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
         true if it worked, otherwise throws an error.
     */
     public unregisterExternalExtension(uuid = ""): boolean {
-        this.logger.writeDebug(`Unregistering extension with session UUID: ${uuid}`);
+        this.logger.writeDebug(
+            `Unregistering extension with session UUID: ${uuid}`,
+        );
         if (!ExternalApiFeature.registeredExternalExtension.delete(uuid)) {
-            throw new Error(`No extension registered with session UUID: ${uuid}`);
+            throw new Error(
+                `No extension registered with session UUID: ${uuid}`,
+            );
         }
         return true;
     }
@@ -107,7 +127,8 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
     private getRegisteredExtension(uuid = ""): IExternalExtension {
         if (!ExternalApiFeature.registeredExternalExtension.has(uuid)) {
             throw new Error(
-                "UUID provided was invalid, make sure you ran the 'powershellExtensionClient.registerExternalExtension(extensionId)' method and pass in the UUID that it returns to subsequent methods.");
+                "UUID provided was invalid, make sure you ran the 'powershellExtensionClient.registerExternalExtension(extensionId)' method and pass in the UUID that it returns to subsequent methods.",
+            );
         }
 
         // TODO: When we have more than one API version, make sure to include a check here.
@@ -132,18 +153,26 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
             architecture: string;
         }
     */
-    public async getPowerShellVersionDetails(uuid = ""): Promise<IExternalPowerShellDetails> {
+    public async getPowerShellVersionDetails(
+        uuid = "",
+    ): Promise<IExternalPowerShellDetails> {
         const extension = this.getRegisteredExtension(uuid);
-        this.logger.writeDebug(`Extension '${extension.id}' called 'getPowerShellVersionDetails'.`);
+        this.logger.writeDebug(
+            `Extension '${extension.id}' called 'getPowerShellVersionDetails'.`,
+        );
 
         await this.sessionManager.waitUntilStarted();
-        const versionDetails = this.sessionManager.getPowerShellVersionDetails();
+        const versionDetails =
+            this.sessionManager.getPowerShellVersionDetails();
 
         return {
-            exePath: this.sessionManager.PowerShellExeDetails?.exePath ?? "unknown",
+            exePath:
+                this.sessionManager.PowerShellExeDetails?.exePath ?? "unknown",
             version: versionDetails?.version ?? "unknown",
-            displayName: this.sessionManager.PowerShellExeDetails?.displayName ?? "unknown", // comes from the Session Menu
-            architecture: versionDetails?.architecture ?? "unknown"
+            displayName:
+                this.sessionManager.PowerShellExeDetails?.displayName ??
+                "unknown", // comes from the Session Menu
+            architecture: versionDetails?.architecture ?? "unknown",
         };
     }
     /*
@@ -162,18 +191,20 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
     */
     public async waitUntilStarted(uuid = ""): Promise<void> {
         const extension = this.getRegisteredExtension(uuid);
-        this.logger.writeDebug(`Extension '${extension.id}' called 'waitUntilStarted'.`);
+        this.logger.writeDebug(
+            `Extension '${extension.id}' called 'waitUntilStarted'.`,
+        );
         await this.sessionManager.waitUntilStarted();
     }
 
     public getStorageUri(): vscode.Uri {
         // We have to override the scheme because it defaults to
         // 'vscode-userdata' which breaks UNC paths.
-        return this.extensionContext.globalStorageUri.with({ scheme: "file"});
+        return this.extensionContext.globalStorageUri.with({ scheme: "file" });
     }
 
     public getLogUri(): vscode.Uri {
-        return this.extensionContext.logUri.with({ scheme: "file"});
+        return this.extensionContext.logUri.with({ scheme: "file" });
     }
 
     public dispose(): void {

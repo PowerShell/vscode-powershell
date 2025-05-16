@@ -6,11 +6,17 @@ import TelemetryReporter from "@vscode/extension-telemetry";
 import { DocumentSelector } from "vscode-languageclient";
 import { CodeActionsFeature } from "./features/CodeActions";
 import { ConsoleFeature } from "./features/Console";
-import { DebugSessionFeature } from "./features/DebugSession";
+import {
+    DebugSessionFeature,
+    SpecifyScriptArgsFeature,
+} from "./features/DebugSession";
 import { ExamplesFeature } from "./features/Examples";
 import { ExpandAliasFeature } from "./features/ExpandAlias";
 import { ExtensionCommandsFeature } from "./features/ExtensionCommands";
-import { ExternalApiFeature, type IPowerShellExtensionClient } from "./features/ExternalApi";
+import {
+    ExternalApiFeature,
+    type IPowerShellExtensionClient,
+} from "./features/ExternalApi";
 import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
@@ -19,15 +25,15 @@ import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
 import { ShowHelpFeature } from "./features/ShowHelp";
-import { SpecifyScriptArgsFeature } from "./features/DebugSession";
+import { LanguageClientConsumer } from "./languageClientConsumer";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
 import { getSettings } from "./settings";
 import { PowerShellLanguageId } from "./utils";
-import { LanguageClientConsumer } from "./languageClientConsumer";
 // The 1DS telemetry key, which is just shared among all Microsoft extensions
 // (and isn't sensitive).
-const TELEMETRY_KEY = "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255";
+const TELEMETRY_KEY =
+    "0c6ae279ed8443289764825290e4f9e2-1a736e7c-1324-4338-be46-fc2a58ae4d14-7255";
 
 let languageConfigurationDisposable: vscode.Disposable;
 let logger: Logger;
@@ -41,7 +47,9 @@ const documentSelector: DocumentSelector = [
     { language: "powershell", scheme: "untitled" },
 ];
 
-export async function activate(context: vscode.ExtensionContext): Promise<IPowerShellExtensionClient> {
+export async function activate(
+    context: vscode.ExtensionContext,
+): Promise<IPowerShellExtensionClient> {
     logger = new Logger();
     if (context.extensionMode === vscode.ExtensionMode.Development) {
         restartOnExtensionFileChanges(context);
@@ -50,14 +58,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
     const settings = getSettings();
-    logger.writeDebug(`Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`);
+    logger.writeDebug(
+        `Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`,
+    );
 
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
         PowerShellLanguageId,
         {
             // TODO: Remove the useless escapes
-            // eslint-disable-next-line no-useless-escape
-            wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)/g,
+            wordPattern:
+                // eslint-disable-next-line no-useless-escape
+                /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\=\+\[\{\]\}\\\|\;\'\"\,\.\<\>\/\?\s]+)/g,
 
             indentationRules: {
                 // ^(.*\*/)?\s*\}.*$
@@ -83,34 +94,50 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
                     // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
                     afterText: /^\s*\*\/$/,
-                    action: { indentAction: vscode.IndentAction.IndentOutdent, appendText: " * " },
+                    action: {
+                        indentAction: vscode.IndentAction.IndentOutdent,
+                        appendText: " * ",
+                    },
                 },
                 {
                     // e.g. /** ...|
                     // eslint-disable-next-line no-useless-escape
                     beforeText: /^\s*\/\*\*(?!\/)([^\*]|\*(?!\/))*$/,
-                    action: { indentAction: vscode.IndentAction.None, appendText: " * " },
+                    action: {
+                        indentAction: vscode.IndentAction.None,
+                        appendText: " * ",
+                    },
                 },
                 {
                     // e.g.  * ...|
                     // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*(\ ([^\*]|\*(?!\/))*)?$/,
-                    action: { indentAction: vscode.IndentAction.None, appendText: "* " },
+                    action: {
+                        indentAction: vscode.IndentAction.None,
+                        appendText: "* ",
+                    },
                 },
                 {
                     // e.g.  */|
                     // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*\/\s*$/,
-                    action: { indentAction: vscode.IndentAction.None, removeText: 1 },
+                    action: {
+                        indentAction: vscode.IndentAction.None,
+                        removeText: 1,
+                    },
                 },
                 {
                     // e.g.  *-----*/|
                     // eslint-disable-next-line no-useless-escape
                     beforeText: /^(\t|(\ \ ))*\ \*[^/]*\*\/\s*$/,
-                    action: { indentAction: vscode.IndentAction.None, removeText: 1 },
+                    action: {
+                        indentAction: vscode.IndentAction.None,
+                        removeText: 1,
+                    },
                 },
             ],
-        });
+        },
+    );
 
     interface IPackageInfo {
         name: string;
@@ -118,7 +145,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         version: string;
         publisher: string;
     }
-    const packageInfo:IPackageInfo = context.extension.packageJSON;
+    const packageInfo: IPackageInfo = context.extension.packageJSON;
 
     sessionManager = new SessionManager(
         context,
@@ -129,7 +156,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
         packageInfo.displayName,
         packageInfo.version,
         packageInfo.publisher,
-        telemetryReporter);
+        telemetryReporter,
+    );
 
     // Register commands that do not require Language client
     commandRegistrations = [
@@ -143,22 +171,23 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
 
         vscode.commands.registerCommand(
             "PowerShell.OpenLogFolder",
-            async () => {await vscode.commands.executeCommand(
-                "vscode.openFolder",
-                context.logUri,
-                { forceNewWindow: true }
-            );}
+            async () => {
+                await vscode.commands.executeCommand(
+                    "vscode.openFolder",
+                    context.logUri,
+                    { forceNewWindow: true },
+                );
+            },
         ),
-        vscode.commands.registerCommand(
-            "PowerShell.ShowLogs",
-            () => {logger.showLogPanel();}
-        ),
+        vscode.commands.registerCommand("PowerShell.ShowLogs", () => {
+            logger.showLogPanel();
+        }),
         vscode.commands.registerCommand(
             "GetVsCodeSessionId",
-            () => vscode.env.sessionId
+            () => vscode.env.sessionId,
         ),
         // Register a command that waits for the Extension Terminal to be active. Can be used by .NET Attach Tasks.
-        registerWaitForPsesActivationCommand(context)
+        registerWaitForPsesActivationCommand(context),
     ];
 
     const externalApi = new ExternalApiFeature(context, sessionManager, logger);
@@ -182,22 +211,31 @@ export async function activate(context: vscode.ExtensionContext): Promise<IPower
     }
 
     return {
-        registerExternalExtension: (id: string, apiVersion = "v1") => externalApi.registerExternalExtension(id, apiVersion),
-        unregisterExternalExtension: uuid => externalApi.unregisterExternalExtension(uuid),
-        getPowerShellVersionDetails: uuid => externalApi.getPowerShellVersionDetails(uuid),
-        waitUntilStarted: uuid => externalApi.waitUntilStarted(uuid),
+        registerExternalExtension: (id: string, apiVersion = "v1") =>
+            externalApi.registerExternalExtension(id, apiVersion),
+        unregisterExternalExtension: (uuid) =>
+            externalApi.unregisterExternalExtension(uuid),
+        getPowerShellVersionDetails: (uuid) =>
+            externalApi.getPowerShellVersionDetails(uuid),
+        waitUntilStarted: (uuid) => externalApi.waitUntilStarted(uuid),
         getStorageUri: () => externalApi.getStorageUri(),
         getLogUri: () => externalApi.getLogUri(),
     };
 }
 
 /** Registers a command that waits for PSES Activation and returns the PID, used to auto-attach the PSES debugger */
-function registerWaitForPsesActivationCommand(context: vscode.ExtensionContext): vscode.Disposable {
+function registerWaitForPsesActivationCommand(
+    context: vscode.ExtensionContext,
+): vscode.Disposable {
     return vscode.commands.registerCommand(
         "PowerShell.WaitForPsesActivationAndReturnProcessId",
         async () => {
             const pidFileName = `PSES-${vscode.env.sessionId}.pid`;
-            const pidFile = vscode.Uri.joinPath(context.globalStorageUri, "sessions", pidFileName);
+            const pidFile = vscode.Uri.joinPath(
+                context.globalStorageUri,
+                "sessions",
+                pidFileName,
+            );
             const fs = vscode.workspace.fs;
             // Wait for the file to be created
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -219,22 +257,24 @@ function registerWaitForPsesActivationCommand(context: vscode.ExtensionContext):
                     return pidContent.toString();
                 } catch {
                     // File doesn't exist yet, wait and try again
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
             }
-        }
+        },
     );
 }
 
 /** Restarts the extension host when extension file changes are detected. Useful for development. */
 function restartOnExtensionFileChanges(context: vscode.ExtensionContext): void {
     const watcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(context.extensionPath, "dist/*.js")
+        new vscode.RelativePattern(context.extensionPath, "dist/*.js"),
     );
 
     context.subscriptions.push(watcher);
     watcher.onDidChange(({ fsPath }) => {
-        vscode.window.showInformationMessage(`${fsPath.split(context.extensionPath, 2)[1]} changed. Reloading Extension Host...`);
+        vscode.window.showInformationMessage(
+            `${fsPath.split(context.extensionPath, 2)[1]} changed. Reloading Extension Host...`,
+        );
         vscode.commands.executeCommand("workbench.action.restartExtensionHost");
     });
 }

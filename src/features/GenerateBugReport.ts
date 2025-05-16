@@ -8,21 +8,30 @@ import { SessionManager } from "../session";
 const issuesUrl = "https://github.com/PowerShell/vscode-powershell/issues/new?";
 
 export class GenerateBugReportFeature implements vscode.Disposable {
-
     private command: vscode.Disposable;
 
     constructor(private sessionManager: SessionManager) {
-        this.command = vscode.commands.registerCommand("PowerShell.GenerateBugReport", async () => {
-            const params = [
-                "labels=Issue-Bug",
-                "template=bug-report.yml",
-                "powershell-version=" + this.getRuntimeInfo(),
-                "vscode-version=" + vscode.version + "\n" + process.arch,
-                "extension-version=" + sessionManager.Publisher + "." + sessionManager.HostName + "@" + sessionManager.HostVersion,
-            ];
-            const url = vscode.Uri.parse(issuesUrl + encodeURIComponent(params.join("&")));
-            await vscode.env.openExternal(url);
-        });
+        this.command = vscode.commands.registerCommand(
+            "PowerShell.GenerateBugReport",
+            async () => {
+                const params = [
+                    "labels=Issue-Bug",
+                    "template=bug-report.yml",
+                    "powershell-version=" + this.getRuntimeInfo(),
+                    "vscode-version=" + vscode.version + "\n" + process.arch,
+                    "extension-version=" +
+                        sessionManager.Publisher +
+                        "." +
+                        sessionManager.HostName +
+                        "@" +
+                        sessionManager.HostVersion,
+                ];
+                const url = vscode.Uri.parse(
+                    issuesUrl + encodeURIComponent(params.join("&")),
+                );
+                await vscode.env.openExternal(url);
+            },
+        );
     }
 
     public dispose(): void {
@@ -35,7 +44,13 @@ export class GenerateBugReportFeature implements vscode.Disposable {
         }
         const child = child_process.spawnSync(
             this.sessionManager.PowerShellExeDetails.exePath,
-            ["-NoProfile", "-NoLogo", "-Command", "$PSVersionTable | Out-String"]);
+            [
+                "-NoProfile",
+                "-NoLogo",
+                "-Command",
+                "$PSVersionTable | Out-String",
+            ],
+        );
         // Replace semicolons as they'll cause the URI component to truncate
         return child.stdout.toString().trim().replace(";", ",");
     }

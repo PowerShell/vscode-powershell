@@ -5,23 +5,32 @@ import vscode = require("vscode");
 import { NotificationType, RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import {
-  type ICheckboxQuickPickItem,
-  showCheckboxQuickPick,
+    type ICheckboxQuickPickItem,
+    showCheckboxQuickPick,
 } from "../controls/checkboxQuickPick";
+import { LanguageClientConsumer } from "../languageClientConsumer";
 import type { ILogger } from "../logging";
 import { getSettings } from "../settings";
-import { LanguageClientConsumer } from "../languageClientConsumer";
 
-export const EvaluateRequestType = new RequestType<IEvaluateRequestArguments, void, void>("evaluate");
-export const OutputNotificationType = new NotificationType<IOutputNotificationBody>("output");
+export const EvaluateRequestType = new RequestType<
+    IEvaluateRequestArguments,
+    void,
+    void
+>("evaluate");
+export const OutputNotificationType =
+    new NotificationType<IOutputNotificationBody>("output");
 
-export const ShowChoicePromptRequestType =
-    new RequestType<IShowChoicePromptRequestArgs,
-        IShowChoicePromptResponseBody, string>("powerShell/showChoicePrompt");
+export const ShowChoicePromptRequestType = new RequestType<
+    IShowChoicePromptRequestArgs,
+    IShowChoicePromptResponseBody,
+    string
+>("powerShell/showChoicePrompt");
 
-export const ShowInputPromptRequestType =
-    new RequestType<IShowInputPromptRequestArgs,
-        IShowInputPromptResponseBody, string>("powerShell/showInputPrompt");
+export const ShowInputPromptRequestType = new RequestType<
+    IShowInputPromptRequestArgs,
+    IShowInputPromptResponseBody,
+    string
+>("powerShell/showInputPrompt");
 
 export interface IEvaluateRequestArguments {
     expression: string;
@@ -60,27 +69,29 @@ interface IShowInputPromptResponseBody {
     promptCancelled: boolean;
 }
 
-
-function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable<IShowChoicePromptResponseBody> {
-
+function showChoicePrompt(
+    promptDetails: IShowChoicePromptRequestArgs,
+): Thenable<IShowChoicePromptResponseBody> {
     let resultThenable: Thenable<IShowChoicePromptResponseBody>;
 
     if (!promptDetails.isMultiChoice) {
-        let quickPickItems =
-            promptDetails.choices.map<vscode.QuickPickItem>((choice) => {
+        let quickPickItems = promptDetails.choices.map<vscode.QuickPickItem>(
+            (choice) => {
                 return {
                     label: choice.label,
                     description: choice.helpMessage,
                 };
-            });
+            },
+        );
 
         if (promptDetails.defaultChoices.length > 0) {
             // Shift the default items to the front of the
             // array so that the user can select it easily
             const defaultChoice = promptDetails.defaultChoices[0];
-            if (defaultChoice > -1 &&
-                defaultChoice < promptDetails.choices.length) {
-
+            if (
+                defaultChoice > -1 &&
+                defaultChoice < promptDetails.choices.length
+            ) {
                 const defaultChoiceItem = quickPickItems[defaultChoice];
                 quickPickItems.splice(defaultChoice, 1);
 
@@ -89,12 +100,11 @@ function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable
             }
         }
 
-        resultThenable =
-            vscode.window
-                .showQuickPick(
-                    quickPickItems,
-                    { placeHolder: promptDetails.message })
-                .then(onItemSelected);
+        resultThenable = vscode.window
+            .showQuickPick(quickPickItems, {
+                placeHolder: promptDetails.message,
+            })
+            .then(onItemSelected);
     } else {
         const checkboxQuickPickItems =
             promptDetails.choices.map<ICheckboxQuickPickItem>((choice) => {
@@ -110,26 +120,33 @@ function showChoicePrompt(promptDetails: IShowChoicePromptRequestArgs): Thenable
             checkboxQuickPickItems[choice].isSelected = true;
         }
 
-        resultThenable =
-            showCheckboxQuickPick(
-                checkboxQuickPickItems,
-                { confirmPlaceHolder: promptDetails.message })
-                .then(onItemsSelected);
+        resultThenable = showCheckboxQuickPick(checkboxQuickPickItems, {
+            confirmPlaceHolder: promptDetails.message,
+        }).then(onItemsSelected);
     }
 
     return resultThenable;
 }
 
-async function showInputPrompt(promptDetails: IShowInputPromptRequestArgs): Promise<IShowInputPromptResponseBody> {
-    const responseText = await vscode.window.showInputBox({ placeHolder: promptDetails.name + ": " });
+async function showInputPrompt(
+    promptDetails: IShowInputPromptRequestArgs,
+): Promise<IShowInputPromptResponseBody> {
+    const responseText = await vscode.window.showInputBox({
+        placeHolder: promptDetails.name + ": ",
+    });
     return onInputEntered(responseText);
 }
 
-function onItemsSelected(chosenItems: ICheckboxQuickPickItem[] | undefined): IShowChoicePromptResponseBody {
+function onItemsSelected(
+    chosenItems: ICheckboxQuickPickItem[] | undefined,
+): IShowChoicePromptResponseBody {
     if (chosenItems !== undefined) {
         return {
             promptCancelled: false,
-            responseText: chosenItems.filter((item) => item.isSelected).map((item) => item.label).join(", "),
+            responseText: chosenItems
+                .filter((item) => item.isSelected)
+                .map((item) => item.label)
+                .join(", "),
         };
     } else {
         // User cancelled the prompt, send the cancellation
@@ -140,7 +157,9 @@ function onItemsSelected(chosenItems: ICheckboxQuickPickItem[] | undefined): ISh
     }
 }
 
-function onItemSelected(chosenItem: vscode.QuickPickItem | undefined): IShowChoicePromptResponseBody {
+function onItemSelected(
+    chosenItem: vscode.QuickPickItem | undefined,
+): IShowChoicePromptResponseBody {
     if (chosenItem !== undefined) {
         return {
             promptCancelled: false,
@@ -155,7 +174,9 @@ function onItemSelected(chosenItem: vscode.QuickPickItem | undefined): IShowChoi
     }
 }
 
-function onInputEntered(responseText: string | undefined): IShowInputPromptResponseBody {
+function onInputEntered(
+    responseText: string | undefined,
+): IShowInputPromptResponseBody {
     if (responseText !== undefined) {
         return {
             promptCancelled: false,
@@ -176,43 +197,69 @@ export class ConsoleFeature extends LanguageClientConsumer {
     constructor(private logger: ILogger) {
         super();
         this.commands = [
-            vscode.commands.registerCommand("PowerShell.RunSelection", async () => {
-                if (vscode.window.activeTerminal &&
-                    vscode.window.activeTerminal.name !== "PowerShell Extension") {
-                    this.logger.write("PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'.");
-                    await vscode.commands.executeCommand("workbench.action.terminal.runSelectedText");
+            vscode.commands.registerCommand(
+                "PowerShell.RunSelection",
+                async () => {
+                    if (
+                        vscode.window.activeTerminal &&
+                        vscode.window.activeTerminal.name !==
+                            "PowerShell Extension"
+                    ) {
+                        this.logger.write(
+                            "PowerShell Extension Terminal is not active! Running in current terminal using 'runSelectedText'.",
+                        );
+                        await vscode.commands.executeCommand(
+                            "workbench.action.terminal.runSelectedText",
+                        );
 
-                    // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
-                    // takes is called `preserveFocus` which when `true` the terminal will not take focus.
-                    // This is the inverse of focusConsoleOnExecute so we have to inverse the boolean.
-                    vscode.window.activeTerminal.show(!getSettings().integratedConsole.focusConsoleOnExecute);
-                    await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
+                        // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
+                        // takes is called `preserveFocus` which when `true` the terminal will not take focus.
+                        // This is the inverse of focusConsoleOnExecute so we have to inverse the boolean.
+                        vscode.window.activeTerminal.show(
+                            !getSettings().integratedConsole
+                                .focusConsoleOnExecute,
+                        );
+                        await vscode.commands.executeCommand(
+                            "workbench.action.terminal.scrollToBottom",
+                        );
 
-                    return;
-                }
+                        return;
+                    }
 
-                const editor = vscode.window.activeTextEditor;
-                if (editor === undefined) {
-                    return;
-                }
+                    const editor = vscode.window.activeTextEditor;
+                    if (editor === undefined) {
+                        return;
+                    }
 
-                let selectionRange: vscode.Range;
+                    let selectionRange: vscode.Range;
 
-                if (!editor.selection.isEmpty) {
-                    selectionRange = new vscode.Range(editor.selection.start, editor.selection.end);
-                } else {
-                    selectionRange = editor.document.lineAt(editor.selection.start.line).range;
-                }
-                const client = await LanguageClientConsumer.getLanguageClient();
-                await client.sendRequest(EvaluateRequestType, {
-                    expression: editor.document.getText(selectionRange),
-                });
+                    if (!editor.selection.isEmpty) {
+                        selectionRange = new vscode.Range(
+                            editor.selection.start,
+                            editor.selection.end,
+                        );
+                    } else {
+                        selectionRange = editor.document.lineAt(
+                            editor.selection.start.line,
+                        ).range;
+                    }
+                    const client =
+                        await LanguageClientConsumer.getLanguageClient();
+                    await client.sendRequest(EvaluateRequestType, {
+                        expression: editor.document.getText(selectionRange),
+                    });
 
-                // Show the Extension Terminal if it isn't already visible and
-                // scroll terminal to bottom so new output is visible
-                await vscode.commands.executeCommand("PowerShell.ShowSessionConsole", true);
-                await vscode.commands.executeCommand("workbench.action.terminal.scrollToBottom");
-            }),
+                    // Show the Extension Terminal if it isn't already visible and
+                    // scroll terminal to bottom so new output is visible
+                    await vscode.commands.executeCommand(
+                        "PowerShell.ShowSessionConsole",
+                        true,
+                    );
+                    await vscode.commands.executeCommand(
+                        "workbench.action.terminal.scrollToBottom",
+                    );
+                },
+            ),
         ];
     }
 
@@ -230,11 +277,13 @@ export class ConsoleFeature extends LanguageClientConsumer {
         this.handlers = [
             languageClient.onRequest(
                 ShowChoicePromptRequestType,
-                (promptDetails) => showChoicePrompt(promptDetails)),
+                (promptDetails) => showChoicePrompt(promptDetails),
+            ),
 
             languageClient.onRequest(
                 ShowInputPromptRequestType,
-                (promptDetails) => showInputPrompt(promptDetails)),
+                (promptDetails) => showInputPrompt(promptDetails),
+            ),
         ];
     }
 }

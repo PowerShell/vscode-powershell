@@ -14,7 +14,9 @@ export abstract class LanguageClientConsumer {
 
     // This is called in the session manager when the client is started (so we
     // can wait for that). It's what actually resolves the promise.
-    public static onLanguageClientStarted(languageClient: LanguageClient): void {
+    public static onLanguageClientStarted(
+        languageClient: LanguageClient,
+    ): void {
         // It should have been created earlier, but if not, create and resolve it.
         this.languageClientPromise ??= Promise.resolve(languageClient);
         this.getLanguageClientResolve?.(languageClient);
@@ -34,7 +36,8 @@ export abstract class LanguageClientConsumer {
         LanguageClientConsumer.languageClientPromise?.catch(() => {
             LanguageClientConsumer.languageClientPromise = undefined;
         });
-        LanguageClientConsumer.languageClientPromise ??= LanguageClientConsumer.createLanguageClientPromise();
+        LanguageClientConsumer.languageClientPromise ??=
+            LanguageClientConsumer.createLanguageClientPromise();
         return LanguageClientConsumer.languageClientPromise;
     }
 
@@ -45,22 +48,29 @@ export abstract class LanguageClientConsumer {
             {
                 location: ProgressLocation.Notification,
                 title: "Please wait, starting PowerShell Extension Terminal...",
-                cancellable: true
+                cancellable: true,
             },
             (_progress, token) => {
                 token.onCancellationRequested(() => {
-                    void window.showErrorMessage("Cancelled PowerShell Extension Terminal start-up.");
+                    void window.showErrorMessage(
+                        "Cancelled PowerShell Extension Terminal start-up.",
+                    );
                 });
 
                 // The real promise!
-                return new Promise<LanguageClient>(
-                    (resolve, reject) => {
-                        // Store the resolve function to be called in resetLanguageClient.
-                        LanguageClientConsumer.getLanguageClientResolve = resolve;
-                        // Reject the promise if the operation is cancelled.
-                        token.onCancellationRequested(() => { reject(new Error("Cancelled PowerShell Extension Terminal start-up.")); });
-                    }
-                );
-            });
+                return new Promise<LanguageClient>((resolve, reject) => {
+                    // Store the resolve function to be called in resetLanguageClient.
+                    LanguageClientConsumer.getLanguageClientResolve = resolve;
+                    // Reject the promise if the operation is cancelled.
+                    token.onCancellationRequested(() => {
+                        reject(
+                            new Error(
+                                "Cancelled PowerShell Extension Terminal start-up.",
+                            ),
+                        );
+                    });
+                });
+            },
+        );
     }
 }

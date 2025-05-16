@@ -29,6 +29,7 @@ export default tseslint.config(
                 "error",
                 {
                     argsIgnorePattern: "^_",
+                    destructuredArrayIgnorePattern: "^_",
                 },
             ],
             "@typescript-eslint/no-unsafe-argument": "off",

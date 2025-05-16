@@ -4,8 +4,8 @@
 import vscode = require("vscode");
 import utils = require("./utils");
 import os = require("os");
-import type { ILogger } from "./logging";
 import untildify from "untildify";
+import type { ILogger } from "./logging";
 import path = require("path");
 
 // TODO: Quite a few of these settings are unused in the client and instead
@@ -17,7 +17,7 @@ import path = require("path");
 // Perhaps we just get rid of this entirely?
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-class PartialSettings { }
+class PartialSettings {}
 
 export class Settings extends PartialSettings {
     powerShellAdditionalExePaths: PowerShellAdditionalExePathSettings = {};
@@ -36,7 +36,7 @@ export class Settings extends PartialSettings {
     sideBar = new SideBarSettings();
     pester = new PesterSettings();
     buttons = new ButtonSettings();
-    cwd = "";  // NOTE: use validateCwdSetting() instead of this directly!
+    cwd = ""; // NOTE: use validateCwdSetting() instead of this directly!
     enableReferencesCodeLens = true;
     analyzeOpenDocumentsOnly = false;
     // TODO: Add (deprecated) useX86Host (for testing)
@@ -64,12 +64,12 @@ export enum CommentType {
 
 export enum StartLocation {
     Editor = "Editor",
-    Panel = "Panel"
+    Panel = "Panel",
 }
 
-export enum ExecuteMode{
+export enum ExecuteMode {
     Call = "Call",
-    DotSource = "DotSource"
+    DotSource = "DotSource",
 }
 
 export type PowerShellAdditionalExePathSettings = Record<string, string>;
@@ -152,7 +152,11 @@ class ButtonSettings extends PartialSettings {
 }
 
 // This is a recursive function which unpacks a WorkspaceConfiguration into our settings.
-function getSetting<TSetting>(key: string | undefined, value: TSetting, configuration: vscode.WorkspaceConfiguration): TSetting {
+function getSetting<TSetting>(
+    key: string | undefined,
+    value: TSetting,
+    configuration: vscode.WorkspaceConfiguration,
+): TSetting {
     // Base case where we're looking at a primitive type (or our special record).
     if (key !== undefined && !(value instanceof PartialSettings)) {
         return configuration.get<TSetting>(key, value);
@@ -175,18 +179,20 @@ export function getSettings(): Settings {
 }
 
 // Get the ConfigurationTarget (read: scope) of where the *effective* setting value comes from
-export function getEffectiveConfigurationTarget(settingName: string): vscode.ConfigurationTarget | undefined {
-    const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+export function getEffectiveConfigurationTarget(
+    settingName: string,
+): vscode.ConfigurationTarget | undefined {
+    const configuration = vscode.workspace.getConfiguration(
+        utils.PowerShellLanguageId,
+    );
     const detail = configuration.inspect(settingName);
     if (detail === undefined) {
         return undefined;
     } else if (typeof detail.workspaceFolderValue !== "undefined") {
         return vscode.ConfigurationTarget.WorkspaceFolder;
-    }
-    else if (typeof detail.workspaceValue !== "undefined") {
+    } else if (typeof detail.workspaceValue !== "undefined") {
         return vscode.ConfigurationTarget.Workspace;
-    }
-    else if (typeof detail.globalValue !== "undefined") {
+    } else if (typeof detail.globalValue !== "undefined") {
         return vscode.ConfigurationTarget.Global;
     }
     return undefined;
@@ -197,12 +203,16 @@ export async function changeSetting(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     newValue: any,
     configurationTarget: vscode.ConfigurationTarget | boolean | undefined,
-    logger: ILogger | undefined): Promise<void> {
-
-    logger?.writeDebug(`Changing '${settingName}' at scope '${configurationTarget}' to '${newValue}'.`);
+    logger: ILogger | undefined,
+): Promise<void> {
+    logger?.writeDebug(
+        `Changing '${settingName}' at scope '${configurationTarget}' to '${newValue}'.`,
+    );
 
     try {
-        const configuration = vscode.workspace.getConfiguration(utils.PowerShellLanguageId);
+        const configuration = vscode.workspace.getConfiguration(
+            utils.PowerShellLanguageId,
+        );
         await configuration.update(settingName, newValue, configurationTarget);
     } catch (err) {
         logger?.writeError(`Failed to change setting: ${err}`);
@@ -212,14 +222,18 @@ export async function changeSetting(
 // We don't want to query the user more than once, so this is idempotent.
 let hasChosen = false;
 let chosenWorkspace: vscode.WorkspaceFolder | undefined = undefined;
-export async function getChosenWorkspace(logger: ILogger | undefined): Promise<vscode.WorkspaceFolder | undefined> {
+export async function getChosenWorkspace(
+    logger: ILogger | undefined,
+): Promise<vscode.WorkspaceFolder | undefined> {
     if (hasChosen) {
         return chosenWorkspace;
     }
 
     // If there is no workspace, or there is but it has no folders, fallback.
-    if (vscode.workspace.workspaceFolders === undefined
-        || vscode.workspace.workspaceFolders.length === 0) {
+    if (
+        vscode.workspace.workspaceFolders === undefined ||
+        vscode.workspace.workspaceFolders.length === 0
+    ) {
         chosenWorkspace = undefined;
         // If there is exactly one workspace folder, use that.
     } else if (vscode.workspace.workspaceFolders.length === 1) {
@@ -227,21 +241,31 @@ export async function getChosenWorkspace(logger: ILogger | undefined): Promise<v
         // If there is more than one workspace folder, prompt the user once.
     } else if (vscode.workspace.workspaceFolders.length > 1) {
         const options: vscode.WorkspaceFolderPickOptions = {
-            placeHolder: "Select a workspace folder to use for the PowerShell Extension.",
+            placeHolder:
+                "Select a workspace folder to use for the PowerShell Extension.",
         };
 
         chosenWorkspace = await vscode.window.showWorkspaceFolderPick(options);
 
-        logger?.writeDebug(`User selected workspace: '${chosenWorkspace?.name}'`);
+        logger?.writeDebug(
+            `User selected workspace: '${chosenWorkspace?.name}'`,
+        );
         if (chosenWorkspace === undefined) {
             chosenWorkspace = vscode.workspace.workspaceFolders[0];
         } else {
             const response = await vscode.window.showInformationMessage(
                 `Would you like to save this choice by setting this workspace's 'powershell.cwd' value to '${chosenWorkspace.name}'?`,
-                "Yes", "No");
+                "Yes",
+                "No",
+            );
 
             if (response === "Yes") {
-                await changeSetting("cwd", chosenWorkspace.name, vscode.ConfigurationTarget.Workspace, logger);
+                await changeSetting(
+                    "cwd",
+                    chosenWorkspace.name,
+                    vscode.ConfigurationTarget.Workspace,
+                    logger,
+                );
             }
         }
     }
@@ -253,10 +277,15 @@ export async function getChosenWorkspace(logger: ILogger | undefined): Promise<v
     return chosenWorkspace;
 }
 
-export async function validateCwdSetting(logger: ILogger | undefined): Promise<string> {
-    let cwd = utils.stripQuotePair(
-        vscode.workspace.getConfiguration(utils.PowerShellLanguageId).get<string>("cwd"))
-        ?? "";
+export async function validateCwdSetting(
+    logger: ILogger | undefined,
+): Promise<string> {
+    let cwd =
+        utils.stripQuotePair(
+            vscode.workspace
+                .getConfiguration(utils.PowerShellLanguageId)
+                .get<string>("cwd"),
+        ) ?? "";
 
     // Replace ~ with home directory.
     cwd = untildify(cwd);
@@ -264,7 +293,7 @@ export async function validateCwdSetting(logger: ILogger | undefined): Promise<s
     // Use the cwd setting if it's absolute and exists. We don't use or resolve
     // relative paths here because it'll be relative to the Code process's cwd,
     // which is not what the user is expecting.
-    if (path.isAbsolute(cwd) && await utils.checkIfDirectoryExists(cwd)) {
+    if (path.isAbsolute(cwd) && (await utils.checkIfDirectoryExists(cwd))) {
         return cwd;
     }
 
@@ -307,7 +336,6 @@ export async function validateCwdSetting(logger: ILogger | undefined): Promise<s
     return os.homedir();
 }
 
-
 /**
  * Options for the `onSettingChange` function.
  * @param scope the scope in which the vscode setting should be evaluated.
@@ -338,8 +366,10 @@ export function onSettingChange<T>(
     options?: onSettingChangeOptions,
 ): vscode.Disposable {
     const settingPath = `${section}.${setting}`;
-    const disposable = vscode.workspace.onDidChangeConfiguration(e => {
-        if (!e.affectsConfiguration(settingPath, options?.scope)) { return; }
+    const disposable = vscode.workspace.onDidChangeConfiguration((e) => {
+        if (!e.affectsConfiguration(settingPath, options?.scope)) {
+            return;
+        }
 
         doOnSettingsChange(section, setting, action, options?.scope);
         if (options?.run === "once") {
@@ -362,7 +392,9 @@ function doOnSettingsChange<T>(
     action: (newValue: T | undefined) => void,
     scope?: vscode.ConfigurationScope,
 ): void {
-    const value = vscode.workspace.getConfiguration(section, scope).get<T>(setting);
+    const value = vscode.workspace
+        .getConfiguration(section, scope)
+        .get<T>(setting);
     action(value);
 }
 
@@ -381,8 +413,7 @@ function doOnSettingsChange<T>(
 export function onPowerShellSettingChange<T>(
     setting: string,
     action: (newValue: T | undefined) => void,
-    options?: onSettingChangeOptions
-
+    options?: onSettingChangeOptions,
 ): vscode.Disposable {
     const section = "powershell";
     return onSettingChange(section, setting, action, options);

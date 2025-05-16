@@ -2,7 +2,7 @@
   "instanceUrl": "https://msazure.visualstudio.com",
   "projectName": "One",
   "areaPath": "One\\MGMT\\Compute\\Powershell\\Powershell",
-  "notificationAliases": [ "andschwa@microsoft.com", "slee@microsoft.com" ],
+  "notificationAliases": ["andschwa@microsoft.com", "slee@microsoft.com"],
   "codebaseName": "PowerShell_vscode-powershell_20240328",
-  "tools": [ "CredScan", "PoliCheck", "BinSkim" ]
+  "tools": ["CredScan", "PoliCheck", "BinSkim"]
 }

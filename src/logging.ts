@@ -1,39 +1,60 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { type LogOutputChannel, LogLevel, window, type Event } from "vscode";
+import { LogLevel, window, type Event, type LogOutputChannel } from "vscode";
 
 /** Interface for logging operations. New features should use this interface for the "type" of logger.
  *  This will allow for easy mocking of the logger during unit tests.
  */
 export interface ILogger {
     write(message: string, ...additionalMessages: string[]): void;
-    writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void>;
+    writeAndShowInformation(
+        message: string,
+        ...additionalMessages: string[]
+    ): Promise<void>;
     writeTrace(message: string, ...additionalMessages: string[]): void;
     writeDebug(message: string, ...additionalMessages: string[]): void;
     writeWarning(message: string, ...additionalMessages: string[]): void;
-    writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void>;
+    writeAndShowWarning(
+        message: string,
+        ...additionalMessages: string[]
+    ): Promise<void>;
     writeError(message: string, ...additionalMessages: string[]): void;
-    writeAndShowError(message: string, ...additionalMessages: string[]): Promise<void>;
+    writeAndShowError(
+        message: string,
+        ...additionalMessages: string[]
+    ): Promise<void>;
     writeAndShowErrorWithActions(
         message: string,
-        actions: { prompt: string; action: (() => Promise<void>) | undefined }[]): Promise<void>;
+        actions: {
+            prompt: string;
+            action: (() => Promise<void>) | undefined;
+        }[],
+    ): Promise<void>;
 }
 
 export class Logger implements ILogger {
     // Log output channel handles all the verbosity management so we don't have to.
     private logChannel: LogOutputChannel;
-    public get logLevel(): LogLevel { return this.logChannel.logLevel;}
+    public get logLevel(): LogLevel {
+        return this.logChannel.logLevel;
+    }
 
     constructor(logChannel?: LogOutputChannel) {
-        this.logChannel = logChannel ?? window.createOutputChannel("PowerShell", {log: true});
+        this.logChannel =
+            logChannel ??
+            window.createOutputChannel("PowerShell", { log: true });
     }
 
     public dispose(): void {
         this.logChannel.dispose();
     }
 
-    private writeAtLevel(logLevel: LogLevel, message: string, ...additionalMessages: string[]): void {
+    private writeAtLevel(
+        logLevel: LogLevel,
+        message: string,
+        ...additionalMessages: string[]
+    ): void {
         if (logLevel >= this.logLevel) {
             void this.writeLine(message, logLevel);
 
@@ -47,10 +68,17 @@ export class Logger implements ILogger {
         this.writeAtLevel(LogLevel.Info, message, ...additionalMessages);
     }
 
-    public async writeAndShowInformation(message: string, ...additionalMessages: string[]): Promise<void> {
+    public async writeAndShowInformation(
+        message: string,
+        ...additionalMessages: string[]
+    ): Promise<void> {
         this.write(message, ...additionalMessages);
 
-        const selection = await window.showInformationMessage(message, "Show Logs", "Okay");
+        const selection = await window.showInformationMessage(
+            message,
+            "Show Logs",
+            "Okay",
+        );
         if (selection === "Show Logs") {
             this.showLogPanel();
         }
@@ -64,11 +92,17 @@ export class Logger implements ILogger {
         this.writeAtLevel(LogLevel.Debug, message, ...additionalMessages);
     }
 
-    public writeWarning(message: string, ...additionalMessages: string[]): void {
+    public writeWarning(
+        message: string,
+        ...additionalMessages: string[]
+    ): void {
         this.writeAtLevel(LogLevel.Warning, message, ...additionalMessages);
     }
 
-    public async writeAndShowWarning(message: string, ...additionalMessages: string[]): Promise<void> {
+    public async writeAndShowWarning(
+        message: string,
+        ...additionalMessages: string[]
+    ): Promise<void> {
         this.writeWarning(message, ...additionalMessages);
 
         const selection = await window.showWarningMessage(message, "Show Logs");
@@ -81,7 +115,10 @@ export class Logger implements ILogger {
         this.writeAtLevel(LogLevel.Error, message, ...additionalMessages);
     }
 
-    public async writeAndShowError(message: string, ...additionalMessages: string[]): Promise<void> {
+    public async writeAndShowError(
+        message: string,
+        ...additionalMessages: string[]
+    ): Promise<void> {
         this.writeError(message, ...additionalMessages);
 
         const choice = await window.showErrorMessage(message, "Show Logs");
@@ -92,12 +129,21 @@ export class Logger implements ILogger {
 
     public async writeAndShowErrorWithActions(
         message: string,
-        actions: { prompt: string; action: (() => Promise<void>) | undefined }[]): Promise<void> {
+        actions: {
+            prompt: string;
+            action: (() => Promise<void>) | undefined;
+        }[],
+    ): Promise<void> {
         this.writeError(message);
 
         const fullActions = [
             ...actions,
-            { prompt: "Show Logs", action: (): void => { this.showLogPanel(); } },
+            {
+                prompt: "Show Logs",
+                action: (): void => {
+                    this.showLogPanel();
+                },
+            },
         ];
 
         const actionKeys: string[] = fullActions.map((action) => action.prompt);
@@ -105,7 +151,7 @@ export class Logger implements ILogger {
         const choice = await window.showErrorMessage(message, ...actionKeys);
         if (choice) {
             for (const action of fullActions) {
-                if (choice === action.prompt && action.action !== undefined ) {
+                if (choice === action.prompt && action.action !== undefined) {
                     await action.action();
                     return;
                 }
@@ -117,16 +163,32 @@ export class Logger implements ILogger {
         this.logChannel.show();
     }
 
-    private async writeLine(message: string, level: LogLevel = LogLevel.Info): Promise<void> {
+    private async writeLine(
+        message: string,
+        level: LogLevel = LogLevel.Info,
+    ): Promise<void> {
         return new Promise<void>((resolve) => {
             switch (level) {
-            case LogLevel.Off: break;
-            case LogLevel.Trace: this.logChannel.trace(message); break;
-            case LogLevel.Debug: this.logChannel.debug(message); break;
-            case LogLevel.Info: this.logChannel.info(message); break;
-            case LogLevel.Warning: this.logChannel.warn(message); break;
-            case LogLevel.Error: this.logChannel.error(message); break;
-            default: this.logChannel.appendLine(message); break;
+                case LogLevel.Off:
+                    break;
+                case LogLevel.Trace:
+                    this.logChannel.trace(message);
+                    break;
+                case LogLevel.Debug:
+                    this.logChannel.debug(message);
+                    break;
+                case LogLevel.Info:
+                    this.logChannel.info(message);
+                    break;
+                case LogLevel.Warning:
+                    this.logChannel.warn(message);
+                    break;
+                case LogLevel.Error:
+                    this.logChannel.error(message);
+                    break;
+                default:
+                    this.logChannel.appendLine(message);
+                    break;
             }
             resolve();
         });
@@ -140,7 +202,9 @@ export class Logger implements ILogger {
 export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
     private _channel: LogOutputChannel | undefined;
     private get channel(): LogOutputChannel {
-        this._channel ??= window.createOutputChannel(this.channelName, {log: true});
+        this._channel ??= window.createOutputChannel(this.channelName, {
+            log: true,
+        });
         return this._channel;
     }
 
@@ -152,9 +216,14 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
      */
     constructor(
         private channelName: string,
-        private parser: (message: string) => [string, LogLevel] | undefined = LanguageClientOutputChannelAdapter.omnisharpLspParser.bind(this)
-    ) {
-    }
+        private parser: (
+            message: string,
+        ) =>
+            | [string, LogLevel]
+            | undefined = LanguageClientOutputChannelAdapter.omnisharpLspParser.bind(
+            this,
+        ),
+    ) {}
 
     public appendLine(message: string): void {
         this.append(message);
@@ -162,12 +231,17 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
 
     public append(message: string): void {
         const parseResult = this.parser(message);
-        if (parseResult !== undefined) {this.sendLogMessage(...parseResult);}
+        if (parseResult !== undefined) {
+            this.sendLogMessage(...parseResult);
+        }
     }
 
     /** Converts from Omnisharp logs since middleware for LogMessage does not currently exist **/
     public static omnisharpLspParser(message: string): [string, LogLevel] {
-        const logLevelMatch = /^\[(?<level>Trace|Debug|Info|Warn|Error) +- \d+:\d+:\d+ [AP]M\] (?<message>.+)/.exec(message);
+        const logLevelMatch =
+            /^\[(?<level>Trace|Debug|Info|Warn|Error) +- \d+:\d+:\d+ [AP]M\] (?<message>.+)/.exec(
+                message,
+            );
         const logLevel: LogLevel = logLevelMatch?.groups?.level
             ? LogLevel[logLevelMatch.groups.level as keyof typeof LogLevel]
             : LogLevel.Info;
@@ -178,24 +252,24 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
 
     protected sendLogMessage(message: string, level: LogLevel): void {
         switch (level) {
-        case LogLevel.Trace:
-            this.channel.trace(message);
-            break;
-        case LogLevel.Debug:
-            this.channel.debug(message);
-            break;
-        case LogLevel.Info:
-            this.channel.info(message);
-            break;
-        case LogLevel.Warning:
-            this.channel.warn(message);
-            break;
-        case LogLevel.Error:
-            this.channel.error(message);
-            break;
-        default:
-            this.channel.error("!UNKNOWN LOG LEVEL!: " + message);
-            break;
+            case LogLevel.Trace:
+                this.channel.trace(message);
+                break;
+            case LogLevel.Debug:
+                this.channel.debug(message);
+                break;
+            case LogLevel.Info:
+                this.channel.info(message);
+                break;
+            case LogLevel.Warning:
+                this.channel.warn(message);
+                break;
+            case LogLevel.Error:
+                this.channel.error(message);
+                break;
+            default:
+                this.channel.error("!UNKNOWN LOG LEVEL!: " + message);
+                break;
         }
     }
 
@@ -250,9 +324,12 @@ export class LanguageClientOutputChannelAdapter implements LogOutputChannel {
 
 /** Special parsing for PowerShell Editor Services LSP messages since the LogLevel cannot be read due to vscode
  * LanguageClient Limitations (https://github.com/microsoft/vscode-languageserver-node/issues/1116)
-  */
+ */
 export function PsesParser(message: string): [string, LogLevel] {
-    const logLevelMatch = /^<(?<level>Trace|Debug|Info|Warning|Error)>(?<message>.+)/.exec(message);
+    const logLevelMatch =
+        /^<(?<level>Trace|Debug|Info|Warning|Error)>(?<message>.+)/.exec(
+            message,
+        );
     const logLevel: LogLevel = logLevelMatch?.groups?.level
         ? LogLevel[logLevelMatch.groups.level as keyof typeof LogLevel]
         : LogLevel.Info;
@@ -263,7 +340,8 @@ export function PsesParser(message: string): [string, LogLevel] {
 
 /** Lsp Trace Parser that does some additional parsing and formatting to make it look nicer */
 export function LspTraceParser(message: string): [string, LogLevel] {
-    let [parsedMessage, level] = LanguageClientOutputChannelAdapter.omnisharpLspParser(message);
+    let [parsedMessage, level] =
+        LanguageClientOutputChannelAdapter.omnisharpLspParser(message);
     if (parsedMessage.startsWith("Sending ")) {
         parsedMessage = parsedMessage.replace("Sending", "➡️");
         level = LogLevel.Debug;
@@ -272,8 +350,9 @@ export function LspTraceParser(message: string): [string, LogLevel] {
         parsedMessage = parsedMessage.replace("Received", "⬅️");
         level = LogLevel.Debug;
     }
-    if (parsedMessage.startsWith("Params:")
-        || parsedMessage.startsWith("Result:")
+    if (
+        parsedMessage.startsWith("Params:") ||
+        parsedMessage.startsWith("Result:")
     ) {
         level = LogLevel.Trace;
     }

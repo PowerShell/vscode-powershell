@@ -2,12 +2,12 @@
   "folders": [
     {
       "name": "Client",
-      "path": "."
+      "path": ".",
     },
     {
       "name": "Server",
-      "path": "../PowerShellEditorServices"
-    }
+      "path": "../PowerShellEditorServices",
+    },
   ],
   "extensions": {
     "recommendations": [
@@ -18,8 +18,8 @@
       "ms-dotnettools.csharp",
       "ms-vscode.powershell",
       "connor4312.esbuild-problem-matchers",
-      "ms-vscode.extension-test-runner"
-    ]
+      "ms-vscode.extension-test-runner",
+    ],
   },
   "settings": {
     "window.title": "PowerShell VS Code Extension Development",
@@ -39,7 +39,7 @@
     },
     // Ignore the Markdown rule:
     "markdownlint.config": {
-      "MD024": false // no-duplicate-header
+      "MD024": false, // no-duplicate-header
     },
     "powershell.cwd": "Client",
     "powershell.codeFormatting.autoCorrectAliases": true,
@@ -60,36 +60,25 @@
       "options": {
         "shell": {
           "executable": "pwsh.exe",
-          "args": [
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command"
-          ]
-        }
-      }
+          "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"],
+        },
+      },
     },
     "linux": {
       "options": {
         "shell": {
           "executable": "pwsh",
-          "args": [
-            "-NoProfile",
-            "-Command"
-          ]
-        }
-      }
+          "args": ["-NoProfile", "-Command"],
+        },
+      },
     },
     "osx": {
       "options": {
         "shell": {
           "executable": "pwsh",
-          "args": [
-            "-NoProfile",
-            "-Command"
-          ]
-        }
-      }
+          "args": ["-NoProfile", "-Command"],
+        },
+      },
     },
     "tasks": [
       {
@@ -99,24 +88,21 @@
         },
         "type": "shell",
         "options": {
-          "cwd": "${workspaceFolder:Client}"
+          "cwd": "${workspaceFolder:Client}",
         },
         "command": "Invoke-Build Build",
-        "problemMatcher": [
-          "$msCompile",
-          "$tsc"
-        ],
+        "problemMatcher": ["$msCompile", "$tsc"],
         "group": {
           "kind": "build",
-          "isDefault": true
-        }
+          "isDefault": true,
+        },
       },
       {
         "label": "Extension: Watch",
         "type": "shell",
         "isBackground": true,
         "options": {
-          "cwd": "${workspaceFolder:Client}"
+          "cwd": "${workspaceFolder:Client}",
         },
         "command": "npm run watch",
         "problemMatcher": {
@@ -131,104 +117,90 @@
           "background": {
             "activeOnStart": true,
             "beginsPattern": "^\\[watch\\] build started",
-            "endsPattern": "^\\[watch\\] build finished"
-          }
+            "endsPattern": "^\\[watch\\] build finished",
+          },
         },
         "icon": {
           "id": "sync",
-          "color": "terminal.ansiCyan"
+          "color": "terminal.ansiCyan",
         },
         "group": {
           "kind": "build",
-        }
+        },
       },
       {
         "label": "PSES: BuildIfChanged",
         "type": "shell",
         "options": {
-          "cwd": "${workspaceFolder:Server}"
+          "cwd": "${workspaceFolder:Server}",
         },
         "command": "Invoke-Build BuildIfChanged",
         "problemMatcher": "$msCompile",
         "icon": {
           "id": "tools",
-          "color": "terminal.ansiCyan"
+          "color": "terminal.ansiCyan",
         },
         "group": {
           "kind": "build",
-        }
+        },
       },
       {
         "label": "PreLaunch",
-        "dependsOn": [
-          "Extension: Watch",
-          "PSES: BuildIfChanged"
-        ],
-        "dependsOrder": "parallel"
+        "dependsOn": ["Extension: Watch", "PSES: BuildIfChanged"],
+        "dependsOrder": "parallel",
       },
       {
         "label": "Test Client",
         "type": "shell",
         "options": {
-          "cwd": "${workspaceFolder:Client}"
+          "cwd": "${workspaceFolder:Client}",
         },
         "command": "Invoke-Build Test",
-        "problemMatcher": [
-          "$msCompile",
-          "$tsc"
-        ],
+        "problemMatcher": ["$msCompile", "$tsc"],
         "group": {
           "kind": "test",
-          "isDefault": true
-        }
+          "isDefault": true,
+        },
       },
       {
         "label": "Test Server",
         "type": "shell",
         "options": {
-          "cwd": "${workspaceFolder:Server}"
+          "cwd": "${workspaceFolder:Server}",
         },
-        "problemMatcher": [
-          "$msCompile"
-        ],
+        "problemMatcher": ["$msCompile"],
         "command": "Invoke-Build TestPS74",
         "group": {
           "kind": "test",
-          "isDefault": true
-        }
+          "isDefault": true,
+        },
       },
       {
         "label": "Invoke-Build Client",
         "type": "shell",
         "options": {
-          "cwd": "${workspaceFolder:Client}"
+          "cwd": "${workspaceFolder:Client}",
         },
         "command": "Invoke-Build ${input:clientBuildCommand}",
-        "group": "build"
+        "group": "build",
       },
       {
         "label": "Invoke-Build Server",
         "type": "shell",
         "options": {
-          "cwd": "${workspaceFolder:Server}"
+          "cwd": "${workspaceFolder:Server}",
         },
         "command": "Invoke-Build ${input:serverBuildCommand}",
-        "group": "build"
-      }
+        "group": "build",
+      },
     ],
     "inputs": [
       {
         "type": "pickString",
         "id": "clientBuildCommand",
         "description": "Which Invoke-Build Client Task?",
-        "options": [
-          "Restore",
-          "Clean",
-          "Build",
-          "Test",
-          "Package"
-        ],
-        "default": "Clean"
+        "options": ["Restore", "Clean", "Build", "Test", "Package"],
+        "default": "Clean",
       },
       {
         "type": "pickString",
@@ -245,56 +217,46 @@
           "TestPS51",
           "TestE2EPowerShell",
         ],
-        "default": "Clean"
-      }
+        "default": "Clean",
+      },
     ],
-
   },
   "launch": {
     "version": "0.2.0",
     "compounds": [
       {
         "name": "Launch Extension",
-        "configurations": [
-          "Launch",
-          "PowerShell Editor Services"
-        ],
+        "configurations": ["Launch", "PowerShell Editor Services"],
         "preLaunchTask": "Build",
         "stopAll": true,
         "presentation": {
           "hidden": false,
           "group": "Test",
-          "order": 1
-        }
+          "order": 1,
+        },
       },
       {
         "name": "Launch Extension - Temp Profile",
-        "configurations": [
-          "Launch-Temp",
-          "PowerShell Editor Services"
-        ],
+        "configurations": ["Launch-Temp", "PowerShell Editor Services"],
         "preLaunchTask": "PreLaunch",
         "stopAll": true,
         "presentation": {
           "hidden": false,
           "group": "Test",
-          "order": 2
-        }
+          "order": 2,
+        },
       },
       {
         "name": "Launch Extension - Isolated Profile",
-        "configurations": [
-          "Launch-Isolated",
-          "PowerShell Editor Services"
-        ],
+        "configurations": ["Launch-Isolated", "PowerShell Editor Services"],
         "preLaunchTask": "Build",
         "stopAll": true,
         "presentation": {
           "hidden": false,
           "group": "Test",
-          "order": 3
-        }
-      }
+          "order": 3,
+        },
+      },
     ],
     "configurations": [
       {
@@ -307,22 +269,20 @@
         "runtimeExecutable": "${execPath}",
         "args": [
           "--extensionDevelopmentPath=${workspaceFolder:Client}",
-          "${workspaceFolder:Client}/examples"
+          "${workspaceFolder:Client}/examples",
         ],
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/dist/*.js"
-        ],
+        "outFiles": ["${workspaceFolder:Client}/dist/*.js"],
         "skipFiles": [
           "<node_internals>/**",
           "**/node_modules/**",
           "**/.vscode-test/**",
-          "**/app/out/vs/**" // Skips Extension Host internals
+          "**/app/out/vs/**", // Skips Extension Host internals
         ],
         "presentation": {
-          "hidden": true
-        }
+          "hidden": true,
+        },
       },
       {
         "name": "Launch-Temp",
@@ -337,13 +297,11 @@
           // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
           "--profile-temp",
           "--extensionDevelopmentPath=${workspaceFolder:Client}",
-          "${workspaceFolder:Client}/examples"
+          "${workspaceFolder:Client}/examples",
         ],
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/dist/*.js"
-        ],
+        "outFiles": ["${workspaceFolder:Client}/dist/*.js"],
         "skipFiles": [
           "<node_internals>/**",
           "**/node_modules/**",
@@ -351,8 +309,8 @@
           "**/app/out/vs/**", // Skips Extension Host internals
         ],
         "presentation": {
-          "hidden": true
-        }
+          "hidden": true,
+        },
       },
       {
         "name": "Launch-Isolated",
@@ -367,22 +325,20 @@
           // Undocumented: https://github.com/microsoft/vscode-docs/issues/6220
           "--profile=pwsh-debug",
           "--extensionDevelopmentPath=${workspaceFolder:Client}",
-          "${workspaceFolder:Client}/examples"
+          "${workspaceFolder:Client}/examples",
         ],
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/dist/*.js"
-        ],
+        "outFiles": ["${workspaceFolder:Client}/dist/*.js"],
         "skipFiles": [
           "<node_internals>/**",
           "**/node_modules/**",
           "**/.vscode-test/**",
-          "**/app/out/vs/**" // Skips Extension Host internals
+          "**/app/out/vs/**", // Skips Extension Host internals
         ],
         "presentation": {
-          "hidden": true
-        }
+          "hidden": true,
+        },
       },
       {
         // https://code.visualstudio.com/docs/csharp/debugger-settings
@@ -395,15 +351,15 @@
         "symbolOptions": {
           "searchPaths": [],
           "searchMicrosoftSymbolServer": false,
-          "searchNuGetOrgSymbolServer": false
+          "searchNuGetOrgSymbolServer": false,
         },
         "presentation": {
           "hidden": false,
           "group": "Test",
-          "order": 5
+          "order": 5,
         },
         "logging": {
-          "moduleLoad": false
+          "moduleLoad": false,
         },
       },
       {
@@ -418,14 +374,14 @@
         "symbolOptions": {
           "searchPaths": [],
           "searchMicrosoftSymbolServer": false,
-          "searchNuGetOrgSymbolServer": false
+          "searchNuGetOrgSymbolServer": false,
         },
         "presentation": {
-          "hidden": true
+          "hidden": true,
         },
         "logging": {
-          "moduleLoad": false
-        }
+          "moduleLoad": false,
+        },
       },
       {
         // Runs the extension in an isolated but persistent profile separate from the user settings
@@ -437,22 +393,20 @@
         "args": [
           "--profile=debug",
           "--extensionDevelopmentPath=${workspaceFolder:Client}",
-          "${workspaceFolder:Server}/test/PowerShellEditorServices.Test.Shared/Refactoring"
+          "${workspaceFolder:Server}/test/PowerShellEditorServices.Test.Shared/Refactoring",
         ],
         "sourceMaps": true,
         // This speeds up source map detection and makes smartStep work correctly
-        "outFiles": [
-          "${workspaceFolder:Client}/dist/*.js"
-        ],
+        "outFiles": ["${workspaceFolder:Client}/dist/*.js"],
         "skipFiles": [
           "<node_internals>/**",
           "**/node_modules/**",
-          "**/.vscode-test/**" // Skips Extension Host internals
+          "**/.vscode-test/**", // Skips Extension Host internals
         ],
         "presentation": {
           "hidden": true,
-        }
+        },
       },
-    ]
-  }
+    ],
+  },
 }
