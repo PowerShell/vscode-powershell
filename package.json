@@ -111,6 +111,7 @@
     "test": "vscode-test"
   },
   "prettier": {
+    "endOfLine": "auto",
     "plugins": [
       "prettier-plugin-organize-imports"
     ]
