@@ -2,8 +2,11 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
+import type {
+    IExternalPowerShellDetails,
+    IPowerShellExtensionClient,
+} from "../../src/features/ExternalApi";
 import utils = require("../utils");
-import type { IExternalPowerShellDetails, IPowerShellExtensionClient } from "../../src/features/ExternalApi";
 
 describe("ExternalApi feature", function () {
     describe("External extension registration", function () {
@@ -13,35 +16,48 @@ describe("ExternalApi feature", function () {
         });
 
         it("Registers and unregisters an extension", function () {
-            const sessionId: string = extension.registerExternalExtension(utils.extensionId);
+            const sessionId: string = extension.registerExternalExtension(
+                utils.extensionId,
+            );
             assert.notStrictEqual(sessionId, "");
             assert.notStrictEqual(sessionId, null);
             assert.strictEqual(
                 extension.unregisterExternalExtension(sessionId),
-                true);
+                true,
+            );
         });
 
         it("Registers and unregisters an extension with a version", function () {
-            const sessionId: string = extension.registerExternalExtension(utils.extensionId, "v2");
+            const sessionId: string = extension.registerExternalExtension(
+                utils.extensionId,
+                "v2",
+            );
             assert.notStrictEqual(sessionId, "");
             assert.notStrictEqual(sessionId, null);
             assert.strictEqual(
                 extension.unregisterExternalExtension(sessionId),
-                true);
+                true,
+            );
         });
 
         it("Rejects if not registered", async function () {
-            await assert.rejects(async () => await extension.getPowerShellVersionDetails(""));
+            await assert.rejects(
+                async () => await extension.getPowerShellVersionDetails(""),
+            );
         });
 
         it("Throws if attempting to register an extension more than once", function () {
-            const sessionId: string = extension.registerExternalExtension(utils.extensionId);
+            const sessionId: string = extension.registerExternalExtension(
+                utils.extensionId,
+            );
             try {
                 assert.throws(
-                    () => extension.registerExternalExtension(utils.extensionId),
+                    () =>
+                        extension.registerExternalExtension(utils.extensionId),
                     {
-                        message: `The extension '${utils.extensionId}' is already registered.`
-                    });
+                        message: `The extension '${utils.extensionId}' is already registered.`,
+                    },
+                );
             } finally {
                 extension.unregisterExternalExtension(sessionId);
             }
@@ -51,8 +67,10 @@ describe("ExternalApi feature", function () {
             assert.throws(
                 () => extension.unregisterExternalExtension("not-real"),
                 {
-                    message: "No extension registered with session UUID: not-real"
-                });
+                    message:
+                        "No extension registered with session UUID: not-real",
+                },
+            );
         });
     });
 
@@ -65,10 +83,13 @@ describe("ExternalApi feature", function () {
             sessionId = extension.registerExternalExtension(utils.extensionId);
         });
 
-        after(function () { extension.unregisterExternalExtension(sessionId); });
+        after(function () {
+            extension.unregisterExternalExtension(sessionId);
+        });
 
         it("Gets non-empty version details from the PowerShell Editor Services", async function () {
-            const versionDetails: IExternalPowerShellDetails = await extension.getPowerShellVersionDetails(sessionId);
+            const versionDetails: IExternalPowerShellDetails =
+                await extension.getPowerShellVersionDetails(sessionId);
 
             assert.notStrictEqual(versionDetails.architecture, "");
             assert.notStrictEqual(versionDetails.architecture, null);

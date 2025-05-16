@@ -38,10 +38,7 @@
     ]
   },
   "Class Constructor": {
-    "prefix": [
-      "ctor-class",
-      "class-constructor"
-    ],
+    "prefix": ["ctor-class", "class-constructor"],
     "description": "Set default values and validate object logic at the moment of creating the instance of the class. Constructors have the same name as the class. Constructors might have arguments, to initialize the data members of the new object. More: Get-Help about_Classes",
     "body": [
       "${1:ClassName}(${2:<#OptionalParameters#>}) {",
@@ -61,14 +58,10 @@
   "Class Property": {
     "prefix": "class-property",
     "description": "Properties are variables declared at class scope. A property may be of any built-in type or an instance of another class. Classes have no restriction in the number of properties they have. More: Get-Help about_Classes",
-    "body": [
-      "[${1:propertyType}] $${0:PropertyName}"
-    ]
+    "body": ["[${1:propertyType}] $${0:PropertyName}"]
   },
   "Comment Block": {
-    "prefix": [
-      "block-comment"
-    ],
+    "prefix": ["block-comment"],
     "description": "A multi-line comment.",
     "body": [
       "$BLOCK_COMMENT_START",
@@ -202,10 +195,7 @@
     ]
   },
   "Function Help": {
-    "prefix": [
-      "help-function",
-      "comment-help"
-    ],
+    "prefix": ["help-function", "comment-help"],
     "description": "Comment-based help for an advanced function. More: Get-Help about_Comment_Based_Help",
     "body": [
       "<#",
@@ -226,10 +216,7 @@
     ]
   },
   "Function-Advanced": {
-    "prefix": [
-      "function-advanced",
-      "cmdlet"
-    ],
+    "prefix": ["function-advanced", "cmdlet"],
     "description": "Script advanced function definition snippet. More: Get-Help about_Functions_Advanced",
     "body": [
       "function ${1:Verb-Noun} {",
@@ -262,10 +249,7 @@
     ]
   },
   "Function: Suppress PSScriptAnalyzer Rule": {
-    "prefix": [
-      "suppress-message-rule-function",
-      "[SuppressMessageAttribute]"
-    ],
+    "prefix": ["suppress-message-rule-function", "[SuppressMessageAttribute]"],
     "description": "Suppress a PSScriptAnalyzer rule for a function. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
     "body": [
       "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
@@ -278,44 +262,22 @@
   "Hashtable": {
     "prefix": "hashtable",
     "description": "A key/value store that are very efficient for finding and retrieving data. More: Get-Help about_Hash_Tables",
-    "body": [
-      "\\$${1:Var} = @{",
-      "\t${2:Name} = ${3:Value}",
-      "}"
-    ]
+    "body": ["\\$${1:Var} = @{", "\t${2:Name} = ${3:Value}", "}"]
   },
   "Here-String": {
-    "prefix": [
-      "hs",
-      "here-string"
-    ],
+    "prefix": ["hs", "here-string"],
     "description": "Escape all text but evaluate variables. More: Get-Help about_Quoting_Rules",
-    "body": [
-      "@\"",
-      "${0:TM_SELECTED_TEXT}",
-      "\"@",
-      ""
-    ]
+    "body": ["@\"", "${0:TM_SELECTED_TEXT}", "\"@", ""]
   },
   "Here-String (Literal)": {
-    "prefix": [
-      "hsl",
-      "literal-here-string"
-    ],
+    "prefix": ["hsl", "literal-here-string"],
     "description": "Escape all text literally. More: Get-Help about_Quoting_Rules",
-    "body": [
-      "@'",
-      "${0:TM_SELECTED_TEXT}",
-      "'@",
-      ""
-    ]
+    "body": ["@'", "${0:TM_SELECTED_TEXT}", "'@", ""]
   },
   "Hidden Property": {
     "prefix": "class-proph-hidden",
     "description": "Useful for creating internal properties and methods within a class that are hidden from users. More: Get-Help about_Hidden",
-    "body": [
-      "hidden [${1:string}] $${0:PropertyName}"
-    ]
+    "body": ["hidden [${1:string}] $${0:PropertyName}"]
   },
   "IArgumentCompleter Class": {
     "prefix": "iargument-completer",
@@ -518,10 +480,7 @@
     ]
   },
   "Parameter: Suppress PSScriptAnalyzer Rule": {
-    "prefix": [
-      "suppress-message-rule-parameter",
-      "[SuppressMessageAttribute]"
-    ],
+    "prefix": ["suppress-message-rule-parameter", "[SuppressMessageAttribute]"],
     "description": "Suppress a PSScriptAnalyzer rule on a parameter. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
     "body": [
       "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
@@ -548,31 +507,17 @@
     ]
   },
   "PSCustomObject": {
-    "prefix": [
-      "pscustomobject",
-      "[PSCustomObject]"
-    ],
+    "prefix": ["pscustomobject", "[PSCustomObject]"],
     "description": "Create a custom object from a hashtable of properties. More: Get-Help about_PSCustomObject",
-    "body": [
-      "[PSCustomObject]@{",
-      "\t${1:Name} = ${2:Value}",
-      "}"
-    ]
+    "body": ["[PSCustomObject]@{", "\t${1:Name} = ${2:Value}", "}"]
   },
   "Region Block": {
     "prefix": "region",
     "description": "Region block for organizing and folding of your code",
-    "body": [
-      "#region ${1}",
-      "${0:$TM_SELECTED_TEXT}",
-      "#endregion"
-    ]
+    "body": ["#region ${1}", "${0:$TM_SELECTED_TEXT}", "#endregion"]
   },
   "Scope: Suppress PSScriptAnalyzer Rule": {
-    "prefix": [
-      "suppress-message-rule-scope",
-      "[SuppressMessageAttribute]"
-    ],
+    "prefix": ["suppress-message-rule-scope", "[SuppressMessageAttribute]"],
     "description": "Suppress a PSScriptAnalyzer rule based on a function/parameter/class/variable/object's name by setting the SuppressMessageAttribute's Target property to a regular expression or a glob pattern. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
     "body": [
       "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
@@ -594,10 +539,7 @@
     ]
   },
   "Suppress PSScriptAnalyzer Rule": {
-    "prefix": [
-      "suppress-message-rule",
-      "[SuppressMessageAttribute]"
-    ],
+    "prefix": ["suppress-message-rule", "[SuppressMessageAttribute]"],
     "description": "Suppress a PSScriptAnalyzer rule. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
     "body": [
       "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
@@ -665,10 +607,6 @@
   "while": {
     "prefix": "while",
     "description": "Repeatedly perform an action after verifying a condition is true first. More: Get-Help about_While",
-    "body": [
-      "while (${1:condition}) {",
-      "\t${0:$TM_SELECTED_TEXT}",
-      "}"
-    ]
+    "body": ["while (${1:condition}) {", "\t${0:$TM_SELECTED_TEXT}", "}"]
   }
 }

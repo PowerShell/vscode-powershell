@@ -30,73 +30,60 @@
 // ${cwd} the task runner's current working directory on startup
 // ${lineNumber} the current selected line number in the active file
 {
-    "version": "2.0.0",
-    "windows": {
-        "options": {
-            "shell": {
-                "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-                "args": [
-                    "-NoProfile",
-                    "-ExecutionPolicy",
-                    "Bypass",
-                    "-Command"
-                ]
-            }
-        }
+  "version": "2.0.0",
+  "windows": {
+    "options": {
+      "shell": {
+        "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+      }
+    }
+  },
+  "linux": {
+    "options": {
+      "shell": {
+        "executable": "/usr/bin/pwsh",
+        "args": ["-NoProfile", "-Command"]
+      }
+    }
+  },
+  "osx": {
+    "options": {
+      "shell": {
+        "executable": "/usr/local/bin/pwsh",
+        "args": ["-NoProfile", "-Command"]
+      }
+    }
+  },
+  "tasks": [
+    {
+      "label": "Clean",
+      "type": "shell",
+      "command": "Invoke-PSake build.ps1 -taskList Clean"
     },
-    "linux": {
-        "options": {
-            "shell": {
-                "executable": "/usr/bin/pwsh",
-                "args": [
-                    "-NoProfile",
-                    "-Command"
-                ]
-            }
-        }
+    {
+      "label": "Build",
+      "type": "shell",
+      "command": "Invoke-PSake build.ps1 -taskList Build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     },
-    "osx": {
-        "options": {
-            "shell": {
-                "executable": "/usr/local/bin/pwsh",
-                "args": [
-                    "-NoProfile",
-                    "-Command"
-                ]
-            }
-        }
+    {
+      "label": "Test",
+      "type": "shell",
+      "command": "Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true}",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": ["$pester"]
     },
-    "tasks": [
-        {
-            "label": "Clean",
-            "type": "shell",
-            "command": "Invoke-PSake build.ps1 -taskList Clean"
-        },
-        {
-            "label": "Build",
-            "type": "shell",
-            "command": "Invoke-PSake build.ps1 -taskList Build",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "label": "Test",
-            "type": "shell",
-            "command": "Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true}",
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "problemMatcher": [
-                "$pester"
-            ]
-        },
-        {
-            "label": "Publish",
-            "type": "shell",
-            "command": "Invoke-PSake build.ps1 -taskList Publish"
-        }
-    ]
+    {
+      "label": "Publish",
+      "type": "shell",
+      "command": "Invoke-PSake build.ps1 -taskList Publish"
+    }
+  ]
 }

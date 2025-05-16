@@ -3,21 +3,26 @@
 
 import * as assert from "assert";
 import * as os from "os";
+import path from "path";
 import * as vscode from "vscode";
 import {
-    Settings,
-    getSettings,
-    getEffectiveConfigurationTarget,
     changeSetting,
     CommentType,
-    validateCwdSetting
+    getEffectiveConfigurationTarget,
+    getSettings,
+    Settings,
+    validateCwdSetting,
 } from "../../src/settings";
-import path from "path";
 import { ensureEditorServicesIsConnected } from "../utils";
 
 describe("Settings E2E", function () {
     async function changeCwdSetting(cwd: string | undefined): Promise<void> {
-        await changeSetting("cwd", cwd, vscode.ConfigurationTarget.Workspace, undefined);
+        await changeSetting(
+            "cwd",
+            cwd,
+            vscode.ConfigurationTarget.Workspace,
+            undefined,
+        );
     }
 
     async function resetCwdSetting(): Promise<void> {
@@ -40,20 +45,38 @@ describe("Settings E2E", function () {
 
     describe("The 'changeSetting' method", function () {
         it("Updates correctly", async function () {
-            await changeSetting("helpCompletion", CommentType.LineComment, vscode.ConfigurationTarget.Workspace, undefined);
-            assert.strictEqual(getSettings().helpCompletion, CommentType.LineComment);
+            await changeSetting(
+                "helpCompletion",
+                CommentType.LineComment,
+                vscode.ConfigurationTarget.Workspace,
+                undefined,
+            );
+            assert.strictEqual(
+                getSettings().helpCompletion,
+                CommentType.LineComment,
+            );
         });
     });
 
     describe("The 'getEffectiveConfigurationTarget' method'", function () {
         it("Works for 'Workspace' target", async function () {
-            await changeSetting("helpCompletion", CommentType.LineComment, vscode.ConfigurationTarget.Workspace, undefined);
+            await changeSetting(
+                "helpCompletion",
+                CommentType.LineComment,
+                vscode.ConfigurationTarget.Workspace,
+                undefined,
+            );
             const target = getEffectiveConfigurationTarget("helpCompletion");
             assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);
         });
 
         it("Works for 'undefined' target", async function () {
-            await changeSetting("helpCompletion", undefined, vscode.ConfigurationTarget.Workspace, undefined);
+            await changeSetting(
+                "helpCompletion",
+                undefined,
+                vscode.ConfigurationTarget.Workspace,
+                undefined,
+            );
             const target = getEffectiveConfigurationTarget("helpCompletion");
             assert.strictEqual(target, undefined);
         });
@@ -85,7 +108,10 @@ describe("Settings E2E", function () {
 
         it("Uses the home folder for ~ (tilde)", async function () {
             await changeCwdSetting("~");
-            assert.strictEqual(await validateCwdSetting(undefined), os.homedir());
+            assert.strictEqual(
+                await validateCwdSetting(undefined),
+                os.homedir(),
+            );
         });
 
         it("Accepts relative paths", async function () {

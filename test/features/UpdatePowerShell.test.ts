@@ -3,8 +3,8 @@
 
 import assert from "assert";
 import { UpdatePowerShell } from "../../src/features/UpdatePowerShell";
-import { Settings } from "../../src/settings";
 import type { IPowerShellVersionDetails } from "../../src/session";
+import { Settings } from "../../src/settings";
 import { testLogger } from "../utils";
 
 describe("UpdatePowerShell feature", function () {

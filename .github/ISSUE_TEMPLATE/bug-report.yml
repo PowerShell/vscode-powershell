@@ -2,98 +2,98 @@ name: 🐛 Bug report
 description: Open an issue about a bug that needs fixing.
 labels: ["Issue-Bug", "Needs: Triage"]
 body:
-- type: checkboxes
-  attributes:
-    label: Prerequisites
-    options:
-    - label: I have written a descriptive issue title.
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      options:
+        - label: I have written a descriptive issue title.
+          required: true
+        - label: I have searched all [_open and closed_ issues](https://github.com/PowerShell/vscode-powershell/issues?q=is%3Aissue) to ensure it has not already been reported.
+        - label: I have read the [troubleshooting](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md) guide.
+        - label: I am sure this issue is with the _extension itself_ and does not reproduce in a standalone [PowerShell](https://github.com/PowerShell/PowerShell/issues/new/choose) instance.
+        - label: I have verified that I am using the latest version of Visual Studio Code and the PowerShell extension.
+        - label: If this is a security issue, I have read the [security issue reporting guidance](https://github.com/PowerShell/vscode-powershell/blob/main/SECURITY.md).
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Explain the problem briefly below.
+      placeholder: I am experiencing a problem with X. I think Y should be happening but Z is actually happening.
+    validations:
       required: true
-    - label: I have searched all [_open and closed_ issues](https://github.com/PowerShell/vscode-powershell/issues?q=is%3Aissue) to ensure it has not already been reported.
-    - label: I have read the [troubleshooting](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md) guide.
-    - label: I am sure this issue is with the _extension itself_ and does not reproduce in a standalone [PowerShell](https://github.com/PowerShell/PowerShell/issues/new/choose) instance.
-    - label: I have verified that I am using the latest version of Visual Studio Code and the PowerShell extension.
-    - label: If this is a security issue, I have read the [security issue reporting guidance](https://github.com/PowerShell/vscode-powershell/blob/main/SECURITY.md).
-- type: textarea
-  id: summary
-  attributes:
-    label: Summary
-    description: Explain the problem briefly below.
-    placeholder: I am experiencing a problem with X. I think Y should be happening but Z is actually happening.
-  validations:
-    required: true
-- type: textarea
-  id: powershell-version
-  attributes:
-    label: PowerShell Version
-    description: Paste verbatim output from `$PSVersionTable; $Host` below. **Please include `$Host`** so we know this version is from the Extension Terminal!
-    render: console
-    placeholder: |
-      PS> $PSVersionTable; $Host
+  - type: textarea
+    id: powershell-version
+    attributes:
+      label: PowerShell Version
+      description: Paste verbatim output from `$PSVersionTable; $Host` below. **Please include `$Host`** so we know this version is from the Extension Terminal!
+      render: console
+      placeholder: |
+        PS> $PSVersionTable; $Host
 
-      Name                           Value
-      ----                           -----
-      PSVersion                      7.4.0
-      PSEdition                      Core
-      GitCommitId                    7.4.0
-      OS                             Microsoft Windows 10.0.22631
-      Platform                       Win32NT
-      PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0…}
-      PSRemotingProtocolVersion      2.3
-      SerializationVersion           1.1.0.1
-      WSManStackVersion              3.0
+        Name                           Value
+        ----                           -----
+        PSVersion                      7.4.0
+        PSEdition                      Core
+        GitCommitId                    7.4.0
+        OS                             Microsoft Windows 10.0.22631
+        Platform                       Win32NT
+        PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0…}
+        PSRemotingProtocolVersion      2.3
+        SerializationVersion           1.1.0.1
+        WSManStackVersion              3.0
 
-      Name             : Visual Studio Code Host
-      Version          : 2023.11.0
-      InstanceId       : 803ce61b-6187-4574-9c1f-827ebb11b8b6
-      UI               : System.Management.Automation.Internal.Host.InternalHostUserInterface
-      CurrentCulture   : en-US
-      CurrentUICulture : en-US
-      PrivateData      : Microsoft.PowerShell.ConsoleHost+ConsoleColorProxy
-      DebuggerEnabled  : True
-      IsRunspacePushed : False
-      Runspace         : System.Management.Automation.Runspaces.LocalRunspace
-  validations:
-    required: true
-- type: textarea
-  id: vscode-version
-  attributes:
-    label: Visual Studio Code Version
-    description: Paste verbatim output from `code --version` below.
-    render: console
-    placeholder: |
-      PS> code --version
+        Name             : Visual Studio Code Host
+        Version          : 2023.11.0
+        InstanceId       : 803ce61b-6187-4574-9c1f-827ebb11b8b6
+        UI               : System.Management.Automation.Internal.Host.InternalHostUserInterface
+        CurrentCulture   : en-US
+        CurrentUICulture : en-US
+        PrivateData      : Microsoft.PowerShell.ConsoleHost+ConsoleColorProxy
+        DebuggerEnabled  : True
+        IsRunspacePushed : False
+        Runspace         : System.Management.Automation.Runspaces.LocalRunspace
+    validations:
+      required: true
+  - type: textarea
+    id: vscode-version
+    attributes:
+      label: Visual Studio Code Version
+      description: Paste verbatim output from `code --version` below.
+      render: console
+      placeholder: |
+        PS> code --version
 
-      1.57.1
-      507ce72a4466fbb27b715c3722558bb15afa9f48
-      arm64
-  validations:
-    required: true
-- type: textarea
-  id: extension-version
-  attributes:
-    label: Extension Version
-    description: Paste verbatim output from `code --list-extensions --show-versions | Select-String powershell` below.
-    render: console
-    placeholder: |
-      PS> code --list-extensions --show-versions | Select-String powershell
+        1.57.1
+        507ce72a4466fbb27b715c3722558bb15afa9f48
+        arm64
+    validations:
+      required: true
+  - type: textarea
+    id: extension-version
+    attributes:
+      label: Extension Version
+      description: Paste verbatim output from `code --list-extensions --show-versions | Select-String powershell` below.
+      render: console
+      placeholder: |
+        PS> code --list-extensions --show-versions | Select-String powershell
 
-      ms-vscode.powershell@2021.8.0
-  validations:
-    required: true
-- type: textarea
-  id: steps-to-reproduce
-  attributes:
-    label: Steps to Reproduce
-    description: List of steps, sample code, failing test or link to a project that reproduces the behavior. Make sure you place a stack trace inside a code (```) block to avoid linking unrelated issues.
-  validations:
-    required: true
-- type: textarea
-  id: visuals
-  attributes:
-    label: Visuals
-    description: Please upload images or animations that can be used to reproduce issues in the area below. Try the [Steps Recorder](https://support.microsoft.com/en-us/windows/record-steps-to-reproduce-a-problem-46582a9b-620f-2e36-00c9-04e25d784e47) on Windows or [Screenshot](https://support.apple.com/en-us/HT208721) on macOS.
-- type: textarea
-  id: logs
-  attributes:
-    label: Logs
-    description: Please upload logs collected by following these [instructions](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md#logs) in the area below. Be careful to scrub sensitive information!
+        ms-vscode.powershell@2021.8.0
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: List of steps, sample code, failing test or link to a project that reproduces the behavior. Make sure you place a stack trace inside a code (```) block to avoid linking unrelated issues.
+    validations:
+      required: true
+  - type: textarea
+    id: visuals
+    attributes:
+      label: Visuals
+      description: Please upload images or animations that can be used to reproduce issues in the area below. Try the [Steps Recorder](https://support.microsoft.com/en-us/windows/record-steps-to-reproduce-a-problem-46582a9b-620f-2e36-00c9-04e25d784e47) on Windows or [Screenshot](https://support.apple.com/en-us/HT208721) on macOS.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Please upload logs collected by following these [instructions](https://github.com/PowerShell/vscode-powershell/blob/main/docs/troubleshooting.md#logs) in the area below. Be careful to scrub sensitive information!

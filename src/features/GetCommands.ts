@@ -19,7 +19,9 @@ interface ICommand {
  * RequestType sent over to PSES.
  * Expects: ICommand to be returned
  */
-export const GetCommandRequestType = new RequestType0<ICommand[], void>("powerShell/getCommand");
+export const GetCommandRequestType = new RequestType0<ICommand[], void>(
+    "powerShell/getCommand",
+);
 
 /**
  * A PowerShell Command listing feature. Implements a treeview control.
@@ -32,14 +34,25 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     constructor() {
         super();
         this.commands = [
-            vscode.commands.registerCommand("PowerShell.RefreshCommandsExplorer",
-                async () => { await this.CommandExplorerRefresh(); }),
-            vscode.commands.registerCommand("PowerShell.InsertCommand", async (item) => { await this.InsertCommand(item); })
+            vscode.commands.registerCommand(
+                "PowerShell.RefreshCommandsExplorer",
+                async () => {
+                    await this.CommandExplorerRefresh();
+                },
+            ),
+            vscode.commands.registerCommand(
+                "PowerShell.InsertCommand",
+                async (item) => {
+                    await this.InsertCommand(item);
+                },
+            ),
         ];
         this.commandsExplorerProvider = new CommandsExplorerProvider();
 
-        this.commandsExplorerTreeView = vscode.window.createTreeView<Command>("PowerShellCommands",
-            { treeDataProvider: this.commandsExplorerProvider });
+        this.commandsExplorerTreeView = vscode.window.createTreeView<Command>(
+            "PowerShellCommands",
+            { treeDataProvider: this.commandsExplorerProvider },
+        );
 
         // Refresh the command explorer when the view is visible
         this.commandsExplorerTreeView.onDidChangeVisibility(async (e) => {
@@ -57,7 +70,9 @@ export class GetCommandsFeature extends LanguageClientConsumer {
 
     public override onLanguageClientSet(_languageClient: LanguageClient): void {
         if (this.commandsExplorerTreeView.visible) {
-            void vscode.commands.executeCommand("PowerShell.RefreshCommandsExplorer");
+            void vscode.commands.executeCommand(
+                "PowerShell.RefreshCommandsExplorer",
+            );
         }
     }
 
@@ -65,13 +80,19 @@ export class GetCommandsFeature extends LanguageClientConsumer {
         const client = await LanguageClientConsumer.getLanguageClient();
         const result = await client.sendRequest(GetCommandRequestType);
         const exclusions = getSettings().sideBar.CommandExplorerExcludeFilter;
-        const excludeFilter = exclusions.map((filter: string) => filter.toLowerCase());
-        const filteredResult = result.filter((command) => (!excludeFilter.includes(command.moduleName.toLowerCase())));
-        this.commandsExplorerProvider.powerShellCommands = filteredResult.map(toCommand);
+        const excludeFilter = exclusions.map((filter: string) =>
+            filter.toLowerCase(),
+        );
+        const filteredResult = result.filter(
+            (command) =>
+                !excludeFilter.includes(command.moduleName.toLowerCase()),
+        );
+        this.commandsExplorerProvider.powerShellCommands =
+            filteredResult.map(toCommand);
         this.commandsExplorerProvider.refresh();
     }
 
-    private async InsertCommand(item: { Name: string; }): Promise<void> {
+    private async InsertCommand(item: { Name: string }): Promise<void> {
         const editor = vscode.window.activeTextEditor;
         if (editor === undefined) {
             return;
@@ -79,7 +100,12 @@ export class GetCommandsFeature extends LanguageClientConsumer {
 
         const sls = editor.selection.start;
         const sle = editor.selection.end;
-        const range = new vscode.Range(sls.line, sls.character, sle.line, sle.character);
+        const range = new vscode.Range(
+            sls.line,
+            sls.character,
+            sle.line,
+            sle.character,
+        );
         await editor.edit((editBuilder) => {
             editBuilder.replace(range, item.Name);
         });
@@ -89,7 +115,8 @@ export class GetCommandsFeature extends LanguageClientConsumer {
 class CommandsExplorerProvider implements vscode.TreeDataProvider<Command> {
     public readonly onDidChangeTreeData: vscode.Event<Command | undefined>;
     public powerShellCommands: Command[] = [];
-    private didChangeTreeData: vscode.EventEmitter<Command | undefined> = new vscode.EventEmitter<Command>();
+    private didChangeTreeData: vscode.EventEmitter<Command | undefined> =
+        new vscode.EventEmitter<Command>();
 
     constructor() {
         this.onDidChangeTreeData = this.didChangeTreeData.event;
@@ -125,7 +152,8 @@ class Command extends vscode.TreeItem {
         public readonly defaultParameterSet: string,
         public readonly ParameterSets: object,
         public readonly Parameters: object,
-        public override readonly collapsibleState = vscode.TreeItemCollapsibleState.None,
+        public override readonly collapsibleState = vscode
+            .TreeItemCollapsibleState.None,
     ) {
         super(Name, collapsibleState);
     }

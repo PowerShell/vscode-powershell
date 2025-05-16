@@ -19,7 +19,7 @@ jobs:
     env:
       DOTNET_NOLOGO: true
       DOTNET_GENERATE_ASPNET_CERTIFICATE: false
-      DISPLAY: ':99.0'
+      DISPLAY: ":99.0"
     timeout-minutes: 10
     steps:
       - name: Checkout PowerShellEditorServices
@@ -70,11 +70,11 @@ jobs:
         if: always()
         with:
           name: vscode-powershell-vsix-${{ matrix.os }}
-          path: '**/*.vsix'
+          path: "**/*.vsix"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: vscode-powershell-test-results-${{ matrix.os }}
-          path: '**/test-results.xml'
+          path: "**/test-results.xml"
