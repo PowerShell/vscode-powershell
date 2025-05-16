@@ -24,14 +24,15 @@
   "settings": {
     "window.title": "PowerShell VS Code Extension Development",
     "debug.onTaskErrors": "prompt",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "modifications",
+    "editor.formatOnPaste": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
     },
-    "[typescript][javascript][json]": {
+    "[typescript][javascript][json][jsonc]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode",
-      "editor.formatOnPaste": true,
-      "editor.formatOnSave": true,
-      "editor.formatOnSaveMode": "modificationsIfAvailable",
+      "editor.formatOnSaveMode": "file",
     },
     "files.associations": {
       "**/snippets/*.json": "jsonc", // Use JSONC instead of JSON because that's how VS Code interprets snippet files, and it enables better source documentation.
