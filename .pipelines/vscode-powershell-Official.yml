@@ -190,10 +190,6 @@ extends:
                 - input: pipelineArtifact
                   artifactName: drop_build_main
             steps:
-              - task: UseNode@1
-                displayName: Use Node 20.x
-                inputs:
-                  version: 20.x
               - pwsh: npm ci
                 displayName: Install NPM packages (for vsce)
               - task: AzureCLI@2
