@@ -109,8 +109,8 @@ extends:
                 displayName: PowerShellEditorServices version
               - pwsh: ./tools/installPSResources.ps1 -PSRepository CFS
                 displayName: Install PSResources
-              - pwsh: Invoke-Build Build -Configuration $(BuildConfiguration)
-                displayName: Build
+              - pwsh: Invoke-Build Test -Configuration $(BuildConfiguration)
+                displayName: Build and test
               - task: onebranch.pipeline.signing@1
                 displayName: Sign 1st-party example PowerShell files
                 inputs:
@@ -132,50 +132,6 @@ extends:
                   search_root: $(Build.SourcesDirectory)/out
                   files_to_sign: |
                     *.signature.p7s;
-          - job: test
-            displayName: Build and run tests
-            pool:
-              type: windows
-              isCustom: true
-              name: Azure Pipelines
-              vmImage: windows-latest
-            variables:
-              ob_outputDirectory: $(Build.SourcesDirectory)/out
-              skipComponentGovernanceDetection: true
-            steps:
-              - task: UseNode@1
-                displayName: Use Node 20.x
-                inputs:
-                  version: 20.x
-              - task: UseDotNet@2
-                displayName: Use .NET 8.x SDK
-                inputs:
-                  packageType: sdk
-                  version: 8.x
-              - task: DownloadPipelineArtifact@2
-                displayName: Download PowerShellEditorServices
-                inputs:
-                  source: specific
-                  project: PowerShellCore
-                  definition: 2905
-                  specificBuildWithTriggering: true
-                  allowPartiallySucceededBuilds: true
-                  buildVersionToDownload: latestFromBranch
-                  branchName: refs/heads/main
-                  artifact: drop_build_main
-              - task: ExtractFiles@1
-                displayName: Extract PowerShellEditorServices
-                inputs:
-                  archiveFilePatterns: $(Pipeline.Workspace)/PowerShellEditorServices.zip
-                  destinationFolder: $(Build.SourcesDirectory)/modules
-              - pwsh: |
-                  $manifest = Test-ModuleManifest $(Build.SourcesDirectory)/modules/PowerShellEditorServices/PowerShellEditorServices.psd1
-                  Write-Host Using PowerShellEditorServices v$($manifest.Version)
-                displayName: PowerShellEditorServices version
-              - pwsh: ./tools/installPSResources.ps1 -PSRepository CFS
-                displayName: Install PSResources
-              - pwsh: Invoke-Build Test -Configuration $(BuildConfiguration)
-                displayName: Run tests
       - stage: release
         dependsOn: build
         condition: eq(variables['Build.Reason'], 'Manual')
