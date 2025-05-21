@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
+import { existsSync } from "fs";
 import * as os from "os";
 import path from "path";
 import * as vscode from "vscode";
@@ -38,6 +39,12 @@ describe("Settings E2E", function () {
 
         it("Loads the correct defaults", function () {
             const testSettings = new Settings();
+            if (existsSync("C:\\powershell-7\\pwsh.exe")) {
+                testSettings.powerShellAdditionalExePaths = {
+                    OneBranch: "C:\\powershell-7\\pwsh.exe",
+                };
+                testSettings.powerShellDefaultVersion = "OneBranch";
+            }
             const actualSettings = getSettings();
             assert.deepStrictEqual(actualSettings, testSettings);
         });
