@@ -6,6 +6,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import type { IPowerShellExtensionClient } from "../src/features/ExternalApi";
 import type { ILogger } from "../src/logging";
+import { sleep } from "../src/utils";
 
 // This lets us test the rest of our path assumptions against the baseline of
 // this test file existing at `<root>/test/utils.js`.
@@ -64,11 +65,19 @@ export class TestLogger implements ILogger {
 export const testLogger = new TestLogger();
 
 export async function ensureExtensionIsActivated(): Promise<IPowerShellExtensionClient> {
-    const extension = vscode.extensions.getExtension(extensionId);
-    if (!extension!.isActive) {
-        await extension!.activate();
+    let extension = vscode.extensions.getExtension(extensionId);
+    while (!extension) {
+        // Wait for VS Code to be ready
+        testLogger.writeDebug(`Extension ${extensionId} not yet found...`);
+        await sleep(200);
+        extension = vscode.extensions.getExtension(extensionId);
+        // Wait for VS Code to be ready
+        await sleep(200);
     }
-    return extension!.exports as IPowerShellExtensionClient;
+    if (!extension.isActive) {
+        await extension.activate();
+    }
+    return extension.exports as IPowerShellExtensionClient;
 }
 
 export async function ensureEditorServicesIsConnected(): Promise<IPowerShellExtensionClient> {

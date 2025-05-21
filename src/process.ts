@@ -315,7 +315,7 @@ export class PowerShellProcess {
             }
 
             // Wait a bit and try again.
-            await utils.sleep(1000);
+            await utils.sleep(200);
         }
 
         this.logger.writeError("Timed out waiting for session file!");
