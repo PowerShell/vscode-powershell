@@ -1,20 +1,20 @@
 import { defineConfig } from "@vscode/test-cli";
-import os from "os";
-import path from "path";
 
 export default defineConfig({
     files: "test/**/*.test.ts",
-    // The default user data directory had too many characters for the IPC connection on macOS in CI.
+    // It may break CI but we'll know sooner rather than later
+    version: "insiders",
     launchArgs: [
+        // Other extensions are unnecessary while testing
+        "--disable-extensions",
+        // Undocumented but valid option to use a temporary profile for testing
         "--profile-temp",
-        "--user-data-dir",
-        path.join(os.tmpdir(), "vscode-user-data"),
     ],
     workspaceFolder: "test/TestEnvironment.code-workspace",
     mocha: {
         ui: "bdd", // describe, it, etc.
         require: ["esbuild-register"], // transpile TypeScript on-the-fly
-        slow: 2000, // 2 seconds for slow test
-        timeout: 60 * 1000, // 10 minutes to allow for debugging
+        slow: 2 * 1000, // 2 seconds for slow test
+        timeout: 2 * 60 * 1000, // 2 minutes to allow for debugging
     },
 });

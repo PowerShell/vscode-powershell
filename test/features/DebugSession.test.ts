@@ -656,8 +656,6 @@ describe("DebugSessionFeature", () => {
 });
 
 describe("DebugSessionFeature E2E", function () {
-    // E2E tests can take a while to run since the debugger has to start up and attach
-    this.slow(20000);
     before(async () => {
         // Registers and warms up the debug adapter and the PowerShell Extension Terminal
         await ensureEditorServicesIsConnected();

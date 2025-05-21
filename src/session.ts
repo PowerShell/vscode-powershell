@@ -319,7 +319,7 @@ export class SessionManager implements Middleware {
         try {
             // If the stop fails, so will the dispose, I think this is a bug in
             // the client library.
-            await this.languageClient?.stop(3000);
+            await this.languageClient?.stop(2000);
             await this.languageClient?.dispose();
         } catch (err) {
             this.logger.writeError(
@@ -491,7 +491,7 @@ export class SessionManager implements Middleware {
 
     public async waitUntilStarted(): Promise<void> {
         while (this.sessionStatus !== SessionStatus.Running) {
-            await utils.sleep(300);
+            await utils.sleep(200);
         }
     }
 
@@ -1180,13 +1180,13 @@ Type 'help' to get help.
             ) {
                 return;
             }
-            await utils.sleep(300);
+            await utils.sleep(200);
         }
     }
 
     private async waitWhileStopping(): Promise<void> {
         while (this.sessionStatus === SessionStatus.Stopping) {
-            await utils.sleep(300);
+            await utils.sleep(200);
         }
     }
 

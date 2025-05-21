@@ -94,8 +94,6 @@ describe("ISE compatibility feature", function () {
     });
 
     describe("Color theme interactions", function () {
-        // These tests are slow because they change the user's theme.
-        this.slow(3000);
         beforeEach(enableISEMode);
 
         function assertISESettings(): void {

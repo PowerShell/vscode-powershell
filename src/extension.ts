@@ -29,7 +29,7 @@ import { LanguageClientConsumer } from "./languageClientConsumer";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
 import { getSettings } from "./settings";
-import { PowerShellLanguageId } from "./utils";
+import { PowerShellLanguageId, sleep } from "./utils";
 // The 1DS telemetry key, which is just shared among all Microsoft extensions
 // (and isn't sensitive).
 const TELEMETRY_KEY =
@@ -257,7 +257,7 @@ function registerWaitForPsesActivationCommand(
                     return pidContent.toString();
                 } catch {
                     // File doesn't exist yet, wait and try again
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                    await sleep(200);
                 }
             }
         },
