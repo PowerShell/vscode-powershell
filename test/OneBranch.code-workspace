@@ -1,0 +1,18 @@
+{
+  // A simple test environment that suppresses some first start warnings we don't care about.
+  "folders": [
+    {
+      "path": "mocks",
+    },
+  ],
+  "settings": {
+    "git.openRepositoryInParentFolders": "never",
+    "csharp.suppressDotnetRestoreNotification": true,
+    "extensions.ignoreRecommendations": true,
+    // The settings tests account for this fix
+    "powershell.powerShellAdditionalExePaths": {
+      "OneBranch": "C:\\powershell-7\\pwsh.exe",
+    },
+    "powershell.powerShellDefaultVersion": "OneBranch",
+  },
+}

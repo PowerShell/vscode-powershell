@@ -1,4 +1,5 @@
 import { defineConfig } from "@vscode/test-cli";
+import { existsSync } from "fs";
 
 export default defineConfig({
     files: "test/**/*.test.ts",
@@ -10,7 +11,7 @@ export default defineConfig({
         // Undocumented but valid option to use a temporary profile for testing
         "--profile-temp",
     ],
-    workspaceFolder: "test/TestEnvironment.code-workspace",
+    workspaceFolder: `test/${existsSync("C:\\powershell-7\\pwsh.exe") ? "OneBranch" : "TestEnvironment"}.code-workspace`,
     mocha: {
         ui: "bdd", // describe, it, etc.
         require: ["esbuild-register"], // transpile TypeScript on-the-fly
