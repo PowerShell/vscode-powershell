@@ -11,9 +11,6 @@ import { Settings, validateCwdSetting } from "./settings";
 import utils = require("./utils");
 
 export class PowerShellProcess {
-    // This is used to warn the user that the extension is taking longer than expected to startup.
-    private static warnUserThreshold = 30;
-
     private static title = "PowerShell Extension";
 
     public onExited: vscode.Event<void>;
@@ -282,9 +279,9 @@ export class PowerShellProcess {
     private async waitForSessionFile(
         cancellationToken: vscode.CancellationToken,
     ): Promise<IEditorServicesSessionDetails | undefined> {
-        const numOfTries =
-            this.sessionSettings.developer.waitForSessionFileTimeoutSeconds;
-        const warnAt = numOfTries - PowerShellProcess.warnUserThreshold;
+        const numOfTries = // We sleep for 1/5 of a second each try
+            5 * this.sessionSettings.developer.waitForSessionFileTimeoutSeconds;
+        const warnAt = numOfTries - 5 * 30; // Warn at 30 seconds
 
         // Check every second.
         this.logger.writeDebug(
@@ -314,7 +311,7 @@ export class PowerShellProcess {
                 );
             }
 
-            // Wait a bit and try again.
+            // Wait 1/5 of a second and try again
             await utils.sleep(200);
         }
 
