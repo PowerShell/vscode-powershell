@@ -137,7 +137,7 @@ extends:
         dependsOn: build
         condition: eq(variables['Build.Reason'], 'Manual')
         variables:
-          ob_release_environment: PPE
+          ob_release_environment: Production
           version: $[ stageDependencies.build.main.outputs['package.version'] ]
           vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
           prerelease: $[ stageDependencies.build.main.outputs['package.prerelease'] ]
@@ -179,7 +179,6 @@ extends:
                 inputs:
                   notifyUsers: $(Build.RequestedForEmail)
                   instructions: Please validate the release and then publish it!
-                  timeoutInMinutes: 1440
           - job: vscode
             dependsOn: validation
             displayName: Publish to VS Code Marketplace
@@ -189,24 +188,19 @@ extends:
               inputs:
                 - input: pipelineArtifact
                   artifactName: drop_build_main
+              workflow: vsce
+              vsce:
+                serviceConnection: vscode-marketplace
+                vsixPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).vsix"
+                signaturePath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).signature.p7s"
+                manifestPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).manifest"
+                preRelease: $(prerelease)
+                useCustomVSCE: true
+                feed:
+                  organization: mscodehub
+                  project: PowerShellCore
+                  feedName: PowerShellCore_PublicPackages
             steps:
-              - pwsh: npm ci
-                displayName: Install NPM packages (for vsce)
-              - task: AzureCLI@2
-                displayName: Run vsce publish
-                inputs:
-                  azureSubscription: vscode-marketplace
-                  scriptType: pscore
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    $publishArgs = @(
-                      '--azure-credential'
-                      '--packagePath'
-                      '$(Pipeline.Workspace)/powershell-$(vsixVersion).vsix'
-                      '--manifestPath'
-                      '$(Pipeline.Workspace)/powershell-$(vsixVersion).manifest'
-                      '--signaturePath'
-                      '$(Pipeline.Workspace)/powershell-$(vsixVersion).signature.p7s'
-                      if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
-                    )
-                    npm run publish -- @publishArgs
+              - pwsh: |
+                  Write-Host Publishing: $(vsixVersion), pre-release: $(prerelease)
+                displayName: No-op step to satisfy pipeline requirements
