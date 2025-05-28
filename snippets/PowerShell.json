@@ -271,7 +271,7 @@
       "\t\tPositionalBinding",
       "\t\tHelpUri = 'http://yourwebsiteforhelp.here',",
       "\t\tConfirmImpact = 'Medium')]",
-      "\t[Alias()]",
+      "\t[Alias('Be-lazyWithThis','lzy','Use-OldFunctionName')]",
       "\t[OutputType([String])]",
       "\tparam (",
       "\t\t# Param1 help description",
