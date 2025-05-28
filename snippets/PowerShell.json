@@ -305,7 +305,7 @@
       "\t\t[String]",
       "\t\t\\$Param3",
       "",
-      "\t\t# Checkout the docs https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_argument_completion?view=powershell-7.5#argumentcompletions-attribute on differnet ways to provide Argumnet Completion",
+      "\t\t# Checkout the docs https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_argument_completion?view=powershell-7.5#argumentcompletions-attribute on different ways to provide Argument Completion",
       "\t\t[Parameter(ParameterSetName = 'Yet Another Parameter Set')]",
       "\t\t[ArgumentCompleter({'add script'})]",
       "\t\t[ValidateLength(0, 15)]",
