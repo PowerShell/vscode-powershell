@@ -131,7 +131,7 @@ export const DebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
         name: "PowerShell: Windows PowerShell",
         type: "PowerShell",
         request: "launch",
-        temporaryIntegratedConsoleExeName: "Windows PowerShell (x64)",
+        sessionName: "Windows PowerShell (x64)",
     },
 };
 
