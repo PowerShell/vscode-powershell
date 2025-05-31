@@ -240,10 +240,7 @@
     ]
   },
   "Function-Advanced-Doc-Full-Example-From-ISE": {
-    "prefix": [
-      "function-advanced-doc-fromISE",
-      "cmdlet-doc-fromISE"
-    ],
+    "prefix": ["function-advanced-doc-fromISE", "cmdlet-doc-fromISE"],
     "description": "Script advanced function definition with full comment-based help and parameter attributes.",
     "body": [
       "function ${1:Verb-Noun} {",
@@ -347,10 +344,7 @@
     ]
   },
   "Function: Suppress PSScriptAnalyzer Rule": {
-    "prefix": [
-      "suppress-message-rule-function",
-      "[SuppressMessageAttribute]"
-    ],
+    "prefix": ["suppress-message-rule-function", "[SuppressMessageAttribute]"],
     "description": "Suppress a PSScriptAnalyzer rule for a function. More: https://docs.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules#suppressing-rules",
     "body": [
       "[Diagnostics.CodeAnalysis.SuppressMessageAttribute(",
@@ -363,44 +357,22 @@
   "Hashtable": {
     "prefix": "hashtable",
     "description": "A key/value store that are very efficient for finding and retrieving data. More: Get-Help about_Hash_Tables",
-    "body": [
-      "\\$${1:Var} = @{",
-      "\t${2:Name} = ${3:Value}",
-      "}"
-    ]
+    "body": ["\\$${1:Var} = @{", "\t${2:Name} = ${3:Value}", "}"]
   },
   "Here-String": {
-    "prefix": [
-      "hs",
-      "here-string"
-    ],
+    "prefix": ["hs", "here-string"],
     "description": "Escape all text but evaluate variables. More: Get-Help about_Quoting_Rules",
-    "body": [
-      "@\"",
-      "${0:TM_SELECTED_TEXT}",
-      "\"@",
-      ""
-    ]
+    "body": ["@\"", "${0:TM_SELECTED_TEXT}", "\"@", ""]
   },
   "Here-String (Literal)": {
-    "prefix": [
-      "hsl",
-      "literal-here-string"
-    ],
+    "prefix": ["hsl", "literal-here-string"],
     "description": "Escape all text literally. More: Get-Help about_Quoting_Rules",
-    "body": [
-      "@'",
-      "${0:TM_SELECTED_TEXT}",
-      "'@",
-      ""
-    ]
+    "body": ["@'", "${0:TM_SELECTED_TEXT}", "'@", ""]
   },
   "Hidden Property": {
     "prefix": "class-proph-hidden",
     "description": "Useful for creating internal properties and methods within a class that are hidden from users. More: Get-Help about_Hidden",
-    "body": [
-      "hidden [${1:string}] $${0:PropertyName}"
-    ]
+    "body": ["hidden [${1:string}] $${0:PropertyName}"]
   },
   "IArgumentCompleter Class": {
     "prefix": "iargument-completer",
