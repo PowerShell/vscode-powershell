@@ -239,7 +239,7 @@
       "}"
     ]
   },
-  	"Function-Advanced-Doc-Full-Example-From-ISE": {
+  "Function-Advanced-Doc-Full-Example-From-ISE": {
     "prefix": ["function-advanced-doc-fromISE", "cmdlet-doc-fromISE"],
     "description": "Script advanced function definition with full comment-based help and parameter attributes.",
     "body": [
