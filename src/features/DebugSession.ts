@@ -56,6 +56,7 @@ export enum DebugConfig {
     ModuleInteractiveSession,
     BinaryModule,
     BinaryModulePester,
+    WindowsPowerShell,
 }
 
 /** Make the implicit behavior of undefined and null in the debug api more explicit  */
@@ -125,6 +126,12 @@ export const DebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
         script: "Invoke-Pester",
         createTemporaryIntegratedConsole: true,
         attachDotnetDebugger: true,
+    },
+    [DebugConfig.WindowsPowerShell]: {
+        name: "PowerShell: Windows PowerShell",
+        type: "PowerShell",
+        request: "launch",
+        temporaryIntegratedConsoleExeName: "Windows PowerShell (x64)",
     },
 };
 
@@ -271,12 +278,23 @@ export class DebugSessionFeature
                     "Debug a .NET binary or hybrid module loaded into a PowerShell session. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
             },
             {
-                id: DebugConfig.RunPester,
+                id: DebugConfig.BinaryModulePester,
                 label: "Run Pester Tests (Binary Module)",
                 description:
                     "Debug a .NET binary or hybrid module by running Pester tests. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
             },
         ];
+
+        // Only show the Windows PowerShell option if the platform is Windows
+        const platformDetails = getPlatformDetails();
+        if (platformDetails.operatingSystem === OperatingSystem.Windows) {
+            debugConfigPickItems.push({
+                id: DebugConfig.WindowsPowerShell,
+                label: "Windows PowerShell",
+                description:
+                    "Launch Windows PowerShell in a temporary integrated console for debugging",
+            });
+        }
 
         const launchSelection = await window.showQuickPick(
             debugConfigPickItems,
@@ -440,6 +458,10 @@ export class DebugSessionFeature
             return PREVENT_DEBUG_START_AND_OPEN_DEBUGCONFIG;
         }
 
+        if (config.sessionName) {
+            config.createTemporaryIntegratedConsole = true;
+        }
+
         if (config.attachDotnetDebugger) {
             return this.resolveAttachDotnetDebugConfiguration(config);
         }
@@ -477,7 +499,10 @@ export class DebugSessionFeature
     ): Promise<IEditorServicesSessionDetails | undefined> {
         const settings = getSettings();
         this.tempDebugProcess =
-            await this.sessionManager.createDebugSessionProcess(settings);
+            await this.sessionManager.createDebugSessionProcess(
+                settings,
+                session.configuration.sessionName,
+            );
         // TODO: Maybe set a timeout on the cancellation token?
         const cancellationTokenSource = new CancellationTokenSource();
         this.tempSessionDetails = await this.tempDebugProcess.start(

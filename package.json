@@ -519,7 +519,7 @@
             }
           },
           {
-            "label": "Run Pester Tests (Binary Module)",
+            "label": "PowerShell: Run Pester Tests (Binary Module)",
             "description": "Debug a .NET binary or hybrid module by running Pester tests. Breakpoints you set in your .NET (C#/F#/VB/etc.) code will be hit upon command execution. You may want to add a compile or watch action as a pre-launch task to this configuration.",
             "body": {
               "name": "PowerShell: Binary Module Pester Tests",
@@ -528,6 +528,16 @@
               "script": "Invoke-Pester",
               "createTemporaryIntegratedConsole": true,
               "attachDotnetDebugger": true
+            }
+          },
+          {
+            "label": "PowerShell: Windows PowerShell",
+            "description": "(Windows Only) Launch a temporary Windows PowerShell console for debugging. This is useful for debugging legacy scripts that require Windows PowerShell.",
+            "body": {
+              "name": "PowerShell: Windows PowerShell",
+              "type": "PowerShell",
+              "request": "launch",
+              "sessionName": "Windows PowerShell (x64)"
             }
           }
         ],
@@ -555,6 +565,14 @@
                 "type": "boolean",
                 "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
                 "default": false
+              },
+              "sessionName": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "If specified, uses the PowerShell session name to launch the debug configuration. Will always launch in a temporary console if specified.",
+                "default": null
               },
               "attachDotnetDebugger": {
                 "type": "boolean",
