@@ -106,7 +106,7 @@
     "lint": "eslint src test --ext .ts",
     "format": "prettier --check '**/*.{ts,json,yml,mjs,code-workspace}'",
     "package": "vsce package --out out/ --no-gitHubIssueLinking --follow-symlinks",
-    "publish": "vsce publish",
+    "publish": "vsce publish --follow-symlinks",
     "pretest": "npm run compile",
     "test": "vscode-test"
   },
