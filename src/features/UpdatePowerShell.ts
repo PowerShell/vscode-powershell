@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import fetch from "node-fetch";
 import { SemVer } from "semver";
 import vscode = require("vscode");
 
@@ -112,7 +111,7 @@ export class UpdatePowerShell {
         }
         // Looks like:
         // {
-        //     "ReleaseDate": "2022-10-20T22:01:38Z",
+        //     "ReleaseDate": "2022-10-fetc20T22:01:38Z",
         //     "BlobName": "v7-2-7",
         //     "ReleaseTag": "v7.2.7"
         // }
