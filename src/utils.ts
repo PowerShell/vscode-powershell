@@ -9,8 +9,8 @@ import { satisfies } from "semver";
 export const PowerShellLanguageId = "powershell";
 
 // Path to the shell integration script in the VS Code installation
-// See https://github.com/microsoft/vscode/pull/227244
-const shellIntegrationMoved = satisfies(vscode.version, ">=1.94", {
+// See https://github.com/microsoft/vscode/pull/251303
+const shellIntegrationMoved = satisfies(vscode.version, ">=1.102", {
     includePrerelease: true,
 });
 export const ShellIntegrationScript = path.join(
@@ -20,9 +20,9 @@ export const ShellIntegrationScript = path.join(
     "workbench",
     "contrib",
     "terminal",
-    shellIntegrationMoved ? "common" : "browser",
-    shellIntegrationMoved ? "scripts" : "media",
-    "shellIntegration.ps1",
+    "common",
+    "scripts",
+    shellIntegrationMoved ? "shellIntegration.psm1" : "shellIntegration.ps1",
 );
 
 export function escapeSingleQuotes(p: string): string {
