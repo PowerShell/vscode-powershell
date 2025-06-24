@@ -58,6 +58,8 @@ extends:
       WindowsHostVersion:
         Version: 2022
         Network: KS3
+    release:
+      category: NonAzure
     stages:
       - stage: build
         jobs:
@@ -130,33 +132,35 @@ extends:
                   command: sign
                   cp_code: "CP-401405-VSCodePublisherSign"
                   search_root: $(Build.SourcesDirectory)/out
-                  files_to_sign: |
-                    *.signature.p7s;
+                  files_to_sign: "*.signature.p7s"
       - stage: release
         dependsOn: build
         condition: eq(variables['Build.Reason'], 'Manual')
         variables:
+          ob_release_environment: Production
           version: $[ stageDependencies.build.main.outputs['package.version'] ]
           vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
           prerelease: $[ stageDependencies.build.main.outputs['package.prerelease'] ]
-          drop: $(Pipeline.Workspace)/drop_build_main
         jobs:
           - job: github
             displayName: Publish draft to GitHub
             pool:
-              type: windows
-            variables:
-              ob_outputDirectory: $(Build.SourcesDirectory)/out
+              type: release
+            templateContext:
+              inputs:
+                - input: pipelineArtifact
+                  artifactName: drop_build_main
             steps:
-              - download: current
-                displayName: Download artifacts
               - task: GitHubRelease@1
                 displayName: Create GitHub release
                 inputs:
                   gitHubConnection: GitHub
                   repositoryName: PowerShell/vscode-powershell
                   target: main
-                  assets: $(drop)/powershell-$(vsixVersion).vsix
+                  assets: |
+                    $(Pipeline.Workspace)/powershell-$(vsixVersion).vsix
+                    $(Pipeline.Workspace)/powershell-$(vsixVersion).manifest
+                    $(Pipeline.Workspace)/powershell-$(vsixVersion).signature.p7s
                   tagSource: userSpecifiedTag
                   tag: v$(version)
                   isDraft: true
@@ -167,7 +171,7 @@ extends:
           - job: validation
             displayName: Manual validation
             pool:
-              type: agentless
+              type: server
             timeoutInMinutes: 1440
             steps:
               - task: ManualValidation@0
@@ -175,38 +179,28 @@ extends:
                 inputs:
                   notifyUsers: $(Build.RequestedForEmail)
                   instructions: Please validate the release and then publish it!
-                  timeoutInMinutes: 1440
           - job: vscode
             dependsOn: validation
             displayName: Publish to VS Code Marketplace
             pool:
-              type: windows
-            variables:
-              ob_outputDirectory: $(Build.SourcesDirectory)/out
+              type: release
+            templateContext:
+              inputs:
+                - input: pipelineArtifact
+                  artifactName: drop_build_main
+              workflow: vsce
+              vsce:
+                serviceConnection: vscode-marketplace
+                vsixPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).vsix"
+                signaturePath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).signature.p7s"
+                manifestPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).manifest"
+                preRelease: $(prerelease)
+                useCustomVSCE: true
+                feed:
+                  organization: mscodehub
+                  project: PowerShellCore
+                  feedName: PowerShellCore_PublicPackages
             steps:
-              - download: current
-                displayName: Download artifacts
-              - task: UseNode@1
-                displayName: Use Node 20.x
-                inputs:
-                  version: 20.x
-              - pwsh: npm ci
-                displayName: Install NPM packages (for vsce)
-              - task: AzureCLI@2
-                displayName: Run vsce publish
-                inputs:
-                  azureSubscription: vscode-marketplace
-                  scriptType: pscore
-                  scriptLocation: inlineScript
-                  inlineScript: |
-                    $publishArgs = @(
-                      '--azure-credential'
-                      '--packagePath'
-                      '$(drop)/powershell-$(vsixVersion).vsix'
-                      '--manifestPath'
-                      '$(drop)/powershell-$(vsixVersion).manifest'
-                      '--signaturePath'
-                      '$(drop)/powershell-$(vsixVersion).signature.p7s'
-                      if ([bool]::Parse('$(prerelease)')) { '--pre-release' }
-                    )
-                    npm run publish -- @publishArgs
+              - pwsh: |
+                  Write-Host Publishing: $(vsixVersion), pre-release: $(prerelease)
+                displayName: No-op step to satisfy pipeline requirements
