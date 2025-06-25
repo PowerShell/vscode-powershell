@@ -1,5 +1,14 @@
 # PowerShell Extension Release History
 
+## v2025.3.1-preview
+### Wednesday, June 25, 2025
+
+With PowerShell Editor Services [v4.3.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v4.3.0)!
+
+PowerShell installed via `brew` now found!
+
+See more details at the GitHub Release for [v2025.3.1-preview](https://github.com/PowerShell/vscode-powershell/releases/tag/v2025.3.1-preview).
+
 ## v2025.3.0-preview
 ### Tuesday, March 18, 2025
 
