@@ -51,7 +51,7 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
             if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne $linkType) {
                 Write-Build DarkMagenta "Creating $linkType to PSES"
                 Remove-BuildLinks $linkType $psesModuleDir
-                New-Item -ItemType $linkType -Path ./modules -Value "$(Split-Path (Get-EditorServicesPath))/module"
+                New-Item -ItemType $linkType -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
             }
 
             Write-Build DarkGreen "Building PSES"
