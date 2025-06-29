@@ -78,7 +78,7 @@ export function getPlatformDetails(): IPlatformDetails {
  */
 export class PowerShellExeFinder {
     // This is required, since parseInt("7-preview") will return 7.
-    private static IntRegex = /^\d+$/;
+    private static IntRegex = /^\d$/;
     private static PwshMsixRegex = /^Microsoft.PowerShell_.*/;
     private static PwshPreviewMsixRegex = /^Microsoft.PowerShellPreview_.*/;
     private winPS: IPossiblePowerShellExe | undefined;
