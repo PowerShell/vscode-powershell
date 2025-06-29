@@ -20,6 +20,15 @@ function Get-EditorServicesPath {
     return Resolve-Path "$psesRepoPath/PowerShellEditorServices.build.ps1" -ErrorAction SilentlyContinue
 }
 
+function Remove-BuildLinks {
+    param($linkType, $modulesDir)
+    if ($linkType -eq 'Junction' -and $null -ne $modulesDir) {
+        $modulesDir.Delete()
+    } else {
+        Remove-BuildItem ./modules
+    }
+}
+
 #region Setup tasks
 
 task RestoreNode -If { !(Test-Path ./node_modules/esbuild) } {
@@ -33,14 +42,16 @@ task RestoreNodeOptional -If { !(Test-Path ./node_modules/eslint) } {
 }
 
 task RestoreEditorServices -If (Get-EditorServicesPath) {
+    $linkType = if ($env:OS -eq 'Windows_NT') { 'Junction' } else { 'SymbolicLink' }
+    $psesModuleDir = Get-Item ./modules -ErrorAction SilentlyContinue
     switch ($Configuration) {
         "Debug" {
             # When debugging, we always rebuild PSES and ensure its symlinked so
             # that developers always have the latest local bits.
-            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne "SymbolicLink") {
-                Write-Build DarkMagenta "Creating symbolic link to PSES"
-                Remove-BuildItem ./modules
-                New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
+            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne $linkType) {
+                Write-Build DarkMagenta "Creating $linkType to PSES"
+                Remove-BuildLinks $linkType $psesModuleDir
+                New-Item -ItemType $linkType -Path ./modules -Value "$(Split-Path (Get-EditorServicesPath))/module"
             }
 
             Write-Build DarkGreen "Building PSES"
@@ -49,9 +60,9 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
         "Release" {
             # When releasing, we ensure the bits are not symlinked but copied,
             # and only if they don't already exist.
-            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq "SymbolicLink") {
-                Write-Build DarkRed "Deleting PSES symbolic link"
-                Remove-BuildItem ./modules
+            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -eq $linkType) {
+                Write-Build DarkRed "Deleting PSES $linkType"
+                Remove-BuildLinks $linkType $psesModuleDir
             }
 
             if (!(Test-Path ./modules)) {
