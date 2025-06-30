@@ -60,20 +60,22 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {
                 ProgramFiles: "C:\\Program Files",
                 "ProgramFiles(x86)": "C:\\Program Files (x86)",
+                "ProgramFiles(Arm)": "C:\\Program Files (Arm)",
                 windir: "C:\\WINDOWS",
             },
             expectedPowerShellSequence: [
                 {
-                    exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+                    exePath: "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
                     displayName: "PowerShell (x64)",
                     supportsProperArguments: true,
                 },
                 {
-                    exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
+                    exePath: "C:\\Program Files (x86)\\PowerShell\\7\\pwsh.exe",
                     displayName: "PowerShell (x86)",
                     supportsProperArguments: true,
                 },
@@ -114,7 +116,15 @@ if (process.platform === "win32") {
             ],
             filesystem: {
                 "C:\\Program Files\\PowerShell": {
-                    "6": {
+                    "7": {
+                        "pwsh.exe": "",
+                    },
+                    "7-preview": {
+                        "pwsh.exe": "",
+                    },
+                },
+                "C:\\Program Files (Arm)\\PowerShell": {
+                    "7": {
                         "pwsh.exe": "",
                     },
                     "7-preview": {
@@ -122,7 +132,100 @@ if (process.platform === "win32") {
                     },
                 },
                 "C:\\Program Files (x86)\\PowerShell": {
-                    "6": {
+                    "7": {
+                        "pwsh.exe": "",
+                    },
+                    "7-preview": {
+                        "pwsh.exe": "",
+                    },
+                },
+                [msixAppDir]: {
+                    "Microsoft.PowerShell_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
+                    "Microsoft.PowerShellPreview_8wekyb3d8bbwe": {
+                        "pwsh.exe": "",
+                    },
+                },
+                "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0": {
+                    "powershell.exe": "",
+                },
+                "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0": {
+                    "powershell.exe": "",
+                },
+            },
+        },
+        {
+            name: "Windows 64-bit, 64-bit VSCode (no x86-64)",
+            platformDetails: {
+                operatingSystem: platform.OperatingSystem.Windows,
+                isOS64Bit: true,
+                isProcess64Bit: true,
+                isArm64: true,
+            },
+            environmentVars: {
+                ProgramFiles: "C:\\Program Files",
+                "ProgramFiles(x86)": "C:\\Program Files (x86)",
+                "ProgramFiles(Arm)": "C:\\Program Files (Arm)",
+                windir: "C:\\WINDOWS",
+            },
+            expectedPowerShellSequence: [
+                {
+                    exePath: "C:\\Program Files (Arm)\\PowerShell\\7\\pwsh.exe",
+                    displayName: "PowerShell (x64)",
+                    supportsProperArguments: true,
+                },
+                {
+                    exePath: "C:\\Program Files (x86)\\PowerShell\\7\\pwsh.exe",
+                    displayName: "PowerShell (x86)",
+                    supportsProperArguments: true,
+                },
+                {
+                    exePath: pwshMsixPath,
+                    displayName: "PowerShell (Store)",
+                    supportsProperArguments: true,
+                },
+                {
+                    exePath:
+                        "C:\\Program Files (Arm)\\PowerShell\\7-preview\\pwsh.exe",
+                    displayName: "PowerShell Preview (x64)",
+                    supportsProperArguments: true,
+                },
+                {
+                    exePath: pwshPreviewMsixPath,
+                    displayName: "PowerShell Preview (Store)",
+                    supportsProperArguments: true,
+                },
+                {
+                    exePath:
+                        "C:\\Program Files (x86)\\PowerShell\\7-preview\\pwsh.exe",
+                    displayName: "PowerShell Preview (x86)",
+                    supportsProperArguments: true,
+                },
+                {
+                    exePath:
+                        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                    displayName: "Windows PowerShell (x64)",
+                    supportsProperArguments: true,
+                },
+                {
+                    exePath:
+                        "C:\\WINDOWS\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe",
+                    displayName: "Windows PowerShell (x86)",
+                    supportsProperArguments: true,
+                },
+            ],
+            filesystem: {
+                "C:\\Program Files (Arm)\\PowerShell": {
+                    "7": {
+                        "pwsh.exe": "",
+                    },
+                    "7-preview": {
+                        "pwsh.exe": "",
+                    },
+                },
+                "C:\\Program Files (x86)\\PowerShell": {
+                    "7": {
                         "pwsh.exe": "",
                     },
                     "7-preview": {
@@ -151,10 +254,12 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {
                 ProgramFiles: "C:\\Program Files",
                 "ProgramFiles(x86)": "C:\\Program Files (x86)",
+                "ProgramFiles(Arm)": "C:\\Program Files (Arm)",
                 windir: "C:\\WINDOWS",
             },
             expectedPowerShellSequence: [
@@ -186,6 +291,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: true,
                 isProcess64Bit: false,
+                isArm64: false,
             },
             environmentVars: {
                 ProgramFiles: "C:\\Program Files (x86)",
@@ -194,12 +300,12 @@ if (process.platform === "win32") {
             },
             expectedPowerShellSequence: [
                 {
-                    exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
+                    exePath: "C:\\Program Files (x86)\\PowerShell\\7\\pwsh.exe",
                     displayName: "PowerShell (x86)",
                     supportsProperArguments: true,
                 },
                 {
-                    exePath: "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+                    exePath: "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
                     displayName: "PowerShell (x64)",
                     supportsProperArguments: true,
                 },
@@ -240,7 +346,7 @@ if (process.platform === "win32") {
             ],
             filesystem: {
                 "C:\\Program Files\\PowerShell": {
-                    "6": {
+                    "7": {
                         "pwsh.exe": "",
                     },
                     "7-preview": {
@@ -248,7 +354,7 @@ if (process.platform === "win32") {
                     },
                 },
                 "C:\\Program Files (x86)\\PowerShell": {
-                    "6": {
+                    "7": {
                         "pwsh.exe": "",
                     },
                     "7-preview": {
@@ -277,6 +383,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: true,
                 isProcess64Bit: false,
+                isArm64: false,
             },
             environmentVars: {
                 ProgramFiles: "C:\\Program Files (x86)",
@@ -312,6 +419,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: false,
                 isProcess64Bit: false,
+                isArm64: false,
             },
             environmentVars: {
                 ProgramFiles: "C:\\Program Files (x86)",
@@ -320,7 +428,7 @@ if (process.platform === "win32") {
             },
             expectedPowerShellSequence: [
                 {
-                    exePath: "C:\\Program Files (x86)\\PowerShell\\6\\pwsh.exe",
+                    exePath: "C:\\Program Files (x86)\\PowerShell\\7\\pwsh.exe",
                     displayName: "PowerShell (x86)",
                     supportsProperArguments: true,
                 },
@@ -349,7 +457,7 @@ if (process.platform === "win32") {
             ],
             filesystem: {
                 "C:\\Program Files (x86)\\PowerShell": {
-                    "6": {
+                    "7": {
                         "pwsh.exe": "",
                     },
                     "7-preview": {
@@ -375,6 +483,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: false,
                 isProcess64Bit: false,
+                isArm64: false,
             },
             environmentVars: {
                 ProgramFiles: "C:\\Program Files (x86)",
@@ -401,6 +510,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: false,
             },
             environmentVars: {
                 USERNAME: "test",
@@ -453,6 +563,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Windows,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {
                 USERNAME: "test",
@@ -513,6 +624,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Linux,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {},
             expectedPowerShellSequence: [
@@ -554,6 +666,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.MacOS,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {},
             expectedPowerShellSequence: [
@@ -601,6 +714,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Linux,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {},
             expectedPowerShellSequence: [
@@ -622,6 +736,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Linux,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {},
             expectedPowerShellSequence: [
@@ -643,6 +758,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.MacOS,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {},
             expectedPowerShellSequence: [
@@ -664,6 +780,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.MacOS,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {
                 USER: "test",
@@ -688,6 +805,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Linux,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: false,
             },
             environmentVars: {
                 USER: "test",
@@ -724,6 +842,7 @@ if (process.platform === "win32") {
                 operatingSystem: platform.OperatingSystem.Linux,
                 isOS64Bit: true,
                 isProcess64Bit: true,
+                isArm64: true,
             },
             environmentVars: {
                 USER: "test",
@@ -781,6 +900,7 @@ const errorTestCases: ITestPlatform[] = [
             operatingSystem: platform.OperatingSystem.Linux,
             isOS64Bit: true,
             isProcess64Bit: true,
+            isArm64: true,
         },
         environmentVars: {},
         filesystem: {},
@@ -791,6 +911,7 @@ const errorTestCases: ITestPlatform[] = [
             operatingSystem: platform.OperatingSystem.MacOS,
             isOS64Bit: true,
             isProcess64Bit: true,
+            isArm64: true,
         },
         environmentVars: {},
         filesystem: {},
