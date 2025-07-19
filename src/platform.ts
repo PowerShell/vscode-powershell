@@ -42,6 +42,7 @@ export interface IPlatformDetails {
     operatingSystem: OperatingSystem;
     isOS64Bit: boolean;
     isProcess64Bit: boolean;
+    isArm64: boolean;
 }
 
 export interface IPowerShellExeDetails {
@@ -68,6 +69,7 @@ export function getPlatformDetails(): IPlatformDetails {
         isOS64Bit:
             isProcess64Bit || process.env.PROCESSOR_ARCHITEW6432 !== undefined,
         isProcess64Bit,
+        isArm64: process.arch === "arm64",
     };
 }
 
@@ -562,93 +564,96 @@ export class PowerShellExeFinder {
     }: { useAlternateBitness?: boolean; findPreview?: boolean } = {}): Promise<
         IPossiblePowerShellExe | undefined
     > {
-        const programFilesPath = this.getProgramFilesPath({
+        for (const programFilesPath of this.getProgramFilesPath({
             useAlternateBitness,
-        });
+        })) {
 
-        if (!programFilesPath) {
-            return undefined;
-        }
-
-        const powerShellInstallBaseDir = path.join(
-            programFilesPath,
-            "PowerShell",
-        );
-
-        // Ensure the base directory exists
-        if (!(await utils.checkIfDirectoryExists(powerShellInstallBaseDir))) {
-            return undefined;
-        }
-
-        let highestSeenVersion = -1;
-        let pwshExePath: string | undefined;
-        for (const item of await utils.readDirectory(
-            powerShellInstallBaseDir,
-        )) {
-            let currentVersion = -1;
-            if (findPreview) {
-                // We are looking for something like "7-preview"
-
-                // Preview dirs all have dashes in them
-                const dashIndex: integer = item.indexOf("-");
-                if (dashIndex < 0) {
-                    continue;
-                }
-
-                // Verify that the part before the dash is an integer
-                const intPart: string = item.substring(0, dashIndex);
-                if (!PowerShellExeFinder.IntRegex.test(intPart)) {
-                    continue;
-                }
-
-                // Verify that the part after the dash is "preview"
-                if (item.substring(dashIndex + 1) !== "preview") {
-                    continue;
-                }
-
-                currentVersion = parseInt(intPart, 10);
-            } else {
-                // Search for a directory like "6" or "7"
-                if (!PowerShellExeFinder.IntRegex.test(item)) {
-                    continue;
-                }
-
-                currentVersion = parseInt(item, 10);
-            }
-
-            // Ensure we haven't already seen a higher version
-            if (currentVersion <= highestSeenVersion) {
+            if (!programFilesPath) {
                 continue;
             }
 
-            // Now look for the file
-            const exePath = path.join(
-                powerShellInstallBaseDir,
-                item,
-                "pwsh.exe",
+            const powerShellInstallBaseDir = path.join(
+                programFilesPath,
+                "PowerShell",
             );
-            if (!(await utils.checkIfFileExists(exePath))) {
+
+            // Ensure the base directory exists
+            if (!(await utils.checkIfDirectoryExists(powerShellInstallBaseDir))) {
                 continue;
             }
 
-            pwshExePath = exePath;
-            highestSeenVersion = currentVersion;
+            let highestSeenVersion = -1;
+            let pwshExePath: string | undefined;
+            for (const item of await utils.readDirectory(
+                powerShellInstallBaseDir,
+            )) {
+                let currentVersion = -1;
+                if (findPreview) {
+                    // We are looking for something like "7-preview"
+
+                    // Preview dirs all have dashes in them
+                    const dashIndex: integer = item.indexOf("-");
+                    if (dashIndex < 0) {
+                        continue;
+                    }
+
+                    // Verify that the part before the dash is an integer
+                    const intPart: string = item.substring(0, dashIndex);
+                    if (!PowerShellExeFinder.IntRegex.test(intPart)) {
+                        continue;
+                    }
+
+                    // Verify that the part after the dash is "preview"
+                    if (item.substring(dashIndex + 1) !== "preview") {
+                        continue;
+                    }
+
+                    currentVersion = parseInt(intPart, 10);
+                } else {
+                    // Search for a directory like "6" or "7"
+                    if (!PowerShellExeFinder.IntRegex.test(item)) {
+                        continue;
+                    }
+
+                    currentVersion = parseInt(item, 10);
+                }
+
+                // Ensure we haven't already seen a higher version
+                if (currentVersion <= highestSeenVersion) {
+                    continue;
+                }
+
+                // Now look for the file
+                const exePath = path.join(
+                    powerShellInstallBaseDir,
+                    item,
+                    "pwsh.exe",
+                );
+                if (!(await utils.checkIfFileExists(exePath))) {
+                    continue;
+                }
+
+                pwshExePath = exePath;
+                highestSeenVersion = currentVersion;
+            }
+
+            if (!pwshExePath) {
+                continue;
+            }
+
+            const bitness: string = programFilesPath.includes("x86")
+                ? "(x86)"
+                : "(x64)";
+
+            const preview: string = findPreview ? " Preview" : "";
+
+            return new PossiblePowerShellExe(
+                pwshExePath,
+                `PowerShell${preview} ${bitness}`,
+            );
         }
 
-        if (!pwshExePath) {
-            return undefined;
-        }
-
-        const bitness: string = programFilesPath.includes("x86")
-            ? "(x86)"
-            : "(x64)";
-
-        const preview: string = findPreview ? " Preview" : "";
-
-        return new PossiblePowerShellExe(
-            pwshExePath,
-            `PowerShell${preview} ${bitness}`,
-        );
+        return undefined;
     }
 
     private findWinPS({
@@ -707,24 +712,29 @@ export class PowerShellExeFinder {
 
     private getProgramFilesPath({
         useAlternateBitness = false,
-    }: { useAlternateBitness?: boolean } = {}): string | undefined {
+    }: { useAlternateBitness?: boolean } = {}): (string | undefined)[] {
+        const result: (string | undefined)[] = [];
+
         if (!useAlternateBitness) {
             // Just use the native system bitness
-            return process.env.ProgramFiles;
-        }
+            result.push(process.env.ProgramFiles);
 
-        // We might be a 64-bit process looking for 32-bit program files
-        if (this.platformDetails.isProcess64Bit) {
-            return process.env["ProgramFiles(x86)"];
-        }
+            // We might be a Arm64 process looking for Arm program files
+            if (this.platformDetails.isArm64) {
+                result.push(process.env["ProgramFiles(Arm)"]);
+            }
+        } else {
+            // We might be a 64-bit process looking for 32-bit program files
+            if (this.platformDetails.isProcess64Bit) {
+                result.push(process.env["ProgramFiles(x86)"]);
+            }
 
-        // We might be a 32-bit process looking for 64-bit program files
-        if (this.platformDetails.isOS64Bit) {
-            return process.env.ProgramW6432;
+            // We might be a 32-bit process looking for 64-bit program files
+            if (this.platformDetails.isOS64Bit) {
+                result.push(process.env.ProgramW6432);
+            }
         }
-
-        // We're a 32-bit process on 32-bit Windows, there is no other Program Files dir
-        return undefined;
+        return result;
     }
 
     private getSystem32Path({
