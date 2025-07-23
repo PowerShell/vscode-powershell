@@ -442,6 +442,7 @@ export class SessionManager implements Middleware {
 
     public async createDebugSessionProcess(
         settings: Settings,
+        powershellExeName?: string,
     ): Promise<PowerShellProcess> {
         // NOTE: We only support one temporary Extension Terminal at a time. To
         // support more, we need to track each separately, and tie the session
@@ -455,6 +456,12 @@ export class SessionManager implements Middleware {
             );
         }
 
+        const debugPowerShellExeDetails =
+            powershellExeName === undefined
+                ? this.PowerShellExeDetails
+                : ((await this.findPowerShell(powershellExeName)) ??
+                  this.PowerShellExeDetails);
+
         // TODO: It might not be totally necessary to update the session
         // settings here, but I don't want to accidentally change this behavior
         // just yet. Working on getting things to be more idempotent!
@@ -462,7 +469,7 @@ export class SessionManager implements Middleware {
 
         const bundledModulesPath = await this.getBundledModulesPath();
         this.debugSessionProcess = new PowerShellProcess(
-            this.PowerShellExeDetails.exePath,
+            debugPowerShellExeDetails.exePath,
             bundledModulesPath,
             true,
             false,
@@ -716,7 +723,9 @@ export class SessionManager implements Middleware {
         ];
     }
 
-    private async findPowerShell(): Promise<IPowerShellExeDetails | undefined> {
+    private async findPowerShell(
+        wantedName?: string,
+    ): Promise<IPowerShellExeDetails | undefined> {
         this.logger.writeDebug("Finding PowerShell...");
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
@@ -727,7 +736,7 @@ export class SessionManager implements Middleware {
         let foundPowerShell: IPowerShellExeDetails | undefined;
         try {
             let defaultPowerShell: IPowerShellExeDetails | undefined;
-            const wantedName = this.sessionSettings.powerShellDefaultVersion;
+            wantedName ??= this.sessionSettings.powerShellDefaultVersion;
             if (wantedName !== "") {
                 for await (const details of powershellExeFinder.enumeratePowerShellInstallations()) {
                     // Need to compare names case-insensitively, from https://stackoverflow.com/a/2140723

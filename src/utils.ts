@@ -4,15 +4,11 @@
 import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
-import { satisfies } from "semver";
 
 export const PowerShellLanguageId = "powershell";
 
-// Path to the shell integration script in the VS Code installation
-// See https://github.com/microsoft/vscode/pull/227244
-const shellIntegrationMoved = satisfies(vscode.version, ">=1.94", {
-    includePrerelease: true,
-});
+// Path to the shell integration script in the VS Code installation.
+// See commit 21114288b if it moves again.
 export const ShellIntegrationScript = path.join(
     vscode.env.appRoot,
     "out",
@@ -20,8 +16,8 @@ export const ShellIntegrationScript = path.join(
     "workbench",
     "contrib",
     "terminal",
-    shellIntegrationMoved ? "common" : "browser",
-    shellIntegrationMoved ? "scripts" : "media",
+    "common",
+    "scripts",
     "shellIntegration.ps1",
 );
 
