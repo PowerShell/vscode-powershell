@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import fetch from "node-fetch";
 import { SemVer } from "semver";
 import vscode = require("vscode");
 
