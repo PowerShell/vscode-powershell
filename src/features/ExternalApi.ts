@@ -19,6 +19,7 @@ export interface IPowerShellExtensionClient {
     getPowerShellVersionDetails(
         uuid: string,
     ): Promise<IExternalPowerShellDetails>;
+    getRegisteredExtensions(): Map<string, IExternalExtension>;
     waitUntilStarted(uuid: string): Promise<void>;
     getStorageUri(): vscode.Uri;
     getLogUri(): vscode.Uri;
@@ -133,6 +134,21 @@ export class ExternalApiFeature implements IPowerShellExtensionClient {
 
         // TODO: When we have more than one API version, make sure to include a check here.
         return ExternalApiFeature.registeredExternalExtension.get(uuid)!;
+    }
+
+    /*
+    DESCRIPTION:
+        returns a map of all registered extensions that have registered.
+
+    USAGE:
+        powerShellExtensionClient.getRegisteredExtensions();
+
+    RETURNS:
+        a map containing the UUID as the key and an IExternalExtension showing
+        the extension id and api version.
+    */
+    public getRegisteredExtensions(): Map<string, IExternalExtension> {
+        return ExternalApiFeature.registeredExternalExtension;
     }
 
     /*
