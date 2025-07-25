@@ -610,6 +610,11 @@
                 "type": "string",
                 "description": "The custom pipe name of the PowerShell host process to attach to.",
                 "default": null
+              },
+              "createTemporaryIntegratedConsole": {
+                "type": "boolean",
+                "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
+                "default": false
               }
             }
           }
