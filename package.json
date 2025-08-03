@@ -581,6 +581,24 @@
                 "type": "string",
                 "description": "If you would like to use a custom coreclr attach debug launch configuration for the debug session, specify the name here. Otherwise a default basic config will be used. The config must be a coreclr attach config. Launch configs are not supported.",
                 "default": false
+              },
+              "pathMappings": {
+                "type": "array",
+                "description": "Optional: An array of path mappings to use when debugging a remote PowerShell host process. Each mapping is an object with 'localRoot' and 'remoteRoot' properties. This is only used if the current integrated terminal is connected to a remote PowerShell runspace.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "localRoot": {
+                      "type": "string",
+                      "description": "The local root to map."
+                    },
+                    "remoteRoot": {
+                      "type": "string",
+                      "description": "The remote root to map."
+                    }
+                  }
+                },
+                "default": []
               }
             }
           },
@@ -615,6 +633,24 @@
                 "type": "boolean",
                 "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
                 "default": false
+              },
+              "pathMappings": {
+                "type": "array",
+                "description": "Optional: An array of path mappings to use when debugging a remote PowerShell host process. Each mapping is an object with 'localRoot' and 'remoteRoot' properties.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "localRoot": {
+                      "type": "string",
+                      "description": "The local root to map."
+                    },
+                    "remoteRoot": {
+                      "type": "string",
+                      "description": "The remote root to map."
+                    }
+                  }
+                },
+                "default": []
               }
             }
           }
