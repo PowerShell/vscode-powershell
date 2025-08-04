@@ -604,22 +604,35 @@ export class DebugSessionFeature
             );
         }
 
-        const closeDebugEvent = debug.onDidTerminateDebugSession(
-            (terminatedSession) => {
-                closeDebugEvent.dispose();
+        if (
+            session.configuration.temporaryConsoleWindowActionOnDebugEnd !==
+            "keep"
+        ) {
+            const closeDebugEvent = debug.onDidTerminateDebugSession(
+                (terminatedSession) => {
+                    closeDebugEvent.dispose();
 
-                if (terminatedSession.id !== session.id) {
-                    return;
-                }
+                    if (terminatedSession.id !== session.id) {
+                        return;
+                    }
 
-                if (terminatedSession.configuration.temporaryConsoleWindowActionOnDebugEnd === "close") {
-                    this.tempDebugProcess?.dispose();
-                } else if (terminatedSession.configuration.temporaryConsoleWindowActionOnDebugEnd === "hide" &&
-                    window.terminals.includes(previousActiveTerminal)) {
-                    previousActiveTerminal.show();
-                }
-            },
-        );
+                    if (
+                        terminatedSession.configuration
+                            .temporaryConsoleWindowActionOnDebugEnd === "close"
+                    ) {
+                        this.tempDebugProcess?.dispose();
+                    } else if (
+                        terminatedSession.configuration
+                            .temporaryConsoleWindowActionOnDebugEnd ===
+                            "hide" &&
+                        previousActiveTerminal &&
+                        window.terminals.includes(previousActiveTerminal)
+                    ) {
+                        previousActiveTerminal.show();
+                    }
+                },
+            );
+        }
 
         return this.tempSessionDetails;
     }
