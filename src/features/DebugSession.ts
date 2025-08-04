@@ -466,6 +466,8 @@ export class DebugSessionFeature
             return this.resolveAttachDotnetDebugConfiguration(config);
         }
 
+        config.temporaryConsoleWindowActionOnDebugEnd ??= "keep";
+
         return config;
     }
 
@@ -498,6 +500,8 @@ export class DebugSessionFeature
         session: DebugSession,
     ): Promise<IEditorServicesSessionDetails | undefined> {
         const settings = getSettings();
+        const previousActiveTerminal = window.activeTerminal;
+
         this.tempDebugProcess =
             await this.sessionManager.createDebugSessionProcess(
                 settings,
@@ -599,6 +603,23 @@ export class DebugSessionFeature
                 `Attached dotnet debugger to process: ${pid}`,
             );
         }
+
+        const closeDebugEvent = debug.onDidTerminateDebugSession(
+            (terminatedSession) => {
+                closeDebugEvent.dispose();
+
+                if (terminatedSession.id !== session.id) {
+                    return;
+                }
+
+                if (terminatedSession.configuration.temporaryConsoleWindowActionOnDebugEnd === "close") {
+                    this.tempDebugProcess?.dispose();
+                } else if (terminatedSession.configuration.temporaryConsoleWindowActionOnDebugEnd === "hide" &&
+                    window.terminals.includes(previousActiveTerminal)) {
+                    previousActiveTerminal.show();
+                }
+            },
+        );
 
         return this.tempSessionDetails;
     }
@@ -704,6 +725,8 @@ export class DebugSessionFeature
                 return PREVENT_DEBUG_START;
             }
         }
+
+        config.temporaryConsoleWindowActionOnDebugEnd ??= "keep";
 
         return config;
     }
