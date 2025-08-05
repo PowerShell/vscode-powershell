@@ -611,7 +611,8 @@
                       "type": "string",
                       "description": "The remote root to map."
                     }
-                  }
+                  },
+                  "required": ["localRoot", "remoteRoot"]
                 },
                 "default": []
               }
@@ -678,7 +679,8 @@
                       "type": "string",
                       "description": "The remote root to map."
                     }
-                  }
+                  },
+                  "required": ["localRoot", "remoteRoot"]
                 },
                 "default": []
               }
