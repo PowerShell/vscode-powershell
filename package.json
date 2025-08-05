@@ -581,6 +581,21 @@
                 "type": "string",
                 "description": "If you would like to use a custom coreclr attach debug launch configuration for the debug session, specify the name here. Otherwise a default basic config will be used. The config must be a coreclr attach config. Launch configs are not supported.",
                 "default": false
+              },
+              "temporaryConsoleWindowActionOnDebugEnd": {
+                "type": "string",
+                "description": "Determines whether the temporary PowerShell Extension Terminal is closed when the debugging session ends.",
+                "default": "keep",
+                "enum": [
+                  "close",
+                  "hide",
+                  "keep"
+                ],
+                "enumDescriptions": [
+                  "Closes the temporary PowerShell Extension Terminal when the debugging session ends.",
+                  "Hides the temporary PowerShell Extension Terminal when the debugging session ends and restores the previous window before the debug session had started. This does nothing if the previous window was closed during the debug session.",
+                  "Keeps the temporary PowerShell Extension Terminal open after the debugging session ends."
+                ]
               }
             }
           },
@@ -615,6 +630,21 @@
                 "type": "boolean",
                 "description": "Determines whether a temporary PowerShell Extension Terminal is created for each debugging session, useful for debugging PowerShell classes and binary modules.  Overrides the user setting 'powershell.debugging.createTemporaryIntegratedConsole'.",
                 "default": false
+              },
+              "temporaryConsoleWindowActionOnDebugEnd": {
+                "type": "string",
+                "description": "Determines whether the temporary PowerShell Extension Terminal is closed when the debugging session ends.",
+                "default": "keep",
+                "enum": [
+                  "close",
+                  "hide",
+                  "keep"
+                ],
+                "enumDescriptions": [
+                  "Closes the temporary PowerShell Extension Terminal when the debugging session ends.",
+                  "Hides the temporary PowerShell Extension Terminal when the debugging session ends and restores the previous window before the debug session had started. This does nothing if the previous window was closed during the debug session.",
+                  "Keeps the temporary PowerShell Extension Terminal open after the debugging session ends."
+                ]
               }
             }
           }
