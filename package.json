@@ -597,7 +597,10 @@
                       "description": "The remote root to map."
                     }
                   },
-                  "required": ["localRoot", "remoteRoot"]
+                  "required": [
+                    "localRoot",
+                    "remoteRoot"
+                  ]
                 },
                 "default": []
               }
@@ -650,7 +653,10 @@
                       "description": "The remote root to map."
                     }
                   },
-                  "required": ["localRoot", "remoteRoot"]
+                  "required": [
+                    "localRoot",
+                    "remoteRoot"
+                  ]
                 },
                 "default": []
               }
