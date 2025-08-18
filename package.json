@@ -103,7 +103,7 @@
     "watch": "npm run compile -- --watch",
     "lint": "eslint src test --ext .ts",
     "format": "prettier --check '**/*.{ts,json,yml,mjs,code-workspace}'",
-    "package": "vsce package --out out/ --no-gitHubIssueLinking",
+    "package": "vsce package --out out/ --no-gitHubIssueLinking --follow-symlinks",
     "publish": "vsce publish",
     "pretest": "npm run compile",
     "test": "vscode-test"
