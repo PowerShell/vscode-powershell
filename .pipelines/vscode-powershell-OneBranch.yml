@@ -11,25 +11,6 @@
 trigger:
   - main
 
-schedules:
-  - cron: "25 9 * * 3"
-    displayName: Weekly CodeQL
-    branches:
-      include:
-        - main
-    always: true
-
-parameters:
-  - name: debug
-    displayName: Enable debug output
-    type: boolean
-    default: false
-
-variables:
-  system.debug: ${{ parameters.debug }}
-  BuildConfiguration: Release
-  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2022/vse2022:latest
-
 resources:
   repositories:
     - repository: templates
@@ -45,9 +26,25 @@ resources:
         stages:
           - release
 
+parameters:
+  - name: debug
+    displayName: Enable debug output
+    type: boolean
+    default: false
+  - name: OfficialBuild
+    displayName: Use Official OneBranch template
+    type: boolean
+    default: false
+
+variables:
+  system.debug: ${{ parameters.debug }}
+  BuildConfiguration: Release
+  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2022/vse2022:latest
+  OneBranchTemplate: ${{ iif(parameters.OfficialBuild, 'v2/OneBranch.Official.CrossPlat.yml@templates', 'v2/OneBranch.NonOfficial.CrossPlat.yml@templates') }}
+
 extends:
   # https://aka.ms/obpipelines/templates
-  template: v2/OneBranch.Official.CrossPlat.yml@templates
+  template: ${{ variables.OneBranchTemplate }}
   parameters:
     globalSdl: # https://aka.ms/obpipelines/sdl
       asyncSdl:
@@ -94,7 +91,7 @@ extends:
                 inputs:
                   source: specific
                   project: PowerShellCore
-                  definition: 2905
+                  definition: 2905 # TODO: Update with new number
                   specificBuildWithTriggering: true
                   allowPartiallySucceededBuilds: true
                   buildVersionToDownload: latestFromBranch
@@ -135,9 +132,9 @@ extends:
                   files_to_sign: "*.signature.p7s"
       - stage: release
         dependsOn: build
-        condition: eq(variables['Build.Reason'], 'Manual')
+        condition: and(succeeded(), ${{ eq(parameters.OfficialBuild, true) }})
         variables:
-          ob_release_environment: Production
+          ob_release_environment: ${{ iif(parameters.OfficialBuild, 'Production', 'Test') }}
           version: $[ stageDependencies.build.main.outputs['package.version'] ]
           vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
           prerelease: $[ stageDependencies.build.main.outputs['package.prerelease'] ]
@@ -154,7 +151,7 @@ extends:
               - task: GitHubRelease@1
                 displayName: Create GitHub release
                 inputs:
-                  gitHubConnection: GitHub
+                  gitHubConnection: github.com_andyleejordan
                   repositoryName: PowerShell/vscode-powershell
                   target: main
                   assets: |
@@ -190,16 +187,16 @@ extends:
                   artifactName: drop_build_main
               workflow: vsce
               vsce:
-                serviceConnection: vscode-marketplace
+                serviceConnection: vscode-marketplace # TODO
                 vsixPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).vsix"
                 signaturePath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).signature.p7s"
                 manifestPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).manifest"
                 preRelease: $(prerelease)
                 useCustomVSCE: true
                 feed:
-                  organization: mscodehub
-                  project: PowerShellCore
-                  feedName: PowerShellCore_PublicPackages
+                  organization: msazure
+                  project: One
+                  feedName: npmjs
             steps:
               - pwsh: |
                   Write-Host Publishing: $(vsixVersion), pre-release: $(prerelease)
