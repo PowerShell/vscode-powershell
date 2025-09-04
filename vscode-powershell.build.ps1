@@ -41,12 +41,8 @@ task RestoreEditorServices -If (Get-EditorServicesPath) {
         New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
     }
 
-    # For Debug configuration, always rebuild to ensure latest local bits.
-    # For Release configuration, only build if it hasn't been built at all.
-    if ($Configuration -eq "Debug" -or !(Test-Path "$(Split-Path (Get-EditorServicesPath))/module/PowerShellEditorServices/bin")) {
-        Write-Build DarkGreen "Building PSES"
-        Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
-    }
+    Write-Build DarkGreen "Building PSES"
+    Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
 }
 
 #endregion
