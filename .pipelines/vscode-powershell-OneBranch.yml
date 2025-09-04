@@ -19,17 +19,6 @@ schedules:
         - main
     always: true
 
-parameters:
-  - name: debug
-    displayName: Enable debug output
-    type: boolean
-    default: false
-
-variables:
-  system.debug: ${{ parameters.debug }}
-  BuildConfiguration: Release
-  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2022/vse2022:latest
-
 resources:
   repositories:
     - repository: templates
@@ -45,9 +34,25 @@ resources:
         stages:
           - release
 
+parameters:
+  - name: debug
+    displayName: Enable debug output
+    type: boolean
+    default: false
+  - name: OfficialBuild
+    displayName: Use Official OneBranch template
+    type: boolean
+    default: false
+
+variables:
+  system.debug: ${{ parameters.debug }}
+  BuildConfiguration: Release
+  WindowsContainerImage: onebranch.azurecr.io/windows/ltsc2022/vse2022:latest
+  OneBranchTemplate: ${{ iif(parameters.OfficialBuild, 'v2/OneBranch.Official.CrossPlat.yml@templates', 'v2/OneBranch.NonOfficial.CrossPlat.yml@templates') }}
+
 extends:
   # https://aka.ms/obpipelines/templates
-  template: v2/OneBranch.Official.CrossPlat.yml@templates
+  template: ${{ variables.OneBranchTemplate }}
   parameters:
     globalSdl: # https://aka.ms/obpipelines/sdl
       asyncSdl:
@@ -90,14 +95,15 @@ extends:
                 inputs:
                   version: 20.x
               - task: DownloadPipelineArtifact@2
-                displayName: Download PowerShellEditorServices
+                displayName: Download Official PowerShellEditorServices
                 inputs:
                   source: specific
-                  project: PowerShellCore
-                  definition: 2905
+                  project: One
+                  definition: 136077443
                   specificBuildWithTriggering: true
                   allowPartiallySucceededBuilds: true
                   buildVersionToDownload: latestFromBranch
+                  tags: onebranch_build_type_official
                   branchName: refs/heads/main
                   artifact: drop_build_main
               - task: ExtractFiles@1
@@ -135,9 +141,9 @@ extends:
                   files_to_sign: "*.signature.p7s"
       - stage: release
         dependsOn: build
-        condition: eq(variables['Build.Reason'], 'Manual')
+        condition: and(succeeded(), ${{ eq(parameters.OfficialBuild, true) }})
         variables:
-          ob_release_environment: Production
+          ob_release_environment: ${{ iif(parameters.OfficialBuild, 'Production', 'Test') }}
           version: $[ stageDependencies.build.main.outputs['package.version'] ]
           vsixVersion: $[ stageDependencies.build.main.outputs['package.vsixVersion'] ]
           prerelease: $[ stageDependencies.build.main.outputs['package.prerelease'] ]
@@ -154,7 +160,7 @@ extends:
               - task: GitHubRelease@1
                 displayName: Create GitHub release
                 inputs:
-                  gitHubConnection: GitHub
+                  gitHubConnection: github.com_andyleejordan
                   repositoryName: PowerShell/vscode-powershell
                   target: main
                   assets: |
@@ -168,19 +174,7 @@ extends:
                   addChangeLog: false
                   releaseNotesSource: inline
                   releaseNotesInline: "<!-- TODO: Generate release notes on GitHub! -->"
-          - job: validation
-            displayName: Manual validation
-            pool:
-              type: server
-            timeoutInMinutes: 1440
-            steps:
-              - task: ManualValidation@0
-                displayName: Wait 24 hours for validation
-                inputs:
-                  notifyUsers: $(Build.RequestedForEmail)
-                  instructions: Please validate the release and then publish it!
           - job: vscode
-            dependsOn: validation
             displayName: Publish to VS Code Marketplace
             pool:
               type: release
@@ -190,16 +184,16 @@ extends:
                   artifactName: drop_build_main
               workflow: vsce
               vsce:
-                serviceConnection: vscode-marketplace
+                serviceConnection: powershell-vscode-marketplace
                 vsixPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).vsix"
                 signaturePath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).signature.p7s"
                 manifestPath: "$(Pipeline.Workspace)/powershell-$(vsixVersion).manifest"
                 preRelease: $(prerelease)
                 useCustomVSCE: true
                 feed:
-                  organization: mscodehub
-                  project: PowerShellCore
-                  feedName: PowerShellCore_PublicPackages
+                  organization: msazure
+                  project: One
+                  feedName: npmjs
             steps:
               - pwsh: |
                   Write-Host Publishing: $(vsixVersion), pre-release: $(prerelease)
