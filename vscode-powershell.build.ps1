@@ -33,34 +33,19 @@ task RestoreNodeOptional -If { !(Test-Path ./node_modules/eslint) } {
 }
 
 task RestoreEditorServices -If (Get-EditorServicesPath) {
-    switch ($Configuration) {
-        "Debug" {
-            # When debugging, we always rebuild PSES and ensure its symlinked so
-            # that developers always have the latest local bits.
-            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne "SymbolicLink") {
-                Write-Build DarkMagenta "Creating symbolic link to PSES"
-                Remove-BuildItem ./modules
-                New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
-            }
+    # With VSCE --follow-symlinks support, we can now use symlinks consistently
+    # for both Debug and Release configurations.
+    if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne "SymbolicLink") {
+        Write-Build DarkMagenta "Creating symbolic link to PSES"
+        Remove-BuildItem ./modules
+        New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
+    }
 
-            Write-Build DarkGreen "Building PSES"
-            Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
-        }
-        "Release" {
-            # With VSCE --follow-symlinks support, we can now use symlinks in Release mode too.
-            # Create symlink if it doesn't exist, ensuring it points to the correct location.
-            if ((Get-Item ./modules -ErrorAction SilentlyContinue).LinkType -ne "SymbolicLink") {
-                Write-Build DarkMagenta "Creating symbolic link to PSES"
-                Remove-BuildItem ./modules
-                New-Item -ItemType SymbolicLink -Path ./modules -Target "$(Split-Path (Get-EditorServicesPath))/module"
-            }
-
-            # Only build if it hasn't been built at all.
-            if (!(Test-Path "$(Split-Path (Get-EditorServicesPath))/module/PowerShellEditorServices/bin")) {
-                Write-Build DarkGreen "Building PSES"
-                Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
-            }
-        }
+    # For Debug configuration, always rebuild to ensure latest local bits.
+    # For Release configuration, only build if it hasn't been built at all.
+    if ($Configuration -eq "Debug" -or !(Test-Path "$(Split-Path (Get-EditorServicesPath))/module/PowerShellEditorServices/bin")) {
+        Write-Build DarkGreen "Building PSES"
+        Invoke-Build Build (Get-EditorServicesPath) -Configuration $Configuration
     }
 }
 
@@ -127,9 +112,7 @@ task Package {
     New-Item -ItemType Directory -Force out | Out-Null
 
     Assert-Build (Test-Path ./dist/extension.js) "Extension must be built!"
-
-    # With --follow-symlinks flag, VSCE can now package symbolic links directly,
-    # so we no longer need to convert symlinks to copies.
+    Assert-Build (Test-Path ./modules/PowerShellEditorServices/bin) "PowerShell Editor Services must be built under modules!"
 
     if ($version.Minor % 2 -ne 0) {
         Write-Build DarkRed "This is a pre-release!"
