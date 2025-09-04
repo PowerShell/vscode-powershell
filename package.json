@@ -596,6 +596,28 @@
                   "Hides the temporary PowerShell Extension Terminal when the debugging session ends and restores the previous window before the debug session had started. This does nothing if the previous window was closed during the debug session.",
                   "Keeps the temporary PowerShell Extension Terminal open after the debugging session ends."
                 ]
+              },
+              "pathMappings": {
+                "type": "array",
+                "description": "Optional: An array of path mappings to use when debugging a remote PowerShell host process. Each mapping is an object with 'localRoot' and 'remoteRoot' properties. This is only used if the current integrated terminal is connected to a remote PowerShell runspace.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "localRoot": {
+                      "type": "string",
+                      "description": "The local root to map."
+                    },
+                    "remoteRoot": {
+                      "type": "string",
+                      "description": "The remote root to map."
+                    }
+                  },
+                  "required": [
+                    "localRoot",
+                    "remoteRoot"
+                  ]
+                },
+                "default": []
               }
             }
           },
@@ -645,6 +667,28 @@
                   "Hides the temporary PowerShell Extension Terminal when the debugging session ends and restores the previous window before the debug session had started. This does nothing if the previous window was closed during the debug session.",
                   "Keeps the temporary PowerShell Extension Terminal open after the debugging session ends."
                 ]
+              },
+              "pathMappings": {
+                "type": "array",
+                "description": "Optional: An array of path mappings to use when debugging a remote PowerShell host process. Each mapping is an object with 'localRoot' and 'remoteRoot' properties.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "localRoot": {
+                      "type": "string",
+                      "description": "The local root to map."
+                    },
+                    "remoteRoot": {
+                      "type": "string",
+                      "description": "The remote root to map."
+                    }
+                  },
+                  "required": [
+                    "localRoot",
+                    "remoteRoot"
+                  ]
+                },
+                "default": []
               }
             }
           }
