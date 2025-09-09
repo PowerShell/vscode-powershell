@@ -87,8 +87,7 @@ extends:
                 inputs:
                   source: specific
                   project: One
-                  definition: 136077443
-                  specificBuildWithTriggering: true
+                  definition: 433526
                   allowPartiallySucceededBuilds: true
                   buildVersionToDownload: latestFromBranch
                   tags: onebranch_build_type_official
