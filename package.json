@@ -69,13 +69,13 @@
   },
   "devDependencies": {
     "@vscode/vsce": "^3.6.0",
-    "esbuild": "^0.25.8"
+    "esbuild": "^0.25.9"
   },
   "optionalDependencies": {
     "@eslint/js": "^9.26.0",
     "@types/mock-fs": "^4.13.4",
-    "@types/node": "^22.16.5",
-    "@types/semver": "^7.7.0",
+    "@types/node": "^22.18.1",
+    "@types/semver": "^7.7.1",
     "@types/sinon": "^17.0.4",
     "@types/ungap__structured-clone": "^1.2.0",
     "@types/uuid": "^9.0.8",
@@ -85,14 +85,14 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "esbuild-register": "^3.6.0",
-    "eslint": "^9.31.0",
+    "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "mock-fs": "^5.5.0",
     "prettier": "^3.6.2",
     "prettier-plugin-organize-imports": "^4.2.0",
     "sinon": "^19.0.5",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.38.0"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
