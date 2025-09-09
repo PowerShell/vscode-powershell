@@ -25,14 +25,6 @@ resources:
       type: git
       name: OneBranch.Pipelines/GovernedTemplates
       ref: refs/heads/main
-  pipelines:
-    - pipeline: PowerShellEditorServices-Official
-      source: PowerShellEditorServices-Official
-      trigger:
-        branches:
-          - main
-        stages:
-          - release
 
 parameters:
   - name: debug
