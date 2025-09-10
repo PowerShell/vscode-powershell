@@ -71,12 +71,6 @@ task Build RestoreEditorServices, RestoreNode, {
     Write-Build DarkGreen "Building vscode-powershell"
     Assert-Build (Test-Path ./modules/PowerShellEditorServices/bin) "Extension requires PSES"
 
-    # TODO: When supported we should use `esbuild` for the tests too. Although
-    # we now use `esbuild` to transpile, bundle, and minify the extension, we
-    # still use `tsc` to transpile everything in `src` and `test` because the VS
-    # Code test runner expects individual files (and globs them at runtime).
-    # Unfortunately `esbuild` doesn't support emitting 1:1 files (yet).
-    # https://github.com/evanw/esbuild/issues/944
     switch ($Configuration) {
         "Debug" { Invoke-BuildExec { & npm run compile } }
         "Release" { Invoke-BuildExec { & npm run compile -- --minify } }

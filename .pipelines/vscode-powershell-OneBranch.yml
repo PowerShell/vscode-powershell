@@ -54,7 +54,6 @@ extends:
       EnableCDPxPAT: false
       WindowsHostVersion:
         Version: 2022
-        Network: KS3
     release:
       category: NonAzure
     stages:
@@ -180,7 +179,7 @@ extends:
                 feed:
                   organization: msazure
                   project: One
-                  feedName: npmjs
+                  feedName: vsce
             steps:
               - pwsh: |
                   Write-Host Publishing: $(vsixVersion), pre-release: $(prerelease)
