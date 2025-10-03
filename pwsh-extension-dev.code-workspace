@@ -45,6 +45,7 @@
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.removeTrailingWhitespace": true,
     "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
     "powershell.codeFormatting.useCorrectCasing": true,
     "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
