@@ -34,6 +34,10 @@ parameters:
   - name: OfficialBuild
     displayName: Use Official OneBranch template
     type: boolean
+    default: true
+  - name: Release
+    displayName: Generate a release
+    type: boolean
     default: false
 
 variables:
@@ -127,7 +131,7 @@ extends:
                   files_to_sign: "*.signature.p7s"
       - stage: release
         dependsOn: build
-        condition: and(succeeded(), ${{ eq(parameters.OfficialBuild, true) }})
+        condition: and(succeeded(), ${{ eq(parameters.Release, true) }})
         variables:
           ob_release_environment: ${{ iif(parameters.OfficialBuild, 'Production', 'Test') }}
           version: $[ stageDependencies.build.main.outputs['package.version'] ]
