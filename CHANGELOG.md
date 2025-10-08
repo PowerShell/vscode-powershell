@@ -1,5 +1,15 @@
 # PowerShell Extension Release History
 
+## v2025.4.0
+### Wednesday, October 08, 2025
+
+With PowerShell Editor Services [v4.4.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v4.4.0)!
+
+New stable release! Now with screen reader support from PSReadLine [2.4.4-beta4](https://github.com/PowerShell/PSReadLine/releases/tag/v2.4.4-beta4)
+and arbitrary path mapping support in the debugger.
+
+See more details at the GitHub Release for [v2025.4.0](https://github.com/PowerShell/vscode-powershell/releases/tag/v2025.4.0).
+
 ## v2025.5.0-preview
 ### Tuesday, September 09, 2025
 
@@ -256,7 +266,6 @@ being such fantastic users!
 ### Tuesday, November 07, 2023
 
 #### [vscode-powershell](https://github.com/PowerShell/vscode-powershell)
-
 
 #### [PowerShellEditorServices](https://github.com/PowerShell/PowerShellEditorServices) v3.14.0
 
@@ -1963,7 +1972,7 @@ This release also contains all changes listed in [v2021.8.1-preview](#v202181-pr
 below. Notably it fixes several major issues when debugging scripts that were caused by
 threading deadlocks in both PowerShell Editor Services and its library, [OmniSharp's C#
 Language Server Protocol][omnisharp] that we resolved by setting the compiler to treat
-[CA2007][] as an error. This allowed us to programmatically fix _every_ awaited task to
+[CA2007][] as an error. This allowed us to programmatically fix *every* awaited task to
 use `.ConfigureAwait(false)` and so avoid deadlocks caused by the introduction of new
 synchronization contexts in user code (such as the use of `System.Windows.Forms`). By
 fixing this through a compiler rule, we effectively prevent the issue from recurring.
