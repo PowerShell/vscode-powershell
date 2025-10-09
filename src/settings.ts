@@ -94,6 +94,7 @@ class CodeFormattingSettings extends PartialSettings {
     alignPropertyValuePairs = true;
     useConstantStrings = false;
     useCorrectCasing = false;
+    removeTrailingWhitespace = false;
 }
 
 class ScriptAnalysisSettings extends PartialSettings {
