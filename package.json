@@ -698,7 +698,8 @@
     ],
     "configuration": [
       {
-        "title": "PowerShell: Interface",
+        "id": "powershell.interface",
+        "title": "Interface",
         "properties": {
           "powershell.buttons.showRunButtons": {
             "type": "boolean",
@@ -772,7 +773,8 @@
         }
       },
       {
-        "title": "PowerShell: Formatting",
+        "id": "powershell.formatting",
+        "title": "Formatting",
         "properties": {
           "powershell.codeFormatting.preset": {
             "type": "string",
@@ -902,7 +904,8 @@
         }
       },
       {
-        "title": "PowerShell: Editor Services",
+        "id": "powershell.editorServices",
+        "title": "Editor Services",
         "properties": {
           "powershell.powerShellDefaultVersion": {
             "type": "string",
@@ -991,7 +994,8 @@
         }
       },
       {
-        "title": "PowerShell: Pester",
+        "id": "powershell.pester",
+        "title": "Pester",
         "properties": {
           "powershell.pester.useLegacyCodeLens": {
             "type": "boolean",
@@ -1031,7 +1035,8 @@
         }
       },
       {
-        "title": "PowerShell: Terminal",
+        "id": "powershell.terminal",
+        "title": "Terminal",
         "properties": {
           "powershell.integratedConsole.suppressStartupBanner": {
             "type": "boolean",
@@ -1079,7 +1084,8 @@
         }
       },
       {
-        "title": "PowerShell: Developer",
+        "id": "powershell.developer",
+        "title": "Developer",
         "properties": {
           "powershell.developer.editorServicesLogLevel": {
             "type": "string",
