@@ -72,7 +72,7 @@
     "esbuild": "^0.27.0"
   },
   "optionalDependencies": {
-    "@eslint/js": "^9.26.0",
+    "@eslint/js": "^9.39.1",
     "@types/mock-fs": "^4.13.4",
     "@types/node": "^22.19.1",
     "@types/semver": "^7.7.1",
