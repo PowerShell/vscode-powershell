@@ -60,7 +60,7 @@
     "onCommand:PowerShell.SpecifyScriptArgs"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "^0.9.9",
+    "@vscode/extension-telemetry": "^1.2.0",
     "semver": "^7.7.3",
     "untildify": "^4.0.0",
     "uuid": "^9.0.1",
