@@ -696,8 +696,10 @@
         "initialConfigurations": []
       }
     ],
-    "configuration": {
-      "properties": {
+    "configuration": [
+      {
+        "title": "PowerShell: Interface",
+        "properties": {
           "powershell.buttons.showRunButtons": {
             "type": "boolean",
             "default": true,
@@ -766,7 +768,12 @@
             "type": "boolean",
             "default": false,
             "markdownDescription": "Suppresses the warning message when any of `#powershell.powerShellAdditionalExePaths#` is not found."
-          },
+          }
+        }
+      },
+      {
+        "title": "PowerShell: Formatting",
+        "properties": {
           "powershell.codeFormatting.preset": {
             "type": "string",
             "default": "Custom",
@@ -891,7 +898,12 @@
             "type": "boolean",
             "default": false,
             "markdownDescription": "Use correct casing for cmdlets."
-          },
+          }
+        }
+      },
+      {
+        "title": "PowerShell: Editor Services",
+        "properties": {
           "powershell.powerShellDefaultVersion": {
             "type": "string",
             "default": "",
@@ -975,7 +987,12 @@
             "default": false,
             "markdownDescription": "**Deprecated:** Uses the 32-bit language service on 64-bit Windows. This setting has no effect on 32-bit Windows or on the PowerShell extension debugger, which has its own architecture configuration.",
             "markdownDeprecationMessage": "**Deprecated:** This setting was removed when the PowerShell installation searcher was added. Please use the `#powershell.powerShellAdditionalExePaths#` setting instead."
-          },
+          }
+        }
+      },
+      {
+        "title": "PowerShell: Pester",
+        "properties": {
           "powershell.pester.useLegacyCodeLens": {
             "type": "boolean",
             "default": true,
@@ -1010,7 +1027,12 @@
             ],
             "default": "Diagnostic",
             "markdownDescription": "Defines the verbosity of output to be used when debugging a test or a block. For Pester 5 and newer the default value `Diagnostic` will print additional information about discovery, skipped and filtered tests, mocking and more."
-          },
+          }
+        }
+      },
+      {
+        "title": "PowerShell: Terminal",
+        "properties": {
           "powershell.integratedConsole.suppressStartupBanner": {
             "type": "boolean",
             "default": false,
@@ -1053,7 +1075,12 @@
             "type": "boolean",
             "default": false,
             "markdownDescription": "Use the VS Code API to clear the terminal since that's the only reliable way to clear the scrollback buffer. Turn this on if you're used to `Clear-Host` clearing scroll history. **This setting is not recommended and likely to be deprecated!**"
-          },
+          }
+        }
+      },
+      {
+        "title": "PowerShell: Developer",
+        "properties": {
           "powershell.developer.editorServicesLogLevel": {
             "type": "string",
             "default": "Warning",
@@ -1124,8 +1151,9 @@
             "markdownDescription": "**Deprecated:** Specifies the URL of the GitHub project in which to generate bug reports.",
             "markdownDeprecationMessage": "**Deprecated:** This setting was never meant to be changed!"
           }
+        }
       }
-    },
+    ],
     "capabilities": {
       "untrustedWorkspaces": {
         "supported": false
