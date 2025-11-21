@@ -63,7 +63,7 @@
     "@vscode/extension-telemetry": "^1.2.0",
     "semver": "^7.7.3",
     "untildify": "^4.0.0",
-    "uuid": "^9.0.1",
+    "uuid": "^13.0.0",
     "vscode-languageclient": "^9.0.1",
     "vscode-languageserver-protocol": "^3.17.5"
   },
@@ -78,7 +78,6 @@
     "@types/semver": "^7.7.1",
     "@types/sinon": "^17.0.4",
     "@types/ungap__structured-clone": "^1.2.0",
-    "@types/uuid": "^9.0.8",
     "@types/vscode": "~1.101.0",
     "@ungap/structured-clone": "^1.3.0",
     "@vscode/debugprotocol": "^1.68.0",
