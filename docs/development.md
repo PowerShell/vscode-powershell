@@ -12,7 +12,7 @@
 1. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
    PowerShell Editor Services. **You will need to complete this step before proceeding**.
 
-1. Install [Node.js](https://nodejs.org/en/) 18.x or higher.
+1. Install [Node.js](https://nodejs.org/en/download/package-manager) 22.x or higher.
 
 1. Install [Visual Studio Code](https://code.visualstudio.com).
    Open the multi-root workspace file in this repo, `extension-dev.code-workspace`.
@@ -40,9 +40,9 @@ developer machines if necessary, the CI and OneBranch pipeline tasks, and the
 `.tsconfig` file. Note that the version of `@types/node` will not necessarily
 exactly match the version of Node.js, but the major version should.
 
-[`electron`]: https://github.com/microsoft/vscode/blob/138f619c86f1199955d53b4166bef66ef252935c/package.json#L156
-[Electron]: https://releases.electronjs.org/release/v32.2.6
-[Node.js]: https://nodejs.org/en/download/package-manager
+[`electron`]: https://github.com/microsoft/vscode/blob/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/package.json#L163
+[Electron]: https://releases.electronjs.org/release/v37.7.0
+[Node.js]: https://nodejs.org/en/blog/release/v22.20.0
 
 ### Building the Code
 
@@ -62,6 +62,7 @@ Explore the `vscode-powershell.build.ps1` file for other build targets.
 First, ensure you have completed a build as instructed above, as the launch templates do not check some prerequisites for performance reasons.
 
 To debug the extension use one of the provided `Launch Extension` debug configurations.
+
 1. `Launch Extension`: Launches the debugger using your personal profile settings.
 2. `Temp Profile`: Launches VS Code with a temp profile that resets on every launch. Useful for "out of the box" environment testing.
 3. `Isolated Profile`: Launches the debugger with a persistent debug profile specific to the extension, so you can preserve some settings or test certain prerequisites.
