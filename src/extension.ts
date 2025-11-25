@@ -17,7 +17,6 @@ import {
     ExternalApiFeature,
     type IPowerShellExtensionClient,
 } from "./features/ExternalApi";
-import { GenerateBugReportFeature } from "./features/GenerateBugReport";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { ISECompatibilityFeature } from "./features/ISECompatibility";
@@ -162,7 +161,6 @@ export async function activate(
     // Register commands that do not require Language client
     commandRegistrations = [
         new ExamplesFeature(),
-        new GenerateBugReportFeature(sessionManager),
         new ISECompatibilityFeature(),
         new OpenInISEFeature(),
         new PesterTestsFeature(sessionManager, logger),

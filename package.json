@@ -234,11 +234,6 @@
         "category": "PowerShell"
       },
       {
-        "command": "PowerShell.GenerateBugReport",
-        "title": "Upload Bug Report to GitHub",
-        "category": "PowerShell"
-      },
-      {
         "command": "PowerShell.OpenInISE",
         "title": "Open Current File in PowerShell ISE",
         "category": "PowerShell"
@@ -1150,12 +1145,6 @@
             "type": "number",
             "default": 240,
             "markdownDescription": "Specifies how many seconds the extension will wait for the LSP server, PowerShell Editor Services, to connect. The default is four minutes; try increasing this value if your computer is particularly slow (often caused by overactive anti-malware programs)."
-          },
-          "powershell.bugReporting.project": {
-            "type": "string",
-            "default": "https://github.com/PowerShell/vscode-powershell",
-            "markdownDescription": "**Deprecated:** Specifies the URL of the GitHub project in which to generate bug reports.",
-            "markdownDeprecationMessage": "**Deprecated:** This setting was never meant to be changed!"
           }
         }
       }
