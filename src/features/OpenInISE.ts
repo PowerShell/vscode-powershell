@@ -18,7 +18,7 @@ export class OpenInISEFeature implements vscode.Disposable {
 
                 const document = editor.document;
                 const uri = document.uri;
-                let ISEPath = process.env.windir ?? "C:\\Windows";
+                let ISEPath: string = process.env.windir ?? "C:\\Windows";
 
                 if (process.env.PROCESSOR_ARCHITEW6432 !== undefined) {
                     ISEPath += "\\Sysnative";
