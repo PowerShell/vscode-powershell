@@ -1270,8 +1270,10 @@ Type 'help' to get help.
             {
                 prompt: "Open an Issue",
                 action: async (): Promise<void> => {
-                    await vscode.commands.executeCommand(
-                        "PowerShell.GenerateBugReport",
+                    await vscode.env.openExternal(
+                        vscode.Uri.parse(
+                            "https://github.com/PowerShell/vscode-powershell/issues/new/choose",
+                        ),
                     );
                 },
             },
