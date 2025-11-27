@@ -215,6 +215,7 @@ export async function activate(
             externalApi.unregisterExternalExtension(uuid),
         getPowerShellVersionDetails: (uuid) =>
             externalApi.getPowerShellVersionDetails(uuid),
+        getRegisteredExtensions: () => externalApi.getRegisteredExtensions(),
         waitUntilStarted: (uuid) => externalApi.waitUntilStarted(uuid),
         getStorageUri: () => externalApi.getStorageUri(),
         getLogUri: () => externalApi.getLogUri(),

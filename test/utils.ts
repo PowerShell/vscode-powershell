@@ -82,6 +82,15 @@ export async function ensureExtensionIsActivated(): Promise<IPowerShellExtension
 
 export async function ensureEditorServicesIsConnected(): Promise<IPowerShellExtensionClient> {
     const extension = await ensureExtensionIsActivated();
+    for (const [
+        _name,
+        externalExtension,
+    ] of extension.getRegisteredExtensions().entries()) {
+        if (externalExtension.id === extensionId) {
+            extension.unregisterExternalExtension(_name);
+        }
+    };
+
     const sessionId = extension.registerExternalExtension(extensionId);
     await extension.waitUntilStarted(sessionId);
     extension.unregisterExternalExtension(sessionId);
