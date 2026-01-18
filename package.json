@@ -1043,6 +1043,11 @@
             "default": false,
             "markdownDescription": "Do not show the startup banner in the PowerShell Extension Terminal."
           },
+          "powershell.showTerminalStoppedNotification": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Show a notification when the PowerShell Extension terminal has stopped."
+          },
           "powershell.integratedConsole.showOnStartup": {
             "type": "boolean",
             "default": true,

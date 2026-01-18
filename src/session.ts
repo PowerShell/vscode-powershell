@@ -1158,6 +1158,15 @@ Type 'help' to get help.
     }
 
     private async promptForRestart(): Promise<void> {
+        // Check user configuration before showing notification
+        const showNotifications = vscode.workspace
+            .getConfiguration("powershell")
+            .get<boolean>("showTerminalStoppedNotification", true);
+
+        if (!showNotifications) {
+            // User opted out — silently skip the notification
+            return;
+        }
         await this.logger.writeAndShowErrorWithActions(
             "The PowerShell Extension Terminal has stopped, would you like to restart it? IntelliSense and other features will not work without it!",
             [
