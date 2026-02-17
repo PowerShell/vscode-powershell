@@ -99,6 +99,21 @@ export const PowerShellVersionRequestType = new RequestType0<
     void
 >("powerShell/getVersion");
 
+const DidOpenTextDocumentNotificationType = new NotificationType<{
+    textDocument: {
+        uri: string;
+        languageId: string;
+        version: number;
+        text: string;
+    };
+}>("textDocument/didOpen");
+
+const DidCloseTextDocumentNotificationType = new NotificationType<{
+    textDocument: {
+        uri: string;
+    };
+}>("textDocument/didClose");
+
 export class SessionManager implements Middleware {
     public HostName: string;
     public DisplayName: string;
@@ -295,6 +310,7 @@ export class SessionManager implements Middleware {
                 `Started PowerShell v${this.versionDetails.version}.`,
             );
             this.setSessionRunningStatus(); // Yay, we made it!
+            this.refreshOpenPowerShellDocumentDiagnostics();
 
             await this.writePidIfInDevMode(this.languageServerProcess);
 
@@ -1163,6 +1179,49 @@ Type 'help' to get help.
                 eventName,
                 properties,
                 measures,
+            );
+        }
+    }
+
+    private refreshOpenPowerShellDocumentDiagnostics(): void {
+        if (!this.languageClient?.isRunning()) {
+            return;
+        }
+
+        const openPowerShellDocuments = vscode.workspace.textDocuments.filter(
+            (document) =>
+                document.languageId === "powershell" &&
+                (document.uri.scheme === "file" ||
+                    document.uri.scheme === "untitled"),
+        );
+
+        if (openPowerShellDocuments.length === 0) {
+            return;
+        }
+
+        this.logger.writeDebug(
+            `Refreshing analysis for ${openPowerShellDocuments.length} open PowerShell document(s).`,
+        );
+
+        for (const document of openPowerShellDocuments) {
+            const uri = document.uri.toString();
+            this.languageClient.sendNotification(
+                DidCloseTextDocumentNotificationType,
+                {
+                    textDocument: { uri },
+                },
+            );
+
+            this.languageClient.sendNotification(
+                DidOpenTextDocumentNotificationType,
+                {
+                    textDocument: {
+                        uri,
+                        languageId: document.languageId,
+                        version: document.version,
+                        text: document.getText(),
+                    },
+                },
             );
         }
     }
