@@ -60,8 +60,8 @@
     "onCommand:PowerShell.SpecifyScriptArgs"
   ],
   "dependencies": {
-    "@vscode/extension-telemetry": "^1.2.0",
-    "semver": "^7.7.3",
+    "@vscode/extension-telemetry": "^1.5.0",
+    "semver": "^7.7.4",
     "untildify": "^4.0.0",
     "uuid": "^13.0.0",
     "vscode-languageclient": "^9.0.1",
@@ -69,12 +69,12 @@
   },
   "devDependencies": {
     "@vscode/vsce": "^3.7.1",
-    "esbuild": "^0.27.0"
+    "esbuild": "^0.27.3"
   },
   "optionalDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/mock-fs": "^4.13.4",
-    "@types/node": "^22.19.1",
+    "@types/node": "^22.19.11",
     "@types/semver": "^7.7.1",
     "@types/sinon": "^17.0.4",
     "@types/ungap__structured-clone": "^1.2.0",
@@ -84,14 +84,14 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "esbuild-register": "^3.6.0",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "mock-fs": "^5.5.0",
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.1",
     "prettier-plugin-organize-imports": "^4.3.0",
     "sinon": "^19.0.5",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.48.0"
+    "typescript-eslint": "^8.56.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
