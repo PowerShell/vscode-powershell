@@ -1205,14 +1205,14 @@ Type 'help' to get help.
 
         for (const document of openPowerShellDocuments) {
             const uri = document.uri.toString();
-            this.languageClient.sendNotification(
+            void this.languageClient.sendNotification(
                 DidCloseTextDocumentNotificationType,
                 {
                     textDocument: { uri },
                 },
             );
 
-            this.languageClient.sendNotification(
+            void this.languageClient.sendNotification(
                 DidOpenTextDocumentNotificationType,
                 {
                     textDocument: {
