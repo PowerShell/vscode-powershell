@@ -3,3 +3,5 @@
 
 # Set svg to binary type, as SVG is unlikely to be editted by hand. Can be treated as checked in blob
 *.svg binary
+
+.github/workflows/*.lock.yml linguist-generated=true merge=ours
