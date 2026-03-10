@@ -269,7 +269,7 @@ your logs for any sensitive information you would not like to share online!**
 
 * Logs are located at:
   * Unix: `~/.config/Code/User/globalStorage/ms-vscode.powershell/logs`.
-  * Windows: `%APPDATA%\Code\User\globalStorage\ms-vscode.powershell\logs`
+  * Windows: `%APPDATA%\Code\User\globalStorage\ms-vscode.powershell\sessions`
 
 * In VS Code you can open and read the logs directly from the [Command Palette][]
   (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) with `PowerShell: Open PowerShell Extension Logs Folder`.
