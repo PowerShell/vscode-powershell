@@ -130,7 +130,7 @@ describe("UpdatePowerShell feature", function () {
             // NOTE: This will need to be updated each new major stable.
             // TODO: Upstream bug causes LTS releases to update the stable info.
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            assert(tag?.startsWith("v7.5") || tag?.startsWith("v7.4"));
+            assert(tag?.startsWith("v7.6") || tag?.startsWith("v7.4"));
         });
     });
 });
