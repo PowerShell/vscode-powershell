@@ -92,6 +92,7 @@ class CodeFormattingSettings extends PartialSettings {
     trimWhitespaceAroundPipe = false;
     ignoreOneLineBlock = true;
     alignPropertyValuePairs = true;
+    alignEnumMemberValues = true;
     useConstantStrings = false;
     useCorrectCasing = false;
 }

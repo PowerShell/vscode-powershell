@@ -885,6 +885,11 @@
             "default": true,
             "markdownDescription": "Align assignment statements in a hashtable or a DSC Configuration."
           },
+          "powershell.codeFormatting.alignEnumMemberValues": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Align member value assignments in an Enum Type Definition."
+          },
           "powershell.codeFormatting.useConstantStrings": {
             "type": "boolean",
             "default": false,
