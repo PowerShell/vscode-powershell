@@ -2,14 +2,9 @@
 // Licensed under the MIT License.
 
 import vscode = require("vscode");
-import { NotificationType } from "vscode-languageclient";
 import type { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
-
-interface IShowHelpNotificationArguments {}
-
-export const ShowHelpNotificationType =
-    new NotificationType<IShowHelpNotificationArguments>("powerShell/showHelp");
+import { PowerShellIntegratedConsole } from "../powerShellIntegratedConsole";
 
 export class ShowHelpFeature extends LanguageClientConsumer {
     private command: vscode.Disposable;
@@ -19,29 +14,38 @@ export class ShowHelpFeature extends LanguageClientConsumer {
         this.command = vscode.commands.registerCommand(
             "PowerShell.ShowHelp",
             async (item?) => {
-                if (!item?.Name) {
+                let text: string | undefined;
+                if (item?.Name) {
+                    text = item.Name;
+                } else {
                     const editor = vscode.window.activeTextEditor;
                     if (editor === undefined) {
                         return;
                     }
-
                     const selection = editor.selection;
                     const doc = editor.document;
                     const cwr = doc.getWordRangeAtPosition(selection.active);
-                    const text = doc.getText(cwr);
-
-                    const client =
-                        await LanguageClientConsumer.getLanguageClient();
-                    await client.sendNotification(ShowHelpNotificationType, {
-                        text,
-                    });
-                } else {
-                    const client =
-                        await LanguageClientConsumer.getLanguageClient();
-                    await client.sendNotification(ShowHelpNotificationType, {
-                        text: item.Name,
-                    });
+                    text = doc.getText(cwr);
                 }
+
+                if (!text) {
+                    return;
+                }
+
+                // We need to escape single quotes for the PowerShell command.
+                const escapedText = text.replace(/'/g, "''");
+                const psCommand =
+                    `try { ` +
+                        `$help = (Get-Help '${escapedText}' -ErrorAction Stop)[0]; ` +
+                        `$uri = $help.RelatedLinks.NavigationLink[0].Uri; ` +
+                        `if ($null -ne $uri) { Start-Process $uri } ` +
+                    `} catch { ` +
+                        `# This fails silently, which is similar to the old behavior where no browser ` +
+                        `# would be opened if help is not found. ` +
+                    `}`;
+
+                // We don't want to focus the terminal, and we don't want this to show up in history.
+                await PowerShellIntegratedConsole.instance.executeCommand(psCommand, false, false);
             },
         );
     }
