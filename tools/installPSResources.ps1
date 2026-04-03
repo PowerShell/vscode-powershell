@@ -6,7 +6,7 @@ param(
 )
 
 if ($PSRepository -eq "CFS" -and -not (Get-PSResourceRepository -Name CFS -ErrorAction SilentlyContinue)) {
-    Register-PSResourceRepository -Name CFS -Uri "https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/PowerShellGalleryMirror/nuget/v3/index.json"
+    Register-PSResourceRepository -Name CFS -Uri "https://pkgs.dev.azure.com/msazure/One/_packaging/PowerShellGalleryMirror/nuget/v3/index.json"
 }
 
 # NOTE: Due to a bug in Install-PSResource with upstream feeds, we have to
@@ -14,7 +14,7 @@ if ($PSRepository -eq "CFS" -and -not (Get-PSResourceRepository -Name CFS -Error
 # upstream feed, it will fail to install any version at all.
 Install-PSResource -Verbose -TrustRepository -RequiredResource  @{
     InvokeBuild = @{
-        version = "5.12.1"
+        version = "5.14.23"
         repository = $PSRepository
       }
     platyPS = @{
