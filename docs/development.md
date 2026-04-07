@@ -5,9 +5,10 @@
 1. [Fork and clone][fork] the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell).
 
 1. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices).
-   > The `vscode-powershell` folder and the `PowerShellEditorServices` folder should be next to each other on the file
-   > system. Code in `vscode-powershell` looks for PSES at `../PowerShellEditorServices` if you're building locally so
-   > PSES must be in that location.
+
+    > The `vscode-powershell` folder and the `PowerShellEditorServices` folder should be next to each other on the file
+    > system. Code in `vscode-powershell` looks for PSES at `../PowerShellEditorServices` if you're building locally so
+    > PSES must be in that location.
 
 1. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
    PowerShell Editor Services. **You will need to complete this step before proceeding**.
@@ -16,9 +17,10 @@
 
 1. Install [Visual Studio Code](https://code.visualstudio.com).
    Open the multi-root workspace file in this repo, `extension-dev.code-workspace`.
-   > This has a set of recommended extensions to install and provides tasks.
-   > The ESLint formatter will require you to install ESLint globally, using `npm install -g eslint`.
-   > Otherwise VS Code will erroneously complain that it isn't able to use it to format TypeScript files.
+
+    > This has a set of recommended extensions to install and provides tasks.
+    > The ESLint formatter will require you to install ESLint globally, using `npm install -g eslint`.
+    > Otherwise VS Code will erroneously complain that it isn't able to use it to format TypeScript files.
 
 1. (optional) Set `git config blame.ignoreRevsFile .git-blame-ignore-revs` to ignore formatting-related commits.
 
@@ -40,9 +42,9 @@ developer machines if necessary, the CI and OneBranch pipeline tasks, and the
 `.tsconfig` file. Note that the version of `@types/node` will not necessarily
 exactly match the version of Node.js, but the major version should.
 
-[`electron`]: https://github.com/microsoft/vscode/blob/ac4cbdf48759c7d8c3eb91ffe6bb04316e263c57/package.json#L163
-[Electron]: https://releases.electronjs.org/release/v37.7.0
-[Node.js]: https://nodejs.org/en/blog/release/v22.20.0
+[`electron`]: https://github.com/microsoft/vscode/blob/release/1.114/package.json
+[Electron]: https://releases.electronjs.org/release/v39.8.3
+[Node.js]: https://nodejs.org/en/blog/release/v22.22.1
 
 ### Building the Code
 
@@ -59,6 +61,7 @@ Invoke-Build Build
 Explore the `vscode-powershell.build.ps1` file for other build targets.
 
 ### Launching the extension
+
 First, ensure you have completed a build as instructed above, as the launch templates do not check some prerequisites for performance reasons.
 
 To debug the extension use one of the provided `Launch Extension` debug configurations.
