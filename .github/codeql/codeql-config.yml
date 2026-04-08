@@ -1,0 +1,7 @@
+# CodeQL analysis configuration for vscode-powershell.
+# Excludes runtime-downloaded artifacts that are not part of the repository source.
+paths-ignore:
+  - .vscode-test/ # Downloaded VS Code binaries for integration testing (in .gitignore)
+  - node_modules/
+  - out/
+  - dist/
