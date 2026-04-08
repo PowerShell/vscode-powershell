@@ -980,7 +980,8 @@ export class SessionManager implements Middleware {
                     return {
                         action: CloseAction.DoNotRestart,
                         message:
-                            "Connection to PowerShell Editor Services (the Extension Terminal) was closed. See below prompt to restart!",
+                            "Connection to PowerShell Editor Services (the Extension Terminal) was closed.",
+                        handled: true,
                     };
                 },
             },
@@ -1159,14 +1160,15 @@ Type 'help' to get help.
 
     private async promptForRestart(): Promise<void> {
         // Check user configuration before showing notification
-        const showNotifications = vscode.workspace
-            .getConfiguration("powershell")
-            .get<boolean>("showTerminalStoppedNotification", true);
+        const suppressNotification =
+            vscode.workspace
+                .getConfiguration("powershell")
+                .get<boolean>("suppressTerminalStoppedNotification") ?? false;
 
-        if (!showNotifications) {
-            // User opted out — silently skip the notification
+        if (suppressNotification) {
             return;
         }
+
         await this.logger.writeAndShowErrorWithActions(
             "The PowerShell Extension Terminal has stopped, would you like to restart it? IntelliSense and other features will not work without it!",
             [
@@ -1179,6 +1181,17 @@ Type 'help' to get help.
                 {
                     prompt: "No",
                     action: undefined,
+                },
+                {
+                    prompt: "Don't Show Again",
+                    action: async (): Promise<void> => {
+                        await changeSetting(
+                            "suppressTerminalStoppedNotification",
+                            true,
+                            true,
+                            this.logger,
+                        );
+                    },
                 },
             ],
         );
