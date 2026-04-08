@@ -70,6 +70,10 @@ extends:
             variables:
               ob_outputDirectory: $(Build.SourcesDirectory)/out
               ob_sdl_codeSignValidation_excludes: -|**\*.js # Node.js JavaScript signatures are not supported
+              # Exclude downloaded VS Code test binaries from CodeQL scans.
+              # .vscode-test/ is populated at test-time by @vscode/test-electron with VS Code
+              # Insiders binaries; it is already .gitignore'd but is present during SDL scans.
+              ob_sdl_codeql_pathsToExclude: .vscode-test/**
             steps:
               - pwsh: |
                   $version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
