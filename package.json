@@ -94,6 +94,10 @@
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.0"
   },
+  "overrides": {
+    "serialize-javascript": "^7.0.5",
+    "diff": "^8.0.3"
+  },
   "extensionDependencies": [
     "vscode.powershell"
   ],
