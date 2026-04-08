@@ -1,5 +1,14 @@
 # PowerShell Extension Release History
 
+## v2026.1.0-preview
+### Wednesday, April 08, 2026
+
+With PowerShell Editor Services [v4.5.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v4.5.0)!
+
+New PSSA version and lots of fixes!
+
+See more details at the GitHub Release for [v2026.1.0-preview](https://github.com/PowerShell/vscode-powershell/releases/tag/v2026.1.0-preview).
+
 ## v2025.4.0
 ### Wednesday, October 08, 2025
 
