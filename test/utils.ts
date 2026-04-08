@@ -107,6 +107,7 @@ export function BuildBinaryModuleMock(): void {
     } catch (err) {
         throw new Error(
             `Failed to build the binary module mock. Please ensure that you have the .NET Core SDK installed: ${err}`,
+            { cause: err },
         );
     }
 }
