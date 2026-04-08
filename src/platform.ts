@@ -585,7 +585,7 @@ export class PowerShellExeFinder {
         for (const item of await utils.readDirectory(
             powerShellInstallBaseDir,
         )) {
-            let currentVersion = -1;
+            let currentVersion: number;
             if (findPreview) {
                 // We are looking for something like "7-preview"
 
