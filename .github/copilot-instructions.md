@@ -9,3 +9,5 @@
 - After updating, verify: `npm run compile` (build), `npm run lint` (lint), `npm audit` (security)
 - The ESLint packages (`eslint`, `@eslint/js`, `typescript-eslint`, `eslint-config-prettier`) should be updated together
 - Fix any new lint warnings from updates to ESLint
+- Use `npm audit` to identify vulnerabilities
+- Do not use `npm audit fix --force` when a vulnerability is in a transitive dependency, instead add an `overrides` entry
