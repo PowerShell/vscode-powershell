@@ -126,6 +126,10 @@ export class SessionManager implements Middleware {
     private versionDetails: IPowerShellVersionDetails | undefined;
     private traceLogLevelHandler?: vscode.Disposable;
 
+    // Promise-based gate resolved when the session reaches Running status.
+    // Used by waitUntilStarted() and the didOpen()/didChange() notifications.
+    private started = Promise.withResolvers<undefined>();
+
     constructor(
         private extensionContext: vscode.ExtensionContext,
         private sessionSettings: Settings,
@@ -295,6 +299,7 @@ export class SessionManager implements Middleware {
                 `Started PowerShell v${this.versionDetails.version}.`,
             );
             this.setSessionRunningStatus(); // Yay, we made it!
+            this.started.resolve(undefined); // Release didOpen()/didChange() notifications and waitUntilStarted() gate
 
             await this.writePidIfInDevMode(this.languageServerProcess);
 
@@ -328,6 +333,8 @@ export class SessionManager implements Middleware {
         }
 
         this.languageClient = undefined;
+        this.started.resolve(undefined);
+        this.started = Promise.withResolvers<undefined>();
 
         // Stop and dispose the PowerShell process(es).
         this.debugSessionProcess?.dispose();
@@ -497,9 +504,27 @@ export class SessionManager implements Middleware {
     }
 
     public async waitUntilStarted(): Promise<void> {
-        while (this.sessionStatus !== SessionStatus.Running) {
-            await utils.sleep(200);
-        }
+        await this.started.promise;
+    }
+
+    // Middleware hooks to delay document sync notifications until the server
+    // is fully initialized. This prevents stale parser diagnostics (e.g.
+    // unresolved custom attribute types) that would otherwise appear because
+    // textDocument/didOpen is sent before the server's type resolution is ready.
+    public async didOpen(
+        document: vscode.TextDocument,
+        next: (document: vscode.TextDocument) => Promise<void>,
+    ): Promise<void> {
+        await this.started.promise;
+        return next(document);
+    }
+
+    public async didChange(
+        event: vscode.TextDocumentChangeEvent,
+        next: (event: vscode.TextDocumentChangeEvent) => Promise<void>,
+    ): Promise<void> {
+        await this.started.promise;
+        return next(event);
     }
 
     // TODO: Is this used by the magic of "Middleware" in the client library?
