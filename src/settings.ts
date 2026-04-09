@@ -133,6 +133,7 @@ class IntegratedConsoleSettings extends PartialSettings {
     useLegacyReadLine = false;
     forceClearScrollbackBuffer = false;
     suppressStartupBanner = false;
+    suppressTerminalStoppedNotification = false;
     startLocation = StartLocation.Panel;
 }
 

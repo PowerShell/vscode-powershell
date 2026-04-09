@@ -1159,13 +1159,9 @@ Type 'help' to get help.
     }
 
     private async promptForRestart(): Promise<void> {
-        // Check user configuration before showing notification
-        const suppressNotification =
-            vscode.workspace
-                .getConfiguration("powershell")
-                .get<boolean>("suppressTerminalStoppedNotification") ?? false;
-
-        if (suppressNotification) {
+        if (
+            getSettings().integratedConsole.suppressTerminalStoppedNotification
+        ) {
             return;
         }
 
@@ -1186,7 +1182,7 @@ Type 'help' to get help.
                     prompt: "Don't Show Again",
                     action: async (): Promise<void> => {
                         await changeSetting(
-                            "suppressTerminalStoppedNotification",
+                            "integratedConsole.suppressTerminalStoppedNotification",
                             true,
                             true,
                             this.logger,
