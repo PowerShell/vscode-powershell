@@ -2,18 +2,10 @@
 // Licensed under the MIT License.
 
 import * as assert from "assert";
-import { existsSync } from "fs";
 import * as os from "os";
 import path from "path";
 import * as vscode from "vscode";
-import {
-    changeSetting,
-    CommentType,
-    getEffectiveConfigurationTarget,
-    getSettings,
-    Settings,
-    validateCwdSetting,
-} from "../../src/settings";
+import { changeSetting, validateCwdSetting } from "../../src/settings";
 import { ensureEditorServicesIsConnected } from "../utils";
 
 describe("Settings E2E", function () {
@@ -30,62 +22,27 @@ describe("Settings E2E", function () {
         await changeCwdSetting(undefined);
     }
 
-    describe("The 'getSettings' method loads the 'Settings' class", function () {
-        before(resetCwdSetting);
-
-        it("Loads without error", function () {
-            assert.doesNotThrow(getSettings);
-        });
-
-        it("Loads the correct defaults", function () {
-            const testSettings = new Settings();
-            if (existsSync("C:\\powershell-7\\pwsh.exe")) {
-                testSettings.powerShellAdditionalExePaths = {
-                    OneBranch: "C:\\powershell-7\\pwsh.exe",
-                };
-                testSettings.powerShellDefaultVersion = "OneBranch";
-            }
-            const actualSettings = getSettings();
-            assert.deepStrictEqual(actualSettings, testSettings);
-        });
-    });
-
     describe("The 'changeSetting' method", function () {
         it("Updates correctly", async function () {
             await changeSetting(
                 "helpCompletion",
-                CommentType.LineComment,
+                "LineComment",
                 vscode.ConfigurationTarget.Workspace,
                 undefined,
             );
             assert.strictEqual(
-                getSettings().helpCompletion,
-                CommentType.LineComment,
+                vscode.workspace
+                    .getConfiguration("powershell")
+                    .get<string>("helpCompletion"),
+                "LineComment",
             );
-        });
-    });
-
-    describe("The 'getEffectiveConfigurationTarget' method'", function () {
-        it("Works for 'Workspace' target", async function () {
-            await changeSetting(
-                "helpCompletion",
-                CommentType.LineComment,
-                vscode.ConfigurationTarget.Workspace,
-                undefined,
-            );
-            const target = getEffectiveConfigurationTarget("helpCompletion");
-            assert.strictEqual(target, vscode.ConfigurationTarget.Workspace);
-        });
-
-        it("Works for 'undefined' target", async function () {
+            // Clean up
             await changeSetting(
                 "helpCompletion",
                 undefined,
                 vscode.ConfigurationTarget.Workspace,
                 undefined,
             );
-            const target = getEffectiveConfigurationTarget("helpCompletion");
-            assert.strictEqual(target, undefined);
         });
     });
 

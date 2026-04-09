@@ -5,8 +5,6 @@ import os = require("os");
 import path = require("path");
 import vscode = require("vscode");
 
-export const PowerShellLanguageId = "powershell";
-
 // Path to the shell integration script in the VS Code installation.
 // See commit 21114288b if it moves again.
 export const ShellIntegrationScript = path.join(

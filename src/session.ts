@@ -16,13 +16,7 @@ import {
     PsesParser,
 } from "./logging";
 import { PowerShellProcess } from "./process";
-import {
-    Settings,
-    changeSetting,
-    getEffectiveConfigurationTarget,
-    getSettings,
-    validateCwdSetting,
-} from "./settings";
+import { changeSetting, validateCwdSetting } from "./settings";
 import utils = require("./utils");
 
 import {
@@ -122,6 +116,7 @@ export class SessionManager implements Middleware {
     private startCancellationTokenSource:
         | vscode.CancellationTokenSource
         | undefined;
+    private powerShellVersionOverride: string | undefined;
     private suppressRestartPrompt = false;
     private versionDetails: IPowerShellVersionDetails | undefined;
     private traceLogLevelHandler?: vscode.Disposable;
@@ -132,7 +127,6 @@ export class SessionManager implements Middleware {
 
     constructor(
         private extensionContext: vscode.ExtensionContext,
-        private sessionSettings: Settings,
         private logger: ILogger,
         private documentSelector: DocumentSelector,
         hostName: string,
@@ -233,14 +227,10 @@ export class SessionManager implements Middleware {
         // Create a folder for the session files.
         await vscode.workspace.fs.createDirectory(this.sessionsFolder);
 
-        // Migrate things.
-        await this.migrateWhitespaceAroundPipeSetting();
-
         // Update non-PowerShell settings.
-        this.shellIntegrationEnabled =
-            vscode.workspace
-                .getConfiguration("terminal.integrated.shellIntegration")
-                .get<boolean>("enabled") ?? false;
+        this.shellIntegrationEnabled = vscode.workspace
+            .getConfiguration("terminal.integrated.shellIntegration")
+            .get<boolean>("enabled", false);
 
         // Find the PowerShell executable to use for the server.
         this.PowerShellExeDetails = await this.findPowerShell();
@@ -305,7 +295,6 @@ export class SessionManager implements Middleware {
 
             // Fire and forget the updater.
             const updater = new UpdatePowerShell(
-                this.sessionSettings,
                 this.logger,
                 this.versionDetails,
             );
@@ -359,16 +348,13 @@ export class SessionManager implements Middleware {
         this.logger.write("Restarting session...");
         await this.stop();
 
-        // Re-load the settings.
-        this.sessionSettings = getSettings();
-
         if (exeNameOverride) {
             // Reset the version and PowerShell details since we're launching a
             // new executable.
             this.logger.writeDebug(
                 `Starting with executable overriden to: ${exeNameOverride}`,
             );
-            this.sessionSettings.powerShellDefaultVersion = exeNameOverride;
+            this.powerShellVersionOverride = exeNameOverride;
             this.versionDetails = undefined;
             this.PowerShellExeDetails = undefined;
         }
@@ -448,7 +434,6 @@ export class SessionManager implements Middleware {
     }
 
     public async createDebugSessionProcess(
-        settings: Settings,
         powershellExeName?: string,
     ): Promise<PowerShellProcess> {
         // NOTE: We only support one temporary Extension Terminal at a time. To
@@ -469,11 +454,6 @@ export class SessionManager implements Middleware {
                 : ((await this.findPowerShell(powershellExeName)) ??
                   this.PowerShellExeDetails);
 
-        // TODO: It might not be totally necessary to update the session
-        // settings here, but I don't want to accidentally change this behavior
-        // just yet. Working on getting things to be more idempotent!
-        this.sessionSettings = settings;
-
         const bundledModulesPath = await this.getBundledModulesPath();
         this.debugSessionProcess = new PowerShellProcess(
             debugPowerShellExeDetails.exePath,
@@ -487,7 +467,6 @@ export class SessionManager implements Middleware {
                 this.PowerShellExeDetails,
             ) + "-DebugServiceOnly ",
             this.getNewSessionFilePath(),
-            this.sessionSettings,
         );
 
         // Similar to the regular Extension Terminal, we need to send a key
@@ -597,45 +576,6 @@ export class SessionManager implements Middleware {
         return resolvedCodeLens;
     }
 
-    // TODO: Remove this migration code. Move old setting
-    // codeFormatting.whitespaceAroundPipe to new setting
-    // codeFormatting.addWhitespaceAroundPipe.
-    private async migrateWhitespaceAroundPipeSetting(): Promise<void> {
-        const configuration = vscode.workspace.getConfiguration(
-            utils.PowerShellLanguageId,
-        );
-        const deprecatedSetting = "codeFormatting.whitespaceAroundPipe";
-        const newSetting = "codeFormatting.addWhitespaceAroundPipe";
-        const configurationTargetOfNewSetting =
-            getEffectiveConfigurationTarget(newSetting);
-        const configurationTargetOfOldSetting =
-            getEffectiveConfigurationTarget(deprecatedSetting);
-        if (
-            configurationTargetOfOldSetting !== undefined &&
-            configurationTargetOfNewSetting === undefined
-        ) {
-            this.logger.writeWarning(
-                "Deprecated setting: whitespaceAroundPipe",
-            );
-            const value = configuration.get(
-                deprecatedSetting,
-                configurationTargetOfOldSetting,
-            );
-            await changeSetting(
-                newSetting,
-                value,
-                configurationTargetOfOldSetting,
-                this.logger,
-            );
-            await changeSetting(
-                deprecatedSetting,
-                undefined,
-                configurationTargetOfOldSetting,
-                this.logger,
-            );
-        }
-    }
-
     /** There are some changes we cannot "hot" set, so these require a restart of the session */
     private async restartOnCriticalConfigChange(
         changeEvent: vscode.ConfigurationChangeEvent,
@@ -647,21 +587,19 @@ export class SessionManager implements Middleware {
             return;
         }
 
-        // Restart not needed if shell integration is enabled but the shell is backgrounded.
-        const settings = getSettings();
+        // Restart needed if shell integration changes while the shell is not backgrounded.
         if (
             changeEvent.affectsConfiguration(
                 "terminal.integrated.shellIntegration.enabled",
             )
         ) {
-            const shellIntegrationEnabled =
-                vscode.workspace
-                    .getConfiguration("terminal.integrated.shellIntegration")
-                    .get<boolean>("enabled") ?? false;
-            if (
-                shellIntegrationEnabled &&
-                !settings.integratedConsole.startInBackground
-            ) {
+            const shellIntegrationEnabled = vscode.workspace
+                .getConfiguration("terminal.integrated.shellIntegration")
+                .get<boolean>("enabled", false);
+            const startInBackground = vscode.workspace
+                .getConfiguration("powershell.integratedConsole")
+                .get<boolean>("startInBackground");
+            if (shellIntegrationEnabled && !startInBackground) {
                 return this.restartWithPrompt();
             }
         }
@@ -672,40 +610,23 @@ export class SessionManager implements Middleware {
         }
 
         // Detect any setting changes that would affect the session.
-        const coldRestartSettingNames = [
+        const restartSettingNames = [
             "developer.traceLsp",
             "developer.traceDap",
             "developer.editorServicesLogLevel",
+            "cwd",
+            "powerShellDefaultVersion",
+            "developer.bundledModulesPath",
+            "developer.editorServicesWaitForDebugger",
+            "developer.setExecutionPolicy",
+            "integratedConsole.useLegacyReadLine",
+            "integratedConsole.startInBackground",
+            "integratedConsole.startLocation",
         ];
-        for (const settingName of coldRestartSettingNames) {
-            if (
-                changeEvent.affectsConfiguration(
-                    "powershell" + "." + settingName,
-                )
-            ) {
+        for (const settingName of restartSettingNames) {
+            if (changeEvent.affectsConfiguration(`powershell.${settingName}`)) {
                 return this.restartWithPrompt();
             }
-        }
-
-        // TODO: Migrate these to affectsConfiguration style above
-        if (
-            settings.cwd !== this.sessionSettings.cwd ||
-            settings.powerShellDefaultVersion !==
-                this.sessionSettings.powerShellDefaultVersion ||
-            settings.developer.bundledModulesPath !==
-                this.sessionSettings.developer.bundledModulesPath ||
-            settings.developer.editorServicesWaitForDebugger !==
-                this.sessionSettings.developer.editorServicesWaitForDebugger ||
-            settings.developer.setExecutionPolicy !==
-                this.sessionSettings.developer.setExecutionPolicy ||
-            settings.integratedConsole.useLegacyReadLine !==
-                this.sessionSettings.integratedConsole.useLegacyReadLine ||
-            settings.integratedConsole.startInBackground !==
-                this.sessionSettings.integratedConsole.startInBackground ||
-            settings.integratedConsole.startLocation !==
-                this.sessionSettings.integratedConsole.startLocation
-        ) {
-            return this.restartWithPrompt();
         }
     }
 
@@ -752,16 +673,23 @@ export class SessionManager implements Middleware {
         wantedName?: string,
     ): Promise<IPowerShellExeDetails | undefined> {
         this.logger.writeDebug("Finding PowerShell...");
+        const powerShellAdditionalExePaths = vscode.workspace
+            .getConfiguration("powershell")
+            .get<Record<string, string>>("powerShellAdditionalExePaths", {});
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
-            this.sessionSettings.powerShellAdditionalExePaths,
+            powerShellAdditionalExePaths,
             this.logger,
         );
 
         let foundPowerShell: IPowerShellExeDetails | undefined;
         try {
             let defaultPowerShell: IPowerShellExeDetails | undefined;
-            wantedName ??= this.sessionSettings.powerShellDefaultVersion;
+            wantedName ??=
+                this.powerShellVersionOverride ??
+                vscode.workspace
+                    .getConfiguration("powershell")
+                    .get("powerShellDefaultVersion", "");
             if (wantedName !== "") {
                 for await (const details of powershellExeFinder.enumeratePowerShellInstallations()) {
                     // Need to compare names case-insensitively, from https://stackoverflow.com/a/2140723
@@ -819,7 +747,6 @@ export class SessionManager implements Middleware {
                 powerShellExeDetails,
             ),
             this.getNewSessionFilePath(),
-            this.sessionSettings,
             this.extensionContext.extensionMode ==
                 vscode.ExtensionMode.Development,
         );
@@ -878,11 +805,7 @@ export class SessionManager implements Middleware {
                 commit: version, // Actually used by UpdatePowerShell
                 architecture: process.arch, // Best guess based off Code's architecture
             };
-            const updater = new UpdatePowerShell(
-                this.sessionSettings,
-                this.logger,
-                versionDetails,
-            );
+            const updater = new UpdatePowerShell(this.logger, versionDetails);
             void updater.checkForUpdate();
         }
     }
@@ -942,18 +865,16 @@ export class SessionManager implements Middleware {
             synchronize: {
                 // TODO: This is deprecated and they should be pulled by the server.
                 // backend uses "files" and "search" to ignore references.
-                configurationSection: [
-                    utils.PowerShellLanguageId,
-                    "files",
-                    "search",
-                ],
+                configurationSection: ["powershell", "files", "search"],
                 // TODO: fileEvents: vscode.workspace.createFileSystemWatcher('**/.eslintrc')
             },
             // NOTE: Some settings are only applicable on startup, so we send them during initialization.
             // When Terminal Shell Integration is enabled, we pass the path to the script that the server should execute.
             // Passing an empty string implies integration is disabled.
             initializationOptions: {
-                enableProfileLoading: this.sessionSettings.enableProfileLoading,
+                enableProfileLoading: vscode.workspace
+                    .getConfiguration("powershell")
+                    .get<boolean>("enableProfileLoading", true),
                 initialWorkingDirectory: await validateCwdSetting(this.logger),
                 shellIntegrationScript: this.shellIntegrationEnabled
                     ? utils.ShellIntegrationScript
@@ -1069,7 +990,12 @@ export class SessionManager implements Middleware {
         ) {
             const devBundledModulesPath = path.resolve(
                 __dirname,
-                this.sessionSettings.developer.bundledModulesPath,
+                vscode.workspace
+                    .getConfiguration("powershell.developer")
+                    .get(
+                        "bundledModulesPath",
+                        "../../PowerShellEditorServices/module",
+                    ),
             );
 
             // Make sure the module's bin path exists
@@ -1097,7 +1023,10 @@ export class SessionManager implements Middleware {
             `-BundledModulesPath '${utils.escapeSingleQuotes(bundledModulesPath)}' ` +
             "-EnableConsoleRepl ";
 
-        if (this.sessionSettings.integratedConsole.suppressStartupBanner) {
+        const suppressStartupBanner = vscode.workspace
+            .getConfiguration("powershell.integratedConsole")
+            .get<boolean>("suppressStartupBanner");
+        if (suppressStartupBanner) {
             editorServicesArgs += "-StartupBanner '' ";
         } else if (
             utils.isWindows &&
@@ -1120,8 +1049,11 @@ Type 'help' to get help.
         }
 
         // We guard this here too out of an abundance of precaution.
+        const editorServicesWaitForDebugger = vscode.workspace
+            .getConfiguration("powershell.developer")
+            .get<boolean>("editorServicesWaitForDebugger");
         if (
-            this.sessionSettings.developer.editorServicesWaitForDebugger &&
+            editorServicesWaitForDebugger &&
             this.extensionContext.extensionMode ===
                 vscode.ExtensionMode.Development
         ) {
@@ -1129,7 +1061,7 @@ Type 'help' to get help.
         }
         const logLevel = vscode.workspace
             .getConfiguration("powershell.developer")
-            .get<string>("editorServicesLogLevel");
+            .get("editorServicesLogLevel", "Warning");
         editorServicesArgs += `-LogLevel '${logLevel}' `;
 
         return editorServicesArgs;
@@ -1159,9 +1091,10 @@ Type 'help' to get help.
     }
 
     private async promptForRestart(): Promise<void> {
-        if (
-            getSettings().integratedConsole.suppressTerminalStoppedNotification
-        ) {
+        const suppressTerminalStoppedNotification = vscode.workspace
+            .getConfiguration("powershell.integratedConsole")
+            .get<boolean>("suppressTerminalStoppedNotification");
+        if (suppressTerminalStoppedNotification) {
             return;
         }
 
@@ -1258,10 +1191,17 @@ Type 'help' to get help.
             // When it hasn't started yet.
             this.languageStatusItem.text += ` ${this.PowerShellExeDetails.displayName}`;
             this.languageStatusItem.detail += ` at '${this.PowerShellExeDetails.exePath}'`;
-        } else if (this.sessionSettings.powerShellDefaultVersion) {
-            // When it hasn't been found yet.
-            this.languageStatusItem.text += ` ${this.sessionSettings.powerShellDefaultVersion}`;
-            this.languageStatusItem.detail = `Looking for '${this.sessionSettings.powerShellDefaultVersion}'...`;
+        } else {
+            const wantedVersion =
+                this.powerShellVersionOverride ??
+                vscode.workspace
+                    .getConfiguration("powershell")
+                    .get("powerShellDefaultVersion", "");
+            if (wantedVersion) {
+                // When it hasn't been found yet.
+                this.languageStatusItem.text += ` ${wantedVersion}`;
+                this.languageStatusItem.detail = `Looking for '${wantedVersion}'...`;
+            }
         }
 
         if (detail) {
@@ -1381,34 +1321,35 @@ Type 'help' to get help.
 
     // Shows the temp debug terminal if it exists, otherwise the session terminal.
     public showDebugTerminal(isExecute?: boolean): void {
+        const preserveFocus =
+            isExecute &&
+            !vscode.workspace
+                .getConfiguration("powershell.integratedConsole")
+                .get<boolean>("focusConsoleOnExecute", true);
         if (this.debugSessionProcess) {
-            this.debugSessionProcess.showTerminal(
-                isExecute &&
-                    !this.sessionSettings.integratedConsole
-                        .focusConsoleOnExecute,
-            );
+            this.debugSessionProcess.showTerminal(preserveFocus);
         } else {
-            this.languageServerProcess?.showTerminal(
-                isExecute &&
-                    !this.sessionSettings.integratedConsole
-                        .focusConsoleOnExecute,
-            );
+            this.languageServerProcess?.showTerminal(preserveFocus);
         }
     }
 
     // Always shows the session terminal.
     private showSessionTerminal(isExecute?: boolean): void {
-        this.languageServerProcess?.showTerminal(
+        const preserveFocus =
             isExecute &&
-                !this.sessionSettings.integratedConsole.focusConsoleOnExecute,
-        );
+            !vscode.workspace
+                .getConfiguration("powershell.integratedConsole")
+                .get<boolean>("focusConsoleOnExecute", true);
+        this.languageServerProcess?.showTerminal(preserveFocus);
     }
 
     private async showSessionMenu(): Promise<void> {
+        const powerShellAdditionalExePaths = vscode.workspace
+            .getConfiguration("powershell")
+            .get<Record<string, string>>("powerShellAdditionalExePaths", {});
         const powershellExeFinder = new PowerShellExeFinder(
             this.platformDetails,
-            // We don't pull from session settings because we want them fresh!
-            getSettings().powerShellAdditionalExePaths,
+            powerShellAdditionalExePaths,
             this.logger,
         );
         const availablePowerShellExes =

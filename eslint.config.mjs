@@ -18,6 +18,10 @@ export default defineConfig(
         rules: {
             "@typescript-eslint/explicit-function-return-type": "error",
             "@typescript-eslint/no-empty-object-type": "off",
+            // VS Code's .get<T>(key, default) needs explicit type params to
+            // widen literal defaults (e.g. true -> boolean), otherwise
+            // no-unnecessary-condition fires on the result.
+            "@typescript-eslint/no-unnecessary-type-arguments": "off",
             "@typescript-eslint/no-floating-promises": [
                 "error",
                 {

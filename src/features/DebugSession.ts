@@ -36,7 +36,6 @@ import type { ILogger } from "../logging";
 import { OperatingSystem, getPlatformDetails } from "../platform";
 import { PowerShellProcess } from "../process";
 import { SessionManager, type IEditorServicesSessionDetails } from "../session";
-import { getSettings } from "../settings";
 import { checkIfFileExists } from "../utils";
 
 export const StartDebuggerNotificationType = new NotificationType<void>(
@@ -358,10 +357,12 @@ export class DebugSessionFeature
         // Prevent the Debug Console from opening
         config.internalConsoleOptions = "neverOpen";
 
-        const settings = getSettings();
-        config.createTemporaryIntegratedConsole ??=
-            settings.debugging.createTemporaryIntegratedConsole;
-        config.executeMode ??= settings.debugging.executeMode;
+        config.createTemporaryIntegratedConsole ??= workspace
+            .getConfiguration("powershell.debugging")
+            .get<boolean>("createTemporaryIntegratedConsole");
+        config.executeMode ??= workspace
+            .getConfiguration("powershell.debugging")
+            .get("executeMode", "DotSource");
         if (config.request === "attach") {
             resolvedConfig = await this.resolveAttachDebugConfiguration(config);
         } else if (config.request === "launch") {
@@ -499,12 +500,10 @@ export class DebugSessionFeature
     private async createTemporaryIntegratedConsole(
         session: DebugSession,
     ): Promise<IEditorServicesSessionDetails | undefined> {
-        const settings = getSettings();
         const previousActiveTerminal = window.activeTerminal;
 
         this.tempDebugProcess =
             await this.sessionManager.createDebugSessionProcess(
-                settings,
                 session.configuration.sessionName,
             );
         // TODO: Maybe set a timeout on the cancellation token?
@@ -665,11 +664,9 @@ export class DebugSessionFeature
 
     /** Fetches all available vscode launch configurations. This is abstracted out for easier testing. */
     private getLaunchConfigurations(): DebugConfiguration[] {
-        return (
-            workspace
-                .getConfiguration("launch")
-                .get<DebugConfiguration[]>("configurations") ?? []
-        );
+        return workspace
+            .getConfiguration("launch")
+            .get<DebugConfiguration[]>("configurations", []);
     }
 
     private async resolveAttachDebugConfiguration(
@@ -823,12 +820,10 @@ class PowerShellDebugAdapterTrackerFactory
      * user re-enables, then logging resumes.
      */
     get log(): LogOutputChannel | undefined {
-        if (
-            workspace
-                .getConfiguration("powershell.developer")
-                .get<boolean>("traceDap") &&
-            this._log === undefined
-        ) {
+        const traceDap = workspace
+            .getConfiguration("powershell.developer")
+            .get<boolean>("traceDap");
+        if (traceDap && this._log === undefined) {
             this._log = window.createOutputChannel(
                 `${this.adapterName}: Trace DAP`,
                 { log: true },
