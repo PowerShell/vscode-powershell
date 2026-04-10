@@ -352,7 +352,7 @@ export class SessionManager implements Middleware {
             // Reset the version and PowerShell details since we're launching a
             // new executable.
             this.logger.writeDebug(
-                `Starting with executable overriden to: ${exeNameOverride}`,
+                `Starting with executable overridden to: ${exeNameOverride}`,
             );
             this.powerShellVersionOverride = exeNameOverride;
             this.versionDetails = undefined;

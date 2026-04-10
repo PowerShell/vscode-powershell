@@ -864,12 +864,6 @@
             "default": false,
             "markdownDescription": "Removes redundant whitespace between parameters."
           },
-          "powershell.codeFormatting.whitespaceAroundPipe": {
-            "type": "boolean",
-            "default": true,
-            "markdownDescription": "**Deprecated:** Please use the `#powershell.codeFormatting.addWhitespaceAroundPipe#` setting instead. If you've used this setting before, we have moved it for you automatically.",
-            "markdownDeprecationMessage": "**Deprecated:** Please use the `#powershell.codeFormatting.addWhitespaceAroundPipe#` setting instead. If you've used this setting before, we have moved it for you automatically."
-          },
           "powershell.codeFormatting.addWhitespaceAroundPipe": {
             "type": "boolean",
             "default": true,
