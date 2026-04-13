@@ -12,10 +12,10 @@
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
 			"nvmVersion": "latest", // Can be used to change node versions as needed
-			"version": "20.19.0" // Keep in sync with package.json for what target vscode version uses
+			"version": "22.22.1" // Keep in sync with package.json for what target vscode version uses
 		}
 	},
-	"postCreateCommand": "pwsh -c 'if (-not (Test-Path /workspaces/PowerShellEditorServices)) {git clone https://github.com/PowerShell/PowerShellEditorServices.git /workspaces/PowerShellEditorServices}'"
+	"postCreateCommand": "pwsh -c 'if (-not (Test-Path /workspaces/PowerShellEditorServices/.git)) {git clone https://github.com/PowerShell/PowerShellEditorServices.git /workspaces/PowerShellEditorServices}'",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
@@ -26,5 +26,5 @@
 	// "customizations": {},
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	"remoteUser": "vscode"
 }

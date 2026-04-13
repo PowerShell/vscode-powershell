@@ -14,3 +14,8 @@ rm -rf /var/lib/apt/lists/*
 SCRIPT
 
 RUN pwsh -noni -c 'Install-PSResource -TrustRepository -Confirm:$false -Verbose Platyps'
+
+# The container runs as vscode user (UID 1000) so we need to precreate this folder to avoid future permssions
+USER vscode
+WORKDIR /workspaces
+RUN mkdir -p vscode-powershell PowerShellEditorServices && chown vscode:vscode vscode-powershell PowerShellEditorServices
