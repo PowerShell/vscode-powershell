@@ -2,92 +2,75 @@
 
 ## Development Setup
 
-1. [Fork and clone][fork] the [vscode-powershell repository](https://github.com/PowerShell/vscode-powershell).
+1. Clone [vscode-powershell][] and [PowerShellEditorServices][] as siblings — PSES must be at
+   `../PowerShellEditorServices` relative to this repo.
+1. Follow the [PSES development instructions][pses-dev] and build it first.
+1. Install [Node.js][] 22.x or higher.
+1. Open `pwsh-extension-dev.code-workspace` in [Visual Studio Code][] for recommended extensions and tasks.
+1. Optionally run `git config blame.ignoreRevsFile .git-blame-ignore-revs` to ignore formatting commits.
 
-1. [Fork and clone][fork] the [PowerShell Editor Services (PSES) repository](https://github.com/PowerShell/PowerShellEditorServices).
-
-    > The `vscode-powershell` folder and the `PowerShellEditorServices` folder should be next to each other on the file
-    > system. Code in `vscode-powershell` looks for PSES at `../PowerShellEditorServices` if you're building locally so
-    > PSES must be in that location.
-
-1. Follow the [development instructions](https://github.com/PowerShell/PowerShellEditorServices#development) for
-   PowerShell Editor Services. **You will need to complete this step before proceeding**.
-
-1. Install [Node.js](https://nodejs.org/en/download/package-manager) 22.x or higher.
-
-1. Install [Visual Studio Code](https://code.visualstudio.com).
-   Open the multi-root workspace file in this repo, `extension-dev.code-workspace`.
-
-    > This has a set of recommended extensions to install and provides tasks.
-    > The ESLint formatter will require you to install ESLint globally, using `npm install -g eslint`.
-    > Otherwise VS Code will erroneously complain that it isn't able to use it to format TypeScript files.
-
-1. (optional) Set `git config blame.ignoreRevsFile .git-blame-ignore-revs` to ignore formatting-related commits.
-
-[fork]: https://help.github.com/articles/fork-a-repo/
+[vscode-powershell]: https://github.com/PowerShell/vscode-powershell
+[PowerShellEditorServices]: https://github.com/PowerShell/PowerShellEditorServices
+[pses-dev]: https://github.com/PowerShell/PowerShellEditorServices#development
+[Node.js]: https://nodejs.org/en/download/package-manager
+[Visual Studio Code]: https://code.visualstudio.com
 
 ## Tracking Upstream Dependencies
 
-As a VS Code extension, we first rely on the `engine` field of `package.json` to
-state the lowest version of VS Code we support.
+The `engines.vscode` field in `package.json` declares the minimum VS Code version we support.
+When it is updated:
 
-When our `engine` field is updated the development dependency `@types/vscode`
-must be updated to match. Note that it uses `~` (not `^`) so as to accept new
-patches with `npm update` but not new minor versions. Then we check that version
-of VS Code's own `package.json` file for their [`electron`][] dependency. The
-major version of [Electron][] will tell us which [Node.js][] is included, which
-dictates which version of Node.js the extension is eventually run with. This
-lets us finally update our `@types/node` development dependency to match, our
-developer machines if necessary, the CI and OneBranch pipeline tasks, and the
-`.tsconfig` file. Note that the version of `@types/node` will not necessarily
-exactly match the version of Node.js, but the major version should.
+1. Update `@types/vscode` to match (use `~` not `^` — patch updates only, not minor)
+2. Check that VS Code version's `package.json` for its [`electron`][] dependency — the
+   [Electron][] major version determines which [Node.js][] is bundled, which is the runtime
+   the extension actually runs on
+3. Update `@types/node` major to match that Node.js version (exact version need not match, but
+   major should)
+4. Update the Node.js version in CI (GitHub Actions) and OneBranch (Azure DevOps) pipelines,
+   and developer machines to match
 
 [`electron`]: https://github.com/microsoft/vscode/blob/release/1.114/package.json
 [Electron]: https://releases.electronjs.org/release/v39.8.3
 [Node.js]: https://nodejs.org/en/blog/release/v22.22.1
 
-### Building the Code
+## Building the Code
 
-#### From Visual Studio Code
-
-Press <kbd>Ctrl+P</kbd> and type `task build`. Explore the other provided tasks for helpful commands.
-
-#### From a PowerShell prompt
+From VS Code run the build and test tasks, or from PowerShell:
 
 ```powershell
 Invoke-Build Build
+Invoke-Build Test
 ```
 
-Explore the `vscode-powershell.build.ps1` file for other build targets.
+See `vscode-powershell.build.ps1` for all available targets.
 
-### Launching the extension
+## Launching the Extension
 
-First, ensure you have completed a build as instructed above, as the launch templates do not check some prerequisites for performance reasons.
+Build first, then use one of the provided `Launch Extension` debug configurations:
 
-To debug the extension use one of the provided `Launch Extension` debug configurations.
+- **Launch Extension** — uses your personal profile
+- **Temp Profile** — resets on every launch; useful for "out of the box" testing
+- **Isolated Profile** — persistent debug profile for preserving test settings
 
-1. `Launch Extension`: Launches the debugger using your personal profile settings.
-2. `Temp Profile`: Launches VS Code with a temp profile that resets on every launch. Useful for "out of the box" environment testing.
-3. `Isolated Profile`: Launches the debugger with a persistent debug profile specific to the extension, so you can preserve some settings or test certain prerequisites.
-
-All three templates use pre-launch tasks to build the code, and support automatic restart of the extension host on changes to the Extension source code. [Hot Reload](https://devblogs.microsoft.com/dotnet/introducing-net-hot-reload/) is also enabled for PowerShell Editor Services.
+All configurations support automatic extension host restart on source changes.
+[Hot Reload](https://devblogs.microsoft.com/dotnet/introducing-net-hot-reload/) is also
+enabled for PowerShell Editor Services.
 
 > [!WARNING]
-> There is a current limitation that, if you restart the extension/extension host or it is restarted due to a extension code change, the editor services attachment will be disconnected due to the PSES terminal being terminated, and you will either need to restart the debug session completely, or do a manual build of PSES and run the `Attach to Editor Services` debug launch manually.
-
-Try the `powershell.developer.editorServicesWaitForDebugger` setting to ensure that you are fully attached before the extension startup process continues.
+> If the extension host restarts, the PSES debugger attachment is lost. Either restart the
+> full debug session, or rebuild PSES and run `Attach to Editor Services` manually.
+> Use `powershell.developer.editorServicesWaitForDebugger` to ensure full attachment before
+> startup continues.
 
 ## Contributing Snippets
 
-For more information on contributing snippets please read our
-[snippet requirements](https://github.com/PowerShell/vscode-powershell/blob/main/docs/community_snippets.md#contributing).
+See [snippet requirements](community_snippets.md#contributing).
 
 ## Creating a Release
 
-These are the current steps for creating a release for both the editor services
-and the extension. Azure DevOps access is restricted to Microsoft employees and
-is used to sign and validate the produced binaries before publishing on behalf
-of Microsoft. Assume `origin` is GitHub and `ado` is Azure DevOps.
+Azure DevOps access (Microsoft employees only) is required for signing and publishing.
+
+The Git remote `origin` = GitHub, `ado` = the internal Azure DevOps mirror.
 
 ```powershell
 cd ./PowerShellEditorServices
@@ -96,94 +79,53 @@ git checkout -B release
 # Amend changelog as necessary
 git push --force-with-lease origin
 # Open, approve, and merge PR on GitHub
+
 cd ../vscode-powershell
 git checkout -B release
 ./tools/updateVersion.ps1 -Version "2024.4.0" -Changes "Major release!"
 # Amend changelog as necessary
 git push --force-with-lease origin
 # Open, approve, and merge PR on GitHub
+
+# After both PRs are merged:
 cd ../PowerShellEditorServices
 git checkout main
 git pull
-git push ado HEAD:release
+git push ado HEAD:upstream
 cd ../vscode-powershell
 git checkout main
 git pull
-git push ado HEAD:release
+git push ado HEAD:upstream
 # Download and test assets from draft GitHub Releases
 # Publish releases, ensuring tag is at release commit in `main`
 # Permit pipeline to publish to marketplace
 ```
 
-If rolling from pre-release to release, do not change the version of PowerShell
-Editor Services between a pre-release and the subsequent release! We only
-need to release the extension.
-
-The Azure DevOps pipelines have to build off a PR merged to `main` for _reasons_,
-hence that repo is a superset including all our commits plus signed PR merge commits.
+When rolling from pre-release to release, do **not** update the PSES version — only the
+extension needs a new release. The `release` branch is ephemeral and deleted after each release.
+The ADO repo is a superset of GitHub — it includes our commits plus signed PR merge commits,
+which is why the ADO push must happen after the PR is merged to `main`.
 
 ### Versioning
 
-For both our repositories we use Git tags in the form `vX.Y.Z` to mark the releases in the
-codebase. We use the GitHub Release feature to create these tags. The ephemeral branch
-`release` is used in the process of creating a release for each repository, primarily for
-the Pull Requests and for Azure DevOps triggers. Once the release PRs are merged, the
-branch is deleted until used again to prepare the next release. This branch _does not_
-mark any specific release, that is the point of the tags.
+The extension uses `vYYYY.X.Z` (not SemVer). Releases are based on completed work, not a
+schedule. Git tags mark releases; GitHub Releases (drafted by the release pipeline) create the tags.
 
-For PowerShellEditor Services, we simply follow semantic versioning, e.g.
-`vX.Y.Z`. We do not release previews frequently because this dependency is not
-generally used directly: it's a library consumed by other projects which
-themselves use pre-releases for beta testing.
+**Even minor** = release, **odd minor** = pre-release. A release's minor version is `n-1` of
+its previewing pre-release (e.g. pre-release `v2024.1.0-preview` previews release `v2024.0.0`).
+This keeps the marketplace [pre-release][] option always visible (odd > even by version sort).
 
-For the VS Code PowerShell Extension, our version follows `vYYYY.X.Z`, that is: current
-year, minor version, and patch version. This is not semantic versioning because of issues
-with how the VS Code marketplace and extension hosting API itself uses our version number.
-We do not release on a chronological schedule: we release based on completed work. For
-historical reasons we are stuck with the major version being year.
+- The `v` prefix is used in Git tags and the changelog (e.g. `v2024.0.0`), but **not** in
+  `package.json`'s `version` field (e.g. `2024.0.0`). The `updateVersion.ps1` `-Version`
+  parameter also takes no `v` prefix.
+- Append `-preview` to the version in the changelog and Git tag, but **not** in `package.json`
+- The `preview` field in `package.json` is always `false`, even for pre-releases — the
+  marketplace derives its state from the latest release inclusive of pre-releases, so setting
+  it `true` caused the extension to permanently appear as a preview extension
+- Multiple pre-releases increment the patch: `v2024.1.0-preview`, `v2024.1.1-preview`, etc.
+- PSES must not change version between a pre-release and its subsequent release
+- Hotfix releases skip the pre-release step and build off the last release's Git tag
 
-Before releasing a stable version (a _release_) we should almost always first release a
-preview of the same code, which is a _pre-release_. The exception to this is hotfix
-releases where we need to push _only_ bug fixes out as soon as possible, and these should
-be built off the last release's codebase (found from the Git tag). The pre-release is
-uploaded to the marketplace using the `--pre-release` flag given to `vsce` (the CLI tool
-used to do so). The previous separate "PowerShell Preview" extension has been deprecated
-in favor of using the marketplace's support for [pre-releases][] on the one-and-only
-extension.
+PSES uses standard SemVer (`vX.Y.Z`), realistically it's Pride Versioning.
 
-Because the marketplace does not actually understand Semantic Versioning pre-release tags
-(the `-preview` suffix), the patch numbers need to increment continuously, but we append
-`-preview` to _our_ version in the changelog and Git tags. When multiple pre-releases are
-needed, the patch version is incremented (again because the marketplace ignores the
-pre-release tag, we can't do `-alpha`, `-beta` etc.). The `preview` field in
-the extension's manifest (the `package.json` file) is _always_ `false`, even for
-pre-releases, because the marketplace takes the information from the latest release
-inclusive of pre-releases, hence it was causing the one-and-only extension to look like it
-was in preview. This is also why the icon no longer changes to the PowerShell Preview icon
-for pre-releases. When they support pre-releases better (ideally that means supporting the
-pre-release tags in full) we can revisit this.
-
-Furthermore, for releases, the minor version must be _even_ (like 0, 2, etc.) and for
-pre-releases it must be _odd_ (like 1, 3, etc.), and an upcoming release's version must be
-`n-1` of the pre-release which previews it. That is, release `v2024.0.0` is previewed in
-the pre-release `v2024.1.0-preview`. This scheme is designed such that the "newest" (by version)
-release is always a pre-release, so that the VS Code marketplace _always_ shows a
-pre-release option. When we previously did this the other way around (incrementing the
-release as `n+1` to the pre-release), every time we released, the pre-release option
-(dropdown) in the marketplace would unfortunately disappear.
-
-[pre-releases]: https://code.visualstudio.com/api/working-with-extensions/publishing-extension#prerelease-extensions
-
-For example, the date is August 23, 2023. The last release was in June, and its version
-was `v2023.6.0`. Some significant work has been completed and we want to release the
-extension, so the next release will be `v2023.8.0` (the minor version is `n+2` because it
-must remain even, it only coincidentally matches the month). That means first we create a
-pre-release with version `v2023.9.0-preview` (the minor version is `n+1` of the upcoming
-release, and `-preview` was appended). After publishing, some issues were identified and
-we decided we needed a second pre-release. Its version is `v2023.9.1-preview`. User
-feedback hopefully indicates that the pre-release is working well, so to create a release
-we will use the same code (but with an updated changelog etc.) and use version
-`v2023.8.0`, the _next_ release since `v2023.6.0`. The version of PowerShell Editor
-Services may update between pre-releases or releases, but must not change between a
-pre-release and its subsequent release, as they should use the same code (which includes
-dependencies).
+[pre-release]: https://code.visualstudio.com/api/working-with-extensions/publishing-extension#prerelease-extensions
