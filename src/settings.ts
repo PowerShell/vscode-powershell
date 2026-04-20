@@ -46,6 +46,7 @@ export enum CodeFormattingPreset {
     Custom = "Custom",
     Allman = "Allman",
     OTBS = "OTBS",
+    OTPS = "OTPS",
     Stroustrup = "Stroustrup",
 }
 
