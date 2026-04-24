@@ -7,11 +7,7 @@ import * as process from "process";
 import untildify from "untildify";
 import { integer } from "vscode-languageserver-protocol";
 import type { ILogger } from "./logging";
-import {
-    changeSetting,
-    getSettings,
-    type PowerShellAdditionalExePathSettings,
-} from "./settings";
+import { changeSetting } from "./settings";
 import * as utils from "./utils";
 import vscode = require("vscode");
 
@@ -93,7 +89,7 @@ export class PowerShellExeFinder {
         // The platform details descriptor for the platform we're on
         private platformDetails: IPlatformDetails,
         // Additional configured PowerShells
-        private additionalPowerShellExes: PowerShellAdditionalExePathSettings,
+        private additionalPowerShellExes: Record<string, string>,
         private logger?: ILogger,
     ) {}
 
@@ -169,7 +165,10 @@ export class PowerShellExeFinder {
                 const message = `Additional PowerShell '${additionalPwsh.displayName}' not found at '${additionalPwsh.exePath}'!`;
                 this.logger?.writeWarning(message);
 
-                if (!getSettings().suppressAdditionalExeNotFoundWarning) {
+                const suppressAdditionalExeNotFoundWarning = vscode.workspace
+                    .getConfiguration("powershell")
+                    .get<boolean>("suppressAdditionalExeNotFoundWarning");
+                if (!suppressAdditionalExeNotFoundWarning) {
                     const selection = await vscode.window.showWarningMessage(
                         message,
                         "Don't Show Again",

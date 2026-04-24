@@ -4,7 +4,7 @@
 import * as path from "path";
 import type { ILogger } from "../logging";
 import { SessionManager } from "../session";
-import { getChosenWorkspace, getSettings } from "../settings";
+import { getChosenWorkspace } from "../settings";
 import vscode = require("vscode");
 import utils = require("../utils");
 
@@ -115,7 +115,11 @@ export class PesterTestsFeature implements vscode.Disposable {
         lineNum?: number,
         outputPath?: string,
     ): vscode.DebugConfiguration {
-        const settings = getSettings();
+        const debuggingConfig = vscode.workspace.getConfiguration(
+            "powershell.debugging",
+        );
+        const pesterConfig =
+            vscode.workspace.getConfiguration("powershell.pester");
         const launchConfig = {
             request: "launch",
             type: "PowerShell",
@@ -127,8 +131,9 @@ export class PesterTestsFeature implements vscode.Disposable {
             ],
             internalConsoleOptions: "neverOpen",
             noDebug: launchType === LaunchType.Run,
-            createTemporaryIntegratedConsole:
-                settings.debugging.createTemporaryIntegratedConsole,
+            createTemporaryIntegratedConsole: debuggingConfig.get<boolean>(
+                "createTemporaryIntegratedConsole",
+            ),
         };
 
         if (lineNum) {
@@ -142,19 +147,23 @@ export class PesterTestsFeature implements vscode.Disposable {
             launchConfig.args.push("-All");
         }
 
-        if (!settings.pester.useLegacyCodeLens) {
+        const useLegacyCodeLens = pesterConfig.get<boolean>(
+            "useLegacyCodeLens",
+            true,
+        );
+        if (!useLegacyCodeLens) {
             launchConfig.args.push("-MinimumVersion5");
         }
 
         if (launchType === LaunchType.Debug) {
             launchConfig.args.push(
                 "-Output",
-                `'${settings.pester.debugOutputVerbosity}'`,
+                `'${pesterConfig.get("debugOutputVerbosity", "Diagnostic")}'`,
             );
         } else {
             launchConfig.args.push(
                 "-Output",
-                `'${settings.pester.outputVerbosity}'`,
+                `'${pesterConfig.get("outputVerbosity", "FromPreference")}'`,
             );
         }
 

@@ -27,8 +27,7 @@ import { ShowHelpFeature } from "./features/ShowHelp";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 import { Logger } from "./logging";
 import { SessionManager } from "./session";
-import { getSettings } from "./settings";
-import { PowerShellLanguageId, sleep } from "./utils";
+import { sleep } from "./utils";
 // The 1DS telemetry key, which is just shared among all Microsoft extensions
 // (and isn't sensitive).
 const TELEMETRY_KEY =
@@ -56,13 +55,8 @@ export async function activate(
 
     telemetryReporter = new TelemetryReporter(TELEMETRY_KEY);
 
-    const settings = getSettings();
-    logger.writeDebug(
-        `Loaded settings:\n${JSON.stringify(settings, undefined, 2)}`,
-    );
-
     languageConfigurationDisposable = vscode.languages.setLanguageConfiguration(
-        PowerShellLanguageId,
+        "powershell",
         {
             // TODO: Remove the useless escapes
             wordPattern:
@@ -148,7 +142,6 @@ export async function activate(
 
     sessionManager = new SessionManager(
         context,
-        settings,
         logger,
         documentSelector,
         packageInfo.name,
@@ -204,7 +197,10 @@ export async function activate(
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);
 
-    if (settings.startAutomatically) {
+    const startAutomatically = vscode.workspace
+        .getConfiguration("powershell")
+        .get<boolean>("startAutomatically", true);
+    if (startAutomatically) {
         await sessionManager.start();
     }
 

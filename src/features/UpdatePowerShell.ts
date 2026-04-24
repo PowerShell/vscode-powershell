@@ -6,7 +6,7 @@ import vscode = require("vscode");
 
 import type { ILogger } from "../logging";
 import type { IPowerShellVersionDetails } from "../session";
-import { changeSetting, Settings } from "../settings";
+import { changeSetting } from "../settings";
 
 interface IUpdateMessageItem extends vscode.MessageItem {
     id: number;
@@ -39,7 +39,6 @@ export class UpdatePowerShell {
     private localVersion: SemVer;
 
     constructor(
-        private sessionSettings: Settings,
         private logger: ILogger,
         versionDetails: IPowerShellVersionDetails,
     ) {
@@ -52,7 +51,10 @@ export class UpdatePowerShell {
 
     private shouldCheckForUpdate(): boolean {
         // Respect user setting.
-        if (!this.sessionSettings.promptToUpdatePowerShell) {
+        const promptToUpdatePowerShell = vscode.workspace
+            .getConfiguration("powershell")
+            .get<boolean>("promptToUpdatePowerShell", true);
+        if (!promptToUpdatePowerShell) {
             this.logger.writeDebug(
                 "Setting 'promptToUpdatePowerShell' was false.",
             );

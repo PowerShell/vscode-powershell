@@ -5,7 +5,6 @@ import * as vscode from "vscode";
 import { RequestType0 } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
-import { getSettings } from "../settings";
 
 interface ICommand {
     name: string;
@@ -79,7 +78,9 @@ export class GetCommandsFeature extends LanguageClientConsumer {
     private async CommandExplorerRefresh(): Promise<void> {
         const client = await LanguageClientConsumer.getLanguageClient();
         const result = await client.sendRequest(GetCommandRequestType);
-        const exclusions = getSettings().sideBar.CommandExplorerExcludeFilter;
+        const exclusions = vscode.workspace
+            .getConfiguration("powershell.sideBar")
+            .get<string[]>("CommandExplorerExcludeFilter", []);
         const excludeFilter = exclusions.map((filter: string) =>
             filter.toLowerCase(),
         );

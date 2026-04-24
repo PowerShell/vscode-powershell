@@ -13,7 +13,7 @@ import {
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import type { ILogger } from "../logging";
-import { getSettings, validateCwdSetting } from "../settings";
+import { validateCwdSetting } from "../settings";
 import { DebugConfig, DebugConfigurations } from "./DebugSession";
 
 export interface IExtensionCommand {
@@ -311,9 +311,10 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             languageClient.onNotification(ClearTerminalNotificationType, () => {
                 // We check to see if they have TrueClear on. If not, no-op because the
                 // overriden Clear-Host already calls [System.Console]::Clear()
-                if (
-                    getSettings().integratedConsole.forceClearScrollbackBuffer
-                ) {
+                const forceClearScrollbackBuffer = vscode.workspace
+                    .getConfiguration("powershell.integratedConsole")
+                    .get<boolean>("forceClearScrollbackBuffer");
+                if (forceClearScrollbackBuffer) {
                     void vscode.commands.executeCommand(
                         "workbench.action.terminal.clear",
                     );

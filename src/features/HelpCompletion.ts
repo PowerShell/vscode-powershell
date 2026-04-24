@@ -14,7 +14,12 @@ import {
 import { RequestType } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
 import { LanguageClientConsumer } from "../languageClientConsumer";
-import { CommentType, getSettings, Settings } from "../settings";
+
+enum CommentType {
+    Disabled = "Disabled",
+    BlockComment = "BlockComment",
+    LineComment = "LineComment",
+}
 
 interface ICommentHelpRequestArguments {}
 
@@ -37,13 +42,14 @@ enum SearchState {
 export class HelpCompletionFeature extends LanguageClientConsumer {
     private helpCompletionProvider: HelpCompletionProvider | undefined;
     private disposable: Disposable | undefined;
-    private settings: Settings;
 
     constructor() {
         super();
-        this.settings = getSettings();
 
-        if (this.settings.helpCompletion !== CommentType.Disabled) {
+        const helpCompletion = workspace
+            .getConfiguration("powershell")
+            .get<CommentType>("helpCompletion", CommentType.BlockComment);
+        if (helpCompletion !== CommentType.Disabled) {
             this.helpCompletionProvider = new HelpCompletionProvider();
             this.disposable = workspace.onDidChangeTextDocument(async (e) => {
                 await this.onEvent(e);
@@ -144,12 +150,10 @@ class HelpCompletionProvider extends LanguageClientConsumer {
     private triggerFinderHelpComment: TriggerFinder;
     private lastChangeRange: Range | undefined;
     private lastDocument: TextDocument | undefined;
-    private settings: Settings;
 
     constructor() {
         super();
         this.triggerFinderHelpComment = new TriggerFinder("##");
-        this.settings = getSettings();
     }
 
     public get triggerFound(): boolean {
@@ -187,11 +191,13 @@ class HelpCompletionProvider extends LanguageClientConsumer {
         const doc = this.lastDocument;
 
         const client = await LanguageClientConsumer.getLanguageClient();
+        const helpCompletion = workspace
+            .getConfiguration("powershell")
+            .get<CommentType>("helpCompletion", CommentType.BlockComment);
         const result = await client.sendRequest(CommentHelpRequestType, {
             documentUri: doc.uri.toString(),
             triggerPosition: triggerStartPos,
-            blockComment:
-                this.settings.helpCompletion === CommentType.BlockComment,
+            blockComment: helpCompletion === CommentType.BlockComment,
         });
 
         if (result.content.length === 0) {

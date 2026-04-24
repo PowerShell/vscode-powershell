@@ -10,7 +10,6 @@ import {
 } from "../controls/checkboxQuickPick";
 import { LanguageClientConsumer } from "../languageClientConsumer";
 import type { ILogger } from "../logging";
-import { getSettings } from "../settings";
 
 export const EvaluateRequestType = new RequestType<
     IEvaluateRequestArguments,
@@ -215,9 +214,11 @@ export class ConsoleFeature extends LanguageClientConsumer {
                         // We need to honor the focusConsoleOnExecute setting here too. However, the boolean that `show`
                         // takes is called `preserveFocus` which when `true` the terminal will not take focus.
                         // This is the inverse of focusConsoleOnExecute so we have to inverse the boolean.
+                        const focusConsoleOnExecute = vscode.workspace
+                            .getConfiguration("powershell.integratedConsole")
+                            .get<boolean>("focusConsoleOnExecute", true);
                         vscode.window.activeTerminal.show(
-                            !getSettings().integratedConsole
-                                .focusConsoleOnExecute,
+                            !focusConsoleOnExecute,
                         );
                         await vscode.commands.executeCommand(
                             "workbench.action.terminal.scrollToBottom",
