@@ -2,5 +2,9 @@
   // Use a custom PowerShell Script Analyzer settings file for this workspace.
   // Relative paths for this setting are always relative to the workspace root dir.
   "powershell.scriptAnalysis.settingsPath": "./PSScriptAnalyzerSettings.psd1",
-  "files.defaultLanguage": "powershell"
+  // NOTE: "files.defaultLanguage" has been removed because it overrides user's
+  // global editor settings without explicit consent, which is unexpected behavior.
+  // Users who want PowerShell as the default language can add this setting
+  // to their user or workspace settings if desired.
+  // See: https://github.com/PowerShell/vscode-powershell/issues/5330
 }
