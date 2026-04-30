@@ -1401,7 +1401,8 @@ Type 'help' to get help.
         const selectedIndex = additionalPowerShellLocations.findIndex(
             (location) =>
                 location.platform === supportedPlatform &&
-                location.name === exePath.displayName,
+                location.name === exePath.displayName &&
+                location.path === exePath.exePath,
         );
 
         if (selectedIndex < 0) {
