@@ -138,14 +138,16 @@ export class PowerShellExeFinder {
     /**
      * Create a new PowerShellFinder object to discover PowerShell installations.
      * @param platformDetails Information about the machine we are running on.
-     * @param additionalPowerShellExes Additional PowerShell installations as configured in the settings.
+     * @param additionalPowerShellExePaths `additionalPowerShellExePaths` in the settings.
+     * @param additionalPowerShellLocations `additionalPowerShellLocations` in the settings.
      */
     constructor(
         // The platform details descriptor for the platform we're on
         private platformDetails: IPlatformDetails,
-        // Additional configured PowerShells
-        private additionalPowerShellExes: Record<string, string>,
+        // (Old) Additional configured PowerShells
+        private additionalPowerShellExePaths: Record<string, string>,
         private logger?: ILogger,
+        // (New) Additional configured PowerShell locations
         private additionalPowerShellLocations: IAdditionalPowerShellLocation[] = [],
         private processArchitecture: NodeJS.Architecture = process.arch,
     ) {}
@@ -218,7 +220,7 @@ export class PowerShellExeFinder {
         const configuredPowerShells =
             this.additionalPowerShellLocations.length > 0
                 ? this.enumerateAdditionalPowerShellLocations()
-                : this.enumerateAdditionalPowerShellInstallations();
+                : this.enumerateAdditionalPowerShellExePaths();
         for await (const additionalPwsh of configuredPowerShells) {
             if (await additionalPwsh.exists()) {
                 yield additionalPwsh;
@@ -326,17 +328,17 @@ export class PowerShellExeFinder {
     }
 
     /**
-     * Iterates through the configured additional PowerShell executable locations,
+     * Iterates through the configured `additionalPowerShellExePaths`,
      * without checking for their existence.
      */
-    public async *enumerateAdditionalPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe> {
+    public async *enumerateAdditionalPowerShellExePaths(): AsyncIterable<IPossiblePowerShellExe> {
         yield* this.enumerateConfiguredPowerShellInstallations(
-            Object.entries(this.additionalPowerShellExes),
+            Object.entries(this.additionalPowerShellExePaths),
         );
     }
 
     /**
-     * Iterates through the configured additional PowerShell locations for the current platform,
+     * Iterates through the configured `additionalPowerShellLocations` for the current platform,
      * without checking for their existence.
      */
     public async *enumerateAdditionalPowerShellLocations(): AsyncIterable<IPossiblePowerShellExe> {

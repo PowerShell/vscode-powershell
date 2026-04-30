@@ -724,6 +724,18 @@ export class SessionManager implements Middleware {
         return foundPowerShell;
     }
 
+    /**
+     * Read `powershell.powerShellAdditionalExePaths` setting
+     */
+    private getAdditionalPowerShellExePaths(): Record<string, string> {
+        return vscode.workspace
+            .getConfiguration("powershell")
+            .get<Record<string, string>>("powerShellAdditionalExePaths", {});
+    }
+
+    /**
+     * Read `powershell.additionalPowerShellLocations` setting
+     */
     private getAdditionalPowerShellLocations(): IAdditionalPowerShellLocation[] {
         return vscode.workspace
             .getConfiguration("powershell")
@@ -732,7 +744,10 @@ export class SessionManager implements Middleware {
             >("additionalPowerShellLocations", []);
     }
 
-    private usesAdditionalPowerShellLocations(
+    /**
+     * Check if `powershell.additionalPowerShellLocations` setting has any entries
+     */
+    private hasAdditionalPowerShellLocations(
         additionalPowerShellLocations = this.getAdditionalPowerShellLocations(),
     ): boolean {
         return additionalPowerShellLocations.length > 0;
@@ -742,9 +757,7 @@ export class SessionManager implements Middleware {
         additionalPowerShellLocations = this.getAdditionalPowerShellLocations(),
     ): string {
         if (
-            this.usesAdditionalPowerShellLocations(
-                additionalPowerShellLocations,
-            )
+            this.hasAdditionalPowerShellLocations(additionalPowerShellLocations)
         ) {
             return (
                 this.getTopRankedAdditionalPowerShellLocation(
@@ -777,16 +790,12 @@ export class SessionManager implements Middleware {
     private createPowerShellExeFinder(
         additionalPowerShellLocations = this.getAdditionalPowerShellLocations(),
     ): PowerShellExeFinder {
+        // Set `additionalPowerShellExePaths` to empty if
+        // `additionalPowerShellLocations` is configured
         const powerShellAdditionalExePaths =
-            this.usesAdditionalPowerShellLocations(
-                additionalPowerShellLocations,
-            )
+            this.hasAdditionalPowerShellLocations(additionalPowerShellLocations)
                 ? {}
-                : vscode.workspace
-                      .getConfiguration("powershell")
-                      .get<
-                          Record<string, string>
-                      >("powerShellAdditionalExePaths", {});
+                : this.getAdditionalPowerShellExePaths();
 
         return new PowerShellExeFinder(
             this.platformDetails,
@@ -1470,8 +1479,8 @@ Type 'help' to get help.
     private async showSessionMenu(): Promise<void> {
         const additionalPowerShellLocations =
             this.getAdditionalPowerShellLocations();
-        const usesAdditionalPowerShellLocations =
-            this.usesAdditionalPowerShellLocations(
+        const hasAdditionalPowerShellLocations =
+            this.hasAdditionalPowerShellLocations(
                 additionalPowerShellLocations,
             );
         const powershellExeFinder = this.createPowerShellExeFinder(
@@ -1489,7 +1498,7 @@ Type 'help' to get help.
                 return new SessionMenuItem(
                     `Switch to: ${item.displayName}`,
                     async () => {
-                        if (usesAdditionalPowerShellLocations) {
+                        if (hasAdditionalPowerShellLocations) {
                             await this.increaseAdditionalPowerShellLocationWeight(
                                 item,
                             );
@@ -1535,7 +1544,7 @@ Type 'help' to get help.
                 async () => {
                     await vscode.commands.executeCommand(
                         "workbench.action.openSettings",
-                        usesAdditionalPowerShellLocations
+                        hasAdditionalPowerShellLocations
                             ? "additionalPowerShellLocations"
                             : "powerShellAdditionalExePaths",
                     );

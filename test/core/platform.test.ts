@@ -1147,7 +1147,7 @@ describe("Platform module", function () {
                 );
 
                 let i = 0;
-                for await (const additionalPwsh of powerShellExeFinder.enumerateAdditionalPowerShellInstallations()) {
+                for await (const additionalPwsh of powerShellExeFinder.enumerateAdditionalPowerShellExePaths()) {
                     const expectedPowerShell =
                         testPlatform.expectedPowerShellSequence[i];
                     i++;
