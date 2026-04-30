@@ -34,6 +34,21 @@ export enum OperatingSystem {
     Linux,
 }
 
+export type SupportedPlatform =
+    | "windows-x64"
+    | "windows-arm64"
+    | "macos-x64"
+    | "macos-arm64"
+    | "linux-x64"
+    | "linux-aarch64";
+
+export interface IAdditionalPowerShellLocation {
+    readonly name: string;
+    readonly path: string;
+    readonly platform: SupportedPlatform;
+    readonly weight?: number;
+}
+
 export interface IPlatformDetails {
     operatingSystem: OperatingSystem;
     isOS64Bit: boolean;
@@ -44,6 +59,46 @@ export interface IPowerShellExeDetails {
     readonly displayName: string;
     readonly exePath: string;
     readonly supportsProperArguments: boolean;
+}
+
+export function getSupportedPlatform(
+    platformDetails: IPlatformDetails,
+    processArchitecture: NodeJS.Architecture = process.arch,
+): SupportedPlatform | undefined {
+    switch (platformDetails.operatingSystem) {
+        case OperatingSystem.Windows:
+            switch (processArchitecture) {
+                case "x64":
+                    return "windows-x64";
+                case "arm64":
+                    return "windows-arm64";
+                default:
+                    return undefined;
+            }
+
+        case OperatingSystem.MacOS:
+            switch (processArchitecture) {
+                case "x64":
+                    return "macos-x64";
+                case "arm64":
+                    return "macos-arm64";
+                default:
+                    return undefined;
+            }
+
+        case OperatingSystem.Linux:
+            switch (processArchitecture) {
+                case "x64":
+                    return "linux-x64";
+                case "arm64":
+                    return "linux-aarch64";
+                default:
+                    return undefined;
+            }
+
+        case OperatingSystem.Unknown:
+            return undefined;
+    }
 }
 
 export function getPlatformDetails(): IPlatformDetails {
@@ -91,6 +146,8 @@ export class PowerShellExeFinder {
         // Additional configured PowerShells
         private additionalPowerShellExes: Record<string, string>,
         private logger?: ILogger,
+        private additionalPowerShellLocations: IAdditionalPowerShellLocation[] = [],
+        private processArchitecture: NodeJS.Architecture = process.arch,
     ) {}
 
     /**
@@ -158,7 +215,11 @@ export class PowerShellExeFinder {
 
         // Also show any additionally configured PowerShells
         // These may be duplicates of the default installations, but given a different name.
-        for await (const additionalPwsh of this.enumerateAdditionalPowerShellInstallations()) {
+        const configuredPowerShells =
+            this.additionalPowerShellLocations.length > 0
+                ? this.enumerateAdditionalPowerShellLocations()
+                : this.enumerateAdditionalPowerShellInstallations();
+        for await (const additionalPwsh of configuredPowerShells) {
             if (await additionalPwsh.exists()) {
                 yield additionalPwsh;
             } else if (!additionalPwsh.suppressWarning) {
@@ -269,69 +330,75 @@ export class PowerShellExeFinder {
      * without checking for their existence.
      */
     public async *enumerateAdditionalPowerShellInstallations(): AsyncIterable<IPossiblePowerShellExe> {
-        for (const versionName in this.additionalPowerShellExes) {
+        yield* this.enumerateConfiguredPowerShellInstallations(
+            Object.entries(this.additionalPowerShellExes),
+        );
+    }
+
+    /**
+     * Iterates through the configured additional PowerShell locations for the current platform,
+     * without checking for their existence.
+     */
+    public async *enumerateAdditionalPowerShellLocations(): AsyncIterable<IPossiblePowerShellExe> {
+        const supportedPlatform = getSupportedPlatform(
+            this.platformDetails,
+            this.processArchitecture,
+        );
+        if (!supportedPlatform) {
+            return;
+        }
+
+        yield* this.enumerateConfiguredPowerShellInstallations(
+            this.additionalPowerShellLocations
+                .filter((location) => location.platform === supportedPlatform)
+                // Higher weight wins. Equal weights preserve definition order.
+                .sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0))
+                .map((location): [string, string] => [
+                    location.name,
+                    location.path,
+                ]),
+        );
+    }
+
+    private async *enumerateConfiguredPowerShellInstallations(
+        configuredPowerShells: Iterable<readonly [string, string]>,
+    ): AsyncIterable<IPossiblePowerShellExe> {
+        for (const [versionName, configuredPath] of configuredPowerShells) {
+            let exePath: string | undefined =
+                utils.stripQuotePair(configuredPath);
+            if (!exePath) {
+                continue;
+            }
+
+            exePath = untildify(exePath);
+            const args: [string, undefined, boolean, boolean] =
+                // Must be a tuple type and is suppressing the warning
+                [versionName, undefined, true, true];
+
+            // Always search for what the user gave us first, but with the warning
+            // suppressed so we can display it after all possibilities are exhausted
+            let pwsh = new PossiblePowerShellExe(exePath, ...args);
+            if (await pwsh.exists()) {
+                yield pwsh;
+                continue;
+            }
+
+            // Also search for `pwsh[.exe]` and `powershell[.exe]` if missing
             if (
-                Object.prototype.hasOwnProperty.call(
-                    this.additionalPowerShellExes,
-                    versionName,
-                )
+                this.platformDetails.operatingSystem === OperatingSystem.Windows
             ) {
-                let exePath: string | undefined = utils.stripQuotePair(
-                    this.additionalPowerShellExes[versionName],
-                );
-                if (!exePath) {
-                    continue;
-                }
-
-                exePath = untildify(exePath);
-                const args: [string, undefined, boolean, boolean] =
-                    // Must be a tuple type and is suppressing the warning
-                    [versionName, undefined, true, true];
-
-                // Always search for what the user gave us first, but with the warning
-                // suppressed so we can display it after all possibilities are exhausted
-                let pwsh = new PossiblePowerShellExe(exePath, ...args);
-                if (await pwsh.exists()) {
-                    yield pwsh;
-                    continue;
-                }
-
-                // Also search for `pwsh[.exe]` and `powershell[.exe]` if missing
+                // Handle Windows where '.exe' and 'powershell' are things
                 if (
-                    this.platformDetails.operatingSystem ===
-                    OperatingSystem.Windows
+                    !exePath.endsWith("pwsh.exe") &&
+                    !exePath.endsWith("powershell.exe")
                 ) {
-                    // Handle Windows where '.exe' and 'powershell' are things
                     if (
-                        !exePath.endsWith("pwsh.exe") &&
-                        !exePath.endsWith("powershell.exe")
+                        exePath.endsWith("pwsh") ||
+                        exePath.endsWith("powershell")
                     ) {
-                        if (
-                            exePath.endsWith("pwsh") ||
-                            exePath.endsWith("powershell")
-                        ) {
-                            // Add extension if that was missing
-                            pwsh = new PossiblePowerShellExe(
-                                exePath + ".exe",
-                                ...args,
-                            );
-                            if (await pwsh.exists()) {
-                                yield pwsh;
-                                continue;
-                            }
-                        }
-                        // Also add full exe names (this isn't an else just in case
-                        // the folder was named "pwsh" or "powershell")
+                        // Add extension if that was missing
                         pwsh = new PossiblePowerShellExe(
-                            path.join(exePath, "pwsh.exe"),
-                            ...args,
-                        );
-                        if (await pwsh.exists()) {
-                            yield pwsh;
-                            continue;
-                        }
-                        pwsh = new PossiblePowerShellExe(
-                            path.join(exePath, "powershell.exe"),
+                            exePath + ".exe",
                             ...args,
                         );
                         if (await pwsh.exists()) {
@@ -339,10 +406,20 @@ export class PowerShellExeFinder {
                             continue;
                         }
                     }
-                } else if (!exePath.endsWith("pwsh")) {
-                    // Always just 'pwsh' on non-Windows
+
+                    // Also add full exe names (this isn't an else just in case
+                    // the folder was named "pwsh" or "powershell")
                     pwsh = new PossiblePowerShellExe(
-                        path.join(exePath, "pwsh"),
+                        path.join(exePath, "pwsh.exe"),
+                        ...args,
+                    );
+                    if (await pwsh.exists()) {
+                        yield pwsh;
+                        continue;
+                    }
+
+                    pwsh = new PossiblePowerShellExe(
+                        path.join(exePath, "powershell.exe"),
                         ...args,
                     );
                     if (await pwsh.exists()) {
@@ -350,16 +427,26 @@ export class PowerShellExeFinder {
                         continue;
                     }
                 }
-
-                // If we're still being iterated over, no permutation of the given path existed so yield an object with the warning unsuppressed
-                yield new PossiblePowerShellExe(
-                    exePath,
-                    versionName,
-                    false,
-                    undefined,
-                    false,
+            } else if (!exePath.endsWith("pwsh")) {
+                // Always just 'pwsh' on non-Windows
+                pwsh = new PossiblePowerShellExe(
+                    path.join(exePath, "pwsh"),
+                    ...args,
                 );
+                if (await pwsh.exists()) {
+                    yield pwsh;
+                    continue;
+                }
             }
+
+            // If we're still being iterated over, no permutation of the given path existed so yield an object with the warning unsuppressed
+            yield new PossiblePowerShellExe(
+                exePath,
+                versionName,
+                false,
+                undefined,
+                false,
+            );
         }
     }
 

@@ -968,6 +968,46 @@
               "type": "string"
             }
           },
+          "powershell.additionalPowerShellLocations": {
+            "type": "array",
+            "default": [],
+            "markdownDescription": "Specifies a list of named PowerShell executables tied to a specific platform. When this setting is non-empty, `#powershell.powerShellAdditionalExePaths#` and `#powershell.powerShellDefaultVersion#` are ignored. Entries are ranked by `weight` (highest first), and entries with the same `weight` keep definition order.",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "path",
+                "platform"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "markdownDescription": "The display name shown in the Session Menu."
+                },
+                "path": {
+                  "type": "string",
+                  "markdownDescription": "The absolute path to the PowerShell executable or containing folder."
+                },
+                "platform": {
+                  "type": "string",
+                  "enum": [
+                    "windows-x64",
+                    "windows-arm64",
+                    "macos-x64",
+                    "macos-arm64",
+                    "linux-x64",
+                    "linux-aarch64"
+                  ],
+                  "markdownDescription": "The target host platform for this PowerShell location."
+                },
+                "weight": {
+                  "type": "number",
+                  "markdownDescription": "Ranking for this location on its platform. Higher values are preferred; equal values preserve definition order."
+                }
+              }
+            }
+          },
           "powershell.cwd": {
             "type": "string",
             "default": "",
