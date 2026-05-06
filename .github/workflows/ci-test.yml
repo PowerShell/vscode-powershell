@@ -67,15 +67,24 @@ jobs:
         run: Invoke-Build -Configuration Release
         working-directory: vscode-powershell
 
+      - name: Rename VSIX to include OS name
+        if: always()
+        shell: pwsh
+        # archive: false uses the filename as the artifact name, so we need unique names across matrix jobs
+        run: Get-Item out/*.vsix -ErrorAction SilentlyContinue | Rename-Item -NewName { $_.BaseName + '-${{ matrix.os }}' + $_.Extension }
+        working-directory: vscode-powershell
+
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: vscode-powershell-vsix-${{ matrix.os }}
-          path: "**/*.vsix"
+          # archive: false uploads the .vsix directly (no zip wrapper) using the filename as the artifact name
+          path: "vscode-powershell/out/*.vsix"
+          archive: false
+          if-no-files-found: ignore
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: vscode-powershell-test-results-${{ matrix.os }}
