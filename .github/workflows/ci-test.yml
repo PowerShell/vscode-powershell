@@ -25,13 +25,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout PowerShellEditorServices
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: PowerShell/PowerShellEditorServices
           path: PowerShellEditorServices
 
       - name: Checkout vscode-powershell
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: vscode-powershell
 
@@ -41,7 +41,7 @@ jobs:
         working-directory: vscode-powershell
 
       - name: Install dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           cache: true
           cache-dependency-path: PowerShellEditorServices/**/*.csproj
@@ -52,7 +52,7 @@ jobs:
         shell: pwsh
         run: ./vscode-powershell/tools/installPSResources.ps1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
