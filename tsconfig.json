@@ -10,7 +10,8 @@
     "verbatimModuleSyntax": true,
     "strict": true,
     "noEmit": true,
-    "module": "Preserve"
+    "module": "Preserve",
+    "types": ["mocha"]
   },
   "include": ["**/*.ts", "eslint.config.mjs", ".vscode-test.mjs"],
   "exclude": ["node_modules"]
