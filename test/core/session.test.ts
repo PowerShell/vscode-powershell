@@ -61,7 +61,8 @@ describe("SessionManager middleware", () => {
             },
         );
 
-        const didOpenPromise = manager.didOpen(document, next);
+        const didOpen = manager.didOpen;
+        const didOpenPromise = didOpen(document, next);
 
         await Promise.resolve();
         assert.equal(
@@ -137,7 +138,8 @@ describe("SessionManager middleware", () => {
             },
         );
 
-        const didChangePromise = manager.didChange(changeEvent, next);
+        const didChange = manager.didChange;
+        const didChangePromise = didChange(changeEvent, next);
 
         await Promise.resolve();
         assert.equal(
