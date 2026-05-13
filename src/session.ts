@@ -490,21 +490,21 @@ export class SessionManager implements Middleware {
     // is fully initialized. This prevents stale parser diagnostics (e.g.
     // unresolved custom attribute types) that would otherwise appear because
     // textDocument/didOpen is sent before the server's type resolution is ready.
-    public async didOpen(
+    public didOpen = async (
         document: vscode.TextDocument,
         next: (document: vscode.TextDocument) => Promise<void>,
-    ): Promise<void> {
+    ): Promise<void> => {
         await this.started.promise;
         return next(document);
-    }
+    };
 
-    public async didChange(
+    public didChange = async (
         event: vscode.TextDocumentChangeEvent,
         next: (event: vscode.TextDocumentChangeEvent) => Promise<void>,
-    ): Promise<void> {
+    ): Promise<void> => {
         await this.started.promise;
         return next(event);
-    }
+    };
 
     // TODO: Is this used by the magic of "Middleware" in the client library?
     public resolveCodeLens(
