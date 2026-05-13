@@ -69,12 +69,12 @@
     "vscode-languageserver-protocol": "^3.17.5"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.10",
     "@vscode/vsce": "^3.7.1",
     "esbuild": "^0.28.0"
   },
   "optionalDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/mocha": "^10.0.10",
     "@types/mock-fs": "^4.13.4",
     "@types/node": "^22.19.17",
     "@types/semver": "^7.7.1",
