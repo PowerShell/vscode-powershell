@@ -726,6 +726,11 @@
             "default": true,
             "markdownDescription": "Shows the last line of a folded section similar to the default VS Code folding style. When disabled, the entire folded region is hidden."
           },
+          "powershell.rename.createParameterAlias": {
+            "type": "boolean",
+            "default": true,
+            "markdownDescription": "Creates an alias attribute for a parameter when renaming a parameter definition."
+          },
           "powershell.helpCompletion": {
             "type": "string",
             "default": "BlockComment",
@@ -769,6 +774,11 @@
             "type": "boolean",
             "default": false,
             "markdownDescription": "Suppresses the warning message when any of `#powershell.powerShellAdditionalExePaths#` is not found."
+          },
+          "powershell.rename.acceptDisclaimer": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Auto-accepts the disclaimer for the PowerShell Rename Symbol feature which has support limitations and risks."
           }
         }
       },
