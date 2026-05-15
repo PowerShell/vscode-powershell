@@ -778,7 +778,7 @@
           "powershell.rename.acceptDisclaimer": {
             "type": "boolean",
             "default": false,
-            "markdownDescription": "Auto-accepts the disclaimer for the PowerShell Rename Symbol feature which has support limitations and risks."
+            "markdownDescription": "Auto-accepts the [disclaimer for the PowerShell Rename Symbol feature](https://aka.ms/powershell-rename-disclaimer) which has support limitations and risks."
           }
         }
       },
