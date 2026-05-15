@@ -1,8 +1,8 @@
 # PowerShell for Visual Studio Code
 
 [![CI Tests](https://github.com/PowerShell/vscode-powershell/actions/workflows/ci-test.yml/badge.svg)](https://github.com/PowerShell/vscode-powershell/actions/workflows/ci-test.yml)
-[![Version](https://img.shields.io/visual-studio-marketplace/v/ms-vscode.PowerShell)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/ms-vscode.PowerShell)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
+[![Version](https://vsmarketplacebadges.dev/version/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
+[![Installs](https://vsmarketplacebadges.dev/downloads-short/ms-vscode.PowerShell.svg)](https://marketplace.visualstudio.com/items?itemName=ms-vscode.PowerShell)
 [![Join the chat on Discord](https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white)](https://aka.ms/powershell-vscode-discord)
 
 This extension provides rich [PowerShell][] language support for [Visual Studio Code][] (VS Code).
