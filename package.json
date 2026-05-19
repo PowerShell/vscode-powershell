@@ -689,6 +689,11 @@
                   ]
                 },
                 "default": []
+              },
+              "notifyOnAttach": {
+                "type": "boolean",
+                "description": "Creates the event 'PSES.Attached' when the debugger attaches to the PowerShell host process. This is useful when creating a script that waits for the debugger to attach.",
+                "default": false
               }
             }
           }
