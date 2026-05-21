@@ -38,11 +38,13 @@ import { SemVer, satisfies } from "semver";
 import { UpdatePowerShell } from "./features/UpdatePowerShell";
 import { LanguageClientConsumer } from "./languageClientConsumer";
 import {
+    type IAdditionalPowerShellLocation,
     type IPlatformDetails,
     type IPowerShellExeDetails,
     OperatingSystem,
     PowerShellExeFinder,
     getPlatformDetails,
+    getSupportedPlatform,
 } from "./platform";
 
 enum SessionStatus {
@@ -673,13 +675,10 @@ export class SessionManager implements Middleware {
         wantedName?: string,
     ): Promise<IPowerShellExeDetails | undefined> {
         this.logger.writeDebug("Finding PowerShell...");
-        const powerShellAdditionalExePaths = vscode.workspace
-            .getConfiguration("powershell")
-            .get<Record<string, string>>("powerShellAdditionalExePaths", {});
-        const powershellExeFinder = new PowerShellExeFinder(
-            this.platformDetails,
-            powerShellAdditionalExePaths,
-            this.logger,
+        const additionalPowerShellLocations =
+            this.getAdditionalPowerShellLocations();
+        const powershellExeFinder = this.createPowerShellExeFinder(
+            additionalPowerShellLocations,
         );
 
         let foundPowerShell: IPowerShellExeDetails | undefined;
@@ -687,9 +686,7 @@ export class SessionManager implements Middleware {
             let defaultPowerShell: IPowerShellExeDetails | undefined;
             wantedName ??=
                 this.powerShellVersionOverride ??
-                vscode.workspace
-                    .getConfiguration("powershell")
-                    .get("powerShellDefaultVersion", "");
+                this.getConfiguredPowerShellName(additionalPowerShellLocations);
             if (wantedName !== "") {
                 for await (const details of powershellExeFinder.enumeratePowerShellInstallations()) {
                     // Need to compare names case-insensitively, from https://stackoverflow.com/a/2140723
@@ -714,7 +711,7 @@ export class SessionManager implements Middleware {
                 foundPowerShell !== undefined
             ) {
                 void this.logger.writeAndShowWarning(
-                    `The 'powerShellDefaultVersion' setting was '${wantedName}' but this was not found!` +
+                    `The requested PowerShell '${wantedName}' was not found!` +
                         ` Instead using first available installation '${foundPowerShell.displayName}' at '${foundPowerShell.exePath}'!`,
                 );
             }
@@ -725,6 +722,87 @@ export class SessionManager implements Middleware {
         }
 
         return foundPowerShell;
+    }
+
+    /**
+     * Read `powershell.powerShellAdditionalExePaths` setting
+     */
+    private getAdditionalPowerShellExePaths(): Record<string, string> {
+        return vscode.workspace
+            .getConfiguration("powershell")
+            .get<Record<string, string>>("powerShellAdditionalExePaths", {});
+    }
+
+    /**
+     * Read `powershell.additionalPowerShellLocations` setting
+     */
+    private getAdditionalPowerShellLocations(): IAdditionalPowerShellLocation[] {
+        return vscode.workspace
+            .getConfiguration("powershell")
+            .get<
+                IAdditionalPowerShellLocation[]
+            >("additionalPowerShellLocations", []);
+    }
+
+    /**
+     * Check if `powershell.additionalPowerShellLocations` setting has any entries
+     */
+    private hasAdditionalPowerShellLocations(
+        additionalPowerShellLocations = this.getAdditionalPowerShellLocations(),
+    ): boolean {
+        return additionalPowerShellLocations.length > 0;
+    }
+
+    private getConfiguredPowerShellName(
+        additionalPowerShellLocations = this.getAdditionalPowerShellLocations(),
+    ): string {
+        if (
+            this.hasAdditionalPowerShellLocations(additionalPowerShellLocations)
+        ) {
+            return (
+                this.getTopRankedAdditionalPowerShellLocation(
+                    additionalPowerShellLocations,
+                )?.name ?? ""
+            );
+        }
+
+        return vscode.workspace
+            .getConfiguration("powershell")
+            .get("powerShellDefaultVersion", "");
+    }
+
+    private getTopRankedAdditionalPowerShellLocation(
+        additionalPowerShellLocations = this.getAdditionalPowerShellLocations(),
+    ): IAdditionalPowerShellLocation | undefined {
+        const supportedPlatform = getSupportedPlatform(this.platformDetails);
+        if (!supportedPlatform) {
+            return undefined;
+        }
+
+        return (
+            additionalPowerShellLocations
+                .filter((location) => location.platform === supportedPlatform)
+                // Higher weight wins. Equal weights preserve definition order.
+                .sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0))[0]
+        );
+    }
+
+    private createPowerShellExeFinder(
+        additionalPowerShellLocations = this.getAdditionalPowerShellLocations(),
+    ): PowerShellExeFinder {
+        // Set `additionalPowerShellExePaths` to empty if
+        // `additionalPowerShellLocations` is configured
+        const powerShellAdditionalExePaths =
+            this.hasAdditionalPowerShellLocations(additionalPowerShellLocations)
+                ? {}
+                : this.getAdditionalPowerShellExePaths();
+
+        return new PowerShellExeFinder(
+            this.platformDetails,
+            powerShellAdditionalExePaths,
+            this.logger,
+            additionalPowerShellLocations,
+        );
     }
 
     private async startLanguageServerProcess(
@@ -1194,9 +1272,7 @@ Type 'help' to get help.
         } else {
             const wantedVersion =
                 this.powerShellVersionOverride ??
-                vscode.workspace
-                    .getConfiguration("powershell")
-                    .get("powerShellDefaultVersion", "");
+                this.getConfiguredPowerShellName();
             if (wantedVersion) {
                 // When it hasn't been found yet.
                 this.languageStatusItem.text += ` ${wantedVersion}`;
@@ -1319,6 +1395,63 @@ Type 'help' to get help.
         await this.restartSession(exePath.displayName);
     }
 
+    private async increaseAdditionalPowerShellLocationWeight(
+        exePath: IPowerShellExeDetails,
+    ): Promise<void> {
+        const additionalPowerShellLocations =
+            this.getAdditionalPowerShellLocations();
+        const supportedPlatform = getSupportedPlatform(this.platformDetails);
+
+        if (!supportedPlatform) {
+            await this.restartSession(exePath.displayName);
+            return;
+        }
+
+        const selectedIndex = additionalPowerShellLocations.findIndex(
+            (location) =>
+                location.platform === supportedPlatform &&
+                location.name === exePath.displayName &&
+                location.path === exePath.exePath,
+        );
+
+        if (selectedIndex < 0) {
+            await this.restartSession(exePath.displayName);
+            return;
+        }
+
+        const highestWeightForPlatform = additionalPowerShellLocations
+            .filter((location) => location.platform === supportedPlatform)
+            .reduce(
+                (highestWeight, location) =>
+                    Math.max(highestWeight, location.weight ?? 0),
+                0,
+            );
+
+        const updatedLocations = additionalPowerShellLocations.map(
+            (location, index) =>
+                index === selectedIndex
+                    ? {
+                          ...location,
+                          weight: highestWeightForPlatform + 1,
+                      }
+                    : location,
+        );
+
+        this.suppressRestartPrompt = true;
+        try {
+            await changeSetting(
+                "additionalPowerShellLocations",
+                updatedLocations,
+                true,
+                this.logger,
+            );
+        } finally {
+            this.suppressRestartPrompt = false;
+        }
+
+        await this.restartSession(exePath.displayName);
+    }
+
     // Shows the temp debug terminal if it exists, otherwise the session terminal.
     public showDebugTerminal(isExecute?: boolean): void {
         const preserveFocus =
@@ -1344,13 +1477,14 @@ Type 'help' to get help.
     }
 
     private async showSessionMenu(): Promise<void> {
-        const powerShellAdditionalExePaths = vscode.workspace
-            .getConfiguration("powershell")
-            .get<Record<string, string>>("powerShellAdditionalExePaths", {});
-        const powershellExeFinder = new PowerShellExeFinder(
-            this.platformDetails,
-            powerShellAdditionalExePaths,
-            this.logger,
+        const additionalPowerShellLocations =
+            this.getAdditionalPowerShellLocations();
+        const hasAdditionalPowerShellLocations =
+            this.hasAdditionalPowerShellLocations(
+                additionalPowerShellLocations,
+            );
+        const powershellExeFinder = this.createPowerShellExeFinder(
+            additionalPowerShellLocations,
         );
         const availablePowerShellExes =
             await powershellExeFinder.getAllAvailablePowerShellInstallations();
@@ -1364,6 +1498,13 @@ Type 'help' to get help.
                 return new SessionMenuItem(
                     `Switch to: ${item.displayName}`,
                     async () => {
+                        if (hasAdditionalPowerShellLocations) {
+                            await this.increaseAdditionalPowerShellLocationWeight(
+                                item,
+                            );
+                            return;
+                        }
+
                         await this.changePowerShellDefaultVersion(item);
                     },
                 );
@@ -1403,7 +1544,9 @@ Type 'help' to get help.
                 async () => {
                     await vscode.commands.executeCommand(
                         "workbench.action.openSettings",
-                        "powerShellAdditionalExePaths",
+                        hasAdditionalPowerShellLocations
+                            ? "additionalPowerShellLocations"
+                            : "powerShellAdditionalExePaths",
                     );
                 },
             ),
