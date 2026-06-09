@@ -20,6 +20,7 @@ import {
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { ISECompatibilityFeature } from "./features/ISECompatibility";
+import { LanguageModelToolsFeature } from "./features/LanguageModelTools";
 import { OpenInISEFeature } from "./features/OpenInISE";
 import { PesterTestsFeature } from "./features/PesterTests";
 import { RemoteFilesFeature } from "./features/RemoteFiles";
@@ -193,6 +194,7 @@ export async function activate(
         new RemoteFilesFeature(),
         new DebugSessionFeature(context, sessionManager, logger),
         new HelpCompletionFeature(),
+        new LanguageModelToolsFeature(),
     ];
 
     sessionManager.setLanguageClientConsumers(languageClientConsumers);

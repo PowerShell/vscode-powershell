@@ -132,6 +132,97 @@
         "language": "powershell"
       }
     ],
+    "languageModelTools": [
+      {
+        "name": "powershell_get_command",
+        "toolReferenceName": "getPowerShellCommand",
+        "displayName": "Get PowerShell Command",
+        "modelDescription": "Get the commands (cmdlets, functions, and scripts) available in the user's active PowerShell session, scoped by name and/or module. You must provide a 'name' and/or 'module' filter (at least one is required). Returns each matching command's name, module, default parameter set, and parameter names. Use this to discover the exact name, module, and parameters of a PowerShell command instead of guessing.",
+        "userDescription": "Lists commands available in the active PowerShell session.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(symbol-method)",
+        "tags": [
+          "powershell"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Only return commands whose name matches this value (supports wildcards; bare text is matched as a substring), e.g. 'Get-ChildItem', 'ChildItem', or 'Get-*'. Provide this and/or 'module'."
+            },
+            "module": {
+              "type": "string",
+              "description": "Only return commands from this module (supports wildcards), e.g. 'Microsoft.PowerShell.Management'. Provide this and/or 'name'."
+            }
+          }
+        }
+      },
+      {
+        "name": "powershell_get_help",
+        "toolReferenceName": "getPowerShellHelp",
+        "displayName": "Get PowerShell Help",
+        "modelDescription": "Get the full help (Get-Help -Full) for a specific PowerShell command from the user's active session, including synopsis, syntax, parameter descriptions, and examples. Use this to ground answers about how a PowerShell command works and what parameters it accepts, instead of guessing.",
+        "userDescription": "Retrieves the full help for a PowerShell command.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(question)",
+        "tags": [
+          "powershell"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "The name of the PowerShell command to get help for, e.g. 'Get-ChildItem'."
+            }
+          },
+          "required": [
+            "command"
+          ]
+        }
+      },
+      {
+        "name": "powershell_get_environment",
+        "toolReferenceName": "getPowerShellEnvironment",
+        "displayName": "Get PowerShell Environment",
+        "modelDescription": "Get details about the user's active PowerShell session, including the PowerShell version, edition (Core or Desktop), and process architecture. Use this before constructing version- or edition-specific PowerShell so that suggestions match the user's actual environment.",
+        "userDescription": "Reports the active PowerShell version, edition, and architecture.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(terminal-powershell)",
+        "tags": [
+          "powershell"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "powershell_expand_alias",
+        "toolReferenceName": "expandPowerShellAlias",
+        "displayName": "Expand PowerShell Aliases",
+        "modelDescription": "Expand the aliases in a PowerShell script to their full command names (for example 'gci' becomes 'Get-ChildItem' and '?' becomes 'Where-Object') using the user's active PowerShell session. Use this to normalize or clarify aliased PowerShell before explaining or editing it.",
+        "userDescription": "Expands aliases in a PowerShell script to full command names.",
+        "canBeReferencedInPrompt": true,
+        "icon": "$(symbol-string)",
+        "tags": [
+          "powershell"
+        ],
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The PowerShell script text whose aliases should be expanded."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        }
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
