@@ -19,6 +19,22 @@ describe("ISE compatibility feature", function () {
         await vscode.commands.executeCommand("PowerShell.ToggleISEMode");
     }
 
+    // A setting whose default already equals its ISE value (e.g. an always-visible
+    // Command Explorer) stays at that value after ISE mode is disabled, so its
+    // revert can't be observed by comparing against the ISE value. Such settings
+    // are skipped by the revert assertions below.
+    function revertIsObservable(iseSetting: {
+        path: string;
+        name: string;
+        value: string | boolean;
+    }): boolean {
+        return (
+            vscode.workspace
+                .getConfiguration(iseSetting.path)
+                .inspect(iseSetting.name)?.defaultValue !== iseSetting.value
+        );
+    }
+
     before(async function () {
         // Save user's current theme.
         currentTheme = await vscode.workspace
@@ -57,6 +73,9 @@ describe("ISE compatibility feature", function () {
         after(disableISEMode);
         for (const iseSetting of ISECompatibilityFeature.settings) {
             it(`Reverts ${iseSetting.name} correctly`, function () {
+                if (!revertIsObservable(iseSetting)) {
+                    this.skip();
+                }
                 const currently = vscode.workspace
                     .getConfiguration(iseSetting.path)
                     .get(iseSetting.name);
@@ -71,6 +90,9 @@ describe("ISE compatibility feature", function () {
         after(disableISEMode);
         for (const iseSetting of ISECompatibilityFeature.settings) {
             it(`Reverts ${iseSetting.name} correctly`, function () {
+                if (!revertIsObservable(iseSetting)) {
+                    this.skip();
+                }
                 const currently = vscode.workspace
                     .getConfiguration(iseSetting.path)
                     .get(iseSetting.name);
@@ -98,6 +120,9 @@ describe("ISE compatibility feature", function () {
 
         function assertISESettings(): void {
             for (const iseSetting of ISECompatibilityFeature.settings) {
+                if (!revertIsObservable(iseSetting)) {
+                    continue;
+                }
                 const currently = vscode.workspace
                     .getConfiguration(iseSetting.path)
                     .get(iseSetting.name);
