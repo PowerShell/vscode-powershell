@@ -40,9 +40,24 @@ extensions.
 
 ### PSES and Cross-Repo Work
 
-The `modules/` folder contains the PSES, PSReadLine, and PSScriptAnalyzer PowerShell modules. In development it is a
-symlink to `../PowerShellEditorServices/module` — [PowerShellEditorServices][] must be
+The `modules/` folder contains the PSES, PSReadLine, and PSScriptAnalyzer PowerShell modules. In development the whole
+folder is a symlink to `../PowerShellEditorServices/module` — [PowerShellEditorServices][] must be
 cloned as a sibling and built before `npm run compile` will succeed. For cross-repo work, use `pwsh-extension-dev.code-workspace`.
+
+**Cross-repo dev/test cycle.** Because `modules/` is a symlink into the sibling PSES checkout's
+`module/` directory, building PSES deploys its DLLs straight into the path the extension loads from —
+there is no copy step:
+
+- **Edit PSES C# (server)** → rebuild PSES (e.g. `dotnet build src/PowerShellEditorServices/PowerShellEditorServices.csproj`,
+  or `Invoke-Build Build` for a full build). The build deploys into `module/PowerShellEditorServices/bin`,
+  which the symlinked `modules/` exposes to the extension automatically. The extension (and its tests)
+  then load the new DLL — no copy, but you must rebuild PSES, since the extension does not.
+- **Edit extension TypeScript (client)** → `npm run compile`.
+- **Verify end-to-end** → `npm test`. This launches a real VS Code Extension Host with PSES connected
+  and runs the Mocha suite, exercising the locally-built PSES through the symlink. Prefer this over
+  only eyeballing the Extension Development Host: it is the way to confirm cross-repo (client + server)
+  changes actually work, and to catch regressions. After changing a setting's default or any shared
+  behavior, run the full suite — e.g. ISE-compatibility tests assert against setting defaults.
 
 ## Key Conventions
 
