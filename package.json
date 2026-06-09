@@ -210,7 +210,7 @@
         "command": "PowerShell.InsertCommand",
         "title": "Insert Command",
         "category": "PowerShell",
-        "icon": "$(pencil)"
+        "icon": "$(arrow-right)"
       },
       {
         "command": "PowerShell.ShowHelp",
@@ -398,12 +398,12 @@
       "view/item/context": [
         {
           "command": "PowerShell.ShowHelp",
-          "when": "view == PowerShellCommands",
+          "when": "view == PowerShellCommands && viewItem == command",
           "group": "inline@1"
         },
         {
           "command": "PowerShell.InsertCommand",
-          "when": "view == PowerShellCommands",
+          "when": "view == PowerShellCommands && viewItem == command",
           "group": "inline@2"
         }
       ]
@@ -755,7 +755,7 @@
           },
           "powershell.sideBar.CommandExplorerVisibility": {
             "type": "boolean",
-            "default": false,
+            "default": true,
             "markdownDescription": "Specifies the visibility of the Command Explorer in the side bar."
           },
           "powershell.sideBar.CommandExplorerExcludeFilter": {
