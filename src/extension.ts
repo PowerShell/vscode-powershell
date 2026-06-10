@@ -17,6 +17,7 @@ import {
     ExternalApiFeature,
     type IPowerShellExtensionClient,
 } from "./features/ExternalApi";
+import { FoldingFeature } from "./features/Folding";
 import { GetCommandsFeature } from "./features/GetCommands";
 import { HelpCompletionFeature } from "./features/HelpCompletion";
 import { ISECompatibilityFeature } from "./features/ISECompatibility";
@@ -159,6 +160,9 @@ export async function activate(
         new PesterTestsFeature(sessionManager, logger),
         new CodeActionsFeature(logger),
         new SpecifyScriptArgsFeature(context),
+        // Client-side folding fallback for virtual workspaces, where the
+        // language server (which normally provides folding) cannot run.
+        new FoldingFeature(),
 
         vscode.commands.registerCommand(
             "PowerShell.OpenLogFolder",

@@ -1171,6 +1171,10 @@
     "capabilities": {
       "untrustedWorkspaces": {
         "supported": false
+      },
+      "virtualWorkspaces": {
+        "supported": "limited",
+        "description": "In virtual workspaces the PowerShell language server cannot run, so language features that require executing PowerShell are unavailable. Single-file features such as code folding still work."
       }
     },
     "configurationDefaults": {
