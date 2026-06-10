@@ -36,6 +36,8 @@ const endRegionTextRegex = /^\s*#[eE]nd[rR]egion\b/;
 enum TokenKind {
     LCurly,
     RCurly,
+    // Opening parenthesis: a plain `(`, an array subexpression `@(`, or a
+    // subexpression `$(`. All three are treated identically for folding.
     LParen,
     RParen,
     Span,
