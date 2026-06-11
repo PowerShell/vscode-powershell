@@ -149,7 +149,7 @@ export class PesterTestsFeature implements vscode.Disposable {
 
         const useLegacyCodeLens = pesterConfig.get<boolean>(
             "useLegacyCodeLens",
-            true,
+            false,
         );
         if (!useLegacyCodeLens) {
             launchConfig.args.push("-MinimumVersion5");
