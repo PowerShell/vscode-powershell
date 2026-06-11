@@ -1,5 +1,7 @@
 import { defineConfig } from "@vscode/test-cli";
 import { existsSync } from "fs";
+import { tmpdir } from "os";
+import { join } from "path";
 
 export default defineConfig({
     files: "test/**/*.test.ts",
@@ -10,6 +12,11 @@ export default defineConfig({
         "--disable-extensions",
         // Undocumented but valid option to use a temporary profile for testing
         "--profile-temp",
+        // Keep the user-data-dir short. The default lives under .vscode-test/
+        // which, combined with the nested checkout paths CI uses, can push the
+        // main IPC socket path over the macOS 103-char AF_UNIX limit and fail
+        // with EINVAL. See microsoft/vscode#196543.
+        `--user-data-dir=${join(tmpdir(), "vscp")}`,
     ],
     workspaceFolder: `test/${existsSync("C:\\powershell-7\\pwsh.exe") ? "OneBranch" : "TestEnvironment"}.code-workspace`,
     mocha: {
