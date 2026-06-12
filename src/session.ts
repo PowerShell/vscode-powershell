@@ -387,8 +387,14 @@ export class SessionManager implements Middleware {
         await fs.writeFile(pidFilePath, Buffer.from(pid));
         const deletePidOnExit = pwshProcess.onExited(async () => {
             deletePidOnExit.dispose();
-            await fs.delete(pidFilePath, { useTrash: false });
-            this.logger.writeDebug(`Deleted PID file: ${pidFilePath}`);
+            try {
+                await fs.delete(pidFilePath, { useTrash: false });
+                this.logger.writeDebug(`Deleted PID file: ${pidFilePath}`);
+            } catch (err) {
+                this.logger.writeError(
+                    `Error occurred while deleting PID file:\n${err}`,
+                );
+            }
         });
         this.registeredCommands.push(deletePidOnExit);
         this.extensionContext.subscriptions.push(deletePidOnExit);
