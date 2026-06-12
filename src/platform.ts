@@ -755,21 +755,6 @@ export class PowerShellExeFinder {
     }
 }
 
-export function getWindowsSystemPowerShellPath(
-    systemFolderName: string,
-): string | undefined {
-    if (process.env.windir === undefined) {
-        return undefined;
-    } else
-        return path.join(
-            process.env.windir,
-            systemFolderName,
-            "WindowsPowerShell",
-            "v1.0",
-            "powershell.exe",
-        );
-}
-
 interface IPossiblePowerShellExe extends IPowerShellExeDetails {
     exists(): Promise<boolean>;
     readonly suppressWarning: boolean;
