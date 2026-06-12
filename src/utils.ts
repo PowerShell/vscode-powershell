@@ -96,11 +96,6 @@ export async function readDirectory(
     return items.map(([name, _type]) => name);
 }
 
-export function getTimestampString(): string {
-    const time = new Date();
-    return `[${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}]`;
-}
-
 export function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }

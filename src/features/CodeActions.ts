@@ -27,7 +27,7 @@ export class CodeActionsFeature implements vscode.Disposable {
 
     private async showRuleDocumentation(ruleId: string): Promise<void> {
         const pssaDocBaseURL =
-            "https://docs.microsoft.com/powershell/utility-modules/psscriptanalyzer/rules/";
+            "https://learn.microsoft.com/powershell/utility-modules/psscriptanalyzer/rules/";
 
         if (!ruleId) {
             this.log.writeWarning(

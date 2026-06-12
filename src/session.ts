@@ -385,10 +385,10 @@ export class SessionManager implements Middleware {
         const fs = vscode.workspace.fs;
         const pid = (await pwshProcess.getPid())!.toString();
         await fs.writeFile(pidFilePath, Buffer.from(pid));
-        const deletePidOnExit = pwshProcess.onExited(() => {
+        const deletePidOnExit = pwshProcess.onExited(async () => {
             deletePidOnExit.dispose();
-            fs.delete(pidFilePath, { useTrash: false });
-            console.log(`Deleted PID file: ${pidFilePath}`);
+            await fs.delete(pidFilePath, { useTrash: false });
+            this.logger.writeDebug(`Deleted PID file: ${pidFilePath}`);
         });
         this.registeredCommands.push(deletePidOnExit);
         this.extensionContext.subscriptions.push(deletePidOnExit);
