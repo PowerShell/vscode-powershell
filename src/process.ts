@@ -19,6 +19,11 @@ export class PowerShellProcess {
     private consoleTerminal?: vscode.Terminal;
     private consoleCloseSubscription?: vscode.Disposable;
 
+    // The reason the Extension Terminal closed, if it was closed by VS Code
+    // (as opposed to disposed by us). Used to suppress the restart prompt when
+    // the window is shutting down or reloading (see issue #4101).
+    public terminalExitReason?: vscode.TerminalExitReason;
+
     private pid?: number;
     private pidUpdateEmitter?: vscode.EventEmitter<number | undefined>;
 
@@ -342,6 +347,11 @@ export class PowerShellProcess {
         if (terminal !== this.consoleTerminal) {
             return;
         }
+
+        // Capture why the terminal closed before disposing fires `onExited`, so
+        // consumers can tell a window shutdown/reload apart from a user closing
+        // the terminal or the process crashing.
+        this.terminalExitReason = terminal.exitStatus?.reason;
 
         this.logger.writeWarning(
             `PowerShell process terminated or Extension Terminal was closed, PID: ${this.pid}`,

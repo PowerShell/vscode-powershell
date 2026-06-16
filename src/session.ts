@@ -121,6 +121,14 @@ export class SessionManager implements Middleware {
     private versionDetails: IPowerShellVersionDetails | undefined;
     private traceLogLevelHandler?: vscode.Disposable;
 
+    // Set when the session manager is being disposed (e.g. the extension is
+    // deactivating because VS Code is shutting down or reloading). Used to
+    // suppress the "Extension Terminal has stopped" prompt (see issue #4101).
+    private isDisposing = false;
+    // Guards against showing the restart prompt more than once concurrently
+    // (see issue #4145).
+    private isPromptingForRestart = false;
+
     // Promise-based gate resolved when the session reaches Running status.
     // Used by waitUntilStarted() and the didOpen()/didChange() notifications.
     private started = Promise.withResolvers<undefined>();
@@ -170,6 +178,7 @@ export class SessionManager implements Middleware {
     }
 
     public async dispose(): Promise<void> {
+        this.isDisposing = true;
         await this.stop(); // A whole lot of disposals.
 
         this.languageStatusItem.dispose();
@@ -759,7 +768,9 @@ export class SessionManager implements Middleware {
                 this.sessionStatus === SessionStatus.Busy
             ) {
                 this.setSessionStatus("Session Exited!", SessionStatus.Failed);
-                void this.promptForRestart();
+                void this.promptForRestart(
+                    languageServerProcess.terminalExitReason,
+                );
             }
         });
 
@@ -1090,7 +1101,25 @@ Type 'help' to get help.
         return versionDetails;
     }
 
-    private async promptForRestart(): Promise<void> {
+    private async promptForRestart(
+        terminalExitReason?: vscode.TerminalExitReason,
+    ): Promise<void> {
+        // Don't prompt when VS Code itself is shutting down or reloading the
+        // window, nor when the session manager is being disposed (#4101). The
+        // terminal exit reason tells us the window closed even if it happens
+        // before the extension's `deactivate()` runs.
+        if (
+            this.isDisposing ||
+            terminalExitReason === vscode.TerminalExitReason.Shutdown
+        ) {
+            return;
+        }
+
+        // Don't show a second prompt while one is already open (#4145).
+        if (this.isPromptingForRestart) {
+            return;
+        }
+
         const suppressTerminalStoppedNotification = vscode.workspace
             .getConfiguration("powershell.integratedConsole")
             .get<boolean>("suppressTerminalStoppedNotification");
@@ -1098,32 +1127,37 @@ Type 'help' to get help.
             return;
         }
 
-        await this.logger.writeAndShowErrorWithActions(
-            "The PowerShell Extension Terminal has stopped, would you like to restart it? IntelliSense and other features will not work without it!",
-            [
-                {
-                    prompt: "Yes",
-                    action: async (): Promise<void> => {
-                        await this.restartSession();
+        this.isPromptingForRestart = true;
+        try {
+            await this.logger.writeAndShowErrorWithActions(
+                "The PowerShell Extension Terminal has stopped, would you like to restart it? IntelliSense and other features will not work without it!",
+                [
+                    {
+                        prompt: "Yes",
+                        action: async (): Promise<void> => {
+                            await this.restartSession();
+                        },
                     },
-                },
-                {
-                    prompt: "No",
-                    action: undefined,
-                },
-                {
-                    prompt: "Don't Show Again",
-                    action: async (): Promise<void> => {
-                        await changeSetting(
-                            "integratedConsole.suppressTerminalStoppedNotification",
-                            true,
-                            true,
-                            this.logger,
-                        );
+                    {
+                        prompt: "No",
+                        action: undefined,
                     },
-                },
-            ],
-        );
+                    {
+                        prompt: "Don't Show Again",
+                        action: async (): Promise<void> => {
+                            await changeSetting(
+                                "integratedConsole.suppressTerminalStoppedNotification",
+                                true,
+                                true,
+                                this.logger,
+                            );
+                        },
+                    },
+                ],
+            );
+        } finally {
+            this.isPromptingForRestart = false;
+        }
     }
 
     private sendTelemetryEvent(
