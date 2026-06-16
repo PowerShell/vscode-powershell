@@ -328,7 +328,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
     private async clearTerminal(): Promise<void> {
         // We check to see if they have TrueClear on. If not, no-op because the
-        // overriden Clear-Host already calls [System.Console]::Clear()
+        // overridden Clear-Host already calls [System.Console]::Clear()
         const forceClearScrollbackBuffer = vscode.workspace
             .getConfiguration("powershell.integratedConsole")
             .get<boolean>("forceClearScrollbackBuffer");
