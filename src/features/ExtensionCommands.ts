@@ -338,8 +338,13 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
 
         await vscode.commands.executeCommand("workbench.action.terminal.clear");
 
-        // Clearing the terminal focuses it, but if the user has asked us not to
-        // focus the console on execute, then we restore focus to the editor.
+        // Clearing the terminal also focuses it, and VS Code exposes no way to
+        // learn what was focused beforehand (there's no terminal focus state,
+        // and `activeTextEditor` doesn't go undefined when the terminal is
+        // focused). So when the user has opted out of focusing the console on
+        // execute, we best-effort restore focus to the editor. The caveat is
+        // that running `Clear-Host` directly in the console also moves focus to
+        // the editor under this setting.
         const focusConsoleOnExecute = vscode.workspace
             .getConfiguration("powershell.integratedConsole")
             .get<boolean>("focusConsoleOnExecute", true);
