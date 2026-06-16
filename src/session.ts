@@ -4,9 +4,10 @@
 import net = require("net");
 import path = require("path");
 import vscode = require("vscode");
-import TelemetryReporter, {
+import {
     type TelemetryEventMeasurements,
     type TelemetryEventProperties,
+    TelemetryReporter,
 } from "@vscode/extension-telemetry";
 import { Message } from "vscode-jsonrpc";
 import {
