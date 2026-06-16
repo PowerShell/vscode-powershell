@@ -309,16 +309,7 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
             ),
 
             languageClient.onNotification(ClearTerminalNotificationType, () => {
-                // We check to see if they have TrueClear on. If not, no-op because the
-                // overriden Clear-Host already calls [System.Console]::Clear()
-                const forceClearScrollbackBuffer = vscode.workspace
-                    .getConfiguration("powershell.integratedConsole")
-                    .get<boolean>("forceClearScrollbackBuffer");
-                if (forceClearScrollbackBuffer) {
-                    void vscode.commands.executeCommand(
-                        "workbench.action.terminal.clear",
-                    );
-                }
+                void this.clearTerminal();
             }),
         ];
     }
@@ -332,6 +323,30 @@ export class ExtensionCommandsFeature extends LanguageClientConsumer {
         }
         for (const statusBarMessage of this.statusBarMessages) {
             statusBarMessage.dispose();
+        }
+    }
+
+    private async clearTerminal(): Promise<void> {
+        // We check to see if they have TrueClear on. If not, no-op because the
+        // overriden Clear-Host already calls [System.Console]::Clear()
+        const forceClearScrollbackBuffer = vscode.workspace
+            .getConfiguration("powershell.integratedConsole")
+            .get<boolean>("forceClearScrollbackBuffer");
+        if (!forceClearScrollbackBuffer) {
+            return;
+        }
+
+        await vscode.commands.executeCommand("workbench.action.terminal.clear");
+
+        // Clearing the terminal focuses it, but if the user has asked us not to
+        // focus the console on execute, then we restore focus to the editor.
+        const focusConsoleOnExecute = vscode.workspace
+            .getConfiguration("powershell.integratedConsole")
+            .get<boolean>("focusConsoleOnExecute", true);
+        if (!focusConsoleOnExecute) {
+            await vscode.commands.executeCommand(
+                "workbench.action.focusActiveEditorGroup",
+            );
         }
     }
 
