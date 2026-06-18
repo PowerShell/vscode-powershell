@@ -1196,7 +1196,7 @@ Type 'help' to get help.
         const statusTitle = "Show PowerShell Session Menu";
         const languageStatusItem = vscode.languages.createLanguageStatusItem(
             "powershell",
-            this.documentSelector,
+            this.documentSelector as vscode.DocumentSelector,
         );
         languageStatusItem.command = {
             title: statusTitle,
