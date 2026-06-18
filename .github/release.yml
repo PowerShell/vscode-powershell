@@ -11,6 +11,9 @@ changelog:
     - title: Squashed Bugs 🐛
       labels:
         - Issue-Bug
+    - title: Performance Improvements ⚡
+      labels:
+        - Issue-Performance
     - title: Other Changes 🙏
       labels:
         - "*"
