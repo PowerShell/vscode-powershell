@@ -62,21 +62,21 @@
   "dependencies": {
     "@microsoft/applicationinsights-common": "^3.4.1",
     "@vscode/extension-telemetry": "^1.5.2",
-    "semver": "^7.8.0",
+    "semver": "^7.8.4",
     "untildify": "^4.0.0",
     "uuid": "^14.0.0",
     "vscode-languageclient": "^9.0.1",
-    "vscode-languageserver-protocol": "^3.17.5"
+    "vscode-languageserver-protocol": "^3.18.0"
   },
   "devDependencies": {
-    "@vscode/vsce": "^3.9.1",
-    "esbuild": "^0.28.0"
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.28.1"
   },
   "optionalDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/mocha": "^10.0.10",
     "@types/mock-fs": "^4.13.4",
-    "@types/node": "^22.19.19",
+    "@types/node": "^22.19.21",
     "@types/semver": "^7.7.1",
     "@types/sinon": "^21.0.1",
     "@types/ungap__structured-clone": "^1.2.0",
@@ -86,18 +86,25 @@
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "esbuild-register": "^3.6.0",
-    "eslint": "^10.3.0",
+    "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
     "mock-fs": "^5.5.0",
-    "prettier": "^3.8.3",
+    "prettier": "^3.8.4",
     "prettier-plugin-organize-imports": "^4.3.0",
     "sinon": "^22.0.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "^8.61.1"
   },
   "overrides": {
-    "serialize-javascript": "^7.0.5",
-    "diff": "^8.0.3"
+    "@nevware21/ts-utils": "^0.15.0",
+    "diff": "^8.0.3",
+    "form-data": "^4.0.6",
+    "js-yaml": "^4.2.0",
+    "markdown-it": "^14.2.0",
+    "qs": "^6.15.2",
+    "serialize-javascript": "^7.0.6",
+    "tmp": "^0.2.7",
+    "undici": "^7.28.0"
   },
   "extensionDependencies": [
     "vscode.powershell"
