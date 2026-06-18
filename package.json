@@ -65,8 +65,8 @@
     "semver": "^7.8.0",
     "untildify": "^4.0.0",
     "uuid": "^14.0.0",
-    "vscode-languageclient": "^9.0.1",
-    "vscode-languageserver-protocol": "^3.17.5"
+    "vscode-languageclient": "^10.0.0",
+    "vscode-languageserver-protocol": "^3.18.0"
   },
   "devDependencies": {
     "@vscode/vsce": "^3.9.1",

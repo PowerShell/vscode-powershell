@@ -41,7 +41,7 @@ export interface IEditorContext {
 
 export interface IInvokeExtensionCommandRequestArguments {
     name: string;
-    context: IEditorContext;
+    context: IEditorContext | undefined;
 }
 
 export const ExtensionCommandAddedNotificationType =
@@ -68,7 +68,7 @@ function asCodePosition(value: Position): vscode.Position {
 
 export const GetEditorContextRequestType = new RequestType<
     IGetEditorContextRequestArguments,
-    IEditorContext,
+    IEditorContext | undefined,
     void
 >("editor/getEditorContext");
 
