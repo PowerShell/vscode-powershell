@@ -1,12 +1,12 @@
 import eslint from "@eslint/js";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import { defineConfig } from "eslint/config";
-import tseslint from "typescript-eslint";
 
 export default defineConfig(
     eslint.configs.recommended,
-    tseslint.configs.strictTypeChecked,
-    tseslint.configs.stylisticTypeChecked,
+    ...typescriptEslint.configs["flat/strict-type-checked"],
+    ...typescriptEslint.configs["flat/stylistic-type-checked"],
     eslintConfigPrettier,
     {
         languageOptions: {
