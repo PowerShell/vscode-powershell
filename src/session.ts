@@ -281,7 +281,7 @@ export class SessionManager implements Middleware {
             this.versionDetails = await this.getVersionDetails();
             if (this.versionDetails === undefined) {
                 void this.setSessionFailedOpenBug(
-                    "Unable to get version details!",
+                    "PowerShell started but didn't report its version in time, so the session couldn't finish starting up!",
                 );
                 return;
             }
@@ -856,13 +856,30 @@ export class SessionManager implements Middleware {
     ): Promise<LanguageClient> {
         this.logger.writeDebug("Connecting to language service...");
         const connectFunc = (): Promise<StreamInfo> => {
-            return new Promise<StreamInfo>((resolve, _reject) => {
-                const socket = net.connect(
-                    sessionDetails.languageServicePipeName,
-                );
+            return new Promise<StreamInfo>((resolve, reject) => {
+                const pipeName = sessionDetails.languageServicePipeName;
+                const socket = net.connect(pipeName);
+
+                // Reject (rather than hang forever) if the transport never
+                // connects, e.g. a stalled named pipe or socket.
+                const timeout = setTimeout(() => {
+                    const message = `Timed out connecting to language service at '${pipeName}'!`;
+                    this.logger.writeError(message);
+                    socket.destroy();
+                    reject(new Error(message));
+                }, 60 * 1000);
+
                 socket.on("connect", () => {
+                    clearTimeout(timeout);
                     this.logger.writeDebug("Language service connected.");
                     resolve({ writer: socket, reader: socket });
+                });
+
+                socket.on("error", (error) => {
+                    clearTimeout(timeout);
+                    const message = `Error connecting to language service at '${pipeName}': ${error.message}`;
+                    this.logger.writeError(message);
+                    reject(error);
                 });
             });
         };
@@ -1077,16 +1094,34 @@ Type 'help' to get help.
     private async getVersionDetails(): Promise<
         IPowerShellVersionDetails | undefined
     > {
-        // Take one minute to get version details, otherwise cancel and fail.
+        // Take one minute to get version details, otherwise cancel and fail
+        // gracefully by returning undefined rather than throwing out of
+        // start(). The caller handles undefined by surfacing the startup
+        // failure to the user.
         const timeout = new vscode.CancellationTokenSource();
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             timeout.cancel();
         }, 60 * 1000);
 
-        const versionDetails = await this.languageClient?.sendRequest(
-            PowerShellVersionRequestType,
-            timeout.token,
-        );
+        let versionDetails: IPowerShellVersionDetails | undefined;
+        try {
+            versionDetails = await this.languageClient?.sendRequest(
+                PowerShellVersionRequestType,
+                timeout.token,
+            );
+        } catch (err) {
+            // A cancelled token (our timeout elapsed) or any other transport
+            // failure rejects the request. Swallow it and return undefined so
+            // the caller's failure handling runs instead of throwing. We log
+            // the underlying cause here since the caller's error won't include
+            // it; the caller surfaces the user-facing message.
+            this.logger.writeWarning(
+                `The PowerShell version request did not complete: ${err}`,
+            );
+        } finally {
+            clearTimeout(timer);
+            timeout.dispose();
+        }
 
         // This is pretty much the only telemetry event we care about.
         // TODO: We actually could send this earlier from PSES itself.
