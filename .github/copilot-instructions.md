@@ -55,3 +55,39 @@ cloned as a sibling and built before `npm run compile` will succeed. For cross-r
   plugin. Use `import x = require("x")` for Node/VS Code built-ins.
 - **File headers**: Every source file starts with `// Copyright (c) Microsoft Corporation.`
   and `// Licensed under the MIT License.`
+
+## Pull Request Labels
+
+Every pull request **must** be labeled before it is opened so it is triaged
+correctly and lands in the right changelog section.
+
+Each PR requires:
+
+- **At least one `Area-*` label** describing the part of the codebase it touches
+  (e.g. `Area-Debugging`, `Area-IntelliSense`, `Area-Workspaces`,
+  `Area-Documentation`). This is used for triage and filtering.
+- **Exactly one `Issue-*` label** describing the kind of change:
+  - `Issue-Bug` — a bug fix.
+  - `Issue-Enhancement` — a new feature or changed behavior.
+  - `Issue-Performance` — a performance improvement.
+
+The `Issue-*` label is not optional: GitHub's auto-generated release notes use it
+to pick the changelog category. See [`.github/release.yml`](./release.yml) for the
+authoritative mapping (`Issue-Enhancement` → "Enhancements & Features ✨",
+`Issue-Bug` → "Squashed Bugs 🐛"). Any PR **without** an `Issue-*` label falls
+through the `"*"` catch-all into "Other Changes 🙏" and is silently
+miscategorized, so always set one correctly.
+
+Additionally:
+
+- Add the relevant **`OS-*` label** (`OS-Windows`, `OS-macOS`, `OS-Linux`) when a
+  change is platform-specific.
+- Use the **`Ignore`** label only for changes that should be excluded from the
+  release notes entirely (e.g. pure CI, test, or docs chores the maintainers do
+  not want in the changelog). `.github/release.yml` excludes this label from the
+  changelog.
+
+The full, authoritative set of labels drifts over time — do not hard-code it
+here. List the current labels with `gh label list --repo PowerShell/vscode-powershell`
+or the repo's [Labels page](https://github.com/PowerShell/vscode-powershell/labels)
+and pick the closest matches.
