@@ -798,8 +798,15 @@ export class SessionManager implements Middleware {
             );
         } else {
             shouldUpdate = false;
+            // If the process terminated before connecting, VS Code gives us the
+            // terminal's exit code, which is far more actionable than a generic
+            // failure. A `undefined` code means it timed out or was closed
+            // without reporting one.
+            const exitCode = powerShellProcess.getExitStatus()?.code;
             void this.setSessionFailedOpenBug(
-                "PowerShell Language Server process didn't start!",
+                exitCode !== undefined && exitCode !== 0
+                    ? `PowerShell Language Server process exited with code: ${exitCode} before connecting! Check the PowerShell output for errors.`
+                    : "PowerShell Language Server process didn't start!",
             );
         }
 

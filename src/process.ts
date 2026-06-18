@@ -22,6 +22,10 @@ export class PowerShellProcess {
     private pid?: number;
     private pidUpdateEmitter?: vscode.EventEmitter<number | undefined>;
 
+    // Captured when the terminal closes so callers can report why the process
+    // exited (e.g. a non-zero exit code) instead of a generic failure message.
+    private exitStatus?: vscode.TerminalExitStatus;
+
     constructor(
         public exePath: string,
         private bundledModulesPath: string,
@@ -223,6 +227,13 @@ export class PowerShellProcess {
         return await this.consoleTerminal?.processId;
     }
 
+    // Returns the exit status of the terminal, if it has closed. This is
+    // captured before the terminal is disposed so callers can report a non-zero
+    // exit code when the process terminates before connecting.
+    public getExitStatus(): vscode.TerminalExitStatus | undefined {
+        return this.exitStatus;
+    }
+
     public showTerminal(preserveFocus?: boolean): void {
         this.consoleTerminal?.show(preserveFocus);
     }
@@ -343,8 +354,16 @@ export class PowerShellProcess {
             return;
         }
 
+        // Capture the exit status before disposing so it can be reported. A
+        // non-zero code means the process failed to start; `undefined` means
+        // the user (or VS Code) closed the terminal.
+        this.exitStatus = terminal.exitStatus;
+        const code = this.exitStatus?.code;
+
         this.logger.writeWarning(
-            `PowerShell process terminated or Extension Terminal was closed, PID: ${this.pid}`,
+            `PowerShell process terminated or Extension Terminal was closed${
+                code !== undefined ? ` with exit code: ${code}` : ""
+            }, PID: ${this.pid}`,
         );
         this.dispose();
     }
