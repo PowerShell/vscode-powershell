@@ -1,5 +1,14 @@
 # PowerShell Extension Release History
 
+## v2026.1.2-preview
+### Thursday, June 25, 2026
+
+With PowerShell Editor Services [v4.7.0](https://github.com/PowerShell/PowerShellEditorServices/releases/tag/v4.7.0)!
+
+Add language model tools, redesign the Command Explorer, and render Show Help in an editor pane.
+
+See more details at the GitHub Release for [v2026.1.2-preview](https://github.com/PowerShell/vscode-powershell/releases/tag/v2026.1.2-preview).
+
 ## v2026.1.1-preview
 ### Friday, May 15, 2026
 
