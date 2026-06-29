@@ -82,6 +82,19 @@ export async function activate(
                 ["(", ")"],
             ],
 
+            autoClosingPairs: [
+                ["{", "}"],
+                ["[", "]"],
+                ["(", ")"],
+                // Here-strings: auto-close @' with \n'@ and @" with \n"@
+                // (fix for https://github.com/PowerShell/vscode-powershell/issues/1517)
+                { open: "@'", close: "\n'@", notIn: ["string", "comment"] },
+                { open: '@"', close: '\n"@', notIn: ["string", "comment"] },
+                { open: '"', close: '"', notIn: ["string"] },
+                { open: "'", close: "'", notIn: ["string", "comment"] },
+                ["<#", "#>"],
+            ],
+
             onEnterRules: [
                 {
                     // e.g. /** | */
