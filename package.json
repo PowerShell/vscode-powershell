@@ -38,11 +38,6 @@
       "url": "https://img.shields.io/discord/180528040881815552.svg?label=%23vscode&logo=discord&logoColor=white",
       "href": "https://aka.ms/powershell-vscode-discord",
       "description": "Join the chat on Discord"
-    },
-    {
-      "url": "https://badges.gitter.im/PowerShell/vscode-powershell.svg",
-      "href": "https://gitter.im/PowerShell/vscode-powershell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge",
-      "description": "Join the chat on Gitter"
     }
   ],
   "repository": {
