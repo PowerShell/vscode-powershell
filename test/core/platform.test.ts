@@ -807,9 +807,109 @@ function setupTestEnvironment(testPlatform: ITestPlatform): void {
     }
 }
 
+function getSupportedPlatformForTest(
+    testPlatform: ITestPlatform,
+): platform.SupportedPlatform {
+    switch (testPlatform.platformDetails.operatingSystem) {
+        case platform.OperatingSystem.Windows:
+            return "windows-x64";
+        case platform.OperatingSystem.MacOS:
+            return "macos-x64";
+        case platform.OperatingSystem.Linux:
+            return "linux-x64";
+        default:
+            throw new Error("Unsupported test platform");
+    }
+}
+
+function getNonMatchingSupportedPlatformForTest(
+    supportedPlatform: platform.SupportedPlatform,
+): platform.SupportedPlatform {
+    switch (supportedPlatform) {
+        case "windows-x64":
+        case "windows-arm64":
+            return "linux-x64";
+        case "macos-x64":
+        case "macos-arm64":
+            return "windows-x64";
+        case "linux-x64":
+        case "linux-aarch64":
+            return "windows-x64";
+    }
+}
+
 describe("Platform module", function () {
     afterEach(function () {
         mockFS.restore();
+    });
+
+    it("Maps supported platforms from OS and architecture", function () {
+        assert.strictEqual(
+            platform.getSupportedPlatform(
+                {
+                    operatingSystem: platform.OperatingSystem.Windows,
+                    isOS64Bit: true,
+                    isProcess64Bit: true,
+                },
+                "x64",
+            ),
+            "windows-x64",
+        );
+        assert.strictEqual(
+            platform.getSupportedPlatform(
+                {
+                    operatingSystem: platform.OperatingSystem.Windows,
+                    isOS64Bit: true,
+                    isProcess64Bit: true,
+                },
+                "arm64",
+            ),
+            "windows-arm64",
+        );
+        assert.strictEqual(
+            platform.getSupportedPlatform(
+                {
+                    operatingSystem: platform.OperatingSystem.MacOS,
+                    isOS64Bit: true,
+                    isProcess64Bit: true,
+                },
+                "x64",
+            ),
+            "macos-x64",
+        );
+        assert.strictEqual(
+            platform.getSupportedPlatform(
+                {
+                    operatingSystem: platform.OperatingSystem.MacOS,
+                    isOS64Bit: true,
+                    isProcess64Bit: true,
+                },
+                "arm64",
+            ),
+            "macos-arm64",
+        );
+        assert.strictEqual(
+            platform.getSupportedPlatform(
+                {
+                    operatingSystem: platform.OperatingSystem.Linux,
+                    isOS64Bit: true,
+                    isProcess64Bit: true,
+                },
+                "x64",
+            ),
+            "linux-x64",
+        );
+        assert.strictEqual(
+            platform.getSupportedPlatform(
+                {
+                    operatingSystem: platform.OperatingSystem.Linux,
+                    isOS64Bit: true,
+                    isProcess64Bit: true,
+                },
+                "arm64",
+            ),
+            "linux-aarch64",
+        );
     });
 
     it("Gets the correct platform details", function () {
@@ -1047,7 +1147,7 @@ describe("Platform module", function () {
                 );
 
                 let i = 0;
-                for await (const additionalPwsh of powerShellExeFinder.enumerateAdditionalPowerShellInstallations()) {
+                for await (const additionalPwsh of powerShellExeFinder.enumerateAdditionalPowerShellExePaths()) {
                     const expectedPowerShell =
                         testPlatform.expectedPowerShellSequence[i];
                     i++;
@@ -1063,5 +1163,155 @@ describe("Platform module", function () {
                 }
             });
         }
+    });
+
+    describe("PowerShell executables from 'additionalPowerShellLocations' are found", function () {
+        for (const testPlatform of successAdditionalTestCases) {
+            it(`Finds and filters for ${testPlatform.name}`, async function () {
+                setupTestEnvironment(testPlatform);
+
+                const supportedPlatform =
+                    getSupportedPlatformForTest(testPlatform);
+                const nonMatchingPlatform =
+                    getNonMatchingSupportedPlatformForTest(supportedPlatform);
+                const additionalPowerShellLocations: platform.IAdditionalPowerShellLocation[] =
+                    testPlatform.expectedPowerShellSequence.map(
+                        (expectedPowerShell, index) => ({
+                            name: expectedPowerShell.displayName,
+                            path: expectedPowerShell.exePath,
+                            platform: supportedPlatform,
+                            weight:
+                                testPlatform.expectedPowerShellSequence.length -
+                                index,
+                        }),
+                    );
+
+                additionalPowerShellLocations.push({
+                    name: "Wrong Platform",
+                    path: "does-not-exist",
+                    platform: nonMatchingPlatform,
+                    weight: 100,
+                });
+
+                const powerShellExeFinder = new platform.PowerShellExeFinder(
+                    testPlatform.platformDetails,
+                    {},
+                    undefined,
+                    additionalPowerShellLocations,
+                    "x64",
+                );
+
+                let i = 0;
+                for await (const additionalPwsh of powerShellExeFinder.enumerateAdditionalPowerShellLocations()) {
+                    const expectedPowerShell =
+                        testPlatform.expectedPowerShellSequence[i];
+                    i++;
+
+                    assert.strictEqual(
+                        additionalPwsh.exePath,
+                        expectedPowerShell.exePath,
+                    );
+                    assert.strictEqual(
+                        additionalPwsh.displayName,
+                        expectedPowerShell.displayName,
+                    );
+                }
+
+                assert.strictEqual(
+                    i,
+                    testPlatform.expectedPowerShellSequence.length,
+                );
+            });
+
+            it(`Takes priority over legacy setting for ${testPlatform.name}`, async function () {
+                setupTestEnvironment(testPlatform);
+
+                const supportedPlatform =
+                    getSupportedPlatformForTest(testPlatform);
+                const expectedPowerShell =
+                    testPlatform.expectedPowerShellSequence[0];
+                const powerShellExeFinder = new platform.PowerShellExeFinder(
+                    testPlatform.platformDetails,
+                    {
+                        "Old PowerShell": "does-not-exist",
+                    },
+                    undefined,
+                    [
+                        {
+                            name: expectedPowerShell.displayName,
+                            path: expectedPowerShell.exePath,
+                            platform: supportedPlatform,
+                            weight: 10,
+                        },
+                    ],
+                    "x64",
+                );
+
+                const foundPowerShells =
+                    await powerShellExeFinder.getAllAvailablePowerShellInstallations();
+
+                assert.strictEqual(
+                    foundPowerShells.some(
+                        (powerShell) =>
+                            powerShell.displayName ===
+                            expectedPowerShell.displayName,
+                    ),
+                    true,
+                );
+                assert.strictEqual(
+                    foundPowerShells.some(
+                        (powerShell) =>
+                            powerShell.displayName === "Old PowerShell",
+                    ),
+                    false,
+                );
+            });
+        }
+
+        it("Sorts matching entries by descending weight", async function () {
+            const testPlatform = successAdditionalTestCases[0];
+            setupTestEnvironment(testPlatform);
+
+            const supportedPlatform = getSupportedPlatformForTest(testPlatform);
+            const lowWeightPowerShell =
+                testPlatform.expectedPowerShellSequence[0];
+            const highWeightPowerShell =
+                testPlatform.expectedPowerShellSequence[1];
+            const powerShellExeFinder = new platform.PowerShellExeFinder(
+                testPlatform.platformDetails,
+                {},
+                undefined,
+                [
+                    {
+                        name: lowWeightPowerShell.displayName,
+                        path: lowWeightPowerShell.exePath,
+                        platform: supportedPlatform,
+                        weight: 1,
+                    },
+                    {
+                        name: highWeightPowerShell.displayName,
+                        path: highWeightPowerShell.exePath,
+                        platform: supportedPlatform,
+                        weight: 10,
+                    },
+                ],
+                "x64",
+            );
+
+            const foundPowerShells =
+                await powerShellExeFinder.getAllAvailablePowerShellInstallations();
+            const highWeightIndex = foundPowerShells.findIndex(
+                (powerShell) =>
+                    powerShell.displayName === highWeightPowerShell.displayName,
+            );
+            const lowWeightIndex = foundPowerShells.findIndex(
+                (powerShell) =>
+                    powerShell.displayName === lowWeightPowerShell.displayName,
+            );
+
+            assert.strictEqual(highWeightIndex >= 0, true);
+            assert.strictEqual(lowWeightIndex >= 0, true);
+            assert.strictEqual(highWeightIndex < lowWeightIndex, true);
+        });
     });
 });
