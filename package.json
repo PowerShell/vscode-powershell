@@ -1039,6 +1039,11 @@
             "default": false,
             "markdownDescription": "Specifies to search for references only within open documents instead of all workspace files. An alternative to `#powershell.enableReferencesCodeLens#` that allows large workspaces to support some references without the performance impact."
           },
+          "powershell.enableParameterOutline": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Specifies whether parameters are displayed in the Outline view."
+          },
           "powershell.debugging.createTemporaryIntegratedConsole": {
             "type": "boolean",
             "default": false,
