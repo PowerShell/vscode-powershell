@@ -546,20 +546,6 @@
             }
           },
           {
-            "label": "PowerShell: Launch Current File w/Args Prompt",
-            "description": "Launch and debug the current file, prompting for command-line arguments",
-            "body": {
-              "name": "PowerShell Launch Current File w/Args Prompt",
-              "type": "PowerShell",
-              "request": "launch",
-              "script": "^\"\\${file}\"",
-              "args": [
-                "\\${command:SpecifyScriptArgs}"
-              ],
-              "cwd": "^\"\\${cwd}\""
-            }
-          },
-          {
             "label": "PowerShell: Launch Script",
             "description": "Launch and debug the specified file or command",
             "body": {
@@ -1052,6 +1038,11 @@
             "type": "boolean",
             "default": false,
             "markdownDescription": "Specifies to search for references only within open documents instead of all workspace files. An alternative to `#powershell.enableReferencesCodeLens#` that allows large workspaces to support some references without the performance impact."
+          },
+          "powershell.enableParameterOutline": {
+            "type": "boolean",
+            "default": false,
+            "markdownDescription": "Specifies whether parameters are displayed in the Outline view."
           },
           "powershell.debugging.createTemporaryIntegratedConsole": {
             "type": "boolean",
