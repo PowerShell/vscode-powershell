@@ -17,6 +17,9 @@ export default defineConfig({
         // main IPC socket path over the macOS 103-char AF_UNIX limit and fail
         // with EINVAL. See microsoft/vscode#196543.
         `--user-data-dir=${join(tmpdir(), "vscp")}`,
+        // Ubuntu's headless Xvfb runner has no usable GPU. Without this,
+        // Electron can leave the test process alive after the suite completes.
+        ...(process.platform === "linux" ? ["--disable-gpu"] : []),
     ],
     workspaceFolder: `test/${existsSync("C:\\powershell-7\\pwsh.exe") ? "OneBranch" : "TestEnvironment"}.code-workspace`,
     mocha: {
