@@ -15,6 +15,9 @@ jobs:
   ci:
     name: node
     strategy:
+      # Report every platform's result instead of cancelling the others as soon
+      # as one fails.
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
@@ -30,10 +33,51 @@ jobs:
           repository: PowerShell/PowerShellEditorServices
           path: PowerShellEditorServices
 
+      # TODO: Drop this once PowerShellEditorServices can restore again. Its
+      # nuget.config only lists an Azure DevOps feed whose package downloads
+      # return 401 (Unauthorized) to anonymous clients such as GitHub runners,
+      # so restoring the .NET reference packs fails before any tests run. Add
+      # nuget.org and map the reference packs to it (otherwise NuGet still
+      # downloads them from the feed that 401s).
+      - name: Add nuget.org for the PowerShellEditorServices reference packs
+        shell: pwsh
+        run: |
+          $config = @(
+            '<?xml version="1.0" encoding="utf-8"?>'
+            '<configuration>'
+            '  <packageSources>'
+            '    <clear />'
+            '    <add key="PowerShellCore_PublicPackages" value="https://pkgs.dev.azure.com/powershell/PowerShell/_packaging/powershell/nuget/v3/index.json" />'
+            '    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />'
+            '  </packageSources>'
+            '  <packageSourceMapping>'
+            '    <packageSource key="nuget.org">'
+            '      <package pattern="Microsoft.NETCore.App.*" />'
+            '      <package pattern="Microsoft.AspNetCore.App.*" />'
+            '      <package pattern="Microsoft.WindowsDesktop.App.*" />'
+            '    </packageSource>'
+            '    <packageSource key="PowerShellCore_PublicPackages">'
+            '      <package pattern="*" />'
+            '    </packageSource>'
+            '  </packageSourceMapping>'
+            '</configuration>'
+          )
+          Set-Content -Path PowerShellEditorServices/nuget.config -Value $config
+
       - name: Checkout vscode-powershell
         uses: actions/checkout@v7
         with:
           path: vscode-powershell
+
+      # TODO: Drop this once the PowerShell npm mirror has cached
+      # @vscode/test-electron 3.x. The mirror returns 401 for packages it has
+      # not cached (upstream access needs auth), and npm silently skips optional
+      # dependencies it cannot fetch, so `vscode-test` cannot resolve the newer
+      # package and the run dies before doing anything.
+      - name: Use npmjs instead of the PowerShell mirror
+        shell: pwsh
+        working-directory: vscode-powershell
+        run: (Get-Content .npmrc) -replace '^registry=.*', 'registry=https://registry.npmjs.org/' | Set-Content .npmrc
 
       - name: Validate snippets JSON file
         shell: pwsh
