@@ -69,6 +69,16 @@ jobs:
         with:
           path: vscode-powershell
 
+      # TODO: Drop this once the PowerShell npm mirror has cached
+      # @vscode/test-electron 3.x. The mirror returns 401 for packages it has
+      # not cached (upstream access needs auth), and npm silently skips optional
+      # dependencies it cannot fetch, so `vscode-test` cannot resolve the newer
+      # package and the run dies before doing anything.
+      - name: Use npmjs instead of the PowerShell mirror
+        shell: pwsh
+        working-directory: vscode-powershell
+        run: (Get-Content .npmrc) -replace '^registry=.*', 'registry=https://registry.npmjs.org/' | Set-Content .npmrc
+
       - name: Validate snippets JSON file
         shell: pwsh
         run: $null = ConvertFrom-Json -InputObject (Get-Content -Raw -Path './snippets/PowerShell.json')
