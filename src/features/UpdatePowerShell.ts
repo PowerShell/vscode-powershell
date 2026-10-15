@@ -8,6 +8,21 @@ import type { ILogger } from "../logging";
 import type { IPowerShellVersionDetails } from "../session";
 import { changeSetting } from "../settings";
 
+/** The WinGet package identifier for PowerShell. */
+const WINGET_PACKAGE = "Microsoft.PowerShell";
+
+/** The WinGet command that upgrades PowerShell. */
+const WINGET_UPGRADE = `winget update --id ${WINGET_PACKAGE} -e -s winget`;
+
+/** The GitHub repository that hosts the WinGet package manifests. */
+const WINGET_PKGS_REPO = "microsoft/winget-pkgs";
+
+/**
+ * The first PowerShell Core release. Anything older is Windows PowerShell,
+ * which is neither checked nor prompted for updates.
+ */
+export const FIRST_CORE_RELEASE = "6.0.0";
+
 async function fetchJSON<T>(url: string): Promise<T | undefined> {
     const response = await fetch(url);
     if (!response.ok) return undefined;
@@ -41,6 +56,15 @@ export function getLatestWinGetVersion(
         .sort((a, b) => new SemVer(b).compare(a))[0];
 }
 
+/**
+ * Whether the error means there is no `winget` executable to run. Every other
+ * failure (a source lookup, a network problem, and so on) leaves WinGet itself
+ * installed, it just did not answer.
+ */
+export function isWinGetMissing(error: unknown): boolean {
+    return (error as { code?: unknown } | undefined)?.code === "ENOENT";
+}
+
 /** What WinGet has for PowerShell on this machine, if anything. */
 export interface IWinGetStatus {
     /** Whether the `winget` CLI was found. */
@@ -72,18 +96,29 @@ export function buildUpdatePrompt(
     winget: IWinGetStatus,
 ): IUpdatePrompt {
     const releaseVersion = new SemVer(releaseTag);
+    // WinGet can report a version while missing (it is what it would install),
+    // so only use a version that comes from an installed WinGet.
+    const installedVersion =
+        winget.installed && winget.version
+            ? new SemVer(winget.version)
+            : undefined;
     const options: IUpdatePromptOption[] = [];
 
     // WinGet only exists on Windows, so don't offer it elsewhere.
     if (isWindows) {
-        options.push({
-            id: "winget",
-            title: winget.installed ? "Upgrade with WinGet" : "Install WinGet",
-        });
+        if (!winget.installed) {
+            options.push({ id: "winget", title: "Install WinGet" });
+        } else if (
+            installedVersion === undefined ||
+            installedVersion.compare(localVersion) > 0
+        ) {
+            // Only offer the upgrade when WinGet actually has something newer,
+            // otherwise `winget update` is a guaranteed no-op.
+            options.push({ id: "winget", title: "Upgrade with WinGet" });
+        }
         if (
-            winget.installed &&
-            winget.version &&
-            new SemVer(winget.version).compare(releaseVersion.version) < 0
+            installedVersion &&
+            installedVersion.compare(releaseVersion.version) < 0
         ) {
             options.push({
                 id: "winget-progress",
@@ -101,11 +136,10 @@ export function buildUpdatePrompt(
         `PowerShell v${localVersion} is out-of-date.\n` +
         `The latest version is v${releaseVersion.version}.`;
     // Note when WinGet is relevant but not (yet) useful.
-    if (winget.installed && winget.version) {
-        const wingetVersion = new SemVer(winget.version);
-        if (wingetVersion.compare(localVersion) <= 0) {
+    if (installedVersion) {
+        if (installedVersion.compare(localVersion) <= 0) {
             message += `\n(WinGet hasn't caught up yet — currently v${winget.version}.)`;
-        } else if (wingetVersion.compare(releaseVersion.version) < 0) {
+        } else if (installedVersion.compare(releaseVersion.version) < 0) {
             message += `\n(WinGet currently has v${winget.version}.)`;
         }
     } else if (isWindows) {
@@ -118,6 +152,20 @@ export function buildUpdatePrompt(
     return { message, options };
 }
 
+/** Open a terminal, show it, and run the given command. */
+function runInTerminal(
+    name: string,
+    command: string,
+    shellPath?: string,
+): void {
+    // Pin the shell only when asked, else use the user's default terminal.
+    const terminal = shellPath
+        ? vscode.window.createTerminal({ name, shellPath })
+        : vscode.window.createTerminal(name);
+    terminal.show();
+    terminal.sendText(command);
+}
+
 /** Await a value/promise, and if non-nullish, pass it to `fn`. */
 async function whenSome<T>(
     value: T | undefined | null | Promise<T | undefined | null>,
@@ -125,6 +173,25 @@ async function whenSome<T>(
 ): Promise<void> {
     const resolved = await value;
     if (resolved != null) await fn(resolved);
+}
+
+/** The highest-versioned WinGet package match seen so far, with its link. */
+interface IBestMatch {
+    version: SemVer;
+    url: string;
+}
+
+/** The given match, or `best` when it already refers to a higher version. */
+function keepHighestMatch(
+    best: IBestMatch | undefined,
+    version: string,
+    url: string,
+): IBestMatch {
+    const candidate = new SemVer(version);
+    if (best === undefined || candidate.compare(best.version) > 0) {
+        return { version: candidate, url };
+    }
+    return best;
 }
 
 // This attempts to mirror PowerShell's `UpdatesNotification.cs` logic as much as
@@ -164,7 +231,7 @@ export class UpdatePowerShell {
             );
 
         // Skip prompting when using Windows PowerShell for now.
-        if (this.localVersion.compare("6.0.0") === -1)
+        if (this.localVersion.compare(FIRST_CORE_RELEASE) === -1)
             // TODO: Maybe we should announce PowerShell Core?
             return this.skip("Not prompting to update Windows PowerShell.");
 
@@ -269,7 +336,7 @@ export class UpdatePowerShell {
                 const { stdout } = await promisify(execFile)("winget", [
                     "show",
                     "--id",
-                    "Microsoft.PowerShell",
+                    WINGET_PACKAGE,
                     "-s",
                     "winget",
                     "--accept-source-agreements",
@@ -278,24 +345,33 @@ export class UpdatePowerShell {
                 if (version !== undefined) {
                     winget = { installed: true, version };
                 }
-            } catch {
-                // WinGet may not be installed — fall back to the GitHub API to
-                // ask which version it would offer.
-                try {
-                    const entries = await fetchJSON<IWinGetManifestEntry[]>(
-                        "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/m/Microsoft/PowerShell?per_page=100",
-                    );
-                    const version = entries
-                        ? getLatestWinGetVersion(entries)
-                        : undefined;
-                    this.logger.writeDebug(
-                        `WinGet repo latest: ${version ?? "not found"}`,
-                    );
-                    if (version !== undefined) {
-                        winget = { installed: false, version };
+            } catch (error) {
+                if (isWinGetMissing(error)) {
+                    // WinGet is not installed — ask the winget-pkgs listing
+                    // which version it would offer.
+                    try {
+                        const entries = await fetchJSON<IWinGetManifestEntry[]>(
+                            `https://api.github.com/repos/${WINGET_PKGS_REPO}/contents/manifests/m/Microsoft/PowerShell?per_page=100`,
+                        );
+                        const version = entries
+                            ? getLatestWinGetVersion(entries)
+                            : undefined;
+                        this.logger.writeDebug(
+                            `WinGet repo latest: ${version ?? "not found"}`,
+                        );
+                        if (version !== undefined) {
+                            winget = { installed: false, version };
+                        }
+                    } catch {
+                        // Best effort.
                     }
-                } catch {
-                    // Best effort.
+                } else {
+                    // WinGet is installed, it just did not answer (a source or
+                    // network problem), so keep it and leave the version unknown.
+                    this.logger.writeDebug(
+                        `Could not get the WinGet version: ${error instanceof Error ? error.message : "unknown"}`,
+                    );
+                    winget = { installed: true };
                 }
             }
         }
@@ -324,21 +400,24 @@ export class UpdatePowerShell {
             case "winget":
                 if (winget.installed) {
                     this.logger.write("Upgrading PowerShell via WinGet...");
-                    vscode.window
-                        .createTerminal("PowerShell Upgrade (WinGet)")
-                        .sendText(
-                            "winget update --id Microsoft.PowerShell -e -s winget",
-                        );
+                    runInTerminal(
+                        "PowerShell Upgrade (WinGet)",
+                        WINGET_UPGRADE,
+                    );
                 } else {
                     // From: https://aka.ms/winget-docs
                     this.logger.write(
                         "Installing WinGet and upgrading PowerShell...",
                     );
-                    vscode.window
-                        .createTerminal("Install WinGet & Upgrade PowerShell")
-                        .sendText(
-                            "$result = Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe -ErrorAction SilentlyContinue; if ($?) { winget update --id Microsoft.PowerShell -e -s winget } else { Write-Warning 'Failed to install WinGet. See https://aka.ms/winget-docs' }",
-                        );
+                    // The command is PowerShell (Add-AppxPackage is a cmdlet),
+                    // so don't run it in whatever profile happens to be the
+                    // user's default terminal.
+                    runInTerminal(
+                        "Install WinGet & Upgrade PowerShell",
+                        "$result = Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe -ErrorAction SilentlyContinue; " +
+                            `if ($?) { ${WINGET_UPGRADE} } else { Write-Warning 'Failed to install WinGet. See https://aka.ms/winget-docs' }`,
+                        "powershell.exe",
+                    );
                 }
                 break;
             case "winget-progress": {
@@ -346,12 +425,11 @@ export class UpdatePowerShell {
                 // missing; find the open issue/PR mentioning the highest
                 // PowerShell version.
                 let statusUrl =
-                    "https://github.com/microsoft/winget-pkgs/pulls?q=Microsoft.PowerShell+is:open";
+                    `https://github.com/${WINGET_PKGS_REPO}` +
+                    `/pulls?q=${WINGET_PACKAGE}+is:open`;
                 try {
-                    let bestPR: string | undefined;
-                    let bestIssue: string | undefined;
-                    let bestPRVer: string | undefined;
-                    let bestIssueVer: string | undefined;
+                    let bestPR: IBestMatch | undefined;
+                    let bestIssue: IBestMatch | undefined;
                     for (const {
                         ver,
                         html_url,
@@ -366,7 +444,7 @@ export class UpdatePowerShell {
                                         pull_request?: unknown;
                                     }[];
                                 }>(
-                                    "https://api.github.com/search/issues?q=Microsoft.PowerShell+repo:microsoft/winget-pkgs+is:open&sort=created&order=desc&per_page=30",
+                                    `https://api.github.com/search/issues?q=${WINGET_PACKAGE}+repo:${WINGET_PKGS_REPO}+is:open&sort=created&order=desc&per_page=30`,
                                 )
                             )?.items ?? []
                         ).map(
@@ -404,35 +482,30 @@ export class UpdatePowerShell {
                     )) {
                         if (!ver) continue;
                         if (pull_request) {
-                            if (
-                                !bestPRVer ||
-                                new SemVer(ver).compare(bestPRVer) > 0
-                            ) {
-                                bestPRVer = ver;
-                                bestPR = html_url;
-                            }
-                        } else if (
-                            !bestIssueVer ||
-                            new SemVer(ver).compare(bestIssueVer) > 0
-                        ) {
-                            bestIssueVer = ver;
-                            bestIssue = html_url;
+                            bestPR = keepHighestMatch(bestPR, ver, html_url);
+                        } else {
+                            bestIssue = keepHighestMatch(
+                                bestIssue,
+                                ver,
+                                html_url,
+                            );
                         }
                     }
                     // Prefer issue when linked to the PR for the same version.
-                    const prVer = bestPRVer ? new SemVer(bestPRVer) : undefined;
-                    const issueVer = bestIssueVer
-                        ? new SemVer(bestIssueVer)
-                        : undefined;
-                    if (prVer && issueVer && prVer.compare(issueVer) === 0) {
-                        statusUrl = bestIssue!;
-                    } else if (
-                        prVer &&
-                        (!issueVer || prVer.compare(issueVer) > 0)
+                    if (
+                        bestPR &&
+                        bestIssue &&
+                        bestPR.version.compare(bestIssue.version) === 0
                     ) {
-                        statusUrl = bestPR!;
-                    } else if (issueVer) {
-                        statusUrl = bestIssue!;
+                        statusUrl = bestIssue.url;
+                    } else if (
+                        bestPR &&
+                        (!bestIssue ||
+                            bestPR.version.compare(bestIssue.version) > 0)
+                    ) {
+                        statusUrl = bestPR.url;
+                    } else if (bestIssue) {
+                        statusUrl = bestIssue.url;
                     }
                 } catch {
                     // Fall back to generic search.
