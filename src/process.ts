@@ -238,6 +238,10 @@ export class PowerShellProcess {
         this.consoleTerminal?.show(preserveFocus);
     }
 
+    public isTerminalActive(): boolean {
+        return this.consoleTerminal === vscode.window.activeTerminal;
+    }
+
     public dispose(): void {
         this.logger.writeDebug(
             `Disposing PowerShell process with PID: ${this.pid}`,

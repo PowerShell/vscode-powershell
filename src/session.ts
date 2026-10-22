@@ -347,6 +347,11 @@ export class SessionManager implements Middleware {
 
     private async restartSession(exeNameOverride?: string): Promise<void> {
         this.logger.write("Restarting session...");
+        const shouldRevealTerminalAfterRestart =
+            this.languageServerProcess?.isTerminalActive() === true &&
+            vscode.workspace
+                .getConfiguration("powershell.integratedConsole")
+                .get<boolean>("startInBackground") === true;
         await this.stop();
 
         if (exeNameOverride) {
@@ -361,6 +366,9 @@ export class SessionManager implements Middleware {
         }
 
         await this.start();
+        if (shouldRevealTerminalAfterRestart) {
+            this.languageServerProcess?.showTerminal(true);
+        }
     }
 
     /** In Development mode, write the PID to a file where the parent session can find it, to attach the dotnet debugger. */

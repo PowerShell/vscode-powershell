@@ -6,6 +6,7 @@ import * as assert from "assert";
 import Sinon from "sinon";
 import * as vscode from "vscode";
 import type { DocumentSelector } from "vscode-languageclient";
+import { PowerShellProcess } from "../../src/process";
 import {
     type IPowerShellVersionDetails,
     SessionManager,
@@ -197,6 +198,89 @@ describe("SessionManager.getVersionDetails", () => {
 
         const result = await getVersionDetails(manager);
         assert.strictEqual(result, details);
+    });
+});
+
+describe("SessionManager.restartSession", () => {
+    afterEach(() => {
+        Sinon.restore();
+    });
+
+    it("re-shows the terminal after restart when it was active in background mode", async () => {
+        const manager = makeManager();
+        const oldProcess = stubInterface<PowerShellProcess>({
+            isTerminalActive: () => true,
+        });
+        const showTerminal = Sinon.spy();
+        const newProcess = stubInterface<PowerShellProcess>({
+            showTerminal,
+        });
+        (
+            manager as unknown as { languageServerProcess: PowerShellProcess }
+        ).languageServerProcess = oldProcess;
+
+        Sinon.stub(vscode.workspace, "getConfiguration").returns(
+            stubInterface<vscode.WorkspaceConfiguration>({
+                get: <T>(_section: string): T => true as T,
+            }),
+        );
+        Sinon.stub(manager as unknown as { stop(): Promise<void> }, "stop")
+            .resolves();
+        Sinon.stub(manager as unknown as { start(): Promise<void> }, "start")
+            .callsFake(async () => {
+                (
+                    manager as unknown as {
+                        languageServerProcess: PowerShellProcess;
+                    }
+                ).languageServerProcess = newProcess;
+            });
+
+        await (
+            manager as unknown as {
+                restartSession(): Promise<void>;
+            }
+        ).restartSession();
+
+        assert.strictEqual(showTerminal.callCount, 1);
+        assert.deepStrictEqual(showTerminal.firstCall.args, [true]);
+    });
+
+    it("keeps the terminal hidden after restart when it was not active in background mode", async () => {
+        const manager = makeManager();
+        const oldProcess = stubInterface<PowerShellProcess>({
+            isTerminalActive: () => false,
+        });
+        const showTerminal = Sinon.spy();
+        const newProcess = stubInterface<PowerShellProcess>({
+            showTerminal,
+        });
+        (
+            manager as unknown as { languageServerProcess: PowerShellProcess }
+        ).languageServerProcess = oldProcess;
+
+        Sinon.stub(vscode.workspace, "getConfiguration").returns(
+            stubInterface<vscode.WorkspaceConfiguration>({
+                get: <T>(_section: string): T => true as T,
+            }),
+        );
+        Sinon.stub(manager as unknown as { stop(): Promise<void> }, "stop")
+            .resolves();
+        Sinon.stub(manager as unknown as { start(): Promise<void> }, "start")
+            .callsFake(async () => {
+                (
+                    manager as unknown as {
+                        languageServerProcess: PowerShellProcess;
+                    }
+                ).languageServerProcess = newProcess;
+            });
+
+        await (
+            manager as unknown as {
+                restartSession(): Promise<void>;
+            }
+        ).restartSession();
+
+        assert.strictEqual(showTerminal.callCount, 0);
     });
 });
 
