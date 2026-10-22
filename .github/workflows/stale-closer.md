@@ -34,13 +34,18 @@ safe-outputs:
     max: 10
 
 tools:
+  bash: false
+  cli-proxy: false
   github:
     toolsets: [issues, labels, search]
     min-integrity: none
 
 timeout-minutes: 30
 source: githubnext/agentics/workflows/stale-closer.md@2f03fdaafb8c1ae62dfde7e0be762a822a201aeb
-engine: copilot
+engine:
+  id: copilot
+  version: 1.0.96
+  copilot-sdk: true
 ---
 
 # Stale Issue Closer — Intelligent Triage

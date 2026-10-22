@@ -49,13 +49,18 @@ safe-outputs:
     max: 1
 
 tools:
+  bash: false
+  cli-proxy: false
   github:
     toolsets: [issues, labels]
     min-integrity: none
 
 timeout-minutes: 5
 source: githubnext/agentics/workflows/issue-comment-handler.md@2f03fdaafb8c1ae62dfde7e0be762a822a201aeb
-engine: copilot
+engine:
+  id: copilot
+  version: 1.0.96
+  copilot-sdk: true
 ---
 
 # Issue Comment Handler — Intelligent Response Processing

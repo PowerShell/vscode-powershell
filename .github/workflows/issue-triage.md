@@ -56,6 +56,8 @@ safe-outputs:
 
 tools:
   web-fetch:
+  bash: false
+  cli-proxy: false
   github:
     toolsets: [issues, labels]
     # This is a public repository, so triage must be able to see issues from
@@ -66,7 +68,10 @@ tools:
 
 timeout-minutes: 10
 source: githubnext/agentics/workflows/issue-triage.md@2f03fdaafb8c1ae62dfde7e0be762a822a201aeb
-engine: copilot
+engine:
+  id: copilot
+  version: 1.0.96
+  copilot-sdk: true
 ---
 
 # Agentic Issue Triage
