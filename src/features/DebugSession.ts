@@ -48,6 +48,7 @@ export const StopDebuggerNotificationType = new NotificationType<void>(
 
 export enum DebugConfig {
     LaunchCurrentFile,
+    LaunchCurrentFileWithArgsPrompt,
     LaunchScript,
     InteractiveSession,
     AttachHostProcess,
@@ -78,6 +79,13 @@ export const DebugConfigurations: Record<DebugConfig, DebugConfiguration> = {
         request: "launch",
         script: "${file}",
         args: [],
+    },
+    [DebugConfig.LaunchCurrentFileWithArgsPrompt]: {
+        name: "PowerShell: Launch Current File w/Args Prompt",
+        type: "PowerShell",
+        request: "launch",
+        script: "${file}",
+        args: ["${command:SpecifyScriptArgs}"],
     },
     [DebugConfig.LaunchScript]: {
         name: "PowerShell: Launch Script",
@@ -240,6 +248,12 @@ export class DebugSessionFeature
                 label: "Launch Current File",
                 description:
                     "Launch and debug the file in the currently active editor window",
+            },
+            {
+                id: DebugConfig.LaunchCurrentFileWithArgsPrompt,
+                label: "Launch Current File w/Args Prompt",
+                description:
+                    "Launch and debug the current file, prompting for command-line arguments",
             },
             {
                 id: DebugConfig.LaunchScript,
