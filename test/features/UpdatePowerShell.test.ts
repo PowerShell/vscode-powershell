@@ -3,6 +3,7 @@
 
 import assert from "assert";
 import * as vscode from "vscode";
+import Sinon from "sinon";
 import { UpdatePowerShell } from "../../src/features/UpdatePowerShell";
 import type { IPowerShellVersionDetails } from "../../src/session";
 import { changeSetting } from "../../src/settings";
@@ -114,36 +115,53 @@ describe("UpdatePowerShell feature", function () {
     });
 
     describe("Which version it gets", function () {
-        it("Would update to LTS", async function () {
-            process.env.POWERSHELL_UPDATECHECK = "LTS";
-            const version: IPowerShellVersionDetails = {
-                version: "7.2.0",
-                edition: "Core",
-                commit: "7.2.0",
-                architecture: "X64",
-            };
-            const updater = new UpdatePowerShell(testLogger, version);
-            // @ts-expect-error method is private.
-            const tag: string = (await updater.maybeGetNewRelease()) ?? "";
-            // NOTE: This will need to be updated each time an LTS is released.
-            // Also sometimes the prior LTS is more recently updated than the latest LTS.
-            assert(tag.startsWith("v7.4"));
-        });
-
-        it("Would update to stable", async function () {
-            const version: IPowerShellVersionDetails = {
-                version: "7.3.0",
-                edition: "Core",
-                commit: "7.3.0",
-                architecture: "X64",
-            };
-            const updater = new UpdatePowerShell(testLogger, version);
-            // @ts-expect-error method is private.
-            const tag: string | undefined = await updater.maybeGetNewRelease();
-            // NOTE: This will need to be updated each new major stable.
-            // TODO: Upstream bug causes LTS releases to update the stable info.
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-            assert(tag?.startsWith("v7.6") || tag?.startsWith("v7.4"));
-        });
+        for (const [channel, tag] of [
+            ["latest", "v7.8.0"],
+            ["preview", "v7.9.0-preview.1"],
+            ["lts", "v7.4.0"],
+        ] as const) {
+            it(`Would update to ${channel}`, async function () {
+                await changeSetting(
+                    "updateChannel",
+                    channel,
+                    vscode.ConfigurationTarget.Workspace,
+                    undefined,
+                );
+                const fetchStub = Sinon.stub(globalThis, "fetch").resolves({
+                    ok: true,
+                    json: async () => ({
+                        StableReleaseTag: "v7.8.0",
+                        PreviewReleaseTag: "v7.9.0-preview.1",
+                        LTSReleaseTag: "v7.4.0",
+                    }),
+                } as Response);
+                try {
+                    const version: IPowerShellVersionDetails = {
+                        version: "7.3.0",
+                        edition: "Core",
+                        commit: "7.3.0",
+                        architecture: "X64",
+                    };
+                    const updater = new UpdatePowerShell(testLogger, version);
+                    // @ts-expect-error method is private.
+                    const foundTag: string | undefined =
+                        await updater.maybeGetNewRelease();
+                    assert.strictEqual(foundTag, tag);
+                    assert(
+                        fetchStub.calledOnceWith(
+                            "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/heads/master/tools/metadata.json",
+                        ),
+                    );
+                } finally {
+                    fetchStub.restore();
+                    await changeSetting(
+                        "updateChannel",
+                        undefined,
+                        vscode.ConfigurationTarget.Workspace,
+                        undefined,
+                    );
+                }
+            });
+        }
     });
 });
