@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import assert from "assert";
-import * as vscode from "vscode";
 import Sinon from "sinon";
+import * as vscode from "vscode";
 import { UpdatePowerShell } from "../../src/features/UpdatePowerShell";
 import type { IPowerShellVersionDetails } from "../../src/session";
 import { changeSetting } from "../../src/settings";
