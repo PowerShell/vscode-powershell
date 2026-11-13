@@ -857,6 +857,21 @@
             "default": true,
             "markdownDescription": "Specifies whether you may be prompted to update your version of PowerShell."
           },
+          "powershell.updateChannel": {
+            "type": "string",
+            "default": "latest",
+            "enum": [
+              "latest",
+              "preview",
+              "lts"
+            ],
+            "enumDescriptions": [
+              "Checks for stable releases.",
+              "Checks for preview releases.",
+              "Checks for long-term servicing releases."
+            ],
+            "markdownDescription": "Specifies which PowerShell release channel to check for updates."
+          },
           "powershell.promptToUpdatePackageManagement": {
             "type": "boolean",
             "default": false,

@@ -12,14 +12,20 @@ interface IUpdateMessageItem extends vscode.MessageItem {
     id: number;
 }
 
+type UpdateChannel = "latest" | "preview" | "lts";
+
+interface IPowerShellReleaseMetadata {
+    StableReleaseTag?: string;
+    PreviewReleaseTag?: string;
+    LTSReleaseTag?: string;
+}
+
 // This attempts to mirror PowerShell's `UpdatesNotification.cs` logic as much as
 // possibly, documented at:
 // https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_update_notifications
 export class UpdatePowerShell {
-    private static LTSBuildInfoURL = "https://aka.ms/pwsh-buildinfo-lts";
-    private static StableBuildInfoURL = "https://aka.ms/pwsh-buildinfo-stable";
-    private static PreviewBuildInfoURL =
-        "https://aka.ms/pwsh-buildinfo-preview";
+    private static ReleaseMetadataURL =
+        "https://raw.githubusercontent.com/PowerShell/PowerShell/refs/heads/master/tools/metadata.json";
     private static GitHubWebReleaseURL =
         "https://github.com/PowerShell/PowerShell/releases/tag/";
     private static promptOptions: IUpdateMessageItem[] = [
@@ -106,22 +112,22 @@ export class UpdatePowerShell {
         return true;
     }
 
-    private async getRemoteVersion(url: string): Promise<string | undefined> {
-        const response = await fetch(url);
+    private async getRemoteVersion(
+        channel: UpdateChannel,
+    ): Promise<string | undefined> {
+        const response = await fetch(UpdatePowerShell.ReleaseMetadataURL);
         if (!response.ok) {
             return undefined;
         }
-        // Looks like:
-        // {
-        //     "ReleaseDate": "2022-10-20T22:01:38Z",
-        //     "BlobName": "v7-2-7",
-        //     "ReleaseTag": "v7.2.7"
-        // }
-        const data = await response.json();
+        const data = (await response.json()) as IPowerShellReleaseMetadata;
         this.logger.writeDebug(
-            `Received from '${url}':\n${JSON.stringify(data, undefined, 2)}`,
+            `Received from '${UpdatePowerShell.ReleaseMetadataURL}':\n${JSON.stringify(data, undefined, 2)}`,
         );
-        return data.ReleaseTag;
+        return {
+            latest: data.StableReleaseTag,
+            preview: data.PreviewReleaseTag,
+            lts: data.LTSReleaseTag,
+        }[channel];
     }
 
     private async maybeGetNewRelease(): Promise<string | undefined> {
@@ -130,42 +136,18 @@ export class UpdatePowerShell {
         }
 
         this.logger.writeDebug("Checking for PowerShell update...");
-        const tags: string[] = [];
-        if (process.env.POWERSHELL_UPDATECHECK?.toLowerCase() === "lts") {
-            // Only check for update to LTS.
-            this.logger.writeDebug("Checking for LTS update...");
-            const tag = await this.getRemoteVersion(
-                UpdatePowerShell.LTSBuildInfoURL,
-            );
-            if (tag != undefined) {
-                tags.push(tag);
-            }
-        } else {
-            // Check for update to stable.
-            this.logger.writeDebug("Checking for stable update...");
-            const tag = await this.getRemoteVersion(
-                UpdatePowerShell.StableBuildInfoURL,
-            );
-            if (tag != undefined) {
-                tags.push(tag);
-            }
-
-            // Also check for a preview update.
-            if (this.localVersion.prerelease.length > 0) {
-                this.logger.writeDebug("Checking for preview update...");
-                const tag = await this.getRemoteVersion(
-                    UpdatePowerShell.PreviewBuildInfoURL,
-                );
-                if (tag != undefined) {
-                    tags.push(tag);
-                }
-            }
-        }
-
-        for (const tag of tags) {
-            if (this.localVersion.compare(tag) === -1) {
-                return tag;
-            }
+        const updateChannel =
+            process.env.POWERSHELL_UPDATECHECK?.toLowerCase() === "lts"
+                ? "lts"
+                : vscode.workspace
+                      .getConfiguration("powershell")
+                      .get<UpdateChannel>("updateChannel", "latest");
+        this.logger.writeDebug(
+            `Checking for ${updateChannel} PowerShell update...`,
+        );
+        const tag = await this.getRemoteVersion(updateChannel);
+        if (tag && this.localVersion.compare(tag) === -1) {
+            return tag;
         }
 
         this.logger.write("PowerShell is up-to-date.");
